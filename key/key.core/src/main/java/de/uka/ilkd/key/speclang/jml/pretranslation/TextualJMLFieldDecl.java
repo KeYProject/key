@@ -13,19 +13,18 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
  * A JML field declaration (ghost or model) in textual form.
  */
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     
-    private final PositionedString decl;
+    private final JmlParser.Field_declarationContext decl;
     
     
-    public TextualJMLFieldDecl(ImmutableList<String> mods, PositionedString decl) {
+    public TextualJMLFieldDecl(ImmutableList<String> mods, JmlParser.Field_declarationContext decl) {
         super(mods);
         assert decl != null;
         this.decl = decl;
@@ -33,7 +32,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     }
     
     
-    public PositionedString getDecl() {
+    public JmlParser.Field_declarationContext getDecl() {
         return decl;
     }
     

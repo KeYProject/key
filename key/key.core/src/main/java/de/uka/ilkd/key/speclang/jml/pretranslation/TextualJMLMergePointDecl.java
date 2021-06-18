@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.speclang.PositionedString;
+import java.util.Objects;
 
 /**
  * A JML merge point declaration in textual form.
@@ -25,60 +27,38 @@ import de.uka.ilkd.key.speclang.PositionedString;
  * @author Dominic Scheurer
  */
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
+    private final @Nonnull JmlParser.Merge_point_statementContext mergeProc;
 
-    private final PositionedString mergeProc;
-    private final PositionedString mergeParams;
-
-    public TextualJMLMergePointDecl(ImmutableList<String> mods) {
+    public TextualJMLMergePointDecl(@Nonnull ImmutableList<String> mods,
+                                    @Nonnull JmlParser.Merge_point_statementContext mergeProc) {
         super(mods);
-        mergeProc = null;
-        mergeParams = null;
-    }
-
-    public TextualJMLMergePointDecl(ImmutableList<String> mods,
-            PositionedString mergeProc) {
-        super(mods);
-        assert mergeProc != null;
         this.mergeProc = mergeProc;
-        mergeParams = null;
         setPosition(mergeProc);
     }
 
-    public TextualJMLMergePointDecl(ImmutableList<String> mods,
-            PositionedString mergeProc, PositionedString mergeParams) {
-        super(mods);
-        assert mergeProc != null;
-        assert mergeParams != null;
-        this.mergeProc = mergeProc;
-        this.mergeParams = mergeParams;
-        setPosition(mergeProc);
-    }
-
-
-    public PositionedString getMergeParams() {
-        return mergeParams;
-    }
-
-    public PositionedString getMergeProc() {
+    public @Nonnull JmlParser.Merge_point_statementContext getMergeProc() {
         return mergeProc;
     }
 
     @Override
     public String toString() {
-        return mergeProc.toString();
+        return "TextualJMLMergePointDecl{" +
+                "mergeProc=" + mergeProc.getText() +
+                ", mods=" + mods +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLMergePointDecl)) {
-            return false;
-        }
-        TextualJMLMergePointDecl fd = (TextualJMLMergePointDecl) o;
-        return mods.equals(fd.mods) && mergeProc.equals(fd.mergeProc);
+        if (this == o) return true;
+        if (!(o instanceof TextualJMLMergePointDecl)) return false;
+        TextualJMLMergePointDecl that = (TextualJMLMergePointDecl) o;
+        return getMergeProc().equals(that.getMergeProc());
     }
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + mergeProc.hashCode();
+        return Objects.hash(getMergeProc());
     }
 }

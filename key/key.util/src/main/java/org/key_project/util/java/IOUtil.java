@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
@@ -9,35 +9,24 @@
  *
  * Contributors:
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
+ */
 
 package org.key_project.util.java;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -56,7 +45,7 @@ public final class IOUtil {
     /**
      * The default charset to use. The value is independent from the current operating system.
      */
-    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+    public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Forbid instances by this private constructor.
@@ -95,7 +84,7 @@ public final class IOUtil {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
-            int read = 0;
+            int read;
             while ((read = in.read(buffer)) > 0) {
                 digest.update(buffer, 0, read);
             }
@@ -150,7 +139,7 @@ public final class IOUtil {
     /**
      * Returns the file name without file extension for the given file name with extension.
      *
-     * @param file The file name with extension for that the file name without extension is needed.
+     * @param fileName The file name with extension for that the file name without extension is needed.
      * @return The file name without extension or {@code null} if it was not possible to compute it.
      */
     public static String getFileNameWithoutExtension(String fileName) {
@@ -188,7 +177,7 @@ public final class IOUtil {
     /**
      * Reads the complete content from the {@link URL}.
      *
-     * @param file The {@link URL} to read from.
+     * @param url The {@link URL} to read from.
      * @return The read content or {@code null} if the {@link URL} is {@code null}.
      * @throws IOException Occurred Exception.
      */
@@ -223,27 +212,18 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static String readFrom(InputStream in) throws IOException {
-        InputStreamReader reader = null;
-        try {
-            if (in != null) {
-                reader = new InputStreamReader(in);
-                StringBuffer sb = new StringBuffer();
-                char[] buffer = new char[BUFFER_SIZE];
-                int read;
-                while ((read = reader.read(buffer)) >= 1) {
-                    sb.append(buffer, 0, read);
-                }
-                return sb.toString();
-            } else {
-                return null;
+        if (in == null) {
+            return null;
+        }
+
+        try (InputStreamReader reader = new InputStreamReader(in)) {
+            StringBuilder sb = new StringBuilder();
+            char[] buffer = new char[BUFFER_SIZE];
+            int read;
+            while ((read = reader.read(buffer)) >= 1) {
+                sb.append(buffer, 0, read);
             }
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-            if (in != null) {
-                in.close();
-            }
+            return sb.toString();
         }
     }
 
@@ -281,21 +261,12 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static void writeTo(OutputStream out, String content, String encoding) throws IOException {
-        PrintStream printStream = null;
-        try {
-            if (out != null && content != null) {
-                printStream = encoding != null ?
-                        new PrintStream(out, false, encoding) :
-                        new PrintStream(out);
-                printStream.print(content);
-            }
-        } finally {
-            if (out != null) {
-                out.close();
-            }
-            if (printStream != null) {
-                printStream.close();
-            }
+        if (out == null || content == null) return;
+
+        try (PrintStream printStream = encoding != null ?
+                new PrintStream(out, false, encoding) :
+                new PrintStream(out)) {
+            printStream.print(content);
         }
     }
 
@@ -357,83 +328,84 @@ public final class IOUtil {
      * </code></pre>
      * </p>
      *
-     * @param file The given {@link File}.
+     * @param in The given {@link File}.
      * @return The computed start indices.
      * @throws IOException Occurred Exception.
      */
     public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
-        InputStreamReader reader = null;
-        try {
-            List<LineInformation> result = new LinkedList<LineInformation>();
-            if (in != null) {
-                reader = new InputStreamReader(in);
-                char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
-                int read; // The number of read signs
-                int startIndex = 0; // The accumulated start index over all read buffers
-                int lastSignWasRBreakIndex = -1; // If this is a positive index it indicates that the last buffer ends with '\r' which must now be handled. The absolute result index is stored in this variable
-                int lastIndex = 0; // The index to add to the result when the next line break sing '\r' or '\n' is read
-                List<Integer> tabIndices = new LinkedList<Integer>();
-                // Iterate over the whole content of the given stream
-                while ((read = reader.read(buffer)) >= 1) {
-                    for (int i = 0; i < read; i++) {
-                        if ('\n' == buffer[i]) {
-                            // Check for possible line breaks with "\r\n"
-                            if (lastSignWasRBreakIndex >= 0) {
-                                // Handle line break with "\r\n"
-                                result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
-                                lastSignWasRBreakIndex = -1;
-                                tabIndices.clear();
-                            } else {
-                                // Handle normal line breaks with '\n'
-                                result.add(new LineInformation(lastIndex, tabIndices));
-                                tabIndices.clear();
-                            }
-                            lastIndex = startIndex + i + 1;
-                        } else if ('\r' == buffer[i]) {
-                            // Handle double line break with "\r\r" normally if required
-                            if (lastSignWasRBreakIndex >= 0) {
-                                result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
-                                lastSignWasRBreakIndex = -1;
-                                tabIndices.clear();
-                            }
-                            // Check for possible line breaks with "\r\n"
-                            if (i < buffer.length - 1) {
-                                if ('\n' != buffer[i + 1]) {
-                                    // Handle normal line breaks with '\r'
-                                    result.add(new LineInformation(lastIndex, tabIndices));
-                                    lastIndex = startIndex + i + 1;
-                                    tabIndices.clear();
-                                }
-                            } else {
-                                // Can't check for line break with "\r\n", do check after reading next content
-                                lastSignWasRBreakIndex = lastIndex;
-                                lastIndex = startIndex + i + 1;
-                            }
-                        } else if ('\t' == buffer[i]) {
-                            tabIndices.add(Integer.valueOf(i - lastIndex));
+        if (in == null) return new LineInformation[0];
+
+        try (InputStreamReader reader = new InputStreamReader(in)) {
+            List<LineInformation> result = new LinkedList<>();
+            char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
+
+            // The number of read signs
+            int read;
+
+            // The accumulated start index over all read buffers
+            int startIndex = 0;
+
+            // If this is a positive index it indicates that the last buffer ends with '\r'
+            // which must now be handled. The absolute result index is stored in this variable
+            int lastSignWasRBreakIndex = -1;
+
+            // The index to add to the result when the next line break sing '\r' or '\n' is read
+            int lastIndex = 0;
+
+            List<Integer> tabIndices = new LinkedList<>();
+            // Iterate over the whole content of the given stream
+            while ((read = reader.read(buffer)) >= 1) {
+                for (int i = 0; i < read; i++) {
+                    if ('\n' == buffer[i]) {
+                        // Check for possible line breaks with "\r\n"
+                        if (lastSignWasRBreakIndex >= 0) {
+                            // Handle line break with "\r\n"
+                            result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
+                            lastSignWasRBreakIndex = -1;
+                            tabIndices.clear();
+                        } else {
+                            // Handle normal line breaks with '\n'
+                            result.add(new LineInformation(lastIndex, tabIndices));
+                            tabIndices.clear();
                         }
+                        lastIndex = startIndex + i + 1;
+                    } else if ('\r' == buffer[i]) {
+                        // Handle double line break with "\r\r" normally if required
+                        if (lastSignWasRBreakIndex >= 0) {
+                            result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
+                            lastSignWasRBreakIndex = -1;
+                            tabIndices.clear();
+                        }
+                        // Check for possible line breaks with "\r\n"
+                        if (i < buffer.length - 1) {
+                            if ('\n' != buffer[i + 1]) {
+                                // Handle normal line breaks with '\r'
+                                result.add(new LineInformation(lastIndex, tabIndices));
+                                lastIndex = startIndex + i + 1;
+                                tabIndices.clear();
+                            }
+                        } else {
+                            // Can't check for line break with "\r\n", do check after reading next content
+                            lastSignWasRBreakIndex = lastIndex;
+                            lastIndex = startIndex + i + 1;
+                        }
+                    } else if ('\t' == buffer[i]) {
+                        tabIndices.add(i - lastIndex);
                     }
-                    startIndex += read;
                 }
-                // Handle last read '\r' sign if no more content was read
-                if (lastSignWasRBreakIndex >= 0) {
-                    result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
-                    tabIndices.clear();
-                }
-                // Handle last read '\r' or '\n' sign if no more content was read
-                if (lastIndex >= 0) {
-                    result.add(new LineInformation(lastIndex, tabIndices));
-                    tabIndices.clear();
-                }
+                startIndex += read;
             }
-            return result.toArray(new LineInformation[result.size()]);
-        } finally {
-            if (reader != null) {
-                reader.close();
+            // Handle last read '\r' sign if no more content was read
+            if (lastSignWasRBreakIndex >= 0) {
+                result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
+                tabIndices.clear();
             }
-            if (in != null) {
-                in.close();
+            // Handle last read '\r' or '\n' sign if no more content was read
+            if (lastIndex >= 0) {
+                result.add(new LineInformation(lastIndex, tabIndices));
+                tabIndices.clear();
             }
+            return result.toArray(new LineInformation[0]);
         }
     }
 
@@ -447,12 +419,12 @@ public final class IOUtil {
         /**
          * The offset of the line from beginning of the file.
          */
-        private int offset;
+        private final int offset;
 
         /**
          * The indices of all tabs in the line.
          */
-        private int[] tabIndices;
+        private final int[] tabIndices;
 
         /**
          * Constructor.
@@ -467,7 +439,7 @@ public final class IOUtil {
                 int i = 0;
                 for (Integer index : tabIndices) {
                     assert index != null;
-                    this.tabIndices[i] = index.intValue();
+                    this.tabIndices[i] = index;
                     i++;
                 }
             } else {
@@ -533,7 +505,8 @@ public final class IOUtil {
          * </pre>
          * </p>
          *
-         * @param column   The column where tabs represents multiple characters. If the column is negative this value is returned.
+         * @param column   The column where tabs represents multiple characters.
+         *                 If the column is negative this value is returned.
          * @param tabWidth The tab width which must be greater as {@code 1}, otherwise the column index is returned.
          * @return The normalized column where tabs represents only one character.
          */
@@ -550,7 +523,8 @@ public final class IOUtil {
                     }
                 }
                 if (i - 1 >= 0 && i - 1 < tabIndices.length) {
-                    if (column - (i - 1) * (tabWidth - 1) >= tabIndices[i - 1] && column - (i - 1) * (tabWidth - 1) < tabIndices[i - 1] + tabWidth - 1) {
+                    if (column - (i - 1) * (tabWidth - 1) >= tabIndices[i - 1]
+                            && column - (i - 1) * (tabWidth - 1) < tabIndices[i - 1] + tabWidth - 1) {
                         result += column - (i - 1) * (tabWidth - 1) - tabIndices[i - 1];
                     }
                 }
@@ -564,8 +538,10 @@ public final class IOUtil {
     /**
      * Creates a temporary directory with help of {@link File#createTempFile(String, String)}.
      *
-     * @param prefix The prefix string to be used in generating the file's name; must be at least three characters long.
-     * @param suffix The suffix string to be used in generating the file's name; may be null, in which case the suffix ".tmp" will be used.
+     * @param prefix The prefix string to be used in generating the file's name;
+     *               must be at least three characters long.
+     * @param suffix The suffix string to be used in generating the file's name; may be null,
+     *               in which case the suffix ".tmp" will be used.
      * @return Created temporary directory.
      * @throws IOException Occurred Exception.
      */
@@ -661,7 +637,8 @@ public final class IOUtil {
      *
      * @param parents The parent {@link File}.
      * @param child   The child {@link File} to check for containment in parents.
-     * @return {@code true} child is contained (recursive) in at least one parent, {@code false} child is not contained in any parent.
+     * @return {@code true} child is contained (recursive) in at least one parent,
+     * {@code false} child is not contained in any parent.
      */
     public static boolean contains(Iterable<File> parents, File child) {
         boolean contains = false;
@@ -735,12 +712,12 @@ public final class IOUtil {
         return file != null && file.exists();
     }
 
-    public static final URL getClassLocationURL(Class<?> classInstance) {
+    public static URL getClassLocationURL(Class<?> classInstance) {
         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
         return cs != null ? cs.getLocation() : null;
     }
 
-    public static final File getClassLocation(Class<?> classInstance) {
+    public static File getClassLocation(Class<?> classInstance) {
         if (classInstance != null) {
             return toFile(getClassLocationURL(classInstance));
         } else {
@@ -748,7 +725,7 @@ public final class IOUtil {
         }
     }
 
-    public static final File getProjectRoot(Class<?> classInstance) {
+    public static File getProjectRoot(Class<?> classInstance) {
         File file = getClassLocation(classInstance);
         return file != null ? file.getParentFile() : null;
     }
@@ -812,7 +789,7 @@ public final class IOUtil {
      * that it is a valid file/folder name. Each invalid sign will be replaced
      * by {@code '_'}.
      *
-     * @param segment The segment to validate.
+     * @param name The segment to validate.
      * @return The validated OS independent path segment in which each invalid sign is replaced.
      */
     public static String validateOSIndependentFileName(String name) {
@@ -830,37 +807,38 @@ public final class IOUtil {
                 }
             }
             return new String(content);
-      }
-      else {
-         return name;
-      }
-   }
-
-   /**
-    * Extracts a ZIP archive to the given target directory.
-    * @param archive the ZIP archive to extract
-    * @param targetDir the directory the extracted files will be located in
-    * @throws ZipException if a ZIP format error occurs
-    * @throws IOException if an I/O error occurs
-    */
-   public static void extractZip(Path archive, Path targetDir) throws ZipException, IOException {
-       if (archive != null && targetDir != null) {
-           ZipFile zipFile = new ZipFile(archive.toFile());
-           Enumeration<? extends ZipEntry> entries = zipFile.entries();
-           while (entries.hasMoreElements()) {
-               ZipEntry entry = entries.nextElement();
-               if (entry.isDirectory()) {
-                   /* we use createDirectories instead of createDirectory in case the parent
-                    * directory does not exist */
-                   Files.createDirectories(targetDir.resolve(entry.getName()));
         } else {
-                   // create nonexistent parent directories and then extract the file
-                   Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
-                   Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
-               }
-           }
-           zipFile.close();
+            return name;
         }
     }
 
+    /**
+     * Extracts a ZIP archive to the given target directory.
+     *
+     * @param archive   the ZIP archive to extract
+     * @param targetDir the directory the extracted files will be located in
+     * @throws ZipException if a ZIP format error occurs
+     * @throws IOException  if an I/O error occurs
+     */
+    public static void extractZip(Path archive, Path targetDir) throws IOException {
+        if (archive == null || targetDir == null) {
+            return;
+        }
+
+        try (ZipFile zipFile = new ZipFile(archive.toFile())) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    /* we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist */
+                    Files.createDirectories(targetDir.resolve(entry.getName()));
+                } else {
+                    // create nonexistent parent directories and then extract the file
+                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
+                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
+                }
+            }
+        }
+    }
 }

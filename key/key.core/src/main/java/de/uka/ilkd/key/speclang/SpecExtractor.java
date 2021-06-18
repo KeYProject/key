@@ -125,5 +125,5 @@ public interface SpecExtractor {
      * this may warn about unsupported features which have been ignored by the
      * translation)
      */
-    public ImmutableSet<PositionedString> getWarnings();
+    public ImmutableList<PositionedString> getWarnings();
 }

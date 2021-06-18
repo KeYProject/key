@@ -13,27 +13,13 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
@@ -41,6 +27,15 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 /**
  * A class axiom corresponding to a JML* represents clause.
@@ -61,27 +56,27 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<ProgramVariable> originalParamVars;
 
     public RepresentsAxiom(String name,
-            IObserverFunction target,
-            KeYJavaType kjt,
-            VisibilityModifier visibility,
-            Term pre,
-            Term rep,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ProgramVariable> atPreVars) {
+                           IObserverFunction target,
+                           KeYJavaType kjt,
+                           VisibilityModifier visibility,
+                           Term pre,
+                           Term rep,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars,
+                           Map<LocationVariable, ProgramVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
     public RepresentsAxiom(String name,
-            String displayName,
-            IObserverFunction target,
-            KeYJavaType kjt,
-            VisibilityModifier visibility,
-            Term pre,
-            Term rep,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ProgramVariable> atPreVars) {
+                           String displayName,
+                           IObserverFunction target,
+                           KeYJavaType kjt,
+                           VisibilityModifier visibility,
+                           Term pre,
+                           Term rep,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars,
+                           Map<LocationVariable, ProgramVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
         assert target != null;
@@ -134,18 +129,18 @@ public final class RepresentsAxiom extends ClassAxiom {
         return originalRep.op() instanceof Equality
                 && originalRep.sub(0).op() == target
                 && (target.isStatic()
-                        || originalRep.sub(0)
-                                .sub(target.getStateCount() * target.getHeapCount(services))
-                                .op().equals(originalSelfVar));
+                || originalRep.sub(0)
+                .sub(target.getStateCount() * target.getHeapCount(services))
+                .op().equals(originalSelfVar));
     }
 
     public Term getAxiom(ParsableVariable heapVar,
-            ParsableVariable selfVar,
-            Services services) {
+                         ParsableVariable selfVar,
+                         Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, ParsableVariable> map
-            = new LinkedHashMap<ProgramVariable, ParsableVariable>();
+                = new LinkedHashMap<ProgramVariable, ParsableVariable>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
@@ -200,11 +195,12 @@ public final class RepresentsAxiom extends ClassAxiom {
                     originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
-            if (originalPre != null) {
-                assert false :
-                    "Only functional represents for model methods is currently supported,"
-                    + "this should not have occured.";
-            }
+           if (originalPre != null) {
+               //FIXME weigl: this was a runtime exception, I am not sure why.
+               //             I need a little bit help, why this is triggerd for my JML thing.
+               throw new IllegalStateException("Only functional represents for model methods is currently supported,"
+                       + "this should not have occured.");
+           }
             Taclet tacletWithShowSatisfiability = tg.generateRelationalRepresentsTaclet(tacletName,
                     originalRep,
                     kjt,

@@ -13,21 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -35,18 +21,9 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -56,11 +33,15 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
@@ -285,9 +266,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * Computes the Term that can be evaluated, from the user given condition
     * @param condition the condition given by the user
     * @return the {@link Term} that represents the condition
-    * @throws SLTranslationException if the Term could not be parsed
     */
-   private Term computeTermForCondition(String condition) throws SLTranslationException {
+   private Term computeTermForCondition(String condition) {
       if(condition==null){
          return getProof().getServices().getTermBuilder().tt();
       }
@@ -327,17 +307,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       this.setVarsForCondition(varsForCondition);
       //parse string
       PositionedString ps = new PositionedString(condition);
-      KeYJMLParser parser = new KeYJMLParser(ps, 
-                                             getProof().getServices(), 
-                                             containerType, 
-                                             getSelfVar(), 
-                                             varsForCondition, 
-                                             null, 
-                                             null, 
-                                             null);
-      
-         return parser.parseExpression();
-      
+
+      JmlIO io = new JmlIO()
+              .services(getProof().getServices())
+              .classType(containerType)
+              .selfVar(getSelfVar())
+              .parameters(varsForCondition);
+
+      return io.parseExpression(ps);
    }
    
    /**

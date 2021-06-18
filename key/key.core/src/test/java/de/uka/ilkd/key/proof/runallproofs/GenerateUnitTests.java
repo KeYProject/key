@@ -43,7 +43,7 @@ public class GenerateUnitTests {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
-            System.err.println("Usage: <main> <ouput-folder>");
+            System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
 
