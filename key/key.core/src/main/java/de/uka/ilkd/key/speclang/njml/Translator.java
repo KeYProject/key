@@ -557,8 +557,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-        SLExpression result = accept(ctx.shiftexpr(0));
-        SLExpression right = accept(ctx.shiftexpr(1));
+    	SLExpression result = accept(ctx.shiftexpr(0));
+    	SLExpression right = accept(ctx.shiftexpr(1));
         assert result != null && right != null;
 
         if (result.isTerm() || right.isTerm()) {
@@ -578,7 +578,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
-            Sort os = right.getType().getSort();
+        	Sort os = right.getType().getSort();
             Function ioFunc = os.getInstanceofSymbol(services);
             result = new SLExpression(
                     tb.equals(

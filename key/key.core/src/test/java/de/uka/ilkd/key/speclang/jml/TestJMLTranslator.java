@@ -462,14 +462,20 @@ public class TestJMLTranslator {
 
     @Test
     public void testSubtypeExpression() {
-        Term result = jmlIO.parseExpression(
+        Term resultTypeofClass = jmlIO.parseExpression(
                 "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )");
+        Term resultTypeofPrimitive = jmlIO.parseExpression(
+                "( \\exists int i; \\typeof(i) <: \\type(int) )");
 
-        assertNotNull(result);
+        assertNotNull(resultTypeofClass);
+        assertNotNull(resultTypeofPrimitive);
 
-        Sort sds = javaInfo.objectSort();
-        Function ioFunc = sds.getInstanceofSymbol(services);
-        assertTrue(termContains(result, ioFunc));
+        Function ioFuncObject = javaInfo.objectSort().getInstanceofSymbol(services);
+        Function ioFuncInt =
+        		services.getNamespaces().sorts().lookup("int").getInstanceofSymbol(services);
+        
+        assertTrue(termContains(resultTypeofClass, ioFuncObject));
+        assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));
     }
 
 
