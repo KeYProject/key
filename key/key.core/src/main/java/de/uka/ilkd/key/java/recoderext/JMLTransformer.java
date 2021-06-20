@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.recoderext;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -38,6 +39,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 import javax.annotation.Nonnull;
+import java.io.StringReader;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -411,6 +413,42 @@ public final class JMLTransformer extends RecoderModelTransformer {
         methodDecl.setComments(newComments);
     }
 
+    private void transformAssertStatement(TextualJMLAssertStatement stat,
+                                          Comment[] originalComments) throws SLTranslationException {
+        if (originalComments.length <= 0) throw new IllegalArgumentException();
+
+        // determine parent, child index
+        StatementBlock astParent = (StatementBlock) originalComments[0]
+                .getParent().getASTParent();
+        int childIndex = astParent
+                .getIndexOfChild(originalComments[0].getParent());
+
+        ParserRuleContext ctx = stat.getContext().first;
+
+        // Convert to block with block contract, attach to AST.
+        de.uka.ilkd.key.java.Position pos = new de.uka.ilkd.key.java.Position(
+                ctx.start.getLine(),
+                ctx.start.getCharPositionInLine());
+
+        try {
+            String comment = String.format(
+                    "/*@ normal_behavior\n"
+                    + "  @ %s %s\n"
+                    + "  @ assignable \\strictly_nothing;\n"
+                    + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
+
+            StatementBlock block = services.getProgramFactory().parseStatementBlock(
+                    new StringReader(String.format("{\n%s\n{;;}}", comment)));
+
+            updatePositionInformation(block, pos);
+            doAttach(block, astParent, childIndex);
+        } catch (Throwable e) {
+            throw new SLTranslationException(
+                    String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
+                    ctx.start.getTokenSource().getSourceName(), pos, e);
+        }
+    }
+
     private void transformSetStatement(TextualJMLSetStatement stat,
                                        Comment[] originalComments) throws SLTranslationException {
         assert originalComments.length > 0;
@@ -570,6 +608,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 transformSetStatement((TextualJMLSetStatement) c, comments);
             } else if (c instanceof TextualJMLMergePointDecl) {
                 transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
+            } else if (c instanceof TextualJMLAssertStatement) {
+                transformAssertStatement((TextualJMLAssertStatement) c, comments);
             }
         }
     }

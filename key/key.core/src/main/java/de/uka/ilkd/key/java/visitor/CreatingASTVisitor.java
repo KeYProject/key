@@ -126,16 +126,22 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public void performActionOnStatementBlock(final StatementBlock x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                StatementBlock newBlock = new StatementBlock(changeList);
-                performActionOnBlockContract(x, newBlock);
-                performActionOnLoopContract(x, newBlock);
-                return newBlock;
+        ExtList changeList = stack.peek();
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            if (!preservesPositionInfo) {
+                changeList.removeFirstOccurrence(PositionInfo.class);
             }
-        };
-        def.doAction(x);
+            StatementBlock newBlock = new StatementBlock(changeList);
+            performActionOnBlockContract(x, newBlock);
+            performActionOnLoopContract(x, newBlock);
+            addChild(newBlock);
+            changed();
+        } else {
+            doDefaultAction(x);
+            performActionOnBlockContract(x, x);
+            performActionOnLoopContract(x, x);
+        }
     }
 
     @Override

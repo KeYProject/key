@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -426,6 +427,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term[] assumptions = createAssumptions(pm, selfVar, heaps, localInVariables,
                 conditionsAndClausesBuilder, services);
+        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
 
         final Term[] postconditions = createPostconditions(conditionsAndClausesBuilder);
 
@@ -437,7 +439,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 = setUpGoalConfigurator(block, selfVar, selfTerm, variables, services, tb);
 
         final Term validity = setUpValidityTerm(heaps, anonHeaps, anonOutHeaps, localInVariables,
-                localOutVariables, exceptionParameter, assumptions, postconditions, updates,
+                localOutVariables, exceptionParameter,
+                ArrayUtil.add(assumptions, freePrecondition),
+                postconditions, updates,
                 contract.getAuxiliaryContract(),
                 conditionsAndClausesBuilder, configurator, services,
                 tb);

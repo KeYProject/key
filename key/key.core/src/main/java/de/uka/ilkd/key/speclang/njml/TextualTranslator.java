@@ -408,35 +408,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+                TextualJMLAssertStatement.Kind.ASSUME,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSUME));
         constructs = constructs.prepend(b);
-        b.addClause(ENSURES_FREE, new LabeledParserRuleContext(ctx,
-                OriginTermLabel.SpecType.ENSURES_FREE));
         return null;
     }
 
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        /*
-             * Produce a (textual) block contract from a JML assert statement.
-             * The resulting contract has an empty precondition, the assert expression
-             * as a postcondition, and strictly_nothing as frame.
-            public static TextualJMLSpecCase assert2blockContract(ImmutableList<String> mods, PositionedString assertStm) {
-                final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-                res.addName(new PositionedString("assert " + assertStm.text, assertStm.fileName, assertStm.pos));
-                res.addClause(Clause.ENSURES, assertStm);
-                res.addClause(Clause.ASSIGNABLE, new PositionedString("assignable \\strictly_nothing;", assertStm.fileName, assertStm.pos));
-                res.setPosition(assertStm);
-                return res;
-            }
-            */
-        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NORMAL_BEHAVIOR);
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+                TextualJMLAssertStatement.Kind.ASSERT,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
         constructs = constructs.prepend(b);
-        b.addName("assert " + ctx.getText());
-        b.addClause(ENSURES,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ENSURES));
-        b.addClause(ASSIGNABLE, JmlFacade.parseClause("assignable \\strictly_nothing;"));
         return null;
     }
 
