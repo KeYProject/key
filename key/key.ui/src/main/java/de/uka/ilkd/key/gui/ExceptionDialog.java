@@ -202,7 +202,7 @@ public class ExceptionDialog extends JDialog {
                                           .limit(location.getLine())
                                           .collect(Collectors.toList());
                     String line = list.get(location.getLine() - 1);
-                    String pointLine = StringUtil.createLine(" ", location.getColumn() - 1) + "^";
+                    String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
                     message.append(StringUtil.NEW_LINE).
                         append(StringUtil.NEW_LINE).
                         append(line).

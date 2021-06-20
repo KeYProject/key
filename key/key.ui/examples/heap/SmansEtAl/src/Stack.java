@@ -41,7 +41,7 @@ class Stack {
     
     /*@ model \locset footprint;
       @ accessible footprint: footprint;
-      @ represents footprint = contents, contents.footprint;
+      @ represents footprint = \set_union( \locset(contents), contents.footprint );
       @*/
     
     

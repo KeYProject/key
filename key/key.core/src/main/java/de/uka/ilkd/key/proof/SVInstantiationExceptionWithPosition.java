@@ -14,22 +14,24 @@
 package de.uka.ilkd.key.proof;
 
 
-/** 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import javax.annotation.Nullable;
+import java.net.MalformedURLException;
+
+/**
  * Represents an exception with position information. The row position is
  * absolut this means, if in a table it is the row of the table, but the column
  * position is relative to the text and does not describe the column of the
  * table. (has to be changed)
  */
 public abstract class SVInstantiationExceptionWithPosition 
-    extends SVInstantiationException {
+    extends SVInstantiationException implements HasLocation {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2157800633859913303L;
-    private int row;
-    private int column;
-    private boolean inIfSequent;
+    private final int row;
+    private final int column;
+    private final boolean inIfSequent;
          
     public SVInstantiationExceptionWithPosition( String description, 
 						 int    row, 
@@ -71,4 +73,12 @@ public abstract class SVInstantiationExceptionWithPosition
     public String toString() {
 	return getMessage();
     }
+
+	@Nullable
+	@Override
+	public Location getLocation() throws MalformedURLException {
+		Location location;
+		location = new Location((String) null, getRow(), getColumn());
+		return location;
+	}
 }

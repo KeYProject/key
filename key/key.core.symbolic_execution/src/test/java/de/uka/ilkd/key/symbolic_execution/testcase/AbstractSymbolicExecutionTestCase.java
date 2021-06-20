@@ -209,10 +209,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
          final String SUFFIX = " ###";
          String path = tempNewOracleDirectory.toString();
          int length = Math.max(path.length(), HEADER_LINE.length());
-         String borderLines = StringUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
+         String borderLines = StringUtil.repeat("#", PREFIX.length() + length + SUFFIX.length());
          System.out.println(borderLines);
-         System.out.println(PREFIX + HEADER_LINE + StringUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
-         System.out.println(PREFIX + path + StringUtil.createLine(" ", length - path.length()) + SUFFIX);
+         System.out.println(PREFIX + HEADER_LINE + StringUtil.repeat(" ", length - HEADER_LINE.length()) + SUFFIX);
+         System.out.println(PREFIX + path + StringUtil.repeat(" ", length - path.length()) + SUFFIX);
          System.out.println(borderLines);
       }
    }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
@@ -9,7 +9,7 @@
  *
  * Contributors:
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
+ */
 
 package org.key_project.util.java;
 
@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Provides static methods to work with objects.
@@ -42,7 +43,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static <T> T get(Object obj, String fieldName) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static <T> T get(Object obj, String fieldName)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       if (obj == null) {
          throw new IllegalArgumentException("Object is undefined (null).");
       }
@@ -61,7 +63,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static <T> T get(Object obj, Class<?> classInstance, String fieldName) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static <T> T get(Object obj, Class<?> classInstance, String fieldName)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       Field field = findField(classInstance, fieldName);
       return get(obj, field);
    }
@@ -103,7 +106,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, String fieldName, Object value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, String fieldName, Object value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       if (obj == null) {
          throw new IllegalArgumentException("Object is undefined (null).");
       }
@@ -121,7 +125,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, Class<?> classInstance, String fieldName, Object value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, Class<?> classInstance, String fieldName, Object value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       Field field = findField(classInstance, fieldName);
       set(obj, field, value);
    }
@@ -134,7 +139,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, Field field, Object value)
+           throws IllegalArgumentException, IllegalAccessException {
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -158,7 +164,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, String fieldName, boolean value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, String fieldName, boolean value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       if (obj == null) {
          throw new IllegalArgumentException("Object is undefined (null).");
       }
@@ -176,7 +183,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, Class<?> classInstance, String fieldName, boolean value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, Class<?> classInstance, String fieldName, boolean value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       Field field = findField(classInstance, fieldName);
       set(obj, field, value);
    }
@@ -189,7 +197,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, Field field, boolean value) throws IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, Field field, boolean value)
+           throws IllegalArgumentException, IllegalAccessException {
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -213,7 +222,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, String fieldName, int value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, String fieldName, int value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       if (obj == null) {
          throw new IllegalArgumentException("Object is undefined (null).");
       }
@@ -231,7 +241,8 @@ public final class ObjectUtil {
     * @throws IllegalArgumentException Occurred Exception.
     * @throws IllegalAccessException Occurred Exception.
     */
-   public static void set(Object obj, Class<?> classInstance, String fieldName, int value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+   public static void set(Object obj, Class<?> classInstance, String fieldName, int value)
+           throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
       Field field = findField(classInstance, fieldName);
       set(obj, field, value);
    }
@@ -302,7 +313,8 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     * @throws InvocationTargetException Occurred Exception.
     */
-   public static <T> T invoke(Object obj, String methodName, Object... parameters) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+   public static <T> T invoke(Object obj, String methodName, Object... parameters)
+           throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (obj == null) {
          throw new IllegalArgumentException("Object is undefined (null).");
       }
@@ -429,12 +441,7 @@ public final class ObjectUtil {
     * @return The created {@link Comparator}.
     */
    public static <T> Comparator<T> createEqualsComparator() {
-       return new Comparator<T>() {
-           @Override
-           public int compare(T arg0, T arg1) {
-               return ObjectUtil.equals(arg0, arg1) ? 0 : 1;
-           }
-       };
+       return (arg0, arg1) -> equals(arg0, arg1) ? 0 : 1;
    }
 
    /**

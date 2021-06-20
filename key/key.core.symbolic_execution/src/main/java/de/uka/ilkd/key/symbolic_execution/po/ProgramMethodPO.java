@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,8 +42,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
  * <p>
@@ -174,25 +173,18 @@ public class ProgramMethodPO extends AbstractOperationPO {
                          ImmutableList<ProgramVariable> paramVars,
                          Map<LocationVariable, LocationVariable> atPreVars,
                          Services services) {
-      try {
-         if (precondition != null && !precondition.isEmpty()) {
-            PositionedString ps = new PositionedString(precondition);
-            KeYJMLParser parser = new KeYJMLParser(ps,
-                                                   services,
-                                                   getCalleeKeYJavaType(),
-                                                   selfVar,
-                                                   paramVars,
-                                                   null,
-                                                   null,
-                                                   null);
-            return parser.parseExpression();
-         }
-         else {
-            return tb.tt();
-         }
+      if (precondition != null && !precondition.isEmpty()) {
+         JmlIO io = new JmlIO()
+                 .services(services)
+                 .classType(getCalleeKeYJavaType())
+                 .selfVar(selfVar)
+                 .parameters(paramVars);
+
+         PositionedString ps = new PositionedString(precondition);
+         return io.parseExpression(ps);
       }
-      catch (SLTranslationException e) {
-         throw new RuntimeException("Can't parse precondition \"" + precondition + "\".", e);
+      else {
+         return tb.tt();
       }
    }
 

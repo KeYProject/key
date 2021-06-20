@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.util.java.StringUtil;
 
+import static org.key_project.util.java.StringUtil.trim;
+
 /**
  * Tests for {@link StringUtil}
  * @author Martin Hentschel
@@ -46,7 +48,7 @@ public class StringUtilTest extends TestCase {
          }
       }, "H"));
    }
-   
+
    /**
     * Tests {@link StringUtil#chop(String, int)}
     */
@@ -69,7 +71,7 @@ public class StringUtilTest extends TestCase {
       assertEquals("1234567890", StringUtil.chop("1234567890", 11));
       assertEquals("1234567890", StringUtil.chop("1234567890", 12));
    }
-   
+
    /**
     * Tests {@link StringUtil#trimRight(String)}.
     */
@@ -100,7 +102,7 @@ public class StringUtilTest extends TestCase {
       assertEquals("  hello", StringUtil.trimRight("  hello\t"));
       assertEquals("  hello world!", StringUtil.trimRight("  hello world! \t\n "));
    }
-   
+
    /**
     * Tests {@link StringUtil#fillString(String, char, int)}.
     */
@@ -120,7 +122,7 @@ public class StringUtilTest extends TestCase {
          assertEquals("Text \"abcd\" with length 4 is longer as 3.", e.getMessage());
       }
    }
-   
+
    /**
     * Tests {@link StringUtil#equalIgnoreWhiteSpace(String, String)}.
     */
@@ -148,7 +150,7 @@ public class StringUtilTest extends TestCase {
       assertTrue(StringUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("{result=self.doubleValue(_value)@ExistingContractTest; }", "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
    }
-   
+
    /**
     * Tests {@link StringUtil#toSingleLinedString(String)}
     */
@@ -159,7 +161,7 @@ public class StringUtilTest extends TestCase {
       assertEquals("", StringUtil.toSingleLinedString(""));
       assertEquals("First Line Second Line Line with Tabs Last Line", StringUtil.toSingleLinedString(text));
    }
-   
+
    /**
     * Tests {@link StringUtil#replaceAll(String, char[], char)}
     */
@@ -177,7 +179,7 @@ public class StringUtilTest extends TestCase {
       assertEquals("XBXDXBXDXBXDXBXD", StringUtil.replaceAll(text, new char[] {'A', 'C'}, 'X'));
       assertEquals("XXXXXXXXXXXXXXXX", StringUtil.replaceAll(text, new char[] {'A', 'B', 'C', 'D'}, 'X'));
    }
-   
+
    /**
     * Tests {@link StringUtil#contains(String, CharSequence)}
     */
@@ -193,24 +195,24 @@ public class StringUtilTest extends TestCase {
       assertTrue(StringUtil.contains("Hello", "ell"));
       assertTrue(StringUtil.contains("Hello", "ello"));
    }
-   
+
    /**
-    * Tests {@link StringUtil#createLine(String, int)}
+    * Tests {@link StringUtil#repeat(String, int)}
     */
    @Test
-   public void testCreateLine() {
+   public void testRepeat() {
       // Test line with one character
-      assertEquals("", StringUtil.createLine("#", -1));
-      assertEquals("", StringUtil.createLine("#", 0));
-      assertEquals("-", StringUtil.createLine("-", 1));
-      assertEquals("AA", StringUtil.createLine("A", 2));
-      assertEquals("#####", StringUtil.createLine("#", 5));
+      assertEquals("", StringUtil.repeat("#", -1));
+      assertEquals("", StringUtil.repeat("#", 0));
+      assertEquals("-", StringUtil.repeat("-", 1));
+      assertEquals("AA", StringUtil.repeat("A", 2));
+      assertEquals("#####", StringUtil.repeat("#", 5));
       // Test line with multiple characters
-      assertEquals("ABABAB", StringUtil.createLine("AB", 3));
+      assertEquals("ABABAB", StringUtil.repeat("AB", 3));
       // Test null text
-      assertEquals("nullnullnullnull", StringUtil.createLine(null, 4));
+      assertEquals("nullnullnullnull", StringUtil.repeat(null, 4));
    }
-   
+
    /**
     * Tests {@link StringUtil#createIgnoreCaseComparator()}.
     */
@@ -228,7 +230,7 @@ public class StringUtilTest extends TestCase {
       assertNotSame(0, c.compare(null, "A"));
       assertSame(0, c.compare(null, null));
    }
-    
+
    /**
     * Tests {@link StringUtil#toLowerCase(String)}
     */
@@ -246,11 +248,11 @@ public class StringUtilTest extends TestCase {
     */
    @Test
    public void testTrim() {
-      assertNull(StringUtil.trim(null));
-      assertEquals("AA", StringUtil.trim("AA"));
-      assertEquals("AA", StringUtil.trim(" AA "));
+      assertNull(trim(null));
+      assertEquals("AA", trim("AA"));
+      assertEquals("AA", trim(" AA "));
    }
-   
+
    /**
     * Tests {@link StringUtil#isTrimmedEmpty(String)}
     */
@@ -272,4 +274,17 @@ public class StringUtilTest extends TestCase {
       assertFalse(StringUtil.isEmpty(" "));
       assertFalse(StringUtil.isEmpty(" A "));
    }
+
+    public void testTestTrim() {
+       assertEquals("abc", trim("(abc)", "()"));
+       assertEquals("abc", trim("1234567890abc1234567890", Character::isDigit));
+       assertEquals("(abc)", trim("(abc)", ""));
+       assertEquals("abc)", trim("(abc)", '('));
+       assertEquals("abc", trim("(abc)", "()"));
+       assertEquals("abc", trim("   \n\t\fabc\n", Character::isWhitespace));
+       assertEquals("", trim("abc", it -> true));
+       assertEquals("", trim("   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
+               it -> true));
+       assertEquals("", trim("", 'c'));
+    }
 }
