@@ -177,34 +177,36 @@ public class WarningsDialog extends JDialog {
     }
 
     private void updatePreview() {
-        PositionedString ps = listWarnings.getSelectedValue();
-        String source = fileContentsCache.computeIfAbsent(ps.fileName, fn -> {
-            try (InputStream stream = IOUtil.openStream(ps.fileName)) {
-                return IOUtil.readFrom(stream);
-            } catch (IOException e) {
-                Debug.out("Unknown IOException!", e);
-                return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-            }
-        });
-        int offset = getOffsetFromLineColumn(source, ps.pos);
+        try {
+            PositionedString ps = listWarnings.getSelectedValue();
+            String source = fileContentsCache.computeIfAbsent(ps.fileName, fn -> {
+                try (InputStream stream = IOUtil.openStream(ps.fileName)) {
+                    return IOUtil.readFrom(stream);
+                } catch (IOException e) {
+                    Debug.out("Unknown IOException!", e);
+                    return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                }
+            });
 
-        if (isJava(ps.fileName)) {
-            try {
-                JavaDocument doc = new JavaDocument();
-                txtSource.setDocument(doc);
-                doc.insertString(0, source, new SimpleAttributeSet());
-                DefaultHighlighter dh = new DefaultHighlighter();
-                txtSource.setHighlighter(dh);
-                addWarnings(dh, ps.fileName);
-            } catch (BadLocationException e) {
-                throw new AssertionError();
+            if (isJava(ps.fileName)) {
+                try {
+                    JavaDocument doc = new JavaDocument();
+                    txtSource.setDocument(doc);
+                    doc.insertString(0, source, new SimpleAttributeSet());
+                    DefaultHighlighter dh = new DefaultHighlighter();
+                    txtSource.setHighlighter(dh);
+                    addWarnings(dh, ps.fileName);
+                } catch (BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                txtSource.setText(source);
             }
-        } else {
-            txtSource.setText(source);
+            int offset = getOffsetFromLineColumn(source, ps.pos);
+            txtSource.setCaretPosition(offset);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        txtSource.setEditable(false);
-        txtSource.setCaretPosition(offset);
     }
 
     private void addWarnings(DefaultHighlighter dh, String fileName) {
@@ -314,26 +316,24 @@ public class WarningsDialog extends JDialog {
             return panel;
         }
 
-    /*
-    public static void main(String[] args) {
-        PositionedString a = new PositionedString("Multiline text\nTest\n",
-                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
-                new Position(20, 25));
-        PositionedString b = new PositionedString("Multiline text\nTest\n More information: https://google.de",
-                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                new Position(35, 10));
-        PositionedString c = new PositionedString("Blubb",
-                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                new Position(36, 0));
+        public static void main(String[] args) {
+            PositionedString a = new PositionedString("Multiline text\nTest\n",
+                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
+                    new Position(20, 25));
+            PositionedString b = new PositionedString("Multiline text\nTest\n More information: https://google.de",
+                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                    new Position(35, 10));
+            PositionedString c = new PositionedString("Blubb",
+                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                    new Position(36, 0));
 
-        HashSet<PositionedString> warnings = new HashSet<>();
-        warnings.add(a);
-        warnings.add(b);
-        warnings.add(c);
-        WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
-        warningsDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        warningsDialog.setVisible(true);
-    }
-    */
+            HashSet<PositionedString> warnings = new HashSet<>();
+            warnings.add(a);
+            warnings.add(b);
+            warnings.add(c);
+            WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
+            warningsDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            warningsDialog.setVisible(true);
+        }
     }
 }
