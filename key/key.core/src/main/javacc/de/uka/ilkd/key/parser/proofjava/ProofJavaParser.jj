@@ -30,7 +30,7 @@ package de.uka.ilkd.key.parser.proofjava;
 
 import java.io.*;
 import java.util.*;
-
+import de.uka.ilkd.key.parser.ParserUtil;
 import recoder.list.generic.*;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -3179,12 +3179,14 @@ Expression ADTConstructor() :
 {
     Expression result;
     Expression expr, expr2;
+    Token begin;
 }
 
 {
     (
-    "\\singleton" "(" expr = Expression() ")"
+    "\\singleton" {begin=token;} "(" expr = Expression() ")"
     {
+        ParserUtil.checkValidSingletonReference(expr, begin);
         result = new Singleton(expr);
         setPrefixInfo(result);
     }
