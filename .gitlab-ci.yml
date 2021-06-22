@@ -73,8 +73,8 @@ sonarqube:
   allow_failure: true
   script:
     - cd key
-    - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
     - ./scripts/tools/sonarqube_hint.py
+    - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
   only:
     - merge_requests
     - master
