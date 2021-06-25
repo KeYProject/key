@@ -6,7 +6,6 @@ import java.util.EventObject;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -16,8 +15,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  * @author Wolfram Pfeifer
  *
- * @see SourceView#getToolTipText()
- * @see KeYTooltipExtension
+ * @see de.uka.ilkd.key.gui.sourceview.SourceView#getToolTipText()
  */
 public class ToggleSourceViewTooltipAction extends MainWindowAction {
     /** This action's name. */

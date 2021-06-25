@@ -842,8 +842,18 @@ public final class SourceView extends JComponent {
                 }
 
                 int pos = textPane.viewToModel(mouseEvent.getPoint());
-                if (isHighlighted(pos)) {
-                    return TEXTPANE_HIGHLIGHTED_TOOLTIP;
+                int line = posToLine(pos);
+
+                for (Highlight h : symbExHighlights) {
+                    if (line == h.line) {
+                        // found matching highlight h
+                        // Is the mouse cursor inside the highlight?
+                        Range range = calculateLineRange(textPane, lineInformation[line - 1].getOffset());
+                        // we need < here, since viewToModel can not return a position after the last char in a line
+                        if (range.start() <= pos && pos < range.end()) {
+                            return TEXTPANE_HIGHLIGHTED_TOOLTIP;
+                        }
+                    }
                 }
                 return null;
             }
@@ -932,11 +942,21 @@ public final class SourceView extends JComponent {
                 @Override
                 public void mouseMoved(MouseEvent mouseEvent) {
                     int pos = textPane.viewToModel(mouseEvent.getPoint());
-                    if (isHighlighted(pos)) {
-                        textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    } else {
-                        textPane.setCursor(Cursor.getDefaultCursor());
+                    int line = posToLine(pos);
+
+                    for (Highlight h : symbExHighlights) {
+                        if (line == h.line) {
+                            // found matching highlight h
+                            // Is the mouse cursor inside the highlight?
+                            Range range = calculateLineRange(textPane, lineInformation[line - 1].getOffset());
+                            // we need < here, since viewToModel can not return a position after the last char in a line
+                            if (range.start() <= pos && pos < range.end()) {
+                                textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                return;
+                            }
+                        }
                     }
+                    textPane.setCursor(Cursor.getDefaultCursor());
                 }
             });
 
