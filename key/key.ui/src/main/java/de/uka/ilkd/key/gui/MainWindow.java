@@ -149,6 +149,8 @@ public final class MainWindow extends JFrame {
             new HidePackagePrefixToggleAction(this);
     private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
             new ToggleSequentViewTooltipAction(this);
+    private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
+            new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
     JCheckBoxMenuItem saveSMTFile;
@@ -797,6 +799,7 @@ public final class MainWindow extends JFrame {
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
         view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
 
         view.addSeparator();
         {

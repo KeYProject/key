@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,6 +41,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
@@ -102,8 +101,8 @@ public final class SourceView extends JComponent {
     /**
      * ToolTip for the textPanes containing the source code.
      */
-    private static final String TEXTPANE_TOOLTIP = "Click on a highlighted line to jump to the "
-            + "most recent occurrence of this line in symbolic execution.";
+    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent occurrence of this" +
+            " line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
@@ -794,6 +793,25 @@ public final class SourceView extends JComponent {
     }
 
     /**
+     * Checks if the given position is within a highlight.
+     * @param pos the position to check
+     * @return true if highlighted and false if not
+     */
+    private boolean isHighlighted(int pos) {
+        Tab tab = tabs.get(selectedFile);
+
+        int line = tab.posToLine(pos);
+
+        for (Highlight h : symbExHighlights) {
+            if (line == h.line) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
      * @author Wolfram Pfeifer
@@ -815,7 +833,21 @@ public final class SourceView extends JComponent {
         /**
          * The text pane containing the file's content.
          */
-        private final JTextPane textPane = new JTextPane();
+        private final JTextPane textPane = new JTextPane() {
+            @Override
+            public String getToolTipText(MouseEvent mouseEvent) {
+                if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .isShowSourceViewTooltips()) {
+                    return null;
+                }
+
+                int pos = textPane.viewToModel(mouseEvent.getPoint());
+                if (isHighlighted(pos)) {
+                    return TEXTPANE_HIGHLIGHTED_TOOLTIP;
+                }
+                return null;
+            }
+        };
 
         /**
          * The line information for the file this tab belongs to.
@@ -894,8 +926,19 @@ public final class SourceView extends JComponent {
         private void initTextPane() {
             // We use the same font as in SequentView for consistency.
             textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setToolTipText("");
             textPane.setEditable(false);
+            textPane.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent mouseEvent) {
+                    int pos = textPane.viewToModel(mouseEvent.getPoint());
+                    if (isHighlighted(pos)) {
+                        textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    } else {
+                        textPane.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
+            });
 
             // insert source code into text pane
             try {
@@ -1328,25 +1371,6 @@ public final class SourceView extends JComponent {
             this.textPane = textPane;
             this.li = li;
             this.fileURI = fileURI;
-        }
-
-        /**
-         * Checks if the given position is within a highlight.
-         * @param pos the position to check
-         * @return true if highlighted and false if not
-         */
-        private boolean isHighlighted(int pos) {
-            Tab tab = tabs.get(selectedFile);
-
-            int line = tab.posToLine(pos);
-
-            for (Highlight h : symbExHighlights) {
-                if (line == h.line) {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         @Override
