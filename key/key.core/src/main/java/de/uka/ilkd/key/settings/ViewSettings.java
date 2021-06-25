@@ -120,6 +120,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
 
+    /** this setting enables/disables tool tips in the source view */
     private static final String SOURCE_VIEW_TOOLTIP = "[View]SourceViewTooltips";
 
     private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";

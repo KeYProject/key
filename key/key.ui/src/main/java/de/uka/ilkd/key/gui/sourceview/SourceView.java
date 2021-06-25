@@ -101,8 +101,8 @@ public final class SourceView extends JComponent {
     /**
      * ToolTip for the textPanes containing the source code.
      */
-    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent occurrence of this" +
-            " line in symbolic execution.";
+    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent" +
+        " occurrence of this line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
