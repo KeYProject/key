@@ -120,6 +120,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
 
+    /** this setting enables/disables tool tips in the source view */
+    private static final String SOURCE_VIEW_TOOLTIP = "[View]SourceViewTooltips";
+
     private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";
     /**
      *
@@ -193,6 +196,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
     private PropertyEntry<Boolean> showSequentViewTooltips =
             createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+    private PropertyEntry<Boolean> showSourceViewTooltips =
+            createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
     private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
     private PropertyEntry<Set<String>> clutterRules =
             createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
@@ -511,6 +516,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     public void setShowSequentViewTooltips(boolean showSequentViewTooltips) {
         this.showSequentViewTooltips.set(showSequentViewTooltips);
+    }
+
+    public boolean isShowSourceViewTooltips() {
+        return showSourceViewTooltips.get();
+    }
+
+    public void setShowSourceViewTooltips(boolean showSourceViewTooltips) {
+        this.showSourceViewTooltips.set(showSourceViewTooltips);
     }
 
     public double getUIFontSizeFactor() {
