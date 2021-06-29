@@ -74,6 +74,9 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
+    sourceCompatibility = 11
+    targetCompatibility = 11
+
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib", "$rootDir/key.ui/lib" }
@@ -81,7 +84,7 @@ subprojects {
 
     dependencies {
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
-        testImplementation 'junit:junit:4.12'
+        testImplementation 'junit:junit:4.13.2'
         testImplementation project(':key.util')
     }
 

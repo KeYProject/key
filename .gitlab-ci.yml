@@ -57,15 +57,6 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClasses8:
-  dependencies:  []
-  stage: secondary
-  image: wadoon/key-test-docker:jdk8
-  script:
-    - javac -version
-    - cd key
-    - gradle --parallel clean classes testClasses
-
 sonarqube:
   dependencies:  ["compile:testClasses"]
   stage: ternary
