@@ -38,7 +38,7 @@ public abstract class AbstractSolverSocket {
 		return query;
 	}
 
-	public abstract void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException;
+	public abstract void messageIncoming(Pipe pipe, Message message) throws IOException;
 
 	public static AbstractSolverSocket createSocket(SolverType type, ModelExtractor query){
 		String name = type.getName();
@@ -84,9 +84,9 @@ class Z3Socket extends AbstractSolverSocket{
 		super(name, query);	    
 	}
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().trim();
+		String msg = message.getContent(); // do not trim (loses indentation) // .trim();
 		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
 			sc.addMessage(msg);
 			if(msg.indexOf("WARNING:")>-1){
@@ -105,7 +105,7 @@ class Z3Socket extends AbstractSolverSocket{
 					sc.setFinalResult(SMTSolverResult.createValidResult(name));
 					// One cannot ask for proofs and models at one time
 					// rather have modesl than proofs (MU, 2013-07-19)
-					// pipe.sendMessage("(get-proof)\n");
+					pipe.sendMessage("(get-proof)");
 					pipe.sendMessage("(exit)");
 					sc.setState(WAIT_FOR_DETAILS);
 				}
@@ -118,14 +118,15 @@ class Z3Socket extends AbstractSolverSocket{
 				}
 				if(msg.equals("unknown")){
 					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
-					sc.setState(WAIT_FOR_DETAILS);
 					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
 				}
 				break;
 
 			case WAIT_FOR_DETAILS:
 				if(msg.equals("success")){
-					pipe.close();
+//					pipe.sendMessage("(exit)");
+//					pipe.close();
 				}
 				break;
 		}
@@ -142,7 +143,7 @@ class Z3CESocket extends AbstractSolverSocket{
 
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().trim();
 
@@ -181,13 +182,13 @@ class Z3CESocket extends AbstractSolverSocket{
 
 			case WAIT_FOR_DETAILS:
 				if(msg.equals("success")){
-					pipe.close();
+//					pipe.close();
 				}						
 				break;		
 
 			case WAIT_FOR_QUERY:
 				if(msg.equals("success")){
-					pipe.close();
+//					pipe.close();
 				}
 				else {
 					query.messageIncoming(pipe, msg, message.getType().ordinal());
@@ -224,7 +225,7 @@ class CVC3Socket extends AbstractSolverSocket{
 		super(name, query);
 	}
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().replace('-', ' ').trim();
 		sc.addMessage(msg);
@@ -253,7 +254,7 @@ class CVC4Socket extends AbstractSolverSocket{
         super(name, query);
     }
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
         SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().trim();
         if ("".equals(msg)) return;
@@ -272,15 +273,18 @@ class CVC4Socket extends AbstractSolverSocket{
             if(msg.indexOf("\n"+UNSAT) > -1){
                 sc.setFinalResult(SMTSolverResult.createValidResult(name));
                 sc.setState(FINISH);
-                pipe.close();
-            } else if(msg.indexOf("\n"+SAT) > -1){
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-                sc.setState(FINISH);
-                pipe.close();
-            } else if(msg.indexOf("\n"+UNKNOWN)> -1){
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
-                sc.setState(FINISH);
-                pipe.close();
+				pipe.sendMessage("(exit)");
+//				pipe.close();
+			} else if(msg.indexOf("\n"+SAT) > -1){
+				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+				sc.setState(FINISH);
+				pipe.sendMessage("(exit)");
+//				pipe.close();
+			} else if(msg.indexOf("\n"+UNKNOWN)> -1){
+				sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
+				sc.setState(FINISH);
+                pipe.sendMessage("(exit)");
+//                pipe.close();
             }
         }
 
@@ -294,7 +298,7 @@ class SimplifySocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) {
+	public void messageIncoming(Pipe pipe, Message message) {
 		SolverCommunication sc = pipe.getSession();
 		sc.addMessage(message.getContent());
 
@@ -322,7 +326,7 @@ class YICESSocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) {
+	public void messageIncoming(Pipe pipe, Message message) {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().replaceAll("\n","");
 		sc.addMessage(msg);

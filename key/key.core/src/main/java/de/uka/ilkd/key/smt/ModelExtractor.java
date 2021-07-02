@@ -1096,7 +1096,7 @@ public class ModelExtractor {
 		return state;
 	}
 
-	private void finishBasicQueries(Pipe<SolverCommunication> pipe) throws IOException {
+	private void finishBasicQueries(Pipe pipe) throws IOException {
 
 		processBasicQueries();
 		generateArrayQueries();
@@ -1329,7 +1329,7 @@ public class ModelExtractor {
 
 	}
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, String message,
+	public void messageIncoming(Pipe pipe, String message,
 			int type) throws IOException {
 
 		//System.out.println("MQ: " + message);
@@ -1414,13 +1414,13 @@ public class ModelExtractor {
 
 	}
 
-	private void finishTypesQueries(Pipe<SolverCommunication> pipe) throws IOException {
+	private void finishTypesQueries(Pipe pipe) throws IOException {
 		processTypesQueries();
 		startBasicQueries(pipe);
 		
 	}
 	
-	private void finishSeqQueries(Pipe<SolverCommunication> pipe) throws IOException {
+	private void finishSeqQueries(Pipe pipe) throws IOException {
 		processSeqQueries();
 		model.processSeqValues();
 		model.processSequenceNames();
@@ -1432,7 +1432,7 @@ public class ModelExtractor {
 
 
 
-	private void startBasicQueries(Pipe<SolverCommunication> pipe) throws IOException {
+	private void startBasicQueries(Pipe pipe) throws IOException {
 		generateBasicQueries();
 		Query q = queries.get(currentQuery);
 		state = WORKING;
@@ -1472,7 +1472,7 @@ public class ModelExtractor {
 
 
 
-	private void finishArrayQueries(Pipe<SolverCommunication> pipe) throws IOException {
+	private void finishArrayQueries(Pipe pipe) throws IOException {
 		
 		processArrayQueries();
 		state = SEQ;
@@ -1550,7 +1550,7 @@ public class ModelExtractor {
 
 
 
-	public void start(Pipe<SolverCommunication> pipe) throws IOException {
+	public void start(Pipe pipe) throws IOException {
 		//pipe.addListener(this);
 		generateTypeQueries();
 		if(queries.size()>0){

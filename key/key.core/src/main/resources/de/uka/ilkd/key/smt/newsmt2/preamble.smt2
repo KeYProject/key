@@ -3,6 +3,8 @@
 (set-option :print-success true)
 (set-option :produce-unsat-cores true)
 (set-option :produce-models true)
+(set-option :produce-proofs true)
+(set-option :pp.pretty-proof true)
 (set-logic ALL)
 
 (declare-sort T 0)

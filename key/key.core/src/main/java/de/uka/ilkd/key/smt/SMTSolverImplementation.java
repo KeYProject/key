@@ -118,7 +118,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.services = services;
                 this.type = myType;
                 this.socket = AbstractSolverSocket.createSocket(type, query);
-        processLauncher = new ExternalProcessLauncher<>(solverCommunication, type.getDelimiters());
+                processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
 
         }
 
@@ -250,7 +250,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                         solverTimeout.cancel();
                         setSolverState(SolverState.Stopped);
                         listener.processStopped(this, problem);
-            processLauncher.stop();
+                        processLauncher.stop();
                 }
 
         }
@@ -346,6 +346,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 }
                 if (thread != null) {
                 		processLauncher.stop();
+                        //processLauncher.getPipe().close();
                         thread.interrupt();
                 }
 

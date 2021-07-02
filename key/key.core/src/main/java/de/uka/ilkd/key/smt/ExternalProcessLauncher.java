@@ -16,7 +16,8 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.smt.SolverCommunication.Message;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -29,12 +30,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ExternalProcessLauncher<T> {
 
+	private SolverCommunication session;
+	private final String[] messageDelimiters;
 	private Process process;
 
-	private final Pipe<T> pipe;
+	private Pipe pipe;
 
-	public ExternalProcessLauncher(T session, String[] messageDelimiters) {
-		pipe = new Pipe<T>(session, messageDelimiters);
+	public ExternalProcessLauncher(SolverCommunication session, String[] messageDelimiters) {
+		this.session = session;
+		this.messageDelimiters = messageDelimiters;
+//		pipe = new ConcretePipe(session, messageDelimiters);
 	}
 
     /**
@@ -44,35 +49,43 @@ public class ExternalProcessLauncher<T> {
 	public void launch(final String [] command) throws IOException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
-            process = builder.start();
+            builder.redirectErrorStream(true);
 
-            pipe.start(process);
+            process = builder.start();
+            InputStream input = process.getInputStream();
+            OutputStream output = process.getOutputStream();
+
+			pipe = new SimplePipe(input, messageDelimiters, output, session, process);
+
+            //pipe.start(process);
         } catch (Exception ex) {
-            stop();
+			// TODO
+			stop();
+
             throw ex;
         }
 	}
 	
 
-	/**
-	 * Call this method only after the pipe has been stopped. It is not thread safe!
-	 * @return
-	 */
-    T getCommunication(){
-    	return pipe.getSession();
-    }
-	
+//	/**
+//	 * Call this method only after the pipe has been stopped. It is not thread safe!
+//	 * @return
+//	 */
+//    SolverCommunication getCommunication(){
+//    	return pipe.getSession();
+//    }
+//
     /**
-     * Stops the external process: In particular the pipe is closed and the process is destroyed. 
+     * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
 	public void stop() {
 		if(process != null){
 			process.destroy();
 		}
-		pipe.close();
+		//pipe.close();
 	}
 
-	public Pipe<T> getPipe() {
+	public Pipe getPipe() {
 		return pipe;
 	}
 
