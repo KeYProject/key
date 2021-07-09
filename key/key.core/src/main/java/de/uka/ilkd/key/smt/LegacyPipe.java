@@ -17,6 +17,7 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.smt.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.SolverCommunication.MessageType;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,109 +35,111 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author Benjamin Niedermann (original)
  * @author Mattias Ulbrich (ovrhaul)
+ * @author Wolfram Pfeifer (extracted interface, marked as legacy)
  */
+@Deprecated
 class LegacyPipe implements Pipe {
-	/**
-	 * The workers of the pipe. One worker is responsible for sending messages, while the other two workers
-	 * handle messages which are received.
-	 */
-	private Receiver stdoutReceiver;
-	private Receiver stderrReceiver;
+    /**
+     * The workers of the pipe. One worker is responsible for sending messages, while the other two
+     * workers handle messages which are received.
+     */
+    private Receiver stdoutReceiver;
+    private Receiver stderrReceiver;
 
-	/**
-	 * The delimiters of the messages, i.e. strings that indicate the end of a message. If you specify several
-	 * delimiters a single message is chosen as small as possible, i.e., it does not contain any delimiter.
-	 */
-	private final String[] messageDelimiters;
+    /**
+     * The delimiters of the messages, i.e. strings that indicate the end of a message. If you
+     * specify several delimiters a single message is chosen as small as possible, i.e., it does
+     * not contain any delimiter.
+     */
+    private final String[] messageDelimiters;
 
-	private static final Message EXCEPTION_MESSAGE =
-			new Message("Exception", MessageType.Error);
+    private static final Message EXCEPTION_MESSAGE =
+        new Message("Exception", MessageType.Error);
 
-	private static final Message STREAM_CLOSED_MESSAGE =
-			new Message("Stream closed", MessageType.Error);
+    private static final Message STREAM_CLOSED_MESSAGE =
+        new Message("Stream closed", MessageType.Error);
 
-	/**
-	 * User specific data.
-	 */
-	private final SolverCommunication session;
-	private OutputStreamWriter outputWriter;
-	private BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
-	private Exception thrownException;
+    /**
+     * User specific data.
+     */
+    private final SolverCommunication session;
+    private OutputStreamWriter outputWriter;
+    private BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
+    private Exception thrownException;
     private Process process;
 
 
     public LegacyPipe(SolverCommunication session, String [] messageDelimiters) {
-		this.session = session;
-		this.messageDelimiters = messageDelimiters;
-	}
+        this.session = session;
+        this.messageDelimiters = messageDelimiters;
+    }
 
     /**
-	 * Waits until a message is received from the other side of the pipe. Then it forwards the message to its
-	 * listeners and waits again until the next message is received.
-	 */
-	private class Receiver extends Thread {
-		private final InputStream input;
-		private final MessageType type;
-		private boolean alive = true;
-		
-		public Receiver(InputStream input, MessageType type, String name) {
-			super(name);
-			this.input = input;
-			this.type = type;
-		}
+     * Waits until a message is received from the other side of the pipe. Then it forwards the
+     * message to its listeners and waits again until the next message is received.
+     */
+    private class Receiver extends Thread {
+        private final InputStream input;
+        private final MessageType type;
+        private boolean alive = true;
 
-		@Override
-		public void run() {
+        public Receiver(InputStream input, MessageType type, String name) {
+            super(name);
+            this.input = input;
+            this.type = type;
+        }
 
-			// do not use BufferedReader, but this wrapper in order to support different
-			// message delimiters.
-			BufferedMessageReader reader =
-					new BufferedMessageReader(new InputStreamReader(input),
-							messageDelimiters);
+        @Override
+        public void run() {
 
-			try {
+            // do not use BufferedReader, but this wrapper in order to support different
+            // message delimiters.
+            BufferedMessageReader reader =
+                new BufferedMessageReader(new InputStreamReader(input),
+                    messageDelimiters);
 
-				while(true) {
-					if (Thread.interrupted()) {
-						break;
-					}
-					// this call blocks the thread and waits until there is a message.
-					String message = reader.readMessage();
+            try {
+
+                while(true) {
+                    if (Thread.interrupted()) {
+                        break;
+                    }
+                    // this call blocks the thread and waits until there is a message.
+                    String message = reader.readMessage();
                     if (message == null) {
                         // message null indicates EOF.
                         break;
                     }
-					deliverMessage(message, type);
-				}
+                    deliverMessage(message, type);
+                }
 
-			} catch(InterruptedIOException ex) {
-				// Interruption is ok and needs not be reported
-			} catch(IOException e) {
-				close();
-				thrownException = e;
-				messageQueue.add(EXCEPTION_MESSAGE);
-			} finally {
-				try {
-					String buf = reader.drain();
-					if (buf != null && !buf.isEmpty()) {
-						deliverMessage(buf, type);
-					}
-					input.close();
-				} catch(IOException ex) {
-					// considered harmless.
-				}
-				alive = false;
-				messageQueue.add(STREAM_CLOSED_MESSAGE);
-			}
-		}
-	}
+            } catch(InterruptedIOException ex) {
+                // Interruption is ok and needs not be reported
+            } catch(IOException e) {
+                close();
+                thrownException = e;
+                messageQueue.add(EXCEPTION_MESSAGE);
+            } finally {
+                try {
+                    String buf = reader.drain();
+                    if (buf != null && !buf.isEmpty()) {
+                        deliverMessage(buf, type);
+                    }
+                    input.close();
+                } catch(IOException ex) {
+                    // considered harmless.
+                }
+                alive = false;
+                messageQueue.add(STREAM_CLOSED_MESSAGE);
+            }
+        }
+    }
 
-	private void deliverMessage(String buf, MessageType type) {
-	    assert buf != null;
-		Message message = new Message(buf, type);
-		messageQueue.add(message);
-	}
-
+    private void deliverMessage(String buf, MessageType type) {
+        assert buf != null;
+        Message message = new Message(buf, type);
+        messageQueue.add(message);
+    }
 
     public void start(Process process) {
 
@@ -145,62 +148,63 @@ class LegacyPipe implements Pipe {
         InputStream stderr = process.getErrorStream();
 
         this.process = process;
-		this.outputWriter = new OutputStreamWriter(stdin);
-		
-		stdoutReceiver = new Receiver(stdout, MessageType.Output,"receiver for normal messages");
-		stderrReceiver = new Receiver(stderr, MessageType.Error,"receiver for stderr messages");
+        this.outputWriter = new OutputStreamWriter(stdin);
 
-		stdoutReceiver.setDaemon(true);
-		stdoutReceiver.start();
+        stdoutReceiver = new Receiver(stdout, MessageType.Output, "receiver for normal messages");
+        stderrReceiver = new Receiver(stderr, MessageType.Error, "receiver for stderr messages");
 
-		stderrReceiver.setDaemon(true);
-		stderrReceiver.start();
-	}
-	
-	
-	public void close() {
-		stdoutReceiver.interrupt();
-		stderrReceiver.interrupt();
-		process.destroy();
-	}
+        stdoutReceiver.setDaemon(true);
+        stdoutReceiver.start();
 
-	public void join()  throws InterruptedException {
-		stdoutReceiver.join();
-		stderrReceiver.join();
-	}
+        stderrReceiver.setDaemon(true);
+        stderrReceiver.start();
+    }
 
-	@Override
-	public synchronized void sendMessage(String message) throws IOException {
-		outputWriter.write(message + System.lineSeparator());
-		outputWriter.flush();
-	}
+    public void close() {
+        stdoutReceiver.interrupt();
+        stderrReceiver.interrupt();
+        process.destroy();
+    }
 
-	@Override
-	public Message readMessage() throws IOException, InterruptedException {
-		while(isAlive()) {
-			Message result = messageQueue.take();
-			if (result == EXCEPTION_MESSAGE) {
-				// Special indicator for a raised exception.
-				if (thrownException instanceof IOException) {
-					throw (IOException) thrownException;
-				} else {
-					throw new IOException(thrownException);
-				}
-			} else if(result == STREAM_CLOSED_MESSAGE) {
-				// This is a mere indicator to run isAlive once more ...
-			} else {
-				return result;
-			}
-		}
-		return null;
-	}
+    public void join()  throws InterruptedException {
+        stdoutReceiver.join();
+        stderrReceiver.join();
+    }
 
-	public boolean isAlive() {
-		return stderrReceiver.alive && stdoutReceiver.alive;
-	}
+    @Override
+    public synchronized void sendMessage(@Nonnull String message) throws IOException {
+        outputWriter.write(message + System.lineSeparator());
+        outputWriter.flush();
+    }
 
-	public SolverCommunication getSession() {
-		return session;
-	}
-	
+
+    @Override
+    public @Nonnull String readMessage() throws IOException, InterruptedException {
+        while(isAlive()) {
+            Message result = messageQueue.take();
+            if (result == EXCEPTION_MESSAGE) {
+                // Special indicator for a raised exception.
+                if (thrownException instanceof IOException) {
+                    throw (IOException) thrownException;
+                } else {
+                    throw new IOException(thrownException);
+                }
+            } else if(result == STREAM_CLOSED_MESSAGE) {
+                // This is a mere indicator to run isAlive once more ...
+            } else {
+                // just to fix compile problems, the message type is completely thrown away here
+                // (the class only exists as unused legacy code)
+                return result.getContent();
+            }
+        }
+        return null;
+    }
+
+    public boolean isAlive() {
+        return stderrReceiver.alive && stdoutReceiver.alive;
+    }
+
+    public @Nonnull SolverCommunication getSession() {
+        return session;
+    }
 }

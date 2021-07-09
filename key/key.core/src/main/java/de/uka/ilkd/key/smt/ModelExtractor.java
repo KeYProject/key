@@ -1329,8 +1329,7 @@ public class ModelExtractor {
 
 	}
 
-	public void messageIncoming(Pipe pipe, String message,
-			int type) throws IOException {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
 
 		//System.out.println("MQ: " + message);
 

@@ -17,12 +17,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.SolverCommunication.Message;
@@ -59,7 +57,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         private SolverListener listener;
 
         /** starts a external process and returns the result */
-        private ExternalProcessLauncher<SolverCommunication> processLauncher;
+        private ExternalProcessLauncher processLauncher;
    
         /**
          * The services object is stored in order to have the possibility to
@@ -204,73 +202,63 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        @Override
-        public void run() {
-        		
-                // Firstly: Set the state to running and inform the listener.
-                setSolverState(SolverState.Running);
-                listener.processStarted(this, problem);
-                                
-                // Secondly: Translate the given problem
-                String commands[];
-                try {
-                        commands = translateToCommand(problem.getSequent());
-                } catch (Throwable e) {
-                        interruptionOccurred(e);
-                        listener.processInterrupted(this, problem, e);
-                        setSolverState(SolverState.Stopped);
-                        solverTimeout.cancel();
-                        return;
-                }
-     
+    @Override
+    public void run() {
+
+        // Firstly: Set the state to running and inform the listener.
+        setSolverState(SolverState.Running);
+        listener.processStarted(this, problem);
+
+        // Secondly: Translate the given problem
+        String[] commands;
+        try {
+            commands = translateToCommand(problem.getSequent());
+        } catch (Throwable e) {
+            interruptionOccurred(e);
+            listener.processInterrupted(this, problem, e);
+            setSolverState(SolverState.Stopped);
+            solverTimeout.cancel();
+            return;
+        }
 
         // Thirdly: start the external process.
-                try {
+        try {
             processLauncher.launch(commands);
-            processLauncher.sendMessage(type.modifyProblem(problemString));
-                 
-            Message msg = processLauncher.getPipe().readMessage();
-            while(msg != null) {
+            processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
+
+            String msg = processLauncher.getPipe().readMessage();
+            while (msg != null) {
                 socket.messageIncoming(processLauncher.getPipe(), msg);
-                msg = processLauncher.readMessage();
-                        }
-                                      
-                        // uncomment for testing
-                      //  Thread.sleep(3000);
-                        // uncomment for testing
-                       // Random random = new Random();
-                        //Thread.sleep(random.nextInt(3000)+1000);
-                        //throw new RuntimeException("Test exception");
-                } catch (Throwable e) {
-                        interruptionOccurred(e);
-                } finally {
+                msg = processLauncher.getPipe().readMessage();
+            }
+        } catch (Throwable e) {
+            interruptionOccurred(e);
+        } finally {
             // Close everything.
-            // System.out.println(name() + " : " + solverCommunication.getFinalResult());
-
-                        solverTimeout.cancel();
-                        setSolverState(SolverState.Stopped);
-                        listener.processStopped(this, problem);
-                        processLauncher.stop();
-                }
-
+            solverTimeout.cancel();
+            setSolverState(SolverState.Stopped);
+            listener.processStopped(this, problem);
+            processLauncher.stop();
         }
 
-        private void interruptionOccurred(Throwable e) {
-                ReasonOfInterruption reason = getReasonOfInterruption();
-                switch (reason) {
-                case Exception:
-                case NoInterruption:
-                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
-                        listener.processInterrupted(this, problem, e);
-                        break;
-                case Timeout:
-                        listener.processTimeout(this, problem);
-                        break;
-                case User:
-                        listener.processUser(this, problem);
-                        break;
-                }
+    }
+
+    private void interruptionOccurred(Throwable e) {
+        ReasonOfInterruption reason = getReasonOfInterruption();
+        switch (reason) {
+        case Exception:
+        case NoInterruption:
+            setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+            listener.processInterrupted(this, problem, e);
+            break;
+        case Timeout:
+            listener.processTimeout(this, problem);
+            break;
+        case User:
+            listener.processUser(this, problem);
+            break;
         }
+    }
 
         @Override
         public String name() {
@@ -377,10 +365,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         public String getSolverOutput() {       	
         	
          		String output = "";
+                // TODO WP: separate result from real solver output
         		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
         		
-        		for(String s : solverCommunication.getMessages()){
-        			
+                for(Message m : solverCommunication.getMessages()){
+                    String s = m.getContent();
+
         			if(s.equals("endmodel")){
         				break;
         			}

@@ -17,22 +17,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 /**
- * Stores the communication between KeY and an external solver: Contains a list that stores the messages 
- * that has been sent from the solver to KeY and vice versa.
- * 
- * Further, it also contains the final result of the solver. 
+ * Stores the communication between KeY and an external solver: Contains a list that stores the
+ * messages that have been sent from the solver to KeY and vice versa.
+ *
+ * TODO: In contrast to the comment, it does currently not involve messages sent to the solver!
+ *
+ * Further, it also contains the final result of the solver.
+ *
+ * @author Benjamin Niedermann
+ * @author Wolfram Pfeifer (overhaul)
  */
 public class SolverCommunication {
-	private final List<String> messages = Collections.synchronizedList(new LinkedList<String>());
+	private final List<Message> messages = Collections.synchronizedList(new LinkedList<>());
 	
 	private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
 	private int state = 0;
 	private boolean resultHasBeenSet = false;
-	
-	private List<Throwable> exceptions = Collections.synchronizedList(new LinkedList<Throwable> ());
 	
 	/**
 	 * The message type depends on the channel which was used for sending the message.
@@ -55,20 +58,16 @@ public class SolverCommunication {
 		}
 	}
 
-	public SolverCommunication() {
-	}
-	
-
 	/**
 	 * Returns all messages that were sent between KeY and the solver.
 	 */
-	public Iterable<String> getMessages() {
+	public Iterable<Message> getMessages() {
 		// return an new iterable object in order to guarantee that the list of messgages 
 		// cannot be changed.
-		return new Iterable<String>() {
-			
+		return new Iterable<Message>() {
+
 			@Override
-			public Iterator<String> iterator() {
+			public Iterator<Message> iterator() {
 				return messages.iterator();
 			}
 		};
@@ -96,8 +95,8 @@ public class SolverCommunication {
 		resultHasBeenSet = true;
 	}
 
-	void addMessage(String message){
-		messages.add(message);
+	void addMessage(String message, MessageType type){
+		messages.add(new Message(message, type));
 	}
 
 	void setState(int state) {

@@ -13,87 +13,78 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
-
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
 /**
  * This class is responsible for starting external processes:
- * 1. It creates the process
- * 2. Creates a pipe, that is used for communication.
- * 3. Starts the process and waits until the pipe has been closed or the process has been stopped.
- * Remark: It blocks the invoking thread.
- * The parameter T of the class can be used to define user-specific parameters.
+ * <ol>
+ * <li> It creates the process (stderr is merged to stdout).</li>
+ * <li> Creates the pipe that is used for communication.</li>
+ * <li> Starts the process and returns. </li>
+ * </ol>
+ * Remark: Does not block the invoking thread.
+ *
+ * @author Wolfram Pfeifer (overhaul)
  */
-public class ExternalProcessLauncher<T> {
+public class ExternalProcessLauncher {
+    /** the store of all messages send to and received from the external process */
+    private final @Nonnull SolverCommunication session;
 
-	private SolverCommunication session;
-	private final String[] messageDelimiters;
-	private Process process;
+    /** the delimiters which separate the messages */
+    private final @Nonnull  String[] messageDelimiters;
 
-	private Pipe pipe;
+    /** the external process */
+    private Process process;
 
-	public ExternalProcessLauncher(SolverCommunication session, String[] messageDelimiters) {
-		this.session = session;
-		this.messageDelimiters = messageDelimiters;
-//		pipe = new ConcretePipe(session, messageDelimiters);
-	}
+    /** the pipe for sending and receiving to/from the process */
+    private Pipe pipe;
 
     /**
-     * Main procedure of the class. Starts the external process, then it goes sleeping until 
-     * the process has finished its work.
-	 */
-	public void launch(final String [] command) throws IOException {
+     * Creates the external process launcher.
+     * @param session the store for the messages send to and received from the process
+     * @param messageDelimiters delimiters which separate the messages
+     */
+    public ExternalProcessLauncher(@Nonnull SolverCommunication session,
+                                   @Nonnull String[] messageDelimiters) {
+        this.session = session;
+        this.messageDelimiters = messageDelimiters;
+    }
+
+    /**
+     * Main procedure of the class. Starts the external process and connects the pipe to it.
+     * stderr and stdout of the process are merged.
+     * @param command command (program and arguments) which is used to start the external process
+     * @throws IOException if an I/O error occurs
+     */
+    public void launch(final String [] command) throws IOException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
-
             process = builder.start();
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
-
-			pipe = new SimplePipe(input, messageDelimiters, output, session, process);
-
-            //pipe.start(process);
+            pipe = new SimplePipe(input, messageDelimiters, output, session, process);
         } catch (Exception ex) {
-			// TODO
-			stop();
-
+            stop();
             throw ex;
         }
-	}
-	
+    }
 
-//	/**
-//	 * Call this method only after the pipe has been stopped. It is not thread safe!
-//	 * @return
-//	 */
-//    SolverCommunication getCommunication(){
-//    	return pipe.getSession();
-//    }
-//
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
-	public void stop() {
-		if(process != null){
-			process.destroy();
-		}
-		//pipe.close();
-	}
+    public void stop() {
+        if(process != null) {
+            process.destroy();
+        }
+        // TODO: where to close the pipe?
+        //pipe.close();
+    }
 
-	public Pipe getPipe() {
-		return pipe;
-	}
-
-	public void sendMessage(String message) throws IOException {
-		pipe.sendMessage(message);
-	}
-
-	public Message readMessage() throws IOException, InterruptedException {
-		return pipe.readMessage();
-	}
+    public Pipe getPipe() {
+        return pipe;
+    }
 }

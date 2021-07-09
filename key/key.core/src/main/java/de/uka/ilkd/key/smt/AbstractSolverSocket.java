@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.SolverCommunication.MessageType;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ public abstract class AbstractSolverSocket {
     static final String UNKNOWN = "unknown";
     static final String SAT = "sat";
     static final String UNSAT = "unsat";
-	
+
 	protected String name;
 
 	protected ModelExtractor query = null;
@@ -33,12 +32,12 @@ public abstract class AbstractSolverSocket {
 		this.name = name;
 		this.query = query;
 	}
-	
+
 	public ModelExtractor getQuery(){
 		return query;
 	}
 
-	public abstract void messageIncoming(Pipe pipe, Message message) throws IOException;
+	public abstract void messageIncoming(Pipe pipe, String message) throws IOException;
 
 	public static AbstractSolverSocket createSocket(SolverType type, ModelExtractor query){
 		String name = type.getName();
@@ -72,7 +71,7 @@ public abstract class AbstractSolverSocket {
 
 	public void setQuery(ModelExtractor query) {
 	    this.query = query;
-	    
+
     }
 
 
@@ -81,30 +80,31 @@ public abstract class AbstractSolverSocket {
 class Z3Socket extends AbstractSolverSocket{
 
 	public Z3Socket(String name, ModelExtractor query) {
-		super(name, query);	    
+		super(name, query);
 	}
 
-	public void messageIncoming(Pipe pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent(); // do not trim (loses indentation) // .trim();
-		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
-			sc.addMessage(msg);
-			if(msg.indexOf("WARNING:")>-1){
+		String msg = message; // do not trim (loses indentation) // .trim();
+		if(msg.startsWith("(error")) {
+			sc.addMessage(msg, MessageType.Error);
+			if(msg.contains("WARNING:")){
 				return;
 			}
 			throw new IOException("Error while executing Z3: " + msg);
 		}
 
+		// TODO: success messages should also occur in the raw solver output
 		if (!msg.equals("success")) {
-			sc.addMessage(msg);
+			sc.addMessage(msg, MessageType.Output);
 		}
 
 		switch (sc.getState()) {
 			case WAIT_FOR_RESULT:
 				if(msg.equals("unsat")){
 					sc.setFinalResult(SMTSolverResult.createValidResult(name));
-					// One cannot ask for proofs and models at one time
-					// rather have modesl than proofs (MU, 2013-07-19)
+					// TODO: does not work with legacy Z3 translation, as proof production is not
+					//  enabled there
 					pipe.sendMessage("(get-proof)");
 					pipe.sendMessage("(exit)");
 					sc.setState(WAIT_FOR_DETAILS);
@@ -143,19 +143,20 @@ class Z3CESocket extends AbstractSolverSocket{
 
 
 	@Override
-	public void messageIncoming(Pipe pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().trim();
+		String msg = message.trim();
 
-		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
-			sc.addMessage(msg);
-			if(msg.indexOf("WARNING:")>-1){
+		if(msg.startsWith("(error")) {
+			sc.addMessage(msg, MessageType.Error);
+			if(msg.contains("WARNING:")){
 				return;
 			}
 			throw new IOException("Error while executing Z3: " +msg);
 		}
+		// TODO: success messages should also occur in the raw solver output
 		if (!msg.equals("success")) {
-			sc.addMessage(msg);
+			sc.addMessage(msg, MessageType.Output);
 		}
 
 		switch (sc.getState()) {
@@ -170,7 +171,7 @@ class Z3CESocket extends AbstractSolverSocket{
 					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
 					pipe.sendMessage("(get-model)");
 					pipe.sendMessage("(echo \"endmodel\")");
-					sc.setState(WAIT_FOR_MODEL);					
+					sc.setState(WAIT_FOR_MODEL);
 				}
 				if(msg.equals("unknown")){
 					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
@@ -183,15 +184,15 @@ class Z3CESocket extends AbstractSolverSocket{
 			case WAIT_FOR_DETAILS:
 				if(msg.equals("success")){
 //					pipe.close();
-				}						
-				break;		
+				}
+				break;
 
 			case WAIT_FOR_QUERY:
 				if(msg.equals("success")){
 //					pipe.close();
 				}
 				else {
-					query.messageIncoming(pipe, msg, message.getType().ordinal());
+					query.messageIncoming(pipe, msg);
 				}
 
 				break;
@@ -200,13 +201,13 @@ class Z3CESocket extends AbstractSolverSocket{
 				if(msg.equals("endmodel")){
 					if(query !=null && query.getState()==ModelExtractor.DEFAULT){
 						query.getModel().setEmpty(false);
-						//System.out.println("Starting query");						 
+						//System.out.println("Starting query");
 						query.start(pipe);
 						sc.setState(WAIT_FOR_QUERY);
 					}
 					else{
 						pipe.sendMessage("(exit)\n");
-						sc.setState(WAIT_FOR_DETAILS); 
+						sc.setState(WAIT_FOR_DETAILS);
 					}
 				}
 
@@ -225,18 +226,18 @@ class CVC3Socket extends AbstractSolverSocket{
 		super(name, query);
 	}
 
-	public void messageIncoming(Pipe pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().replace('-', ' ').trim();
-		sc.addMessage(msg);
-		if(message.getType() == MessageType.Error && msg.indexOf("Interrupted by signal") == -1) {
+		String msg = message.replace('-', ' ').trim();
+		sc.addMessage(msg, MessageType.Output);		// TODO: more precise message type
+		if(!msg.contains("Interrupted by signal")) {
 			throw new IOException("Error while executing CVC3: " + msg);
 		}
 
 		if(sc.getState() == WAIT_FOR_RESULT ){
-			if(msg.indexOf("unsat") > -1){
+			if(msg.contains("unsat")){
 				sc.setFinalResult(SMTSolverResult.createValidResult(name));
-			} else if(msg.indexOf("sat") > -1){
+			} else if(msg.contains("sat")){
 				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
 			}
 			sc.setState(FINISH);
@@ -254,33 +255,29 @@ class CVC4Socket extends AbstractSolverSocket{
         super(name, query);
     }
 
-	public void messageIncoming(Pipe pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
         SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().trim();
+		String msg = message.trim();
         if ("".equals(msg)) return;
-        if (msg.indexOf("success")==-1)
-            sc.addMessage(msg);
-        if (message.getType() == MessageType.Error) {
-            throw new IOException("Error while executing CVC4: " +msg);
-        }
-
-        // temp hack TODO js/mu
-		if(msg.contains("(error ")) {
-			throw new IOException("Something went wrong somewhere in CVC4: " + msg);
+        if (!msg.contains("success"))
+            sc.addMessage(msg, MessageType.Output);
+        if (message.contains("error") || message.contains("Error")) {
+            sc.addMessage(message, MessageType.Error);
+            throw new IOException("Error while executing CVC4: " + msg);
 		}
 
         if(sc.getState() == WAIT_FOR_RESULT ){
-            if(msg.indexOf("\n"+UNSAT) > -1){
+            if(msg.contains("\n" + UNSAT)){
                 sc.setFinalResult(SMTSolverResult.createValidResult(name));
                 sc.setState(FINISH);
 				pipe.sendMessage("(exit)");
 //				pipe.close();
-			} else if(msg.indexOf("\n"+SAT) > -1){
+			} else if(msg.contains("\n" + SAT)){
 				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
 				sc.setState(FINISH);
 				pipe.sendMessage("(exit)");
 //				pipe.close();
-			} else if(msg.indexOf("\n"+UNKNOWN)> -1){
+			} else if(msg.contains("\n" + UNKNOWN)){
 				sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
 				sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
@@ -291,6 +288,8 @@ class CVC4Socket extends AbstractSolverSocket{
     }
 
 }
+
+// TODO: legacy? remove?
 class SimplifySocket extends AbstractSolverSocket{
 
 	public SimplifySocket(String name, ModelExtractor query) {
@@ -298,27 +297,27 @@ class SimplifySocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe pipe, Message message) {
+	public void messageIncoming(Pipe pipe, String message) {
 		SolverCommunication sc = pipe.getSession();
-		sc.addMessage(message.getContent());
+		sc.addMessage(message, MessageType.Output);		// TODO: more precise message type
 
-
-		if(message.getContent().indexOf("Valid.")>-1){
-			sc.setFinalResult(SMTSolverResult.createValidResult(name));						
+		if(message.contains("Valid.")){
+			sc.setFinalResult(SMTSolverResult.createValidResult(name));
 			pipe.close();
 		}
 
-		if(message.getContent().indexOf("Invalid.")>-1){
-			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));						 
+		if(message.contains("Invalid.")){
+			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
 			pipe.close();
 		}
 
-		if(message.getContent().indexOf("Bad input:")>-1){
+		if(message.contains("Bad input:")){
 			pipe.close();
 		}
-	}	
+	}
 }
 
+// TODO: legacy? remove?
 class YICESSocket extends AbstractSolverSocket{
 
 	public YICESSocket(String name, ModelExtractor query) {
@@ -326,20 +325,24 @@ class YICESSocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe pipe, Message message) {
+	public void messageIncoming(Pipe pipe, String message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().replaceAll("\n","");
-		sc.addMessage(msg);
+		String msg = message.replaceAll("\n","");
+		sc.addMessage(msg, MessageType.Output);		// TODO: more precise message type
 
 
 		if(msg.equals(UNSAT)) {
-			sc.setFinalResult(SMTSolverResult.createValidResult(name));						
-			pipe.close();
+			sc.setFinalResult(SMTSolverResult.createValidResult(name));
+			// TODO: broken pipe here
+			pipe.sendMessage("(exit)");
+			//pipe.close();
 		}
 
 		if(msg.equals(SAT)) {
-			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));						 
-			pipe.close();
+			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+			// TODO: broken pipe here
+			pipe.sendMessage("(exit)");
+			//pipe.close();
 		}
 	}
 
