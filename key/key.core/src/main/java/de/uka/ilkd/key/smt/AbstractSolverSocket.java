@@ -50,15 +50,6 @@ public abstract class AbstractSolverSocket {
 		else if(type == SolverType.Z3_NEW_TL_SOLVER){
 			return new Z3Socket(name, query);
 		}
-		else if(type == SolverType.SIMPLIFY_SOLVER){
-			return new SimplifySocket(name, query);
-		}
-		else if(type == SolverType.YICES_SOLVER){
-			return new YICESSocket(name, query);
-		}
-		else if(type == SolverType.CVC3_SOLVER){
-			return new CVC3Socket(name, query);
-		}
         else if(type == SolverType.CVC4_SOLVER){
             return new CVC4Socket(name, query);
         }
@@ -220,34 +211,6 @@ class Z3CESocket extends AbstractSolverSocket{
 
 }
 
-class CVC3Socket extends AbstractSolverSocket{
-
-	public CVC3Socket(String name, ModelExtractor query) {
-		super(name, query);
-	}
-
-	public void messageIncoming(Pipe pipe, String message) throws IOException {
-		SolverCommunication sc = pipe.getSession();
-		String msg = message.replace('-', ' ').trim();
-		sc.addMessage(msg, MessageType.Output);		// TODO: more precise message type
-		if(!msg.contains("Interrupted by signal")) {
-			throw new IOException("Error while executing CVC3: " + msg);
-		}
-
-		if(sc.getState() == WAIT_FOR_RESULT ){
-			if(msg.contains("unsat")){
-				sc.setFinalResult(SMTSolverResult.createValidResult(name));
-			} else if(msg.contains("sat")){
-				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-			}
-			sc.setState(FINISH);
-			pipe.close();
-		}
-
-	}
-
-}
-
 class CVC4Socket extends AbstractSolverSocket{
 
 
@@ -284,70 +247,5 @@ class CVC4Socket extends AbstractSolverSocket{
 //                pipe.close();
             }
         }
-
     }
-
 }
-
-// TODO: legacy? remove?
-class SimplifySocket extends AbstractSolverSocket{
-
-	public SimplifySocket(String name, ModelExtractor query) {
-		super(name, query);
-	}
-
-	@Override
-	public void messageIncoming(Pipe pipe, String message) {
-		SolverCommunication sc = pipe.getSession();
-		sc.addMessage(message, MessageType.Output);		// TODO: more precise message type
-
-		if(message.contains("Valid.")){
-			sc.setFinalResult(SMTSolverResult.createValidResult(name));
-			pipe.close();
-		}
-
-		if(message.contains("Invalid.")){
-			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-			pipe.close();
-		}
-
-		if(message.contains("Bad input:")){
-			pipe.close();
-		}
-	}
-}
-
-// TODO: legacy? remove?
-class YICESSocket extends AbstractSolverSocket{
-
-	public YICESSocket(String name, ModelExtractor query) {
-		super(name, query);
-	}
-
-	@Override
-	public void messageIncoming(Pipe pipe, String message) throws IOException {
-		SolverCommunication sc = pipe.getSession();
-		String msg = message.replaceAll("\n","");
-		sc.addMessage(msg, MessageType.Output);		// TODO: more precise message type
-
-
-		if(msg.equals(UNSAT)) {
-			sc.setFinalResult(SMTSolverResult.createValidResult(name));
-			// TODO: broken pipe here
-			pipe.sendMessage("(exit)");
-			//pipe.close();
-		}
-
-		if(msg.equals(SAT)) {
-			sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-			// TODO: broken pipe here
-			pipe.sendMessage("(exit)");
-			//pipe.close();
-		}
-	}
-
-}
-
-
-
-

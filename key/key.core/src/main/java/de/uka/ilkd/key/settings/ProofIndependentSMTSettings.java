@@ -160,9 +160,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_NEW_TL_SOLVER, new SolverData(SolverType.Z3_NEW_TL_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_CE_SOLVER, new SolverData(SolverType.Z3_CE_SOLVER));
-                dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
-                dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
-                dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
                 dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
                 dataOfSolvers.put(SolverType.CVC4_NEW_TL_SOLVER, new SolverData(SolverType.CVC4_NEW_TL_SOLVER));
 
@@ -172,10 +169,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
                 // single solvers with legacy translation
                 legacyTranslationSolverUnions.add(new SolverTypeCollection("Z3 Legacy TL",1,SolverType.Z3_SOLVER));
-                legacyTranslationSolverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
-                legacyTranslationSolverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
                 legacyTranslationSolverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
-                legacyTranslationSolverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
 
                 // union of all solvers with new translation enabled
                 solverUnions.add(new SolverTypeCollection("All solvers",2,
@@ -185,10 +179,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 // all available solvers
                 legacyTranslationSolverUnions.add(new SolverTypeCollection("Multiple Solvers",2,SolverType.Z3_SOLVER,
                                 SolverType.Z3_NEW_TL_SOLVER,
-                                SolverType.YICES_SOLVER,
-                                SolverType.CVC3_SOLVER,
-                                SolverType.CVC4_SOLVER,
-                                SolverType.SIMPLIFY_SOLVER));
+                                SolverType.CVC4_SOLVER));
                 legacyTranslationSolverUnions.add(new SolverTypeCollection("Z3 old vs new TL",
                         2,SolverType.Z3_SOLVER,
                                 SolverType.Z3_NEW_TL_SOLVER));
