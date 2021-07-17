@@ -15,10 +15,7 @@ package org.key_project.util.java;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,6 +24,8 @@ import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -840,5 +839,44 @@ public final class IOUtil {
                 }
             }
         }
+    }
+
+
+    private static Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
+
+    /**
+     * Tries to open a stream with the given file name.
+     *
+     * @param fileName either an URL or a file name
+     * @throws IOException if file could not be opened
+     */
+    public static InputStream openStream(String fileName) throws IOException {
+        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
+        if (matcher.matches()) {
+            return openStreamFileInJar(matcher);
+        }
+
+        try {
+            URL url = new URL(fileName);
+            return url.openStream();
+        } catch (MalformedURLException e) {
+            return new FileInputStream(fileName);
+        }
+    }
+
+    private static InputStream openStreamFileInJar(String fileName) throws IOException {
+        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
+        if (matcher.matches()) {
+            return openStreamFileInJar(matcher);
+        }
+        throw new IllegalArgumentException("Given filename is not a file in jar file");
+    }
+
+    private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
+        String jarFile = matcher.group(1);
+        String file = matcher.group(2);
+        ZipFile zipFile = new ZipFile(jarFile);
+        ZipEntry entry = zipFile.getEntry(file);
+        return zipFile.getInputStream(entry);
     }
 }
