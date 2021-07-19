@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.communication;
 
 
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.SolverCommunication.MessageType;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

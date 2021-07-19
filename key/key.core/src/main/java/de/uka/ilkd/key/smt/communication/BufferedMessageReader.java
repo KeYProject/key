@@ -11,12 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
-
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
 

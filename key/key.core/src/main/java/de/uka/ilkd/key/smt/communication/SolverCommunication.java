@@ -11,13 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.communication;
+
+import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the

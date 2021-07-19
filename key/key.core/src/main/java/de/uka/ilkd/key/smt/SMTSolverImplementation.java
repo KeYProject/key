@@ -23,22 +23,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SolverCommunication;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-
-interface SolverListener {
-        void processStarted(SMTSolver solver, SMTProblem problem);
-
-        void processInterrupted(SMTSolver solver, SMTProblem problem,
-                        Throwable e);
-
-        void processStopped(SMTSolver solver, SMTProblem problem);
-
-        void processTimeout(SMTSolver solver, SMTProblem problem);
-
-        void processUser(SMTSolver solver, SMTProblem problem);
-}
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
  

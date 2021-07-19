@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.communication.Pipe;
 import de.uka.ilkd.key.smt.lang.SMTFunction;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.Util;
