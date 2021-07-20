@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -32,6 +33,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -1115,6 +1118,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fullyQualifiedName = suffix;
         else
             fullyQualifiedName += "." + suffix;
+    }
+
+    @Override
+    public Object visitPrimaryKeyTerm(JmlParser.PrimaryKeyTermContext ctx) {
+        KeyIO io = new KeyIO(services);
+        CharStream stream = CharStreams.fromString(ctx.getText(), ctx.start.getTokenSource().getSourceName());
+        Term expr = io.parseExpression(stream);
+        return new SLExpression(expr);
     }
 
     @Override

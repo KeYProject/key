@@ -467,6 +467,7 @@ CHAR_LITERAL:
 fragment OCT_CHAR:
         (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
+KEY_TERM: '`' -> pushMode(keyesc),more;
 STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
@@ -484,3 +485,9 @@ mode string;
 S_ESC: '\\"' -> more;
 S_END: '"' -> type(STRING_LITERAL), popMode;
 S_ANY: . -> more;
+
+
+mode keyesc;
+K_ESC: '\\`' -> more;
+K_END: '`' -> type(KEY_TERM), popMode;
+K_ANY: . -> more;

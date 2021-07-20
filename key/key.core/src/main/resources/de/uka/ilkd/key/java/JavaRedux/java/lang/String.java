@@ -30,8 +30,8 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires v != null;
       ensures \dl_seqLen ( \dl_strContent ( s ) ) == v.length
-          && \forall int i; ((i >= 0 && i < v.length)
-                       -> (int) \dl_seqGet(\dl_strContent(s), i) == v[i]));
+          && (\forall int i; i >= 0 && i < v.length;
+               (int) \dl_seqGet(\dl_strContent(s), i) == v[i]);
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -53,7 +53,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    also
    public exceptional_behavior
       requires v != null;
-      requires (offset < 0 || count < 0 || offset + count > v.length));
+      requires (offset < 0 || count < 0 || offset + count > v.length);
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
    also
@@ -98,7 +98,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       assignable \stricly_nothing;
    also
    public exceptional_behavior
-      requires charIdx < 0 || charIdx >= \dl_seqLen(\dl_strContent(this)))
+      requires charIdx < 0 || charIdx >= \dl_seqLen(\dl_strContent(this));
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
     */
@@ -114,11 +114,11 @@ public final class String extends java.lang.Object implements java.io.Serializab
                && dstBegin >= 0
                && dstBegin + (srcEnd - srcBegin) <= dst.length;
       ensures (\forall int i;
-               (0 <= i < (srcEnd - srcBegin) ->
+               0 <= i < (srcEnd - srcBegin);
                   (int) \dl_seqGet(\dl_strContent(this), srcBegin + i) == dst[dstBegin + i])
-               && (0 <= i < dstBegin -> dst[i] == \old(dst[i]))
+               && (0 <= i  && i < dstBegin ==> dst[i] == \old(dst[i]))
 			   && (dstBegin + (srcEnd - srcBegin) <= i < dst.length)
-			         -> dst[i] == \old(dst[i]));
+			         ==> dst[i] == \old(dst[i]);
       assignable dst[*];
    also
    public exceptional_behavior
@@ -154,7 +154,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    requires true;
    ensures \result <==> obj != null
           && obj instanceof java.lang.String
-          && \dl_strContent(s)==\dl_strContent((java.lang.String)obj)));
+          && \dl_strContent(s)==\dl_strContent((java.lang.String)obj);
    assignable \strictly_nothing;
    */
    public boolean equals(java.lang.Object obj);
@@ -172,8 +172,13 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \result <==>
                startIdx >= 0
               && (startIdx <= \dl_seqLen(\dl_strContent(stringCallee)))
-              && \dl_clStartsWith(\dl_seqSub(\dl_strContent(stringCallee), startIdx,
-                  \dl_seqLen(\dl_strContent(stringCallee))), \dl_strContent(stringArgument))));
+              && \dl_clStartsWith(
+                     \dl_seqSub(
+                        \dl_strContent(stringCallee), startIdx,
+                        \dl_seqLen(\dl_strContent(stringCallee))
+                     ),
+                     \dl_strContent(stringArgument)
+                 );
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -199,7 +204,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires other  != null;
-      ensures \result <==> \dl_clEndsWith(\dl_strContent(this), \dl_strContent(other)))
+      ensures \result <==> \dl_clEndsWith(\dl_strContent(this), \dl_strContent(other));
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -212,24 +217,22 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires true;
-      ensures \result == \dl_clHashCode(\dl_strContent(s)));
+      ensures \result == \dl_clHashCode(\dl_strContent(s));
       assignable \strictly_nothing;
    */
    public int hashCode();
    /*@
    public normal_behavior
       requires true;
-      ensures \result==\dl_clIndexOfChar ( \dl_strContent(this), charVal, 0 ) );
+      ensures \result==\dl_clIndexOfChar( \dl_strContent(this), charVal, 0);
       assignable \strictly_nothing;
-   also
-   private normal_behavior
    */
    public int indexOf(int charVal) { return indexOf(charVal, 0); }
 
    /*@
    public normal_behavior
       requires true;
-      ensures \result == \dl_clIndexOfChar(\dl_strContent(s), charVal, from));
+      ensures \result == \dl_clIndexOfChar(\dl_strContent(s), charVal, from);
       assignable \strictly_nothing;
    */
    public int indexOf(int arg0, int arg1);
@@ -251,7 +254,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires t != null;
-      ensures \result == \dl_clIndexOfCl(\dl_strContent(this), from, \dl_strContent(t)))
+      ensures \result == \dl_clIndexOfCl(\dl_strContent(this), from, \dl_strContent(t));
       assignable \strictly_nothing;
    also
       public exceptional_behavior
@@ -266,8 +269,10 @@ public final class String extends java.lang.Object implements java.io.Serializab
       requires t != null;
       ensures \result ==
                   \dl_clLastIndexOfCl(
-                     \dl_strContent(this), \dl_seqLen(\dl_strContent(this)) - 1,
-                                   \dl_strContent(other)))
+                     \dl_strContent(this),
+                     \dl_seqLen(\dl_strContent(this)) - 1,
+                     \dl_strContent(other));
+
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -281,7 +286,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires t != null;
       ensures \result ==
-                  \dl_clLastIndexOfCl(\dl_strContent(this), from, \dl_strContent(other)));
+                  \dl_clLastIndexOfCl(\dl_strContent(this), from, \dl_strContent(other));
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -296,10 +301,10 @@ public final class String extends java.lang.Object implements java.io.Serializab
       requires startIdx >= 0 && startIdx < \dl_seqLen(\dl_strContent(this));
       //boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
       ensures \result != null;
-      ensures \dl_strContent(\result)==\dl_seqSub(\dl_strContent(this), startIdx, \dl_seqLen(\dl_strContent(this));
+      ensures \dl_strContent(\result)==\dl_seqSub(\dl_strContent(this), startIdx, \dl_seqLen(\dl_strContent(this)));
       assignable \strictly_nothing;
    also
-   public exceptional behavior
+   public exceptional_behavior
       requires startIdx < 0 || startIdx > \dl_seqLen(\dl_strContent(this));
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
@@ -310,14 +315,14 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       ensures endIdx >= startIdx && startIdx >= 0
-           && endIdx <= \dl_seqLen(\dl_strContent(this)));
+           && endIdx <= \dl_seqLen(\dl_strContent(this));
       //boolean::select(heapAtPre, result, java.lang.Object::<created>)==FALSE
       ensures \result != null;
-      ensures \dl_strContent(result)==\dl_seqSub(\dl_strContent(this), startIdx, endIdx));
+      ensures \dl_strContent(result)==\dl_seqSub(\dl_strContent(this), startIdx, endIdx);
       assignable \strictly_nothing;
    also
    public exceptional_behavior
-      ensures (startIdx > endIdx || startIdx < 0 || endIdx > \dl_seqLen(\dl_strContent(this)));
+      ensures startIdx > endIdx || startIdx < 0 || endIdx > \dl_seqLen(\dl_strContent(this));
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
     */
@@ -327,7 +332,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires    other != null;
-      requires \dl_seqLen(\dl_strContent(other)) > 0);
+      requires \dl_seqLen(\dl_strContent(other)) > 0;
       //ensures boolean::select(heapAtPre, result, java.lang.Object::<created>)==FALSE
       ensures \result != null;
       ensures \dl_strContent(\result)==\dl_seqConcat(\dl_strContent(this), \dl_strContent(other));
@@ -388,16 +393,16 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires true;
       ensures \result != null;
-      ensures \dl_strContent(\result).length <= \dl_strContent(this).length);
+      ensures \dl_strContent(\result).length <= \dl_strContent(this).length;
       assignable \nothing;
    also
       public normal_behavior
       requires (\exists int i;
                (0 <= i & i < \dl_strContent(self).length
-                     && ((char)\dl_strContent(string)[i]) > '\u0020')) ->
+                     && ((char)\dl_strContent(string)[i]) > '\u0020'));
       ensures \result != null;
       ensures \dl_strContent(\result).length <= \dl_strContent(this).length;
-      ensures \dl_strContent(\result).length >= 1);
+      ensures \dl_strContent(\result).length >= 1;
     */
    public java.lang.String trim();
 
@@ -423,7 +428,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 
    /*@
    public normal_behavior
-      requires obj == null
+      requires obj == null;
       ensures \dl_strContent(\result) == "null";
       ensures \result != null;
       //       && boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
@@ -466,7 +471,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires (data != null);
       ensures (\forall int i; 0<= i < data.length;
-                  (int) \dl_seqGet(\dl_strContent(\result), i)==data[i]));
+                  (int) \dl_seqGet(\dl_strContent(\result), i)==data[i]);
       ensures \dl_seqLen(\dl_strContent(\result))==data.length;
       ensures \result != null;
       assignable \strictly_nothing;
@@ -483,7 +488,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       requires data != null && offset >= 0 && count >= 0
                && offset + count <= data.length;
       ensures (\forall int i; 0<= i && i < count;
-                  (int) \dl_strContent(\result)[i] == data[offset + i]));
+                  (int) \dl_strContent(\result)[i] == data[offset + i]);
       ensures \dl_seqLen(\dl_strContent(\result)) == count;
       ensures \result != null;
       assignable \strictly_nothing;
@@ -507,7 +512,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       requires data != null;
       requires offset >= 0 && count >= 0 && offset+count <= data.length;
       ensures \dl_seqLen(\dl_strContent(\result)) == count;
-      ensurs (\forall int i; 0 <= i < count;
+      ensures (\forall int i; 0 <= i < count;
                          (int) \dl_seqGet(\dl_strContent(\result), i) == data[i+offset]);
       //    && boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
       ensures \result != null;
@@ -561,12 +566,15 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires other != null;
-      ensures \result == \ifEx int i; (  i < \dl_seqLen(\dl_strContent(stringCallee))
-                                  && i < \dl_seqLen(\dl_strContent(stringArgument))
-                                  && int::seqGet(\dl_strContent(stringCallee),i)
-                                     != int::seqGet(\dl_strContent(stringArgument),i) )
-                        \then (int::seqGet(\dl_strContent(stringCallee), i) - int::seqGet(\dl_strContent(stringArgument), i))
-                        \else (\dl_seqLen(\dl_strContent(stringCallee)) - \dl_seqLen(\dl_strContent(stringArgument))) )
+      ensures \result ==
+         `
+            \ifEx int i;  ( i < seqLen(strContent(stringCallee))
+                          & i < \dl_seqLen(\dl_strContent(stringArgument))
+                          & int::seqGet(\dl_strContent(stringCallee), i)
+                              != int::seqGet(\dl_strContent(stringArgument),i))
+            \then (int::seqGet(\strContent(stringCallee), i) - int::seqGet(\strContent(stringArgument), i))
+            \else (\dl_seqLen(\strContent(stringCallee)) - \seqLen(\strContent(stringArgument))) )
+         `;
       assignable \strictly_nothing;
    also
    public exceptional_behavior
