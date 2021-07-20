@@ -20,7 +20,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -33,6 +36,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -804,7 +808,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         if (expr == null) {
-            raiseError(format("Expression %s cannot be resolved.", fullyQualifiedName), ctx);
+            raiseError(format("The fully qualified name '%s' could not be resolved.", fullyQualifiedName), ctx);
         }
         fullyQualifiedName = oldFqName;
         return expr;
@@ -962,7 +966,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String lookupName = fullyQualifiedName;
 
         if (fullyQualifiedName.startsWith("\\dl_")) {
-            return termFactory.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
+            try {
+                return termFactory.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
+            } catch (Exception e) {
+                raiseError(ctx, e);
+            }
         }
         SLParameters params = visitParameters(ctx.expressionlist());
 
@@ -1122,10 +1130,23 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryKeyTerm(JmlParser.PrimaryKeyTermContext ctx) {
-        KeyIO io = new KeyIO(services);
-        CharStream stream = CharStreams.fromString(ctx.getText(), ctx.start.getTokenSource().getSourceName());
-        Term expr = io.parseExpression(stream);
-        return new SLExpression(expr);
+        NamespaceSet nss = services.getNamespaces().shallowCopy();
+        nss.programVariables().add(selfVar);
+        nss.programVariables().add(excVar);
+        this.paramVars.forEach(it -> nss.programVariables().add(it));
+
+        KeyIO io = new KeyIO(services, nss);
+        final String text = ctx.getText();
+        CharStream stream = CharStreams.fromString(text.substring(1, text.length() - 1),
+                ctx.start.getTokenSource().getSourceName());
+        try {
+            KeyAst.Term syn = ParsingFacade.parseExpression(stream, ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            Term expr = io.parseExpression(syn);
+            return new SLExpression(expr);
+        } catch (SyntaxErrorReporter.ParserException e) {
+            raiseError(ctx, e);
+            return null;
+        }
     }
 
     @Override

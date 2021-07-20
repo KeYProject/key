@@ -89,6 +89,10 @@ public class KeyIO {
     public @Nonnull
     Term parseExpression(@Nonnull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
+        return parseExpression(ctx);
+    }
+
+    public Term parseExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null)
