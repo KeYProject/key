@@ -31,8 +31,7 @@ import java.io.OutputStream;
  */
 public class ExternalProcessLauncher {
     /** the store of all messages send to and received from the external process */
-    private final @Nonnull
-    SolverCommunication session;
+    private final @Nonnull SolverCommunication session;
 
     /** the delimiters which separate the messages */
     private final @Nonnull  String[] messageDelimiters;

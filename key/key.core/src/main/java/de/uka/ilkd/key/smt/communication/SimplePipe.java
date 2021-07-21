@@ -42,7 +42,7 @@ public class SimplePipe implements Pipe {
 
     @Override
     public void sendMessage(@Nonnull String message) throws IOException {
-        session.addMessage(message, SolverCommunication.MessageType.Input);
+        session.addMessage(message, SolverCommunication.MessageType.INPUT);
         outputStreamWriter.write(message + System.lineSeparator());
         outputStreamWriter.flush();
     }
@@ -54,7 +54,7 @@ public class SimplePipe implements Pipe {
     }
 
     @Override
-    public @Nonnull SolverCommunication getSession() {
+    public @Nonnull SolverCommunication getSolverCommunication() {
         return session;
     }
 

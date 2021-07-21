@@ -16,7 +16,6 @@ package de.uka.ilkd.key.smt.communication;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,97 +32,113 @@ import java.util.stream.Collectors;
  * @author Wolfram Pfeifer (overhaul)
  */
 public class SolverCommunication {
-	private final List<Message> messages = Collections.synchronizedList(new LinkedList<>());
-	
-	private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
-	private int state = 0;
-	private boolean resultHasBeenSet = false;
+    /** All messages (input/output/error) sent between KeY and SMT solver. */
+    private final List<Message> messages = Collections.synchronizedList(new LinkedList<>());
 
-	/**
-	 * The message type depends on the channel which was used for sending the message.
-	 */
-	public enum MessageType {Input, Output, Error}
+    /** The final result of the associated solver (unknown if not yet set). */
+    private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
 
+    /** The current state of the communication. The states are defined by the solver sockets. */
+    private int state = 0;
+
+    /**
+     * The message type depends on the channel which was used for sending the message.
+     */
+    public enum MessageType {
+        /** a message that has been sent from KeY to the solver */
+        INPUT,
+        /** a non-error message that has been sent from the solver to KeY */
+        OUTPUT,
+        /** an error message that has been sent from the solver to KeY */
+        ERROR
+    }
+
+    /**
+     * Represents a single message sent from or to the solver.
+     */
     public static final class Message {
-		private final String content;
-		private final MessageType type;
-	
-		public Message(String content, MessageType type) {
-			this.content = content;
-			this.type = type;
-		}
-		public String getContent() {
-			return content;
-		}	
-		public MessageType getType() {
-			return type;
-		}
-	}
+        /** the text of the message */
+        private final String content;
 
-	/**
-	 * Returns all messages that were sent between KeY and the solver.
-	 */
-	public Iterable<Message> getMessages() {
-		// return an new iterable object in order to guarantee that the list of messages
-		// cannot be changed.
-		return new Iterable<Message>() {
+        /** the type of the message (INPUT/OUTPUT/ERROR) */
+        private final MessageType type;
 
-			@Override
-			public Iterator<Message> iterator() {
-				return messages.iterator();
-			}
-		};
-	}
+        /**
+         * Creates a new message.
+         * @param content the text of the new message
+         * @param type the type of the new message
+         */
+        public Message(String content, MessageType type) {
+            this.content = content;
+            this.type = type;
+        }
+        public String getContent() {
+            return content;
+        }
+        public MessageType getType() {
+            return type;
+        }
+    }
 
-	/**
-	 * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
-	 * containing all the sent messages of the given type.
-	 * @param type the type to filter the messages for
-	 * @return a new Iterable containing all messages of the given type
-	 */
-	public Iterable<Message> getMessages(MessageType type) {
-		return messages.stream()
-					   .filter(m -> m.getType() == type)
-			           .collect(Collectors.toUnmodifiableList());
-	}
+    /**
+     * Returns all messages that were sent between KeY and the solver. Note that, input and output
+     * messages are interwoven but in order.
+     * @return all messages sent in both directions
+     */
+    public Iterable<Message> getMessages() {
+        // wrap into an unmodifiable list to prohibit changes to the messages list
+        return Collections.unmodifiableList(messages);
+    }
 
-	/**
-	 * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
-	 * containing all the output messages sent by the solver (including error messages!).
-	 * @return a new Iterable containing all output messages of the solver
-	 */
-	public Iterable<Message> getOutMessages() {
-		return messages.stream()
-			.filter(m -> m.getType() == MessageType.Output || m.getType() == MessageType.Error)
-			.collect(Collectors.toUnmodifiableList());
-	}
-	
-	public SMTSolverResult getFinalResult() {
-		return finalResult;
-	}
-	
-	/**
-	 * Returns the current state of the communication. The states are defined by the solver classes.
-	 */
-	public int getState() {
-		return state;
-	}
-	
-	public boolean resultHasBeenSet() {
-		return resultHasBeenSet;
-	}
+    /**
+     * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
+     * containing all the sent messages of the given type.
+     * @param type the type to filter the messages for
+     * @return a new Iterable containing all messages of the given type
+     */
+    public Iterable<Message> getMessages(MessageType type) {
+        // since we stream from a list, the original order is maintained
+        return messages.stream()
+            .sequential()
+            .filter(m -> m.getType() == type)
+            .collect(Collectors.toUnmodifiableList());
+    }
 
-	void setFinalResult(SMTSolverResult finalResult) {
-		this.finalResult = finalResult;
-		resultHasBeenSet = true;
-	}
+    /**
+     * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
+     * containing all the output messages sent by the solver (including error messages!).
+     * @return a new Iterable containing all output messages of the solver
+     */
+    public Iterable<Message> getOutMessages() {
+        // since we stream from a list, the original order is maintained
+        return messages.stream()
+            .sequential()
+            .filter(m -> m.getType() == MessageType.OUTPUT || m.getType() == MessageType.ERROR)
+            .collect(Collectors.toUnmodifiableList());
+    }
 
-	void addMessage(String message, MessageType type){
-		messages.add(new Message(message, type));
-	}
+    /**
+     * Adds a message to the communication log.
+     * @param message the text of the message to add
+     * @param type the type of the message to add
+     */
+    void addMessage(String message, MessageType type) {
+        messages.add(new Message(message, type));
+    }
 
-	void setState(int state) {
-		this.state = state;
-	}
-	
+    public SMTSolverResult getFinalResult() {
+        return finalResult;
+    }
+
+    void setFinalResult(SMTSolverResult finalResult) {
+        this.finalResult = finalResult;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    void setState(int state) {
+        this.state = state;
+    }
 }

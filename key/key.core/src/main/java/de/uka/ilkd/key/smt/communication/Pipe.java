@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  * This interface describes a pipe for sending messages to or receiving them from an external
- * process.
+ * SMT solver process.
  *
  * @author Wolfram Pfeifer
  */
@@ -27,16 +27,16 @@ public interface Pipe {
     @Nonnull String readMessage() throws IOException, InterruptedException;
 
     /**
-     *
-     * @return
+     * Can be used to obtain the messages sent to and from the solver as well as its final result.
+     * @return the data sent between KeY and solver until now
      */
-    @Nonnull SolverCommunication getSession();
+    @Nonnull SolverCommunication getSolverCommunication();
 
     /**
      * Forcibly closes the Pipe by destroying the process. Calling this method should be avoided if
-     * possible, since then the Pipe may lose messages or even. Most likely it is
-     * better to make the process terminate normally (e.g. by sending "(exit)" in case of SMT
-     * solvers) and wait for the pipe to automatically close.
+     * possible, since the Pipe may lose messages otherwise. Most likely it is better to make the
+     * process terminate normally (by sending "(exit)" to the SMT solver) and wait for the pipe to
+     * automatically close.
      */
     void close();
 }

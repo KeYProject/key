@@ -54,10 +54,10 @@ class LegacyPipe implements Pipe {
     private final String[] messageDelimiters;
 
     private static final Message EXCEPTION_MESSAGE =
-        new Message("Exception", MessageType.Error);
+        new Message("Exception", MessageType.ERROR);
 
     private static final Message STREAM_CLOSED_MESSAGE =
-        new Message("Stream closed", MessageType.Error);
+        new Message("Stream closed", MessageType.ERROR);
 
     /**
      * User specific data.
@@ -150,8 +150,8 @@ class LegacyPipe implements Pipe {
         this.process = process;
         this.outputWriter = new OutputStreamWriter(stdin);
 
-        stdoutReceiver = new Receiver(stdout, MessageType.Output, "receiver for normal messages");
-        stderrReceiver = new Receiver(stderr, MessageType.Error, "receiver for stderr messages");
+        stdoutReceiver = new Receiver(stdout, MessageType.OUTPUT, "receiver for normal messages");
+        stderrReceiver = new Receiver(stderr, MessageType.ERROR, "receiver for stderr messages");
 
         stdoutReceiver.setDaemon(true);
         stdoutReceiver.start();
@@ -204,7 +204,7 @@ class LegacyPipe implements Pipe {
         return stderrReceiver.alive && stdoutReceiver.alive;
     }
 
-    public @Nonnull SolverCommunication getSession() {
+    public @Nonnull SolverCommunication getSolverCommunication() {
         return session;
     }
 }

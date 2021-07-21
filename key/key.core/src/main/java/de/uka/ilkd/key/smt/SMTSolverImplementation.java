@@ -378,7 +378,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
     public String getRawSolverInput() {
         StringBuilder input = new StringBuilder();
 
-        for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.Input)) {
+        for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.INPUT)) {
             String s = m.getContent();
             input.append(s).append("\n");
         }
