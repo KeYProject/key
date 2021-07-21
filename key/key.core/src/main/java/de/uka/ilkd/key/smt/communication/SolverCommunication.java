@@ -19,14 +19,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the
  * messages that have been sent from the solver to KeY and vice versa.
- *
- * TODO: In contrast to the comment, it does currently not involve messages sent to the solver!
- *
  * Further, it also contains the final result of the solver.
+ * <br><br>
+ * <b>Note:</b> The solver outputs "endmodel" and "success" are currently not stored, since they are
+ * used solely to steer the interaction between solver and KeY.
  *
  * @author Benjamin Niedermann
  * @author Wolfram Pfeifer (overhaul)
@@ -37,13 +38,13 @@ public class SolverCommunication {
 	private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
 	private int state = 0;
 	private boolean resultHasBeenSet = false;
-	
+
 	/**
 	 * The message type depends on the channel which was used for sending the message.
 	 */
 	public enum MessageType {Input, Output, Error}
 
-    public static class Message {
+    public static final class Message {
 		private final String content;
 		private final MessageType type;
 	
@@ -63,7 +64,7 @@ public class SolverCommunication {
 	 * Returns all messages that were sent between KeY and the solver.
 	 */
 	public Iterable<Message> getMessages() {
-		// return an new iterable object in order to guarantee that the list of messgages 
+		// return an new iterable object in order to guarantee that the list of messages
 		// cannot be changed.
 		return new Iterable<Message>() {
 
@@ -72,6 +73,29 @@ public class SolverCommunication {
 				return messages.iterator();
 			}
 		};
+	}
+
+	/**
+	 * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
+	 * containing all the sent messages of the given type.
+	 * @param type the type to filter the messages for
+	 * @return a new Iterable containing all messages of the given type
+	 */
+	public Iterable<Message> getMessages(MessageType type) {
+		return messages.stream()
+					   .filter(m -> m.getType() == type)
+			           .collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
+	 * containing all the output messages sent by the solver (including error messages!).
+	 * @return a new Iterable containing all output messages of the solver
+	 */
+	public Iterable<Message> getOutMessages() {
+		return messages.stream()
+			.filter(m -> m.getType() == MessageType.Output || m.getType() == MessageType.Error)
+			.collect(Collectors.toUnmodifiableList());
 	}
 	
 	public SMTSolverResult getFinalResult() {
@@ -88,9 +112,7 @@ public class SolverCommunication {
 	public boolean resultHasBeenSet() {
 		return resultHasBeenSet;
 	}
-	
-	
-	/*Only public for classes of the same package */
+
 	void setFinalResult(SMTSolverResult finalResult) {
 		this.finalResult = finalResult;
 		resultHasBeenSet = true;

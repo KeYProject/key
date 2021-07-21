@@ -27,7 +27,6 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
@@ -351,38 +350,40 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 return name() + " (ID: " + ID + ")";
         }
 
-        @Override
-        public String getSolverOutput() {       	
-        	
-         		String output = "";
-                // TODO WP: separate result from real solver output
-        		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-        		
-                for(Message m : solverCommunication.getMessages()){
-                    String s = m.getContent();
+    @Override
+    public String getRawSolverOutput() {
 
-        			if(s.equals("endmodel")){
-        				break;
-        			}
-        			
-        			output += s+"\n";	
-        			
-        		}
-        		
-        		if(getSocket().getQuery()!=null){
-        			ModelExtractor mq = getSocket().getQuery();
-        			Model m = mq.getModel();
-        			if(m!=null){
-        				output += "\n\n";
-        				output += m.toString();
-        			}
-        			
-        			
-        			
-        		}		
-        		
-                return output;
+        StringBuilder output = new StringBuilder();
+
+        for (Message m : solverCommunication.getOutMessages()) {
+            String s = m.getContent();
+            output.append(s).append("\n");
         }
+
+        // queries are now included in message list of SolverCommunication
+        /*
+        if(getSocket().getQuery()!=null){
+            ModelExtractor mq = getSocket().getQuery();
+            Model m = mq.getModel();
+            if(m!=null){
+                output.append("\n\n");
+                output.append(m);
+            }
+        }*/
+
+        return output.toString();
+    }
+
+    @Override
+    public String getRawSolverInput() {
+        StringBuilder input = new StringBuilder();
+
+        for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.Input)) {
+            String s = m.getContent();
+            input.append(s).append("\n");
+        }
+        return input.toString();
+    }
 
         @Override
         public Collection<Throwable> getExceptionsOfTacletTranslation() {

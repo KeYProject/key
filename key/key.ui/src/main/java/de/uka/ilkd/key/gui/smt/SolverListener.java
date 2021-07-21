@@ -132,14 +132,13 @@ public class SolverListener implements SolverLauncherListener {
                                 
 
                         }
-                        addInformation("Translation", solver.getTranslation());
+                        addInformation("Solver Input", solver.getRawSolverInput());
                         if (solver.getTacletTranslation() != null) {
                                 addInformation("Taclets", solver
                                                 .getTacletTranslation()
                                                 .toString());
                         }
-                        addInformation("Solver Output",
-                                        solver.getSolverOutput());
+                        addInformation("Solver Output", solver.getRawSolverOutput());
 
                         Collection<Throwable> exceptionsOfTacletTranslation = solver
                                         .getExceptionsOfTacletTranslation();

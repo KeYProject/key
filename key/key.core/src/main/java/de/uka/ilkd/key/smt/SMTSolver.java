@@ -152,21 +152,27 @@ public interface SMTSolver {
      * 'unknown'.
      **/
     public SMTSolverResult getFinalResult();
-    
+
     /**
-     * Returns the solver output without any change. 
-     * The format is:
-     * "
-     * Normal Output:
-     * ...
-     * 
-     * Error Output:
-     * ...
-     * Exit Code: ...
-     * "
+     * Returns the raw solver output. This includes the result (sat/unsat/unknown), possibly
+     * error/warning messages, and possibly model/proof as certificate for sat/unsat.
+     *
+     * <br><br>
+     * <b>Note:</b> Since "endmodel" and "success" are used only for steering the interaction
+     * between solver and KeY, these are currently filtered out!
+     *
+     * @return the raw output of the SMT solver
      */
-    public String getSolverOutput();
-    
+    String getRawSolverOutput();
+
+    /**
+     * Returns the raw solver input. This includes the preamble, the translation of the sequent,
+     * and the commands send to the solver to obtain the result(s).
+     *
+     * @return the complete input that has been sent to the solver
+     */
+    String getRawSolverInput();
+
     /**
      * Returns the exceptions that has been thrown while translating taclets into assumptions. 
      */

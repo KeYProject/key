@@ -65,10 +65,7 @@ public abstract class AbstractSolverSocket {
 
 	public void setQuery(ModelExtractor query) {
 	    this.query = query;
-
     }
-
-
 }
 
 class Z3Socket extends AbstractSolverSocket{
@@ -88,7 +85,7 @@ class Z3Socket extends AbstractSolverSocket{
 			throw new IOException("Error while executing Z3: " + msg);
 		}
 
-		// TODO: success messages should also occur in the raw solver output
+		// used only to steer the interaction with the solver and thus filtered out currently
 		if (!msg.equals("success")) {
 			sc.addMessage(msg, MessageType.Output);
 		}
@@ -125,7 +122,6 @@ class Z3Socket extends AbstractSolverSocket{
 				break;
 		}
 	}
-
 }
 
 class Z3CESocket extends AbstractSolverSocket{
@@ -134,12 +130,10 @@ class Z3CESocket extends AbstractSolverSocket{
 		super(name, query);
 	}
 
-
-
 	@Override
 	public void messageIncoming(Pipe pipe, String message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.trim();
+		String msg = message; // do not trim (loses indentation) // .trim();
 
 		if(msg.startsWith("(error")) {
 			sc.addMessage(msg, MessageType.Error);
@@ -148,8 +142,9 @@ class Z3CESocket extends AbstractSolverSocket{
 			}
 			throw new IOException("Error while executing Z3: " +msg);
 		}
-		// TODO: success messages should also occur in the raw solver output
-		if (!msg.equals("success")) {
+		// These two messages are only used to steer the interaction with the solver and are thus
+		// currently filtered out to avoid cluttering up the output.
+		if (!msg.equals("success") && !msg.equals("endmodel")) {
 			sc.addMessage(msg, MessageType.Output);
 		}
 
@@ -204,14 +199,9 @@ class Z3CESocket extends AbstractSolverSocket{
 						sc.setState(WAIT_FOR_DETAILS);
 					}
 				}
-
-
 				break;
 		}
-
 	}
-
-
 }
 
 class CVC4Socket extends AbstractSolverSocket{
@@ -223,10 +213,15 @@ class CVC4Socket extends AbstractSolverSocket{
 
 	public void messageIncoming(Pipe pipe, String message) throws IOException {
         SolverCommunication sc = pipe.getSession();
-		String msg = message.trim();
+		String msg = message; // do not trim (loses indentation) // .trim();
+		//String msg = message.trim();
         if ("".equals(msg)) return;
-        if (!msg.contains("success"))
-            sc.addMessage(msg, MessageType.Output);
+
+        // used only to steer the interaction with the solver and thus filtered out currently
+        if (!msg.contains("success")) {
+			sc.addMessage(msg, MessageType.Output);
+		}
+
         if (message.contains("error") || message.contains("Error")) {
             sc.addMessage(message, MessageType.Error);
             throw new IOException("Error while executing CVC4: " + msg);

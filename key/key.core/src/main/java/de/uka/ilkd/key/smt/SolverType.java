@@ -38,7 +38,7 @@ public interface SolverType  {
 	 * Creates an instance of SMTSolver representing a concrete instance of that solver.
 	 * 		 */
 	public SMTSolver createSolver(SMTProblem problem,
-			SolverListener listener, Services services);
+								  SolverListener listener, Services services);
 
 	/**
 	 * Returns the name of the solver.
@@ -144,7 +144,7 @@ public interface SolverType  {
 
             @Override
             public SMTSolver createSolver(SMTProblem problem,
-                            SolverListener listener, Services services) {
+										  SolverListener listener, Services services) {
                     return new SMTSolverImplementation(problem, listener,
                                     services, this);
             }
@@ -313,7 +313,7 @@ public interface SolverType  {
 
 		@Override
 		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
 			return new SMTSolverImplementation(problem, listener,
 					services, this);
 		}
@@ -378,7 +378,7 @@ public interface SolverType  {
 	    // TODO move to AbstractSolverType?
         @Override
         public SMTSolver createSolver(SMTProblem problem,
-                        SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
             return new SMTSolverImplementation(problem, listener,
                             services, this);
         }
@@ -440,7 +440,7 @@ public interface SolverType  {
 	    // TODO move to AbstractSolverType?
         @Override
         public SMTSolver createSolver(SMTProblem problem,
-                        SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
             return new SMTSolverImplementation(problem, listener,
                             services, this);
         }
