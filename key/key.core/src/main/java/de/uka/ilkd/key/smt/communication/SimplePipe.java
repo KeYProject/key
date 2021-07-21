@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 
 /**
@@ -48,7 +49,7 @@ public class SimplePipe implements Pipe {
     }
 
     @Override
-    public @Nonnull String readMessage() throws IOException, InterruptedException {
+    public @Nullable String readMessage() throws IOException, InterruptedException {
         // blocks if there is currently no message
         return reader.readMessage();
     }

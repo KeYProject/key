@@ -18,6 +18,7 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -179,7 +180,7 @@ class LegacyPipe implements Pipe {
 
 
     @Override
-    public @Nonnull String readMessage() throws IOException, InterruptedException {
+    public @Nullable String readMessage() throws IOException, InterruptedException {
         while(isAlive()) {
             Message result = messageQueue.take();
             if (result == EXCEPTION_MESSAGE) {

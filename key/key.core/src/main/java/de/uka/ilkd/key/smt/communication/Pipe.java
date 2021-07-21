@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
@@ -24,7 +25,7 @@ public interface Pipe {
      * @throws IOException if reading fails
      * @throws InterruptedException if interrupted while waiting
      */
-    @Nonnull String readMessage() throws IOException, InterruptedException;
+    @Nullable String readMessage() throws IOException, InterruptedException;
 
     /**
      * Can be used to obtain the messages sent to and from the solver as well as its final result.
