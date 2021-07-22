@@ -81,7 +81,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \result==\dl_seqLen(\dl_strContent(this));
       assignable \strictly_nothing;
     */
-   public int length();
+   public /*@ helper */ int length();
 
    /*@
    public normal_behavior
@@ -89,7 +89,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \result <==> \dl_strContent(this)==\dl_seqEmpty();
       assignable \strictly_nothing;
    */
-   public boolean isEmpty();
+   public /*@ helper */ boolean isEmpty();
 
    /*@
    public normal_behavior
@@ -102,11 +102,11 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
     */
-   public char charAt(int charIdx);
-   public int codePointAt(int arg0);
-   public int codePointBefore(int arg0);
-   public int codePointCount(int arg0, int arg1);
-   public int offsetByCodePoints(int arg0, int arg1);
+   public /*@ helper */ char charAt(int charIdx);
+   public /*@ helper */ int codePointAt(int arg0);
+   public /*@ helper */ int codePointBefore(int arg0);
+   public /*@ helper */ int codePointCount(int arg0, int arg1);
+   public /*@ helper */ int offsetByCodePoints(int arg0, int arg1);
    /*@
    public normal_behavior
       requires dst != null && srcBegin >= 0 && srcBegin <= srcEnd
@@ -147,7 +147,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \dl_strContent(this);
      @*/
-   public byte[] getBytes();
+   public /*@ helper */ byte[] getBytes();
 
    /*@
    public normal_behavior
@@ -157,14 +157,14 @@ public final class String extends java.lang.Object implements java.io.Serializab
           && \dl_strContent(this)==\dl_strContent((java.lang.String)obj);
    assignable \strictly_nothing;
    */
-   public boolean equals(java.lang.Object obj);
+   public /*@ helper */ boolean equals(java.lang.Object obj);
 // public boolean contentEquals(java.lang.StringBuffer arg0);
 // public boolean contentEquals(java.lang.CharSequence arg0);
-   public boolean equalsIgnoreCase(java.lang.String arg0);
-   public int compareTo(java.lang.String arg0);
-   public int compareToIgnoreCase(java.lang.String arg0);
-   public boolean regionMatches(int arg0, java.lang.String arg1, int arg2, int arg3);
-   public boolean regionMatches(boolean arg0, int arg1, java.lang.String arg2, int arg3, int arg4);
+   public /*@ helper */ boolean equalsIgnoreCase(java.lang.String arg0);
+   public /*@ helper */ int compareTo(java.lang.String arg0);
+   public /*@ helper */ int compareToIgnoreCase(java.lang.String arg0);
+   public /*@ helper */ boolean regionMatches(int arg0, java.lang.String arg1, int arg2, int arg3);
+   public /*@ helper */ boolean regionMatches(boolean arg0, int arg1, java.lang.String arg2, int arg3, int arg4);
 
    /*@
    public normal_behavior
@@ -186,7 +186,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
    */
-   public boolean startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
+   public boolean /*@ helper */ startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
 
    /*@
    public normal_behavior
@@ -199,7 +199,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
     */
-   public boolean startsWith(java.lang.String other);
+   public boolean /*@ helper */ startsWith(java.lang.String other);
 
    /*@
    public normal_behavior
@@ -212,7 +212,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
     */
-   public boolean endsWith(java.lang.String other);
+   public /*@ helper */ boolean endsWith(java.lang.String other);
 
    /*@
    public normal_behavior
@@ -220,14 +220,14 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \result == \dl_clHashCode(\dl_strContent(this));
       assignable \strictly_nothing;
    */
-   public int hashCode();
+   public /*@ helper */ int hashCode();
    /*@
    public normal_behavior
       requires true;
       ensures \result==\dl_clIndexOfChar( \dl_strContent(this), charVal, 0);
       assignable \strictly_nothing;
    */
-   public int indexOf(int charVal) { return indexOf(charVal, 0); }
+   public /*@ helper */ int indexOf(int charVal) { return indexOf(charVal, 0); }
 
    /*@
    public normal_behavior
@@ -235,7 +235,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \result == \dl_clIndexOfChar(\dl_strContent(this), charVal, from);
       assignable \strictly_nothing;
    */
-   public int indexOf(int charVal, int from);
+   public /*@ helper */ int indexOf(int charVal, int from);
 
    /* @
    public normal_behavior
@@ -245,11 +245,11 @@ public final class String extends java.lang.Object implements java.io.Serializab
                   \dl_seqLen(\dl_strContent(this)) - 1));
       assignable \strictly_nothing;
    */
-   public int lastIndexOf(int charVal) { return lastIndexOf(charVal, 0); }
+   public /*@ helper */ int lastIndexOf(int charVal) { return lastIndexOf(charVal, 0); }
 
-   public int lastIndexOf(int charVal, int from);
+   public /*@ helper */ int lastIndexOf(int charVal, int from);
 
-   public int indexOf(java.lang.String other) { return indexOf(other, 0); }
+   public /*@ helper */ int indexOf(java.lang.String other) { return indexOf(other, 0); }
 
    /*@
    public normal_behavior
@@ -262,7 +262,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
    */
-   public int indexOf(java.lang.String t, int from);
+   public /*@ helper */ int indexOf(java.lang.String t, int from);
 
    /*@
    public normal_behavior
@@ -280,7 +280,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
    */
-   public int lastIndexOf(java.lang.String other);
+   public /*@ helper */ int lastIndexOf(java.lang.String other);
 
    /*@
    public normal_behavior
@@ -294,7 +294,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
    */
-   public int lastIndexOf(java.lang.String other, int from);
+   public /*@ helper */ int lastIndexOf(java.lang.String other, int from);
 
    /*@
    public normal_behavior
@@ -309,7 +309,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
    */
-   public java.lang.String substring(int startIdx);
+   public /*@ helper */ java.lang.String substring(int startIdx);
 
 
    /*@
@@ -326,7 +326,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.IndexOutOfBoundsException) true;
       assignable \strictly_nothing;
     */
-   public java.lang.String substring(int startIdx, int endIdx);
+   public /*@ helper */ java.lang.String substring(int startIdx, int endIdx);
 // public java.lang.CharSequence subSequence(int arg0, int arg1);
 
    /*@
