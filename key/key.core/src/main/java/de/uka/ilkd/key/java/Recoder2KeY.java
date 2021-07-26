@@ -401,12 +401,16 @@ public class Recoder2KeY implements JavaReader {
                          Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
                          BufferedReader br = new BufferedReader(fr)) {
                         cu = servConf.getProgramFactory().parseCompilationUnit(br);
+                    } catch (Exception e) {
+                        throw new ParseExceptionInFile(filename, e);
                     }
                 } else {
                     // fallback without FileRepo
                     try (Reader fr = new FileReader(filename);
                          BufferedReader br = new BufferedReader(fr)) {
                         cu = servConf.getProgramFactory().parseCompilationUnit(br);
+                    } catch (Exception e) {
+                        throw new ParseExceptionInFile(filename, e);
                     }
                 }
 
