@@ -241,6 +241,10 @@ public abstract class AbstractProblemLoader {
         this.includes = includes;
     }
 
+    protected void setProof(Proof proof) {
+    	this.proof = proof;
+    }
+
     /**
      * Executes the loading process and tries to instantiate a proof
      * and to re-apply rules on it if possible.
@@ -248,53 +252,27 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public void load() throws ProofInputException, IOException, ProblemLoaderException {
+    public final void load() throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
-        FileRepo fileRepo = createFileRepo();
-
-        // Read environment
-        envInput = createEnvInput(fileRepo);
-        problemInitializer = createProblemInitializer(fileRepo);
-        initConfig = createInitConfig();
-        initConfig.setFileRepo(fileRepo);
-        if (!problemInitializer.getWarnings().isEmpty()) {
-            control.reportWarnings(problemInitializer.getWarnings());
-        }
-        // Read proof obligation settings
+        loadEnvironment();
+        
+        
         LoadedPOContainer poContainer = createProofObligationContainer();
         ProofAggregate proofList = null;
         try {
             if (poContainer == null) {
                 if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                    if (control.selectProofObligation(initConfig)) {
-                        return;
-                    } else {
-                        // That message would be reported otherwise. Undesired.
-                        // return new ProblemLoaderException(this, "Aborted.");
-                        return;
-                    }
+                	selectAndLoadProof(control, initConfig);
                 } else {
                     // Do not instantiate any proof but allow the user of the DefaultProblemLoader
                     // to access the loaded InitConfig.
                     return;
                 }
+            } else {
+                proofList = createProof(poContainer);
+            	loadSelectedProof(poContainer, proofList);
             }
-
-            // Create and register proof at specification repository
-            proofList = createProof(poContainer);
-
-            // try to replay first proof
-            proof = proofList.getProof(poContainer.getProofNum());
-
-
-            if (proof != null) {
-                OneStepSimplifier.refreshOSS(proof);
-                result = replayProof(proof);
-            }
-
-            // this message is propagated to the top level in console mode
-            return; // Everything fine
         } catch (Throwable t) {
             // Throw this exception; otherwise, it can for instance occur
             // that "result" will be null (if replayProof(...) fails) and
@@ -304,8 +282,61 @@ public abstract class AbstractProblemLoader {
             control.loadingFinished(this, poContainer, proofList, result);
         }
     }
+    
+    /**
+     * Loads and initialized the proof environment.
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
+     * @see AbstractProblemLoader#load()
+     */
+    protected void loadEnvironment() throws ProofInputException, IOException {
+        FileRepo fileRepo = createFileRepo();
+        
+    	envInput = createEnvInput(fileRepo);
+        problemInitializer = createProblemInitializer(fileRepo);
+        initConfig = createInitConfig();
+        initConfig.setFileRepo(fileRepo);
+        if (!problemInitializer.getWarnings().isEmpty()) {
+            control.reportWarnings(problemInitializer.getWarnings());
+        }
+    }
 
     /**
+     * Asks the user to select a proof obligation and loads it.
+     * @param the ui controller.
+     * @param initConfig the proof configuration.
+     * @see AbstractProblemLoader#load()
+     */
+    protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
+    	if (control.selectProofObligation(initConfig)) {
+            return;
+        } else {
+            // That message would be reported otherwise. Undesired.
+            // return new ProblemLoaderException(this, "Aborted.");
+            return;
+        }
+    }
+    /**
+     * Loads a proof from the proof list.
+     * @param poContainer the container created by {@link #createProofObligationContainer()}.
+     * @param proofList the proof list containing the proof to load.
+     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     * @see AbstractProblemLoader#load()
+     */
+	protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList)
+			throws ProofInputException, ProblemLoaderException {
+        // try to replay first proof
+        proof = proofList.getProof(poContainer.getProofNum());
+
+
+        if (proof != null) {
+            OneStepSimplifier.refreshOSS(proof);
+            result = replayProof(proof);
+        }
+	}
+
+	/**
      * Find first 'non-wrapper' exception type in cause chain.
      */
     private Throwable unwrap(Throwable e) {

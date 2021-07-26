@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,7 +21,10 @@ import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
@@ -100,8 +104,22 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
            ptl.taskFinished(tfi);
        }
    }
+   
 
-    /**
+
+   @Override
+	protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
+	   	if (control.selectProofObligation(initConfig)) {
+			setProof(mediator.getSelectedProof());
+	        return;
+	    } else {
+	        // That message would be reported otherwise. Undesired.
+	        // return new ProblemLoaderException(this, "Aborted.");
+	        return;
+	    }
+	}
+
+	/**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
      * The start is announced by invoking

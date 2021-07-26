@@ -84,7 +84,9 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
                 final ProofAggregate pl = pi.startProver(initConfig, po);
 
                 ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
-
+                
+                mediator.setProof(pl.getFirstProof());
+                
             } catch (ProofInputException exc) {
                 exc.printStackTrace();
             }
