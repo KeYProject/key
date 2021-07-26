@@ -264,10 +264,6 @@ public abstract class AbstractProblemLoader {
             if (poContainer == null) {
                 if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
                     selectAndLoadProof(control, initConfig);
-                } else {
-                    // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                    // to access the loaded InitConfig.
-                    return;
                 }
             } else {
                 proofList = createProof(poContainer);
@@ -308,13 +304,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
-        if (control.selectProofObligation(initConfig)) {
-            return;
-        } else {
-            // That message would be reported otherwise. Undesired.
-            // return new ProblemLoaderException(this, "Aborted.");
-            return;
-        }
+        control.selectProofObligation(initConfig);
     }
     /**
      * Loads a proof from the proof list.
