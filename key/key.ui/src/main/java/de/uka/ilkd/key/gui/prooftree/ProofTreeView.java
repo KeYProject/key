@@ -303,11 +303,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private void setProofTreeFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+
+        /* We set a constant row height for all rows. This increases the performance of JTree,
+         * since this way it does have to not calculate the height of each individual row by its
+         * content. This is a reasonable optimization since variable row heights are not needed in
+         * our case. The greatest benefit is observable when collapsing large branches. */
+        int rowHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
+
         if (myFont != null) {
+            rowHeight = delegateView.getFontMetrics(myFont).getHeight();
+            // set row height before changing the font (since the latter repaints the component)
+            delegateView.setRowHeight(rowHeight);
+
             delegateView.setFont(myFont);
         } else {
             Debug.out("KEY-PROOF_TREE_FONT not available, " +
                     "use standard font.");
+            delegateView.setRowHeight(rowHeight);
         }
     }
 
