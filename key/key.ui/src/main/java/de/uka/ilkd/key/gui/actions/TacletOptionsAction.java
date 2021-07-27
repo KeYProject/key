@@ -48,8 +48,7 @@ public class TacletOptionsAction extends MainWindowAction {
                             "If you wish to see the available options "
                             + "for a proof, you have to load one first."));
         } else {
-            new ChoiceSelector
-            (ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
+            new ChoiceSelector(mainWindow, ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
         }
     }
 }

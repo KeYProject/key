@@ -50,7 +50,6 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 
 public class ChoiceSelector extends JDialog {
 
@@ -72,34 +71,27 @@ public class ChoiceSelector extends JDialog {
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** creates a new TacletOptionsSettings, using the <code>ChoiceSettings</code>
-     * from <code>settings</code> */
-    public ChoiceSelector(ChoiceSettings settings) {  
-	super(new JFrame(), "Taclet Base Configuration", true);
-       	this.settings = settings;
-	category2DefaultChoice = settings.getDefaultChoices();
-	if(category2DefaultChoice.isEmpty()) {
-	    JOptionPane.showConfirmDialog
-		(ChoiceSelector.this,
-		 "There are no Taclet Options available as the rule-files "+
-		 "have not been parsed yet!",
-		 "No Options available", 
-		 JOptionPane.DEFAULT_OPTION);
-	    dispose();
-	} else {
-	    category2Choices = settings.getChoices();
-	    layoutChoiceSelector();
-	    setChoiceList();
-	    pack();
-	    setLocationRelativeTo(null);
-	    //setLocation(70, 70);
-	    setVisible(true);
-	}
-    }
-
-    /** creates a new TacletOptionsSettings */
-    public ChoiceSelector(){
-	this(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
+    /** Creates a new dialog for choosing taclet options.
+     * @param mainWindow the parent window (dialog is centered on this)
+     * @param settings the currently selected settings */
+    public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
+        super(mainWindow, "Taclet Base Configuration", true);
+        this.settings = settings;
+        category2DefaultChoice = settings.getDefaultChoices();
+        if(category2DefaultChoice.isEmpty()) {
+            JOptionPane.showConfirmDialog(ChoiceSelector.this,
+                "There are no Taclet Options available as the rule-files have not been parsed yet!",
+                "No Options available",
+                JOptionPane.DEFAULT_OPTION);
+            dispose();
+        } else {
+            category2Choices = settings.getChoices();
+            layoutChoiceSelector();
+            setChoiceList();
+            pack();
+            setLocationRelativeTo(mainWindow);
+            setVisible(true);
+        }
     }
 
     /** layout */
