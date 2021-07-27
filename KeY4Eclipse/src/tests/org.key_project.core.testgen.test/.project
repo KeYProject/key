@@ -29,12 +29,12 @@
 		<link>
 			<name>key.resources</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.testgen.test/resources</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.testgen/src/test/resources</locationURI>
 		</link>
 		<link>
 			<name>key.src</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.testgen.test/src</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.testgen/src/test/java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

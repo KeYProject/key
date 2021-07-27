@@ -24,7 +24,7 @@ public class OwnerPIN implements PIN {
           && JCSystem.isTransient(_isValidated) == JCSystem.CLEAR_ON_RESET
           && !\transactionUpdated(_isValidated); @*/
 
-    //@ public represents validatedRep = _isValidated[0];
+    //@ public represents validatedRep = \locset(_isValidated[0]);
     //@ public represents isValidated = _isValidated[0];
 
     private /*@ spec_public non_null @*/ byte[] _pin;

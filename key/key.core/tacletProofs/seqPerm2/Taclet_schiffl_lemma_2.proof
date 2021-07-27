@@ -1,0 +1,419 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Thu Oct 27 13:34:28 CEST 2016
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_RESTRICTED
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=2000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Thu Oct 27 13:34:28 CEST 2016
+name=schiffl_lemma_2
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proofScript "
+macro split-prop;
+rule allRight;
+rule allRight;
+macro split-prop;
+rule 'seqPermDefLeft';
+rule 'andLeft';
+rule 'exLeft';
+macro split-prop;
+# the following equations are useful in many case.
+rule  seqNPermRange;
+instantiate var=iv with='v_x_0' occ=1;
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+# 1. triple of equations
+instantiate var=iv with='v_y_0' occ=1;
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+# 2. triple of equations
+rule seqNPermDefLeft;
+instantiate var=iv with='v_x_0' occ=2;
+rule impLeft;
+tryclose branch; 
+rule exLeft;
+rule andLeft;
+rule andLeft;
+# 3. triple of equations
+instantiate hide var=iv with='v_y_0' occ=2;
+rule impLeft;
+tryclose branch; 
+rule exLeft;
+rule andLeft;
+rule andLeft;
+# 4. triple of equations
+instantiate var=iv with='jv_0' occ=1;
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+rule castAdd formula='s_0[jv_0] = v_x_0' occ=0;
+# 5. set of equations
+instantiate hide var=iv with='jv_1' occ=1;
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+rule castAdd formula='s_0[jv_1] = v_y_0' occ=0;
+# 6. set of equations
+instantiate var=iv  with='v_x_0';
+rule impLeft;
+tryclose branch;
+# 7. equation
+instantiate var=iv  with='v_y_0';
+rule impLeft;
+tryclose branch;
+# 8. equation
+cut 'v_x_0 = v_y_0';
+# This corresponds to case A in the Notes.
+instantiate hide var='v_r' with='seqSwap(s_0,v_x_0,jv_0)';
+# in the following r refers to this instantion
+rule andRight;
+rule andRight;
+rule andRight;
+rule andRight;
+rule lenOfSwap;
+tryclose branch;
+# established: r is of correct length
+rule seqNPermSwapNPerm;
+instantiate hide var='iv' with='v_x_0' occ=1;
+instantiate hide var='jv' with='jv_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+# established: r is permutation
+rule allRight;
+rule impRight;
+rule andLeft;
+instantiate var=iv with='v_iv_0';
+rule impLeft;
+tryclose branch;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+#  established:  witness property of r
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: r fixes v_x_0
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: r fixes v_y_0
+# from now on v_x_0 != v_y_0
+cut '(int)s_0[v_x_0] = (int)s_0[v_y_0]';
+rule seqNPermInjective;
+instantiate hide var=iv with='v_x_0';
+instantiate hide var=jv with='v_y_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+## from now on s_0[v_x_0] != v_x_0
+cut '(int)s_0[v_x_0] = v_x_0';
+# This corresponds to case B1 & B2  in the Notes.
+instantiate hide var=v_r with='seqSwap(s_0,v_y_0,jv_1)';
+# in the following r1 refers to this instantion
+rule andRight;
+rule andRight;
+rule andRight;
+rule andRight;
+tryclose branch;
+# established: r1 is of the correct length
+rule seqNPermSwapNPerm;
+instantiate hide var=iv with='v_y_0';
+instantiate hide var=jv with='jv_1';
+tryclose branch;
+# established: r1 is permutation
+rule allRight;
+rule impRight;
+rule andLeft;
+instantiate var=iv with='v_iv_0';
+rule impLeft;
+tryclose branch;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+tryclose branch;
+instantiate var=iv with='v_y_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: witness property for r1
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+# established: r1 fixes v_x_0
+tryclose branch;
+# established: r1 fixes v_y_0
+# from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0
+cut  '(int)s_0[v_y_0] = v_y_0';
+# This corresponds to case B3  in the Notes.
+instantiate hide var=v_r with='seqSwap(s_0,v_x_0,jv_0)';
+# in the following r2 refers to this instantion
+rule andRight;
+rule andRight;
+rule andRight;
+rule andRight;
+tryclose branch;
+# established: r2 is of the correct length
+rule seqNPermSwapNPerm;
+instantiate hide var=iv with='v_x_0';
+instantiate hide var=jv with='jv_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+# established: r2 is permutation
+rule allRight;
+rule impRight;
+rule andLeft;
+instantiate var=iv with='v_iv_0';
+rule impLeft;
+tryclose branch;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: witness property for r2
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+# established: r2 fixes v_x_0
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+# established: r2 fixes v_y_0
+# from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  s_0[v_y_0]!= v_y_0
+cut '(int)s_0[v_x_0]=v_y_0';
+# This corresponds to case B4i & B4iii  in the Notes.
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0,jv_0,v_x_0),jv_0,v_y_0)';
+# in the following r3 refers to this instantion
+rule andRight;
+rule andRight;
+rule andRight;
+rule andRight;
+tryclose branch;
+# established: r3 is of the correct length
+rule seqNPermSwapNPerm;
+instantiate hide var=iv with='jv_0';
+instantiate hide var=jv with='v_x_0';
+rule impLeft;
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0, jv_0, v_x_0))';
+instantiate hide var=iv with='jv_0';
+instantiate hide var=jv with='v_y_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+# established: r3 is permutation
+rule allRight;
+rule impRight;
+rule andLeft;
+# start: providing equation for latter use
+#        in many case distinctions
+instantiate var=iv with='v_iv_0';
+rule impLeft;
+tryclose branch;
+# end: providing equation for latter use
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: case v_iv_3=jv_0 in the unravelling of r3
+rule ifthenelse_split;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: case v_iv_3=v_y_0 in the unravelling of r3
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: witness property for r3
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+rule andLeft;
+rule andLeft;
+rule andLeft;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split occ=0;
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+tryclose branch;
+# established: r3 fixes v_x_0
+rule getOfSwap;
+rule ifthenelse_negated;
+rule ifthenelse_split occ=0;
+tryclose branch;
+tryclose branch;
+# established: r3 fixes v_y_0
+# from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  
+# s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0
+cut 'int::seqGet(s_0, v_y_0)=v_x_0';
+# This corresponds to case B4ii  in the Notes.
+# in the following r4 refers to this instantion
+tryclose branch;
+# established: r4 is of the correct length
+rule seqNPermSwapNPerm;
+instantiate hide var=iv with='jv_1';
+instantiate hide var=jv with='v_y_0';
+rule impLeft;
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,jv_1,v_y_0))';
+instantiate hide var=iv with='jv_1';
+instantiate hide var=jv with='v_x_0';
+rule impLeft;
+tryclose branch;
+tryclose branch;
+# established: r4 is permutation
+# established: r4 fixes v_y_0
+# from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  
+# s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0 and  s_0[v_y_0]!=v_x_0;
+# this corresponds to case B4iv in the Notes
+# in the following r5 refers to this instantion
+tryclose branch;
+# established: r5 is of the correct length
+rule seqNPermSwapNPerm formula='seqNPerm(s_0)';
+instantiate hide var=iv with='v_x_0';
+instantiate hide var=jv with='jv_0';
+rule impLeft;
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
+instantiate hide var=iv with='v_y_0';
+instantiate hide var=jv with='jv_1';
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(s_0)';
+instantiate hide var=iv with='v_x_0';
+instantiate hide var=jv with='jv_0';
+rule impLeft;
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
+instantiate hide var=iv with='v_y_0';
+instantiate hide var=jv with='jv_1';
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
+tryclose branch;
+"
+

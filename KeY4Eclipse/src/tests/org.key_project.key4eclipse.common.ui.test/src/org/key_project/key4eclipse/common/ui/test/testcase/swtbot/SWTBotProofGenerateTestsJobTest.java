@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestZ3;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
@@ -56,7 +57,7 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
          IFile proofFile = src.getFile("IntegerUtil.proof");
          assertTrue(proofFile.exists());
          // Open Proof
-         env = WindowUserInterfaceControl.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, null, false);
+         env = WindowUserInterfaceControl.loadInMainWindow(JavaProfile.getDefaultProfile(),ResourceUtil.getLocation(proofFile), null, null, null, false, false);
          KeYMediator mediator = env.getUi().getMediator();
          assertNotNull(mediator);
          Proof proof = env.getLoadedProof();

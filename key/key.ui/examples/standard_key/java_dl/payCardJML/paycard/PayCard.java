@@ -69,7 +69,7 @@ public class PayCard implements LimitedIntContainer {
       @   requires LogRecord.transactionCounter >= 0;
       @   requires amount > 0;
       @   assignable balance, unsuccessfulOperations, log.currentRecord, 
-      @              \infinite_union(int x; 0 <= x && x < log.logArray.length ? log.logArray[x].* : \empty),
+      @              (\infinite_union int x; 0 <= x && x < log.logArray.length ? log.logArray[x].* : \empty),
       @              LogRecord.transactionCounter;
       @   ensures balance >= \old(balance);
       @*/

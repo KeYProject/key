@@ -52,7 +52,7 @@ tempDir = ../../key.core.test/runallproofs_tmp
  * 
  * Timeout per subprocess in seconds
  */
-forkTimeout = 1000
+forkTimeout = 2000
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses 
@@ -95,7 +95,7 @@ keySettings = "#Proof-Settings-Config-File
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INVARIANT
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
@@ -120,7 +120,7 @@ keySettings = "#Proof-Settings-Config-File
 [SMTSettings]instantiateHierarchyAssumptions=true
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off
+[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment:efficient
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 
 "
@@ -189,7 +189,7 @@ group applicationRestrictions {
    notprovable ./heap/polarity_tests/wellformed11.key
 }
 
-# Tests for block contracts:
+# Tests for block & loop contracts:
 group blockContracts {
    provable ./heap/block_contracts/Simple__add.key
    provable ./heap/block_contracts/Simple__addAbsoluteValues.key
@@ -203,6 +203,18 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
+   provable ./heap/block_loop_contracts/Free/assertions0.key
+   provable ./heap/block_loop_contracts/Free/assertions1.key
+   provable ./heap/block_loop_contracts/Free/blockContracts0.key
+   provable ./heap/block_loop_contracts/Free/blockContracts1.key
+   notprovable ./heap/block_loop_contracts/Finally/block_finally.key
+   notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -217,6 +229,7 @@ group javaCard {
 
 # Other tests:
    provable ./heap/coincidence_count/project.key
+   provable ./heap/verifyThis11_1_Maximum/project.key
    provable ./heap/fm12_01_LRS/lcp.key
    provable ./heap/SemanticSlicing/project.key
    provable ./heap/information_flow/ArrayList_contains.key
@@ -357,6 +370,8 @@ group simpleTests {
    provable ./heap/strictly_pure/useStrictlyPureMethod.key
    provable ./heap/Wellfounded/ackermann.key
    provable ./standard_key/unicode_test.key
+   provable ./heap/strictlyModular/mayExpand.key
+   notprovable ./heap/strictlyModular/modularOnly.key
 }
 
 group SmansEtAl {
@@ -575,7 +590,8 @@ group javadl {
    provable ./standard_key/java_dl/methodCall.key
    provable ./standard_key/java_dl/methodCall1.key
    provable ./standard_key/java_dl/methodCall1box.key
-   provable ./standard_key/java_dl/methodCall2.key
+## Commented out as this can not be proved modularly sound (See !183 which is related)
+#  provable ./standard_key/java_dl/methodCall2.key
    provable ./standard_key/java_dl/methodCall3.key
    provable ./standard_key/java_dl/polishFlagSort.key
    provable ./standard_key/java_dl/postConditionTaclets1.key
@@ -598,7 +614,7 @@ group javadl {
    provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
    provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
    provable ./standard_key/types/disjoint.key
-   provable ../../key.core.test/resources/testcase/classpath/classpath.key
+   provable ../../key.core/src/test/resources/testcase/classpath/classpath.key
    notprovable ./heap/inconsistent_represents/MyClass_m.key
    notprovable ./heap/inconsistent_represents/MyClass_n.key
 }
@@ -914,15 +930,30 @@ group permissionHeap {
    # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 }
 
+# Completion scopes / Exec statement tests
+group completionScopes {
+   provable ./completionscopes/testCcatchReturnVal.key
+   provable ./completionscopes/testMultCcatchClauses.key
+   provable ./completionscopes/testNestedExec.key
+   provable ./completionscopes/testCcatchBreakLabel.key
+   provable ./completionscopes/testCcatchContinueLabel.key
+   provable ./completionscopes/testCcatchBreakLabelWildcard.key
+   provable ./completionscopes/testCcatchContinueLabelWildcard.key
+   provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
+}
+
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
 group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
 
+   # This is a reload regression test. Since it is the only one
+   # it goes here with the sibling reload tests
+   loadable ./standard_key/arith/saveProofTest.key.proof
    loadable ./heap/permutedSum/perm.proof
    loadable ./firstTouch/05-ReverseArray/reverseArray.proof
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
    loadable ./heap/verifyThis15_3_DLL/doUndo.proof
    loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
-   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof
+   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 }

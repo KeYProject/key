@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-public class Recurse {
+public final class Recurse {
 
     int recurse(boolean clear) {
 	int x = 1;

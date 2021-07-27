@@ -1,6 +1,6 @@
-<!-- KEY BUG REPORT  /label ~Bug 
+<!-- 
      Thank you for taking your time to make KeY a better tool!
-     Please replace the blockquotes below with your answered.
+     Please replace the quoted lines (`> ...`) below with your text.
 --> 
 
 ## Description
@@ -28,17 +28,14 @@
 
 ---
 
-* Commit: <!-- SHA checksum of the git commit -->
+* Commit: <!-- SHA checksum of the git commit where you observed the problem-->
 
-<!-- KeY Component
- Information Flow Engine, Calculus, Soundness, JML Parser,
- JML (Semantics), GUI, Counter Example Generator, KeY Parser, Deployment
- Prover Core, SMT, Symb. Debugger, Test Case Generator, Proof Loading/Saving,
- Command Line Interface, Strategy, Test cases, RIFL, Documentation, Webpage
+<!--
+  From the "labels" selection component below this textfield, please select appropriate labels:
+  * If you think this is a "bug" that should be fixed, please select Bug.
+  * Please select exactly one of the priority labels:  P:LOW, P:NORMAL, P:HIGH or P:URGENT.
+  * Please select those components (0, 1 or more) to which this issue refers 
+    (the labels with lilac background)
 -->
-* Component: /label ~Calculus 
-
-<!-- Please select one severity level -->
-/label ~LOW ~NORMAL ~HIGH ~URGENT 
 
 <!-- END OF BUG TEMPLATE -->
