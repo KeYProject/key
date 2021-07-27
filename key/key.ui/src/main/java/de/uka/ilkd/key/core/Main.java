@@ -471,7 +471,7 @@ public final class Main {
         }
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
-            GeneralSettings.noPruningClosed = true;
+            GeneralSettings.noPruningClosed = false;
         }
 
         if (cl.isSet(KEEP_FILEREPOS)) {
@@ -536,6 +536,10 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
+
+            /* explicitly enable pruning in closed branches for interactive mode
+             * (if not manually disabled) */
+            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
 
             MainWindow mainWindow = MainWindow.getInstance();
 
