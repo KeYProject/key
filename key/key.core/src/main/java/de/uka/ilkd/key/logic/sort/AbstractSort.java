@@ -114,7 +114,7 @@ public abstract class AbstractSort implements Sort {
 
 
     @Override
-    public final String toString() {
+    public String toString() {
         return name.toString();
     }
 

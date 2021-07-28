@@ -8,6 +8,7 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -50,13 +51,12 @@ import java.util.function.Function;
 
 public class ParametricSort extends AbstractSort {
 
-
-
     public enum Variance {
         COVARIANT,
         CONTRAVARIANT,
         INVARIANT;
     }
+
     private final ImmutableList<GenericSort> parameters;
 
     private final ImmutableList<Variance> covariances;

@@ -27,28 +27,28 @@ public interface Sort extends Named {
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    public final Sort FORMULA = new SortImpl(new Name("Formula"));
+    Sort FORMULA = new SortImpl(new Name("Formula"));
 
     /**
      * Updates are represented as "terms" of this sort.
      */
-    public final Sort UPDATE = new SortImpl(new Name("Update"));
+    Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    public final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
 
     /**
      * Any is a supersort of all sorts.
      */
-    public final Sort ANY = new SortImpl(new Name("any"));
+    Sort ANY = new SortImpl(new Name("any"));
 
     /**
      * The base name for the cast function family.
      * Individual functions are called e.g. "C::cast" for sort C.
      */
-    public final Name CAST_NAME = new Name("cast");
+    Name CAST_NAME = new Name("cast");
 
     /**
      * The base name for the instance (type membership) function family.

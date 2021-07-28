@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -89,9 +90,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 //        }
     }
 
-    /**
-     * adds an element
-     *
+    /** adds an element
      * @param element of type <T> that has to be added to this set
      */
     @Override
@@ -103,9 +102,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return new DefaultImmutableSet<T>(elementList.prepend(element));
     }
 
-    /**
-     * adds an element, barfs if the element is already present
-     *
+    /** adds an element, barfs if the element is already present
      * @param element of type <T> that has to be added to this set
      * @throws NotUniqueException if the element is already present
      */
@@ -216,6 +213,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     public boolean exists(Predicate<T> predicate) {
         return elementList.exists(predicate);
     }
+
+	@Override
+	public <U> ImmutableSet<U> map(Function<T, U> f) {
+		return new DefaultImmutableSet<>(elementList.map(f));
+	}
 
     /** @return int the cardinality of the set */
     @Override

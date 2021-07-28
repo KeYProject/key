@@ -13,13 +13,6 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -27,11 +20,9 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -41,7 +32,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
+import static de.uka.ilkd.key.logic.sort.ParametricSort.Variance.*;
 import static org.junit.Assert.*;
 
 
@@ -94,6 +87,87 @@ public class TestDeclParser {
                 nss.sorts().lookup(new Name("elem")).name());
         assertEquals("find sort list", new Name("list"),
                 nss.sorts().lookup(new Name("list")).name());
+    }
+
+    @Test
+    public void testSortDeclFail() {
+        try {
+            final String s = "\\sorts { X; X; }";
+            evaluateDeclarations(s);
+            fail("Parsing " + s + " should have failed du to double definition.");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("already declared"));
+        }
+
+    }
+
+    @Test
+    public void testParametericSortDecl() {
+        evaluateDeclarations("\\sorts { \\generic E, F, G; " +
+                "coll<[E]>; list<[+E]> \\extends coll<[E]>;" +
+                "var<[-E, +F, G]>; }");
+
+        Sort e = nss.sorts().lookup("E");
+        ParametricSort list = (ParametricSort) nss.sorts().lookup("list");
+        ParametricSort coll = (ParametricSort) nss.sorts().lookup("coll");
+        ParametricSort var = (ParametricSort) nss.sorts().lookup("var");
+
+        assertTrue(e instanceof GenericSort);
+        assertTrue(coll instanceof ParametricSort);
+        assertTrue(list instanceof ParametricSort);
+
+        assertEquals(
+                Immutables.listOf(CONTRAVARIANT, COVARIANT, INVARIANT),
+                var.getCovariances());
+
+        assertEquals("{coll<[E]>}", list.extendsSorts().toString());
+
+        assertEquals("{any}", coll.extendsSorts().toString());
+    }
+
+    @Test
+    public void testParametericSortDeclFails0() {
+        try {
+            String s = "\\sorts { parametric<[E]>; }";
+            evaluateDeclarations(s);
+            fail("Parsing " + s + " should have failed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared) generic sorts"));
+        }
+
+    }
+
+    @Test
+    public void testParametericSortDeclFails1() {
+        try {
+            String s = "\\sorts { \\generic E; doubled<[E,E]>; }";
+            evaluateDeclarations(s);
+            fail("Parsing " + s + " should have failed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("unique"));
+        }
+    }
+
+    @Test
+    public void testParametericSortDeclFails2() {
+        try {
+            String s = "\\sorts { parametric<[int]>; }";
+            evaluateDeclarations(s);
+            fail("Parsing " + s + " should have failed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared) generic sorts"));
+        }
+    }
+
+    @Test
+    public void testParametericSortDeclFails3() {
+        try {
+            String s = "\\sorts { \\generic E; int<[E]>; }";
+            evaluateDeclarations(s);
+            fail("Parsing " + s + " should have failed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("already declared"));
+        }
     }
 
     private GenericSort checkGenericSort(Named name, ImmutableSet<Sort> pExt,
@@ -220,7 +294,8 @@ public class TestDeclParser {
 
     }
 
-    @Test@Ignore
+    @Test
+    @Ignore
     //weigl: this test case seems not suitable anymore.
     // old parser throw an error message if generic sorts were used in normal mode.
     public void testGenericSortDecl5() {
@@ -300,6 +375,28 @@ public class TestDeclParser {
                         (ArraySort.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
         assertTrue("Cloneable should extend Object ",
                 cloneableSort.extendsSorts().contains(objectSort));
+    }
+
+    @Test
+    public void testFunctionPolymorphicDecl() {
+        evaluateDeclarations("\\sorts { \\generic elem; list<[+elem]>; }\n" +
+                "\\functions {\n" +
+                "  elem elem::head(list<[elem]>);\n" +
+                "  list<[elem]> elem::tail(list<[elem]>);\n" +
+                "  list<[elem]> elem::nil;\n" +
+                "  list<[elem]> elem::cons(elem, list<[elem]>);\n" +
+                "}\n");
+
+
+        SortDependingFunction head = (SortDependingFunction) nss.functions().lookup("any::head");
+        SortDependingFunction inthead = head.getInstanceFor(nss.sorts().lookup("int"), serv);
+        assertEquals("int", inthead.sort().toString());
+        assertEquals("[list<[int]>]", inthead.argSorts().toString());
+
+        SortDependingFunction cons = (SortDependingFunction) nss.functions().lookup("any::cons");
+        SortDependingFunction intcons = cons.getInstanceFor(nss.sorts().lookup("int"), serv);
+        assertEquals("list<[int]>", intcons.sort().toString());
+        assertEquals("[int,list<[int]>]", intcons.argSorts().toString());
     }
 
     @Test

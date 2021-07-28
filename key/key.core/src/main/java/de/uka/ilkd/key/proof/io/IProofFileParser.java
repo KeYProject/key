@@ -15,11 +15,8 @@ package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYParser;
-
 /**
- * Defines the required which a {@link KeYParser} needs to parse a *.proof file
+ * Defines the required which a needs to parse a *.proof file
  * and to apply the rules again.
  *
  * @author Martin Hentschel
@@ -29,7 +26,7 @@ public interface IProofFileParser {
     /**
      * Enumeration of the different syntactic elements occurring in a saved
      * proof tree representation.
-     *
+     * <p>
      * TODO: ProofSaver should not hardcode ids Enum names should be used
      * instead of rawnames (old proofs should be converted)
      *

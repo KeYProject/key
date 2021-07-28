@@ -8,14 +8,17 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.StringUtil;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * This visitor evaluates all basic (level 0) declarations.
@@ -126,16 +129,32 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
+    public List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> visitSortList(KeYParser.SortListContext ctx) {
+        List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> seq = new ArrayList<>();
+        for (KeYParser.SortIdContext context : ctx.sortId()) {
+            String sortName = context.simple_ident_dots().getText();
+            String brackets = StringUtil.repeat("[]", context.EMPTYBRACKETS().size());
+            List<Pair<ParametricSort.Variance, Sort>> typeParams = accept(context.formal_sort_parameters());
+            seq.add(new Pair<>(sortName, typeParams != null ? typeParams : Collections.emptyList()));
+        }
+        return seq;
+    }
+
+
+    @Override
     public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
-        List<String> sortIds = accept(ctx.sortIds);
+        List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> sortIds = accept(ctx.sortIds);
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
-        for (String sortId : sortIds) {
-            Name sort_name = new Name(sortId);
+        assert sortIds != null;
+
+        for (Pair<String, List<Pair<ParametricSort.Variance, Sort>>> sortId : sortIds) {
+            Name sortName = new Name(sortId.first);
+            boolean isParametricSort = !sortId.second.isEmpty();
 
             ImmutableSet<Sort> ext =
                     sortExt == null ? ImmutableSet.empty() :
@@ -145,23 +164,40 @@ public class DeclarationBuilder extends DefaultBuilder {
                             DefaultImmutableSet.fromCollection(sortOneOf);
 
             // attention: no expand to java.lang here!
-            if (sorts().lookup(sort_name) == null) {
+            if (sorts().lookup(sortName) == null) {
                 Sort s = null;
-                if (isGenericSort) {
+                if(isParametricSort) {
+                    if(isGenericSort) {
+                        semanticError(ctx, "Generic sorts are not allowed to have type parameters.");
+                    }
+
+                    for (Pair<ParametricSort.Variance, Sort> param : sortId.second) {
+                        if (!(param.second instanceof GenericSort)) {
+                            semanticError(ctx, "Type parameters must be generic sorts. Given type '%s' is %s",
+                                    param.second.name(), param.second.getClass().getName());
+                        }
+                    }
+
+                    ImmutableList<Pair<GenericSort, ParametricSort.Variance>> typeParams =
+                            sortId.second.stream().map(it ->
+                                    new Pair<>((GenericSort) it.second, it.first))
+                                    .collect(ImmutableSLList.toImmutableList());
+                    s = new ParametricSort(sortName, ext, isAbstractSort, typeParams);
+                }else if (isGenericSort) {
                     int i;
 
                     try {
-                        s = new GenericSort(sort_name, ext, oneOf);
+                        s = new GenericSort(sortName, ext, oneOf);
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
                     }
-                } else if (new Name("any").equals(sort_name)) {
+                } else if (new Name("any").equals(sortName)) {
                     s = Sort.ANY;
                 } else {
                     if (isProxySort) {
-                        s = new ProxySort(sort_name, ext);
+                        s = new ProxySort(sortName, ext);
                     } else {
-                        s = new SortImpl(sort_name, ext, isAbstractSort);
+                        s = new SortImpl(sortName, ext, isAbstractSort);
                     }
                 }
                 assert s != null;

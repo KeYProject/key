@@ -109,12 +109,17 @@ one_sort_decl
 :
   doc=DOC_COMMENT?
   (
-     GENERIC  sortIds=simple_ident_dots_comma_list
+     GENERIC  sortIds=sortList
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
-    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
+    | PROXY  sortIds=sortList (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? sortIds=sortList (EXTENDS sortExt=extends_sorts)?  SEMI
   )
+;
+
+sortList
+:
+    sortId (COMMA sortId)*
 ;
 
 simple_ident_dots
@@ -314,7 +319,21 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (EMPTYBRACKETS)*
+    id=simple_ident_dots (EMPTYBRACKETS)* formal_sort_parameters?
+;
+
+formal_sort_variance
+:
+    (PLUS | MINUS)?
+;
+
+formal_sort_parameter: formal_sort_variance id=sortId;
+
+formal_sort_parameters
+:
+    OPENTYPEPARAMS
+    formal_sort_parameter (COMMA formal_sort_parameter)*
+    CLOSETYPEPARAMS
 ;
 
 id_declaration

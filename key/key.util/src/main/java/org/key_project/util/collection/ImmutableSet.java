@@ -16,6 +16,7 @@ package org.key_project.util.collection;
 import javax.annotation.Nonnull;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
@@ -108,6 +109,18 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @return true if predicate is fullfilled for at least one element
      */
     boolean exists(Predicate<T> predicate);
+
+    /**
+     * Apply a function f to the elements of the set.
+     * If the set has an order:
+     * The result contains the elements in the same order, but after the
+     * application of f.
+     *
+     * @param f the function to apply to the elements
+     * @param <U> result type of the mapping
+     * @return a new immutable list instance, not null.
+     */
+    <U> ImmutableSet<U> map(Function<T,U> f);
 
     /** @return true iff obj in set */
     boolean contains(T obj);

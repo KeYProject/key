@@ -9,13 +9,13 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -350,16 +350,66 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             t = PrimitiveType.JAVA_BIGINT;
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
+
+        if (t != null && !ctx.formal_sort_parameters().formal_sort_parameter().isEmpty()) {
+            semanticError(ctx, "Combination of primitive type and type parameters.");
+        }
+
         Sort s = lookupSort(primitiveName);
         if (s == null) {
             semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
+
+        //parametric sorts should be instantiated
+        if (ctx.formal_sort_parameters() != null) {
+            if (s instanceof ParametricSort) {
+                ParametricSort ps = (ParametricSort) s;
+                ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
+                s = ParametricSortInstance.get(ps, parameters);
+            } else {
+                semanticError(ctx, "Not a polymorphic sort: %s", s);
+            }
+        }
+
 
         if (!ctx.EMPTYBRACKETS().isEmpty()) {
             return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
         }
         return s;
     }
+
+    private ImmutableList<Sort> getSorts(KeYParser.Formal_sort_parametersContext ctx) {
+        List<Pair<ParametricSort.Variance, Sort>> seq = accept(ctx);
+        assert seq != null;
+        for (Pair<ParametricSort.Variance, Sort> p : seq) {
+            if (p.first != ParametricSort.Variance.INVARIANT) {
+                addWarning(ctx, "Variance is ignored");
+            }
+        }
+        return seq.stream().map(it -> it.second).collect(ImmutableSLList.toImmutableList());
+    }
+
+    @Override
+    public List<Pair<ParametricSort.Variance, Sort>> visitFormal_sort_parameters(KeYParser.Formal_sort_parametersContext ctx) {
+        return mapOf(ctx.formal_sort_parameter());
+    }
+
+    @Override
+    public Pair<ParametricSort.Variance, Sort> visitFormal_sort_parameter(KeYParser.Formal_sort_parameterContext ctx) {
+        Sort sort = sorts().lookup(ctx.id.getText());
+        if (sort == null) {
+            semanticError(ctx.id, "Could not find sort '%s'. It was not previously defined.", ctx.id.getText());
+        }
+        return new Pair<>(accept(ctx.formal_sort_variance()), sort);
+    }
+
+    @Override
+    public Object visitFormal_sort_variance(KeYParser.Formal_sort_varianceContext ctx) {
+        if (ctx.PLUS() != null) return ParametricSort.Variance.COVARIANT;
+        if (ctx.MINUS() != null) return ParametricSort.Variance.CONTRAVARIANT;
+        return ParametricSort.Variance.INVARIANT;
+    }
+
 
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
