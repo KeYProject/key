@@ -351,7 +351,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
 
-        if (t != null && !ctx.formal_sort_parameters().formal_sort_parameter().isEmpty()) {
+        if (t != null
+                && ctx.formal_sort_parameters() != null
+                && !ctx.formal_sort_parameters().formal_sort_parameter().isEmpty()) {
             semanticError(ctx, "Combination of primitive type and type parameters.");
         }
 
