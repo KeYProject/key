@@ -258,19 +258,10 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Object tmpNode = context.branch.getLastPathComponent();
-            if (context.branch == context.path) {
-                ExpansionState.collapseAll(context.delegateView, context.branch);
-            } else {
-                for (int count = context.delegateModel.getChildCount(tmpNode),
-                     i = 0; i < count; i++) {
-                    Object child = context.delegateModel.getChild(tmpNode, i);
-                    if (!context.delegateModel.isLeaf(child)) {
-                        ExpansionState.collapseAll(context.delegateView,
-                                                   context.branch.pathByAddingChild(child));
-                    }
-                }
-            }
+            // collapse all below
+            ExpansionState.collapseAllBelow(context.delegateView, context.branch);
+
+            // expand goals below
             Iterator<Goal> it = context.proof.openGoals().iterator();
             Node n;
             while (it.hasNext()) {
@@ -316,7 +307,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ExpansionState.expandAll(context.delegateView, context.branch);
+            ExpansionState.expandAllBelow(context.delegateView, context.path);
         }
     }
 
@@ -368,17 +359,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Object node = context.branch.getLastPathComponent();
-
-            for (int count = context.delegateModel.getChildCount(node), i = 0;
-                 i < count; i++) {
-                Object child = context.delegateModel.getChild(node, i);
-
-                if (!context.delegateModel.isLeaf(child)) {
-                    ExpansionState.collapseAll(context.delegateView,
-                            context.branch.pathByAddingChild(child));
-                }
-            }
+            ExpansionState.collapseAllBelow(context.delegateView, context.path);
         }
     }
 

@@ -19,24 +19,11 @@ http://www.chka.de/swing/tree/expansion/ExpansionState.java
 This code is provided by Christian Kaufhold <ch-kaufhold@gmx.de> under LGPL
 */
 
+import java.util.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import javax.annotation.Nonnull;
 import javax.swing.JTree;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+import javax.swing.event.*;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
@@ -54,7 +41,6 @@ import javax.swing.tree.TreePath;
     only serialize the state(), which doesn't also serialize the JTree
     (If you wanted to serialize the JTree, you wouldn't need to the state
     for serialization purposes at all.)
-    
 
     There are two ways to use this class:
 
@@ -62,7 +48,7 @@ import javax.swing.tree.TreePath;
        completely right (and always accessible without a lot of overhead).
 
        Serializing/exporting:
-       
+
            Collection state = cache.state(new HashSet());
 
            out.writeObject(state);
@@ -100,253 +86,206 @@ import javax.swing.tree.TreePath;
 
     Note the example code uses HashSet because setPaths() does (and very probably
     always will) make use of contains(), which should thus be fast.
-*/
-public class ExpansionState
-    extends AbstractSet<TreePath>
-    implements Serializable
-{
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -8276873816625710215L;
+ *
+ * <p>
+ * Note: For optimization purposes, this class is now tailored to ProofTreeView. In particular, the
+ *       method {@link #expandAllBelow(JTree, TreePath)} temporarily removes most
+ *       TreeExpansionListeners to avoid flooding them with events. This massively increases
+ *       performance on large trees.
+ * <p>
+ * Note: The current implementation probably does not work correctly with TreeWillExpandListeners.
+ *
+ * @author Wolfram Pfeifer: optimized, migrated from older Java version, renamed, and tailored
+ *                         to ProofTreeView, removed unnecessary serialization stuff and unused code
+ */
+class ExpansionState extends AbstractSet<TreePath> {
 
-    private JTree tree;
+    /** the JTree of the ProofTreeView */
+    private final @Nonnull JTree tree;
 
-    private Set<TreePath> paths;
+    /** Stores all paths that are currently expanded. This includes those which are hidden because
+     * some of their parents are collapsed. All paths not in this set are collapsed.
+     * @implNote We always use a LinkedHashSet now since this makes the path traversal order
+     * predictable. */
+    private final @Nonnull Set<TreePath> paths = new LinkedHashSet<>();
 
-    private transient Listener listener;
+    /** Listens for changes in the proof tree as well as for expansion/collapse of GUI nodes. */
+    private final transient @Nonnull Listener listener = new Listener();
 
     /** For the given JTree. Assumes only the root is expanded, if at all
-        (for example, a freshly created JTree, or one for which the model has
-        just been set)
+     * (for example, a freshly created JTree, or one for which the model has
+     * just been set)
+     * @param t the JTree of the ProofTreeView
      */
-    public ExpansionState(JTree t)
-    {
+    public ExpansionState(@Nonnull JTree t) {
         tree = t;
-        
-        paths = new LinkedHashSet<TreePath>();
-
-        listener = createListener();
-
-        tree.addPropertyChangeListener(listener);
         tree.addTreeExpansionListener(listener);
 
         TreeModel data = tree.getModel();
 
-        if (data != null)
-        {
+        if (data != null) {
             data.addTreeModelListener(listener);
 
-            readFromTree();
+            //readFromTree();
+            // could be tuned even further by avoiding copying the set, however, even the largest
+            // proofs have only a couple of hundreds entries in paths, so this is negligible ...
+            paths.addAll(paths(tree));
         }
     }
 
-    /** For the given JTree, with the given set of expanded paths.
-        This is equivalent to using the normal constructor, and then
-        calling setPaths(tree, state).
-    */
-    public ExpansionState(JTree tree, Collection<TreePath> state)
-    {
-        this(tree, state, false);
-    }
-
-    /** For the given JTree, with the given set of expanded paths.
-        This is equivalent to using the normal constructor, and then
-        calling setPaths(tree, state, false);
-    */
-    public ExpansionState(JTree tree, Collection<TreePath> state, boolean assumeCollapsed)
-    {
+    /** Creates a new ProofExpansionState for the given JTree, where the given paths are expanded
+     * initially.
+     * @param tree the JTree this ProofExpansionState refers to
+     * @param state the collection of paths to expand initially
+     */
+    public ExpansionState(@Nonnull JTree tree, @Nonnull Collection<TreePath> state) {
         this(tree);
-
-        setPaths(tree, state, assumeCollapsed);
-    }
-    
-    public void disconnect(JTree t) {
-        tree.removePropertyChangeListener(listener);
-        tree.removeTreeExpansionListener(listener);
-        TreeModel data = tree.getModel();
-        if (data != null) data.removeTreeModelListener(listener);
+        setPaths(tree, state);
     }
 
-    private void readFromTree()
-    {
+    /**
+     * Reads the current expansion state from the assigned tree and updates the set of expanded
+     * paths. Note that the set should be empty when calling the method. Instead of
+     * <code>readFromTree()</code> now the following should be used:
+     *
+     * <code>paths.clear();<br>
+     *       paths.addAll(paths(tree));</code>
+     *
+     * @deprecated Since paths() has been made much more efficient while it is also more precise in
+     *   some cases, it should be used instead. However, we still keep this method around in case
+     *   performance problems with paths() occur in the future.
+     */
+    @Deprecated
+    private void readFromTree() {
         TreeModel data = tree.getModel();
 
         Object root = data.getRoot();
-        
-        if (root != null)
-        {
+
+        if (root != null) {
             TreePath rootPath = new TreePath(root);
-            
+
             // This is a heuristic, we cannot truly capture all
             // Unless someone has subclassed JTree, only the root
             // will be expanded, if at all.
             // It is much too expensive to really use paths()
             // from below.
 
-            if (tree.isExpanded(rootPath))
-                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath); e.hasMoreElements();)
+            if (tree.isExpanded(rootPath)) {
+                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath);
+                     e.hasMoreElements(); ) {
                     paths.add(e.nextElement());
+                }
+            }
         }
     }
 
+    /** Disconnects the ExpansionState from the associated JTree. This means that it no
+     *  longer listens for tree expansions.
+     */
+    public void disconnect() {
+        tree.removeTreeExpansionListener(listener);
+        TreeModel data = tree.getModel();
+        if (data != null) {
+            data.removeTreeModelListener(listener);
+        }
+    }
 
-    public int size()
-    {
+    @Override
+    public int size() {
         return paths.size();
     }
 
-    public boolean isEmpty()
-    {
+    @Override
+    public boolean isEmpty() {
         return paths.isEmpty();
     }
 
-    public boolean contains(TreePath item)
-    {
+    @Override
+    public boolean contains(Object item) {
         return paths.contains(item);
     }
 
-    public boolean containsAll(Collection<?> c)
-    {
+    @Override
+    public boolean containsAll(Collection<?> c) {
         return paths.containsAll(c);
     }
 
-    /**
-       Are all the ancestors (including the path) expanded?
-    */
-    public boolean containsAncestors(TreePath path)
-    {
-        do
-        {
-            if (!contains(path))
-                return false;
-
-            path = path.getParentPath();
-
-        } while (path != null);
-
-        return true;
-    }
-
-    /**
-       Are all the ancestors (including the paths) expanded?
-    */
-    public boolean containsAllAncestors(Collection<TreePath> c)
-    {
-        for (Object aC : c)
-            if (!containsAncestors((TreePath) aC))
-                return false;
-
-        return true;
-    }
-
-
-    public Iterator<TreePath> iterator()
-    {
-        return new Iterator<TreePath>()
-        {
+    @Override
+    public Iterator<TreePath> iterator() {
+        return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
-            public boolean hasNext()
-            {
+            @Override
+            public boolean hasNext() {
                 return i.hasNext();
             }
 
-            public TreePath next()
-            {
+            @Override
+            public TreePath next() {
                 return i.next();
-            }
-            
-            public void remove()
-            {
-                throw new UnsupportedOperationException();
             }
         };
     }
 
-
-
-    protected Object clone()
-        throws CloneNotSupportedException
-    {
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
-
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        in.defaultReadObject();
-
-        listener = createListener();
-
-        tree.addPropertyChangeListener(listener);
-        tree.addTreeExpansionListener(listener);
-
-        TreeModel data = tree.getModel();
-
-        if (data != null)
-        {
-            data.addTreeModelListener(listener);
-
-            readFromTree();
-        }
+    /**
+     * Copies the currently stored expansion state of the associated tree.
+     * @return a shallow copy of the collection of expanded paths
+     */
+    public @Nonnull Collection<TreePath> copyState() {
+        // we need a copy here, such that the set is not shared between multiple trees!
+        return new LinkedHashSet<>(paths);
     }
 
-
-    public Collection<TreePath> state(Collection<TreePath> result)
-    {
-        result.clear();
-        result.addAll(paths);
-
-        return result;
-    }
-
-    
-    /** Will re-expand the root if it was expanded and the tree has
-        an invisible root (otherwise the tree will appear empty, and there
-        is no easy way for the user to change that.
-    */
-    public static void collapseAll(JTree tree)
-    {
+    /** Collapses all paths of the tree. However, it re-expands the root if it was expanded before
+     * and the tree has an invisible root, since otherwise the tree will appear empty, and there
+     *   is no easy way for the user to change that.
+     * @param tree the JTree to collapse
+     */
+    public static void collapseAll(JTree tree) {
         TreeModel data = tree.getModel();
 
-        if (data == null)
+        if (data == null) {
             return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root))
+        if (root == null || data.isLeaf(root)) {
             return;
+        }
 
         TreePath rootPath = new TreePath(root);
 
         boolean rootExpanded = tree.isExpanded(rootPath);
 
-        collapseAll(tree, rootPath);
+        collapseAllBelow(tree, rootPath);
 
-        if (rootExpanded && !tree.isRootVisible())
+        if (rootExpanded && !tree.isRootVisible()) {
             tree.expandPath(rootPath);
+        }
     }
 
-    /** requires: root is not a leaf. That implies that the tree's model is
-        not null and does have a root.
+    /** Collapses all nodes that are below the given path.
+     *  Requires that the given path is not a leaf. That implies that the tree's model is
+     *   not null and does have a root.
+     * @param tree the JTree to collapse
+     * @param path the path which will be collapsed afterwards (including all children recursively)
      */
-    public static void collapseAll(JTree tree, TreePath root)
-    {
-        collapseAllImpl(tree, tree.getModel(), root);
-    }
-
-    private static void collapseAllImpl(JTree tree, TreeModel data, TreePath path)
-    {
+    public static void collapseAllBelow(JTree tree, TreePath path) {
         Object node = path.getLastPathComponent();
+        TreeModel data = tree.getModel();
 
-        for (int count = data.getChildCount(node), i = 0; i < count; i++)
-        {
+        for (int count = data.getChildCount(node), i = 0; i < count; i++) {
             Object child = data.getChild(node, i);
 
-            if (!data.isLeaf(child))
-                collapseAllImpl(tree, data, path.pathByAddingChild(child));
+            if (!data.isLeaf(child)) {
+                collapseAllBelow(tree, path.pathByAddingChild(child));
+            }
         }
 
         // cannot check, since we cannot assume all ancestors
@@ -357,27 +296,50 @@ public class ExpansionState
     }
 
 
-    public static void expandAll(JTree tree)
-    {
+    /**
+     * Expands the given JTree completely.
+     * @param tree the JTree to expand
+     */
+    public static void expandAll(JTree tree) {
         TreeModel data = tree.getModel();
 
-        if (data == null)
+        if (data == null) {
             return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root))
+        if (root == null || data.isLeaf(root)) {
             return;
+        }
 
-        expandAll(tree, new TreePath(root));
+        expandAllBelow(tree, new TreePath(root));
     }
 
-    /** requires: path is not a leaf. That implies the tree has a model,
-        and that has a root.
-    */
-    public static void expandAll(JTree tree, TreePath path)
-    {
-        for (Object o : extremalPaths(tree.getModel(), path, new LinkedHashSet<TreePath>())) tree.expandPath((TreePath) o);
+    /** Completely expands all nodes of the given JTree that are below the given path.
+     *  Requires that path is not a leaf. That implies the tree has a model, and that has a root.
+     * @param tree the JTree to expand
+     * @param path the root path under which everything should be expanded afterwards
+     */
+    public static void expandAllBelow(JTree tree, TreePath path) {
+        // we temporarily remove all expansion listeners (except that which updates the expanded
+        // paths set) before expanding
+        TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
+        for (TreeExpansionListener exl : expansionListeners) {
+            if (!(exl instanceof Listener)) {
+                tree.removeTreeExpansionListener(exl);
+            }
+        }
+        for (TreePath tp : extremalPaths(tree.getModel(), path)) {
+            tree.expandPath(tp);
+        }
+        for (TreeExpansionListener exl : expansionListeners) {
+            if (!(exl instanceof Listener)) {
+                tree.addTreeExpansionListener(exl);
+            }
+        }
+        // inform the listeners for drawing
+        tree.fireTreeExpanded(path);
     }
 
 
@@ -391,268 +353,246 @@ public class ExpansionState
         The extremal paths are stored in the order in which they appear
         in pre-order in the tree model.
     */
-    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path, Collection<TreePath> result)
-    {
-        result.clear();
+    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path) {
+        LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
-        if (data.isLeaf(path.getLastPathComponent()))
+        if (data.isLeaf(path.getLastPathComponent())) {
             return result; // should really be forbidden (?)
-        
-        extremalPathsImpl(data, path, result);
+        }
 
+        extremalPathsImpl(data, path, result);
         return result;
     }
 
-    private static void extremalPathsImpl(TreeModel data, TreePath path, Collection<TreePath> result)
-    {
+    private static void extremalPathsImpl(TreeModel data, TreePath path,
+                                          Collection<TreePath> result) {
         Object node = path.getLastPathComponent();
-        
+
         boolean hasNonLeafChildren = false;
 
         int count = data.getChildCount(node);
-        
-        for (int i = 0; i < count; i++)
-            if (!data.isLeaf(data.getChild(node, i)))
-                hasNonLeafChildren = true;
 
-        if (!hasNonLeafChildren)
+        for (int i = 0; i < count; i++) {
+            if (!data.isLeaf(data.getChild(node, i))) {
+                hasNonLeafChildren = true;
+            }
+        }
+
+        if (!hasNonLeafChildren) {
             result.add(path);
-        else
-        {
-            for (int i = 0; i < count; i++)
-            {
+        } else {
+            for (int i = 0; i < count; i++) {
                 Object child = data.getChild(node, i);
-                
-                if (!data.isLeaf(child))
+
+                if (!data.isLeaf(child)) {
                     extremalPathsImpl(data, path.pathByAddingChild(child), result);
+                }
             }
         }
     }
 
-
-    
-
-
-    
-    /** All paths in the JTree that are expanded, including those 
+    /** All paths in the JTree that are expanded, including those
         under hidden parents. The result is the same as if attaching
         an ExpansionState to the JTree (in creation state) and then
-        calling state() on it.
+        calling getState() on it.
         To return the proper result, this method must temporarily
         expand paths. If any TreeWillExpandListeners veto that, the
         result is undefined.
-    */
-    public static Collection<TreePath> paths(JTree tree, Collection<TreePath> result)
-    {
-        result.clear();
+     * @param tree the JTree the expanded paths are read from
+     * @return the TreePaths that are currently expanded in the given tree, even if any of their
+     *         parents are collapsed
+     */
+    public static Collection<TreePath> paths(JTree tree) {
+        Collection<TreePath> result = new LinkedHashSet<>();
 
         TreeModel data = tree.getModel();
 
-        if (data == null)
+        if (data == null) {
             return result;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root))
+        if (root == null || data.isLeaf(root)) {
             return result;
+        }
+
+        /* To avoid unnecessary events caused by temporary expansion, we disable the listeners.
+         * This makes the method an order of a magnitude faster for large proofs. */
+        TreeExpansionListener[] treeExpansionListeners = tree.getTreeExpansionListeners();
+        for (TreeExpansionListener tel : treeExpansionListeners) {
+            tree.removeTreeExpansionListener(tel);
+        }
 
         pathsImpl(tree, data, new TreePath(root), result);
+
+        // reenable listeners
+        for (TreeExpansionListener tel : treeExpansionListeners) {
+            tree.addTreeExpansionListener(tel);
+        }
 
         return result;
     }
 
-    private static void pathsImpl(JTree tree, TreeModel data, TreePath path, Collection<TreePath> result)
-    {
+    private static void pathsImpl(JTree tree, TreeModel data, TreePath path,
+                                  Collection<TreePath> result) {
         boolean expanded = tree.isExpanded(path);
 
-        if (expanded)
+        if (expanded) {
             result.add(path);
-        else
+        } else {
             tree.expandPath(path);
+        }
 
         Object node = path.getLastPathComponent();
 
-        for (int count = data.getChildCount(node), i = 0; i < count; i++)
-        {
+        for (int count = data.getChildCount(node), i = 0; i < count; i++) {
             Object child = data.getChild(node, i);
 
-            if (!data.isLeaf(child))
+            if (!data.isLeaf(child)) {
                 pathsImpl(tree, data, path.pathByAddingChild(child), result);
+            }
         }
 
-        if (!expanded)
+        if (!expanded) {
             tree.collapsePath(path);
+        }
     }
 
 
-    /** Try to expand exactly the paths given in paths. Of course requires them to be
-        valid in the current TreeModel.
-        Will give undefined results if any TreeWillExpandListeners veto.
-        This implementation does not assume all paths are collapsed.
+    /** Try to expand exactly the given paths given in paths (assumes them to be valid in the
+     * current TreeModel). Will give undefined results if any TreeWillExpandListeners veto.
+     * @param tree the JTree where exactly the paths should be expanded
+     * @param paths the paths to expand. All other paths will be collapsed. Note that collapsed
+     *              parent paths may hide their children, even if those are expanded.
      */
-    public static void setPaths(JTree tree, Collection<TreePath> paths)
-    {
-        setPaths(tree, paths, false);
-    }
-
-    /** assumedCollapsed: if true, assume that (if at all) only the root
-        is expanded. That way, the iteration over the tree nodes only goes
-        to the maximum level of the nodes in 'paths'.
-    */
-    public static void setPaths(JTree tree, Collection<TreePath> paths, boolean assumeCollapsed)
-    {
+    public static void setPaths(@Nonnull JTree tree, @Nonnull Collection<TreePath> paths) {
         TreeModel data = tree.getModel();
-        
-        if (data == null)
+
+        if (data == null) {
             return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root))
+        if (root == null || data.isLeaf(root)) {
             return;
-
-        if (assumeCollapsed)
-        {
-            int maxLevel = 1; // always handle the root (doesn't really matter)
-
-            for (Object path : paths) maxLevel = Math.max(maxLevel, ((TreePath) path).getPathCount());
-
-            setPathsImpl(tree, data, new TreePath(root), maxLevel - 1, paths);
         }
-        else
-            setPathsImpl(tree, data, new TreePath(root), Integer.MAX_VALUE, paths);
-    }
 
-    private static void setPathsImpl(JTree tree, TreeModel data, TreePath path, int maxLevel, Collection<TreePath> paths)
-    {
-        if (maxLevel > 0)
-        {
-            Object node = path.getLastPathComponent();
-            
-            for (int count = data.getChildCount(node), i = 0; i < count; i++)
-            {
-                Object child = data.getChild(node, i);
-
-                if (!data.isLeaf(child))
-                    setPathsImpl(tree, data, path.pathByAddingChild(child), maxLevel - 1, paths);
+        // temporarily disable the listeners to avoid flooding them with events
+        TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
+        for (TreeExpansionListener exl : expansionListeners) {
+            if (!(exl instanceof Listener)) {
+                tree.removeTreeExpansionListener(exl);
             }
         }
-        
-        // Since this is post-order, it doesn't matter that the ancestors are
-        // also expanded. They will be handled afterwards.
-        if (paths.contains(path))
-        {
-            if (!tree.isExpanded(path))
-                tree.expandPath(path);
+
+        setPathsImpl(tree, data, new TreePath(root), Integer.MAX_VALUE, paths);
+
+        // reenable listeners
+        for (TreeExpansionListener exl : expansionListeners) {
+            if (!(exl instanceof Listener)) {
+                tree.addTreeExpansionListener(exl);
+            }
         }
-        else
-        {
-            // The ancestors are always expanded, so isCollapse() won't give
-            // wrong results.
-            if (!tree.isCollapsed(path))
-                tree.collapsePath(path);
-        }
+
+        // inform the listeners for redrawing
+        //tree.collapsePath(new TreePath(root));
+        //tree.expandPath(new TreePath(root));
+        tree.fireTreeExpanded(new TreePath(root));
     }
 
+    private static void setPathsImpl(@Nonnull JTree tree, @Nonnull TreeModel data,
+                                     @Nonnull TreePath start, int maxLevel,
+                                     @Nonnull Collection<TreePath> paths) {
+        // only expand up to depth maxLevel starting from the given start path
+        if (maxLevel > 0) {
+            Object node = start.getLastPathComponent();
 
+            for (int count = data.getChildCount(node), i = 0; i < count; i++) {
+                Object child = data.getChild(node, i);
 
-    private Listener createListener()
-    {
-        return new Listener();
-    }
-
-    private class Listener
-        implements TreeExpansionListener, TreeModelListener,
-                   PropertyChangeListener
-    {
-        public void propertyChange(PropertyChangeEvent e)
-        {
-            if (e.getPropertyName().equals("model"))
-            {
-                TreeModel old = (TreeModel)e.getOldValue();
-
-                if (old != null)
-                    old.removeTreeModelListener(this);
-
-                paths.clear();
-
-                TreeModel data = tree.getModel();
-                
-                if (data != null)
-                {
-                    data.addTreeModelListener(this);
-                    readFromTree();
+                if (!data.isLeaf(child)) {
+                    setPathsImpl(tree, data, start.pathByAddingChild(child), maxLevel - 1, paths);
                 }
             }
         }
 
-        public void treeExpanded(TreeExpansionEvent e)
-        {
+        // Since this is post-order, it doesn't matter that the ancestors are
+        // also expanded. They will be handled afterwards.
+        if (paths.contains(start)) {
+            if (!tree.isExpanded(start)) {
+                tree.expandPath(start);
+            }
+        } else {
+            // The ancestors are always expanded, so isCollapse() won't give
+            // wrong results.
+            if (!tree.isCollapsed(start)) {
+                tree.collapsePath(start);
+            }
+        }
+    }
+
+    private class Listener implements TreeExpansionListener, TreeModelListener {
+        @Override
+        public void treeExpanded(TreeExpansionEvent e) {
             paths.add(e.getPath());
         }
 
-        public void treeCollapsed(TreeExpansionEvent e)
-        {
+        @Override
+        public void treeCollapsed(TreeExpansionEvent e) {
             paths.remove(e.getPath());
         }
- 
-        public void treeNodesChanged(TreeModelEvent e)
-        {
+
+        @Override
+        public void treeNodesChanged(TreeModelEvent e) {
         }
 
-        public void treeNodesInserted(TreeModelEvent e)
-        {
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
         }
 
-        public void treeNodesRemoved(TreeModelEvent e)
-        {
+        @Override
+        public void treeNodesRemoved(TreeModelEvent e) {
+            // TODO: this code seems to be never called, since GUIProofTreeModel only
+            //  fires treeStructureChanged events
             TreePath parent = e.getTreePath();
 
             Object[] children = e.getChildren();
 
-            for (Object aChildren : children) removeDescendants(parent.pathByAddingChild(aChildren));
+            for (Object aChildren : children) {
+                removeDescendants(parent.pathByAddingChild(aChildren));
+            }
         }
 
-        public void treeStructureChanged(TreeModelEvent e)
-        {
+        @Override
+        public void treeStructureChanged(TreeModelEvent e) {
             TreePath path = e.getTreePath();
-
 
             // Heuristic for new null root. It is undocumented which
             // event really to expect.
-            if (path == null)
-            {
+            if (path == null) {
                 paths.clear();
                 return;
             }
-            
+
             // new root, or root changed. JTree will maybe expand the root.
-            if (path.getParentPath() == null)
-            {
+            if (path.getParentPath() == null) {
+                //readFromTree();
                 paths.clear();
-                readFromTree();
-            }
-            else
-            {
+                paths.addAll(paths(tree));
+            } else {
                 removeDescendants(path);
 
-		// PR
-		if ( tree.isExpanded ( path ) )
-		    paths.add(path);
+                if (tree.isExpanded(path)) {
+                    paths.add(path);
+                }
             }
         }
 
-        // remove the descendants (which, by definition, include the path
-        // itself)
-        private void removeDescendants(TreePath path)
-        {
-            for (Iterator<TreePath> i = paths.iterator(); i.hasNext();)
-            {
-                TreePath current = i.next();
-
-                if (current.isDescendant(path))
-                    i.remove();
-            }
+        // remove the descendants (which, by definition, include the path itself)
+        private void removeDescendants(TreePath path) {
+            paths.removeIf(current -> current.isDescendant(path));
         }
     }
 }

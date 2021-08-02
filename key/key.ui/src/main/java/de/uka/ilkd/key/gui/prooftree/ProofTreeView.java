@@ -25,10 +25,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -268,6 +265,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
+
+        // this only has an effect if the row height is set to a constant (see setProofTreeFont())
         delegateView.setLargeModel(true);
 
         setLayout(new BorderLayout());
@@ -417,9 +416,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private void setProof(Proof p) {
         if (delegateModel != null) {
-            expansionState.disconnect(delegateView);
-            delegateModel.storeExpansionState(
-                    expansionState.state(new LinkedHashSet<>()));
+            expansionState.disconnect();
+            delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
             delegateModel.unregister();
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
@@ -442,9 +440,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
-            expansionState =
-                    new ExpansionState(delegateView,
-                            delegateModel.getExpansionState());
+            expansionState = new ExpansionState(delegateView, delegateModel.getExpansionState());
             delegateView.expandRow(0);
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
@@ -828,7 +824,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
          *
          */
         private static final long serialVersionUID = -4990023575036168279L;
-        private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree,
