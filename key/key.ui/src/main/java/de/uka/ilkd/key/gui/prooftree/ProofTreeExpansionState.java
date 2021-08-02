@@ -98,7 +98,7 @@ import javax.swing.tree.TreePath;
  * @author Wolfram Pfeifer: optimized, migrated from older Java version, renamed, and tailored
  *                         to ProofTreeView, removed unnecessary serialization stuff and unused code
  */
-class ExpansionState extends AbstractSet<TreePath> {
+class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /** the JTree of the ProofTreeView */
     private final @Nonnull JTree tree;
@@ -117,7 +117,7 @@ class ExpansionState extends AbstractSet<TreePath> {
      * just been set)
      * @param t the JTree of the ProofTreeView
      */
-    public ExpansionState(@Nonnull JTree t) {
+    public ProofTreeExpansionState(@Nonnull JTree t) {
         tree = t;
         tree.addTreeExpansionListener(listener);
 
@@ -138,7 +138,7 @@ class ExpansionState extends AbstractSet<TreePath> {
      * @param tree the JTree this ProofExpansionState refers to
      * @param state the collection of paths to expand initially
      */
-    public ExpansionState(@Nonnull JTree tree, @Nonnull Collection<TreePath> state) {
+    public ProofTreeExpansionState(@Nonnull JTree tree, @Nonnull Collection<TreePath> state) {
         this(tree);
         setPaths(tree, state);
     }
@@ -179,7 +179,7 @@ class ExpansionState extends AbstractSet<TreePath> {
         }
     }
 
-    /** Disconnects the ExpansionState from the associated JTree. This means that it no
+    /** Disconnects the ProofTreeExpansionState from the associated JTree. This means that it no
      *  longer listens for tree expansions.
      */
     public void disconnect() {
@@ -393,7 +393,7 @@ class ExpansionState extends AbstractSet<TreePath> {
 
     /** All paths in the JTree that are expanded, including those
         under hidden parents. The result is the same as if attaching
-        an ExpansionState to the JTree (in creation state) and then
+        a ProofTreeExpansionState to the JTree (in creation state) and then
         calling getState() on it.
         To return the proper result, this method must temporarily
         expand paths. If any TreeWillExpandListeners veto that, the

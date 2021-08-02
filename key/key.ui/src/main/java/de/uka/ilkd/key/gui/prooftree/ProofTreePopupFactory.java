@@ -259,7 +259,7 @@ public class ProofTreePopupFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             // collapse all below
-            ExpansionState.collapseAllBelow(context.delegateView, context.branch);
+            ProofTreeExpansionState.collapseAllBelow(context.delegateView, context.branch);
 
             // expand goals below
             Iterator<Goal> it = context.proof.openGoals().iterator();
@@ -291,7 +291,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ExpansionState.expandAll(context.delegateView);
+            ProofTreeExpansionState.expandAll(context.delegateView);
 
         }
     }
@@ -307,7 +307,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ExpansionState.expandAllBelow(context.delegateView, context.path);
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path);
         }
     }
 
@@ -344,7 +344,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ExpansionState.collapseAll(context.delegateView);
+            ProofTreeExpansionState.collapseAll(context.delegateView);
             context.delegateView.expandRow(0);
         }
     }
@@ -359,7 +359,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ExpansionState.collapseAllBelow(context.delegateView, context.path);
+            ProofTreeExpansionState.collapseAllBelow(context.delegateView, context.path);
         }
     }
 

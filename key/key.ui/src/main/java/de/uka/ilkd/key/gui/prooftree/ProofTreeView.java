@@ -133,7 +133,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the expansion state of the proof tree
      */
-    private ExpansionState expansionState;
+    private ProofTreeExpansionState expansionState;
     /**
      * listener
      */
@@ -440,7 +440,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
-            expansionState = new ExpansionState(delegateView, delegateModel.getExpansionState());
+            expansionState = new ProofTreeExpansionState(delegateView, delegateModel.getExpansionState());
             delegateView.expandRow(0);
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
