@@ -39,19 +39,20 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * recursive flags imply that the flags are not set. 
      */
     public NoFindTaclet getNoFindTaclet(){
-
-	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
-	prefixBuilder.build();
-	return new NoFindTaclet(this.name, 
+		TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
+		prefixBuilder.build();
+		NoFindTaclet t = new NoFindTaclet(this.name,
 				new TacletApplPart(ifseq,
-						   varsNew,
-						   varsNotFreeIn,
-						   varsNewDependingOn,
-						   variableConditions),
+						varsNew,
+						varsNotFreeIn,
+						varsNewDependingOn,
+						variableConditions),
 				goals, ruleSets,
 				attrs,
 				prefixBuilder.getPrefixMap(),
 				choices, tacletAnnotations);
+		t.setOrigin(origin);
+		return t;
     }
 
 

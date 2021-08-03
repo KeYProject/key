@@ -18,6 +18,8 @@ import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link SymbolicExecutionStrategy}
@@ -28,7 +30,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/blockContractPreconditionNotVerified
     */
-   public void testBlockContractPreconditionNotVerified_SymbolicExecution() throws Exception {
+   @Test public void testBlockContractPreconditionNotVerified_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.java", 
                           "BlockContractPreconditionNotVerified",
@@ -55,7 +57,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/blockContractWithExceptionPostconditionNotVerified
     */
-   public void testBlockContractWithExceptionPostconditionNotVerified_SymbolicExecution() throws Exception {
+   @Test public void testBlockContractWithExceptionPostconditionNotVerified_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractWithExceptionPostconditionNotVerified/test/BlockContractWithExceptionPostconditionNotVerified.java", 
                           "BlockContractWithExceptionPostconditionNotVerified",
@@ -82,7 +84,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/blockContractWithException
     */
-   public void testBlockContractWithException_SymbolicExecution() throws Exception {
+   @Test public void testBlockContractWithException_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractWithException/test/BlockContractWithException.java", 
                           "BlockContractWithException",
@@ -109,7 +111,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/blockContractWithReturnPostconditionNotVerified
     */
-   public void testBlockContractWithReturnPostconditionNotVerified_SymbolicExecution() throws Exception {
+   @Test public void testBlockContractWithReturnPostconditionNotVerified_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractWithReturnPostconditionNotVerified/test/BlockContractWithReturnPostconditionNotVerified.java", 
                           "BlockContractWithReturnPostconditionNotVerified",
@@ -136,7 +138,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/blockContractWithReturn
     */
-   public void testBlockContractWithReturn_SymbolicExecution() throws Exception {
+   @Test public void testBlockContractWithReturn_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractWithReturn/test/BlockContractWithReturn.java", 
                           "BlockContractWithReturn",
@@ -163,7 +165,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingArraysIndexOf
     */
-   public void testNonExecutionBranchHidingArraysIndexOf_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingArraysIndexOf_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/nonExecutionBranchHidingArraysIndexOf/test/Arrays.java", 
                           "Arrays", 
@@ -189,7 +191,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingArraysIndexOf
     */
-   public void testNonExecutionBranchHidingArraysIndexOf_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingArraysIndexOf_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/nonExecutionBranchHidingArraysIndexOf/test/Arrays.java", 
                           "Arrays", 
@@ -216,7 +218,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery
     */
-   public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/test/LoopInvariantWithSplittingQuery.java", 
                           "LoopInvariantWithSplittingQuery", 
@@ -243,7 +245,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery
     */
-   public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/test/LoopInvariantWithSplittingQuery.java", 
                           "LoopInvariantWithSplittingQuery", 
@@ -270,7 +272,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryInPrecondition
     */
-   public void testNonExecutionBranchHidingQueryInPrecondition_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryInPrecondition_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryInPrecondition/test/QueryInPrecondition.java",
                           "QueryInPrecondition",
@@ -297,7 +299,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryInPrecondition
     */
-   public void testNonExecutionBranchHidingQueryInPrecondition_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryInPrecondition_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryInPrecondition/test/QueryInPrecondition.java",
                           "QueryInPrecondition",
@@ -324,7 +326,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingComplexPrecondition
     */
-   public void testNonExecutionBranchHidingComplexPrecondition_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingComplexPrecondition_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingComplexPrecondition/test/ComplexPrecondition.java",
                           "ComplexPrecondition",
@@ -351,7 +353,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingComplexPrecondition
     */
-   public void testNonExecutionBranchHidingComplexPrecondition_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingComplexPrecondition_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingComplexPrecondition/test/ComplexPrecondition.java",
                           "ComplexPrecondition",
@@ -378,7 +380,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryWithSideEffects
     */
-   public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryWithSideEffects/test/QueryWithSideEffects.java",
                           "QueryWithSideEffects",
@@ -405,7 +407,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryWithSideEffects
     */
-   public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryWithSideEffects/test/QueryWithSideEffects.java",
                           "QueryWithSideEffects",
@@ -432,7 +434,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryWithFields
     */
-   public void testNonExecutionBranchHidingQueryWithFields_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryWithFields_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryWithFields/test/QueryWithFields.java",
                           "QueryWithFields",
@@ -459,7 +461,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingQueryWithFields
     */
-   public void testNonExecutionBranchHidingQueryWithFields_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingQueryWithFields_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingQueryWithFields/test/QueryWithFields.java",
                           "QueryWithFields",
@@ -486,7 +488,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleObjectQuery
     */
-   public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleObjectQuery/test/SimpleObjectQuery.java",
                           "SimpleObjectQuery",
@@ -513,7 +515,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleObjectQuery
     */
-   public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleObjectQuery/test/SimpleObjectQuery.java",
                           "SimpleObjectQuery",
@@ -540,7 +542,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleBooleanQuery
     */
-   public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleBooleanQuery/test/SimpleBooleanQuery.java",
                           "SimpleBooleanQuery",
@@ -567,7 +569,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleBooleanQuery
     */
-   public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleBooleanQuery/test/SimpleBooleanQuery.java",
                           "SimpleBooleanQuery",
@@ -594,7 +596,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleIntQuery
     */
-   public void testNonExecutionBranchHidingSimpleIntQuery_mainWithSymbolicUpdates_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleIntQuery_mainWithSymbolicUpdates_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java",
                           "SimpleIntQuery",
@@ -621,7 +623,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleIntQuery
     */
-   public void testNonExecutionBranchHidingSimpleIntQuery_mainWithUpdates_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleIntQuery_mainWithUpdates_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java",
                           "SimpleIntQuery",
@@ -648,7 +650,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleIntQuery
     */
-   public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_side_proof() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_side_proof() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java",
                           "SimpleIntQuery",
@@ -675,7 +677,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/nonExecutionBranchHidingSimpleIntQuery
     */
-   public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_off() throws Exception {
+   @Test public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_off() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java",
                           "SimpleIntQuery",
@@ -702,7 +704,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/aliasTest
     */
-   public void testAliasTest_Array_AliasChecksNever() throws Exception {
+   @Test public void testAliasTest_Array_AliasChecksNever() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/aliasTest/test/AliasTest.java",
                           "AliasTest",
@@ -729,7 +731,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/aliasTest
     */
-   public void testAliasTest_Array_AliasChecksImmediately() throws Exception {
+   @Test public void testAliasTest_Array_AliasChecksImmediately() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/aliasTest/test/AliasTest.java",
                           "AliasTest",
@@ -756,7 +758,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/aliasTest
     */
-   public void testAliasTest_Objects_AliasChecksNever() throws Exception {
+   @Test public void testAliasTest_Objects_AliasChecksNever() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/aliasTest/test/AliasTest.java",
                           "AliasTest",
@@ -783,7 +785,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: /set/aliasTest
     */
-   public void testAliasTest_Objects_AliasChecksImmediately() throws Exception {
+   @Test public void testAliasTest_Objects_AliasChecksImmediately() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/aliasTest/test/AliasTest.java",
                           "AliasTest",

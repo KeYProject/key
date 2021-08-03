@@ -94,7 +94,7 @@ public class ChoiceSettings implements Settings, Cloneable {
     }
     
 
-    private ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
+    private static ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
         ImmutableList<Choice> choices = ImmutableSLList.nil();        
         for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
@@ -201,11 +201,8 @@ public class ChoiceSettings implements Settings, Cloneable {
     }
     
     
-    public ChoiceSettings updateWith(ImmutableSet<Choice> sc) {
+    public ChoiceSettings updateWith(Iterable<Choice> sc) {
         for (final Choice c : sc) {
-            if (category2Default.containsKey(c.category())) {
-                category2Default.remove(c.category());
-            }
             category2Default.put(c.category(), c.name().toString());
         }
         return this;

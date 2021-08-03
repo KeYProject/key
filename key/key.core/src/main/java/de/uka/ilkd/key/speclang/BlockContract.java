@@ -54,7 +54,9 @@ public interface BlockContract extends AuxiliaryContract {
     */
     public BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
+            Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
+            Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables,
             Term newMeasuredBy);

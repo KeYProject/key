@@ -68,6 +68,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
     protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
+    protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
        this.tacletAnnotations = tacletAnnotations;
@@ -154,10 +155,10 @@ public abstract class TacletBuilder<T extends Taclet> {
      * <code>soc</code>
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
-	if(goal2Choices==null){
-	    goal2Choices = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
-	}
-	goal2Choices.put(gt, soc);
+        if(goal2Choices == null){
+            goal2Choices = new LinkedHashMap<>();
+        }
+        goal2Choices.put(gt, soc);
     }
 
     public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices(){
@@ -184,7 +185,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * the Taclet: v is new and has the given type
      */
     public void addVarsNew(SchemaVariable v, KeYJavaType type){
-	addVarsNew(new NewVarcond(v, type));
+        if (type == null)
+            throw new NullPointerException("given type is null");
+        addVarsNew(new NewVarcond(v, type));
     }
 
     /** adds a new <I>new</I> variable to the variable conditions of
@@ -335,6 +338,10 @@ public abstract class TacletBuilder<T extends Taclet> {
           goals = oldGoals;
           return result;
        }
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

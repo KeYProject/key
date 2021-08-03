@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,7 +18,7 @@ public abstract class JMLUtils {
      * or by the end of the string. It also is aware of potential
      * comment starters, i.e., "//" or "/*".
      */
-    public static @NotNull Set<String> splitJmlMarker(@NotNull String starter) {
+    public static @Nonnull Set<String> splitJmlMarker(@Nonnull String starter) {
         Set<String> features = new TreeSet<>();
         int start = 0;
         if (starter.startsWith("//") || starter.startsWith("/*")) {
@@ -43,7 +43,7 @@ public abstract class JMLUtils {
      * <p>
      * Uses {@link #KEY_TOOL_IDENTIFIER} as the marker for this KeY.
      */
-    public static boolean isJmlCommentStarter(@NotNull String starter) {
+    public static boolean isJmlCommentStarter(@Nonnull String starter) {
         return isJmlCommentStarter(starter, KEY_TOOL_IDENTIFIER);
     }
 

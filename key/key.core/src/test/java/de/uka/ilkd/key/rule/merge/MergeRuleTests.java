@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.merge;
 import java.io.File;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 import junit.framework.TestCase;
 
@@ -50,8 +50,7 @@ public class MergeRuleTests extends TestCase {
      * Gcd example) including two merges with ITE antecedent merges and trying
      * to replay it.
      *
-     * @throws ProblemLoaderException
-     *             If the proof could not be loaded.
+     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProof() {
@@ -64,8 +63,7 @@ public class MergeRuleTests extends TestCase {
      * Gcd example) including two merges with predicate abstraction and trying
      * to replay it.
      *
-     * @throws ProblemLoaderException
-     *             If the proof could not be loaded.
+     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
@@ -78,8 +76,7 @@ public class MergeRuleTests extends TestCase {
      * Gcd example) including two merges with predicate abstraction (with
      * lattice elements manually chosen by the user) and trying to replay it.
      *
-     * @throws ProblemLoaderException
-     *             If the proof could not be loaded.
+     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
@@ -175,7 +172,7 @@ public class MergeRuleTests extends TestCase {
      * This test case semi-automatically proves the Gcd problem with two merges
      * in the following way:
      * <p>
-     * 
+     *
      * <ol>
      * <li>Run the {@link FinishSymbolicExecutionUntilMergePointMacro} on the
      * root</li>
@@ -185,11 +182,10 @@ public class MergeRuleTests extends TestCase {
      * <li>Let the automatic strategy finish the proof</li>
      * </ol>
      * <p>
-     * 
+     * <p>
      * At the end, the proof should be closed.
      *
-     * @throws ProblemLoaderException
-     *             If the proof could not be loaded.
+     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testDoManualGcdProof() throws Exception {
@@ -258,8 +254,7 @@ public class MergeRuleTests extends TestCase {
     /**
      * Runs the automatic JavaDL strategy on the given proof.
      *
-     * @param proof
-     *            Proof to prove automatically.
+     * @param proof Proof to prove automatically.
      */
     public static void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
@@ -271,9 +266,8 @@ public class MergeRuleTests extends TestCase {
      * Merges the first open goal in the given proof. Asserts that the
      * constructed merge rule application is complete.
      *
-     * @param proof
-     *            The proof the first goal of which to merge with suitable
-     *            partner(s).
+     * @param proof The proof the first goal of which to merge with suitable
+     *              partner(s).
      */
     private void mergeFirstGoal(final Proof proof, MergeProcedure mergeProc) {
         final Services services = proof.getServices();
@@ -301,8 +295,7 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
-     * @param sequent
-     *            Sequent to get the PIO of the first succedent formula for.
+     * @param sequent Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
     private PosInOccurrence getPioFirstFormula(Sequent sequent) {
@@ -313,10 +306,8 @@ public class MergeRuleTests extends TestCase {
     /**
      * Runs the given macro on the given proof node.
      *
-     * @param macro
-     *            The macro to execute.
-     * @param node
-     *            The node to execute the macro on.
+     * @param macro The macro to execute.
+     * @param node  The node to execute the macro on.
      */
     private void runMacro(AbstractProofMacro macro, Node node) {
         try {
@@ -333,14 +324,13 @@ public class MergeRuleTests extends TestCase {
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
-     * @param directory TODO
-     * @param proofFileName
-     *            The file name of the proof file to load.
      *
+     * @param directory
+     * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
     public static Proof loadProof(File directory, String proofFileName) {
-        File proofFile = new File(directory , proofFileName);
+        File proofFile = new File(directory, proofFileName);
         assertTrue("Proof file: " + proofFile.getAbsolutePath() + " could not be found!",
                 proofFile.exists());
 

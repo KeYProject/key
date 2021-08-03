@@ -13,14 +13,14 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 
-public class KeYSemanticException extends RecognitionException {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -3341865050312925366L;
+import javax.annotation.Nullable;
+import java.net.MalformedURLException;
+
+public class KeYSemanticException extends RecognitionException implements HasLocation {
     private final String cat;
     private final String filename;
     
@@ -74,7 +74,12 @@ public class KeYSemanticException extends RecognitionException {
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return filename+"("+this.getLine()+", "+this.getColumn()+"): "
-	    +getMessage();
+	return String.format("%s(%d, %d): %s", filename, this.getLine(), this.getColumn(), getMessage());
+    }
+
+    @Nullable
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        return new Location(getFilename(), getLine(), getColumn() + 1);
     }
 }

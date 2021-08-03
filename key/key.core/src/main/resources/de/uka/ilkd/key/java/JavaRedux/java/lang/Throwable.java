@@ -59,7 +59,7 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @    ensures \result == cause;
      @*/
    public java.lang.Throwable getCause();
-   
+
    //TODO: fix the contract to match Java's behavior (e.g. arg0 != this or exception)
    /*@ public normal_behavior
      @    requires cause == null;

@@ -148,7 +148,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         JScrollPane javaDLOptionsScrollPane =
                 new JScrollPane(javaDLOptionsPanel,
                         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         javaDLOptionsPanel.setEnabled(true);
 

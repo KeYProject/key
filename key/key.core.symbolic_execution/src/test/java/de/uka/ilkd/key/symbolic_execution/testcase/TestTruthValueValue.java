@@ -2,16 +2,18 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link TruthValue}.
  * @author Martin Hentschel
  */
-public class TestTruthValueValue extends TestCase {
+public class TestTruthValueValue  {
    /**
     * Tests {@link TruthValue#ifThenElse(TruthValue, TruthValue, TruthValue)}.
     */
-   public void testIfThenElse() {
+   @Test public void testIfThenElse() {
       // true
       assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, TruthValue.TRUE));
       assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, TruthValue.FALSE));
@@ -85,7 +87,7 @@ public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#eqv(TruthValue, TruthValue)}.
     */
-   public void testEqv() {
+   @Test public void testEqv() {
       // true
       assertEquals(TruthValue.TRUE, TruthValue.eqv(TruthValue.TRUE, TruthValue.TRUE));
       assertEquals(TruthValue.FALSE, TruthValue.eqv(TruthValue.TRUE, TruthValue.FALSE));
@@ -111,7 +113,7 @@ public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#and(TruthValue, TruthValue)}.
     */
-   public void testAnd() {
+   @Test public void testAnd() {
       // true
       assertEquals(TruthValue.TRUE, TruthValue.and(TruthValue.TRUE, TruthValue.TRUE));
       assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.TRUE, TruthValue.FALSE));
@@ -137,7 +139,7 @@ public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#or(TruthValue, TruthValue)}.
     */
-   public void testOr() {
+   @Test public void testOr() {
       // true
       assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, TruthValue.TRUE));
       assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, TruthValue.FALSE));
@@ -163,7 +165,7 @@ public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#imp(TruthValue, TruthValue)}.
     */
-   public void testImp() {
+   @Test public void testImp() {
       // true
       assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.TRUE, TruthValue.TRUE));
       assertEquals(TruthValue.FALSE, TruthValue.imp(TruthValue.TRUE, TruthValue.FALSE));
@@ -189,7 +191,7 @@ public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#not(TruthValue)}.
     */
-   public void testNot() {
+   @Test public void testNot() {
       assertEquals(TruthValue.FALSE, TruthValue.not(TruthValue.TRUE));
       assertEquals(TruthValue.TRUE, TruthValue.not(TruthValue.FALSE));
       assertEquals(TruthValue.UNKNOWN, TruthValue.not(TruthValue.UNKNOWN));

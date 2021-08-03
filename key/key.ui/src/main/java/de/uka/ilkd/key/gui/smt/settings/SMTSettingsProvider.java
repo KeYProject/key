@@ -127,7 +127,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JComboBox<String> getProgressModeBox() {
-        return addComboBox(BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
+        return addComboBox("", BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
                 e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));

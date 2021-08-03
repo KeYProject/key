@@ -249,6 +249,118 @@ public interface AuxiliaryContract extends SpecificationElement {
      */
     public Term getPostcondition(LocationVariable heap, Services services);
 
+
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePrecondition(LocationVariable heap, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap with all free program variables
+     *         replaced by those in {@code variables}.
+     */
+    public Term getFreePrecondition(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param atPres
+     *            a map from every variable {@code var} to {@code \old(var)} to use instead of
+     *            {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePrecondition(LocationVariable heap, ProgramVariable self,
+            Map<LocationVariable, LocationVariable> atPres, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use to use instead of
+     *            {@link #getPlaceholderVariables()}.
+     * @param atPres
+     *            a map from every variable {@code var} to {@code \old(var)} to use instead of
+     *            {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePrecondition(LocationVariable heapVariable, Term heap, Term self,
+            Map<LocationVariable, Term> atPres, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param terms
+     *            the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePrecondition(LocationVariable heapVariable, Term heap, Terms terms,
+            Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free postcondition on the specified heap.
+     */
+    public Term getFreePostcondition(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param terms
+     *            the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePostcondition(LocationVariable heapVariable, Term heap, Terms terms,
+            Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param services
+     *            services.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getFreePostcondition(LocationVariable heap, Services services);
+
     /**
      *
      * @param heap
@@ -310,9 +422,25 @@ public interface AuxiliaryContract extends SpecificationElement {
      *
      * @param heap
      *            the heap to use.
+     * @return this contract's free precondition on the specified heap.
+     */
+    public Term getRequiresFree(LocationVariable heap);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
      * @return this contract's postcondition on the specified heap.
      */
     public Term getEnsures(LocationVariable heap);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @return this contract's free postcondition on the specified heap.
+     */
+    public Term getEnsuresFree(LocationVariable heap);
 
     /**
      *
@@ -445,6 +573,20 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @return the original postcondition of the contract.
      */
     Term getPost(Services services);
+
+    /**
+     * @param services
+     *            services.
+     * @return the original free precondition of the contract.
+     */
+    Term getFreePre(Services services);
+
+    /**
+     * @param services
+     *            services.
+     * @return the original free postcondition of the contract.
+     */
+    Term getFreePost(Services services);
 
     /**
      * @param services

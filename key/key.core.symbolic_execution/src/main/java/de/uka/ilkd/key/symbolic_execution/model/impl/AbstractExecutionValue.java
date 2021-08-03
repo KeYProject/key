@@ -8,6 +8,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -125,7 +126,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
       if (term != null) {
          if (term.op() instanceof ProgramVariable ||
              SymbolicExecutionUtil.isSelect(services, term)) {
-            toFill.add(term);
+            toFill.add(OriginTermLabel.removeOriginLabels(term, services));
          }
          else {
             for (int i = 0; i < term.arity(); i++) {
@@ -142,7 +143,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * @return {@code true} at least one {@link Term} is contained, {@code false} none of the {@link Term}s is contained.
     */
    protected boolean containsTerm(Term term, Set<Term> toSearch) {
-      if (toSearch.contains(term)) {
+      if (toSearch.contains(OriginTermLabel.removeOriginLabels(term, getServices()))) {
          return true;
       }
       else {

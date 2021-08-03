@@ -44,18 +44,19 @@ public final class KeyStrokeManager {
      * This constant holds the typical key to be used for shortcuts
      * (usually {@link java.awt.Event#CTRL_MASK})
      */
-    public static final int SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    public static final int SHORTCUT_KEY_MASK = getShortcutMask();
+
 
     /**
      * If true, F keys are used for macros, otherwise CTRL+SHIFT+letter.
      */
-    static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
+    public static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
 
     /**
      * This constant holds the typical key combination to be used for auxiliary shortcuts
      * ({@link KeyEvent#SHIFT_MASK} plus usually {@link KeyEvent#CTRL_MASK})
      */
-    static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
+    public static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
 
 
     /**
@@ -159,6 +160,17 @@ public final class KeyStrokeManager {
      */
     static Action findAction(String clazz) {
         return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
+    }
+
+    /**
+     * Workaround for running in non-ui mode, e.g., docker images.
+     */
+    private static int getShortcutMask() {
+        try {
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        } catch (HeadlessException e) {
+            return 0;
+        }
     }
 }
 
