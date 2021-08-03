@@ -79,7 +79,7 @@ public class MasterHandlerTest {
         while(props.containsKey("contains." + i)) {
             assertThat("Occurrence check",
                     translation,
-                    StringContains.containsString(props.get("contains." + i).trim()));
+                    new ContainsModuloSpaces(props.get("contains." + i).trim()));
             i++;
         }
 
