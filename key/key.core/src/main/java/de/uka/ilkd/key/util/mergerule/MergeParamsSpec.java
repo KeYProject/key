@@ -18,11 +18,10 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 
 /**
  * Specification of merge parameters for the creation of {@link MergeContract}s;
- * this is used by {@link KeYJMLParser}.
+ *
  *
  * @author Dominic Scheurer
  */

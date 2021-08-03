@@ -29,8 +29,8 @@ public final class MapUtil {
     public static <E, K, V> Collector<E, Map<K, V>, Map<K, V>> collector(
             Function<? super E, ? extends K> keyMapper,
             Function<? super E, ? extends V> valueMapper) {
-        return Collector.<E, Map<K, V>>of(
-                HashMap<K, V>::new,
+        return Collector.of(
+                HashMap::new,
                 (map, entry) -> map.put(
                         keyMapper.apply(entry), valueMapper.apply(entry)),
                 (map1, map2) -> { map1.putAll(map2); return map1; },

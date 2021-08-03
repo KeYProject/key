@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,7 +76,7 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder STRICT = new AbstractConditionBuilder("scrictSub", TR, TR) {
         @Override
-        public boolean isSuitableFor(@NotNull String name) {
+        public boolean isSuitableFor(@Nonnull String name) {
             if (super.isSuitableFor(name)) return true;
             return "\\strict\\sub".equalsIgnoreCase(name);
         }
@@ -133,7 +133,7 @@ public class TacletBuilderManipulators {
 
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@NotNull ArgumentType... argumentsTypes) {
+        public NotFreeInTacletBuilderCommand(@Nonnull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
         }
 
@@ -249,7 +249,7 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@NotNull String triggerName, boolean forceElmentary) {
+        public JavaTypeToSortConditionBuilder(@Nonnull String triggerName, boolean forceElmentary) {
             super(triggerName, SV, SORT);
             this.elmen = forceElmentary;
         }

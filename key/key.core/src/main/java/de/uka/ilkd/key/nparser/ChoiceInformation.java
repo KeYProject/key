@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.*;
 
@@ -19,7 +19,7 @@ public class ChoiceInformation {
     /**
      * A map from a found category to a set of possible (defined) options.
      */
-    private final Map<@NotNull String, @NotNull Set<String>> foundChoicesAndOptions = new HashMap<>();
+    private final Map<String, Set<String>> foundChoicesAndOptions = new HashMap<>();
 
     /**
      * This set contains categories were an options was activated.
@@ -50,7 +50,7 @@ public class ChoiceInformation {
         this.choices = choices;
     }
 
-    public Map<@NotNull String, @NotNull Set<String>> getFoundChoicesAndOptions() {
+    public Map<String, Set<String>> getFoundChoicesAndOptions() {
         return foundChoicesAndOptions;
     }
 

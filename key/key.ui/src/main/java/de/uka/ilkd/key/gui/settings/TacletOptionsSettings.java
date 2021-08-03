@@ -8,7 +8,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
@@ -225,7 +225,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(p, new CC().span().newline());
     }
 
-    @NotNull
+    @Nonnull
     private JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new BorderLayout());

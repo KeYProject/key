@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.settings;
 
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A base class for own settings based on properties.
@@ -49,22 +50,27 @@ public abstract class AbstractPropertiesSettings implements Settings {
     }
 
     /**
-     * Translation of a string to a list of string by using {@link #SET_DELIMITER}
-     *
+     * Translation of a string to a list of strings by using {@link #SET_DELIMITER}.
      * @param str a nonnull, emptible string
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
-    private static @NotNull List<String> parseStringList(@NotNull String str) {
-        return new ArrayList<>(Arrays.asList(str.split(SET_DELIMITER)));
+    private static @Nonnull List<String> parseStringList(@Nonnull String str) {
+        // escape special chars (in particular the comma)
+        return Arrays.stream(str.split(SET_DELIMITER))
+                     .map(s -> SettingsConverter.convert(s, true))
+                     .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
      * @param seq a string list
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
-    private static @NotNull String stringListToString(@NotNull List<String> seq) {
-        return String.join(SET_DELIMITER, seq);
+    private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
+        // escape special chars (in particular the comma)
+        return seq.stream()
+                  .map(s -> SettingsConverter.convert(s, false))
+                  .collect(Collectors.joining(SET_DELIMITER));
     }
 
     public boolean isInitialized() {
@@ -147,7 +153,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@NotNull String key,
+    protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
                                                                    @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
                 parseStringList(defValue),

@@ -4,7 +4,7 @@ import de.uka.ilkd.key.proof.io.IProofFileParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class ProofReplayer {
      * @param prl   the proof replayer instance
      * @see #run(CharStream, IProofFileParser, int)
      */
-    public static void run(@NotNull Token token, CharStream input, IProofFileParser prl) {
+    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine());
     }

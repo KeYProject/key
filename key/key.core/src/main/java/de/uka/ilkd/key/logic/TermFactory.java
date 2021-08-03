@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -186,12 +186,12 @@ public final class TermFactory {
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @NotNull Term createTerm(@NotNull  Operator junctor, @NotNull List<@NotNull Term> terms) {
+    public @Nonnull Term createTerm(@Nonnull  Operator junctor, @Nonnull List<Term> terms) {
         if(terms.size()==1)
             return terms.get(0);
         else if (terms.size() == 2)
             return createTerm(junctor, terms.get(0), terms.get(1));
-        final Optional<@NotNull Term> reduce = terms.stream()
+        final Optional<Term> reduce = terms.stream()
                 .reduce((a, b) -> createTerm(junctor, a, b));
         if(reduce.isPresent())
             return reduce.get();

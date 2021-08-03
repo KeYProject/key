@@ -112,7 +112,8 @@ public class Simple {
           @ signals_only \nothing;
           @ assignable \nothing;
           @*/
-        /*@ requires x < 0;
+        /*@ also
+          @ requires x < 0;
           @ ensures z == x + y;
           @ diverges false;
           @ signals_only \nothing;

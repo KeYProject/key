@@ -14,27 +14,40 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+import recoder.java.CompilationUnit;
+import recoder.kit.UnitKit;
+import recoder.service.UnresolvedReferenceException;
+
+import javax.annotation.Nullable;
+import java.net.MalformedURLException;
+
 /**
  * A convert exception enriched with a location within a file/source.
- *
+ * <p>
  * The source's name itself is not captured.
  */
-public class PosConvertException extends ConvertException {
+public class PosConvertException extends ConvertException implements HasLocation {
 
     private static final long serialVersionUID = 758453353495075586L;
 
-    /** The line */
+    /**
+     * The line
+     */
     private final int line;
 
-    /** The column */
+    /**
+     * The column
+     */
     private int column;
 
     /**
      * Instantiates a new exception with position information.
      *
      * @param message the message, not null
-     * @param line the line to point to
-     * @param column the column to point to
+     * @param line    the line to point to
+     * @param column  the column to point to
      */
     public PosConvertException(String message, int line, int column) {
         super(message);
@@ -45,8 +58,8 @@ public class PosConvertException extends ConvertException {
     /**
      * Instantiates a new exception with position information.
      *
-     * @param cause the exception causing this instance.
-     * @param line the line to point to
+     * @param cause  the exception causing this instance.
+     * @param line   the line to point to
      * @param column the column to point to
      */
     public PosConvertException(Throwable cause, int line, int column) {
@@ -74,4 +87,17 @@ public class PosConvertException extends ConvertException {
         return column;
     }
 
+    @Nullable
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        Throwable cause = getCause();
+        String file = "";
+        if (cause instanceof UnresolvedReferenceException) {
+            UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+            CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
+            String dataloc = cu.getDataLocation().toString();
+            file = dataloc.substring(dataloc.indexOf(':') + 1);
+        }
+        return new Location(file, getLine(), getColumn());
+    }
 }

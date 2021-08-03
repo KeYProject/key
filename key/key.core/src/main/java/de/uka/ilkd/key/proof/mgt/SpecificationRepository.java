@@ -469,6 +469,7 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
+        //System.out.println(contract.toString());
         if (!WellDefinednessCheck.isOn()
                 && contract instanceof WellDefinednessCheck) {
             return;

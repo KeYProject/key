@@ -1,6 +1,6 @@
 dependencies {
-    compile project(":key.core")
-    testCompile project(":key.core").sourceSets.test.output
+    implementation project(":key.core")
+    testImplementation project(":key.core").sourceSets.test.output
 }
 
 test {

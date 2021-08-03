@@ -17,8 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -74,7 +74,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @NotNull List<@NotNull File> readClassPath() throws ProofInputException;
+    @Nonnull List<File> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.

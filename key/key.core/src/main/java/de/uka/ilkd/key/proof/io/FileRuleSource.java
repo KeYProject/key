@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof.io;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -15,7 +15,7 @@ public class FileRuleSource extends RuleSource {
      * The non-<code>null</code> reference to the file from which rules are
      * read.
      */
-    protected @NotNull
+    protected @Nonnull
     final File ruleFile;
 
     private long numberOfChars;
@@ -31,7 +31,7 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public @NotNull File file() {
+    public @Nonnull File file() {
         return ruleFile;
     }
 

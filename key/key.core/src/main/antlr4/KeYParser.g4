@@ -18,6 +18,10 @@
 
 parser grammar KeYParser;
 
+@header {
+  import de.uka.ilkd.key.util.parsing.*;
+}
+
 @members {
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
@@ -380,7 +384,7 @@ atom_prefix:
   | bracket_term
 ;
 bracket_term: primitive_labeled_term (bracket_suffix_heap)* attribute*;
-bracket_suffix_heap: brace_suffix (AT heap=term)?;
+bracket_suffix_heap: brace_suffix (AT heap=bracket_term)?;
 brace_suffix:
     LBRACKET target=term ASSIGN val=term RBRACKET             #bracket_access_heap_update
   | LBRACKET id=simple_ident args=argument_list RBRACKET      #bracket_access_heap_term
@@ -465,9 +469,9 @@ accessterm
 
 attribute:
     DOT STAR                                                             #attribute_star
-  | DOT id=simple_ident call? (AT heap=term)?                            #attribute_simple
+  | DOT id=simple_ident call? (AT heap=bracket_term)?                    #attribute_simple
   | DOT LPAREN sort=sortId DOUBLECOLON id=simple_ident RPAREN
-     call? (AT heap=term)?                                               #attribute_complex
+     call? (AT heap=bracket_term)?                                       #attribute_complex
 ;
 
 call:

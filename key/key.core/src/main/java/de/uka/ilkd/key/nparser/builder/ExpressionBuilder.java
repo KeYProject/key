@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
@@ -15,12 +14,14 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.StringUtil;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -86,10 +87,10 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     public static String trimJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
-            return CharMatcher.anyOf("\\<>").trimFrom(raw);
+            return StringUtil.trim(raw, "\\<>");
         }
         if (raw.startsWith("\\[")) {
-            return CharMatcher.anyOf("\\[]").trimFrom(raw);
+            return StringUtil.trim(raw, "\\[]");
         }
         int end = raw.length() - (raw.endsWith("\\endmodality") ? "\\endmodality".length() : 0);
         int start = 0;
@@ -332,7 +333,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
             KeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
-            KeYParser.TermContext heap = ctx.bracket_suffix_heap(i).heap;
+            ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
             if (heap != null) {
                 t = replaceHeap(t, accept(heap), heap);
@@ -554,53 +555,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return capsulateTf(ctx, () -> getTermFactory().createTerm(metaId, t));
     }
 
-
-    /*
-    @Override
-    public Object visitAccessterm_suffix_attr(KeYParser.Accessterm_suffix_attrContext ctx) {
-        final Term t = pop();
-        if (ctx.STAR() != null) {
-            return services.getTermBuilder().allFields(t);
-        }
-        assert (ctx.attrid() != null);
-        var prefix = t;
-        String memberName = ctx.attrid().getText();
-        if (prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
-            if ("length".equals(memberName)) {
-                return getServices().getTermBuilder().seqLen(prefix);
-            } else {
-                semanticError(ctx,
-                        "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
-            }
-        }
-        if (ctx.attrid().clss != null) {
-            String className = ctx.attrid().clss.getText();
-            String qname = ctx.attrid().id2.getText();
-            //Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
-            /*if (result == null) {
-                final Sort sort = lookupSort(className);
-                if (sort == null) {
-                    semanticError(ctx, "Could not find matching sort for " + className);
-                }
-                KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-                if (kjt == null) {
-                    semanticError(ctx, "Found logic sort for " + className +
-                            " but no corresponding java type!");
-                }
-            }
-        } else {
-            memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
-            return createAttributeTerm(prefix, v, ctx);
-        }
-
-        if (ctx.heap != null) {
-            //TODO handle heap
-        }
-        return updateOrigin(t, ctx);
-    }*/
-
-
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
 
@@ -739,35 +693,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getServices().getTypeConverter()
                 .convertToLogicElement(new StringLiteral(s));
     }
-
-    /*
-    public Term visitQuery_suffix(KeYParser.Query_suffixContext ctx) {
-        String memberName = pop();
-        Term prefix = pop();
-        String classRef, name;
-        boolean brackets = false;
-        List<Term> args = accept(ctx.argument_list());
-        // true in case class name is not explicitly mentioned as part of memberName
-        memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-        boolean implicitClassName = memberName.indexOf("::") == -1;
-
-        if (implicitClassName) {
-            classRef = prefix.sort().name().toString();
-            name = memberName;
-        } else {
-            String[] parts = memberName.split("::", 2);
-            classRef = parts[0];
-            name = parts[1];
-        }
-        KeYJavaType kjt = getTypeByClassName(classRef);
-        if (kjt == null)
-            semanticError(ctx, "Could not find java type for %s", classRef);
-        classRef = kjt.getFullName();
-
-        return getServices().getJavaInfo().getProgramMethodTerm(prefix, name,
-                args.toArray(new Term[0]), classRef, implicitClassName);
-    }
-    */
 
     @Override
     public Object visitCast_term(KeYParser.Cast_termContext ctx) {
@@ -1204,7 +1129,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                                 "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
                     }
                 }
-                memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+                memberName = StringUtil.trim(memberName, "()");
                 Operator attr = getAttributeInPrefixSort(v.sort(), memberName);
                 return createAttributeTerm(tv, attr, ctx);
             }
@@ -1262,7 +1187,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
                     KeYParser.Attribute_simpleContext simpleContext = (KeYParser.Attribute_simpleContext) attrib;
                     boolean isCall = simpleContext.call() != null;
-                    KeYParser.TermContext heap = simpleContext.heap; //TODO?
+                    ParserRuleContext heap = simpleContext.heap; //TODO?
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                     if (maybeAttr != null) {

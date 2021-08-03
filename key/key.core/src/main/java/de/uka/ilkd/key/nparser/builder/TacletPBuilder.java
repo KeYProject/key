@@ -19,16 +19,16 @@ import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -868,7 +868,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     */
 
 
-    private @NotNull TacletBuilder<?> createTacletBuilderFor(
+    private @Nonnull TacletBuilder<?> createTacletBuilderFor(
             Object find, int applicationRestriction, ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();

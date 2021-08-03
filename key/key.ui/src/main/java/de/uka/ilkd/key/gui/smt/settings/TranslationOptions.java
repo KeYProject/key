@@ -132,7 +132,10 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
-            long result = settings.maxInteger;
+            long result = Integer.MAX_VALUE;
+            if (settings != null) {
+                result = settings.maxInteger;
+            }
             try {
                 result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);

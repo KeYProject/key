@@ -21,6 +21,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import javax.annotation.Nonnull;
 
 
 /**
@@ -30,7 +31,7 @@ public class JavaIntegerSemanticsHelper {
 
     private final TermBuilder tb; 
 
-    private final SLTranslationExceptionManager excManager;
+    private final SLExceptionFactory excManager;
     private final TypeConverter tc;
     private final IntegerLDT integerLDT;
 
@@ -40,9 +41,9 @@ public class JavaIntegerSemanticsHelper {
     //-------------------------------------------------------------------------
 
     public JavaIntegerSemanticsHelper(Services services,
-			    SLTranslationExceptionManager excManager) {
+			    SLExceptionFactory excManager) {
 	assert services != null;
-	assert excManager != null;
+	//assert excManager != null;
 
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
@@ -94,15 +95,14 @@ public class JavaIntegerSemanticsHelper {
     //public interface
     //-------------------------------------------------------------------------
 
-    public boolean isIntegerTerm(SLExpression a) throws SLTranslationException {
+    public boolean isIntegerTerm(@Nonnull SLExpression a)  {
 	assert a.isTerm();
 	return a.getTerm().sort() == integerLDT.targetSort();
     }
 
 
-    public SLExpression buildPromotedOrExpression(SLExpression a, 
-	    				          SLExpression b)
-	    throws SLTranslationException {
+    public SLExpression buildPromotedOrExpression(@Nonnull SLExpression a, @Nonnull SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
 	try {

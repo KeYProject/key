@@ -780,9 +780,19 @@ public class OriginTermLabel implements TermLabel {
         ACCESSIBLE("accessible"),
 
         /**
+         * assert
+         */
+        ASSERT("assert"),
+
+        /**
          * assignable
          */
         ASSIGNABLE("assignable"),
+
+        /**
+         * assume
+         */
+        ASSUME("assume"),
 
         /**
          * decreases

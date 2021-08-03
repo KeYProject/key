@@ -9,7 +9,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.util.LineProperties;
 import org.hamcrest.core.StringContains;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;

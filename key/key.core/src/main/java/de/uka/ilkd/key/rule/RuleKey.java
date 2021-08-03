@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -17,11 +17,11 @@ import de.uka.ilkd.key.logic.Name;
  * {@link Taclet#equals(Object)} and {@link Taclet#hashCode()} method.
  */
 public class RuleKey {
-   public final @NotNull Name name;
-   public final @NotNull ImmutableSet<Choice> choices;
+   public final @Nonnull Name name;
+   public final @Nonnull ImmutableSet<Choice> choices;
    public final Rule r;
 
-   RuleKey(@NotNull Name name, @NotNull ImmutableSet<Choice> choices, Rule r) {
+   RuleKey(@Nonnull Name name, @Nonnull ImmutableSet<Choice> choices, Rule r) {
       this.name = name;
       this.choices = choices;
       this.r = r;

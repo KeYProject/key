@@ -8,17 +8,19 @@ plugins {
 }
 
 dependencies {
-    compile project(":key.core")
-    compile project(":key.core:rifl")
+    implementation project(":key.core")
+    implementation project(":key.core:rifl")
 
-    compile project(":key.core.proof_references")
-    compile project(":key.core.symbolic_execution")
-    compile project(":key.removegenerics")
+    implementation project(":key.core.proof_references")
+    implementation project(":key.core.symbolic_execution")
+    implementation project(":key.removegenerics")
 
-    compile 'com.miglayout:miglayout-swing:5.2'
+    implementation 'com.miglayout:miglayout-swing:5.2'
 
-    compile group: group, name: 'docking-frames-common', version: '1.0'
-    compile group: group, name: 'docking-frames-core', version: '1.0'
+    implementation group: group, name: 'docking-frames-common', version: '1.0'
+    implementation group: group, name: 'docking-frames-core', version: '1.0'
+
+    implementation "org.antlr:antlr4-runtime:4.7.1"
 
     runtimeOnly project(":keyext.ui.testgen")
 
