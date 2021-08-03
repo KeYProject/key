@@ -15,8 +15,8 @@ package de.uka.ilkd.key.core;
 
 import java.util.EventObject;
 
-import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import javax.annotation.Nonnull;
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
 import org.key_project.util.collection.ImmutableList;
@@ -103,6 +103,11 @@ public class KeYMediator {
      * An optional used {@link AutoSaver}.
      */
     private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
+
+    /**
+     * Currently opened proofs.
+     */
+    private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
@@ -894,5 +899,17 @@ public class KeYMediator {
      */
     public AutoSaver getAutoSaver() {
         return autoSaver;
+    }
+
+    /**
+     * Provides a list of currently opened view.
+     * <p>
+     * You can use this instance directly inside your components or
+     * add a listener to observe changes.
+     *
+     * @see DefaultListModel#addListDataListener
+     */
+    public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+        return currentlyOpenedProofs;
     }
 }

@@ -447,6 +447,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
 
