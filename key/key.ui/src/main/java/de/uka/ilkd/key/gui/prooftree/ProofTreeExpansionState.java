@@ -110,7 +110,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     private final @Nonnull Set<TreePath> paths = new LinkedHashSet<>();
 
     /** Listens for changes in the proof tree as well as for expansion/collapse of GUI nodes. */
-    private final transient @Nonnull Listener listener = new Listener();
+    private final @Nonnull Listener listener = new Listener();
 
     /** For the given JTree. Assumes only the root is expanded, if at all
      * (for example, a freshly created JTree, or one for which the model has
@@ -212,7 +212,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     @Override
     public Iterator<TreePath> iterator() {
-        return new Iterator<>() {
+        return new Iterator<TreePath>() {
             final Iterator<TreePath> i = paths.iterator();
 
             @Override
@@ -497,8 +497,6 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
 
         // inform the listeners for redrawing
-        //tree.collapsePath(new TreePath(root));
-        //tree.expandPath(new TreePath(root));
         tree.fireTreeExpanded(new TreePath(root));
     }
 
