@@ -31,6 +31,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * An infrastructure to read string to string maps from files.
+ *
+ * Keys are written in form of heading lines like "### key".
+ * The values are the lines between headings.
+ *
+ * This is nice for having larger text blocks to map.
+ *
+ * @author Mattias Ulbrich
+ */
 public class LineProperties {
 
     private Map<String, String> map = new LinkedHashMap<>();

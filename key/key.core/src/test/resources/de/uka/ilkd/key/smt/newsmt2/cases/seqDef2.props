@@ -15,7 +15,7 @@ free variable
 
 ### contains.2
 
-(assert (forall ((var_0 U)) (! (instanceof (seqDef1 var_0) sort_Seq) :pattern (seqDef1 var_0))))
+(assert (forall ((var_0 U)) (! (instanceof (seqDef1 var_0) sort_Seq) :pattern ((seqDef1 var_0)))))
 
 ### contains.3
 
