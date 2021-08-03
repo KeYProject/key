@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -40,6 +38,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import org.key_project.util.lookup.Lookup;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -763,7 +764,7 @@ public class Node implements Iterable<Node> {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> @Nullable T lookup(Class<T> service) {
+    public <T> T lookup(Class<T> service) {
         try {
             if (userData == null) {
                 return null;
@@ -802,7 +803,7 @@ public class Node implements Iterable<Node> {
      *
      * @return
      */
-    public @NotNull Lookup getUserData() {
+    public @Nonnull Lookup getUserData() {
         if(userData == null) userData = new Lookup();
         return userData;
     }

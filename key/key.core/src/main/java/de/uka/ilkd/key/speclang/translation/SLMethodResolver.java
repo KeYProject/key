@@ -58,6 +58,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
+        //FIXME weigl this seems wrong. Should it not be that this containingType=manager.specInClass?
         KeYJavaType containingType = receiver.getType();
         if(containingType == null) {
             return null;

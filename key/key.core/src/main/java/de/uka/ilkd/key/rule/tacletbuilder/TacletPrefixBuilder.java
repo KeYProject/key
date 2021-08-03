@@ -13,61 +13,46 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletPrefix;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.rule.*;
+import org.key_project.util.collection.*;
+
+import java.util.Iterator;
 
 public class TacletPrefixBuilder {
 
-    /** 
+    /**
      * set of all schemavariables that are only allowed to be matched
-     * with quantifiable variables. 
+     * with quantifiable variables.
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars = DefaultImmutableSet.<SchemaVariable>nil();
     private TacletBuilder<? extends Taclet> tacletBuilder;
 
-    protected ImmutableMap<SchemaVariable,TacletPrefix> prefixMap = DefaultImmutableMap.<SchemaVariable,TacletPrefix>nilMap();
+    protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap = DefaultImmutableMap.<SchemaVariable, TacletPrefix>nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
-	this.tacletBuilder=tacletBuilder;
+        this.tacletBuilder = tacletBuilder;
     }
 
     private void addVarsBoundHere(Term visited, int subTerm) {
-	ImmutableArray<QuantifiableVariable> bdVars=visited.varsBoundHere(subTerm);
-	for (int i=0; i<bdVars.size(); i++) {
-	    QuantifiableVariable boundVar = bdVars.get(i);
-	    if ( boundVar instanceof VariableSV ) {
-		currentlyBoundVars = currentlyBoundVars.add
-		    ((SchemaVariable)boundVar);
-	    }
-	}
+        ImmutableArray<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
+        for (int i = 0; i < bdVars.size(); i++) {
+            QuantifiableVariable boundVar = bdVars.get(i);
+            if (boundVar instanceof VariableSV) {
+                currentlyBoundVars = currentlyBoundVars.add
+                        ((SchemaVariable) boundVar);
+            }
+        }
     }
 
-    private void setPrefixOfOccurrence(SchemaVariable sv, 
-				       ImmutableSet<SchemaVariable> relevantBoundVars) {
-	prefixMap = 
-	    prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
+    private void setPrefixOfOccurrence(SchemaVariable sv,
+                                       ImmutableSet<SchemaVariable> relevantBoundVars) {
+        prefixMap =
+                prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
     }
 
     /**
@@ -75,60 +60,60 @@ public class TacletPrefixBuilder {
      * currently bound vars set.
      */
     private ImmutableSet<SchemaVariable> removeNotFreeIn(SchemaVariable sv) {
-	ImmutableSet<SchemaVariable> result = currentlyBoundVars;
-	Iterator<NotFreeIn> it = tacletBuilder.varsNotFreeIn();
-	while (it.hasNext()) {
-	    NotFreeIn notFreeIn=it.next();
-	    if (notFreeIn.second() == sv) {
-		result = result.remove(notFreeIn.first());
-	    }
-	}
-	return result;
+        ImmutableSet<SchemaVariable> result = currentlyBoundVars;
+        Iterator<NotFreeIn> it = tacletBuilder.varsNotFreeIn();
+        while (it.hasNext()) {
+            NotFreeIn notFreeIn = it.next();
+            if (notFreeIn.second() == sv) {
+                result = result.remove(notFreeIn.first());
+            }
+        }
+        return result;
     }
 
     private void visit(Term t) {
-	if (t.op() instanceof SchemaVariable && 
-            t.arity() == 0 &&
-	    !(t.op() instanceof VariableSV) &&
-	    !(t.op() instanceof ProgramSV) &&
-	    !(t.op() instanceof SkolemTermSV)) {
-	    SchemaVariable sv = (SchemaVariable)t.op();
-	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
-	    TacletPrefix prefix = prefixMap.get(sv);
-	    if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-		setPrefixOfOccurrence(sv, relevantBoundVars);
-	    } else {
-		throw new InvalidPrefixException(tacletBuilder.getName().toString(), 
-						 sv, 
-						 prefix, 
-						 relevantBoundVars);
-	    }
-	}
-	for (int i=0; i<t.arity(); i++) {
-	    ImmutableSet<SchemaVariable> oldBounds=currentlyBoundVars;
-	    addVarsBoundHere(t, i);
-	    visit(t.sub(i));
-	    currentlyBoundVars=oldBounds;
-	}
-	if (t.hasLabels()) {
-	    for (TermLabel l: t.getLabels()) {
-	        if (l instanceof SchemaVariable) {
-	            SchemaVariable sv = (SchemaVariable) l;
-	            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
-	            TacletPrefix prefix = prefixMap.get(sv);
-	            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-	                setPrefixOfOccurrence(sv, relevantBoundVars);
-	            } else {
-	                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
-	                        sv,
-	                        prefix,
-	                        relevantBoundVars);
-	            }
-	        }
-	    }
-	}
+        if (t.op() instanceof SchemaVariable &&
+                t.arity() == 0 &&
+                !(t.op() instanceof VariableSV) &&
+                !(t.op() instanceof ProgramSV) &&
+                !(t.op() instanceof SkolemTermSV)) {
+            SchemaVariable sv = (SchemaVariable) t.op();
+            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+            TacletPrefix prefix = prefixMap.get(sv);
+            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+                setPrefixOfOccurrence(sv, relevantBoundVars);
+            } else {
+                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+                        sv,
+                        prefix,
+                        relevantBoundVars);
+            }
+        }
+        for (int i = 0; i < t.arity(); i++) {
+            ImmutableSet<SchemaVariable> oldBounds = currentlyBoundVars;
+            addVarsBoundHere(t, i);
+            visit(t.sub(i));
+            currentlyBoundVars = oldBounds;
+        }
+        if (t.hasLabels()) {
+            for (TermLabel l : t.getLabels()) {
+                if (l instanceof SchemaVariable) {
+                    SchemaVariable sv = (SchemaVariable) l;
+                    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+                    TacletPrefix prefix = prefixMap.get(sv);
+                    if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+                        setPrefixOfOccurrence(sv, relevantBoundVars);
+                    } else {
+                        throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+                                sv,
+                                prefix,
+                                relevantBoundVars);
+                    }
+                }
+            }
+        }
     }
-    
+
 
     private void visit(Sequent s) {
         for (final SequentFormula cf : s) {
@@ -139,10 +124,10 @@ public class TacletPrefixBuilder {
     private void visit(TacletGoalTemplate templ) {
         visit(templ.sequent());
         if (templ instanceof RewriteTacletGoalTemplate) {
-            visit(((RewriteTacletGoalTemplate)templ).replaceWith());
+            visit(((RewriteTacletGoalTemplate) templ).replaceWith());
         }
         if (templ instanceof AntecSuccTacletGoalTemplate) {
-            visit(((AntecSuccTacletGoalTemplate)templ).replaceWith());
+            visit(((AntecSuccTacletGoalTemplate) templ).replaceWith());
         }
     }
 
@@ -150,8 +135,7 @@ public class TacletPrefixBuilder {
         visit(tacletBuilder.ifSequent());
 
         if (tacletBuilder instanceof FindTacletBuilder) {
-            @SuppressWarnings("unchecked")
-            final Term find = ((FindTacletBuilder<? extends FindTaclet>)tacletBuilder).getFind();
+            @SuppressWarnings("unchecked") final Term find = ((FindTacletBuilder<? extends FindTaclet>) tacletBuilder).getFind();
             visit(find);
         }
 
@@ -164,23 +148,22 @@ public class TacletPrefixBuilder {
     }
 
 
-
     private void checkPrefixInAddRules(Taclet addRule) {
-        final ImmutableMap<SchemaVariable,TacletPrefix> addRuleSV2PrefixMap = 
-                addRule.prefixMap();	
-        for (final ImmutableMapEntry<SchemaVariable,TacletPrefix> entry : prefixMap) {
+        final ImmutableMap<SchemaVariable, TacletPrefix> addRuleSV2PrefixMap =
+                addRule.prefixMap();
+        for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
             final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
 
             if (addRulePrefix != null && !addRulePrefix.prefix().
                     equals(entry.value().prefix())) {
-                throw new InvalidPrefixException(tacletBuilder.getName().toString(), 
-                        entry.key(), 
+                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+                        entry.key(),
                         entry.value(),
-                        addRulePrefix.prefix());	    
+                        addRulePrefix.prefix());
             }
         }
 
-	// we have to descend into the addrules of the addrules
+        // we have to descend into the addrules of the addrules
 
         for (TacletGoalTemplate tacletGoalTemplate : addRule.goalTemplates()) {
             for (Taclet taclet : tacletGoalTemplate.rules()) {
@@ -188,27 +171,27 @@ public class TacletPrefixBuilder {
             }
         }
     }
-    
+
 
     private boolean atMostOneRepl() {
-       @SuppressWarnings("unchecked")
-       RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder=(RewriteTacletBuilder<? extends RewriteTaclet>)tacletBuilder;
-       int count=0;
-       for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
-          if (tmpl instanceof RewriteTacletGoalTemplate) {
-             if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
-                count++;
-             }
-          }
-          if (count>1) return false;
-       }
-       return true;
+        @SuppressWarnings("unchecked")
+        RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder = (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+        int count = 0;
+        for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
+            if (tmpl instanceof RewriteTacletGoalTemplate) {
+                if (((RewriteTacletGoalTemplate) tmpl).replaceWith() != null) {
+                    count++;
+                }
+            }
+            if (count > 1) return false;
+        }
+        return true;
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
         @SuppressWarnings("unchecked")
-        RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder=(RewriteTacletBuilder<? extends RewriteTaclet>)tacletBuilder;
-        TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
+        RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder = (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+        TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
         svc.visit(rwtacletBuilder.ifSequent());
         for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
             TacletGoalTemplate tmpl = tacletGoalTemplate;
@@ -225,34 +208,34 @@ public class TacletPrefixBuilder {
     }
 
     private void considerContext() {
-	if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) {
-	    return;
-	}
-	for (final ImmutableMapEntry<SchemaVariable,TacletPrefix> entry : prefixMap) {
-	    if (occurrsOnlyInFindOrRepl(entry.key())) {
-		prefixMap = prefixMap.put(entry.key(), 
-					  entry.value().setContext(true));
-	    }
-	}
+        if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) {
+            return;
+        }
+        for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
+            if (occurrsOnlyInFindOrRepl(entry.key())) {
+                prefixMap = prefixMap.put(entry.key(),
+                        entry.value().setContext(true));
+            }
+        }
     }
 
-    public ImmutableMap<SchemaVariable,TacletPrefix> getPrefixMap() { 
-	considerContext();
-	return prefixMap;
+    public ImmutableMap<SchemaVariable, TacletPrefix> getPrefixMap() {
+        considerContext();
+        return prefixMap;
     }
-    
+
     public static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
-        
-        InvalidPrefixException(String tacletName, 
-                SchemaVariable sv,
-                TacletPrefix prefix,
-                ImmutableSet<SchemaVariable> sndPrefixVar) {
-            super("Schema variable " + sv + "occurs at different places " + 
+
+        InvalidPrefixException(String tacletName,
+                               SchemaVariable sv,
+                               TacletPrefix prefix,
+                               ImmutableSet<SchemaVariable> sndPrefixVar) {
+            super("Schema variable " + sv + "occurs at different places " +
                     "in taclet " + tacletName + " with different prefixes.\n" +
-                    "Prefix P1:"+((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix()) +
+                    "Prefix P1:" + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix()) +
                     "\n" +
-                    "Prefix P2:"+ sndPrefixVar);
+                    "Prefix P2:" + sndPrefixVar);
         }
 
     }

@@ -3,9 +3,9 @@ package org.key_project.exploration.actions;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import org.jetbrains.annotations.NotNull;
 import org.key_project.exploration.ProofExplorationService;
 
+import javax.annotation.Nonnull;
 import java.awt.event.ActionEvent;
 
 
@@ -29,7 +29,7 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @NotNull Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
+        @Nonnull Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

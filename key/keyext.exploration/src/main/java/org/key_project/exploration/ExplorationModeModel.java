@@ -4,8 +4,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class ExplorationModeModel {
      * Mode which rules to use in actions mode
      * Default: whole application is shown
      */
-    private @NotNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
+    private @Nonnull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
 
     /**
@@ -51,7 +51,7 @@ public class ExplorationModeModel {
     /**
      * Get the state which kind of taclet to use
      */
-    public @NotNull ExplorationState getExplorationTacletAppState() {
+    public @Nonnull ExplorationState getExplorationTacletAppState() {
         return explorationTacletAppState;
     }
 

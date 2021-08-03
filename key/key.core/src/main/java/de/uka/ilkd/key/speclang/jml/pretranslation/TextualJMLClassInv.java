@@ -13,29 +13,19 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.speclang.PositionedString;
 
 
 /**
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-    
-    private final PositionedString inv;
-    
-    
-    public TextualJMLClassInv(ImmutableList<String> mods, 
-	                      PositionedString inv) {
-        super(mods);
-        assert inv != null;
-        this.inv = inv;
-        setPosition(inv);
-    }
+    private final ParserRuleContext inv;
 
-    public TextualJMLClassInv(ImmutableList<String> mods, 
-            PositionedString inv, String name) {
+    public TextualJMLClassInv(ImmutableList<String> mods,
+                              ParserRuleContext inv, String name) {
         super(mods);
         assert inv != null;
         this.inv = inv;
@@ -43,33 +33,38 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public PositionedString getInv() {
+    public TextualJMLClassInv(ImmutableList<String> mods, JmlParser.Class_invariantContext ctx) {
+        super(mods, null);
+        inv = ctx;
+    }
+
+    public ParserRuleContext getInv() {
         return inv;
     }
-    
-    
+
+
     @Override
     public String toString() {
         return inv.toString();
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLClassInv)) {
+        if (!(o instanceof TextualJMLClassInv)) {
             return false;
         }
         TextualJMLClassInv ci = (TextualJMLClassInv) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return mods.hashCode() + inv.hashCode();
     }
-    
-    public String getName(){
+
+    public String getName() {
         return name;
     }
 }

@@ -20,11 +20,9 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -753,6 +751,10 @@ public class Proof implements Named {
             removeOpenGoals(residualLeaves);
             removeClosedGoals(residualLeaves);
 
+            /* this ensures that the open goals are in interactive mode and thus all rules are
+             * available in the just pruned goal (see GitLab #1480) */
+            setRuleAppIndexToInteractiveMode();
+
             return subtrees;
 
         }
@@ -883,7 +885,7 @@ public class Proof implements Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@NotNull Predicate<Node> pred) {
+    public @Nullable Node findAny(@Nonnull Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while(!queue.isEmpty()) {
@@ -1328,7 +1330,7 @@ public class Proof implements Named {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> @Nullable T lookup(Class<T> service) {
+    public <T> T lookup(Class<T> service) {
         try {
             if(userData==null){
                 return null;
@@ -1367,7 +1369,7 @@ public class Proof implements Named {
      *
      * @return
      */
-    public @NotNull Lookup getUserData() {
+    public @Nonnull Lookup getUserData() {
         if(userData == null) userData = new Lookup();
         return userData;
     }

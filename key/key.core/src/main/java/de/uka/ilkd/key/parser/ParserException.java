@@ -14,26 +14,25 @@
 package de.uka.ilkd.key.parser;
 
 
-/** This class represents an error of a parser.
+import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import javax.annotation.Nullable;
+
+/**
+ * This class represents an error of a parser.
  *
  * @author Hubert Schmid
  */
 
-public final class ParserException extends Exception {
-
+public final class ParserException extends Exception implements HasLocation {
     /* --- constructors --- */
-
     /**
-     * 
-     */
-    private static final long serialVersionUID = -5701137989453187397L;
-
-
-    /** @param message The error message. The message may be shown to
-     * the user and should be appropriately formated.
+     * @param message  The error message. The message may be shown to
+     *                 the user and should be appropriately formated.
      * @param location The location on which the error occured. The
-     * location may be null, if the location is unknown or the error
-     * is independent of a location. */
+     *                 location may be null, if the location is unknown or the error
+     *                 is independent of a location.
+     */
     public ParserException(String message, Location location) {
         super(message);
         this.location = location;
@@ -42,7 +41,11 @@ public final class ParserException extends Exception {
 
     /* --- methods --- */
 
-    /** @return The location may be null. */
+    /**
+     * @return The location may be null.
+     */
+    @Nullable
+    @Override
     public Location getLocation() {
         return location;
     }
@@ -54,7 +57,6 @@ public final class ParserException extends Exception {
     }
 
     /* --- fields --- */
-
     private final Location location;
 
 }

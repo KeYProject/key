@@ -16,11 +16,11 @@ package de.uka.ilkd.key.core;
 import java.util.Collection;
 import java.util.EventObject;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -616,7 +616,7 @@ public class KeYMediator {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> @Nullable T lookup(Class<T> service) {
+    public <T> T lookup(Class<T> service) {
         try {
             if(userData==null){
                 return null;
@@ -655,7 +655,7 @@ public class KeYMediator {
      *
      * @return
      */
-    public @NotNull Lookup getUserData() {
+    public @Nonnull Lookup getUserData() {
         if(userData == null) userData = new Lookup();
         return userData;
     }

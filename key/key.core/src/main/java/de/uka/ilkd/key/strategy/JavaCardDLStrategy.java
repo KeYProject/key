@@ -542,7 +542,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "loop_scope_inv_taclet",
                 useLoopInvTaclets ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_expand",
-                useLoopScopeExpand ? longConst(0) : inftyConst());
+                useLoopScopeExpand ? longConst(1000) : inftyConst());
 
         /*
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) :

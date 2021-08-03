@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTest
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymbolicExecutionTestCase {
-   public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env=null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);

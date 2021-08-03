@@ -8,7 +8,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
-import de.uka.ilkd.key.gui.testgen.TestGenOptionsPanel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
@@ -27,7 +26,6 @@ import java.util.Properties;
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
-    public static final TestGenOptionsPanel TEST_GEN_OPTIONS_PANEL = new TestGenOptionsPanel();
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
@@ -52,7 +50,6 @@ public class SettingsManager {
             //INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
-            INSTANCE.add(TEST_GEN_OPTIONS_PANEL);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             //INSTANCE.add(COLOR_SETTINGS);
         }
@@ -71,10 +68,6 @@ public class SettingsManager {
 
     public static ProofIndependentSMTSettings getSmtPiSettings() {
         return ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
-    }
-
-    public static TestGenerationSettings getTestgenSettings() {
-        return ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
     }
 
     public static ChoiceSettings getChoiceSettings(MainWindow window) {

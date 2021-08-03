@@ -93,18 +93,20 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
      * Instantiate a new variable condition.
      *
      * @param negation {@code true} iff the condition is to be negated
-     * @param receiver program schema var for the receiver, may be null for class-local calls
+     *  @param receiver program schema var for the receiver, may be null for class-local calls
      * @param methname non-null program schema var for the methodname
      * @param args non-null program schema var for the arguments of the call
+     * @param negation {@code true} iff the condition is to be negated
      */
-    public MayExpandMethodCondition(boolean negation,
-                                    SchemaVariable receiver,
-                                    SchemaVariable methname,
-                                    SchemaVariable args) {
+    public MayExpandMethodCondition(SchemaVariable receiver, SchemaVariable methname, SchemaVariable args, boolean negation) {
         this.negation = negation;
         this.receiver = receiver;
         this.methname = methname;
         this.args = args;
+    }
+
+    public MayExpandMethodCondition(SchemaVariable methodName, SchemaVariable args, boolean negation) {
+        this(null, methodName, args, negation);
     }
 
     private static ImmutableArray<Expression>

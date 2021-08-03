@@ -131,7 +131,7 @@ public class Main {
     */
    protected static void printSymbolicExecutionTree(String title, SymbolicExecutionTreeBuilder builder) {
       System.out.println(title);
-      System.out.println(StringUtil.createLine("=", title.length()));
+      System.out.println(StringUtil.repeat("=", title.length()));
       ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(builder.getStartNode());
       while (iterator.hasNext()) {
          IExecutionNode<?> next = iterator.next();

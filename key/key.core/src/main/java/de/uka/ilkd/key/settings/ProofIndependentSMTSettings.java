@@ -176,6 +176,10 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
         public String getCommand(SolverType type){
+                return dataOfSolvers.get(type).solverCommand;
+        }
+
+        public String getParameters(SolverType type) {
                 return dataOfSolvers.get(type).solverParameters;
         }
 

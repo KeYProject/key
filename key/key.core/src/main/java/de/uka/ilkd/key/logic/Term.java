@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -192,4 +193,10 @@ public interface Term extends SVSubstitute, Sorted {
     boolean equalsModIrrelevantTermLabels(Object o);
 
     public boolean equalsModTermLabels(Object o);
+
+    /**
+     * Returns an human-readable source of this term. For example the filename
+     * with line and offset.
+     */
+    default @Nullable String getOrigin() {return null;}
 }

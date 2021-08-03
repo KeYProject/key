@@ -12,10 +12,10 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.prooftree.*;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
-import org.jetbrains.annotations.NotNull;
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
@@ -59,9 +59,9 @@ public class ExplorationExtension implements KeYGuiExtension,
 
 
     @Override
-    public List<Action> getContextActions(@NotNull KeYMediator mediator,
-                                          @NotNull ContextMenuKind kind,
-                                          @NotNull Object underlyingObject) {
+    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
+                                          @Nonnull ContextMenuKind kind,
+                                          @Nonnull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -115,7 +115,7 @@ public class ExplorationExtension implements KeYGuiExtension,
     }
 
     @Override
-    public @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow) {
+    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         return Arrays.asList(
                 new ToggleExplorationAction(model),
                 new ShowSecondBranchAction(model));

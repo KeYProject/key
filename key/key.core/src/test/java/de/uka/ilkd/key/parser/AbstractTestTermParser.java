@@ -6,19 +6,16 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,84 +30,53 @@ public class AbstractTestTermParser {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
+    protected KeyIO io;
 
-    AbstractTestTermParser() {
+    public AbstractTestTermParser() {
         services = getServices();
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        io = new KeyIO(services, nss);
     }
 
-    Sort lookup_sort(String name) {
+    protected Sort lookup_sort(String name) {
         return nss.sorts().lookup(new Name(name));
     }
 
-    Function lookup_func(String name) {
+    protected Function lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
-    LogicVariable declareVar(String name, Sort sort) {
+    protected LogicVariable declareVar(String name, Sort sort) {
         LogicVariable v = new LogicVariable(new Name(name), sort);
         nss.variables().add(v);
         return v;
     }
 
-    private KeYParserF stringDeclParser(String s) {
-        // fills namespaces 
-        new Recoder2KeY(services, nss).parseSpecialClasses();
-        return new KeYParserF(ParserMode.DECLARATION,
-                new KeYLexerF(s,
-                        "No file. Call of parser from " + this.getClass().getSimpleName()),
-                services, nss);
-    }
-
-    public void parseDecls(String s) throws RecognitionException {
-        KeYParserF stringDeclParser = stringDeclParser(s);
-        stringDeclParser.decls();
+    public void parseDecls(String content) throws IOException {
+        io.load(content).parseFile()
+                .loadDeclarations()
+                .loadSndDegreeDeclarations();
     }
 
     public Term parseProblem(String s) {
         try {
-            new Recoder2KeY(TacletForTests.services(),
-                    nss).parseSpecialClasses();
-            KeYLexerF lexer = new KeYLexerF(s,
-                    "No file. Call of parser from " + this.getClass().getSimpleName());
-            return new KeYParserF(ParserMode.PROBLEM,
-                    lexer,
-                    new ParserConfig(services, nss),
-                    new ParserConfig(services, nss),
-                    null,
-                    ImmutableSLList.<Taclet>nil()).problem();
+            new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+            KeyIO io = new KeyIO(TacletForTests.services(), nss);
+            KeyIO.Loader loader = io.load(s);
+            return loader.getProblem();
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
+            throw new RuntimeException("Exc while Parsing", e);
         }
-    }
-
-    protected KeYLexerF getLexer(String s) {
-        return new KeYLexerF(s,
-                "No file. Call of parser from parser/" + getClass().getSimpleName());
-    }
-
-    protected KeYParserF getParser(String s) {
-        return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
     public Term parseTerm(String s) throws Exception {
-        return getParser(s).term();
+        return io.parseExpression(s);
     }
 
-    public Term parseFormula(String s) {
-        try {
-            return getParser(s).formula();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+    public Term parseFormula(String s) throws Exception {
+        return parseTerm(s);
     }
 
     /**
@@ -129,11 +95,11 @@ public class AbstractTestTermParser {
      * Remove whitespaces before executing
      * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
      */
-    protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
+    protected static void  assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
-    protected void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
+    protected static void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
         assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
@@ -165,14 +131,14 @@ public class AbstractTestTermParser {
      * the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax {@link Term} in verbose syntax.
+     * @param prettySyntax                  {@link Term} representation in pretty-syntax.
+     * @param verboseSyntax                 {@link Term} in verbose syntax.
      * @param optionalStringRepresentations Optionally, additional String
-     * representations will be tested for correct parsing.
+     *                                      representations will be tested for correct parsing.
      * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
-            String... optionalStringRepresentations) throws Exception {
+                                                           String... optionalStringRepresentations) throws Exception {
         Term expectedParseResult = parseTerm(verboseSyntax);
         compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
     }
@@ -181,16 +147,16 @@ public class AbstractTestTermParser {
      * Takes a {@link String} and a {@link Term} and checks whether they can be
      * transformed into each other by the operations parsing and printing.
      *
-     * @param prettySyntax Expected result after pretty-printing
-     * {@code expectedParseResult}.
-     * @param expectedParseResult Expected result after parsing
-     * {@code expectedPrettySyntax}.
+     * @param prettySyntax                  Expected result after pretty-printing
+     *                                      {@code expectedParseResult}.
+     * @param expectedParseResult           Expected result after parsing
+     *                                      {@code expectedPrettySyntax}.
      * @param optionalStringRepresentations Optionally, additional String
-     * representations will be tested for correct parsing.
+     *                                      representations will be tested for correct parsing.
      * @throws IOException
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
-            String... optionalStringRepresentations) throws Exception {
+                                                                        String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);
         verifyPrettyPrinting(prettySyntax, expectedParseResult);
@@ -203,10 +169,10 @@ public class AbstractTestTermParser {
         }
     }
 
-   protected Services getServices() {
-      File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + File.separator + "termParser" + File.separator + "parserTest.key");
-      return HelperClassForTests.createServices(keyFile);
-   }
+    protected Services getServices() {
+        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
+                + File.separator + "termParser" + File.separator + "parserTest.key");
+        return HelperClassForTests.createServices(keyFile);
+    }
 
 }

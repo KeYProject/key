@@ -9,10 +9,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -39,19 +39,19 @@ import java.util.Objects;
  */
 
 public class ProofExplorationService {
-    private final @NotNull Proof proof;
-    private final @NotNull Services services;
+    private final @Nonnull Proof proof;
+    private final @Nonnull Services services;
 
-    public ProofExplorationService(@NotNull Proof proof, @NotNull Services services) {
+    public ProofExplorationService(@Nonnull Proof proof, @Nonnull Services services) {
         this.proof = proof;
         this.services = services;
     }
 
-    public static @NotNull ProofExplorationService get(KeYMediator mediator) {
+    public static @Nonnull ProofExplorationService get(KeYMediator mediator) {
         return get(mediator.getSelectedProof());
     }
 
-    private static @NotNull ProofExplorationService get(Proof selectedProof) {
+    private static @Nonnull ProofExplorationService get(Proof selectedProof) {
         @Nullable ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
             service = new ProofExplorationService(selectedProof, selectedProof.getServices());
@@ -103,7 +103,7 @@ public class ProofExplorationService {
      *
      * @return
      */
-    public @NotNull Taclet getCutTaclet() {
+    public @Nonnull Taclet getCutTaclet() {
         return Objects.requireNonNull(
                 proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
@@ -115,7 +115,7 @@ public class ProofExplorationService {
      * @param antecedent whether to add teh term to antecedent
      * @return
      */
-    public @NotNull Node soundAddition(@NotNull Goal g, @NotNull Term t, boolean antecedent) {
+    public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
         Taclet cut = g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -162,12 +162,12 @@ public class ProofExplorationService {
      * @return
      */
     public Node applyChangeFormula(
-            @NotNull Goal g, @NotNull PosInOccurrence pio,
-            @NotNull Term term, @NotNull Term newTerm) {
+            @Nonnull Goal g, @Nonnull PosInOccurrence pio,
+            @Nonnull Term term, @Nonnull Term newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         //taint goal with exploration
-        @NotNull ExplorationNodeData data = ExplorationNodeData.get(g.node());
+        @Nonnull ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction("Edit " + LogicPrinter.quickPrintTerm(term, services) + " to " + LogicPrinter.quickPrintTerm(newTerm, services));
 
         //apply cut
@@ -207,7 +207,7 @@ public class ProofExplorationService {
      * @param newTerm
      * @return
      */
-    private TacletApp soundChange(@NotNull PosInOccurrence pio, @NotNull Term term, @NotNull Term newTerm) {
+    private TacletApp soundChange(@Nonnull PosInOccurrence pio, @Nonnull Term term, @Nonnull Term newTerm) {
         Taclet cut = getCutTaclet();
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);

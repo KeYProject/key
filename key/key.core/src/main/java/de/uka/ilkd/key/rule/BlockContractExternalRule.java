@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -234,6 +235,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
+        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
                 variables, conditionsAndClausesBuilder, services);
 
@@ -243,7 +245,9 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 application.posInOccurrence(), services, this);
         result = goal.split(2);
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], preconditions);
-        configurator.setUpUsageGoal(result.head(), updates, assumptions);
+        configurator.setUpUsageGoal(
+                result.head(), updates,
+                ArrayUtil.add(assumptions, freePostcondition));
 
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);

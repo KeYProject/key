@@ -12,11 +12,11 @@ import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -98,7 +98,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     @Override
-    public @NotNull Collection<CAction> getTitleCActions() {
+    public @Nonnull Collection<CAction> getTitleCActions() {
         CButton helpButton = new CButton(null, IconFactory.HELP.get());
         helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
         return Collections.singleton(helpButton);
@@ -118,10 +118,10 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * @param dtm    a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */
-    private void findExplorationChildren(@NotNull Node n,
-                                         final @NotNull ArrayList<Node> foundNodes,
-                                         @NotNull DefaultTreeModel dtm,
-                                         @NotNull MyTreeNode parent) {
+    private void findExplorationChildren(@Nonnull Node n,
+                                         final @Nonnull ArrayList<Node> foundNodes,
+                                         @Nonnull DefaultTreeModel dtm,
+                                         @Nonnull MyTreeNode parent) {
 
         ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
         if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
@@ -197,13 +197,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         return buttonPanel;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getTitle() {
         return "Exploration Steps";
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public JComponent getComponent() {
         return this;

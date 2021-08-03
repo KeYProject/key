@@ -50,14 +50,11 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
      * call. The flag negation allows to reuse this condition for
      * ensuring non static references.
      */
-    public StaticMethodCondition (boolean negation,
-				  SchemaVariable caller,
-				  SchemaVariable methname,
-				  SchemaVariable args) {
-	this.negation = negation;
-	this.caller = caller;
-	this.methname = methname;
-	this.args = args;
+	public StaticMethodCondition(SchemaVariable caller, SchemaVariable methname, SchemaVariable args, boolean negation) {
+		this.negation = negation;
+		this.caller = caller;
+		this.methname = methname;
+		this.args = args;
     }
 
     private static ImmutableArray<Expression> toExpArray(ImmutableArray<? extends ProgramElement> a) {

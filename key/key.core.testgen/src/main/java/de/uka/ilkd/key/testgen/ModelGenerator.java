@@ -70,7 +70,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * @return
 	 */
 	private SolverLauncher prepareLauncher(){
-		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+		final TestGenerationSettings settings = TestGenerationSettings.getInstance();
 		final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
 		
 

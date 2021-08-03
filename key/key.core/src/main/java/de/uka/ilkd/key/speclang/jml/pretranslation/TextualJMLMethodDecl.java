@@ -13,73 +13,87 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.speclang.PositionedString;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A JML model method declaration in textual form.
  */
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
-    
-    private final PositionedString decl;
-    private final String methodName;
-    private final PositionedString methodDefinition;
-    
-    
-    public TextualJMLMethodDecl(ImmutableList<String> mods, 
-                                PositionedString decl, 
-                                String methodName,
-                                PositionedString methodDefinition) {
+    private final JmlParser.Method_declarationContext methodDefinition;
+
+
+    public TextualJMLMethodDecl(ImmutableList<String> mods,
+                                JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
-        assert decl != null;
-        this.decl = decl;
-        this.methodName = methodName;
         this.methodDefinition = methodDefinition;
-        setPosition(decl);
-    }
-    
-    
-    public PositionedString getDecl() {
-        return decl;
-    }
-    
-    
-    public String getMethodName() {
-        return methodName;
     }
 
-    public PositionedString getMethodDefinition() {
-    	return methodDefinition;
+    public String getParsableDeclaration() {
+        String m = mods.stream()
+                .map(it -> {
+                    if (JMLTransformer.javaMods.contains(it)) {
+                        return it;
+                    } else {
+                        return StringUtil.repeat(" ", it.length());
+                    }
+                })
+                .collect(Collectors.joining(" "));
+
+        String paramsString = methodDefinition.param_list().param_decl()
+                .stream()
+                .map(it -> it.t.getText() +
+                        StringUtil.repeat("[]", it.RBRACKET().size()) +
+                        " " + it.p.getText())
+                .collect(Collectors.joining(","));
+        return String.format("%s %s %s (%s);",
+                m, methodDefinition.type().getText(),
+                getMethodName(), paramsString);
     }
-    
+
+    public JmlParser.Method_declarationContext getDecl() {
+        return methodDefinition;
+    }
+
+    public String getMethodName() {
+        return methodDefinition.IDENT().getText();
+    }
+
+    public ParserRuleContext getMethodDefinition() {
+        return methodDefinition;
+    }
+
     @Override
     public String toString() {
-        return decl.toString();
+        return methodDefinition.getText();
     }
-    
-    
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLMethodDecl)) {
-            return false;
-        }
-        TextualJMLMethodDecl md = (TextualJMLMethodDecl) o;
-        return mods.equals(md.mods) 
-               && decl.equals(md.decl) 
-               && methodDefinition.equals(md.methodDefinition) 
-               && methodName.equals(md.methodName);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
+        return Objects.equals(methodDefinition, that.methodDefinition);
     }
-    
-    
+
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode() + methodName.hashCode() + methodDefinition.hashCode();
+        return Objects.hash(methodDefinition);
     }
 
     public int getStateCount() {
-        if(mods.contains("two_state")) { return 2; }
-        if(mods.contains("no_state")) { return 0; }
+        if (mods.contains("two_state")) {
+            return 2;
+        }
+        if (mods.contains("no_state")) {
+            return 0;
+        }
         return 1;
     }
 

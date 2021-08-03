@@ -3,22 +3,30 @@ plugins {
     id 'antlr'
 }
 
+//repositories { jcenter() }
+
+configurations { antlr4 }
+
 dependencies {
-    compile project(':key.util')
-    compile name: 'recoderKey'
-    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
-    compile group: 'antlr', name: 'antlr', version: '2.7.7'
+    api project(':key.util')
+    api group: group, name: 'recoderkey', version: '1.0'
+    implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
     javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
+
+    antlr4 "org.antlr:antlr4:4.7.1"
+    implementation "org.antlr:antlr4-runtime:4.7.1"
+    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 // The target directory for JavaCC (parser generation)
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
-sourceSets.main.java.srcDirs(javaCCOutputDirMain)
+sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
 
 // Generate code from ANTLR grammars.
 generateGrammarSource {
@@ -74,12 +82,6 @@ test {
     }
     // pass debug flag from command line:
     systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
-
-    // TODO @AW. That is already in key/build.gradle. Here or there?
-    // useJUnit {
-    //         excludeCategories 'org.key_project.util.testcategories.Performance'
-    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
-    // }
 }
 
 testFast {
@@ -103,7 +105,6 @@ task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
     filter { 
-        // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
@@ -130,6 +131,67 @@ task generateVersionFiles() {
 
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
+
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4Key(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
+    }
+}
+compileJava.dependsOn runAntlr4Key
+
+task debugKeyLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+// @AW: Say something here. From POV this explain by itself.
+processResources.dependsOn generateVersionFiles
+
+def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
+task runAntlr4Jml(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"
+    outputs.dir antlr4OutputJml
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputJml,
+            "-package", "de.uka.ilkd.key.speclang.njml",
+            "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"]
+    doFirst {
+        file(antlr4OutputJml).mkdirs()
+        println("create $antlr4OutputJml")
+    }
+}
+compileJava.dependsOn runAntlr4Jml
+
+task debugJmlLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task ptest(type: Test) { group "verification"}
+
+task generateRAPUnitTests(type:JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    args("$buildDir/generated-src/rap/")
+}
+sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
+
 
 // @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
 // check.dependsOn << testProofRules << testRunAllProofs
