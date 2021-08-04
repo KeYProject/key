@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -64,6 +65,15 @@ public class SMTReplayer {
     // translation context (contained in SMTExprInContext)!
     private final Map<SMTExprInContext, Term> translationToTermMap;
     private final Map<String, Term> skMap = new HashMap<>();
+    private final Map<String, Node> knownReplayedNodes = new HashMap<>();
+
+    public void addKnownReplayedNode(String text, Node node) {
+        knownReplayedNodes.put(text, node);
+    }
+
+    public Node getKnownReplayedNode(String key) {
+        return knownReplayedNodes.get(key);
+    }
 
     public static class SMTExprInContext {
         public final String smtExpr;

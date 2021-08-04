@@ -386,7 +386,7 @@ public class Node {
      * Removes child/parent relationship between this node and its parent; if this
      * node is root nothing happens. This is only used for testing purposes.
      */
-    void remove() {
+    public void remove() {
         if (parent != null) {
             parent.remove(this);
         }

@@ -4,6 +4,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProofParser.IdentifierContext;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
@@ -195,9 +198,41 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     public Void visitIdentifier(IdentifierContext ctx) {
         ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
-            //System.out.println(ctx.getText() + " (proof term)");
-            // continue proof replay with the partial tree from the symbol table
-            visit(def);
+            // TODO: currently a hack: the same Node is appended at multiple positions in the proof
+            Node old = smtReplayer.getKnownReplayedNode(ctx.getText());
+            // ctx has already been replayed on another branch: reuse the node
+            if (old != null) {
+
+                // TODO: this does work, but many nodes are skipped when counting via
+                //   SubTreeIterator currently (used e.g. by Statistics)
+                Proof proof = goal.proof();
+                Node current = goal.node();
+
+                // Close first, afterwards exchange the node. Otherwise there would be some
+                // (invisible?) nodes left open ...
+                proof.closeGoal(goal);
+
+                Node parent = current.parent();
+                current.remove();
+                parent.add(old);
+                goal.setNode(old);
+
+                // TODO: idea: for better visualization use linked goals
+
+                String notes = current.getNodeInfo().getNotes();
+                if (notes != null) {
+                    notes += "<br>Merged with " + old.serialNr();
+                    current.getNodeInfo().setNotes(notes);
+                } else {
+                    current.getNodeInfo().setNotes("<br>Merged with " + old.serialNr());
+                }
+            } else {
+                smtReplayer.addKnownReplayedNode(ctx.getText(), goal.node());
+
+                //System.out.println(ctx.getText() + " (proof term)");
+                // continue proof replay with the partial tree from the symbol table
+                visit(def);
+            }
         }
         return null;
     }

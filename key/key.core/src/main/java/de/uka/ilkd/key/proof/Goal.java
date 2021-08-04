@@ -274,7 +274,7 @@ public final class Goal {
      * @param p_node the Node in the proof tree to which this goal
      *               refers to
      */
-    private void setNode(Node p_node) {
+    public void setNode(Node p_node) {
         if (node().sequent() != p_node.sequent()) {
             node = p_node;
             resetTagManager();

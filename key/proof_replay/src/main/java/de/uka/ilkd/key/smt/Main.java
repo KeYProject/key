@@ -21,7 +21,7 @@ import java.util.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 public class Main {
-    private static final Path VALID_LIST_PATH = Paths.get("C:\\Users\\Banach\\Desktop\\MA\\experiments\\valid_list.txt");
+    private static final Path VALID_LIST_PATH = Paths.get("/tmp/valid_list.txt");
 
     private static final Set<Path> VALID_SET = new HashSet<>();
 
@@ -59,7 +59,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        outDir = Paths.get("C:\\Users\\Banach\\Desktop\\MA\\experiments\\benchmark"
+        outDir = Paths.get("/tmp/benchmark"
             + System.currentTimeMillis());
         try {
             Files.createDirectories(outDir);
@@ -160,11 +160,11 @@ public class Main {
             loadValidSet();
             List<Path> dirs = new ArrayList<>();
             //dirs.add(exampleDir);
-            dirs.add(Paths.get("C:\\Users\\Banach\\Desktop\\KeY\\key\\key\\key.ui\\examples\\newBook\\Using_KeY"));
-            dirs.add(Paths.get("C:\\Users\\Banach\\Desktop\\KeY\\key\\key\\key.ui\\examples\\smt"));
-            dirs.add(Paths.get("C:\\Users\\Banach\\Desktop\\KeY\\key\\key\\key.ui\\examples\\standard_key"));
-            //dirs.add(Paths.get("C:\\Users\\Banach\\Desktop\\KeY\\key\\key\\key.ui\\examples\\firstTouch"));
-            dirs.add(Paths.get("C:\\Users\\Banach\\Desktop\\KeY\\key\\key\\key.ui\\examples\\firstTouch\\01-Agatha"));
+            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/newBook/Using_KeY"));
+            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/smt"));
+            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/standard_key"));
+            //dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/firstTouch"));
+            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/firstTouch/01-Agatha"));
 
             Files.createDirectories(VALID_LIST_PATH.getParent());
             if (!Files.exists(VALID_LIST_PATH)) {

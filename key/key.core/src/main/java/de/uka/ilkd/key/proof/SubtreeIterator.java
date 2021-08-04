@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Iterator over subtree. Current implementation iteratively traverses the tree
@@ -13,6 +15,7 @@ class SubtreeIterator implements Iterator<Node> {
     private final Node root;
     private Node n;
     private boolean atRoot = true; // special handle
+    private final Set<Node> visited = new HashSet<>();
 
     SubtreeIterator(Node root) {
         assert root != null;
@@ -27,7 +30,9 @@ class SubtreeIterator implements Iterator<Node> {
             final int x = p.getChildNr(m);
             if (x + 1 < c) {
                 final Node result = p.child(x + 1);
-                return result != root ? result : null;
+                if (!visited.contains(result)) {
+                    return result != root ? result : null;
+                }
             }
             m = p;
             p = m.parent();
@@ -50,16 +55,25 @@ class SubtreeIterator implements Iterator<Node> {
     public Node next() {
         if (atRoot) { // stay at root once
             atRoot = false;
+            visited.add(n);
             return n;
         }
         if (n.leaf()) {
             Node s = nextSibling(n);
-            if (s != null) {
-                n = s;
+            //if (s != null) {
+            //    n = s;
+            //}
+            while (s != null) {
+                if (!visited.contains(s)) {
+                    n = s;
+                    break;
+                }
+                s = nextSibling(s);
             }
         } else {
             n = n.child(0);
         }
+        visited.add(n);
         return n;
     }
 
