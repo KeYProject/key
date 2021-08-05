@@ -6,21 +6,21 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.core.all.test.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.junit;bundle-version="4.8.1",
- org.eclipse.swtbot.go;bundle-version="2.0.4",
- org.key_project.key4eclipse.starter.core.test;bundle-version="1.0.0",
- org.key_project.util.test;bundle-version="1.0.0",
- org.key_project.sed.core.test;bundle-version="1.0.0",
- org.key_project.sed.key.core.test;bundle-version="1.0.0",
- org.key_project.sed.key.ui.test;bundle-version="1.0.0",
- org.key_project.sed.ui.test;bundle-version="1.0.0",
- org.key_project.sed.ui.visualization.test;bundle-version="1.0.0",
- org.key_project.sed.key.example.ui.test;bundle-version="1.0.0",
- org.key_project.core.proof_references.test;bundle-version="1.0.0",
- org.key_project.core.symbolic_execution.test;bundle-version="1.0.0",
- org.key_project.core.test;bundle-version="1.0.0",
- org.key_project.core.testgen.test;bundle-version="1.0.0",
- org.key_project.key4eclipse.all.test;bundle-version="1.0.0"
+ org.junit,
+ org.eclipse.swtbot.go,
+ org.key_project.key4eclipse.starter.core.test,
+ org.key_project.util.test,
+ org.key_project.sed.core.test,
+ org.key_project.sed.key.core.test,
+ org.key_project.sed.key.ui.test,
+ org.key_project.sed.ui.test,
+ org.key_project.sed.ui.visualization.test,
+ org.key_project.sed.key.example.ui.test,
+ org.key_project.core.proof_references.test,
+ org.key_project.core.symbolic_execution.test,
+ org.key_project.core.test,
+ org.key_project.core.testgen.test,
+ org.key_project.key4eclipse.all.test
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project

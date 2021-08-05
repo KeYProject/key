@@ -60,7 +60,7 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @*/
    public java.lang.Throwable getCause();
 
-   // TODO There should be "cause != this" as another precondition.
+   //TODO: fix the contract to match Java's behavior (e.g. arg0 != this or exception)
    /*@ public normal_behavior
      @    requires cause == null;
      @    ensures \result == this && cause == arg0;

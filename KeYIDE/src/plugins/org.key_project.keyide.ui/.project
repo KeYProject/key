@@ -26,4 +26,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>ext.lib</name>
+			<type>2</type>
+			<locationURI>PARENT-4-PROJECT_LOC/key/key.ui/build/distributions/key-2.8.0/lib</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -6,9 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.jmlediting.profile.jmlref.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="4.11.0",
- org.key_project.jmlediting.core;bundle-version="1.0.0",
- org.key_project.jmlediting.core.test;bundle-version="1.0.0",
- org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0",
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.core.test,
+ org.key_project.jmlediting.profile.jmlref,
  org.eclipse.jface,
  org.eclipse.swtbot.eclipse.finder,
  org.eclipse.ui.workbench
