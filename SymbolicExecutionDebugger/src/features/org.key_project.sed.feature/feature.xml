@@ -131,14 +131,37 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          version="0.0.0"/>
 
    <requires>
-      <import feature="org.eclipse.platform" version="4.2.0"/>
-      <import feature="org.eclipse.jdt" version="3.7.2"/>
-      <import feature="org.eclipse.gef" version="3.7.2"/>
-      <import feature="org.eclipse.emf" version="2.7.2"/>
-      <import feature="org.eclipse.emf.validation" version="1.5.0"/>
-      <import feature="org.eclipse.emf.transaction" version="1.5.0"/>
-      <import feature="org.eclipse.emf.workspace" version="1.5.1"/>
-      <import feature="org.eclipse.graphiti.feature" version="0.8.2"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.key_project.util"/>
+      <import plugin="org.eclipse.jdt.debug"/>
+      <import plugin="org.eclipse.graphiti"/>
+      <import plugin="org.eclipse.graphiti.mm"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.key_project.core"/>
+      <import plugin="org.key_project.core.symbolic_execution"/>
+      <import plugin="org.key_project.key4eclipse.starter.core"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.key_project.key4eclipse.common.ui"/>
+      <import plugin="org.key_project.ui"/>
+      <import plugin="org.key_project.keyide.ui"/>
+      <import plugin="org.eclipse.jdt.debug.ui"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.key_project.core.testgen"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.emf.edit"/>
+      <import plugin="org.eclipse.emf.transaction"/>
+      <import plugin="org.eclipse.emf.workspace"/>
+      <import plugin="org.eclipse.graphiti.ui"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.core.resources"/>
    </requires>
 
    <plugin

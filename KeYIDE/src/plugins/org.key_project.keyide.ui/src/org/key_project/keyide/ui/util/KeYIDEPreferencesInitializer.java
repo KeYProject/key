@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
  * Initializes the preferences of {@link KeYIDEPreferences} when they are
  * accessed the first time. This is managed by extension point
  * {@code org.eclipse.core.runtime.preferences}.
- * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Käsdorf
+ * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Kï¿½sdorf
  * @see KeYIDEPreferences
  */
 public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer {
@@ -34,11 +34,11 @@ public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer 
    @Override
    public void initializeDefaultPreferences() {
       KeYIDEPreferences.setDefaultSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
-      KeYIDEPreferences.setDefaultClosedGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_GREEN_COLOR));
-      KeYIDEPreferences.setDefaultLinkedGoalColor(ColorUtil.toRGB(ProofTreeView.PINK_COLOR));
+      KeYIDEPreferences.setDefaultClosedGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_GREEN_COLOR.get()));
+      KeYIDEPreferences.setDefaultLinkedGoalColor(ColorUtil.toRGB(ProofTreeView.PINK_COLOR.get()));
       KeYIDEPreferences.setDefaultDisabledGoalColor(new RGB(87, 87, 87)); // ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR)
-      KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_RED_COLOR));
-      KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR));
+      KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_RED_COLOR.get()));
+      KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR.get()));
       KeYIDEPreferences.setDefaultNodeWithActiveStatementColor(new RGB(0, 0, 255)); // ColorUtil.toRGB(ProofTreeView.LIGHT_BLUE_COLOR)
       KeYIDEPreferences.setDefaultFoundNodeColor(new RGB(168, 211, 255)); // Light blue
    }

@@ -5,10 +5,10 @@ Bundle-SymbolicName: org.key_project.jmlediting.profile.key;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.jmlediting.profile.key.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.jface.text;bundle-version="3.9.1",
+ org.eclipse.jface.text,
  org.eclipse.jdt.ui;bundle-version="3.10.1",
- org.key_project.jmlediting.core;bundle-version="1.0.0",
- org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0"
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.profile.jmlref
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.jmlediting.profile.key,
