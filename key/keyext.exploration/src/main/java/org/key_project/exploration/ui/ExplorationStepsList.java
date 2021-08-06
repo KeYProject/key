@@ -32,12 +32,13 @@ import java.util.*;
 @HelpInfo(path = "/Using Key/Exploration/")
 public class ExplorationStepsList extends JPanel implements TabPanel {
     private final JLabel hasExplorationSteps = new JLabel();
-    private PruneExplorationAction actionPruneExploration = new PruneExplorationAction();
-    private JumpToNodeAction actionJumpToNode = new JumpToNodeAction();
-    private DefaultListModel<Node> listModelExploration = new DefaultListModel<>();
-    private JList<Node> listExplorations = new JList<>(listModelExploration);
-    private DefaultTreeModel treeModelExploration = new DefaultTreeModel(null);
-    private JTree treeExploration = new JTree(treeModelExploration);
+    private final PruneExplorationAction actionPruneExploration = new PruneExplorationAction();
+    private final JumpToNodeAction actionJumpToNode = new JumpToNodeAction();
+    private final DefaultListModel<Node> listModelExploration = new DefaultListModel<>();
+    private final JList<Node> listExplorations = new JList<>(listModelExploration);
+    private final DefaultTreeModel treeModelExploration = new DefaultTreeModel(null);
+    private final JTree treeExploration = new JTree(treeModelExploration);
+    private final KeYMediator mediator;
 
     private final RuleAppListener ruleAppListener = e1 -> {
         createModel(e1.getSource());
@@ -45,7 +46,6 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         setTreeExpandedState(treeExploration, true);
         treeExploration.setSelectionPath(selectionPath);
     };
-    private KeYMediator mediator;
 
     private Proof currentProof;
 
@@ -79,7 +79,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             MyTreeNode rootNode = new MyTreeNode(root);
             treeModelExploration.setRoot(rootNode);
             List<Node> explorationNodes = collectAllExplorationSteps(root, treeModelExploration, rootNode);
-            explorationNodes.forEach(node -> listModelExploration.addElement(node));
+            explorationNodes.forEach(listModelExploration::addElement);
         }
         updateLabel();
     }
@@ -150,7 +150,6 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                     TreePath treePath = getTreePath(selected);
                     if (treePath != null) {
                         treeExploration.setSelectionPath(treePath);
-                        //tree.addSelectionPath(treePath);
                     }
                     mediator.getSelectionModel().setSelectedNode(selected);
                 }
@@ -192,7 +191,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private JPanel createBottomPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
-       // buttonPanel.add(new JButton(actionJumpToNode));
+        buttonPanel.add(new JButton(actionJumpToNode));
         buttonPanel.add(new JButton(actionPruneExploration));
         return buttonPanel;
     }
@@ -265,7 +264,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private static class MyCellRenderer extends DefaultListCellRenderer {
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
             JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Node n = (Node) value;
 
@@ -280,7 +280,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                                                      boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
             ExplorationNodeData expData = n.getData().lookup(ExplorationNodeData.class);

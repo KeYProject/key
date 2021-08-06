@@ -61,35 +61,6 @@ public class ProofExplorationService {
     }
 
 
-    /*
-     * Add a formula to the antecedent -> unsound rule
-     *
-     * @param t
-     * @param antecedent whether to add to antecedent
-     * @return
-     */
-    /* void unsoundAddition(Term t, Boolean antecedent) {
-        NoFindTacletBuilder builder = new NoFindTacletBuilder();
-        Sequent addedFormula;
-        if(antecedent) {
-            builder.setName(new Name("add_formula_antec"));
-            Semisequent semisequent = new Semisequent(new SequentFormula(t));
-            addedFormula = Sequent.createAnteSequent(semisequent);
-        } else {
-            builder.setName(new Name("add_formula_succ"));
-            Semisequent semisequent = new Semisequent(new SequentFormula(t));
-            addedFormula = Sequent.createSuccSequent(semisequent);
-        }
-
-
-        ImmutableList<TacletGoalTemplate> templates = ImmutableSLList.nil();
-        templates = templates.append(new TacletGoalTemplate(addedFormula, ImmutableSLList.nil()));
-        builder.setTacletGoalTemplates(templates);
-        Taclet taclet = builder.getTaclet();
-        Goal g = getMediator().getSelectedGoal();
-        ImmutableList<Goal> result = g.apply(NoPosTacletApp.createNoPosTacletApp(taclet));
-        result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
-    }*/
     private Taclet getTaclet(String name) {
         return proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(name));
     }
@@ -100,8 +71,6 @@ public class ProofExplorationService {
 
     /**
      * Finds the `cut` taclet in the current proof environment.
-     *
-     * @return
      */
     public @Nonnull Taclet getCutTaclet() {
         return Objects.requireNonNull(
@@ -113,7 +82,6 @@ public class ProofExplorationService {
      *
      * @param t          Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
-     * @return
      */
     public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
         Taclet cut = g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
@@ -133,14 +101,13 @@ public class ProofExplorationService {
 
         //set the actions flag
         result.forEach(goal -> {
-            //  goal.node().getNodeInfo().setExploration(true);
             goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });
 
         assert result.size() == 2;
-        Node toBeSelected = null;
+        Node toBeSelected;
         String labelPostfix = antecedent ? "FALSE" : "TRUE";
         Goal first = result.head();
 
@@ -154,13 +121,6 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    /**
-     * @param g
-     * @param pio
-     * @param term
-     * @param newTerm
-     * @return
-     */
     public Node applyChangeFormula(
             @Nonnull Goal g, @Nonnull PosInOccurrence pio,
             @Nonnull Term term, @Nonnull Term newTerm) {
@@ -168,7 +128,9 @@ public class ProofExplorationService {
 
         //taint goal with exploration
         @Nonnull ExplorationNodeData data = ExplorationNodeData.get(g.node());
-        data.setExplorationAction("Edit " + LogicPrinter.quickPrintTerm(term, services) + " to " + LogicPrinter.quickPrintTerm(newTerm, services));
+        data.setExplorationAction(String.format("Edit %s to %s",
+                LogicPrinter.quickPrintTerm(term, services),
+                LogicPrinter.quickPrintTerm(newTerm, services)));
 
         //apply cut
         ImmutableList<Goal> result = g.apply(app);
@@ -200,13 +162,6 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    /**
-     *
-     * @param pio
-     * @param term
-     * @param newTerm
-     * @return
-     */
     private TacletApp soundChange(@Nonnull PosInOccurrence pio, @Nonnull Term term, @Nonnull Term newTerm) {
         Taclet cut = getCutTaclet();
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
@@ -216,12 +171,6 @@ public class ProofExplorationService {
         return app;
     }
 
-    /**
-     *
-     * @param g
-     * @param pio
-     * @param term
-     */
     public void soundHide(Goal g, PosInOccurrence pio, Term term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());

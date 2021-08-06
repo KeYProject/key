@@ -27,7 +27,6 @@ public class ExplorationNodeData {
 
     /**
      * Return the String of the Exploration action that was applied to the node
-     * @return
      */
     public String getExplorationAction() {
         return explorationAction;
@@ -35,7 +34,6 @@ public class ExplorationNodeData {
 
     /**
      * Set the String of the Exploration action that was applied to the node
-     * @param explorationAction
      */
     public void setExplorationAction(String explorationAction) {
         this.explorationAction = explorationAction;

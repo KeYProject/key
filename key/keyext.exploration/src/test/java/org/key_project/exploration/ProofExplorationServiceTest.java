@@ -1,17 +1,12 @@
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import org.antlr.runtime.RecognitionException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,8 +14,6 @@ import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
 
 public class ProofExplorationServiceTest {
@@ -36,6 +29,7 @@ public class ProofExplorationServiceTest {
     @Before
     public void setup() throws ProblemLoaderException {
         URL url = getClass().getClassLoader().getResource("org/key_project/exploration/testAdditions.key");
+        assert url != null;
         location = new File(url.getPath());
         env = KeYEnvironment.load(location, null, null, null); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
         currentProof = env.getLoadedProof();
@@ -52,22 +46,18 @@ public class ProofExplorationServiceTest {
     }
 
 
-
 //region Addition
 
     /**
-     * Test tests that the added term is added correctly and that meta data was added as well
-     *
-     * @throws IOException
-     * @throws RecognitionException
+     * Tests that the added term is added correctly and that meta data was added as well
      */
     @Test
-    public void testAdditionAntec() throws IOException, RecognitionException {
+    public void testAdditionAntec() {
         Term add = parseTerm("p");
         expService.soundAddition(currentProof.getGoal(currentProof.root()), add, true);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
-        Assert.assertTrue("Two new goals created", goals.size() == 2);
+        Assert.assertEquals("Two new goals created", 2, goals.size());
 
         Goal first = goals.head();
         Goal second = goals.tail().head();
@@ -78,8 +68,8 @@ public class ProofExplorationServiceTest {
         ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
         Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
 
-        Goal withAddedTerm = null;
-        Goal justification = null;
+        Goal withAddedTerm;
+        Goal justification;
 
         if (!first.node().sequent().antecedent().isEmpty()) {
             withAddedTerm = first;
@@ -105,16 +95,14 @@ public class ProofExplorationServiceTest {
     /**
      * Test tests that the added term is added correctly and that meta data was added as well
      *
-     * @throws IOException
-     * @throws RecognitionException
      */
     @Test
-    public void testAdditionSucc() throws IOException, RecognitionException {
+    public void testAdditionSucc() {
         Term added = parseTerm("q");
         expService.soundAddition(currentProof.getGoal(currentProof.root()), added, false);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
-        Assert.assertTrue("Two new goals created", goals.size() == 2);
+        Assert.assertEquals("Two new goals created", 2, goals.size());
 
         Goal first = goals.head();
         Goal second = goals.tail().head();
@@ -125,8 +113,8 @@ public class ProofExplorationServiceTest {
         ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
         Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
 
-        Goal withAddedTerm = null;
-        Goal justification = null;
+        Goal withAddedTerm;
+        Goal justification;
 
         if (!first.node().sequent().antecedent().isEmpty()) {
             withAddedTerm = second;
@@ -153,11 +141,9 @@ public class ProofExplorationServiceTest {
 
     /**
      * Test changing the root formula
-     * @throws IOException
-     * @throws RecognitionException
      */
     @Test
-    public void testChangeFormula() throws IOException, RecognitionException {
+    public void testChangeFormula() {
         Term change = parseTerm("p->p");
         ImmutableList<Goal> goals = currentProof.openGoals();
         Assert.assertSame("Prerequisite for test", 1, goals.size());
@@ -169,9 +155,9 @@ public class ProofExplorationServiceTest {
         Assert.assertEquals("Two new goals created", 2, newCreatedGoals.size());
 
         //find hide branch
-        Goal applicationBranch = newCreatedGoals.head().isAutomatic()? newCreatedGoals.head() :
+        Goal applicationBranch = newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
                 newCreatedGoals.tail().head();
-        Goal justificationBranch = !newCreatedGoals.head().isAutomatic()? newCreatedGoals.head() :
+        Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
                 newCreatedGoals.tail().head();
 
         //System.out.println("applicationBranch = " + applicationBranch.sequent());
@@ -194,11 +180,6 @@ public class ProofExplorationServiceTest {
 
     /**
      * Tests that sizes are as expected after addition
-     *
-     * @param withAddedTerm
-     * @param justification
-     * @param added
-     * @param antec
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
         Semisequent semiSeqAdded = antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
@@ -212,7 +193,7 @@ public class ProofExplorationServiceTest {
         Assert.assertEquals("Added Term is indeed added", semiSeqAdded.get(0).formula(), added);
         Assert.assertFalse("Justification branch is marked as interactive", justification.isAutomatic());
 
-        Assert.assertSame("The size if untouched semisequents is the same", semiSeqUntouched.size() , parentSemiSeqOfUntouched.size());
+        Assert.assertSame("The size if untouched semisequents is the same", semiSeqUntouched.size(), parentSemiSeqOfUntouched.size());
         Assert.assertEquals("The  untouched semisequents are equal", semiSeqUntouched, parentSemiSeqOfUntouched);
 
         Node parent = withAddedTerm.node().parent();
@@ -225,9 +206,6 @@ public class ProofExplorationServiceTest {
 
     /**
      * Test that exploration metadata have been set to the node
-     *
-     * @param parent
-     * @return
      */
     private boolean checkNodeForExplorationDataAndAction(Node parent) {
         boolean foundExploration = false;
@@ -246,15 +224,8 @@ public class ProofExplorationServiceTest {
 
     }
 
-    private Term parseTerm(String term) throws IOException, RecognitionException {
-        StringReader br = null;
-        br = new StringReader(term);
-        KeYParserF parser = new KeYParserF(ParserMode.TERM, new KeYLexerF(br, ""),
-                new Recoder2KeY(env.getServices(), env.getServices().getNamespaces()), env.getServices(),
-                env.getServices().getNamespaces(), null);
-        Term t = parser.term();
-        return t;
+    private Term parseTerm(String term) {
+        KeyIO io = new KeyIO(env.getServices());
+        return io.parseExpression(term);
     }
-
-
 }

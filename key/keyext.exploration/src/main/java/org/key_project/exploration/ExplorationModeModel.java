@@ -57,8 +57,6 @@ public class ExplorationModeModel {
 
     /**
      * Set the state
-     *
-     * @param explorationTacletAppState
      */
     public void setExplorationTacletAppState(ExplorationState explorationTacletAppState) {
         boolean old = this.explorationModeSelected;
