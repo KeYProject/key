@@ -36,4 +36,9 @@ public interface Settings {
      * @param l the listener
      */
     void addSettingsListener(SettingsListener l);
+    
+    /** removes a listener to the settings object 
+     * @param l the listener
+     */    
+    void removeSettingsListener(SettingsListener l);
 }

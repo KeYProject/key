@@ -13,6 +13,45 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.*;
+
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.TreeUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -103,7 +142,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the expansion state of the proof tree
      */
-    private ExpansionState expansionState;
+    private ProofTreeExpansionState expansionState;
     /**
      * listener
      */
@@ -235,6 +274,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
+
+        // this only has an effect if the row height is set to a constant (see setProofTreeFont())
         delegateView.setLargeModel(true);
 
         setLayout(new BorderLayout());
@@ -270,11 +311,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private void setProofTreeFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+
+        /* We set a constant row height for all rows. This increases the performance of JTree,
+         * since this way it does have to not calculate the height of each individual row by its
+         * content. This is a reasonable optimization since variable row heights are not needed in
+         * our case. The greatest benefit is observable when collapsing large branches. */
+        int rowHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
+
         if (myFont != null) {
+            rowHeight = delegateView.getFontMetrics(myFont).getHeight();
+            // set row height before changing the font (since the latter repaints the component)
+            delegateView.setRowHeight(rowHeight);
+
             delegateView.setFont(myFont);
         } else {
             Debug.out("KEY-PROOF_TREE_FONT not available, " +
                     "use standard font.");
+            delegateView.setRowHeight(rowHeight);
         }
     }
 
@@ -377,9 +430,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private void setProof(Proof p) {
         if (delegateModel != null) {
-            expansionState.disconnect(delegateView);
-            delegateModel.storeExpansionState(
-                    expansionState.state(new LinkedHashSet<>()));
+            expansionState.disconnect();
+            delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
             delegateModel.unregister();
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
@@ -402,9 +454,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
-            expansionState =
-                    new ExpansionState(delegateView,
-                            delegateModel.getExpansionState());
+            expansionState = new ProofTreeExpansionState(delegateView,
+                                                         delegateModel.getExpansionState());
             delegateView.expandRow(0);
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
@@ -419,6 +470,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
 
@@ -788,7 +840,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
-        private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         public ProofRenderer() {
             stylers.add(this::checkNotes);

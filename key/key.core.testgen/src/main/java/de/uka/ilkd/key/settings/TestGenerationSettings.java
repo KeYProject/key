@@ -90,6 +90,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
         listeners.add(l);
     }
 
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listeners.remove(l);
+    }
+
     //FIXME weigl: This method seems broken. I would expect: clone() = new TGS(this)
     public TestGenerationSettings clone(TestGenerationSettings data) {
         return new TestGenerationSettings(data);
