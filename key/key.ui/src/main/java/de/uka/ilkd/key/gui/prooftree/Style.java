@@ -1,117 +1,67 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
 public class Style {
-    private Color foreground, background, border;
-    private int fontStyle;
-    private Icon icon;
-    private String tooltip, text;
+    private final Map<Object, Object> styles = new HashMap<>();
+    private final Set<Object> sealed = new HashSet<>();
 
-    private boolean fixForeground, fixBackground, fixBorder, fixIcon, fixFontStyle, fixTooltip, fixText;
-
-    public Color getForeground() {
-        return foreground;
+    private static class Key<T> {
+        <T> Key(Class<T> clazz) {
+        }
     }
 
-    public void setForeground(Color foreground) {
-        if (fixForeground) return;
-        this.foreground = foreground;
+    public static final Key<Color> KEY_COLOR_FOREGROUND = new Key<>(Color.class);
+    public static final Key<Color> KEY_COLOR_BACKGROUND = new Key<>(Color.class);
+    public static final Key<Color> KEY_COLOR_BORDER = new Key<>(Color.class);
+    public static final Key<Boolean> KEY_FONT_ITALIC = new Key<>(Boolean.class);
+    public static final Key<Boolean> KEY_FONT_BOLD = new Key<>(Boolean.class);
+    public static final Key<Icon> KEY_ICON = new Key<>(Icon.class);
+    public static final Key<String> KEY_TOOLTIP = new Key<>(String.class);
+    public static final Key<String> KEY_TEXT = new Key<>(String.class);
+
+    @Nonnull
+    public <T> Style set(@Nonnull Key<T> key, @Nullable T value) {
+        if (!sealed.contains(key)) {
+            styles.put(key, value);
+        }
+        return this;
     }
 
-    public void setForeground(Color foreground, boolean important) {
-        setForeground(foreground);
-        if (important) fixForeground = true;
+    @Nonnull
+    public <T> Style setAndSeal(@Nonnull Key<T> key, @Nullable T value) {
+        set(key, value);
+        sealed.add(key);
+        return this;
     }
 
-    public Color getBackground() {
-        return background;
+    public <T> boolean contains(@Nonnull Key<T> key) {
+        return styles.containsKey(key);
     }
 
-    public void setBackground(Color background) {
-        if (fixBackground) return;
-        this.background = background;
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <T> T get(@Nonnull Key<T> key, @Nullable T defaultValue) {
+        return (T) styles.getOrDefault(key, defaultValue);
     }
 
-
-    public void setBackground(Color background, boolean important) {
-        setBackground(background);
-        if (important) fixBackground = true;
+    @Nullable
+    public <T> T get(@Nonnull Key<T> key) {
+        return get(key, null);
     }
 
-    public Color getBorder() {
-        return border;
+    public boolean getBoolean(Key<Boolean> key) {
+        return get(key) == Boolean.TRUE;
     }
-
-    public void setBorder(Color border) {
-        if (fixBorder) return;
-        this.border = border;
-    }
-
-    public void setBorder(Color border, boolean important) {
-        setBorder(border);
-        if (important) fixBorder = true;
-    }
-
-    public int getFontStyle() {
-        return fontStyle;
-    }
-
-    public void setFontStyle(int fontStyle) {
-        if (fixFontStyle) return;
-        this.fontStyle = fontStyle;
-    }
-
-    public void setFontStyle(int fontStyle, boolean important) {
-        setFontStyle(fontStyle);
-        if (important) fixFontStyle = true;
-    }
-
-    public Icon getIcon() {
-        return icon;
-    }
-
-    public void setIcon(Icon icon) {
-        if (fixIcon) return;
-        this.icon = icon;
-    }
-
-    public void setIcon(Icon icon, boolean important) {
-        setIcon(icon);
-        if (important) fixIcon = true;
-    }
-
-    public String getTooltip() {
-        return tooltip;
-    }
-
-    public void setTooltip(String tooltip) {
-        if (fixTooltip) return;
-        this.tooltip = tooltip;
-    }
-
-    public void setTooltip(String tooltip, boolean important) {
-        setTooltip(tooltip);
-        if (important) fixTooltip = true;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        if (fixText) return;
-        this.text = text;
-    }
-
-    public void setText(String text, boolean important) {
-        setText(text);
-        if (important) fixText = true;
-    }
-
 }

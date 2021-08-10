@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.EventObject;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
