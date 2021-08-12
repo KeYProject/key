@@ -5,8 +5,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProofParser.IdentifierContext;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
@@ -17,6 +15,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
+
+import static de.uka.ilkd.key.rule.CloseByReferenceRule.*;
 
 /**
  * This class is responsible for the actual replay of rules. For every rule there is a separate
@@ -198,34 +198,20 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     public Void visitIdentifier(IdentifierContext ctx) {
         ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
-            // TODO: currently a hack: the same Node is appended at multiple positions in the proof
             Node old = smtReplayer.getKnownReplayedNode(ctx.getText());
-            // ctx has already been replayed on another branch: reuse the node
+            // ctx has already been replayed on another branch: close by reference
             if (old != null) {
 
-                // TODO: this does work, but many nodes are skipped when counting via
-                //   SubTreeIterator currently (used e.g. by Statistics)
-                Proof proof = goal.proof();
-                Node current = goal.node();
+                CloseByReferenceRule rule = INSTANCE;
+                CloseByReferenceRuleApp app = (CloseByReferenceRuleApp) rule.createApp(null,
+                    goal.proof().getServices());
+                app.setPartner(old);
 
-                // Close first, afterwards exchange the node. Otherwise there would be some
-                // (invisible?) nodes left open ...
-                proof.closeGoal(goal);
+                assert old.isClosed();
 
-                Node parent = current.parent();
-                current.remove();
-                parent.add(old);
-                goal.setNode(old);
-
-                // TODO: idea: for better visualization use linked goals
-
-                String notes = current.getNodeInfo().getNotes();
-                if (notes != null) {
-                    notes += "<br>Merged with " + old.serialNr();
-                    current.getNodeInfo().setNotes(notes);
-                } else {
-                    current.getNodeInfo().setNotes("<br>Merged with " + old.serialNr());
-                }
+                goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+                goal.apply(app);
+                goal.setBranchLabel("Closed by reference to " + old.serialNr());
             } else {
                 smtReplayer.addKnownReplayedNode(ctx.getText(), goal.node());
 
