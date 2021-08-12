@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -191,7 +192,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   .prepend(LoopApplyHeadRule.INSTANCE);
+                                   .prepend(LoopApplyHeadRule.INSTANCE)
+                                   .prepend(CloseByReferenceRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
