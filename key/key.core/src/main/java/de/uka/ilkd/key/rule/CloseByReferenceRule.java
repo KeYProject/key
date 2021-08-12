@@ -76,11 +76,17 @@ public final class CloseByReferenceRule implements BuiltInRule {
         // insert_hidden_ rules). Otherwise it would be a soundness problem.
         // TODO: this implementation works only if pruning in closed branches is enabled ...
         Goal partnerGoal = goal.proof().getClosedGoal(partnerNode);
-        for (NoPosTacletApp npta : goal.indexOfTaclets().getPartialInstantiatedApps()) {
-            if (!partnerGoal.indexOfTaclets().getPartialInstantiatedApps().contains(npta)) {
-                // different rules sets -> not applicable
-                return null;
+        if (partnerGoal != null) {
+            for (NoPosTacletApp npta : goal.indexOfTaclets().getPartialInstantiatedApps()) {
+                if (!partnerGoal.indexOfTaclets().getPartialInstantiatedApps().contains(npta)) {
+                    // different rules sets -> not applicable
+                    return null;
+                }
             }
+        } else {
+            // TODO: in this case, closing may be unsound!
+            System.out.println("Warning: Closing by reference may be unsound, since partially " +
+                "instantiated NoPosTacletApps could not be checked!");
         }
 
         final ImmutableList<Goal> result = goal.split(1);
