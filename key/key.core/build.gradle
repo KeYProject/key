@@ -142,6 +142,17 @@ task testProveSMTLemmas(type: Test) {
     }
 }
 
+// Run the tests for the new smt translation in strict mode
+// where "unknown" is less accepted
+task testStrictSMT(type: Test) {
+    description 'Run the tests for the new smt translation in strict mode'
+    group 'verification'
+    systemProperty("key.newsmt2.stricttests", "true")
+    filter {
+        includeTestsMatching "MasterHandlerTest"
+    }
+}
+
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")

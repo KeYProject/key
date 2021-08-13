@@ -35,8 +35,29 @@ import java.util.Locale;
 
 import static org.junit.Assert.*;
 
+/**
+ * Run this with
+ * <pre>
+ *     gradlew :key.core:testStrictSMT
+ * </pre>
+ */
+
 @RunWith(Parameterized.class)
 public class MasterHandlerTest {
+
+    /**
+     * If this variable is set when running this test class, then
+     * those cases with expected result "weak_valid" will raise an
+     * exception unless they can be proved using the solver.
+     *
+     * Otherwise a "timeout" or "unknown" is accepted. This can be
+     * used to deal with test cases that should verify but do not
+     * yet do so.
+     *
+     * (Default false)
+     */
+    private static final boolean STRICT_TEST =
+            Boolean.getBoolean("key.newsmt2.stricttests");
 
     @Parameter(0)
     public String name;
@@ -134,6 +155,11 @@ public class MasterHandlerTest {
             switch (expectation) {
                 case "valid":
                     lookFor = "unsat";
+                    break;
+                case "weak_valid":
+                    if (STRICT_TEST) {
+                        lookFor = "unsat";
+                    }
                     break;
                 case "fail":
                     lookFor = "sat";
