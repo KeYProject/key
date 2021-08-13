@@ -38,7 +38,7 @@ public interface SolverType  {
 	 * Creates an instance of SMTSolver representing a concrete instance of that solver.
 	 * 		 */
 	public SMTSolver createSolver(SMTProblem problem,
-			SolverListener listener, Services services);
+								  SolverListener listener, Services services);
 
 	/**
 	 * Returns the name of the solver.
@@ -144,7 +144,7 @@ public interface SolverType  {
 
             @Override
             public SMTSolver createSolver(SMTProblem problem,
-                            SolverListener listener, Services services) {
+										  SolverListener listener, Services services) {
                     return new SMTSolverImplementation(problem, listener,
                                     services, this);
             }
@@ -313,7 +313,7 @@ public interface SolverType  {
 
 		@Override
 		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
 			return new SMTSolverImplementation(problem, listener,
 					services, this);
 		}
@@ -369,93 +369,6 @@ public interface SolverType  {
 
 	};
 
-
-	/**
-	 * Class for the CVC3 solver. It makes use of the SMT1-format.
-	 */
-	static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
-
-	    @Override
-	    public String getName() {
-	        return "CVC3 (Legacy Translation)";
-	    }
-
-	    @Override
-	    public SMTSolver createSolver(SMTProblem problem,
-	                    SolverListener listener, Services services) {
-	        return new SMTSolverImplementation(problem, listener,
-	                        services, this);
-	    }
-
-	    @Override
-        public String getDefaultSolverCommand() {
-	        return "cvc3";
-	    }
-
-	    private boolean useNewVersion () {
-	        final String solverVersion = getRawVersion();
-	        return "version 2.4.1".equals(solverVersion);
-	    }
-
-	    @Override
-	    public String getRawVersion () {
-	        final String tmp = super.getRawVersion();
-	        if (tmp==null) {
-                return null;
-            }
-	        return tmp.substring(tmp.indexOf("version"));
-	    }
-
-	    @Override
-	    public String getDefaultSolverParameters() {
-	        // version 2.4.1 uses different parameters
-	        if (useNewVersion()) {
-                return "-lang smt +model +interactive";
-	        //                      return "-lang smt2 +model +interactive";
-            } else {
-                return "+lang smt +model +int";
-            }
-	    }
-
-	    @Override
-        public String[] getDelimiters() {
-	        return new String [] {"CVC>","C>"};
-	    }
-
-	    @Override
-        public String[] getSupportedVersions() {
-	        return new String[] {"version 2.2", "version 2.4.1"};
-	    }
-
-	    @Override
-        public String getVersionParameter() {
-	        return "-version";
-	    }
-
-	    @Override
-	    public SMTTranslator createTranslator(Services services) {
-	        final Configuration conf = new Configuration(false, true);
-	        //                    if (useNewVersion())
-	        //                        return new SmtLib2Translator(services, conf);
-	        //                    else
-	        return new SmtLibTranslator(services,conf);
-	    }
-
-	    @Override
-        public boolean supportsIfThenElse() {
-	        return true;
-	    }
-
-	    @Override
-	    public String getInfo() {
-	        return null;
-	    }
-
-
-
-
-	};
-
 	/**
 	 * CVC4 is the successor to CVC3.
 	 * @author bruns
@@ -465,7 +378,7 @@ public interface SolverType  {
 	    // TODO move to AbstractSolverType?
         @Override
         public SMTSolver createSolver(SMTProblem problem,
-                        SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
             return new SMTSolverImplementation(problem, listener,
                             services, this);
         }
@@ -527,7 +440,7 @@ public interface SolverType  {
 	    // TODO move to AbstractSolverType?
         @Override
         public SMTSolver createSolver(SMTProblem problem,
-                        SolverListener listener, Services services) {
+									  SolverListener listener, Services services) {
             return new SMTSolverImplementation(problem, listener,
                             services, this);
         }
@@ -580,158 +493,11 @@ public interface SolverType  {
 
 	};
 
-
-	/**
-	 * Class for the Yices solver. It makes use of the SMT1-format.
-	 */
-	static public final SolverType YICES_SOLVER = new AbstractSolverType() {
-
-		@Override
-		public String getName() {
-			return "Yices (Legacy Translation)";
-		}
-
-		@Override
-		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener,
-					services, this);
-		}
-
-		@Override
-		public SMTTranslator createTranslator(Services services) {
-			return new SmtLibTranslator(services,
-					new Configuration(true,true));
-		}
-
-
-		@Override
-		public String getDefaultSolverCommand() {
-			return "yices";
-		}
-
-		@Override
-        public String[] getDelimiters() {
-			return new String [] {"\n","\r"};
-                }
-
-		@Override
-		public String getDefaultSolverParameters() {
-			return "-i -e -smt";
-		}
-
-
-		@Override
-        public String getVersionParameter() {
-			return "--version";
-                }
-
-		@Override
-        public String[] getSupportedVersions() {
-			return new String [] {"1.0.34"};
-                }
-
-		@Override
-		public String getInfo() {
-			return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
-			+ "required logic AUFLIA.";
-		}
-
-		@Override
-        public boolean supportsIfThenElse() {
-			return true;
-		};
-
-
-
-
-		@Override
-        public String modifyProblem(String problem) {
-			return problem += "\n\n check\n";
-				}
-
-	};
-
-	/**
-	 * Class for the Simplify solver. It makes use of its own format.
-	 */
-	static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
-
-
-		@Override
-		public String getName() {
-			return "Simplify (Legacy Translation)";
-		}
-
-		@Override
-		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener,
-					services, this);
-		}
-
-		@Override
-		public SMTTranslator createTranslator(Services services) {
-			return new SimplifyTranslator(services,
-					new Configuration(false,true));
-		}
-
-		@Override
-        public String getDefaultSolverCommand() {
-			return "simplify";
-                }
-
-		@Override
-        public String[] getSupportedVersions() {
-			return new String []{"version 1.5.4"};
-                }
-
-            @Override
-                public String getRawVersion () {
-                    final String tmp = super.getRawVersion();
-                    if (tmp==null) {
-                        return null;
-                    }
-                    return tmp.substring(tmp.indexOf("version"));
-                }
-
-		@Override
-        public String[] getDelimiters() {
-			return new String [] {">"};
-                }
-
-		@Override
-        public String getDefaultSolverParameters() {
-			return "-print";
-                }
-
-
-		@Override
-        public String getVersionParameter() {
-			return "-version";
-                }
-
-
-		@Override
-		public String getInfo() {
-			return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
-		}
-
-		@Override
-        public boolean supportsIfThenElse() {
-			return false;
-                }
-
-
-	};
 	public static List<SolverType> ALL_SOLVERS =
                 Collections.unmodifiableList(Arrays.asList(
                         Z3_SOLVER,
                         CVC4_NEW_TL_SOLVER,
-                        CVC3_SOLVER,
-                        CVC4_SOLVER,
-                        SIMPLIFY_SOLVER,
-                        YICES_SOLVER
+                        CVC4_SOLVER
                         ));
 }
 

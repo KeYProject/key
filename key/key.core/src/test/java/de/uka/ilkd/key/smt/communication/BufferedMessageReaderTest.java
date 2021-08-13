@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.communication;
 
 import junit.framework.TestCase;
 
