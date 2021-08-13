@@ -121,9 +121,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
                 versionString = solverType.getRawVersion();
                 info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
             } catch (RuntimeException re) {
-                // this case occurs for instance, if there user can see z3 but has not the permission
+                // this case occurs for instance, if there user can see e.g. z3 but has not the permission
                 // to execute the solver
-                info = "(version: unknown) Z3 is installed, but trying to access it resulted in an error " +
+                info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
                         (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
             }
         }
