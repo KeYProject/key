@@ -138,7 +138,7 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>>
         proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<Triple<LoopStatement, String, Integer>, LoopSpecification>
+    private final Map<Pair<LoopStatement, Integer>, LoopSpecification>
         loopInvs = new LinkedHashMap<>();
     private final Map<Triple<StatementBlock, String, Integer>, ImmutableSet<BlockContract>>
         blockContracts = new LinkedHashMap<>();
@@ -1621,11 +1621,11 @@ public final class SpecificationRepository {
      */
     public LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().getLine();
-        Triple<LoopStatement, String, Integer> l = new Triple<>(
-                loop, loop.getParentClass(), line);
+        Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
+                line);
         LoopSpecification inv = loopInvs.get(l);
         if (inv == null && line != -1) {
-            l = new Triple<>(loop, loop.getParentClass(), -1);
+            l = new Pair<LoopStatement, Integer>(loop, -1);
             inv = loopInvs.get(l);
         }
         return inv;
@@ -1657,11 +1657,11 @@ public final class SpecificationRepository {
     public void addLoopInvariant(final LoopSpecification inv) {
         final LoopStatement loop = inv.getLoop();
         final int line = loop.getStartPosition().getLine();
-        Triple<LoopStatement, String, Integer> l = new Triple<>(
-                loop, loop.getParentClass(), line);
+        Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
+                line);
         loopInvs.put(l, inv);
         if (line != -1) {
-            l = new Triple<>(loop, loop.getParentClass(), -1);
+            l = new Pair<LoopStatement, Integer>(loop, -1);
             loopInvs.put(l, inv);
         }
     }
