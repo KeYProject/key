@@ -45,6 +45,7 @@ public class BooleanConnectiveHandler implements SMTHandler {
         masterHandler.addDeclaration(new VerbatimSMT(handlerSnippets.getProperty("bool.decls")));
         masterHandler.addAxiom(new VerbatimSMT(handlerSnippets.getProperty("bool.axioms")));
         masterHandler.addKnownSymbol("sort_boolean");
+        masterHandler.addSort(ldt.targetSort());
     }
 
     @Override
