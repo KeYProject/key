@@ -23,7 +23,9 @@ public class SMTHandlerServices {
     private static SMTHandlerServices theInstance;
     private List<SMTHandler> handlers;
     private final Map<SMTHandler, Properties> snippetMap = new IdentityHashMap<>();
-    private String preamble;
+    // preamble is volatile since sonarcube tells me the synchronisation scheme
+    // for loading it is broken.
+    private volatile String preamble;
     private final Object theCreationLock = new Object();
     private List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
 
@@ -95,7 +97,7 @@ public class SMTHandlerServices {
 
     public String getPreamble() {
         try {
-            if(preamble == null) {
+            if (preamble == null) {
                 synchronized (theCreationLock) {
                     if(preamble == null) {
                         // make sure this is only ever read once and everyone
