@@ -103,7 +103,9 @@ public class MasterHandlerTest {
 
         if(DUMP_SMT) {
             Path tmpSmt = Files.createTempFile("SMT_key_" + name, ".smt2");
-            Files.writeString(tmpSmt, translation);
+            // FIXME This is beyond Java 8: add as soon as switched to Java 11:
+            // Files.writeString(tmpSmt, translation);
+            Files.write(tmpSmt, translation.getBytes());
             System.err.println("SMT2 for " + name + " saved in: " + tmpSmt);
         }
 
