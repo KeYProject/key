@@ -788,11 +788,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
-            stylers.add(this::checkNotes);
-            stylers.add(this::closedGoal);
-            stylers.add(this::oneStepSimplification);
-            stylers.add(this::renderNonLeaf);
-            stylers.add(this::renderLeaf);
+            stylers.add((style, treeNode) -> checkNotes(style, treeNode));
+            stylers.add((style, treeNode) -> closedGoal(style, treeNode));
+            stylers.add((style, node) -> oneStepSimplification(style, node));
+            stylers.add((style, treeNode) -> renderNonLeaf(style, treeNode));
+            stylers.add((style, node) -> renderLeaf(style, node));
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {

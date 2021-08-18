@@ -18,7 +18,10 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import org.key_project.exploration.ExplorationModeModel;
 
-public class ExplorationAction extends MainWindowAction {
+/**
+ * Common functionalities for proof exploration actions.
+ */
+public abstract class ExplorationAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1662459714803539089L;
 

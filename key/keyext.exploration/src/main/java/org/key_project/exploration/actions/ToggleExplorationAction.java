@@ -7,6 +7,7 @@ import org.key_project.exploration.Icons;
 import java.awt.event.ActionEvent;
 
 /**
+ * Toggles the Exploration Mode.
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */

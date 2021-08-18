@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Entry point for the Proof Exploration Extension.
  * @author Alexander Weigl
  * @version 1 (16.04.19)
  */
@@ -138,15 +139,15 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
             data = node.lookup(ExplorationNodeData.class);
 
             if (data != null) {
-                style.setBorder(DARK_PURPLE_COLOR.get());
-                style.setBackground(LIGHT_PURPLE_COLOR.get());
-                style.setTooltip("Exploration Action Performed");
+                style.set(Style.KEY_COLOR_BORDER, DARK_PURPLE_COLOR.get());
+                style.set(Style.KEY_COLOR_BACKGROUND, LIGHT_PURPLE_COLOR.get());
+                style.set(Style.KEY_TOOLTIP, "Exploration Action Performed");
 
             } else {
-                style.setBorder(null);
+                style.set(Style.KEY_COLOR_BORDER, null);
             }
         } catch (IllegalStateException e) {
-            style.setBorder(null);
+            style.set(Style.KEY_COLOR_BORDER, null);
         }
     }
 }
