@@ -339,8 +339,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         } else if (builtInRule == MergeRule.INSTANCE) {
             // (DS) MergeRule has a special menu item, and thus is not added here.
         } else if (builtInRule == CloseByReferenceRule.INSTANCE) {
-            item = new CloseByReferenceRuleMenuItem(mediator.getSelectedGoal(),
-                mediator.getServices(), mediator);
+            item = new CloseByReferenceRuleMenuItem(mediator.getSelectedGoal(), mediator);
             item.addActionListener(control);
             add(item);
         } else {

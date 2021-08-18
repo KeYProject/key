@@ -16,7 +16,12 @@ import java.awt.event.ActionEvent;
  * @see CloseByReferenceRule
  */
 public class CloseByReferenceRuleMenuItem extends JMenuItem {
-    public CloseByReferenceRuleMenuItem(Goal goal, Services services, KeYMediator mediator) {
+    /**
+     * Creates a new menu item for CloseByReferenceRule.
+     * @param goal the goal that shall be closed by reference to some (already closed) node
+     * @param mediator the mediator to control the UI
+     */
+    public CloseByReferenceRuleMenuItem(Goal goal, KeYMediator mediator) {
         super();
         // note: the text of the menu item is set to the text of the action!
         this.setAction(new AbstractAction(toString()) {
@@ -24,10 +29,10 @@ public class CloseByReferenceRuleMenuItem extends JMenuItem {
             public void actionPerformed(ActionEvent e) {
                 CloseByReferenceRule rule = CloseByReferenceRule.INSTANCE;
                 CloseByReferenceRuleApp app =
-                    (CloseByReferenceRuleApp) rule.createApp(null, services);
+                    (CloseByReferenceRuleApp) rule.createApp(null, mediator.getServices());
                 CloseByReferenceCompletion completion = CloseByReferenceCompletion.INSTANCE;
                 CloseByReferenceRuleApp completedApp =
-                    (CloseByReferenceRuleApp) completion.complete(app , goal, false);
+                    (CloseByReferenceRuleApp) completion.complete(app, goal, false);
                 // The completedApp may be null if the completion was not possible.
                 if (completedApp != null && completedApp.complete()) {
                     mediator.getUI().getProofControl().applyInteractive(completedApp, goal);
