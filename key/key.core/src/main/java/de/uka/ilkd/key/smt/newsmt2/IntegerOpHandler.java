@@ -69,6 +69,7 @@ public class IntegerOpHandler implements SMTHandler {
 
         // sort_int is defined here, declare it as already defined
         masterHandler.addKnownSymbol("sort_int");
+        masterHandler.addSort(integerLDT.targetSort());
 
         this.limitedToPresbuger = PROPERTY_PRESBURGER.get(masterHandler.getTranslationState());
     }
