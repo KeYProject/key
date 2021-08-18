@@ -14,7 +14,10 @@
 
 ### contains.3
 
-(assert (forall ((var_i U)) (=> (and (<= 0 (u2i var_i)) (< (u2i var_i) (- 10 1))) (= (k_seqGet seqDef1 var_i) (let ((var_i (i2u (+ (u2i var_i) 1)))) (i2u (* (u2i var_i) (u2i var_i))))))))
+(assert (forall ((var_i Int))
+    (=> (and (<= 0 var_i) (< var_i (- 10 1)))
+        (= (k_seqGet seqDef1 (i2u var_i))
+          (let ((var_i (+ var_i 1))) (i2u (* var_i var_i)))))))
 
 ### contains.4
 
@@ -24,3 +27,6 @@
 
 valid
 
+### state
+
+extended

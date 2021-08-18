@@ -11,8 +11,10 @@ import de.uka.ilkd.key.util.LineProperties;
 import org.hamcrest.core.StringContains;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
@@ -43,6 +45,7 @@ import static org.junit.Assert.*;
  */
 
 @RunWith(Parameterized.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MasterHandlerTest {
 
     /**
@@ -58,6 +61,8 @@ public class MasterHandlerTest {
      */
     private static final boolean STRICT_TEST =
             Boolean.getBoolean("key.newsmt2.stricttests");
+
+    private static final boolean DUMP_SMT = true;
 
     @Parameter(0)
     public String name;
@@ -96,25 +101,44 @@ public class MasterHandlerTest {
     @Test
     public void testTranslation() throws Exception {
 
+        if(DUMP_SMT) {
+            Path tmpSmt = Files.createTempFile("SMT_key_" + name, ".smt2");
+            Files.writeString(tmpSmt, translation);
+            System.err.println("SMT2 for " + name + " saved in: " + tmpSmt);
+        }
+
         int i = 1;
         while(props.containsKey("contains." + i)) {
-            assertThat("Occurrence check",
+            assertThat("Occurrence check for contains." + i,
                     translation,
                     new ContainsModuloSpaces(props.get("contains." + i).trim()));
             i++;
         }
 
-        this.translation = translation;
     }
 
     @Before
     public void makeTranslation() throws IOException, ProblemLoaderException {
+
         BufferedReader reader = Files.newBufferedReader(path);
         this.props = new LineProperties();
         props.read(reader);
 
-        Path tmpKey = Files.createTempFile("SMT_key_test", ".key");
-        Files.write(tmpKey, props.getLines("KeY"));
+        Assume.assumeFalse("Test case has been marked ignore",
+                "ignore".equals(props.get("state")));
+
+        List<String> sources = props.getLines("sources");
+        List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+        if (!sources.isEmpty()) {
+            Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+            Path tmpSrc = srcDir.resolve("src.java");
+            Files.write(tmpSrc, sources);
+            lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+        }
+
+        Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+        Files.write(tmpKey, lines);
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
                 KeYEnvironment.load(tmpKey.toFile());
@@ -156,18 +180,13 @@ public class MasterHandlerTest {
                 case "valid":
                     lookFor = "unsat";
                     break;
-                case "weak_valid":
-                    if (STRICT_TEST) {
-                        lookFor = "unsat";
-                    }
-                    break;
                 case "fail":
                     lookFor = "sat";
                     break;
                 case "irrelevant":
                     break;
                 default:
-                    fail("Unexpected expecataion: " + expectation);
+                    fail("Unexpected expectation: " + expectation);
             }
 
             for (String line : response) {
@@ -177,6 +196,11 @@ public class MasterHandlerTest {
                 if (lookFor != null && line.equals(lookFor)) {
                     return;
                 }
+            }
+
+            if(!STRICT_TEST) {
+                Assume.assumeFalse("This is an extended test (will be run only in strict mode)",
+                        "extended".equals(props.get("state")));
             }
 
             if (lookFor != null) {

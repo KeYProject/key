@@ -15,15 +15,14 @@ The same seqDef should be shared.
 ### contains.1
 
 ; --- Sequent
-(assert (not (forall ((var_x U))
-  (=> (instanceof var_x sort_int)
-    (= (cast (k_seqGet (seqDef1 var_p) var_x) sort_int)
-       (cast (k_seqGet (seqDef1 var_p) (i2u (* (u2i var_x) 1))) sort_int))))))
+(assert (not (forall ((var_x Int))
+    (= (cast (k_seqGet (seqDef1 u_p) (i2u var_x)) sort_int)
+       (cast (k_seqGet (seqDef1 u_p) (i2u (* var_x 1))) sort_int)))))
 
 ### contains.2
 
-(assert (forall ((var_p U)) (= (k_seqLen (seqDef1 var_p))
-    (ite (>= (- (u2i u_p) 1) 0) (i2u (- (u2i u_p) 1)) (i2u 0)))))
+(assert (forall ((var_p Int)) (= (k_seqLen (seqDef1 (i2u var_p)))
+    (let ((u_p var_p)) (ite (>= (- u_p 1) 0) (i2u (- u_p 1)) (i2u 0))))))
 
 ### contains.3
 
@@ -35,5 +34,8 @@ The same seqDef should be shared.
 
 ### expected
 
-weak_valid
+valid
 
+### state
+
+ignore

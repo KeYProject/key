@@ -6,7 +6,7 @@
 
 ### contains.1
 
-(assert (not (forall ((var_i U)) (=> (instanceof var_i sort_int) (=> (>= (u2i var_i) 0) (>= (* 2 (u2i var_i)) (u2i var_i)))))))
+(assert (not (forall ((var_i Int)) (=> (>= var_i 0) (>= (* 2 var_i) var_i)))))
 
 ### expected
 

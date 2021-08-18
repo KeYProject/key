@@ -9,11 +9,10 @@
 ### contains.1
 
 ; --- Sequent
-(assert (not (exists ((var_x U))
-  (and (instanceof var_x sort_int)
-       (= (i2u (* 3 (u2i var_x))) (i2u 42))))))
+(assert (not (exists ((var_x Int))
+       (= (i2u (* 3 var_x)) (i2u 42)))))
 
 ### expected
 
-weak_valid
+valid
 

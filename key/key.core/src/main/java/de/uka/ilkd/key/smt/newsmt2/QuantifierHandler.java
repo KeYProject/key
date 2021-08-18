@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
@@ -56,27 +57,32 @@ public class QuantifierHandler implements SMTHandler {
         List<SExpr> vars = new ArrayList<>();
         List<SExpr> typeGuards = new ArrayList<>();
         for(QuantifiableVariable bv : term.boundVars()) {
-            String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
-            vars.add(new SExpr(varName, Type.NONE, "U"));
-            trans.addSort(bv.sort());
-            typeGuards.add(SExprs.instanceOf(
-                    new SExpr(varName), SExprs.sortExpr(bv.sort())));
+            Sort sort = bv.sort();
+            String name = bv.name().toString();
+            vars.add(LogicalVariableHandler.makeVarDecl(name, sort));
+            if(!sort.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
+                // Special casing integer quantification: Avoid conversion to "U".
+                // Caution: Must be in sync with logical variable treatment.
+                trans.addSort(sort);
+                typeGuards.add(SExprs.instanceOf(
+                        new SExpr(LogicalVariableHandler.VAR_PREFIX + name),
+                                SExprs.sortExpr(sort)));
+            }
         }
         SExpr typeGuard = SExprs.and(typeGuards);
-        SExpr typeGuardConnector;
         String smtOp;
         Operator op = term.op();
         if(op == Quantifier.ALL) {
             smtOp = "forall";
-            typeGuardConnector = new SExpr("=>", Type.BOOL);
+            matrix = SExprs.imp(typeGuard, matrix);
         } else if(op == Quantifier.EX) {
             smtOp = "exists";
-            typeGuardConnector = new SExpr("and", Type.BOOL);
+            typeGuards.add(matrix);
+            matrix = SExprs.and(typeGuards);
         } else {
             throw new SMTTranslationException("Unknown quantifier " + op);
         }
 
-        matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
         matrix = SExprs.patternSExpr(matrix, new ArrayList<>(triggers));
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
