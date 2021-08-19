@@ -4,10 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.HashSet;
@@ -88,16 +85,21 @@ public final class CloseByReferenceRule implements BuiltInRule {
 
         resultGoal.setBranchLabel("Closed by reference to node " + partnerNode.serialNr());
 
-        goal.proof().addProofTreeListener(new ProofTreeAdapter() {
+        Proof proof = goal.proof();
+        proof.addProofTreeListener(new ProofTreeAdapter() {
             @Override
             public void proofPruned(ProofTreeEvent e) {
-                if (!partnerNode.isClosed()) {
-                    // partnerNode was reopened by pruning -> reopen currentNode (deletes
-                    // the CloseByReferenceRule application)
-                    goal.proof().pruneProof(currentNode);
+                // this additional check is necessary, because the partner node could have already
+                // been removed by the pruning operation
+                if (proof.find(partnerNode)) {
+                    if (!partnerNode.isClosed()) {
+                        // partnerNode was reopened by pruning -> reopen currentNode (deletes
+                        // the CloseByReferenceRule application)
+                        proof.pruneProof(currentNode);
 
-                    // the listener is not needed anymore
-                    goal.proof().removeProofTreeListener(this);
+                        // the listener is not needed anymore
+                        proof.removeProofTreeListener(this);
+                    }
                 }
             }
         });
