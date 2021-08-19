@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.CloseByReferenceRule;
 import de.uka.ilkd.key.rule.CloseByReferenceRule.*;

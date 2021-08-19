@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,13 +26,6 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateA
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -290,6 +284,17 @@ public class IntermediatePresentationProofFileParser
             }
             break;
 
+        case PERSISTENT_NODE_ID:
+            ruleInfo.persistentNodeId = Integer.parseInt(str);
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode).setPersistentNodeId(ruleInfo.persistentNodeId);
+            }
+            break;
+
+        case CLOSE_BY_REFERENCE:
+            ((BuiltinRuleInformation) ruleInfo).closeByReferencePartnerId = Integer.parseInt(str);
+            break;
+
         default:
             break;
         }
@@ -406,6 +411,9 @@ public class IntermediatePresentationProofFileParser
                     builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId,
                 builtinInfo.currNewNames);
+        } else if (builtinInfo.currRuleName.equals("CloseByReferenceRule")) {
+            result = new CloseByReferenceAppIntermediate(builtinInfo.currRuleName,
+                builtinInfo.closeByReferencePartnerId);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
@@ -449,6 +457,7 @@ public class IntermediatePresentationProofFileParser
         protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
         protected ImmutableList<Name> currNewNames = null;
         protected String notes = null;
+        protected int persistentNodeId = -1;
 
         public RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
@@ -498,7 +507,8 @@ public class IntermediatePresentationProofFileParser
         protected Class<? extends AbstractPredicateAbstractionLattice>
             currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;
-        public String currUserChoices = null;
+        protected String currUserChoices = null;
+        protected int closeByReferencePartnerId = -1;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);

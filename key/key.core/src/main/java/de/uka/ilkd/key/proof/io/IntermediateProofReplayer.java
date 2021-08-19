@@ -16,20 +16,14 @@ package de.uka.ilkd.key.proof.io;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.proof.io.intermediate.*;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -66,24 +60,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -139,6 +115,9 @@ public class IntermediateProofReplayer {
 
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
+
+    private List<Pair<Node, CloseByReferenceAppIntermediate>> closeByRefPairs = new ArrayList<>();
+    private Map<Integer, Node> persistentId2Node = new HashMap<>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -199,6 +178,13 @@ public class IntermediateProofReplayer {
                     currNode.getNodeInfo().setScriptRuleApplication(
                         currInterm.isScriptRuleApplication());
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
+
+                    int persistentId = currInterm.getPersistentNodeId();
+                    if (persistentId != -1) {
+                        currNode.getNodeInfo().setPersistentNodeId(persistentId);
+                        // register the node in the map to find it easier later on
+                        persistentId2Node.put(persistentId, currNode);
+                    }
 
                     // Register name proposals
                     proof.getServices().getNameRecorder().setProposals(
@@ -344,6 +330,13 @@ public class IntermediateProofReplayer {
                                         appInterm.getPosInfo().first,
                                         appInterm.getPosInfo().second),
                                     currNodeInterm));
+                        } else if (appInterm instanceof CloseByReferenceAppIntermediate) {
+                            CloseByReferenceAppIntermediate cbrApp =
+                                (CloseByReferenceAppIntermediate) appInterm;
+                            // we need to store the CloseByReference pairs(node,id) and replay
+                            // them later, since the node with the id to close could be not
+                            // closed currently
+                            closeByRefPairs.add(new Pair<>(currNode, cbrApp));
                         } else {
                             try {
                                 IBuiltInRuleApp app = constructBuiltinApp(
@@ -394,6 +387,35 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
+        }
+
+        // now we can replay the CloseByReferenceRules, since we know that all referenced nodes are
+        // closed now
+
+        // needs to be sorted ascending, since ClosedByReferenceRule applications may be chained
+        // TODO: relies on ascending order of persistent node ids
+        closeByRefPairs.sort(Comparator.comparingInt(p -> p.second.getPartnerId()));
+
+        for (Pair<Node, CloseByReferenceAppIntermediate> pair : closeByRefPairs) {
+            Node toClose = pair.first;
+            Goal g = toClose.proof().getGoal(toClose);
+            CloseByReferenceAppIntermediate cbrAppInterm = pair.second;
+            try {
+                IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(cbrAppInterm, g);
+                Node partner = persistentId2Node.get(cbrAppInterm.getPartnerId());
+                int referencePartnerId = cbrAppInterm.getPartnerId();
+
+                ((CloseByReferenceRule.CloseByReferenceRuleApp)builtInRuleApp).setPartner(partner);
+
+                assert builtInRuleApp.complete();
+
+                g.apply(builtInRuleApp);
+                assert toClose.isClosed();
+
+            } catch (SkipSMTRuleException | BuiltInConstructionException e) {
+                e.printStackTrace();
+            }
+
         }
 
         return new Result(status, errors, currGoal);
@@ -545,8 +567,14 @@ public class IntermediateProofReplayer {
             throws SkipSMTRuleException, BuiltInConstructionException {
 
         final String ruleName = currInterm.getRuleName();
-        final int currFormula = currInterm.getPosInfo().first;
-        final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
+        int currFormula = 0;
+        PosInTerm currPosInTerm = null;
+        if (currInterm.getPosInfo() != null) {
+            // this is the case for rules that are applied top-level at the sequent,
+            // e.g. CloseByReference
+            currFormula = currInterm.getPosInfo().first;
+            currPosInTerm = currInterm.getPosInfo().second;
+        }
 
         Contract currContract = null;
         ImmutableList<PosInOccurrence> builtinIfInsts = null;

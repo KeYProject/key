@@ -83,6 +83,9 @@ public final class CloseByReferenceRule implements BuiltInRule {
         final ImmutableList<Goal> result = goal.split(1);
         final Goal resultGoal = result.head();
 
+        /* for saving/loading we ensure that the partner has a unique persistent serial number,
+         * however, in the GUI we show the non-persistent serialNr */
+        partnerNode.getNodeInfo().requestPersistentNodeId();
         resultGoal.setBranchLabel("Closed by reference to node " + partnerNode.serialNr());
 
         Proof proof = goal.proof();
@@ -101,6 +104,7 @@ public final class CloseByReferenceRule implements BuiltInRule {
                         proof.removeProofTreeListener(this);
                     }
                 }
+                // TODO: some listeners may be invalid and still present ...
             }
         });
 

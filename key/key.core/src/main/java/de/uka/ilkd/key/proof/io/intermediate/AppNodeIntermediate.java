@@ -17,6 +17,16 @@ public class AppNodeIntermediate extends NodeIntermediate {
     /** user-provided notes for the node */
     private String notes = null;
 
+    private int persistentNodeId = -1;
+
+    public int getPersistentNodeId() {
+        return persistentNodeId;
+    }
+
+    public void setPersistentNodeId(int persistentNodeId) {
+        this.persistentNodeId = persistentNodeId;
+    }
+
     public AppIntermediate getIntermediateRuleApp() {
         return ruleApp;
     }
