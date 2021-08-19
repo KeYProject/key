@@ -57,6 +57,9 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
  */
 public class NodeInfo {
 
+    /** counter name for persistent node ids */
+    private static final String PERSISTENT_NODE_ID = "persistent_node_id";
+
     private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
 
     /** firstStatement stripped of method frames */
@@ -84,8 +87,6 @@ public class NodeInfo {
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
-    private static final String PERSISTENT_NODE_ID = "persistent_node_id";
-
     /** A proof-wide unique id that is saved in .proof files and thus guaranteed to be the same
      * after re-loading the proof. This id is issued in a lazy approach only to those nodes that
      * need one. */
@@ -109,6 +110,11 @@ public class NodeInfo {
         return persistentNodeId;
     }
 
+    /**
+     * Sets the persistent id and makes sure that the next call to the corresponding counter gets a
+     * larger id number.
+     * @param persistentNodeId the id to set for this node
+     */
     public void setPersistentNodeId(int persistentNodeId) {
         this.persistentNodeId = persistentNodeId;
         // ensure that the next number of counter is greater than the id used here
