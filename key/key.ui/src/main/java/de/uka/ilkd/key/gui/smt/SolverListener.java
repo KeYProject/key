@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -112,12 +111,12 @@ public class SolverListener implements SolverLauncherListener {
                 public SMTProblem getProblem() {
                         return problem;
                 }
-                
+
                 private void addInformation(String title, String content){
                         information.add(new Information(title, content, solver.name()));
                 }
-                
-                public boolean createInformation(){
+
+                public void createInformation(){
                         if (solver.getException() != null) {
 
                                 StringWriter writer = new StringWriter();
@@ -128,8 +127,8 @@ public class SolverListener implements SolverLauncherListener {
                                                 .toString()
                                                 + "\n\n"
                                                 + writer
-                                                                .toString());     
-                                
+                                                                .toString());
+
 
                         }
                         addInformation("Solver Input", solver.getRawSolverInput());
@@ -157,14 +156,15 @@ public class SolverListener implements SolverLauncherListener {
                                 }
                                 addInformation("Warning", exceptionText);
                         }
-                        return solver.getException() != null;
-                }
-                
-                public SMTSolver getSolver() {
-                        return solver;
+
+                    if (solver.getType().supportHasBeenChecked() && !solver.getType().isSupportedVersion()) {
+                        addInformation("Solver Support", computeSolverTypeWarningMessage(solver.getType()));
+                    }
+
+                    solver.getException();
                 }
 
-                public LinkedList<Information> getInformation() {
+            public LinkedList<Information> getInformation() {
                         return information;
                 }
 
@@ -204,37 +204,23 @@ public class SolverListener implements SolverLauncherListener {
 
         @Override
         public void launcherStopped(SolverLauncher launcher,
-                        Collection<SMTSolver> problemSolvers) {
-                timer.cancel();
-                
-  
-                storeInformation();
-                List<InternSMTProblem> problemsWithException = new LinkedList<InternSMTProblem>();
-                progressModel.setEditable(true);
-                refreshDialog();
-                progressDialog.setModus(Modus.discardModus);
-                for (InternSMTProblem problem : problems) {
-                        if(problem.createInformation()){
-                                problemsWithException.add(problem);
-                        }
+                                    Collection<SMTSolver> problemSolvers) {
+            timer.cancel();
 
-                }
-                if (!problemsWithException.isEmpty()) {
-                	 for(InternSMTProblem problem : problemsWithException){
-                		progressDialog.addInformation(createExceptionTitle(problem), Color.RED,problem);
-                	 }
-                } else {
-                        if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
-                                applyEvent(launcher);
-                        }
-                }
-        }
-        
-        public static String createExceptionTitle(InternSMTProblem problem) {
-           return "Exception for "+problem.toString()+".";
+
+            storeInformation();
+            progressModel.setEditable(true);
+            refreshDialog();
+            progressDialog.setModus(Modus.discardModus);
+            for (InternSMTProblem problem : problems) {
+               problem.createInformation();
+            }
+            if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
+                applyEvent(launcher);
+            }
         }
 
-        private String getTitle(SMTProblem p) {
+    private String getTitle(SMTProblem p) {
                 String title = "";
                 Iterator<SMTSolver> it = p.getSolvers().iterator();
                 while (it.hasNext()) {
@@ -294,44 +280,25 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                boolean problemContainsModalityOrQuery = false;
-                String names[] = new String[smtproblems.size()]; //never read
-                int x = 0,y=0;
-                for (SMTProblem problem : smtproblems) {
-                        y = 0;
-                        for (SMTSolver solver : problem.getSolvers()) {
-                                this.problems.add(new InternSMTProblem(x, y,
-                                                problem, solver));
-                                y++;
-                        }
-                        names[x] = problem.getName();
-                        x++;
-                        if (containsModalityOrQuery(problem.getTerm())) {
-                            problemContainsModalityOrQuery = true;
-                        }
+            int x = 0, y = 0;
+            for (SMTProblem problem : smtproblems) {
+                y = 0;
+                for (SMTSolver solver : problem.getSolvers()) {
+                    this.problems.add(new InternSMTProblem(x, y,
+                            problem, solver));
+                    y++;
                 }
+                x++;
+            }
 
-       
-                
+
+
                 boolean ce = solverTypes.contains(SolverType.Z3_CE_SOLVER);
-                
-                    
+
+
 
                 progressDialog = new ProgressDialog(
                                 progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
-
-                for(SolverType type : solverTypes){
-                	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
-                		addWarning(type);
-                	}
-                }
-
-                if (problemContainsModalityOrQuery) {
-                    progressDialog.addInformation("One or more proof goals contain method calls" +
-                            " and/or modalities. The SMT translation of these will be incomplete," +
-                                    " and the result will likely be unhelpful.",
-                            new Color(200,150,0), null);
-                }
          
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -475,7 +442,7 @@ public class SolverListener implements SolverLauncherListener {
                         unsuccessfullyStopped(problem,x,y);
                 } else {
                  
-                        unknownStopped(problem,x,y);
+                        unknownStopped(x,y);
                 }
            
         }
@@ -538,7 +505,7 @@ public class SolverListener implements SolverLauncherListener {
             }
         }
 
-        private void unknownStopped(InternSMTProblem problem, int x, int y) {
+        private void unknownStopped(int x, int y) {
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(Color.BLUE,x,y);
                 progressModel.setText("Unknown.",x,y);
@@ -622,14 +589,6 @@ public class SolverListener implements SolverLauncherListener {
                 return path;
         }
 
-		
-		public void addWarning(SolverType type) {
-			progressDialog.addInformation(computeSolverTypeWarningTitle(type), Color.ORANGE, computeSolverTypeWarningMessage(type));			
-		}
-		
-		public static String computeSolverTypeWarningTitle(SolverType type) {
-		   return "Warning: Your version of "+type.toString()+" may not be supported by KeY.";
-		}
 		
       public static String computeSolverTypeWarningMessage(SolverType type) {
          StringBuffer message = new StringBuffer();
