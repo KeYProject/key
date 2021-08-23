@@ -23,12 +23,14 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofUserManager;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link SideProofStore}
  * @author Martin Hentschel
  */
-public class TestSideProofStore extends TestCase {
+public class TestSideProofStore {
    /**
     * Tests the proof management and thrown events:
     * <ul>
@@ -43,7 +45,7 @@ public class TestSideProofStore extends TestCase {
     * </ul>
     */
    @SuppressWarnings("unchecked")
-   public void testProofManagement() {
+   @Test public void testProofManagement() {
       LoggingProofStoreListener listener = new LoggingProofStoreListener();
       try {
          SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
@@ -202,7 +204,7 @@ public class TestSideProofStore extends TestCase {
     * {@link SideProofStore#setEnabled(boolean)} together with the thrown events
     * and the event management.
     */
-   public void testEnabledState() {
+   @Test public void testEnabledState() {
       LoggingPropertyChangeListener listener = new LoggingPropertyChangeListener();
       boolean originalEnabled = SideProofStore.DEFAULT_INSTANCE.isEnabled();
       try {

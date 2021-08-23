@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -275,12 +276,14 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                         services);
         final Term[] preconditions = createPreconditions(contract, instantiation.self, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
+        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
         final Term frameCondition
                 = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
+        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
                 variables, modifiesClauses, services);
 
@@ -292,11 +295,14 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                         updates[0], updates[1], localOutVariables, configurator, services);
 
         configurator.setUpPreconditionGoal(result.tail().head(), contextUpdate, preconditions);
-        configurator.setUpUsageGoal(result.head(), updates, assumptions);
+        configurator.setUpUsageGoal(
+                result.head(), updates,
+                ArrayUtil.add(assumptions, freePostcondition));
 
         final boolean isInfFlow = InfFlowCheckInfo.isInfFlow(goal);
         setUpValidityGoal(result, isInfFlow, contract, application, instantiation, heaps,
-                anonymisationHeaps, localInVariables, localOutVariables, variables, preconditions,
+                anonymisationHeaps, localInVariables, localOutVariables, variables,
+                ArrayUtil.add(preconditions, freePrecondition),
                 assumptions, frameCondition, updates, configurator, conditionsAndClausesBuilder,
                 services);
         return result;

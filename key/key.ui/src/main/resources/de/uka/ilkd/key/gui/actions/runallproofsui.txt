@@ -1,0 +1,12 @@
+# This file contains *.key files for be loaded with RunAllProofsAction
+# in key.ui. You can use '#' for comments.
+#
+# Relative filenames are considered to be relative to the EXAMPLES_DIR.
+# Absolute filenames are just absolute.
+firstTouch/01-Agatha/project.key
+firstTouch/02-Subset/project.key
+firstTouch/05-ReverseArray/reverseArray.key
+firstTouch/06-BinarySearch/project.key
+firstTouch/07-Cell/project.key
+firstTouch/08-Java5/project.key
+firstTouch/09-Quicktour/project.key

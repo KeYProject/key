@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.strategy;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
@@ -7,8 +10,6 @@ import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *
@@ -88,6 +89,25 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "This rule is easier to comprehend than the traditional rule in "
             + "the presence of<br/>"
             + "potentially exceptional program behavior.</p>"
+            + "</html>";
+    public static final String TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET
+            = "<html>"
+            + "Use the loop scope-based invariant taclet, i.e. not the built-in rules.<br>"
+            + "Three properties have to be shown:<br>"
+            + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
+            + "loop guard and loop body (initially valid).</li>"
+            + "<li>If the invariant was valid at the start of the loop, it holds <br>"
+            + "after arbitrarily many loop iterations (body preserves invariant).</li>"
+            + "<li>Invariant holds after the loop terminates (use case).</li>"
+            + "</ul>"
+            + "<p>The last two are combined into a single goal or split into two<br>"
+            + "goals based on the 'javaLoopTreatment' strategy option.</p>"
+            + "</html>";
+    public static final String TOOL_TIP_LOOP_SCOPE_EXPAND
+            = "<html>"
+            + "Unroll loop body, but with the loop scope technology.<br>"
+            + "This requires less program transformation for irregular<br>"
+            + "termination behavior."
             + "</html>";
     public static final String TOOL_TIP_LOOP_EXPAND = "<html>"
             + "Unroll loop body." + "</html>";
@@ -342,14 +362,23 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         StrategyProperties.LOOP_OPTIONS_KEY,
                         "Loop treatment",
                         2,
+                        /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
+                         * since we now have the loop scope taclets which are based on the
+                         * same theory, but offer several advantages. */
+                        // new StrategyPropertyValueDefinition(
+                        //         StrategyProperties.LOOP_SCOPE_INVARIANT,
+                        //         "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.LOOP_SCOPE_INVARIANT,
-                                "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
+                                StrategyProperties.LOOP_SCOPE_INV_TACLET,
+                                "Invariant (Loop Scope)", TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET),
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.LOOP_SCOPE_EXPAND,
+                                "Expand (Loop Scope)", TOOL_TIP_LOOP_SCOPE_EXPAND),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_INVARIANT,
-                                "Invariant", TOOL_TIP_LOOP_INVARIANT),
+                                "Invariant (Transformation)", TOOL_TIP_LOOP_INVARIANT),
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.LOOP_EXPAND, "Expand",
+                                StrategyProperties.LOOP_EXPAND, "Expand (Transformation)",
                                 TOOL_TIP_LOOP_EXPAND),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_NONE, "None",

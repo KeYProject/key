@@ -42,7 +42,8 @@ public final class ArrayComponentTypeCondition
      * or primitive component type depending on the value of
      *  <code>checkReferenceType</code>
      * @param var the SchemaVariable to be checked
-     * @param checkReferenceType the boolean flag which when is set (<tt>true</tt>) 
+     * @param checkReferenceType the boolean flag which when is set (<tt>true</tt>)
+	 *                           FIXME weigl: this is not true! checkReferenceType is just the negated flag.
      * checks for reference otherwise for primitive type
      */
     public ArrayComponentTypeCondition(SchemaVariable var, 

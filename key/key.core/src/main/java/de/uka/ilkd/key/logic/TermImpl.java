@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * The currently only class implementing the Term interface. TermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl implements Term {
+public class TermImpl implements Term {
 
     /**
      * A static empty list of terms used for memory reasons.
@@ -146,11 +147,13 @@ class TermImpl implements Term {
      * TermCreationException is thrown.
      */
     public Term checked() {
-        if (op.validTopLevel(this)) {
+        op.validTopLevelException(this);
+        return this;
+        /*if (op.validTopLevel(this)) {
             return this;
         } else {
             throw new TermCreationException(op, this);
-        }
+        }*/
     }
 
     @Override
@@ -520,12 +523,11 @@ class TermImpl implements Term {
         final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op)
-                && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
                 && javaBlock.equals(t.javaBlock))) {
             return false;
         }
-
+        
         Term other = (Term) o;
 
         for (TermLabel label : getLabels()) {
@@ -538,6 +540,12 @@ class TermImpl implements Term {
             if (label.isProofRelevant() && !getLabels().contains(label)) {
                 return false;
             }
+        }
+
+        for (int i = 0; i < subs.size(); ++i) {
+        	if (!subs.get(i).equalsModIrrelevantTermLabels(t.subs.get(i))) {
+        		return false;
+        	}
         }
 
         return true;
@@ -662,5 +670,16 @@ class TermImpl implements Term {
             this.containsJavaBlockRecursive = result;
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    private String origin;
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 }

@@ -20,6 +20,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 
+import javax.annotation.Nullable;
+
 
 /**
  * Common superinterface of all constructs created by the specification
@@ -40,7 +42,7 @@ public interface SpecificationElement {
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    public VisibilityModifier getVisibility();
+    public @Nullable VisibilityModifier getVisibility();
 
 
     /**

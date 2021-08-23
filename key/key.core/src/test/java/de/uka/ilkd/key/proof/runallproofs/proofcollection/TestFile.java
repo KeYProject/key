@@ -325,4 +325,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       return settings;
    }
 
+    public TestProperty getTestProperty() {
+        return testProperty;
+    }
 }

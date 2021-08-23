@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.proofdiff;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
@@ -10,16 +11,20 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import de.uka.ilkd.key.proof.Proof;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -30,27 +35,29 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     public static final String PROPERTY_LEFT_NODE = "left";
     public static final String PROPERTY_RIGHT_NODE = "right";
     private static final String EDITOR_TYPE = "plain/text";
+    private final JPanel contentPanel;
     private final KeyAction actionHideCommonFormulas = new HideCommandFormulaAction();
     private final Services services;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    //private final JSplitPane rootPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-    private Box rootPanel = new Box(BoxLayout.Y_AXIS);
+    private final DefaultComboBoxModel<Proof> listModelLeft = new DefaultComboBoxModel<>(),
+            listModelRight = new DefaultComboBoxModel<>();
+    private final KeYMediator mediator;
     private Node left, right;
 
-    public ProofDifferenceView(@NotNull Node left, @NotNull Node right, Services services) {
+    private JComboBox<Proof> listLeftProof = new JComboBox<>(), listRightProof = new JComboBox<>();
+
+    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator) {
         super(NullMultipleCDockableFactory.NULL);
-        this.services = services;
+        this.mediator = mediator;
+        this.services = mediator.getServices();
         setCloseable(true);
         setRemoveOnClose(true);
         addAction(HelpFacade.createHelpButton("Using%20Key/NodeDiff"));
 
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         getContentPane().setLayout(new BorderLayout());
-
-        /*rootPanel.setOneTouchExpandable(true);
-        rootPanel.setDividerSize(10);
-        rootPanel.setLeftComponent(new JLabel("left"));
-        rootPanel.setRightComponent(new JLabel("right"));*/
-        getContentPane().add(rootPanel, BorderLayout.CENTER);
+        add(new JScrollPane(contentPanel));
 
         JPanel pNorth = new JPanel(new FlowLayout(FlowLayout.CENTER));
         Box pNorthLeft = new Box(BoxLayout.Y_AXIS);
@@ -60,13 +67,17 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         JTextField txtLeftNode = new JTextField();
         JTextField txtRightNode = new JTextField();
         pNorthLeft.add(lblLeftNode);
+        pNorthLeft.add(listLeftProof);
         pNorthLeft.add(txtLeftNode);
         pNorthRight.add(lblRightNode);
+        pNorthRight.add(listRightProof);
         pNorthRight.add(txtRightNode);
         //txtLeftNode.setEditable(false);
         //txtRightNode.setEditable(false);
-        txtRightNode.addActionListener(e -> setRight(findNode(txtRightNode.getText())));
-        txtLeftNode.addActionListener(e -> setLeft(findNode(txtLeftNode.getText())));
+        txtRightNode.addActionListener(e -> setRight(findNode(listRightProof, txtRightNode)));
+        txtLeftNode.addActionListener(e -> setLeft(findNode(listLeftProof, txtLeftNode)));
+        listRightProof.addActionListener(e -> setRight(findNode(listRightProof, txtRightNode)));
+        listLeftProof.addActionListener(e -> setLeft(findNode(listLeftProof, txtLeftNode)));
 
         pNorth.add(pNorthLeft);
         pNorth.add(new JSeparator(JSeparator.VERTICAL));
@@ -75,8 +86,38 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         txtLeftNode.setText(String.valueOf(left.serialNr()));
         txtRightNode.setText(String.valueOf(right.serialNr()));
 
+        listLeftProof.setModel(listModelLeft);
+        listRightProof.setModel(listModelRight);
+        mediator.getCurrentlyOpenedProofs().addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                transferProofs();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                transferProofs();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                transferProofs();
+            }
+        });
+        transferProofs();
+        ListCellRenderer<? super Proof> renderer = new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return super.getListCellRendererComponent(list, ((Proof) value).name(), index, isSelected, cellHasFocus);
+            }
+        };
+        listRightProof.setRenderer(renderer);
+        listLeftProof.setRenderer(renderer);
+        listRightProof.setSelectedItem(right.proof());
+        listLeftProof.setSelectedItem(left.proof());
+
         addPropertyChangeListener(evt -> {
-            rootPanel.removeAll();
+            contentPanel.removeAll();
             if (this.left != null && this.right != null) {
                 computeDifferences();
                 setTitleText("Difference between: " + left.serialNr() + " and " + right.serialNr());
@@ -103,10 +144,12 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         txtL.setPreferredSize(max);
     }
 
-    private Node findNode(String text) {
+    private Node findNode(JComboBox<Proof> box, JTextField text) {
         try {
-            int serialNr = Integer.parseInt(text);
-            return left.proof().findAny(n -> n.serialNr() == serialNr);
+            int serialNr = Integer.parseInt(text.getText());
+            Proof proof = (Proof) box.getSelectedItem();
+            if (proof == null) return null;
+            return proof.findAny(n -> n.serialNr() == serialNr);
         } catch (NumberFormatException e) {
 
         }
@@ -129,7 +172,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         return services;
     }
 
-    @NotNull
+    @Nonnull
     public Node getLeft() {
         return left;
     }
@@ -141,7 +184,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
     }
 
-    @NotNull
+    @Nonnull
     public Node getRight() {
         return right;
     }
@@ -154,14 +197,14 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     private void computeDifferences() {
-        rootPanel.removeAll();
-
+        contentPanel.removeAll();
         ProofDifference pd = ProofDifference.create(services, left, right);
-        rootPanel.add(
-                fill("Antecedent Differences", pd.getAntecPairs()));
-
-        rootPanel.add(
-                fill("Succedent Differences", pd.getSuccPairs()));
+        fill("Antecedent Differences", pd.getAntecPairs());
+        /*JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+        sep.setForeground(Color.BLACK);
+        sep.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        contentPanel.add(sep);*/
+        fill("Succedent Differences", pd.getSuccPairs());
 
         getContentPane().invalidate();
         getContentPane().revalidate();
@@ -170,10 +213,11 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         getContentPane().repaint();
     }
 
-    private JComponent fill(String title, List<ProofDifference.Matching> pairs) {
+    private void fill(String title, List<ProofDifference.Matching> pairs) {
         Box pane = new Box(BoxLayout.Y_AXIS);
         pane.setBorder(BorderFactory.createTitledBorder(title));
-
+        if (!pairs.isEmpty())
+            contentPanel.add(pane);
         for (ProofDifference.Matching pair : pairs) {
             // hideCommonFormulas --> distance != 0
             if (!isHideCommonFormulas() || pair.distance > 0) { // skip formulas that have no differences
@@ -190,16 +234,11 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
                 pane.add(new JSeparator(JSeparator.HORIZONTAL));
                 //txtL.setRows(3);
                 //txtR.setRows(3);
-                //rootPanel.add(txtL, cc);
-                //rootPanel.add(txtR, cc);
+                //contentPanel.add(txtL, cc);
+                //contentPanel.add(txtR, cc);
                 //hightlightDifferences(txtL, txtR);
             }
         }
-
-        if (pane.getComponentCount() == 0)
-            pane.add(new JLabel("No differences found"));
-
-        return new JScrollPane(pane);
     }
 
     protected JEditorPane createEditor(String content) {
@@ -210,11 +249,11 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         JPanel textAreaPanel = new JPanel(new BorderLayout());
         textAreaPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         textAreaPanel.add(je);
-        //rootPanel.add(textAreaPanel, new CC().sizeGroup("abc", "abc"));
+        //contentPanel.add(textAreaPanel, new CC().sizeGroup("abc", "abc"));
         return je;
     }
 
-    private void hightlightDifferences(JEditorPane txtL, JEditorPane txtR) {
+    private void highlightDifferences(JEditorPane txtL, JEditorPane txtR) {
         DefaultHighlighter df1 = new DefaultHighlighter();
         txtL.setHighlighter(df1);
         DefaultHighlighter df2 = new DefaultHighlighter();
@@ -245,6 +284,24 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         this.actionHideCommonFormulas.setEnabled(hideCommonFormulas);
     }
 
+    private void transferProofs() {
+        listModelLeft.removeAllElements();
+        listModelRight.removeAllElements();
+        Enumeration<Proof> iter = mediator.getCurrentlyOpenedProofs().elements();
+        while (iter.hasMoreElements()) {
+            Proof proof = iter.nextElement();
+            listModelLeft.addElement(proof);
+            listModelRight.addElement(proof);
+        }
+    }
+
+    /*private Component wrapScrollable(JComponent component, String title) {
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.add(component);
+        titlePanel.setBorder(BorderFactory.createTitledBorder(title));
+        return new JScrollPane(titlePanel);
+    }*/
+
     static class MyPanel extends JPanel implements Scrollable {
         private static final long serialVersionUID = -3046025680639399997L;
 
@@ -273,22 +330,12 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         }
     }
 
-    /*private Component wrapScrollable(JComponent component, String title) {
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.add(component);
-        titlePanel.setBorder(BorderFactory.createTitledBorder(title));
-        return new JScrollPane(titlePanel);
-    }*/
-
     public static class OpenDifferenceWithParent extends MainWindowAction {
-
-        private static final long serialVersionUID = -7820466004457781393L;
-
         private Node left;
 
         public OpenDifferenceWithParent(MainWindow mainWindow, Node node) {
             super(mainWindow);
-            setName("Diff with Parent");
+            setName("Diff with parent");
             setEnabled(node.parent() != null);
             this.left = node;
         }
@@ -296,7 +343,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         @Override
         public void actionPerformed(ActionEvent e) {
             ProofDifferenceView pdv = new ProofDifferenceView(left, left.parent(),
-                    mainWindow.getMediator().getServices());
+                    mainWindow.getMediator());
             mainWindow.getDockControl().addDockable(pdv);
             pdv.setLocation(CLocation.base());
             pdv.setVisible(true);

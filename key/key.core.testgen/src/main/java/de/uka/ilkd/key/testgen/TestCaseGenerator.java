@@ -180,9 +180,8 @@ public class TestCaseGenerator {
 
     public TestCaseGenerator(Proof proof, boolean rflAsInternalClass) {
         super();
-        this.rflAsInternalClass = rflAsInternalClass; 
-        final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTestGenerationSettings();
+        this.rflAsInternalClass = rflAsInternalClass;
+        final TestGenerationSettings settings = TestGenerationSettings.getInstance();
         services = proof.getServices();
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();

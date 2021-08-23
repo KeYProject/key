@@ -889,6 +889,21 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
+         * @return the contract's free precondition.
+         */
+        public Term buildFreePrecondition() {
+            Term result = tt();
+
+            for (LocationVariable heap : heaps) {
+                result = and(result,
+                        contract.getFreePrecondition(heap, getBaseHeap(), terms, services));
+            }
+
+            return result;
+        }
+
+        /**
+         *
          * @return the condition that all heaps are well-formed.
          */
         public Term buildWellFormedHeapsCondition() {
@@ -984,6 +999,19 @@ public final class AuxiliaryContractBuilders {
             for (LocationVariable heap : heaps) {
                 result = and(result,
                         contract.getPostcondition(heap, getBaseHeap(), terms, services));
+            }
+            return result;
+        }
+
+        /**
+         *
+         * @return the contract's postcondition.
+         */
+        public Term buildFreePostcondition() {
+            Term result = tt();
+            for (LocationVariable heap : heaps) {
+                result = and(result,
+                        contract.getFreePostcondition(heap, getBaseHeap(), terms, services));
             }
             return result;
         }

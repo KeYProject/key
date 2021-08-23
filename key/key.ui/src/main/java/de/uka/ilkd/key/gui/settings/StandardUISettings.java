@@ -23,6 +23,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
+    private final JCheckBox chkShowLoadExamplesDialog;
     private final JCheckBox chkShowWholeTacletCB;
     private final JCheckBox chkShowUninstantiatedTaclet;
     private final JCheckBox chkRightClickMacros;
@@ -35,8 +36,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkMinimizeInteraction;
     private final JComboBox<String> spFontSizeTreeSequent;
     private final JCheckBox chkEnsureSourceConsistency;
-    private final JTextField txtClutterRules;
-    private final JTextField txtClutterRuleSets;
+    private final JTextArea txtClutterRules;
+    private final JTextArea txtClutterRuleSets;
 
     public StandardUISettings() {
         setHeaderText(getDescription());
@@ -57,17 +58,21 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         txtMaxTooltipLines = addNumberField("Maximum line number for tooltips",
                 1, 100, 5, info, emptyValidator());
 
+
+        chkShowLoadExamplesDialog =
+                addCheckBox("Show load examples dialog", "Show the load example dialog on startup", true, emptyValidator());
+
         chkShowWholeTacletCB =
                 addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
-                            "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
+                        "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
 
         chkShowUninstantiatedTaclet =
                 addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
-                            false, emptyValidator());
+                        false, emptyValidator());
 
-        txtClutterRules = addTextField("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
-        txtClutterRuleSets =
-                addTextField("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
+            txtClutterRules = addTextArea("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
+
+        txtClutterRuleSets = addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
@@ -96,11 +101,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         GeneralSettings generalSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
 
-        txtClutterRules.setText(vs.clutterRules().value());
-        txtClutterRuleSets.setText(vs.clutterRuleSets().value());
+        txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
+        txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
         spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
         txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
+        chkShowLoadExamplesDialog.setSelected(vs.getShowLoadExamplesDialog());
         chkShowWholeTacletCB.setSelected(vs.getShowWholeTaclet());
         chkShowUninstantiatedTaclet.setSelected(vs.getShowUninstantiatedTaclet());
         chkHidePackagePrefix.setSelected(vs.isHidePackagePrefix());
@@ -130,10 +136,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().set(txtClutterRules.getText());
-        vs.clutterRuleSets().set(txtClutterRuleSets.getText());
+        vs.clutterRules().set(txtClutterRules.getText().replace('\n',','));
+        vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n',','));
 
-
+        vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());
         vs.setShowUninstantiatedTaclet(chkShowUninstantiatedTaclet.isSelected());
         vs.setHidePackagePrefix(chkHidePackagePrefix.isSelected());

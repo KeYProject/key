@@ -52,12 +52,11 @@ public final class Location {
      * @param line line of the Location
      * @param column column of the Location
      * @throws MalformedURLException if the given string is null or can not be parsed to URL
+     * @deprecated Use {@link #Location(URL, int, int)} instead.
      */
     @Deprecated
     public Location(String filename, int line, int column) throws MalformedURLException {
-        this.fileUrl = MiscTools.parseURL(filename);
-        this.line = line;
-        this.column = column;
+        this(filename == null ? null : MiscTools.parseURL(filename), line, column);
     }
 
     /**

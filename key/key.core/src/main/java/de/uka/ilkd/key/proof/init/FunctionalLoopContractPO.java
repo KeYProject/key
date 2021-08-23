@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -205,6 +206,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term[] assumptions = createAssumptions(selfVar, heaps, wellFormedHeapsCondition,
                 services, conditionsAndClausesBuilder);
+        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
         final Term[] postconditionsNext = createPostconditionsNext(selfTerm, heaps, nextVariables,
@@ -217,7 +219,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 = createGoalConfigurator(selfVar, selfTerm, variables, services, tb);
 
         Term validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
-                modifiesClauses, assumptions, decreasesCheck, postconditions, postconditionsNext,
+                modifiesClauses,
+                ArrayUtil.add(assumptions, freePrecondition),
+                decreasesCheck, postconditions, postconditionsNext,
                 wellFormedHeapsCondition, configurator, conditionsAndClausesBuilder, services, tb);
 
         assignPOTerms(validity);

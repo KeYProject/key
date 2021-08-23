@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -29,6 +30,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
+import static org.junit.Assert.*;
 
 /**
  * This test class makes sure that parallel site proofs are working. It is only
@@ -65,7 +68,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests parallel site proofs on a proof reconstructed from a *.proof file.
     */
-   public void testProofFile() throws ProofInputException, IOException, ProblemLoaderException {
+   @Test public void testProofFile() throws ProofInputException, IOException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution

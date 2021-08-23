@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collection;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -69,7 +70,7 @@ public class Includes {
     public RuleSource get(String name){
 	return name2Source.get(name);
     }
-    
+
     public List<File> getFiles() {
     	return files;
     }
@@ -100,5 +101,9 @@ public class Includes {
 	includes.addAll(in.includes);
 	ldtIncludes.addAll(in.ldtIncludes);
 	name2Source.putAll(in.name2Source);
+    }
+
+    public Collection<RuleSource> getRuleSets() {
+        return name2Source.values();
     }
 }

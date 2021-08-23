@@ -77,27 +77,29 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * Prefix fails.
      */
     @SuppressWarnings("unchecked")
-    public T getRewriteTaclet(){
-	if (find==null) {
-	    throw new TacletBuilderException(this, "No find part specified");
+	public T getRewriteTaclet(){
+		if (find==null) {
+			throw new TacletBuilderException(this, "No find part specified");
+		}
+		checkBoundInIfAndFind();
+		TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
+		prefixBuilder.build();
+		RewriteTaclet t = new RewriteTaclet(name,
+				new TacletApplPart(ifseq,
+						varsNew,
+						varsNotFreeIn,
+						varsNewDependingOn,
+						variableConditions),
+				goals, ruleSets,
+				attrs,
+				find,
+				prefixBuilder.getPrefixMap(),
+				applicationRestriction,
+				choices,
+				surviveSmbExec, tacletAnnotations);
+		t.setOrigin(origin);
+		return (T) t;
 	}
-	checkBoundInIfAndFind();
-	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
-	prefixBuilder.build();
-	return (T) new RewriteTaclet(name, 
-				 new TacletApplPart(ifseq,
-						    varsNew,
-						    varsNotFreeIn,
-						    varsNewDependingOn,
-						    variableConditions),
-				 goals, ruleSets,
-				 attrs,
-				 find,
-				 prefixBuilder.getPrefixMap(),
-				 applicationRestriction,
-				 choices,
-                 surviveSmbExec, tacletAnnotations);
-    }
 
     /**
      * adds a new goal descriptions to the goal descriptions of the Taclet.

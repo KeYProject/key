@@ -640,12 +640,14 @@ public final class JavaInfo {
             ImmutableList<KeYJavaType> sig,
             KeYJavaType context) {
 
-	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
+        ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
+        ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
+        for(KeYJavaType sup : removed) {
             final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
-	    if(result != null) {
-		return result;
-	    }
-	}
+            if(result != null) {
+                return result;
+            }
+        }
         return getProgramMethod(kjt, methodName, sig, context);
     }
 
@@ -722,7 +724,7 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    private Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException("Program method " + methodName
                     + " in " + className + " not found.");
@@ -1163,7 +1165,7 @@ public final class JavaInfo {
         }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
-        assert hierarchy.head() == type;
+        //weigl: unclear assertion: assert hierarchy.head() == type;
 
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();

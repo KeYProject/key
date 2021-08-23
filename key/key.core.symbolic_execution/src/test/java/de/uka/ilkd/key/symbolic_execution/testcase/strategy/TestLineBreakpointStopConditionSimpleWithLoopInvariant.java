@@ -29,9 +29,11 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class TestLineBreakpointStopConditionSimpleWithLoopInvariant extends AbstractSymbolicExecutionTestCase {
-   public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain=null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain=null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingLocalMain=null;

@@ -290,15 +290,15 @@ public final class QueryAxiom extends ClassAxiom {
         if (!target.isStatic()) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
             tacletBuilder.setIfSequent(ifSeq);
-            tacletBuilder.addVarsNew(selfProgSV, kjt.getJavaType());
+            tacletBuilder.addVarsNew(selfProgSV, kjt);
         }
         for (int i = 0; i < paramSVs.length; i++) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, paramSVs[i]);
             tacletBuilder.addVarsNew(paramProgSVs[i],
-                                     target.getParamType(i).getJavaType());
+                                     target.getParamType(i));
         }
         tacletBuilder.addVarsNew(resultProgSV,
-                                 target.getReturnType().getJavaType());
+                                 target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(addedSeq,

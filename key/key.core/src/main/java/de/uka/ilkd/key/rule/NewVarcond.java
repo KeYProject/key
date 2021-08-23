@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -23,9 +23,9 @@ public class NewVarcond {
 
     private final SchemaVariable sv;
     private final SchemaVariable peerSV;
-    private final Type type;
+    private final KeYJavaType type;
 
-    
+
     /*
      * @param sv the Schemavariable representing a new variable.
      * @param peerSV a Schemavariable defining the type of the new variable.
@@ -38,8 +38,8 @@ public class NewVarcond {
 	this.type = null;
     }
 
-    
-    public NewVarcond(SchemaVariable sv, Type type) {
+
+    public NewVarcond(SchemaVariable sv, KeYJavaType type) {
 	assert sv != null;
 	assert type != null;
 	this.sv = sv;
@@ -47,38 +47,38 @@ public class NewVarcond {
 	this.type = type;
     }
 
-    
+
     public boolean isDefinedByType() {
 	return peerSV == null;
     }
 
-    
+
     public SchemaVariable getSchemaVariable() {
 	return sv;
     }
-    
+
 
     public SchemaVariable getPeerSchemaVariable() {
 	return peerSV;
     }
-    
 
-    public Type getType() {
+
+    public KeYJavaType getType() {
 	return type;
     }
-    
-    
+
+
     public Object getTypeDefiningObject() {
 	return type != null ? type : peerSV;
     }
 
-    
+
     @Override
     public String toString() {
-	return "\\new(" + sv + ", " 
-	       + (type != null 
-		  ? "" + type 
-	          : "\\typeof(" + peerSV + ")") 
+	return "\\new(" + sv + ", "
+	       + (type != null
+		  ? "" + type
+	          : "\\typeof(" + peerSV + ")")
 	       + ")";
     }
 }

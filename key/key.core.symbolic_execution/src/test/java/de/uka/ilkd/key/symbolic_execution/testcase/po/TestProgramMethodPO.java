@@ -27,6 +27,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link ProgramMethodPO}.
@@ -36,7 +38,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} without precondition.
     */
-   public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass.TheInnerClass",
              "complicatedInnerMethod",
@@ -48,7 +50,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} with precondition.
     */
-   public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass",
              "complicatedMethod",
@@ -60,7 +62,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} without precondition.
     */
-   public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass",
              "complicatedMethod",
@@ -72,7 +74,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code returnMethod} with precondition.
     */
-   public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
@@ -84,7 +86,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code returnMethod} without precondition.
     */
-   public void testReturnMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testReturnMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
@@ -96,7 +98,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code voidMethod} with precondition.
     */
-   public void testVoidMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testVoidMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",
@@ -108,7 +110,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code voidMethod} without precondition.
     */
-   public void testVoidMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testVoidMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",

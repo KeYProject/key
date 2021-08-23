@@ -52,6 +52,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
 
     /**
+     * Show the Load examples dialog window on startup by default
+     */
+    private static final String SHOW_LOAD_EXAMPLES_DIALOG = "[View]ShowLoadExamplesDialog";
+
+    /**
      * do not print the find, varcond and heuristics part of taclets in
      * the TacletMenu by default
      */
@@ -114,6 +119,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String FONT_SIZE_FACTOR = "[View]uiFontSizeFactor";
 
     private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
+
+    /** this setting enables/disables tool tips in the source view */
+    private static final String SOURCE_VIEW_TOOLTIP = "[View]SourceViewTooltips";
 
     private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";
     /**
@@ -180,12 +188,16 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> hidePackagePrefix =
             createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private PropertyEntry<Boolean> showLoadExamplesDialog =
+            createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
     private PropertyEntry<Boolean> showWholeTaclet =
             createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
     private PropertyEntry<Boolean> showSequentViewTooltips =
             createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+    private PropertyEntry<Boolean> showSourceViewTooltips =
+            createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
     private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
     private PropertyEntry<Set<String>> clutterRules =
             createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
@@ -239,6 +251,24 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setMaxTooltipLines(int b) {
         maxTooltipLines.set(b);
+    }
+
+    /**
+     * returns whether the "load examples" dialog should be shown on startup
+     *
+     * @return true iff "Load Examples" dialog should be shown
+     */
+    public boolean getShowLoadExamplesDialog() {
+        return showLoadExamplesDialog.get();
+    }
+
+    /**
+     * Sets whether the "Load Examples" dialog window should be shown on startup
+     *
+     * @param b indicates whether the "Load Examples" dialog window should be shown on startup or not
+     */
+    public void setShowLoadExamplesDialog(boolean b) {
+        showLoadExamplesDialog.set(b);
     }
 
     /**
@@ -486,6 +516,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     public void setShowSequentViewTooltips(boolean showSequentViewTooltips) {
         this.showSequentViewTooltips.set(showSequentViewTooltips);
+    }
+
+    public boolean isShowSourceViewTooltips() {
+        return showSourceViewTooltips.get();
+    }
+
+    public void setShowSourceViewTooltips(boolean showSourceViewTooltips) {
+        this.showSourceViewTooltips.set(showSourceViewTooltips);
     }
 
     public double getUIFontSizeFactor() {

@@ -9,6 +9,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests the conditional values provided by {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
@@ -19,7 +21,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     * Compares the conditional values on the {@code Number} example.
     * @throws Exception Occurred Exception.
     */
-   public void testVariablesUnderMethodReturnCondition() throws Exception {
+   @Test public void testVariablesUnderMethodReturnCondition() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                         "/set/conditionalVariables/test/Number.java", 
                                                                         "Number", 

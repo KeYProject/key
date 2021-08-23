@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -26,11 +27,11 @@ public class Epsilon extends AbstractOperator {
     }
 */
     @Override
-    protected boolean additionalValidTopLevel(Term term) {
-
-
+    protected void additionalValidTopLevel(Term term) {
         final Sort s0 = term.sub(0).sort();
-        return s0 == Sort.FORMULA;
+        if (s0 != Sort.FORMULA) {
+            throw new TermCreationException(this, term);
+        };
     }
 
     @Override

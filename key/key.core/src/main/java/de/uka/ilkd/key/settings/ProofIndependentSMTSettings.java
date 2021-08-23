@@ -179,6 +179,10 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
         public String getCommand(SolverType type){
+                return dataOfSolvers.get(type).solverCommand;
+        }
+
+        public String getParameters(SolverType type) {
                 return dataOfSolvers.get(type).solverParameters;
         }
 
@@ -337,10 +341,15 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
  
       }
 
-@Override
-public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-        
-  
-}
+      @Override
+      public void addSettingsListener(SettingsListener l) {
+          listeners.add(l);
+
+
+      }
+      
+      @Override
+      public void removeSettingsListener(SettingsListener l) {
+          listeners.remove(l);
+      }
 }

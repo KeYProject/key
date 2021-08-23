@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -16,16 +7,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.*;
 
 
 /**
@@ -48,7 +40,7 @@ abstract class ReplaceAndRegisterMethod {
                        StateVars origVars,
                        StateVars poVars,
                        TermBuilder tb) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
@@ -70,9 +62,7 @@ abstract class ReplaceAndRegisterMethod {
             }
         }
         OpReplacer or = new OpReplacer(map, tb.tf());
-        Term result = or.replace(term);
-
-        return result;
+        return or.replace(term);
     }
 
 
@@ -93,15 +83,15 @@ abstract class ReplaceAndRegisterMethod {
                               StateVars origVars,
                               StateVars poVars,
                               TermBuilder tb) {
-        ImmutableList<Term> resultPreExps = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultPreExps = ImmutableSLList.nil();
         for (Term t : terms.preExpressions) {
             resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<Term> resultPostExps = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultPostExps = ImmutableSLList.nil();
         for (Term t : terms.postExpressions) {
             resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultNewObjecs = ImmutableSLList.nil();
         for (Term t : terms.newObjects) {
             resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
         }
@@ -126,7 +116,7 @@ abstract class ReplaceAndRegisterMethod {
                        Term[] origVars,
                        Term[] poVars,
                        TermBuilder tb) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         assert origVars.length == poVars.length;
         for (int i = 0; i < origVars.length; i++) {
@@ -171,11 +161,11 @@ abstract class ReplaceAndRegisterMethod {
         }
     }
 
-    final static Term replaceQuantifiableVariables(Term term,
-                                             HashSet<QuantifiableVariable> qvs,
+    static Term replaceQuantifiableVariables(Term term,
+                                             Set<QuantifiableVariable> qvs,
                                              Services services) {
         Map<QuantifiableVariable, QuantifiableVariable> replaceMap =
-                new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>();
+                new LinkedHashMap<>();
         for (QuantifiableVariable qv: qvs) {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
         }
@@ -185,14 +175,14 @@ abstract class ReplaceAndRegisterMethod {
         return op.replace(term);
     }
 
-    final static HashSet<QuantifiableVariable> collectQuantifiableVariables(Term term) {
+    static Set<QuantifiableVariable> collectQuantifiableVariables(Term term) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         term.execPreOrder(qvVisitor);
         return qvVisitor.getResult();
     }
 
-    final private static class QuantifiableVariableVisitor implements Visitor {
-        private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
+    private static final class QuantifiableVariableVisitor implements Visitor {
+        private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
         public boolean visitSubtree(Term visited) {
@@ -211,6 +201,6 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
 
-        public HashSet<QuantifiableVariable> getResult() { return vars; }
+        public Set<QuantifiableVariable> getResult() { return vars; }
     }
 }

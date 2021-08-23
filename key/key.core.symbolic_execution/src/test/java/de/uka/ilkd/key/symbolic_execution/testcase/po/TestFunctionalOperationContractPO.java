@@ -27,6 +27,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests the {@link FunctionalOperationContractPO} used for symbolic execution.
@@ -36,7 +38,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
    /**
     * Tests the contract of method {@code doubleValue}.
     */
-   public void testDoubleValue() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test public void testDoubleValue() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("/set/existingContractTest/test/ExistingContractTest.java",
              "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
              "/set/existingContractTest/oracle/ExistingContractTest.xml",
