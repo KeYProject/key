@@ -36,6 +36,17 @@ public class Counter {
     public int getCountPlusPlus(){
 	return count++;
     }
+
+    /**
+     * This is needed when loading e.g. persistentNodeIds from a saved proof.
+     * Can only be used to increase the counter.
+     * @param count new count to set. If the current count is smaller, nothing is done.
+     */
+    public void increaseCount(int count) {
+        if (this.count < count) {
+            this.count = count;
+        }
+    }
     
     public String toString() {
         return "Counter "+ name + ": " + count;

@@ -307,6 +307,19 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /**
+     * Indicates whether this Sequent is equal to the given one. All term labels which are not
+     * relevant for the Strategy are ignored. In addition, the order of the SequentFormulas in each
+     * Semisequent is ignored, which makes the method more useful, but also relatively expensive.
+     * @param o the Sequent to compare to
+     * @return true iff both are equal modulo the term labels
+     * @see Term#equalsModIrrelevantTermLabels(Object)
+     */
+    public boolean equalsModIrrelevantTermLabels(Sequent o) {
+        return antecedent.equalsModIrrelevantTermLabels(o.antecedent)
+            && succedent.equalsModIrrelevantTermLabels(o.succedent);
+    }
+
+    /**
      * Computes the position of the given sequent formula on the proof sequent,
      * starting with one for the very first sequent formula.
      * @param inAntec a boolean stating whether we search in the antecedent or the succedent

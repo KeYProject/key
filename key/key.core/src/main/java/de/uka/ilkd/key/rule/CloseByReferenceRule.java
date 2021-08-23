@@ -4,10 +4,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This rule can be used to close a goal by reference to an already closed node. The referred node
@@ -67,37 +68,80 @@ public final class CloseByReferenceRule implements BuiltInRule {
             return null;
         }
 
-        // goal must have the same sequent as its partner node
-        if (!goal.sequent().equals(partnerNode.sequent())) {
+        // goal must have the same sequent as its partner node (strategy irrelevant term labels and
+        // order of formulas are ignored)
+        if (!goal.sequent().equalsModIrrelevantTermLabels(partnerNode.sequent())) {
             return null;
         }
 
         // Ensures that both nodes have the same partially instantiated NoPosTaclets (in particular
-        // insert_hidden_ rules). Otherwise it would be a soundness problem.
-        // TODO: this implementation works only if pruning in closed branches is enabled ...
-        Goal partnerGoal = goal.proof().getClosedGoal(partnerNode);
-        if (partnerGoal != null) {
-            for (NoPosTacletApp npta : goal.indexOfTaclets().getPartialInstantiatedApps()) {
-                if (!partnerGoal.indexOfTaclets().getPartialInstantiatedApps().contains(npta)) {
-                    // different rules sets -> not applicable
-                    return null;
-                }
-            }
-        } else {
-            // TODO: in this case, closing may be unsound!
-            System.out.println("Warning: Closing by reference may be unsound, since partially " +
-                "instantiated NoPosTacletApps could not be checked!");
+        // insert_hidden_ rules). Otherwise, it would be a soundness problem.
+        if (!localRulesAreCompatible(goal, partnerNode)) {
+            return null;
         }
 
         final ImmutableList<Goal> result = goal.split(1);
         final Goal resultGoal = result.head();
-        //final Proof proof = resultGoal.proof();
 
-        // TODO: mark as linked, add listeners in case the partner is pruned
-        //resultGoal.setLinkedGoal(proof.getClosedGoal(partnerNode));
-        //proof.closeGoal(resultGoal);
+        /* for saving/loading we ensure that the partner has a unique persistent serial number,
+         * however, in the GUI we show the non-persistent serialNr */
+        partnerNode.getNodeInfo().requestPersistentNodeId();
+        resultGoal.setBranchLabel("Closed by reference to node " + partnerNode.serialNr());
+
+        Proof proof = goal.proof();
+        proof.addProofTreeListener(new ProofTreeAdapter() {
+            @Override
+            public void proofPruned(ProofTreeEvent e) {
+                // this additional check is necessary, because the partner node could have already
+                // been removed by the pruning operation
+                if (proof.find(partnerNode)) {
+                    if (!partnerNode.isClosed()) {
+                        // partnerNode was reopened by pruning -> reopen currentNode (deletes
+                        // the CloseByReferenceRule application)
+                        proof.pruneProof(currentNode);
+
+                        // the listener is not needed anymore
+                        proof.removeProofTreeListener(this);
+                    }
+                }
+                // TODO: some listeners may be invalid and still present ...
+            }
+        });
 
         return resultGoal.split(0);
+    }
+
+    /**
+     * Checks if the local rules (e.g., insert_hidden rules) of the goal are compatible to those
+     * available at the node. Compatible means that each rule available at partnerNode must also
+     * be available at currentGoal, however, currentGoal may have additional local rules.
+     * @param currentGoal the goal which shall be closed by reference
+     * @param partnerNode the potential reference partner which could be used to close the goal
+     * @return true iff the rules are compatible
+     */
+    public static boolean localRulesAreCompatible(Goal currentGoal, Node partnerNode) {
+        // collect all locally introduced rules that could differ between current and partner node
+        Node currentNode = currentGoal.node();
+        Node commonAncestor = currentNode.commonAncestor(partnerNode);
+        Set<NoPosTacletApp> localTaclets = new HashSet<>();
+        Node n = partnerNode;
+        while (n != commonAncestor) {
+            for (NoPosTacletApp localApp : n.getLocalIntroducedRules()) {
+                localTaclets.add(localApp);
+            }
+            n = n.parent();
+        }
+
+        // closing by reference is only allowed if the referenced node does not have hidden rules
+        // which are not present in the goal to close. Otherwise it would be a soundness problem.
+        for (NoPosTacletApp localApp : localTaclets) {
+            // this is probably slow, but should be ok since localTaclets is of small size ...
+            if (!currentGoal.indexOfTaclets().getPartialInstantiatedApps().contains(localApp)) {
+                // found at least one different -> not applicable
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

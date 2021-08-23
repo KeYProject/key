@@ -452,6 +452,33 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.equals(((Semisequent) o).seqList);
     }
 
+    /**
+     * Indicates whether this Semisequent is equal to the given one. All term labels which are not
+     * relevant for the Strategy are ignored. In addition, the order of the SequentFormulas is
+     * ignored, which makes the method more useful, but also relatively expensive (<em>O(n*m)</em>
+     * with n and m being the formula count in each of the two Semisequents).
+     * @param o the Semisequent to compare to
+     * @return true iff both are equal modulo the term labels
+     * @see Term#equalsModIrrelevantTermLabels(Object)
+     */
+    public boolean equalsModIrrelevantTermLabels(Semisequent o) {
+        if (o.seqList.size() != seqList.size()) {
+            return false;
+        }
+        for (SequentFormula sf1 : seqList) {
+            boolean found = false;
+            for (SequentFormula sf2 : o.seqList) {
+                if (sf1.formula().equalsModIrrelevantTermLabels(sf2.formula())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public int hashCode () {

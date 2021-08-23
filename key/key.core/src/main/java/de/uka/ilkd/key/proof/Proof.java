@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
@@ -84,12 +85,13 @@ public class Proof implements Named {
     /** the root of the proof */
     private Node root;
 
+    //TODO: using a CopyOnWriteArrayList should remove the need for most synchronized blocks
     /**
      * list with prooftree listeners of this proof
-     * attention: firing events makes use of array list's random access
-     * nature
+     * @implNote Using a {@link CopyOnWriteArrayList} allows iterators to remove themselves in their
+     *  event handler without having a ConcurrentModificationException thrown.
      */
-    private List<ProofTreeListener> listenerList = new LinkedList<ProofTreeListener>();
+    private List<ProofTreeListener> listenerList = new CopyOnWriteArrayList<>();
 
     /** list with the open goals of the proof */
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
@@ -873,6 +875,22 @@ public class Proof implements Named {
         }
     }
 
+    /**
+     * Visits this Proof starting at the root.
+     * @param visitor the ProofVisitor that defines the operation to perform
+     */
+    public void accept(ProofVisitor visitor) {
+        visitor.visit(this, root);
+    }
+
+    /**
+     * Visits a subtree of this Proof pending from the given node.
+     * @param startNode the first Node to visit
+     * @param visitor the ProofVisitor that defines the operation to perform
+     */
+    public void accept(Node startNode, ProofVisitor visitor) {
+        visitor.visit(this, startNode);
+    }
 
     /**
      * Bread-first search for the first node, that matches the given

@@ -57,6 +57,9 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
  */
 public class NodeInfo {
 
+    /** counter name for persistent node ids */
+    private static final String PERSISTENT_NODE_ID = "persistent_node_id";
+
     private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
 
     /** firstStatement stripped of method frames */
@@ -83,6 +86,41 @@ public class NodeInfo {
 
     /** User-provided plain-text annotations to the node. */
     private String notes;
+
+    /** A proof-wide unique id that is saved in .proof files and thus guaranteed to be the same
+     * after re-loading the proof. This id is issued in a lazy approach only to those nodes that
+     * need one. */
+    private int persistentNodeId = -1;
+
+    /**
+     * Returns a persistent id for this node that is saved inside .proof files can be used to
+     * uniquely identify the node. If this node currently has no such id, a new one is determined
+     * using a counter.
+     * @return a persistent and unique id for this node
+     */
+    public int requestPersistentNodeId() {
+        if (persistentNodeId == -1) {
+            persistentNodeId = node.proof().getServices().getCounter(PERSISTENT_NODE_ID)
+                .getCountPlusPlus();
+        }
+        return persistentNodeId;
+    }
+
+    public int getPersistentNodeId() {
+        return persistentNodeId;
+    }
+
+    /**
+     * Sets the persistent id and makes sure that the next call to the corresponding counter gets a
+     * larger id number.
+     * @param persistentNodeId the id to set for this node
+     */
+    public void setPersistentNodeId(int persistentNodeId) {
+        this.persistentNodeId = persistentNodeId;
+        // ensure that the next number of counter is greater than the id used here
+        node.proof().getServices().getCounter(PERSISTENT_NODE_ID)
+            .increaseCount(persistentNodeId + 1);
+    }
 
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -55,14 +56,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
@@ -71,6 +64,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.CloseByReferenceRule.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -374,6 +368,7 @@ public class OutputStreamProofSaver {
         }
         output.append("");
         userInteraction2Proof(node, output);
+        persistentId2Proof(node, output);
         notes2Proof(node, output);
         output.append(")\n");
     }
@@ -527,6 +522,15 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
+    private void printSingleCloseByReferenceRuleApp(CloseByReferenceRuleApp closeApp,
+                                                    Appendable output) throws IOException {
+        output.append(" (").append(ProofElementID.CLOSE_BY_REFERENCE.getRawName()).append(" \"");
+        // we know that the partner has a persistent id (see CloseByReferenceRule)
+        int id = closeApp.getPartner().getNodeInfo().getPersistentNodeId();
+        output.append(Integer.toString(id));
+        output.append("\")");
+    }
+
     /**
      * Print rule justification for applied built-in rule application into the passed writer.
      * @param appliedRuleApp            the rule application to be printed
@@ -569,20 +573,19 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             printRuleJustification(appliedRuleApp, output);
-        }
-        if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
+        } else if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
             printSingleMergeRuleApp((MergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
-        }
-
-        if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+        } else if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp(
                 (CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp, node,
                 prefix, output);
+        } else if (appliedRuleApp instanceof CloseByReferenceRuleApp) {
+            printSingleCloseByReferenceRuleApp((CloseByReferenceRuleApp) appliedRuleApp, output);
         }
-
         output.append("");
         userInteraction2Proof(node, output);
+        persistentId2Proof(node, output);
         notes2Proof(node, output);
         output.append(")\n");
     }
@@ -614,9 +617,7 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof TacletApp) {
             printSingleTacletApp((TacletApp) appliedRuleApp, node, prefix,
                 output);
-        }
-
-        if (appliedRuleApp instanceof IBuiltInRuleApp) {
+        } else if (appliedRuleApp instanceof IBuiltInRuleApp) {
             printSingleBuiltInRuleApp((IBuiltInRuleApp) appliedRuleApp, node,
                 prefix, output);
         }
@@ -697,6 +698,16 @@ public class OutputStreamProofSaver {
             notes = notes.replaceAll("\\\\", "\\\\\\\\");
             notes = notes.replaceAll("\\\"", "\\\\\"");
             output.append(notes);
+            output.append("\")");
+        }
+    }
+
+    private void persistentId2Proof(Node node, Appendable output) throws IOException {
+        int id = node.getNodeInfo().getPersistentNodeId();
+        // -1 means that no persistent id is assigned and needed
+        if (id != -1) {
+            output.append(" (persistentNodeId \"");
+            output.append(Integer.toString(id));
             output.append("\")");
         }
     }

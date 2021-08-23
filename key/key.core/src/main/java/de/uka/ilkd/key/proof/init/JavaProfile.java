@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -151,11 +150,6 @@ public class JavaProfile extends AbstractProfile {
                         originTermLabelRefactorings,
                         null
                 ));
-
-        result = result.prepend(new TermLabelConfiguration(
-                DefinedSymbolsHandler.TRIGGER_LABEL.name(),
-                new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
-
         return result;
     }
 

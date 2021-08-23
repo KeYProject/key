@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.gui.CloseByReferenceRuleMenuItem;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -337,6 +338,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             add(item);
         } else if (builtInRule == MergeRule.INSTANCE) {
             // (DS) MergeRule has a special menu item, and thus is not added here.
+        } else if (builtInRule == CloseByReferenceRule.INSTANCE) {
+            item = new CloseByReferenceRuleMenuItem(mediator.getSelectedGoal(), mediator);
+            item.addActionListener(control);
+            add(item);
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
             item.addActionListener(control);
