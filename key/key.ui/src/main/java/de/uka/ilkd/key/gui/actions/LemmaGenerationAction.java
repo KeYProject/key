@@ -204,7 +204,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         @Override
         protected void loadTaclets() {
                 if(chooser == null) {
-                    chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.PROOF);
+                    chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.PROVE);
                 }
 
                 boolean loaded = chooser.showAsDialog();
