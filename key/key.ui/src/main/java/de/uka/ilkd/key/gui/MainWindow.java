@@ -1102,27 +1102,6 @@ public final class MainWindow extends JFrame {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
     }
 
-    /**
-     * Brings up a dialog displaying a message.
-     *
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-            popupInformationMessage(message, title);
-        } else {
-            if (!(message instanceof Component)) {
-                throw new InternalError("only messages of type " + Component.class + " supported, yet");
-            }
-            JFrame dlg = new JFrame(title);
-            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            dlg.getContentPane().add((Component) message);
-            dlg.pack();
-            GuiUtilities.setCenter(dlg, this);
-            dlg.setVisible(true);
-        }
-    }
-
     public TaskTree getProofList() {
         return proofList;
     }
