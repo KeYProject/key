@@ -56,6 +56,17 @@ public class KeYFileChooser {
         }
     };
 
+    /** Constant for the interaction log filter. */
+    public final static FileFilter INTERACTION_LOG_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".xml");
+        }
+
+        public String getDescription() {
+            return "interaction logs (.xml)";
+        }
+    };
+
     /** The Constant for the filter for compressed files. */
     public final static FileFilter COMPRESSED_FILTER = new FileFilter() {
         public boolean accept(File f) {
@@ -97,6 +108,7 @@ public class KeYFileChooser {
         };
         fileChooser.addChoosableFileFilter(STATISTICS_FILTER);
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
+        fileChooser.addChoosableFileFilter(INTERACTION_LOG_FILTER);
         fileChooser.setFileFilter(DEFAULT_FILTER);
     }
 
