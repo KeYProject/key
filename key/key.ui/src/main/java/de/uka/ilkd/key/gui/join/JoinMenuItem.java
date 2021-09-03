@@ -55,7 +55,7 @@ public class JoinMenuItem extends JMenuItem {
                  JoinDialog dialog = new JoinDialog(partner,
                 		 		proof,PredicateEstimator.STD_ESTIMATOR,proof.getServices());
                  dialog.setVisible(true);
-                 if(dialog.okayButtonHasBeenPressed()){
+                 if(dialog.okButtonHasBeenPressed()){
                 	 start(dialog.getSelectedPartner(),proof,mediator);
                  }else{
                 	 mediator.startInterface(true);

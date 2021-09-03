@@ -175,7 +175,7 @@ public class FileChooser extends JPanel{
         
         private JCheckBox lemmaCheckbox;
         
-        private boolean       closedByOkayButton = false;
+        private boolean closedByOkButton = false;
         private final DefaultListModel<File> listModel = new DefaultListModel<>();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
         private boolean firstTimeAddingAxioms = true;      
@@ -544,7 +544,7 @@ public class FileChooser extends JPanel{
                               @Override
                               public void actionPerformed(ActionEvent e) {
                                       getDialog().dispose();
-                                      closedByOkayButton = true;
+                                      closedByOkButton = true;
                               }
                             });   
                 }
@@ -573,7 +573,7 @@ public class FileChooser extends JPanel{
               
               getDialog().setModal(true);
               getDialog().setVisible(true);
-              return closedByOkayButton;
+              return closedByOkButton;
         }
         
         public static void main(String [] args){

@@ -275,7 +275,7 @@ private void setValid(String result){
         dialog.setSize(Math.max(dim.width,dialog.getOkButton().getWidth()*4),dim.height);
         dialog.setVisible(true);
         
-        if(dialog.okayButtonHasBeenPressed()){
+        if(dialog.okButtonHasBeenPressed()){
             return userInput.getInput();
         }
         return null;  

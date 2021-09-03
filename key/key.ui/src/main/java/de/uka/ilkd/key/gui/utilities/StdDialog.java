@@ -31,7 +31,7 @@ import javax.swing.JOptionPane;
  * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel.
  * The content of the dialog is passed to the dialog by the constructor of the class.
  * You can access the three buttons (in order to add some action listeners) by:
- * <code>getOkayButton()</code> 
+ * <code>getOkButton()</code>
  * <code>getCancelButton()</code>
  * <code>getHelpButton()</code>
  * 
@@ -45,7 +45,7 @@ public class StdDialog extends JDialog{
     private JButton helpButton;
     private JButton okButton;
     private JButton cancelButton;
-    private boolean okayButtonHasBeenPressed = false;
+    private boolean okButtonHasBeenPressed = false;
     private boolean cancelButtonHasBeenPressed = false;
     private Box     contentBox; 
     
@@ -109,8 +109,8 @@ public class StdDialog extends JDialog{
     
 
     
-    public boolean okayButtonHasBeenPressed() {
-        return okayButtonHasBeenPressed;
+    public boolean okButtonHasBeenPressed() {
+        return okButtonHasBeenPressed;
     }
     
     public boolean cancelButtonHasBeenPressed() {
@@ -131,7 +131,7 @@ public class StdDialog extends JDialog{
                 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    okayButtonHasBeenPressed = true;
+                    okButtonHasBeenPressed = true;
                     StdDialog.this.dispose();
                     
                 }
