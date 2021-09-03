@@ -25,10 +25,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -136,7 +133,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the expansion state of the proof tree
      */
-    private ExpansionState expansionState;
+    private ProofTreeExpansionState expansionState;
     /**
      * listener
      */
@@ -268,6 +265,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
+
+        // this only has an effect if the row height is set to a constant (see setProofTreeFont())
         delegateView.setLargeModel(true);
 
         setLayout(new BorderLayout());
@@ -303,11 +302,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private void setProofTreeFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+
+        /* We set a constant row height for all rows. This increases the performance of JTree,
+         * since this way it does have to not calculate the height of each individual row by its
+         * content. This is a reasonable optimization since variable row heights are not needed in
+         * our case. The greatest benefit is observable when collapsing large branches. */
+        int rowHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
+
         if (myFont != null) {
+            rowHeight = delegateView.getFontMetrics(myFont).getHeight();
+            // set row height before changing the font (since the latter repaints the component)
+            delegateView.setRowHeight(rowHeight);
+
             delegateView.setFont(myFont);
         } else {
             Debug.out("KEY-PROOF_TREE_FONT not available, " +
                     "use standard font.");
+            delegateView.setRowHeight(rowHeight);
         }
     }
 
@@ -405,9 +416,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private void setProof(Proof p) {
         if (delegateModel != null) {
-            expansionState.disconnect(delegateView);
-            delegateModel.storeExpansionState(
-                    expansionState.state(new LinkedHashSet<>()));
+            expansionState.disconnect();
+            delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
             delegateModel.unregister();
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
@@ -430,9 +440,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
-            expansionState =
-                    new ExpansionState(delegateView,
-                            delegateModel.getExpansionState());
+            expansionState = new ProofTreeExpansionState(delegateView,
+                                                         delegateModel.getExpansionState());
             delegateView.expandRow(0);
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
@@ -447,6 +456,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
 
@@ -816,7 +826,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
          *
          */
         private static final long serialVersionUID = -4990023575036168279L;
-        private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree,

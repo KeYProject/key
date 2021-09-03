@@ -12,6 +12,6 @@ Export-Package: org.key_project.stubby.model.dependencymodel,
  org.key_project.stubby.model.dependencymodel.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
- org.key_project.util;bundle-version="1.0.0"
+ org.key_project.util
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: org.key_project.stubby.model
