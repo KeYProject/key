@@ -73,10 +73,10 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             this.getContentPane().add(Box.createVerticalStrut(5));
             box = Box.createHorizontalBox();
             box.add(Box.createHorizontalStrut(5));
-            JButton btnOkay = new JButton("Ok");
-            btnOkay.addActionListener(e -> dispose());
+            JButton okButton = new JButton("OK");
+            okButton.addActionListener(e -> dispose());
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-            box.add(btnOkay);
+            box.add(okButton);
             box.add(Box.createHorizontalStrut(5));
             this.getContentPane().add(box);
             this.getOptionTree().setModel(model);
@@ -94,7 +94,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             getRootPane().registerKeyboardAction((e) -> dispose(),
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                     JComponent.WHEN_IN_FOCUSED_WINDOW);
-            getRootPane().setDefaultButton(btnOkay);
+            getRootPane().setDefaultButton(okButton);
         }
 
         private Dimension computePreferredSize(TreeModel model) {

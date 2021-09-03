@@ -241,8 +241,8 @@ return;
     //      com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
             selectedTaclet = null;
                                    
-            final JButton cancel = new JButton("Cancel");
-            cancel.addActionListener(new ActionListener() {
+            final JButton cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     selectedTaclet = null;
                     dialog.setVisible(false);
@@ -250,8 +250,8 @@ return;
                 }          
             });
                         
-            final JButton apply  = new JButton("Apply");
-            apply.addActionListener(new ActionListener() {
+            final JButton applyButton  = new JButton("Apply");
+            applyButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {                
                     final TacletAppListItem selectedItem = 
                         selectionList.getSelectedValue();
@@ -272,8 +272,8 @@ return;
             final JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new FlowLayout());
             
-            buttonPanel.add(apply);
-            buttonPanel.add(cancel);
+            buttonPanel.add(applyButton);
+            buttonPanel.add(cancelButton);
     
             dialog.getContentPane().setLayout(new BorderLayout());
             

@@ -157,8 +157,8 @@ public class ChoiceSelector extends JDialog {
         }
         JPanel buttonPanel = new JPanel();
         {
-            JButton ok = new JButton("OK");
-            ok.addActionListener(new ActionListener() {
+            JButton okButton = new JButton("OK");
+            okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if(changed){
                         int res = JOptionPane.showOptionDialog
@@ -178,12 +178,12 @@ public class ChoiceSelector extends JDialog {
                     dispose();
                 }
             });
-            buttonPanel.add(ok);
-            getRootPane().setDefaultButton(ok);	
+            buttonPanel.add(okButton);
+            getRootPane().setDefaultButton(okButton);
         }
         {
-            final JButton cancel = new JButton("Cancel");
-            cancel.addActionListener(new ActionListener() {
+            final JButton cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     setVisible(false);
                     dispose();
@@ -192,16 +192,16 @@ public class ChoiceSelector extends JDialog {
             ActionListener escapeListener = new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     if(event.getActionCommand().equals("ESC")) {
-                        cancel.doClick();
+                        cancelButton.doClick();
                     }
                 }
             };
-            cancel.registerKeyboardAction(
+            cancelButton.registerKeyboardAction(
                     escapeListener,
                     "ESC",
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                     JComponent.WHEN_IN_FOCUSED_WINDOW);	
-            buttonPanel.add(cancel);
+            buttonPanel.add(cancelButton);
         }
 
 	getContentPane().setLayout(new BorderLayout());

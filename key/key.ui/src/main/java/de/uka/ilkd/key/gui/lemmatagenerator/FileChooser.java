@@ -170,7 +170,7 @@ public class FileChooser extends JPanel{
         private KeYFileChooser fileChooser;
         private JDialog     helpWindow;
 
-        private JButton okayButton;
+        private JButton okButton;
         private JButton cancelButton;
         
         private JCheckBox lemmaCheckbox;
@@ -358,8 +358,8 @@ public class FileChooser extends JPanel{
             lemmataFileChooser = new SingleFileChooser("File with user-defined taclets", null){
                                 private static final long serialVersionUID = 1L;
                                 protected void fileHasBeenChosen(File file) {
-                                        if(okayButton != null){
-                                                okayButton.setEnabled(true);
+                                        if(okButton != null){
+                                                okButton.setEnabled(true);
                                         }
                                 }
                         };
@@ -522,7 +522,7 @@ public class FileChooser extends JPanel{
                         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
                         buttonPane.add(getHelpButton());     
                         buttonPane.add(Box.createHorizontalGlue());
-                        buttonPane.add(getOkayButton());
+                        buttonPane.add(getOkButton());
                         buttonPane.add(Box.createHorizontalStrut(10));
                         buttonPane.add(getCancelButton());
                         buttonPane.add(Box.createHorizontalStrut(5));
@@ -534,13 +534,13 @@ public class FileChooser extends JPanel{
                 return dialog;
         }
         
-        private JButton getOkayButton(){
-                if(okayButton == null){
-                      okayButton  = new JButton("OK"); 
+        private JButton getOkButton(){
+                if(okButton == null){
+                      okButton = new JButton("OK");
                       Dimension dim = getCancelButton().getPreferredSize();
-                      okayButton.setEnabled(false);
-                      okayButton.setPreferredSize(dim);
-                      okayButton.addActionListener(new ActionListener() {
+                      okButton.setEnabled(false);
+                      okButton.setPreferredSize(dim);
+                      okButton.addActionListener(new ActionListener() {
                               @Override
                               public void actionPerformed(ActionEvent e) {
                                       getDialog().dispose();
@@ -548,7 +548,7 @@ public class FileChooser extends JPanel{
                               }
                             });   
                 }
-                return okayButton;
+                return okButton;
          }
         
 

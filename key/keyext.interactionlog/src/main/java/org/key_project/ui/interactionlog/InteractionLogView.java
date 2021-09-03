@@ -680,13 +680,13 @@ class MultiLineInputPrompt {
             JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
             root.add(box, BorderLayout.SOUTH);
             JTextArea area = new JTextArea(text);
-            JButton btnOk = new JButton("OK");
-            JButton btnCancel = new JButton("Cancel");
-            box.add(btnOk);
-            box.add(btnCancel);
+            JButton okButton = new JButton("OK");
+            JButton cancelButton = new JButton("Cancel");
+            box.add(okButton);
+            box.add(cancelButton);
 
-            btnOk.addActionListener((evt) -> accept(area.getText()));
-            btnCancel.addActionListener((evt) -> cancel());
+            okButton.addActionListener((evt) -> accept(area.getText()));
+            cancelButton.addActionListener((evt) -> cancel());
             dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override

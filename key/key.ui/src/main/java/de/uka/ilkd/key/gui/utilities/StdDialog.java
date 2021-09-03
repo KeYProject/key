@@ -43,7 +43,7 @@ public class StdDialog extends JDialog{
 
     private static final long serialVersionUID = 1L;
     private JButton helpButton;
-    private JButton okayButton;
+    private JButton okButton;
     private JButton cancelButton;
     private boolean okayButtonHasBeenPressed = false;
     private boolean cancelButtonHasBeenPressed = false;
@@ -76,7 +76,7 @@ public class StdDialog extends JDialog{
             horzBox.add(Box.createHorizontalStrut(strut));
         }
         horzBox.add(Box.createHorizontalGlue());
-        horzBox.add(getOkayButton());
+        horzBox.add(getOkButton());
         horzBox.add(Box.createHorizontalStrut(strut));
         horzBox.add(getCancelButton());
         horzBox.add(Box.createHorizontalStrut(strut));
@@ -124,10 +124,10 @@ public class StdDialog extends JDialog{
         return helpButton;
     }
     
-    public JButton getOkayButton() {
-        if(okayButton == null){
-            okayButton = new JButton("OK");
-            okayButton.addActionListener(new ActionListener() {
+    public JButton getOkButton() {
+        if(okButton == null){
+            okButton = new JButton("OK");
+            okButton.addActionListener(new ActionListener() {
                 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -136,9 +136,9 @@ public class StdDialog extends JDialog{
                     
                 }
             });
-            okayButton.setMnemonic(KeyEvent.VK_O);
+            okButton.setMnemonic(KeyEvent.VK_O);
         }
-        return okayButton;
+        return okButton;
     }
     
     public JButton getCancelButton() {
@@ -167,7 +167,7 @@ public class StdDialog extends JDialog{
     
     public static void main(String [] args) {
         final StdDialog dialog = new StdDialog("Test",new JButton("Test"), 5,true);
-        dialog.getOkayButton().addActionListener(new ActionListener() {
+        dialog.getOkButton().addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {

@@ -75,8 +75,8 @@ public class ShowKnownTypesAction extends MainWindowAction {
                 tabbedPane.addTab("Package view", scrollpane);
             }
             {
-                final JButton button = new JButton("OK");
-                button.addActionListener(new ActionListener() {
+                final JButton okButton = new JButton("OK");
+                okButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         dialog.setVisible(false);
                         dialog.dispose();
@@ -84,17 +84,17 @@ public class ShowKnownTypesAction extends MainWindowAction {
                 });
                 {
                     JPanel panel = new JPanel();
-                    panel.add(button);
+                    panel.add(okButton);
                     pane.add(panel, BorderLayout.SOUTH);
-                    dialog.getRootPane().setDefaultButton(button);
+                    dialog.getRootPane().setDefaultButton(okButton);
                     ActionListener escapeListener = new ActionListener() {
                 	public void actionPerformed(ActionEvent event) {
                 	    if(event.getActionCommand().equals("ESC")) {
-                		button.doClick();
+                            okButton.doClick();
                 	    }
                 	}
                     };
-                    button.registerKeyboardAction(
+                    okButton.registerKeyboardAction(
                 	    escapeListener,
                 	    "ESC",
                 	    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),

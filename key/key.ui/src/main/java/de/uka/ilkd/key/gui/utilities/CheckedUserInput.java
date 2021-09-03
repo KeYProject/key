@@ -255,7 +255,7 @@ private void setValid(String result){
 
             @Override
             public void userInputChanged(String input, boolean valid, String reason) {
-               dialog.getOkayButton().setEnabled(valid);                
+               dialog.getOkButton().setEnabled(valid);
             }
 
 	    
@@ -272,7 +272,7 @@ private void setValid(String result){
         
         userInput.setInput(defaultInput);
         Dimension dim = dialog.getPreferredSize();
-        dialog.setSize(Math.max(dim.width,dialog.getOkayButton().getWidth()*4),dim.height);
+        dialog.setSize(Math.max(dim.width,dialog.getOkButton().getWidth()*4),dim.height);
         dialog.setVisible(true);
         
         if(dialog.okayButtonHasBeenPressed()){

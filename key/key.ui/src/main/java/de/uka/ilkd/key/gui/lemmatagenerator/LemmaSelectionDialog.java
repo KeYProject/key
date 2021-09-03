@@ -51,7 +51,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
         private static final long serialVersionUID = 1L;
 
-        private JButton okayButton;
+        private JButton okButton;
         private JCheckBox showSupported;
         private JButton cancelButton;
         private JPanel buttonPanel;
@@ -129,7 +129,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
                                         BoxLayout.X_AXIS));
                         buttonPanel.add(getShowSupported());
                         buttonPanel.add(Box.createHorizontalGlue());
-                        buttonPanel.add(getOkayButton());
+                        buttonPanel.add(getOkButton());
                         buttonPanel.add(Box.createHorizontalStrut(8));
                         
                         buttonPanel.add(getCancelButton());
@@ -150,19 +150,19 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
                 return contentPanel;
         }
 
-        private JButton getOkayButton() {
-                if (okayButton == null) {
-                        okayButton = new JButton("OK");
-                        okayButton.addActionListener(new ActionListener() {
+        private JButton getOkButton() {
+                if (okButton == null) {
+                        okButton = new JButton("OK");
+                        okButton.addActionListener(new ActionListener() {
 
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                         tacletsSelected();
                                 }
                         });
-                        okayButton.setPreferredSize(getCancelButton().getPreferredSize());
+                        okButton.setPreferredSize(getCancelButton().getPreferredSize());
                 }
-                return okayButton;
+                return okButton;
         }
         
 

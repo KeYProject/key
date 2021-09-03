@@ -631,27 +631,27 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         pane.add(scrollpane, BorderLayout.CENTER);
 
         //ok button
-        final JButton button = new JButton("OK");
-        button.addActionListener(new ActionListener() {
+        final JButton okButton = new JButton("OK");
+        okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
             }
         });
         Dimension buttonDim = new Dimension(100, 27);
-        button.setPreferredSize(buttonDim);
-        button.setMinimumSize(buttonDim);
+        okButton.setPreferredSize(buttonDim);
+        okButton.setMinimumSize(buttonDim);
         JPanel panel = new JPanel();
-        panel.add(button);
+        panel.add(okButton);
         pane.add(panel, BorderLayout.SOUTH);
-        dialog.getRootPane().setDefaultButton(button);
+        dialog.getRootPane().setDefaultButton(okButton);
 
-        button.registerKeyboardAction(
+        okButton.registerKeyboardAction(
             new ActionListener() {
                 @Override
                public void actionPerformed(ActionEvent event) {
                     if(event.getActionCommand().equals("ESC")) {
-                        button.doClick();
+                        okButton.doClick();
                     }
                 }
             },
