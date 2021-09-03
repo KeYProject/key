@@ -699,7 +699,12 @@ class MultiLineInputPrompt {
             root.add(new JScrollPane(area), BorderLayout.CENTER);
 
             dialog.setSize(300, 200);
-            dialog.setLocationRelativeTo(parent);
+            // center over main window if the parent is currently hidden (e.g., inside a tabbedPane)
+            if (parent == null || !parent.isShowing()) {
+                dialog.setLocationRelativeTo(MainWindow.getInstance());
+            } else {
+                dialog.setLocationRelativeTo(parent);
+            }
 
         }
         return dialog;

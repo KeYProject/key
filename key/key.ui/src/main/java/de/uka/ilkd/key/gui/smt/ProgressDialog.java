@@ -45,6 +45,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
@@ -78,6 +79,7 @@ public class ProgressDialog extends JDialog{
 
     public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
                           int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
+        super(MainWindow.getInstance());
         	    table = new ProgressTable(resolution,listener,labelTitles); 
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 table.setModel(model,titles);

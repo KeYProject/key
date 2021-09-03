@@ -262,7 +262,7 @@ public class ExceptionDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(getParent());
     }
 
 // in earlier versions, KeY supported several exceptions.

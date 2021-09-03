@@ -25,6 +25,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel.
  * It contains a table for presenting the taclets using special filters. 
@@ -43,10 +45,6 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
  * The taclet
  * 
  */
-
-
-
-
 public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
         private static final long serialVersionUID = 1L;
@@ -75,6 +73,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
 
         public LemmaSelectionDialog() {
+                super(MainWindow.getInstance());
                 this.setTitle("Taclet Selection");
                 this.setLayout(new BoxLayout(this.getContentPane(),
                                 BoxLayout.X_AXIS));

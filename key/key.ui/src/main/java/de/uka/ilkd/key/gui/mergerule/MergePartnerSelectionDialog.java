@@ -153,9 +153,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     private MergePartnerSelectionDialog() {
         super(MAIN_WINDOW_INSTANCE, "Select partner node for merge operation",
-                true);
-
-        setLocation(MAIN_WINDOW_INSTANCE.getLocation());
+                true);;
 
         // Text areas for goals to merge
         txtPartner1 = new JEditorPane();
@@ -392,6 +390,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         getContentPane().add(lowerContainer, BorderLayout.SOUTH);
 
         setSize(INITIAL_SIZE);
+        setLocationRelativeTo(MAIN_WINDOW_INSTANCE);
     }
 
     /**

@@ -92,7 +92,7 @@ public class LicenseAction extends MainWindowAction {
         fr.getContentPane().add(okButton, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         fr.setSize(600, 900);
-        fr.setLocationRelativeTo(null);
+        fr.setLocationRelativeTo(mainWindow);
         fr.setVisible(true);
     }
 

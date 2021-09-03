@@ -52,7 +52,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         SettingsTreeModel model = new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
         dialog.setTitle("All active settings");
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(mainWindow);
         dialog.setVisible(true);
     }
 
@@ -66,6 +66,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         private JPanel optionPanel;
 
         public ViewSettingsDialog(TreeModel model, JComponent startComponent) {
+            super(mainWindow);
             this.getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
             Box box = Box.createHorizontalBox();
             box.add(getSplitPane());
