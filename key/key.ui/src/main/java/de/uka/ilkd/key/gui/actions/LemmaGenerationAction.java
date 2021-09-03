@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
+import de.uka.ilkd.key.gui.lemmatagenerator.LoadUserTacletsDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -195,7 +195,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     static public class ProveUserDefinedTaclets extends LemmaGenerationAction {
 
         private static final long serialVersionUID = 1L;
-        private FileChooser chooser;
+        private LoadUserTacletsDialog chooser;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
                 super(mainWindow);
@@ -204,7 +204,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         @Override
         protected void loadTaclets() {
                 if(chooser == null) {
-                    chooser = new FileChooser(FileChooser.Mode.PROOF);
+                    chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.PROOF);
                 }
 
                 boolean loaded = chooser.showAsDialog();
@@ -283,7 +283,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-                FileChooser chooser = new FileChooser(FileChooser.Mode.LOAD);
+                LoadUserTacletsDialog chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.LOAD);
 
                 boolean loaded = chooser.showAsDialog();
 

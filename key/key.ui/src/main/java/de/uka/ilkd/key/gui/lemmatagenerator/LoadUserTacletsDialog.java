@@ -48,7 +48,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * @author Benjamin Niedermann
  * @author M. Ulbrich (revisions)
  */
-public class FileChooser extends JPanel{
+public class LoadUserTacletsDialog extends JPanel {
         private static final long serialVersionUID = 1L;
         private static final String HELP_TEXT = 
                 "In this dialog you can choose the files that are used for loading user-defined taclets:\n\n" +
@@ -183,7 +183,7 @@ public class FileChooser extends JPanel{
     private JDialog dialog;
     private JPanel justificationPanel;
     private JPanel cardPanel;
-    public FileChooser(Mode mode){
+    public LoadUserTacletsDialog(Mode mode){
 
         this.mode = mode;
              
@@ -244,7 +244,8 @@ public class FileChooser extends JPanel{
                                             .getLemmaGeneratorSettings()
                                             .isShowingDialogUsingAxioms();
                                             if((showDialogUsingAxioms &&
-                                                            infoDialog.showDialog(INFO_TEXT1,FileChooser.this)) || 
+                                                            infoDialog.showDialog(INFO_TEXT1,
+                                                                LoadUserTacletsDialog.this)) ||
                                                             !showDialogUsingAxioms){
                                               changedToNotSelected();   
                                               lemmaCheckbox.setSelected(false);  
@@ -383,7 +384,8 @@ public class FileChooser extends JPanel{
                                                getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
                                       
                                        InfoDialog infoDialog = new InfoDialog();
-                                       firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT2,FileChooser.this);
+                                       firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT2,
+                                           LoadUserTacletsDialog.this);
                                        ProofIndependentSettings.DEFAULT_INSTANCE
                                        .getLemmaGeneratorSettings().showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                                        if(firstTimeAddingAxioms){
@@ -576,18 +578,7 @@ public class FileChooser extends JPanel{
               return closedByOkButton;
         }
         
-        public static void main(String [] args){
-        FileChooser chooser = new FileChooser(Mode.LOAD);
-        chooser.showAsDialog();
-
-        chooser = new FileChooser(Mode.PROOF);
-                chooser.showAsDialog();
-        }
-        
     public boolean isGenerateProofObligations(){
                 return this.getLemmaCheckBox().isSelected();
         }
-        
-        
-        
 }
