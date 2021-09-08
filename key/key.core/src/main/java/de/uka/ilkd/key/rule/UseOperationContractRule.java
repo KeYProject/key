@@ -844,6 +844,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 post), null)));
 
         // create "Pre" branch
+        reachableState = tb.and(reachableState, tb.created(contractSelf));
         int i = 0;
         for (Term arg : contractParams) {
             KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
