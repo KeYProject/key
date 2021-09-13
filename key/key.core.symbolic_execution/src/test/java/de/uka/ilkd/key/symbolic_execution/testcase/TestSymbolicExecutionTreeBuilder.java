@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
@@ -39,6 +41,8 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import org.key_project.util.testcategories.Slow;
 
+import static org.junit.Assert.*;
+
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
  * {@link ExecutedSymbolicExecutionTreeNodesStopCondition} and
@@ -51,6 +55,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   @Test
    public void testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.proof",
@@ -73,6 +78,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   @Test
    public void testJoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",
@@ -95,6 +101,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   @Test
    public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof",
@@ -117,6 +124,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   @Test
    public void testJoinTestAfterBranchCondition() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterBranchCondition.proof",
@@ -139,6 +147,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   @Test
    public void testJoinTestAfterAssignment() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterAssignment.proof",
@@ -161,6 +170,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesEmptyArrayCreationTest
     */
+   @Test
    public void testVariablesEmptyArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesEmptyArrayCreationTest/test/EmptyArrayCreationTest.java", 
@@ -188,6 +198,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesNonSimpleArrayCreationTest
     */
+   @Test
    public void testVariablesNonSimpleArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
@@ -215,6 +226,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesNonSimpleArrayAssignmentTest
     */
+   @Test
    public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
@@ -242,6 +254,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesArrayCreationInstanceTest
     */
+   @Test
    public void testVariablesArrayCreationInstanceTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
@@ -269,6 +282,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesArrayAssignmentTest
     */
+   @Test
    public void testVariablesArrayAssignmentTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
@@ -296,6 +310,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesArrayCreationTest
     */
+   @Test
    public void testVariablesArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
@@ -323,6 +338,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractLightweightOperationContractTest
     */
+   @Test
    public void testUseOperationContractLightweightOperationContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractLightweightOperationContractTest/test/LightweightOperationContractTest.java", 
@@ -350,6 +366,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractAssignableEverything
     */
+   @Test
    public void testBlockContractAssignableEverything() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
@@ -372,6 +389,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractAssignableLocationNotRequested
     */
+   @Test
    public void testBlockContractAssignableLocationNotRequested() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
@@ -394,6 +412,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractAssignableRequestedLocation
     */
+   @Test
    public void testBlockContractAssignableRequestedLocation() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
@@ -416,6 +435,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractParamRemaned
     */
+   @Test
    public void testBlockContractParamRemaned() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractParamRemaned/test/BlockContractParamRemaned.proof",
@@ -438,6 +458,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractPreconditionNotVerified
     */
+   @Test
    public void testBlockContractPreconditionNotVerified() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.proof",
@@ -460,6 +481,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractThisTest
     */
+   @Test
    public void testBlockContractThisTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractThisTest/test/BlockContractThisTest.proof",
@@ -482,6 +504,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractVarRenamedLater
     */
+   @Test
    public void testBlockContractVarRenamedLater() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractVarRenamedLater/test/BlockContractVarRenamedLater.proof",
@@ -504,6 +527,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractWithException
     */
+   @Test
    public void testBlockContractWithException() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractWithException/test/BlockContractWithException.proof",
@@ -526,6 +550,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractWithExceptionPostconditionNotVerified
     */
+   @Test
    public void testBlockContractWithExceptionPostconditionNotVerified() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractWithExceptionPostconditionNotVerified/test/BlockContractWithExceptionPostconditionNotVerified.proof",
@@ -548,6 +573,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractWithReturn
     */
+   @Test
    public void testBlockContractWithReturn() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractWithReturn/test/BlockContractWithReturn.proof",
@@ -570,6 +596,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/blockContractWithReturnPostconditionNotVerified
     */
+   @Test
    public void testBlockContractWithReturnPostconditionNotVerified() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/blockContractWithReturnPostconditionNotVerified/test/BlockContractWithReturnPostconditionNotVerified.proof",
@@ -592,6 +619,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useLoopInvariantWithoutDecreasing
     */
+   @Test
    public void testUseLoopInvariantWithoutDecreasing() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/useLoopInvariantWithoutDecreasing/test/LoopInvArrayExample.proof",
@@ -614,6 +642,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/simpleIf
     */
+   @Test
    public void testSimpleIfNoConditionSimplification() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/simpleIf/test/SimpleIf.java", 
@@ -642,6 +671,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/simpleStaticContractTest in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
+   @Test
    public void testSimpleStaticContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/simpleStaticContractTest/test/SimpleStaticContractTest.java", 
@@ -670,6 +700,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/anotherStaticContractTest in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
+   @Test
    public void testAnotherStaticContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/anotherStaticContractTest/test/AnotherStaticContractTest.java", 
@@ -698,6 +729,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/staticDefaultContractTest in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
+   @Test
    public void testStaticDefaultContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticDefaultContractTest/test/StaticDefaultContractTest.java", 
@@ -726,6 +758,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/anotherInstanceContractTest in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
+   @Test
    public void testAnotherInstanceContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/anotherInstanceContractTest/test/AnotherInstanceContractTest.java", 
@@ -754,7 +787,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/instanceOfNotInEndlessLoop in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
-   public void testInstanceOfNotInEndlessLoop() throws Exception {
+   @Test public void testInstanceOfNotInEndlessLoop() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                         "/set/instanceOfNotInEndlessLoop/test/Number.java", 
                                                                         "Number", 
@@ -791,7 +824,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/assumesUserInputTest in the Symbolic Execution Profile
     */
-   public void testAssumesUserInputTest() throws Exception {
+   @Test public void testAssumesUserInputTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                 "/set/assumesUserInputTest/test/AssumesUserInputTest.proof", 
                 "/set/assumesUserInputTest/oracle/AssumesUserInputTest.xml", 
@@ -815,7 +848,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @throws Exception
     * @author Anna Filighera
     */
-   public void testSimplePruning() throws Exception {
+   @Test public void testSimplePruning() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          env = doSETTest(testCaseDirectory, 
@@ -856,7 +889,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @throws Exception
     * @author Anna Filighera
     */
-   public void testBranchPruning() throws Exception {
+   @Test public void testBranchPruning() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          env = doSETTest(testCaseDirectory, 
@@ -908,7 +941,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @throws Exception
     * @author Anna Filighera
     */
-   public void testComplexPruning() throws Exception {
+   @Test public void testComplexPruning() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          env = doSETTest(testCaseDirectory, 
@@ -963,7 +996,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/symbolicExecutionCompletionsTest
     */
-   public void testSymbolicExecutionCompletionsTest() throws Exception {
+   @Test public void testSymbolicExecutionCompletionsTest() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
@@ -1034,7 +1067,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/allNodeTypesTest in the Java Profile
     */
-   public void testAllNodeTypesTest_JavaProfile_NoOneStepSimplification() throws Exception {
+   @Test public void testAllNodeTypesTest_JavaProfile_NoOneStepSimplification() throws Exception {
       doJavaProfileTest("/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.proof", 
                         "/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.xml");
    }
@@ -1042,7 +1075,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/allNodeTypesTest in the Java Profile
     */
-   public void testAllNodeTypesTest_JavaProfile() throws Exception {
+   @Test public void testAllNodeTypesTest_JavaProfile() throws Exception {
       doJavaProfileTest("/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile.proof", 
                         "/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile.xml");
    }
@@ -1097,7 +1130,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/allNodeTypesTest in the Symbolic Execution Profile
     */
-   public void testAllNodeTypesTest_SymbolicExecutionProfile() throws Exception {
+   @Test public void testAllNodeTypesTest_SymbolicExecutionProfile() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                 "/set/allNodeTypesTest/test/AllNodeTypesTest.proof", 
                 "/set/allNodeTypesTest/oracle/AllNodeTypesTest.xml", 
@@ -1119,7 +1152,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/loopStatementBlockTest
     */
-   public void testLoopStatementBlockTest_nestedLoop() throws Exception {
+   @Test public void testLoopStatementBlockTest_nestedLoop() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/loopStatementBlockTest/test/LoopStatementBlockTest.java", 
                 "LoopStatementBlockTest", 
@@ -1146,7 +1179,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/loopStatementBlockTest
     */
-   public void testLoopStatementBlockTest_simpleLoop() throws Exception {
+   @Test public void testLoopStatementBlockTest_simpleLoop() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/loopStatementBlockTest/test/LoopStatementBlockTest.java", 
                 "LoopStatementBlockTest", 
@@ -1173,7 +1206,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_min() throws Exception {
+   @Test public void testBranchStatementBlockTest_min() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1200,7 +1233,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_nestedIf() throws Exception {
+   @Test public void testBranchStatementBlockTest_nestedIf() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1227,7 +1260,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_simpleBlock() throws Exception {
+   @Test public void testBranchStatementBlockTest_simpleBlock() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1254,7 +1287,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_ifNoBlock() throws Exception {
+   @Test public void testBranchStatementBlockTest_ifNoBlock() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1281,7 +1314,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_onlyThen() throws Exception {
+   @Test public void testBranchStatementBlockTest_onlyThen() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1308,7 +1341,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_onlyElse() throws Exception {
+   @Test public void testBranchStatementBlockTest_onlyElse() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1335,7 +1368,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_switchTest() throws Exception {
+   @Test public void testBranchStatementBlockTest_switchTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1362,7 +1395,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_onlyEmptyThen() throws Exception {
+   @Test public void testBranchStatementBlockTest_onlyEmptyThen() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1389,7 +1422,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/branchStatementBlockTest
     */
-   public void testBranchStatementBlockTest_recursive() throws Exception {
+   @Test public void testBranchStatementBlockTest_recursive() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/branchStatementBlockTest/test/BranchStatementBlockTest.java", 
                 "BranchStatementBlockTest", 
@@ -1416,7 +1449,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/constraintsAfterUsedLoopInvariant
     */
-   public void testConstraintsAfterUsedLoopInvariant() throws Exception {
+   @Test public void testConstraintsAfterUsedLoopInvariant() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/constraintsAfterUsedLoopInvariant/test/E_Loop.java", 
                 "E_Loop", 
@@ -1443,7 +1476,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/constraintsOfAppliedMethodContract
     */
-   public void testConstraintsOfAppliedMethodContract() throws Exception {
+   @Test public void testConstraintsOfAppliedMethodContract() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/constraintsOfAppliedMethodContract/test/MethodContract.java", 
                 "MethodContract", 
@@ -1470,7 +1503,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/exceptionalMethodReturnTest
     */
-   public void testExceptionalMethodReturnTest() throws Exception {
+   @Test public void testExceptionalMethodReturnTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/exceptionalMethodReturnTest/test/ExceptionalMethodReturnTest.java", 
                 "ExceptionalMethodReturnTest", 
@@ -1497,7 +1530,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/exceptionalMethodReturnTestWithLoop
     */
-   public void testExceptionalMethodReturnTestWithLoop() throws Exception {
+   @Test public void testExceptionalMethodReturnTestWithLoop() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/exceptionalMethodReturnTestWithLoop/test/Loop.java", 
                 "Loop", 
@@ -1524,7 +1557,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticInstanceFieldChanged
     */
-   public void testStaticInstanceFieldChanged() throws Exception {
+   @Test public void testStaticInstanceFieldChanged() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticInstanceFieldChanged/test/StaticInstanceFieldChanged.java", 
                 "StaticInstanceFieldChanged", 
@@ -1551,7 +1584,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractVariableNestedOperationContractUse
     */
-   public void testUseOperationContractVariableNestedOperationContractUse() throws Exception {
+   @Test public void testUseOperationContractVariableNestedOperationContractUse() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractVariableNestedOperationContractUse/test/VariableNestedOperationContractUse.java", 
                 "VariableNestedOperationContractUse", 
@@ -1578,7 +1611,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractApplyContractTwice
     */
-   public void testUseOperationContractApplyContractTwice() throws Exception {
+   @Test public void testUseOperationContractApplyContractTwice() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractApplyContractTwice/test/OperationContractAppliedTwiceTest.java", 
                 "OperationContractAppliedTwiceTest", 
@@ -1605,7 +1638,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verificationProofFile_VerifyNumber
     */
-   public void testVerifyNumberNormal() throws Exception {
+   @Test public void testVerifyNumberNormal() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                 "/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
                 "/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
@@ -1627,7 +1660,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verificationProofFile_VerifyMin
     */
-   public void testVerifyMinTrueBranch() throws Exception {
+   @Test public void testVerifyMinTrueBranch() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                 "/set/verificationProofFile_VerifyMin/test/VerifyMinTrueBranch.proof",
                 "/set/verificationProofFile_VerifyMin/oracle/VerifyMinTrueBranch.xml",
@@ -1649,7 +1682,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verificationProofFile_VerifyMin
     */
-   public void testVerifyMin() throws Exception {
+   @Test public void testVerifyMin() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                 "/set/verificationProofFile_VerifyMin/test/VerifyMin.proof",
                 "/set/verificationProofFile_VerifyMin/oracle/VerifyMin.xml",
@@ -1671,7 +1704,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/simpleMethodCallStackTest
     */
-   public void testSimpleMethodCallStack() throws Exception {
+   @Test public void testSimpleMethodCallStack() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/simpleMethodCallStackTest/test/SimpleMethodCallStackTest.java",
                 "SimpleMethodCallStackTest",
@@ -1698,7 +1731,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodCallStackTest
     */
-   public void testMethodCallStack() throws Exception {
+   @Test public void testMethodCallStack() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/methodCallStackTest/test/MethodCallStackTest.java",
                 "MethodCallStackTest",
@@ -1725,7 +1758,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/unicodeTest
     */
-   public void testUnicode_Disabled() throws Exception {
+   @Test public void testUnicode_Disabled() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/unicodeTest/test/UnicodeTest.java",
                 "UnicodeTest",
@@ -1752,7 +1785,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/unicodeTest
     */
-   public void testUnicode_Enabled() throws Exception {
+   @Test public void testUnicode_Enabled() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/unicodeTest/test/UnicodeTest.java",
                 "UnicodeTest",
@@ -1779,7 +1812,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/prettyPrint
     */
-   public void testPrettyPrinting_Disabled() throws Exception {
+   @Test public void testPrettyPrinting_Disabled() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/prettyPrint/test/PrettyPrintTest.java",
                 "PrettyPrintTest",
@@ -1806,7 +1839,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/prettyPrint
     */
-   public void testPrettyPrinting_Enabled() throws Exception {
+   @Test public void testPrettyPrinting_Enabled() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/prettyPrint/test/PrettyPrintTest.java",
                 "PrettyPrintTest",
@@ -1833,7 +1866,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useLoopInvariantAndOperationContractStrictlyPure
     */
-   public void testLoopInvariantAndOperationContractStrictlyPure() throws Exception {
+   @Test public void testLoopInvariantAndOperationContractStrictlyPure() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/useLoopInvariantAndOperationContractStrictlyPure/test/IndexOf.java",
                 "IndexOf",
@@ -1860,7 +1893,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainVoidMethod() throws Exception {
+   @Test public void testInstanceContractTest_mainVoidMethod() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -1887,7 +1920,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainNoArgs() throws Exception {
+   @Test public void testInstanceContractTest_mainNoArgs() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -1914,7 +1947,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainResult() throws Exception {
+   @Test public void testInstanceContractTest_mainResult() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -1941,7 +1974,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainResultNotSpecified() throws Exception {
+   @Test public void testInstanceContractTest_mainResultNotSpecified() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -1968,7 +2001,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainExceptinalVoid() throws Exception {
+   @Test public void testInstanceContractTest_mainExceptinalVoid() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -1995,7 +2028,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainExceptinalUnused() throws Exception {
+   @Test public void testInstanceContractTest_mainExceptinalUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2022,7 +2055,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainExceptinal() throws Exception {
+   @Test public void testInstanceContractTest_mainExceptinal() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2049,7 +2082,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainBooleanResultUnused() throws Exception {
+   @Test public void testInstanceContractTest_mainBooleanResultUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2076,7 +2109,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+   @Test public void testInstanceContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2103,7 +2136,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainExceptionalConstructor() throws Exception {
+   @Test public void testInstanceContractTest_mainExceptionalConstructor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2130,7 +2163,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainConstructor() throws Exception {
+   @Test public void testInstanceContractTest_mainConstructor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2157,7 +2190,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/instanceContractTest
     */
-   public void testInstanceContractTest_mainOnObject() throws Exception {
+   @Test public void testInstanceContractTest_mainOnObject() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
@@ -2184,7 +2217,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainVoidMethod() throws Exception {
+   @Test public void testStaticContractTest_mainVoidMethod() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2211,7 +2244,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainNoArgs() throws Exception {
+   @Test public void testStaticContractTest_mainNoArgs() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2238,7 +2271,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainResult() throws Exception {
+   @Test public void testStaticContractTest_mainResult() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2265,7 +2298,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainResultNotSpecified() throws Exception {
+   @Test public void testStaticContractTest_mainResultNotSpecified() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2292,7 +2325,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainExceptinalVoid() throws Exception {
+   @Test public void testStaticContractTest_mainExceptinalVoid() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2319,7 +2352,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainExceptinalUnused() throws Exception {
+   @Test public void testStaticContractTest_mainExceptinalUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2346,7 +2379,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainExceptinal() throws Exception {
+   @Test public void testStaticContractTest_mainExceptinal() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2373,7 +2406,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainBooleanResultUnused() throws Exception {
+   @Test public void testStaticContractTest_mainBooleanResultUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2400,7 +2433,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+   @Test public void testStaticContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2427,7 +2460,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainExceptionalConstructor() throws Exception {
+   @Test public void testStaticContractTest_mainExceptionalConstructor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2454,7 +2487,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainConstructor() throws Exception {
+   @Test public void testStaticContractTest_mainConstructor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2481,7 +2514,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticContractTest
     */
-   public void testStaticContractTest_mainOnObject() throws Exception {
+   @Test public void testStaticContractTest_mainOnObject() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticContractTest/test/StaticContractTest.java", 
                 "StaticContractTest", 
@@ -2508,7 +2541,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_notLoop() throws Exception {
+   @Test public void testVerifiedTest_notLoop() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::notLoop(int)].JML operation contract.0", 
@@ -2534,7 +2567,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_loop() throws Exception {
+   @Test public void testVerifiedTest_loop() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::loop(int)].JML operation contract.0", 
@@ -2560,7 +2593,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_notMagic() throws Exception {
+   @Test public void testVerifiedTest_notMagic() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::notMagic()].JML operation contract.0", 
@@ -2586,7 +2619,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_magic() throws Exception {
+   @Test public void testVerifiedTest_magic() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::magic()].JML operation contract.0", 
@@ -2612,7 +2645,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_notMagicException() throws Exception {
+   @Test public void testVerifiedTest_notMagicException() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::notMagicException()].JML exceptional_behavior operation contract.0", 
@@ -2638,7 +2671,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/verifiedTest
     */
-   public void testVerifiedTest_magicException() throws Exception {
+   @Test public void testVerifiedTest_magicException() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/verifiedTest/test/VerifiedTest.java", 
                 "VerifiedTest[VerifiedTest::magicException()].JML exceptional_behavior operation contract.0", 
@@ -2664,7 +2697,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodCallReturnTests
     */
-   public void testMethodCallReturnTests() throws Exception {
+   @Test public void testMethodCallReturnTests() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodCallReturnTests/test/MethodCallReturnTests.java", 
                 "MethodCallReturnTests", 
@@ -2691,7 +2724,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useLoopInvariantArrayAverage
     */
-   public void testUseLoopInvariantArrayAverage() throws Exception {
+   @Test public void testUseLoopInvariantArrayAverage() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArrayAverage/test/ArrayAverage.java", 
                 "ArrayAverage", 
@@ -2718,7 +2751,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractStatementsInImpliciteConstructor
     */
-   public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
+   @Test public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractStatementsInImpliciteConstructor/test/UseOperationContractStatementsInImpliciteConstructor.java", 
                 "UseOperationContractStatementsInImpliciteConstructor", 
@@ -2750,7 +2783,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of method returns in different modalities.
     * </p>
     */
-   public void testUseLoopInvariantLoopSplittingCondition() throws Exception {
+   @Test public void testUseLoopInvariantLoopSplittingCondition() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantLoopSplittingCondition/test/LoopSplittingCondition.java", 
                 "LoopSplittingCondition", 
@@ -2782,7 +2815,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of method returns in different modalities.
     * </p>
     */
-   public void testUseLoopInvariantTwoLoops() throws Exception {
+   @Test public void testUseLoopInvariantTwoLoops() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantTwoLoops/test/TwoLoops.java", 
                 "TwoLoops", 
@@ -2814,7 +2847,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of method returns in different modalities.
     * </p>
     */
-   public void testLoopInvariantMethodReturnInDifferentModalities() throws Exception {
+   @Test public void testLoopInvariantMethodReturnInDifferentModalities() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/test/WhileWithMethodCallAsConditionFullImplemented.java", 
                 "WhileWithMethodCallAsConditionFullImplemented", 
@@ -2846,7 +2879,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code continue} when a loop is expanded.
     * </p>
     */
-   public void testLoopBodyBranchClosed() throws Exception {
+   @Test public void testLoopBodyBranchClosed() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantLoopBodyBranchClosed/test/LoopBodyBranchClosed.java", 
                 "LoopBodyBranchClosed", 
@@ -2878,7 +2911,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code continue} when a loop is expanded.
     * </p>
     */
-   public void testLoopUsageBranchClosed() throws Exception {
+   @Test public void testLoopUsageBranchClosed() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantLoopUsageBranchClosed/test/LoopUsageBranchClosed.java", 
                 "LoopUsageBranchClosed", 
@@ -2910,7 +2943,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code continue} when a loop is expanded.
     * </p>
     */
-   public void testNestedLoopsWithContinue() throws Exception {
+   @Test public void testNestedLoopsWithContinue() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/nestedLoopsWithContinue/test/NestedLoopsWithContinue.java", 
                 "NestedLoopsWithContinue", 
@@ -2942,7 +2975,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code continue} when a loop invariant is applied.
     * </p>
     */
-   public void testArraySumWhileWithContinue() throws Exception {
+   @Test public void testArraySumWhileWithContinue() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhileWithContinue/test/ArraySumWhileWithContinue.java", 
                 "ArraySumWhileWithContinue", 
@@ -2974,7 +3007,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code return} when a loop invariant is applied.
     * </p>
     */
-   public void testVoidWhileWithReturn() throws Exception {
+   @Test public void testVoidWhileWithReturn() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantVoidWhileWithReturn/test/VoidWhileWithReturn.java", 
                 "VoidWhileWithReturn", 
@@ -3006,7 +3039,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code return} when a loop invariant is applied.
     * </p>
     */
-   public void testArraySumWhileWithReturn() throws Exception {
+   @Test public void testArraySumWhileWithReturn() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhileWithReturn/test/ArraySumWhileWithReturn.java", 
                 "ArraySumWhileWithReturn", 
@@ -3038,7 +3071,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of {@code break} when a loop invariant is applied.
     * </p>
     */
-   public void testArraySumWhileWithBreak() throws Exception {
+   @Test public void testArraySumWhileWithBreak() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhileWithBreak/test/ArraySumWhileWithBreak.java", 
                 "ArraySumWhileWithBreak", 
@@ -3070,7 +3103,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests the handling of thrown exceptions when a loop invariant is applied.
     * </p>
     */
-   public void testArraySumWhileWithException() throws Exception {
+   @Test public void testArraySumWhileWithException() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhileWithException/test/ArraySumWhileWithException.java", 
                 "ArraySumWhileWithException", 
@@ -3102,7 +3135,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
+   @Test public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -3134,7 +3167,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithMethodCallAsCondition_preExpandMethods() throws Exception {
+   @Test public void testWhileWithMethodCallAsCondition_preExpandMethods() throws Exception {
       doSETTest(testCaseDirectory,
                 "/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -3166,7 +3199,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithMethodCallAsCondition_NoPreMethodContract() throws Exception {
+   @Test public void testWhileWithMethodCallAsCondition_NoPreMethodContract() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -3198,7 +3231,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithLoopInvariantInCondition() throws Exception {
+   @Test public void testWhileWithLoopInvariantInCondition() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithLoopInvariantInCondition/test/WhileWithLoopInvariantInCondition.java", 
                 "WhileWithLoopInvariantInCondition", 
@@ -3230,7 +3263,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithMethodCallAsConditionOnObject() throws Exception {
+   @Test public void testWhileWithMethodCallAsConditionOnObject() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithMethodCallAsConditionOnObject/test/WhileWithMethodCallAsConditionOnObject.java", 
                 "WhileWithMethodCallAsConditionOnObject", 
@@ -3262,7 +3295,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testWhileWithMethodCallAsCondition_NoPreExpandMethods() throws Exception {
+   @Test public void testWhileWithMethodCallAsCondition_NoPreExpandMethods() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -3294,7 +3327,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySizeDoWhile() throws Exception {
+   @Test public void testUseLoopInvariantArraySizeDoWhile() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySizeDoWhile/test/ArraySizeDoWhile.java", 
                 "ArraySizeDoWhile", 
@@ -3326,7 +3359,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySizeWhile() throws Exception {
+   @Test public void testUseLoopInvariantArraySizeWhile() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySizeWhile/test/ArraySizeWhile.java", 
                 "ArraySizeWhile", 
@@ -3358,7 +3391,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySumFor() throws Exception {
+   @Test public void testUseLoopInvariantArraySumFor() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
                 "ArraySumFor", 
@@ -3390,7 +3423,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySumForEach() throws Exception {
+   @Test public void testUseLoopInvariantArraySumForEach() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
                 "ArraySumForEach", 
@@ -3422,7 +3455,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySumWhile() throws Exception {
+   @Test public void testUseLoopInvariantArraySumWhile() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
                 "ArraySumWhile", 
@@ -3454,7 +3487,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-   public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
+   @Test public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
                 "ArraySumWhileInitiallyInvalid", 
@@ -3481,7 +3514,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractQueryTest
     */
-   public void testUseOperationContractQueryTest() throws Exception {
+   @Test public void testUseOperationContractQueryTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractQueryTest/test/UseOperationContractQueryTest.java", 
                 "UseOperationContractQueryTest", 
@@ -3508,7 +3541,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractAllBranchesOpenTest
     */
-   public void testUseOperationContractAllBranchesOpenTest() throws Exception {
+   @Test public void testUseOperationContractAllBranchesOpenTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractAllBranchesOpenTest/test/UseOperationContractAllBranchesOpenTest.java", 
                 "UseOperationContractAllBranchesOpenTest", 
@@ -3535,7 +3568,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/identicalTermsDuringProof
     */
-   public void testIdenticalTermsDuringProof() throws Exception {
+   @Test public void testIdenticalTermsDuringProof() throws Exception {
       // Make sure that correct symbolic execution tree is created.
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                                "/set/identicalTermsDuringProof/test/IdenticalTermsDuringProof.java", 
@@ -3595,6 +3628,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/labelTest
     */
+   @Test
    public void testLabelTest_doubled() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/labelTest/test/LabelTest.java", 
@@ -3622,6 +3656,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/labelTest
     */
+   @Test
    public void testLabelTest_lost() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/labelTest/test/LabelTest.java", 
@@ -3649,7 +3684,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/emptyBlockTest
     */
-   public void testEmptyBlockTest() throws Exception {
+   @Test public void testEmptyBlockTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/emptyBlockTest/test/EmptyBlockTest.java", 
                 "EmptyBlockTest", 
@@ -3676,6 +3711,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractExceptionalNoPreconditionWithNullCheckTest
     */
+   @Test
    public void testUseOperationContractExceptionalNoPreconditionWithNullCheckTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractExceptionalNoPreconditionWithNullCheckTest/test/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.java", 
@@ -3703,6 +3739,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractFalsePreconditionTest
     */
+   @Test
    public void testUseOperationContractFalsePreconditionTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractFalsePreconditionTest/test/UseOperationContractFalsePreconditionTest.java", 
@@ -3730,6 +3767,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractFixedNormalPostTest
     */
+   @Test
    public void testUseOperationContractFixedNormalPostTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractFixedNormalPostTest/test/UseOperationContractFixedNormalPostTest.java", 
@@ -3757,6 +3795,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractInvalidPreconditionOnObjectTest
     */
+   @Test
    public void testUseOperationContractInvalidPreconditionOnObjectTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractInvalidPreconditionOnObjectTest/test/UseOperationContractInvalidPreconditionOnObjectTest.java", 
@@ -3784,6 +3823,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractInvalidPreconditionTest
     */
+   @Test
    public void testUseOperationContractInvalidPreconditionTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractInvalidPreconditionTest/test/UseOperationContractInvalidPreconditionTest.java", 
@@ -3811,6 +3851,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractNoExceptionTest
     */
+   @Test
    public void testUseOperationContractNoExceptionTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractNoExceptionTest/test/UseOperationContractNoExceptionTest.java", 
@@ -3838,6 +3879,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractNoPreconditionTest
     */
+   @Test
    public void testUseOperationContractNoPreconditionTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractNoPreconditionTest/test/UseOperationContractNoPreconditionTest.java", 
@@ -3865,6 +3907,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractNoPreconditionWithNullCheckTest
     */
+   @Test
    public void testUseOperationContractNoPreconditionWithNullCheckTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractNoPreconditionWithNullCheckTest/test/UseOperationContractNoPreconditionWithNullCheckTest.java", 
@@ -3892,6 +3935,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractNormalAndExceptionalBranchTest
     */
+   @Test
    public void testUseOperationContractNormalAndExceptionalBranchTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractNormalAndExceptionalBranchTest/test/UseOperationContractNormalAndExceptionalBranchTest.java", 
@@ -3919,6 +3963,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/useOperationContractNormalAndExceptionalTogetherTest
     */
+   @Test
    public void testUseOperationContractNormalAndExceptionalTogetherTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/useOperationContractNormalAndExceptionalTogetherTest/test/UseOperationContractNormalAndExceptionalTogetherTest.java", 
@@ -3946,6 +3991,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/complexConstructorTest
     */
+   @Ignore
+   @Test
    public void testComplexConstructorTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/complexConstructorTest/test/ComplexConstructorTest.java", 
@@ -3973,6 +4020,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/simpleConstructorTest
     */
+   @Test
    public void testSimpleConstructorTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/simpleConstructorTest/test/SimpleConstructorTest.java", 
@@ -4000,6 +4048,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesUnknownTest
     */
+   @Test
    public void testVariablesUnknownTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesUnknownTest/test/UnknownTest.java", 
@@ -4027,6 +4076,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesParameterAttributesChange
     */
+   @Test
    public void testElseIfTest_variablesParameterAttributesChange() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesParameterAttributesChange/test/VariablesParameterAttributesChange.java", 
@@ -4054,6 +4104,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/elseIfTest
     */
+   @Test
    public void testElseIfTest_mergedBranchConditions() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/elseIfTest/test/ElseIfTest.java", 
@@ -4081,6 +4132,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/switchCaseTest
     */
+   @Test
    public void testSwitchCaseTest_mergedBranchConditions() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/switchCaseTest/test/SwitchCaseTest.java", 
@@ -4108,6 +4160,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/loopIterationTest
     */
+   @Test
    public void testLoopIteration_LoopWithMethod() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/loopIterationTest/test/LoopIterationTest.java", 
@@ -4135,6 +4188,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/loopIterationTest
     */
+   @Test
    public void testLoopIteration_LoopStatementCopied() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/loopIterationTest/test/LoopIterationTest.java", 
@@ -4162,6 +4216,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/loopIterationTest
     */
+   @Test
    public void testLoopIteration_LoopStatementReused() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/loopIterationTest/test/LoopIterationTest.java", 
@@ -4189,6 +4244,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesArrayTest
     */
+   @Test
    public void testVariablesArrayTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayTest/test/VariablesArrayTest.java", 
@@ -4216,6 +4272,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesInstanceVariableTest
     */
+   @Test
    public void testVariablesInstanceVariableTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesInstanceVariableTest/test/VariablesInstanceVariableTest.java", 
@@ -4243,6 +4300,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesLocalTest
     */
+   @Test
    public void testVariablesLocalTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesLocalTest/test/VariablesLocalTest.java", 
@@ -4270,6 +4328,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/variablesStaticTest
     */
+   @Test
    public void testVariablesStaticTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesStaticTest/test/VariablesStaticTest.java", 
@@ -4297,6 +4356,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/complexFlatSteps
     */
+   @Test
    public void testComplexFlatSteps() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/complexFlatSteps/test/ComplexFlatSteps.java", 
@@ -4324,6 +4384,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/complexIf
     */
+   @Test
    public void testComplexIf() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/complexIf/test/ComplexIf.java", 
@@ -4351,6 +4412,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/doWhileFalseTest
     */
+   @Test
    public void testDoWhileFlaseTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/doWhileFalseTest/test/DoWhileFalseTest.java", 
@@ -4378,6 +4440,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/doWhileTest
     */
+   @Test
    public void testDoWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/doWhileTest/test/DoWhileTest.java", 
@@ -4405,6 +4468,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/elseIfDifferentVariables
     */
+   @Test
    public void testElseIfDifferentVariables() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/elseIfDifferentVariables/test/ElseIfDifferentVariables.java", 
@@ -4432,6 +4496,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/elseIfTest
     */
+   @Test
    public void testElseIfTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/elseIfTest/test/ElseIfTest.java", 
@@ -4459,6 +4524,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/fixedRecursiveMethodCallTest
     */
+   @Test
    public void testFixedRecursiveMethodCallTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/fixedRecursiveMethodCallTest/test/FixedRecursiveMethodCallTest.java", 
@@ -4486,6 +4552,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/forEachTest
     */
+   @Test
    public void testForEachTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/forEachTest/test/ForEachTest.java", 
@@ -4513,6 +4580,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/forFalseTest
     */
+   @Test
    public void testForFalseTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/forFalseTest/test/ForFalseTest.java", 
@@ -4540,6 +4608,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/forTest
     */
+   @Test
    public void testForTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/forTest/test/ForTest.java", 
@@ -4567,6 +4636,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/functionalDoWhileTest
     */
+   @Test
    public void testFunctionalDoWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/functionalDoWhileTest/test/FunctionalDoWhileTest.java", 
@@ -4594,6 +4664,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/functionalForTest
     */
+   @Test
    public void testFunctionalForTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/functionalForTest/test/FunctionalForTest.java", 
@@ -4621,6 +4692,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/functionalIf
     */
+   @Test
    public void testFunctionalIf() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/functionalIf/test/FunctionalIf.java", 
@@ -4648,6 +4720,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/functionalWhileTest
     */
+   @Test
    public void testFunctionalWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/functionalWhileTest/test/FunctionalWhileTest.java", 
@@ -4675,6 +4748,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodCallOnObject
     */
+   @Test
    public void testMethodCallOnObject() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodCallOnObject/test/MethodCallOnObject.java", 
@@ -4702,6 +4776,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodCallOnObjectWithException
     */
+   @Test
    public void testMethodCallOnObjectWithException() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodCallOnObjectWithException/test/MethodCallOnObjectWithException.java", 
@@ -4729,6 +4804,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodCallParallelTest
     */
+   @Test
    public void testMethodCallParallelTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodCallParallelTest/test/MethodCallParallelTest.java", 
@@ -4756,6 +4832,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodFormatTest
     */
+   @Test
    public void testMethodFormatTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodFormatTest/test/MethodFormatTest.java", 
@@ -4783,6 +4860,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodHierarchyCallTest
     */
+   @Test
    public void testMethodHierarchyCallTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodHierarchyCallTest/test/MethodHierarchyCallTest.java", 
@@ -4810,6 +4888,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/methodHierarchyCallWithExceptionTest
     */
+   @Test
    public void testMethodHierarchyCallWithExceptionTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/methodHierarchyCallWithExceptionTest/test/MethodHierarchyCallWithExceptionTest.java", 
@@ -4837,6 +4916,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/nestedDoWhileTest
     */
+   @Test
    public void testNestedDoWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/nestedDoWhileTest/test/NestedDoWhileTest.java", 
@@ -4864,6 +4944,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/nestedForTest
     */
+   @Test
    public void testNestedForTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/nestedForTest/test/NestedForTest.java", 
@@ -4891,6 +4972,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/nestedWhileTest
     */
+   @Test
    public void testNestedWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/nestedWhileTest/test/NestedWhileTest.java", 
@@ -4924,6 +5006,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * that no {@link StackOverflowError}s are thrown.
     * </p>
     */
+   @Test
    public void testRecursiveFibonacci_LONG_RUNNING_TEST() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/recursiveFibonacci/test/RecursiveFibonacci.java", 
@@ -4951,6 +5034,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/simpleIf
     */
+   @Test
    public void testSimpleIf() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/simpleIf/test/SimpleIf.java", 
@@ -4978,6 +5062,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/simpleNullPointerSplitTest
     */
+   @Test
    public void testSimpleNullPointerSplitTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/simpleNullPointerSplitTest/test/SimpleNullPointerSplitTest.java", 
@@ -5005,6 +5090,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/statementKindTest
     */
+   @Test
    public void testStatementKindTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/statementKindTest/test/StatementKindTest.java", 
@@ -5032,6 +5118,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/statements
     */
+   @Test
    public void testStatements() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/statements/test/FlatSteps.java", 
@@ -5059,6 +5146,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/staticMethodCall
     */
+   @Test
    public void testStaticMethodCall() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/staticMethodCall/test/StaticMethodCall.java", 
@@ -5086,6 +5174,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/switchCaseTest
     */
+   @Test
    public void testSwitchCaseTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/switchCaseTest/test/SwitchCaseTest.java", 
@@ -5113,6 +5202,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/throwTest
     */
+   @Test
    public void testThrowTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/throwTest/test/ThrowTest.java", 
@@ -5140,6 +5230,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/throwVariableTest
     */
+   @Test
    public void testThrowVariableTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/throwVariableTest/test/ThrowVariableTest.java", 
@@ -5167,6 +5258,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/tryCatchFinally
     */
+   @Test
    public void testTryCatchFinally() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/tryCatchFinally/test/TryCatchFinally.java", 
@@ -5194,6 +5286,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/whileFalseTest
     */
+   @Test
    public void testWhileFalseTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/whileFalseTest/test/WhileFalseTest.java", 
@@ -5221,6 +5314,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/whileTest
     */
+   @Test
    public void testWhileTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/whileTest/test/WhileTest.java", 

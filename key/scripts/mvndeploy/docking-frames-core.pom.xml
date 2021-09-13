@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.key_project</groupId>
+	<version>1.0</version>
+	<artifactId>docking-frames-core</artifactId>
+	<description>
+		Docking framework for Swing. http://www.docking-frames.org/
+	</description>
+	
+	<url>http://key-project.org/</url>
+	<licenses>
+		<license>
+			<name>Lesser GNU General Public License (LGPL), Version 2.1</name>
+			<url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
+		</license>
+	</licenses>
+</project>

@@ -20,6 +20,7 @@ java.lang.Integer
 java.lang.InterruptedException
 java.lang.Iterable
 java.lang.LinkageError
+java.lang.Math
 java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
@@ -49,7 +50,7 @@ java.io.Serializable
 java.math.BigInteger
 java.util.ArrayList
 java.util.Arrays
-java.util.CollectionIterator
+java.util.ListIteratorImpl
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList

@@ -5,17 +5,15 @@ Bundle-SymbolicName: org.key_project.util;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.util.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.6.1",
- org.eclipse.ui;bundle-version="3.103.0",
- org.eclipse.e4.ui.model.workbench;bundle-version="0.10.1",
- org.eclipse.ui.ide;bundle-version="3.7.0",
- org.eclipse.jdt.core;bundle-version="3.6.2";resolution:=optional,
- org.eclipse.jdt.ui;bundle-version="3.7.0";resolution:=optional,
- org.eclipse.emf.common;bundle-version="2.7.0",
- org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.300";resolution:=optional,
- org.eclipse.jface.text;bundle-version="3.9.2";resolution:=optional,
- org.eclipse.ui.editors;bundle-version="3.8.200";resolution:=optional
-Bundle-ActivationPolicy: lazy
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide,
+ org.eclipse.jdt.core;resolution:=optional,
+ org.eclipse.jdt.ui;resolution:=optional,
+ org.eclipse.emf.common,
+ org.eclipse.ui.views.properties.tabbed;resolution:=optional,
+ org.eclipse.jface.text;resolution:=optional,
+ org.eclipse.ui.editors;resolution:=optional,
+ org.eclipse.e4.ui.model.workbench;bundle-version="2.1.800"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util,
@@ -34,9 +32,14 @@ Export-Package: org.key_project.util,
  org.key_project.util.eclipse.swt.viewer.event,
  org.key_project.util.eclipse.swt.wizard.page,
  org.key_project.util.eclipse.view.editorInView,
+ org.key_project.util.helper,
  org.key_project.util.java,
  org.key_project.util.java.thread,
  org.key_project.util.jdt,
+ org.key_project.util.lookup,
  org.key_project.util.reflection,
+ org.key_project.util.testcategories,
  org.key_project.util.thread
 Automatic-Module-Name: org.key_project.util
+Bundle-ActivationPolicy: lazy
+Eclipse-BuddyPolicy: global, app, ext, boot

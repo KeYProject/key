@@ -16,6 +16,7 @@ package org.key_project.key4eclipse.resources.builder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -90,8 +91,9 @@ public class ProofManager {
     * @param project - the {@link IProject} to use
     * @throws CoreException
     * @throws ProblemLoaderException 
+ * @throws MalformedURLException 
     */
-   public ProofManager(IProject project, int buildType, KeYProjectBuildProperties properties, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
+   public ProofManager(IProject project, int buildType, KeYProjectBuildProperties properties, EditorSelection editorSelection) throws CoreException, ProblemLoaderException, MalformedURLException{
       this.project = project;
       this.buildType = buildType;
       this.properties = properties;
@@ -127,13 +129,14 @@ public class ProofManager {
     * Handles the occurrence of a {@link ProblemLoaderException}. All KeYMarker will be deleted and a ProblemException{@link IMarker} will be set.
     * @param e - the {@link ProblemLoaderException}
     * @throws CoreException
+ * @throws MalformedURLException 
     */
-   private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
+   private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException, MalformedURLException{
       Location location = ExceptionTools.getLocation(e);
       IResource res = project;
       int lineNumber = -1;
       if(location != null){
-         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFilename()));
+         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFileURL().getFile()));
          lineNumber = location.getLine();
       }
       String markerMessage = e.getMessage();

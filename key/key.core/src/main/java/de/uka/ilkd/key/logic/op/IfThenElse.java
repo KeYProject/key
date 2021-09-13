@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -87,14 +88,16 @@ public final class IfThenElse extends AbstractOperator {
     
 
     @Override
-    protected boolean additionalValidTopLevel(Term term) {
+    protected void additionalValidTopLevel(Term term) {
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
         
-        return s0 == Sort.FORMULA
+        if(!(s0 == Sort.FORMULA
                && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA)
                && s1 != Sort.UPDATE 
-               && s2 != Sort.UPDATE;
+               && s2 != Sort.UPDATE)) {
+            throw new TermCreationException(this, term);
+        }
     }
 }

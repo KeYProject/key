@@ -38,8 +38,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.MultiPartInitException;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.internal.PartListenerList;
-import org.eclipse.ui.internal.PartListenerList2;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.eclipse.WorkbenchUtil;

@@ -189,12 +189,22 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             if (precondition != null) {
                 precondition.execPostOrder(collector);
             }
+
+            Term freePrecondition = x.getFreePrecondition(heap, services);
+            if (freePrecondition != null) {
+                freePrecondition.execPostOrder(collector);
+            }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             Term postcondition = x.getPostcondition(heap, services);
             if (postcondition != null) {
                 postcondition.execPostOrder(collector);
+            }
+
+            Term freePostcondition = x.getFreePostcondition(heap, services);
+            if (freePostcondition != null) {
+                freePostcondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
@@ -229,12 +239,22 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             if (precondition != null) {
                 precondition.execPostOrder(collector);
             }
+
+            Term freePrecondition = x.getFreePrecondition(heap, services);
+            if (freePrecondition != null) {
+                freePrecondition.execPostOrder(collector);
+            }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             Term postcondition = x.getPostcondition(heap, services);
             if (postcondition != null) {
                 postcondition.execPostOrder(collector);
+            }
+
+            Term freePostcondition = x.getFreePostcondition(heap, services);
+            if (freePostcondition != null) {
+                freePostcondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()

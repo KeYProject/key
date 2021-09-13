@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -46,17 +47,19 @@ public final class IfExThenElse extends AbstractOperator {
     
 
     @Override
-    protected boolean additionalValidTopLevel(Term term) {
+    protected void additionalValidTopLevel(Term term) {
         for(QuantifiableVariable var : term.varsBoundHere(0)) {
             if(!var.sort().name().toString().equals("int")) {
-        	return false;
+        	    throw new TermCreationException(this, term);
             }
         }
 
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
-        
-        return s0 == Sort.FORMULA && s1.equals(s2);
+
+        if (!(s0 == Sort.FORMULA && s1.equals(s2))) {
+            throw new TermCreationException(this, term);
+        }
     }
 }

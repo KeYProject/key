@@ -17,17 +17,19 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link DefaultEntry}.
  * @author Martin Hentschel
  */
-public class TestDefaultEntry extends TestCase {
+public class TestDefaultEntry {
    /**
     * Tests {@link DefaultEntry#getKey()}, {@link DefaultEntry#getValue()} and
     * {@link DefaultEntry#setValue(Object)}.
     */
-   public void testGetterAndSetter() {
+   @Test public void testGetterAndSetter() {
       Entry<String, String> entry = new DefaultEntry<String, String>("A", "B");
       assertEquals("A", entry.getKey());
       assertEquals("B", entry.getValue());

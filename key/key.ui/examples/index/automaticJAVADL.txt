@@ -95,7 +95,7 @@ keySettings = "#Proof-Settings-Config-File
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INVARIANT
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
@@ -120,7 +120,7 @@ keySettings = "#Proof-Settings-Config-File
 [SMTSettings]instantiateHierarchyAssumptions=true
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off
+[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment:efficient
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 
 "
@@ -209,6 +209,10 @@ group blockContracts {
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
+   provable ./heap/block_loop_contracts/Free/assertions0.key
+   provable ./heap/block_loop_contracts/Free/assertions1.key
+   provable ./heap/block_loop_contracts/Free/blockContracts0.key
+   provable ./heap/block_loop_contracts/Free/blockContracts1.key
    notprovable ./heap/block_loop_contracts/Finally/block_finally.key
    notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 }
@@ -924,6 +928,18 @@ group permissionHeap {
    # provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
    # Is provable, but very heavy (~400000 steps)
    # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
+}
+
+# Completion scopes / Exec statement tests
+group completionScopes {
+   provable ./completionscopes/testCcatchReturnVal.key
+   provable ./completionscopes/testMultCcatchClauses.key
+   provable ./completionscopes/testNestedExec.key
+   provable ./completionscopes/testCcatchBreakLabel.key
+   provable ./completionscopes/testCcatchContinueLabel.key
+   provable ./completionscopes/testCcatchBreakLabelWildcard.key
+   provable ./completionscopes/testCcatchContinueLabelWildcard.key
+   provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
 }
 
 # These are the proof files which can be loaded from the examples menu.

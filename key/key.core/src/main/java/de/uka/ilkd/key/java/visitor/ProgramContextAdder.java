@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.statement.Exec;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -99,6 +100,9 @@ public class ProgramContextAdder {
             } else if (context instanceof SynchronizedBlock) {
                 return createSynchronizedBlockWrapper(
                         (SynchronizedBlock) context, (StatementBlock) body);
+            } else if (context instanceof Exec) {
+                return createExecStatementWrapper((StatementBlock) body,
+                    (Exec) context);
             } else {
                 throw new RuntimeException(new UnexpectedException(
                         "Unexpected block type: " + context.getClass()));
@@ -110,7 +114,7 @@ public class ProgramContextAdder {
      * inserts the content of the statement block <code>putIn</code> and adds
      * succeeding children of the innermost non terminal element (usually
      * statement block) in the context.
-     * 
+     *
      * @param wrapper
      *            the JavaNonTerminalProgramElement with the context that has to
      *            be wrapped around the content of <code>putIn</code>
@@ -172,7 +176,7 @@ public class ProgramContextAdder {
      * optimized as it just returns the replacement block if it is the only
      * child of the statement block to be constructed and the chld is a
      * statementblock too.
-     * 
+     *
      * @param wrapper
      *            the StatementBlock where to replace the first statement
      * @param replacement
@@ -199,6 +203,10 @@ public class ProgramContextAdder {
 
     protected Try createTryStatementWrapper(StatementBlock body, Try old) {
         return new Try(body, old.getBranchList());
+    }
+
+    protected Exec createExecStatementWrapper(StatementBlock body, Exec old) {
+        return new Exec(body, old.getBranchList());
     }
 
     protected MethodFrame createMethodFrameWrapper(MethodFrame old,

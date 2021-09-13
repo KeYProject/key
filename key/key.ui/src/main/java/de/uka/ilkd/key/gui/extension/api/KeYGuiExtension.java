@@ -10,7 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
@@ -100,7 +100,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow);
+        @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
     }
 
     /**
@@ -127,7 +127,7 @@ public interface KeYGuiExtension {
          * @param window   parent of this extension
          * @param mediator the current mediator
          */
-        @NotNull Collection<TabPanel> getPanels(@NotNull MainWindow window, @NotNull KeYMediator mediator);
+        @Nonnull Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
     }
 
     /**
@@ -150,9 +150,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getContextActions(@NotNull KeYMediator mediator,
-                                                @NotNull ContextMenuKind kind,
-                                                @NotNull Object underlyingObject);
+        @Nonnull List<Action> getContextActions(@Nonnull KeYMediator mediator,
+                                                @Nonnull ContextMenuKind kind,
+                                                @Nonnull Object underlyingObject);
     }
 
     /**
@@ -167,7 +167,7 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @NotNull JToolBar getToolbar(MainWindow mainWindow);
+        @Nonnull JToolBar getToolbar(MainWindow mainWindow);
     }
 
     /**
@@ -250,7 +250,7 @@ public interface KeYGuiExtension {
          * @param pos        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @NotNull List<String> getTermInfoStrings(@NotNull MainWindow mainWindow, @NotNull PosInSequent pos);
+        @Nonnull List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

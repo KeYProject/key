@@ -13,20 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-
-import org.key_project.util.java.MapUtil;
-
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -35,6 +22,11 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import org.key_project.util.java.MapUtil;
+
+import java.util.*;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction}
@@ -51,12 +43,12 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
     private final String latticeTypeName;
-    private final ArrayList<AbstractionPredicate> abstractionPredicates;
+    private final List<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-            Map<LocationVariable, Term> atPres, KeYJavaType kjt,
-            String latticeType,
-            ArrayList<AbstractionPredicate> abstractionPredicates) {
+                                             Map<LocationVariable, Term> atPres, KeYJavaType kjt,
+                                             String latticeType,
+                                             List<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
         this.atPres = atPres;
         this.kjt = kjt;

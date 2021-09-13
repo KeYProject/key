@@ -1,67 +1,14 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -74,8 +21,34 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+import java.awt.Dimension;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -102,8 +75,8 @@ public final class SourceView extends JComponent {
     /**
      * ToolTip for the textPanes containing the source code.
      */
-    private static final String TEXTPANE_TOOLTIP = "Click on a highlighted line to jump to the "
-            + "most recent occurrence of this line in symbolic execution.";
+    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent" +
+        " occurrence of this line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
@@ -172,7 +145,7 @@ public final class SourceView extends JComponent {
     private LinkedList<Pair<Node, PositionInfo>> lines;
 
     /** The symbolic execution highlights. */
-    private Set<Highlight> symbExHighlights = new HashSet<>();
+    private final Set<Highlight> symbExHighlights = new HashSet<>();
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -185,20 +158,16 @@ public final class SourceView extends JComponent {
         sourceStatusBar = new JLabel();
         tabPane.setBorder(new TitledBorder(NO_SOURCE));
 
-        tabPane.addChangeListener(new ChangeListener() {
+        tabPane.addChangeListener(e -> {
+            if (tabPane.getSelectedTab() == null) {
+                selectedFile = null;
+            } else {
+                selectedFile = tabPane.getSelectedTab().absoluteFileName;
+            }
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (tabPane.getSelectedTab() == null) {
-                    selectedFile = null;
-                } else {
-                    selectedFile = tabPane.getSelectedTab().absoluteFileName;
-                }
-
-                // Mark tabs that contain highlights.
-                for (Tab tab : tabs.values()) {
-                    tab.markTabComponent();
-                }
+            // Mark tabs that contain highlights.
+            for (Tab tab : tabs.values()) {
+                tab.markTabComponent();
             }
         });
 
@@ -216,12 +185,9 @@ public final class SourceView extends JComponent {
         add(sourceStatusBar, BorderLayout.SOUTH);
 
         // react to font changes
-        Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
-            @Override
-            public void configChanged(ConfigChangeEvent e) {
-                for (Tab tab : tabs.values()) {
-                    tab.textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-                }
+        Config.DEFAULT.addConfigChangeListener(e -> {
+            for (Tab tab : tabs.values()) {
+                tab.textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
             }
         });
 
@@ -350,7 +316,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        Set<Highlight> result = new HashSet<Highlight>();
+        Set<Highlight> result = new HashSet<>();
 
         for (int i = firstLine; i <= lastLine && tab != null; ++i) {
             result.add(addHighlight(fileURI, i, color, level));
@@ -473,6 +439,39 @@ public final class SourceView extends JComponent {
     }
 
     /**
+     * Calculates the range of actual text (not whitespace) in the line containing the given
+     * position.
+     * @param textPane the JTextPane with the text
+     * @param pos the position to check
+     * @return the range of text (may be empty if there is just whitespace in the line)
+     */
+    private static Range calculateLineRange(JTextPane textPane, int pos) {
+        Document doc = textPane.getDocument();
+        String text = "";
+        try {
+            text = doc.getText(0, doc.getLength());
+        } catch (BadLocationException e) {
+            Debug.out(e);
+        }
+
+        // find line end
+        int end = text.indexOf('\n', pos);
+        end = end == -1 ? text.length() : end;      // last line?
+
+        // find line start
+        int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
+        start = start == -1 ? 0 : start;            // first line?
+
+        // ignore whitespace at the beginning of the line
+        while (start < text.length() && start < end
+            && Character.isWhitespace(text.charAt(start))) {
+            start++;
+        }
+
+        return new Range(start, end);
+    }
+
+    /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
      * @param s the String to replace
      * @return the resulting String (without tabs)
@@ -486,6 +485,34 @@ public final class SourceView extends JComponent {
 
     private boolean isSelected(Tab tab) {
         return Objects.equals(selectedFile, tab.absoluteFileName);
+    }
+
+    /**
+     * Checks if the given point is highlighted (by a symbolic execution highlight) inside the
+     * active tab. Due to technical restrictions of the method viewToModel(Point), the result is a
+     * little bit imprecise: The last char in a line is not detected as highlighted, this method
+     * wrongly returns false.
+     * @param point the point to check, usually the position of the mouse cursor
+     * @return true iff the point is on a highlight
+     */
+    private boolean isHighlighted(Point point) {
+        Tab tab = tabs.get(selectedFile);
+        int pos = tab.textPane.viewToModel(point);
+        int line = tab.posToLine(pos);
+
+        for (Highlight h : symbExHighlights) {
+            if (line == h.line) {
+                // found matching highlight h: Is the mouse cursor inside the highlight?
+                Range range = calculateLineRange(tab.textPane,
+                    tab.lineInformation[line - 1].getOffset());
+                // we need < here, since viewToModel can not return a position after the last
+                // char in a line
+                if (range.start() <= pos && pos < range.end()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -815,7 +842,20 @@ public final class SourceView extends JComponent {
         /**
          * The text pane containing the file's content.
          */
-        private final JTextPane textPane = new JTextPane();
+        private final JTextPane textPane = new JTextPane() {
+            @Override
+            public String getToolTipText(MouseEvent mouseEvent) {
+                if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .isShowSourceViewTooltips()) {
+                    return null;
+                }
+
+                if (isHighlighted(mouseEvent.getPoint())) {
+                    return TEXTPANE_HIGHLIGHTED_TOOLTIP;
+                }
+                return null;
+            }
+        };
 
         /**
          * The line information for the file this tab belongs to.
@@ -835,7 +875,7 @@ public final class SourceView extends JComponent {
         /**
          * Maps line numbers to highlights.
          */
-        private Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
+        private final Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
@@ -894,8 +934,18 @@ public final class SourceView extends JComponent {
         private void initTextPane() {
             // We use the same font as in SequentView for consistency.
             textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setToolTipText("");
             textPane.setEditable(false);
+            textPane.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent mouseEvent) {
+                    if (isHighlighted(mouseEvent.getPoint())) {
+                        textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    } else {
+                        textPane.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
+            });
 
             // insert source code into text pane
             try {
@@ -1028,39 +1078,6 @@ public final class SourceView extends JComponent {
         }
 
         /**
-         * Calculates the range of actual text (not whitespace) in the line containing the given
-         * position.
-         * @param textPane the JTextPane with the text
-         * @param pos the position to check
-         * @return the range of text (may be empty if there is just whitespace in the line)
-         */
-        private Range calculateLineRange(JTextPane textPane, int pos) {
-            Document doc = textPane.getDocument();
-            String text = "";
-            try {
-                text = doc.getText(0, doc.getLength());
-            } catch (BadLocationException e) {
-                Debug.out(e);
-            }
-
-            // find line end
-            int end = text.indexOf('\n', pos);
-            end = end == -1 ? text.length() : end;      // last line?
-
-            // find line start
-            int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
-            start = start == -1 ? 0 : start;            // first line?
-
-            // ignore whitespace at the beginning of the line
-            while (start < text.length() && start < end
-                && Character.isWhitespace(text.charAt(start))) {
-                start++;
-            }
-
-            return new Range(start, end);
-        }
-
-        /**
          * Paints the highlights for symbolically executed lines. The most recently executed line is
          * highlighted with a different color.
          */
@@ -1070,6 +1087,10 @@ public final class SourceView extends JComponent {
             }
 
             symbExHighlights.clear();
+
+            if (lines == null) {
+                return;
+            }
 
             try {
                 int mostRecentLine = -1;
@@ -1142,13 +1163,13 @@ public final class SourceView extends JComponent {
         private static final Map<Highlight, Object> TAGS = new HashMap<>();
 
         /** @see #getLevel() */
-        private int level;
+        private final int level;
 
         /** @see #getColor() */
-        private Color color;
+        private final Color color;
 
         /** @see #getFileURI() */
-        private URI fileURI;
+        private final URI fileURI;
 
         /** @see #getLine() */
         private int line;
@@ -1326,29 +1347,10 @@ public final class SourceView extends JComponent {
             this.fileURI = fileURI;
         }
 
-        /**
-         * Checks if the given position is within a highlight.
-         * @param pos the position to check
-         * @return true if highlighted and false if not
-         */
-        private boolean isHighlighted(int pos) {
-            Tab tab = tabs.get(selectedFile);
-
-            int line = tab.posToLine(pos);
-
-            for (Highlight h : symbExHighlights) {
-                if (line == h.line) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         @Override
         public void mouseClicked(MouseEvent e) {
             int pos = textPane.viewToModel(e.getPoint());
-            if (isHighlighted(pos)) {
+            if (isHighlighted(e.getPoint())) {
                 int line = 0;
                 // calculate the line number
                 while (line < li.length - 1) {

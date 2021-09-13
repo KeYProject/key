@@ -27,7 +27,7 @@
             </value>
          </variable>
          <operationContract name="result = max(self) catch(exc_0)
-pre: (!self = null)&lt;&lt;impl&gt;&gt;
+pre: !self = null
 post: ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; self.l2 = 42)
 &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
    -&gt;   java.lang.Error::instance(exc_0) = TRUE

@@ -90,6 +90,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Central storage for all specification elements, such as contracts, class
@@ -138,14 +139,11 @@ public final class SpecificationRepository {
         proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification>
-        loopInvs =
-            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>
-        blockContracts =
-            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
-        loopContracts =
-            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+        loopInvs = new LinkedHashMap<>();
+    private final Map<Triple<StatementBlock, String, Integer>, ImmutableSet<BlockContract>>
+        blockContracts = new LinkedHashMap<>();
+    private final Map<Triple<StatementBlock, String, Integer>, ImmutableSet<LoopContract>>
+        loopContracts = new LinkedHashMap<>();
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
      */
@@ -469,6 +467,7 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
+        //System.out.println(contract.toString());
         if (!WellDefinednessCheck.isOn()
                 && contract instanceof WellDefinednessCheck) {
             return;
@@ -1674,8 +1673,8 @@ public final class SpecificationRepository {
      * @return all block contracts for the specified block.
      */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                block, block.getParentClass(), block.getStartPosition().getLine());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.<BlockContract> nil();
@@ -1691,8 +1690,8 @@ public final class SpecificationRepository {
      * @return all loop contracts for the specified block.
      */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                block, block.getParentClass(), block.getStartPosition().getLine());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.<LoopContract> nil();
@@ -1808,8 +1807,8 @@ public final class SpecificationRepository {
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                block, block.getParentClass(), block.getStartPosition().getLine());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
         if (addFunctionalContract) {
@@ -1826,8 +1825,8 @@ public final class SpecificationRepository {
      */
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                block, block.getParentClass(), block.getStartPosition().getLine());
 
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         blockContracts.put(b, set.remove(contract));
@@ -1853,8 +1852,8 @@ public final class SpecificationRepository {
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                    block, block.getStartPosition().getLine());
+            final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                    block, block.getParentClass(), block.getStartPosition().getLine());
             loopContracts.put(b, getLoopContracts(block).add(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
@@ -1882,8 +1881,8 @@ public final class SpecificationRepository {
     public void removeLoopContract(final LoopContract contract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                    block, block.getStartPosition().getLine());
+            final Triple<StatementBlock, String, Integer> b = new Triple<>(
+                    block, block.getParentClass(), block.getStartPosition().getLine());
 
             ImmutableSet<LoopContract> set = loopContracts.get(b);
             loopContracts.put(b, set.remove(contract));

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
@@ -42,22 +43,30 @@ public class SMTCommand
             throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
-        Goal goal = state.getFirstOpenAutomaticGoal();
-
-        SMTSettings settings = new SMTSettings(
-                goal.proof().getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                goal.proof());
-        SolverLauncher launcher = new SolverLauncher(settings);
-        Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
-        probList.add(new SMTProblem(goal));
-        launcher.launch(su.getTypes(), probList, goal.proof().getServices());
-
-        for (SMTProblem problem : probList) {
-            if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
-                        .setTitle(args.solver);
-                problem.getGoal().apply(app);
+        final List<Goal> goals = new ArrayList<>();
+        
+        if (args.allGoals) {
+            goals.addAll(state.getProof().openEnabledGoals().stream().collect(Collectors.toList()));
+        } else {
+            goals.add(state.getFirstOpenAutomaticGoal());
+        }
+        
+        for (Goal goal : goals) {
+            SMTSettings settings = new SMTSettings(
+                    goal.proof().getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    goal.proof());
+            SolverLauncher launcher = new SolverLauncher(settings);
+            Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
+            probList.add(new SMTProblem(goal));
+            launcher.launch(su.getTypes(), probList, goal.proof().getServices());
+    
+            for (SMTProblem problem : probList) {
+                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+                    IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
+                            .setTitle(args.solver);
+                    problem.getGoal().apply(app);
+                }
             }
         }
     }
@@ -77,6 +86,9 @@ public class SMTCommand
     public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
+        
+        @Option(value = "allgoals", required = false)
+        public boolean allGoals = false;
     }
 
 }

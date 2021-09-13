@@ -25,6 +25,11 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "aux-start";
+    }
+
+    @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {new StartAuxiliaryMethodComputationMacro(),
                                  new StartAuxiliaryLoopComputationMacro(),

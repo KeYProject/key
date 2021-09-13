@@ -288,6 +288,13 @@ public class IntermediatePresentationProofFileParser
             ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
             break;
 
+        case NOTES:
+            ruleInfo.notes = str;
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes);
+            }
+            break;
+
         default:
             break;
         }
@@ -448,6 +455,7 @@ public class IntermediatePresentationProofFileParser
         protected int currFormula = 0;
         protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
         protected ImmutableList<Name> currNewNames = null;
+        protected String notes = null;
 
         public RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();

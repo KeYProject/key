@@ -1603,7 +1603,8 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp} represents a symbolic execution tree node.
     */
    public static boolean isRuleAppToIgnore(RuleApp ruleApp) {
-      return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp));
+        return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp))
+                || "elim_double_block".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
 
    /**

@@ -1,16 +1,18 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
 import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
+import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.PrintWriter;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Matcher to deal with matching a string pattern against a sequent
+ *
  * @author S.Grebing
  */
 public class Matcher {
@@ -27,10 +30,9 @@ public class Matcher {
     private ProofApi api;
 
     /**
-     *
      * @param api reference to proof api in order to get access to the key environment
      */
-    public Matcher(ProofApi api){
+    public Matcher(ProofApi api) {
 
         this.api = api;
     }
@@ -38,23 +40,23 @@ public class Matcher {
     /**
      * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes containing matching
      * results from where the information about instantiated schema variables can be extracted. If no match was possible the list is exmpt.
-     * @param pattern a string representation of the pattern sequent against which the current sequent should be matched
-     * @param currentSeq current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
      *
+     * @param pattern     a string representation of the pattern sequent against which the current sequent should be matched
+     * @param currentSeq  current concrete sequent
+     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
     //List of VarAssignment
-    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
+    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments) {
         //copy services in order to not accidently set assignments and namespace for environment
 
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
         //Aufbau der Deklarationen fuer den NameSpace
-        buildNameSpace(assignments ,copyServices);
+        buildNameSpace(assignments, copyServices);
         //Zusammenbau des Pseudotaclets
         //Parsen des Taclets
-        String patternString = "matchPattern{\\assumes("+pattern+") \\find (==>)  \\add (==>)}";
+        String patternString = "matchPattern{\\assumes(" + pattern + ") \\find (==>)  \\add (==>)}";
 
         Taclet t = null;
         try {
@@ -75,7 +77,7 @@ public class Matcher {
         //Iterator durch die Pattern-Sequent
 
         List<SearchNode> finalCandidates = new ArrayList<>(100);
-        if(size > 0) {
+        if (size > 0) {
             //Iteratoren durch die Sequent
             ImmutableList<IfFormulaInstantiation> antecCand =
                     IfFormulaInstSeq.createList(currentSeq, true, copyServices);
@@ -127,7 +129,7 @@ public class Matcher {
             }*/
         }
         List<VariableAssignments> matches = new ArrayList<>();
-        if(!finalCandidates.isEmpty()) {
+        if (!finalCandidates.isEmpty()) {
             for (SearchNode finalCandidate : finalCandidates) {
                 VariableAssignments va = extractAssignments(finalCandidate, assignments);
                 matches.add(va);
@@ -138,10 +140,11 @@ public class Matcher {
 
     /**
      * Extract the matching results from each SearchNode and tranform these to Variable Assigments
+     *
      * @param sn SearchNode
      * @return VariableAssigments containing the assignments fo matching results to schemavariables
      */
-    private VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments){
+    private VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments) {
         VariableAssignments va = new VariableAssignments();
         SVInstantiations insts = sn.mc.getInstantiations();
         Set<String> varNames = assignments.getTypeMap().keySet();
@@ -153,8 +156,10 @@ public class Matcher {
         return va;
 
     }
+
     /**
      * Adds the variables of VariableAssignments to the namespace
+     *
      * @param assignments VariabelAssignments containing variable names and types
      * @param services
      */
@@ -166,67 +171,52 @@ public class Matcher {
 
     /**
      * Builds a string that is used to create a new schemavariable declaration for the matchpattern
+     *
      * @param assignments varaiables appearing as schema varaibels in the match pattern and their types (in KeY)
      * @return a String representing the declaration part of a taclet for teh matchpattern
      */
     private String buildDecls(VariableAssignments assignments) {
         Map<String, VariableAssignments.VarType> typeMap = assignments.getTypeMap();
-        String schemaVars =  "\\schemaVariables {\n" ;
+        String schemaVars = "\\schemaVariables {\n";
         final List<String> strn = new ArrayList<>();
 
-        typeMap.forEach((id, type) -> strn.add(toDecl(id,type)));
+        typeMap.forEach((id, type) -> strn.add(toDecl(id, type)));
         schemaVars += strn.stream().collect(Collectors.joining("\n"));
-        schemaVars +="}";
+        schemaVars += "}";
         //System.out.println(schemaVars);
         return schemaVars;
     }
 
-    private String toDecl(String id, VariableAssignments.VarType type){
-        return type.getKeYDeclarationPrefix()+" "+id+";";
+    private String toDecl(String id, VariableAssignments.VarType type) {
+        return type.getKeYDeclarationPrefix() + " " + id + ";";
     }
 
-
-    private KeYParserF stringDeclParser(String s, Services services) {
-        return new KeYParserF(ParserMode.DECLARATION,
-                new KeYLexerF(s,
-                        "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
-                services, services.getNamespaces());
-    }
     /**
      * Parse the declaration string for the current pattern and add the variables to the namespace
+     *
      * @param s declaration part of a taclet
      */
     public void parseDecls(String s, Services services) {
         try {
-            KeYParserF p = stringDeclParser(s, services);
-            p.decls();
+            KeyIO io = new KeyIO(services);
+            KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
+            io.evalDeclarations(ctx);
+            //KeYParserF p = stringDeclParser(s, services);
+            //p.decls();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw );
+            throw new RuntimeException("Exc while Parsing:\n" + sw);
         }
-    }
-
-
-
-    private KeYParserF stringTacletParser(String s, Services services) {
-        return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
-                "No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
-                services, services.getNamespaces());
     }
 
     private Taclet parseTaclet(String s, Services services) throws RecognitionException {
-        try {
-            KeYParserF p = stringTacletParser(s, services);
-
-            return p.taclet(DefaultImmutableSet.<Choice>nil());
-        } catch (RecognitionException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw e;
-        }
+        KeyIO io = new KeyIO(services);
+        KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
+        io.evalDeclarations(ctx);
+        io.evalFuncAndPred(ctx);
+        return io.findTaclets(ctx).get(0);
     }
 
 }

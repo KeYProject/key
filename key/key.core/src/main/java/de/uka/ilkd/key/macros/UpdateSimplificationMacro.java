@@ -30,7 +30,6 @@ public class UpdateSimplificationMacro extends
 	    "parallelWithSkip2",
 	    "applySkip1",
 	    "applySkip2",
-	    "applySkip3"	    
 	};
 	
 	private static final Set<String> ADMITTED_RULE_NAMES_AS_SET = new HashSet<String>();

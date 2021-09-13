@@ -66,28 +66,30 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * and find or an InvalidPrefixException if the building of the Taclet 
      * Prefix fails.
      */
-    public SuccTaclet getSuccTaclet(){
-	if (find == null) {
-	    throw new TacletBuilderException(this, "No find part specified");
+	public SuccTaclet getSuccTaclet(){
+		if (find == null) {
+			throw new TacletBuilderException(this, "No find part specified");
 	    
+		}
+		checkBoundInIfAndFind();
+		final TacletPrefixBuilder prefixBuilder =
+				new TacletPrefixBuilder(this);
+		prefixBuilder.build();
+		SuccTaclet t = new SuccTaclet(name,
+				new TacletApplPart(ifseq,
+						varsNew,
+						varsNotFreeIn,
+						varsNewDependingOn,
+						variableConditions),
+				goals, ruleSets,
+				attrs,
+				find,
+				ignoreTopLevelUpdates,
+				prefixBuilder.getPrefixMap(),
+				choices, tacletAnnotations);
+		t.setOrigin(origin);
+		return t;
 	}
-	checkBoundInIfAndFind();
-	final TacletPrefixBuilder prefixBuilder = 
-            new TacletPrefixBuilder(this);
-	prefixBuilder.build();
-	return new SuccTaclet(name, 
-			      new TacletApplPart(ifseq,
-						 varsNew,
-						 varsNotFreeIn,
-						 varsNewDependingOn,
-						 variableConditions),
-			      goals, ruleSets,
-			      attrs,
-			      find,
-                              ignoreTopLevelUpdates,
-			      prefixBuilder.getPrefixMap(),
-			      choices, tacletAnnotations);
-    }
     
     /** builds and returns the Taclet that is specified by
      * former set... / add... methods. If no name is specified then

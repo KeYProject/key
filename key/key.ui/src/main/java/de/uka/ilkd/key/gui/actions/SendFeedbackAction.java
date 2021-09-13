@@ -24,17 +24,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
@@ -343,12 +335,8 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
     private class SendAction implements ActionListener {
-        private static final String MAIL_BODY =
-                "Please attach the file %s with the chosen metadata to this mail and send it.%%0a%%0a" +
-                "Thanks for your feedack, %%0athe KeY team";
-
-        JDialog dialog;
-        JTextArea message;
+        private final JDialog dialog;
+        private final JTextArea message;
 
         public SendAction(JDialog dialog, JTextArea bugDescription) {
             this.dialog = dialog;
@@ -359,30 +347,36 @@ public class SendFeedbackAction extends AbstractAction {
         public void actionPerformed(ActionEvent arg0) {
 
             try {
-                File reportFile = File.createTempFile("key-bugreport", ".zip");
-
                 int confirmed = JOptionPane.showConfirmDialog(
                         parent,
                         "A zip archive containing the selected data will be created.\n"
-                                + "A new e-mail client window will open.\n"
-                                + "Please attach the file " + reportFile +
-                                " to the mail and send it.", "Send Bug Report",
-                                JOptionPane.OK_CANCEL_OPTION);
+                                + "To report a problem, send it in an e-mail to the KeY developers\n"
+                                + "at " + FEEDBACK_RECIPIENT + ".", "Send Bug Report",
+                        JOptionPane.OK_CANCEL_OPTION);
 
-                if (confirmed == JOptionPane.OK_OPTION) {
-                    saveMetaDataToFile(reportFile, message.getText());
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop desktop = Desktop.getDesktop();
-                        URI uriMailTo = new URI("mailto:" + FEEDBACK_RECIPIENT + "?" +
-                                "subject=KeY%20feedback&body=" +
-                                String.format(MAIL_BODY, reportFile).replace(" ", "%20"));
-                        desktop.mail(uriMailTo);
-                    } else {
-                        JOptionPane.showMessageDialog(parent,
-                                "A mail window cannot be automatically opened on your system.\n"+
-                                "Please send the file " + reportFile + " to address " +
-                                FEEDBACK_RECIPIENT);
+                if(confirmed != JOptionPane.OK_OPTION) {
+                    return;
+                }
+
+                JFileChooser jfc = new JFileChooser();
+                jfc.addChoosableFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.getName().toLowerCase().endsWith(".zip");
                     }
+
+                    @Override
+                    public String getDescription() {
+                        return "ZIP archives";
+                    }
+                });
+
+                int answer = jfc.showSaveDialog(parent);
+                if (answer == JFileChooser.APPROVE_OPTION) {
+                    saveMetaDataToFile(jfc.getSelectedFile(), message.getText());
+                    JOptionPane.showMessageDialog(parent,
+                            String.format("Your message has been saved to the file %s.",
+                                    jfc.getSelectedFile()));
                 }
             } catch (Exception e) {
                 ExceptionDialog.showDialog(parent, e);

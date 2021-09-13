@@ -1,29 +1,25 @@
 package de.uka.ilkd.key.util;
 
-import org.antlr.runtime.RecognitionException;
-
-import de.uka.ilkd.key.java.ParseExceptionInFile;
-import de.uka.ilkd.key.java.PosConvertException;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
-import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import recoder.java.CompilationUnit;
-import recoder.kit.UnitKit;
-import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.antlr.runtime.RecognitionException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 
 /**
  * Various utility methods related to exceptions.
+ *
  * @author bruns
  * @since 2.4.0
  */
 public final class ExceptionTools {
+
+    private ExceptionTools() {
+    }
 
     /**
      * Tries to resolve the location (i.e., file name, line, and column)
@@ -33,78 +29,44 @@ public final class ExceptionTools {
      * @param exc the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
      * @throws MalformedURLException if the no URL can be parsed from the String stored
-     *      inside the given Throwable can not be successfully converted to a URL and thus
-     *      no Location can be created
+     *                               inside the given Throwable can not be successfully converted to a URL and thus
+     *                               no Location can be created
      */
-    public static Location getLocation(Throwable exc) throws MalformedURLException {
-        assert exc != null;
-    
+    public static @Nullable
+    Location getLocation(@Nonnull Throwable exc) throws MalformedURLException {
         Location location = null;
-
-        if  (exc instanceof RecognitionException) {
-            RecognitionException recEx = (RecognitionException) exc;
-            // ANTLR 3 - Recognition Exception.
-            if (exc instanceof SLTranslationException) {
-               SLTranslationException ste = (SLTranslationException) exc;
-               location = new Location(ste.getFileName(), 
-                               ste.getLine(), 
-                               ste.getColumn());
-            } else if(exc instanceof KeYSemanticException) {
-                KeYSemanticException kse = (KeYSemanticException) exc;
-             // ANTLR has 0-based column numbers, hence +1.
-                location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn() + 1);
-            } else if(recEx.input != null) {
-                // ANTLR has 0-based column numbers, hence +1.
-                location = new Location(recEx.input.getSourceName(),
-                      recEx.line, recEx.charPositionInLine + 1);
-            }
-        } else if (exc instanceof ParserException) {
-            location = ((ParserException) exc).getLocation();
-        } else if (exc instanceof ParseExceptionInFile) {
-            // This kind of exception has a filename but no line/col information
-            // Retrieve the latter from the cause. location remains null if
-            // no line/col is available in cause.
-            if(exc.getCause() != null) {
-                location = getLocation(exc.getCause());
-                if(location != null) {
-                    String filename = ((ParseExceptionInFile)exc).getFilename();
-                    location = new Location(filename, location.getLine(), location.getColumn());
-                }
-            }
+        if (exc instanceof HasLocation) {
+            return ((HasLocation) exc).getLocation();
+        } else if (exc instanceof RecognitionException) {
+            location = getLocation((RecognitionException) exc);
         } else if (exc instanceof ParseException) {
-            ParseException pexc = (ParseException)exc;
-            Token token = pexc.currentToken;
-            if(token == null) {
-                location = null;
-            } else {
-                // JavaCC has 1-based column numbers
-                location = new Location("", token.next.beginLine, token.next.beginColumn);
-            }
-        } else if (exc instanceof SVInstantiationExceptionWithPosition) {	      
-            location = new Location((String) null,
-                            ((SVInstantiationExceptionWithPosition)exc).getRow(),
-                            ((SVInstantiationExceptionWithPosition)exc).getColumn());
-        } else if (exc instanceof ScriptException) {
-            // may still be null ...
-            location = ((ScriptException)exc).getLocation();
-        } else if (exc instanceof PosConvertException) {
-            Throwable cause = exc.getCause();
-            String file = "";
-            if (cause instanceof UnresolvedReferenceException) {
-                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
-                CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
-                String dataloc = cu.getDataLocation().toString();
-                file = dataloc.substring(dataloc.indexOf(':') + 1);
-            }
-            location = new Location(file, ((PosConvertException) exc).getLine(),
-                                        ((PosConvertException) exc).getColumn());
-        } 
-    
+            location = getLocation((ParseException) exc);
+        }
+
         if (location == null && exc.getCause() != null) {
             location = getLocation(exc.getCause());
         }
-    
+
         return location;
+    }
+
+    @Nullable
+    private static Location getLocation(ParseException exc) throws MalformedURLException {
+        // JavaCC has 1-based column numbers
+        Token token = exc.currentToken;
+        return token == null ? null : new Location("", token.next.beginLine, token.next.beginColumn);
+    }
+
+
+    @Nullable
+    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
+        // ANTLR 3 - Recognition Exception.
+        if (exc.input != null) {
+            // ANTLR has 0-based column numbers, hence +1.
+            return new Location(exc.input.getSourceName(),
+                    exc.line, exc.charPositionInLine + 1);
+        }
+        return null;
     }
 
 }

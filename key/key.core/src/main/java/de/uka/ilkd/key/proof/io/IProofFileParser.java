@@ -15,8 +15,6 @@ package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
-import de.uka.ilkd.key.parser.KeYParser;
-
 /**
  * Defines the required which a {@link KeYParser} needs to parse a *.proof file
  * and to apply the rules again.
@@ -46,7 +44,7 @@ public interface IProofFileParser {
                 "userinteraction"), PROOF_SCRIPT("proofscript"), NEW_NAMES("newnames"), AUTOMODE_TIME(
                 "autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"), KeY_VERSION(
                 "keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL(
-                "opengoal"), MODALITY("modality");
+                "opengoal"), NOTES("notes"), MODALITY("modality");
 
         private String rawName;
 

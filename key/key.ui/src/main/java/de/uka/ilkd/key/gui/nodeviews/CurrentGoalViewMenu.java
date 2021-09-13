@@ -15,16 +15,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,20 +47,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -89,6 +67,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
     private static final long serialVersionUID = 8151230546928796116L;
 
+    private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
     private static final String CREATE_ABBREVIATION = "Create abbreviation";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
     private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
@@ -136,8 +115,24 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
-        createMenu(removeRewrites(findList).prepend(rewriteList), noFindList, builtInList,
-                new MenuControl());
+        createMenu(removeRewrites(findList).prepend(rewriteList), removeIntroduceAxiomTaclet(noFindList),
+                builtInList, new MenuControl());
+    }
+
+    /**
+     * Removes the unsound "introduceAxiom" taclet from the list of displayed
+     * taclets.
+     *
+     * @param list
+     *            The list from which to filter.
+     * @return The original list, without the "introduceAxiom" taclet.
+     */
+    private static ImmutableList<TacletApp>
+            removeIntroduceAxiomTaclet(ImmutableList<TacletApp> list) {
+        return list.stream().filter(
+                app -> !app.rule().name().toString()
+                        .equals(INTRODUCE_AXIOM_TACLET_NAME))
+                .collect(ImmutableSLList.toImmutableList());
     }
 
     /**
@@ -288,10 +283,13 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item;
-        if (builtInRule == WhileInvariantRule.INSTANCE
-                || builtInRule == LoopScopeInvariantRule.INSTANCE) {
+        if (builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
+        } else if (builtInRule == WhileInvariantRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
                     "Applies a known and complete loop specification immediately.",
                     ENTER_LOOP_SPECIFICATION,
                     "Allows to modify an existing or to enter a new loop specification.",

@@ -13,6 +13,8 @@
 
 package org.key_project.util.collection;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -105,7 +107,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * adds an element, barfs if the element is already present
      *
      * @param element of type <T> that has to be added to this set
-     * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
+     * @throws NotUniqueException if the element is already present
      */
     @Override
     public ImmutableSet<T> addUnique(T element) throws NotUniqueException {
@@ -306,7 +308,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param set a non-null mutable set
      * @return a fresh immutable set with all the elements in set
      */
-    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+    public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
+        if(set == null) return null;
         if (set.isEmpty()) {
             return nil();
         } else {
@@ -317,6 +320,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return new DefaultImmutableSet<T>(backerList);
         }
     }
+
+
+    public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
+        if(seq == null) return null;
+        return fromSet(new HashSet<>(seq));
+    }
+
 
     @Override
     public String toString() {

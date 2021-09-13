@@ -92,9 +92,7 @@ public class HelperClassForTests {
             result = pi.startProver(po, po);
 
         } catch (Exception e) {
-            System.err.println("Exception occurred while parsing "+file+"\n");
-            e.printStackTrace();
-            System.exit(-1);
+            throw new RuntimeException(e);
         }
         return result;
     }

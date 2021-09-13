@@ -376,6 +376,40 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
+     * Helper method for parsing a single compilation unit when a FileRepo is present.
+     * @param fileRepo the FileRepo that provides the InputStream
+     * @param filename the name of the file to read
+     * @return the parsed compilation unit
+     * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
+     */
+    private CompilationUnit readViaFileRepo(FileRepo fileRepo, String filename)
+        throws ParseExceptionInFile {
+        try (InputStream is = fileRepo.getInputStream(Paths.get(filename));
+             Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(fr)) {
+            return servConf.getProgramFactory().parseCompilationUnit(br);
+        } catch (Exception e) {
+            throw new ParseExceptionInFile(filename, e);
+        }
+    }
+
+    /**
+     * Helper method for parsing a single compilation unit directly from a file, in case no FileRepo
+     * is present.
+     * @param filename the name of the file to read
+     * @return the parsed compilation unit
+     * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
+     */
+    private CompilationUnit readWithoutFileRepo(String filename) throws ParseExceptionInFile {
+        try (Reader fr = new FileReader(filename);
+             BufferedReader br = new BufferedReader(fr)) {
+            return servConf.getProgramFactory().parseCompilationUnit(br);
+        } catch (Exception e) {
+            throw new ParseExceptionInFile(filename, e);
+        }
+    }
+
+    /**
      * parse a list of java files.
      *
      * Each element of the array is treated as a filename to read in.
@@ -394,24 +428,15 @@ public class Recoder2KeY implements JavaReader {
         try {
             for (String filename : cUnitStrings) {
                 final CompilationUnit cu;
-                Reader fr = null;
-                try {
-                    if (fileRepo != null) {
-                        fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
-                                StandardCharsets.UTF_8);
-                    } else {
-                        // fallback if no repo present (e.g. in tests)
-                        fr = new FileReader(filename);
-                    }
-                    fr = new BufferedReader(fr);
-                    cu = servConf.getProgramFactory().parseCompilationUnit(fr);
-                } catch (Exception e) {
-                    throw new ParseExceptionInFile(filename, e);
-                } finally {
-                    if (fr != null) {
-                        fr.close();
-                    }
+
+                if (fileRepo != null) {
+                    // open stream via FileRepo
+                    cu = readViaFileRepo(fileRepo, filename);
+                } else {
+                    // fallback without FileRepo
+                    cu = readWithoutFileRepo(filename);
                 }
+
                 cu.setDataLocation(new DataFileLocation(filename));
                 cUnits.add(cu);
             }
@@ -567,20 +592,17 @@ public class Recoder2KeY implements JavaReader {
         
         while(walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
-            InputStream is = walker.openCurrent(fileRepo);
-            Reader f = new BufferedReader(new InputStreamReader(is));
-            
-            try {
+            try (InputStream is = walker.openCurrent(fileRepo);
+                 Reader isr = new InputStreamReader(is);
+                 Reader f = new BufferedReader(isr)) {
+
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                 rcu.setDataLocation(loc);
                 // done by parser : rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
             } catch(Exception ex) {
                 throw new ParseExceptionInFile(loc.toString(), ex);
-            } finally {        
-        	    f.close();
             }
-            
             
             if (Debug.ENABLE_DEBUG) {
                 Debug.out("parsed: " + loc);
@@ -638,21 +660,17 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".jml");
             while(walker.step()) {
-        	Reader f = null;
-        	try {
-                    currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent(fileRepo);
-                    f = new BufferedReader(new InputStreamReader(is));
+                currentDataLocation = walker.getCurrentDataLocation();
+                try (InputStream is = walker.openCurrent(fileRepo);
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
+
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, false);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
-                } finally {
-                    if (f != null) {
-                	f.close();
-                    }
                 }
             }
         }
@@ -661,21 +679,17 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".java");
             while(walker.step()) {
-        	Reader f = null;
-        	try {
-                    currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent(fileRepo);
-                    f = new BufferedReader(new InputStreamReader(is));
+                currentDataLocation = walker.getCurrentDataLocation();
+                try (InputStream is = walker.openCurrent(fileRepo);
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
+
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, true);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
-                } finally {
-                    if (f != null) {
-                	f.close();
-                    }
                 }
             }
         }
@@ -686,16 +700,9 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".class");
             while(walker.step()) {
-        	InputStream is = null;
-        	try {
-                    currentDataLocation = walker.getCurrentDataLocation();
-                    is = new BufferedInputStream(walker.openCurrent(fileRepo));
-                    ClassFile cf;
-                    try {
-                        cf = parser.parseClassFile(is);
-                    } finally {
-                        is.close();
-                    }
+                currentDataLocation = walker.getCurrentDataLocation();
+                try (InputStream is = new BufferedInputStream(walker.openCurrent(fileRepo))) {
+                    ClassFile cf = parser.parseClassFile(is);
                     manager.addClassFile(cf, currentDataLocation);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
@@ -845,11 +852,6 @@ public class Recoder2KeY implements JavaReader {
         for(recoder.java.CompilationUnit cu : specialClasses) {
             DataLocation dl = cu.getOriginalDataLocation();
             assert dl != null : "DataLocation not set on " + cu.toSource();
-
-            /* TODO: maybe we should keep the DataLocation or pass an URL here instead of
-             *  converting to a string. This would remove the need for parsing the URL from the
-             *  string later on (e.g. in PositionInfo, FileRepo, ...)
-             */
             getConverter().processCompilationUnit(cu, dl);
         }
         
