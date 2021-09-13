@@ -18,6 +18,7 @@ repositories {
     mavenCentral()
     //mavenLocal()
     flatDir { dirs file("$rootDir/../key/key.core/lib") }
+    flatDir { dirs file("$rootDir/../key/key.ui/lib") }
 }
 
 // In this section you declare the dependencies for your production and test code
@@ -43,5 +44,5 @@ sourceSets {
 }
 
 run {
-    args('check', '--missing', '--settings', '--report', '../../../testReport.html', '--replay', '--dependency', '../../../ba_simple')
+    args('check', '--missing', '--settings', '--report', '../../testReport3.html', '--replay', '--dependency', '../../Bugs_Examples/ba_simple')
 }
