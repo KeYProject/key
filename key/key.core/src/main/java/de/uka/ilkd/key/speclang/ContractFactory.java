@@ -540,7 +540,6 @@ public class ContractFactory {
             Term m2 = other.getMod(h, t.originalSelfVar,
                                    t.originalParamVars,
                                    services);
-            Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
             if (m1 != null || m2 != null) {
                 Term nm;
                 if (m1 == null) {
@@ -552,7 +551,9 @@ public class ContractFactory {
                                       tb.ife(otherPre, m2, tb.allLocs()));
 
                     // check if the other mod is the same as the one in the uniform store.
-                    if(uniformMod.containsKey(h) && !uniformMod.get(h).equals(m2)) {
+                    // To obtain meaningful results, check for equality ignoring origin labels here!
+                    if (uniformMod.containsKey(h)
+                        && !uniformMod.get(h).equalsModIrrelevantTermLabels(m2)) {
                         uniformMod.remove(h);
                     }
                 }
