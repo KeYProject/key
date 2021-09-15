@@ -1,0 +1,25 @@
+(73/73) -- recoder.java.CompilationUnit
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+(1/73) -- recoder.java.declaration.ClassDeclaration
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+(67/1) -- recoder.java.declaration.FieldDeclaration
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+  * /*@model @*/
+(3/3) -- recoder.java.reference.TypeReference
+  * /*@nullable@*/
+(3/13) -- recoder.java.declaration.ConstructorDeclaration
+  * /*@ normal_behavior       @ assignable \nothing;
+(24/37) -- recoder.java.declaration.MethodDeclaration
+  * /*@ normal_behavior       @ assignable footprint;
+(24/24) -- recoder.java.declaration.ParameterDeclaration
+  * /*@nullable@*/
+(31/33) -- recoder.java.statement.For
+  * /*@ loop_invariant 0 <= i && i <= count 	      @
+(46/48) -- recoder.java.declaration.MethodDeclaration
+  * /*@ normal_behavior       @ requires 0 <= i && i <
+  * /*@nullable@*/
+(57/59) -- recoder.java.declaration.MethodDeclaration
+  * /*@ normal_behavior       @ assignable \nothing;
