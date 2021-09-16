@@ -9,7 +9,6 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
-import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;

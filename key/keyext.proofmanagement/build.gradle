@@ -1,0 +1,30 @@
+
+// Apply the java plugin to add support for Java
+//apply plugin: 'java' // already done for all subprojects globally
+apply plugin: 'application'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    //jcenter()
+    //mavenCentral()
+    //mavenLocal()
+    flatDir { dirs file('$rootDir/../../key/key.core/lib') }
+    flatDir { dirs file('$rootDir/../../key/key.ui/lib') }
+}
+
+dependencies {
+    implementation project(':key.core')
+    implementation project(':key.ui')
+}
+
+application {
+    mainClass = "org.key_project.proofmanagement.Main"
+    // for start script generated with createStartScripts
+    applicationName = "pm"
+}
+
+run {
+    args('check', '--missing', '--settings', '--report', '../../../testReport3.html', '--replay', '--dependency', '../../../Bugs_Examples/ba_simple')
+}

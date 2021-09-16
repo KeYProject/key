@@ -25,6 +25,7 @@ dependencies {
     runtimeOnly project(":keyext.ui.testgen")
 
     runtimeOnly project(":keyext.interactionlog")
+    runtimeOnly project(":keyext.proofmanagement")
     //runtimeOnly project(":keyext.script.ui")
 }
 
