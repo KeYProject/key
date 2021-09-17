@@ -83,6 +83,30 @@ public class ContractFactoryTest {
     }
 
     /**
+     * Checks that two different assignable clauses are combined correctly:
+     * \nothing and \strictly_nothing should be combined to empty (w/o if-then-else).
+     * @throws SLTranslationException is not thrown if test succeeds
+     */
+    @Test
+    public void testCombineEmptyAssignable() throws SLTranslationException {
+        String contract = "/*@ normal_behavior\n" +
+                            "@  requires a != 5;\n" +
+                            "@  ensures \\result == 3;\n" +
+                            "@  assignable \\strictly_nothing;\n" +
+                            "@\n" +
+                            "@ also\n" +
+                            "@\n" +
+                            "@ exceptional_behavior\n" +
+                            "@  requires a == 5;\n" +
+                            "@  assignable \\nothing;\n" +
+                            "@  signals (RuntimeException e) true;\n" +
+                            "@  signals_only RuntimeException;\n" +
+                            "@*/";
+        Term woLabels = calculateCombinedModWOLabels(contract);
+        Assert.assertEquals("empty", woLabels.toString());
+    }
+
+    /**
      * Checks that two different assignable clauses are combined correctly, i.e. using intersection
      * and if-expressions with preconditions of the original contracts in their conditions.
      * @throws SLTranslationException is not thrown if test succeeds
@@ -111,9 +135,11 @@ public class ContractFactoryTest {
     }
 
     /**
-     *
+     * Helper for the tests: Parses the given contracts (must always be two), combines them and
+     * returns the modifies term of the resulting combined contract (with origin labels removed).
      * @param contractStr the string containing the contracts for method m
-     * @return the combined modifies term of the contracts in the input string, without term labels
+     * @return the combined modifies term of the contracts in the input string, without origin
+     *         labels
      * @throws SLTranslationException should not be thrown
      */
     private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
@@ -145,7 +171,7 @@ public class ContractFactoryTest {
         ContractFactory cf = new ContractFactory(services);
         FunctionalOperationContract singleContract = cf.union(cs);
 
-        // remove term/origin labels
+        // remove origin labels
         Term combinedMod = singleContract.getMod();
         return TermLabel.removeIrrelevantLabels(combinedMod, services);
     }
