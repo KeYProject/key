@@ -551,9 +551,8 @@ public class ContractFactory {
                                       tb.ife(otherPre, m2, tb.allLocs()));
 
                     // check if the other mod is the same as the one in the uniform store.
-                    // To obtain meaningful results, check for equality ignoring origin labels here!
-                    if (uniformMod.containsKey(h)
-                        && !uniformMod.get(h).equalsModIrrelevantTermLabels(m2)) {
+                    // To obtain meaningful results, check for equality ignoring all term labels!
+                    if (uniformMod.containsKey(h) && !uniformMod.get(h).equalsModTermLabels(m2)) {
                         uniformMod.remove(h);
                     }
                 }
