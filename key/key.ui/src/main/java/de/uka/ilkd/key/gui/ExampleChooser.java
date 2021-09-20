@@ -484,16 +484,14 @@ public final class ExampleChooser extends JDialog {
             return null;
         }
 
-	//show dialog
-	if(instance == null) {
-	    instance = new ExampleChooser(examplesDir);
-	}
-    instance.setLocationRelativeTo(instance.getOwner());
-	instance.setVisible(true);
+        //show dialog
+        if(instance == null) {
+            instance = new ExampleChooser(examplesDir);
+        }
+        instance.setLocationRelativeTo(instance.getOwner());
+        instance.setVisible(true);
 
-	//return result
-	final File result = instance.fileToLoad;
-	return result;
+        return instance.fileToLoad;
     }
 
     /**

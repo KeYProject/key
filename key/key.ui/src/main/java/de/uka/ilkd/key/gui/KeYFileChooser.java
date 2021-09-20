@@ -37,7 +37,7 @@ import de.uka.ilkd.key.core.Main;
  * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the
  *                          need for delegating many methods)
  */
-public class KeYFileChooser extends JFileChooser {
+public final class KeYFileChooser extends JFileChooser {
 
     /** default file filter for loading files */
     public static final FileFilter DEFAULT_FILTER = new FileNameExtensionFilter(
@@ -78,15 +78,13 @@ public class KeYFileChooser extends JFileChooser {
 
     private static KeYFileChooser INSTANCE;
 
-    private boolean saveDialog;
-
-    private File resetFile = null;
-
     private static final long serialVersionUID = -7598570660247063980L;
 
-    public boolean useCompression() {
-        return getSelectedFile().getName().endsWith(".proof.gz");
-    }
+    /** indicates whether the dialog is used for saving or loading */
+    private boolean saveDialog;
+
+    /** this is used to reset the path if the user presses the cancel button */
+    private File resetFile = null;
 
     private KeYFileChooser(File initDir) {
         super(initDir);
@@ -100,6 +98,10 @@ public class KeYFileChooser extends JFileChooser {
         addChoosableFileFilter(ZIP_FILTER);
         addChoosableFileFilter(PROOF_BUNDLE_FILTER);
         setFileFilter(DEFAULT_FILTER);
+    }
+
+    public boolean useCompression() {
+        return getSelectedFile().getName().endsWith(".proof.gz");
     }
 
     @Override

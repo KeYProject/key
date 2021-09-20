@@ -86,7 +86,6 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setCurrentProof(e.getSource().getSelectedProof());
         }
     };
-    private KeYFileChooser fileChooser;
 
     public InteractionLogView(MainWindow window, KeYMediator mediator) {
         // register the recorder in the proof control

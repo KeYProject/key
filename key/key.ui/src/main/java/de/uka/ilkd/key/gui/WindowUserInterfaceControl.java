@@ -421,31 +421,38 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         return file;
     }
 
-   public void saveProofBundle(Proof proof) {
-       final MainWindow mainWindow = MainWindow.getInstance();
-       final KeYFileChooser fileChooser =
-           KeYFileChooser.getFileChooser("Choose filename to save proof");
-       fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
+    /**
+     * Saves the proof as a bundle, i.e., as a zip archive containing all dependencies (Java
+     * sources, classpath and bootclasspath if present, other included key files, e.g., user-defined
+     * taclets).
+     * @param proof the proof to save
+     */
+    public void saveProofBundle(Proof proof) {
+        final MainWindow mainWindow = MainWindow.getInstance();
+        final KeYFileChooser fileChooser =
+            KeYFileChooser.getFileChooser("Choose filename to save proof");
+        fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-       Pair<File, String> f = fileName(proof, ".zproof");
-       final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
-       if (result == KeYFileChooser.APPROVE_OPTION) {
-           File file = fileChooser.getSelectedFile();
-           ProofSaver saver = new ProofBundleSaver(proof, file);
+        Pair<File, String> f = fileName(proof, ".zproof");
+        final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+        if (result == KeYFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            ProofSaver saver = new ProofBundleSaver(proof, file);
 
-           String errorMsg;
-           try {
-               errorMsg = saver.save();
-           } catch (IOException e) {
-               errorMsg = e.toString();
-           }
-           if (errorMsg != null) {
-               mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
-           } else {
-              proof.setProofFile(file);
-           }
-       }
-   }
+            String errorMsg;
+            try {
+                errorMsg = saver.save();
+            } catch (IOException e) {
+                errorMsg = e.toString();
+            }
+            if (errorMsg != null) {
+                mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: "
+                    + errorMsg));
+            } else {
+                proof.setProofFile(file);
+            }
+        }
+    }
 
    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
        // TODO: why do we use GUI components here?

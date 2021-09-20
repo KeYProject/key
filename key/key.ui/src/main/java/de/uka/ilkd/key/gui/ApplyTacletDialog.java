@@ -80,12 +80,12 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         mediator.requestModalAccess(this);
         addWindowListener(new WindowAdapter() {
-                    @Override
+            @Override
             public void windowClosed(WindowEvent e) {
                 ApplyTacletDialog.this.closeDlg();
             }
 
-                    @Override
+            @Override
             public void windowClosing(WindowEvent e) {
                 ApplyTacletDialog.this.closeDlg();
             }

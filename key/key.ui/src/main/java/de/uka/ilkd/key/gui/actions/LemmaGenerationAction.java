@@ -176,7 +176,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected String getTitle() {
-                return "KeY's Taclets...";
+            return "KeY's Taclets...";
         }
 
         @Override

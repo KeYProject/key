@@ -67,12 +67,8 @@ public class LoadUserTacletsDialog extends JPanel {
             "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
             "are only loaded for the lemmata, but not for the current proof.";
 
-    private static final String INFO_TEXT1 =
-        "Be aware of the fact that you are going to load taclets\n" +
-            "without creating corresponding proof obligations!\n" +
-            "In case that the taclets that you want to load are unsound,\n" +
-            "the calculus will become unsound!";
-    private static final String INFO_TEXT2 =
+    /** warning text that will be shown when loading taclets without proving them */
+    private static final String INFO_TEXT =
         "Be aware of the fact that you are going to load taclets\n" +
             "without creating corresponding proof obligations!\n" +
             "In case that the taclets that you want to load are unsound,\n" +
@@ -161,7 +157,6 @@ public class LoadUserTacletsDialog extends JPanel {
     private JPanel axiomFilePanel;
     private JPanel buttonPanel;
     private JScrollPane scrollPane;
-    private KeYFileChooser fileChooser;
     private JDialog helpWindow;
 
     private JButton okButton;
@@ -177,6 +172,10 @@ public class LoadUserTacletsDialog extends JPanel {
     private JPanel justificationPanel;
     private JPanel cardPanel;
 
+    /**
+     * Creates a new dialog for loading user-defined taclets
+     * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
+     */
     public LoadUserTacletsDialog(Mode mode) {
 
         this.mode = mode;
@@ -228,7 +227,7 @@ public class LoadUserTacletsDialog extends JPanel {
                     boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getLemmaGeneratorSettings()
                         .isShowingDialogUsingAxioms();
-                    if (!showDialogUsingAxioms || infoDialog.showDialog(INFO_TEXT1,
+                    if (!showDialogUsingAxioms || infoDialog.showDialog(INFO_TEXT,
                         LoadUserTacletsDialog.this)) {
                         changedToNotSelected();
                         lemmaCheckbox.setSelected(false);
@@ -341,7 +340,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         getLemmaGeneratorSettings().isShowingDialogAddingAxioms()) {
 
                     InfoDialog infoDialog = new InfoDialog();
-                    firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT2,
+                    firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT,
                         LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE
                         .getLemmaGeneratorSettings()

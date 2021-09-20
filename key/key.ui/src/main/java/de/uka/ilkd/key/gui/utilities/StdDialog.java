@@ -125,7 +125,7 @@ public class StdDialog extends JDialog{
     }
     
     public JButton getOkButton() {
-        if(okButton == null){
+        if(okButton == null) {
             okButton = new JButton("OK");
             okButton.addActionListener(new ActionListener() {
                 
