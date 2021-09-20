@@ -315,7 +315,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -1452819623911938236L;
 
         ExportMUScriptAction() {
-            setName("Export as Proof Script");
+            setName("Export as Proof Script...");
             setIcon(IconFactory.EXPORT_MU_SCRIPT.get());
             setMenuPath(MENU_ILOG_EXPORT);
             lookupAcceleratorKey();
@@ -359,7 +359,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = 7081382326391914209L;
 
         LoadAction() {
-            setName("Load");
+            setName("Load...");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
             setIcon(ICON_LOAD.get(SMALL_ICON_SIZE));
             setPriority(0);
@@ -393,7 +393,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
 
         SaveAction() {
-            setName("Save");
+            setName("Save...");
             setIcon(IconFactory.INTERLOG_SAVE.get());
             setMenuPath(MENU_ILOG);
             setPriority(1);
@@ -426,7 +426,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -4194158336899285273L;
 
         AddUserNoteAction() {
-            setName("Add Note");
+            setName("Add Note...");
             setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
@@ -547,7 +547,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -5601133423736836904L;
 
         public ExportKPSAction() {
-            setName("Export as KPS …");
+            setName("Export as KPS...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             setIcon(IconFactory.INTERLOG_EXPORT_KPS.get());
             setMenuPath(MENU_ILOG_EXPORT);
@@ -567,7 +567,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = 1108419704071886953L;
 
         public ExportMarkdownAction() {
-            setName("Export as Markdown …");
+            setName("Export as Markdown...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             setIcon(IconFactory.INTERLOG_EXPORT_MARKDOWN.get());
             setMenuPath(MENU_ILOG_EXPORT);
@@ -587,7 +587,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -2526178400655285314L;
 
         public ShowExtendedActionsAction() {
-            setName("More …");
+            setName("More...");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
             setIcon(IconFactory.INTERLOW_EXTENDED_ACTIONS.get());
             lookupAcceleratorKey();

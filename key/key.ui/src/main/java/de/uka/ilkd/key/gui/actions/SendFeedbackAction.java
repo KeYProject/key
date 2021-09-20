@@ -420,7 +420,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     public SendFeedbackAction(final Window parent, final Throwable exception) {
         this.parent = parent;
-        putValue(NAME, "Send feedback");
+        putValue(NAME, "Send feedback...");
         this.throwable = exception;
     }
 
@@ -459,7 +459,7 @@ public class SendFeedbackAction extends AbstractAction {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton sendFeedbackReportButton = new JButton("Send Feedback");
+        JButton sendFeedbackReportButton = new JButton("Send Feedback...");
         sendFeedbackReportButton.addActionListener(new SendAction(dialog, bugDescription));
 
         JButton cancelButton = new JButton("Cancel");

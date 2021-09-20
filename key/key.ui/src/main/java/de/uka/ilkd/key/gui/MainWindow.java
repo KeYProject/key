@@ -824,7 +824,7 @@ public final class MainWindow extends JFrame {
     }
 
     private JMenu createSelectionMenu() {
-        JMenu goalSelection = new JMenu("Select Goal ...");
+        JMenu goalSelection = new JMenu("Select Goal");
         goalSelection.add(goalSelectAboveAction);
         goalSelection.add(goalSelectBelowAction);
         return goalSelection;
@@ -863,7 +863,7 @@ public final class MainWindow extends JFrame {
         proof.add(new SearchNextAction(this));
         proof.add(new SearchPreviousAction(this));
         {
-            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+            JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
                 searchModeMenu.add(new SearchModeChangeAction(this, mode));

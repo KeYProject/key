@@ -68,14 +68,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
-    private static final String CREATE_ABBREVIATION = "Create abbreviation";
+    private static final String CREATE_ABBREVIATION = "Create abbreviation...";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
     private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
-    private static final String CHANGE_ABBREVIATION = "Change abbreviation";
+    private static final String CHANGE_ABBREVIATION = "Change abbreviation...";
     private static final String MORE_RULES = "More rules";
     private static final String APPLY_CONTRACT = "Apply Contract";
-    private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
-    private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
+    private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract...";
+    private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification...";
     private static final String APPLY_RULE = "Apply Rule";
     private static final String NO_RULES_APPLICABLE = "No rules applicable.";
 

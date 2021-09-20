@@ -34,7 +34,7 @@ public final class OpenExampleAction extends MainWindowAction {
 
     public OpenExampleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Load Example");
+        setName("Load Example...");
         setIcon(IconFactory.openExamples(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load included examples.");
     }

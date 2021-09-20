@@ -176,7 +176,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected String getTitle() {
-                return "KeY's Taclets";
+                return "KeY's Taclets...";
         }
 
         @Override
@@ -260,7 +260,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected String getTitle() {
-               return "User-Defined Taclets";
+               return "User-Defined Taclets...";
         }
 
         @Override
@@ -355,7 +355,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected String getTitle() {
-                 return "Load User-Defined Taclets";
+                 return "Load User-Defined Taclets...";
         }
 
         @Override

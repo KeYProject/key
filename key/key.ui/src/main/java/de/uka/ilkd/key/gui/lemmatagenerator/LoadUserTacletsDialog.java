@@ -121,7 +121,7 @@ public class LoadUserTacletsDialog extends JPanel {
 
         private JButton getChooseFileButton() {
             if (chooseFileButton == null) {
-                chooseFileButton = new JButton("Choose");
+                chooseFileButton = new JButton("Choose...");
                 setMaximumWidth(chooseFileButton,
                     getRemoveAxiomFileButton().getPreferredSize().width);
                 chooseFileButton.addActionListener(e -> {
@@ -330,7 +330,7 @@ public class LoadUserTacletsDialog extends JPanel {
 
     private JButton getAddAxiomFileButton() {
         if (addAxiomFileButton == null) {
-            addAxiomFileButton = new JButton("Add");
+            addAxiomFileButton = new JButton("Add...");
 
             setMaximumWidth(addAxiomFileButton,
                 getRemoveAxiomFileButton().getPreferredSize().width);
