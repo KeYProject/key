@@ -318,6 +318,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Export as Proof Script...");
             setIcon(IconFactory.EXPORT_MU_SCRIPT.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(2);
             lookupAcceleratorKey();
         }
 
@@ -340,6 +341,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Copy MUScript");
             setSmallIcon(IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(5);
             lookupAcceleratorKey();
         }
 
@@ -430,6 +432,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
+            setPriority(9);
             lookupAcceleratorKey();
         }
 
@@ -460,6 +463,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             setIcon(ICON_TOGGLE_FAVOURITE.get(SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG);
+            setPriority(8);
             lookupAcceleratorKey();
         }
 
@@ -478,6 +482,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Jump into Tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
             setMenuPath(MENU_ILOG);
+            setPriority(6);
             lookupAcceleratorKey();
         }
 
@@ -502,6 +507,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(NAME, "Reapply Action");
             putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_ILOG);
+            setPriority(7);
             lookupAcceleratorKey();
         }
 
@@ -551,6 +557,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             setIcon(IconFactory.INTERLOG_EXPORT_KPS.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(3);
             lookupAcceleratorKey();
         }
 
@@ -571,6 +578,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             setIcon(IconFactory.INTERLOG_EXPORT_MARKDOWN.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(4);
             lookupAcceleratorKey();
         }
 
@@ -661,7 +669,7 @@ class MultiLineInputPrompt {
         if (dialog == null) {
             dialog = new JDialog(JOptionPane.getFrameForComponent(parent));
             dialog.setModal(true);
-            dialog.setTitle("Enter note...");
+            dialog.setTitle("Enter note");
 
             JPanel root = new JPanel(new BorderLayout(10, 10));
             JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
