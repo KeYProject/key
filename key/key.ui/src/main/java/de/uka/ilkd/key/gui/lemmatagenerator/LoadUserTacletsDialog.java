@@ -271,15 +271,6 @@ public class LoadUserTacletsDialog extends JPanel {
         return axiomsList;
     }
 
-    private KeYFileChooser getFileChooser(String title) {
-        if (fileChooser == null) {
-            fileChooser = KeYFileChooser.getFileChooser(title);
-        }
-        fileChooser.setDialogTitle(title);
-        fileChooser.prepare();
-        return fileChooser;
-    }
-
     private JButton getHelpButton() {
         if (helpButton == null) {
             helpButton = new JButton("Help");
@@ -319,10 +310,11 @@ public class LoadUserTacletsDialog extends JPanel {
     }
 
     private File chooseFiles(String title) {
-        KeYFileChooser chooser = getFileChooser(title);
-        if (chooser.showOpenDialog(this)) {
+        KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(title);
+        fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
+        if (fileChooser.showOpenDialog(this) != KeYFileChooser.APPROVE_OPTION) {
             // user pressed OK button
-            return chooser.getSelectedFile();
+            return fileChooser.getSelectedFile();
         } else {
             // user pressed Cancel button
             return null;

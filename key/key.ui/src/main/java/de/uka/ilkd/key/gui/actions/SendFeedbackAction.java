@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.LinkedList;
@@ -26,10 +24,10 @@ import java.util.zip.ZipOutputStream;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileFilter;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
@@ -358,25 +356,15 @@ public class SendFeedbackAction extends AbstractAction {
                     return;
                 }
 
-                JFileChooser jfc = new JFileChooser();
-                jfc.addChoosableFileFilter(new FileFilter() {
-                    @Override
-                    public boolean accept(File f) {
-                        return f.getName().toLowerCase().endsWith(".zip");
-                    }
+                KeYFileChooser fileChooser = KeYFileChooser.getFileChooser("Select path to save");
+                fileChooser.setFileFilter(KeYFileChooser.ZIP_FILTER);
 
-                    @Override
-                    public String getDescription() {
-                        return "ZIP archives";
-                    }
-                });
-
-                int answer = jfc.showSaveDialog(parent);
-                if (answer == JFileChooser.APPROVE_OPTION) {
-                    saveMetaDataToFile(jfc.getSelectedFile(), message.getText());
+                int answer = fileChooser.showSaveDialog(parent);
+                if (answer == KeYFileChooser.APPROVE_OPTION) {
+                    saveMetaDataToFile(fileChooser.getSelectedFile(), message.getText());
                     JOptionPane.showMessageDialog(parent,
                             String.format("Your message has been saved to the file %s.",
-                                    jfc.getSelectedFile()));
+                                    fileChooser.getSelectedFile()));
                 }
             } catch (Exception e) {
                 ExceptionDialog.showDialog(parent, e);

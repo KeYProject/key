@@ -389,17 +389,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      */
     public File saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
-        jFC.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
+        final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
+        fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
         Pair<File, String> f = fileName(proof, fileExtension);
-        final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
+        final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
         File file = null;
-        if (saved) {
-            file = jFC.getSelectedFile();
+        if (result == KeYFileChooser.APPROVE_OPTION) {          // saved
+            file = fc.getSelectedFile();
             final String filename = file.getAbsolutePath();
             ProofSaver saver;
-            if (jFC.useCompression()) {
+            if (fc.useCompression()) {
                 saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
             } else {
                 saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
@@ -417,20 +417,21 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 proof.setProofFile(file);
             }
-        } else {
-            jFC.resetPath();
         }
         return file;
     }
 
    public void saveProofBundle(Proof proof) {
        final MainWindow mainWindow = MainWindow.getInstance();
-       final BundleFileChooser fileChooser = BundleFileChooser.getFileChooser("Choose filename to save proof");
+       final KeYFileChooser fileChooser =
+           KeYFileChooser.getFileChooser("Choose filename to save proof");
+       fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-       final boolean saved = fileChooser.showSaveDialog(mainWindow, proof.getProofFile());
-       if (saved) {
-           Path path = fileChooser.getSaveFile();
-           ProofSaver saver = new ProofBundleSaver(proof, path.toFile());
+       Pair<File, String> f = fileName(proof, ".zproof");
+       final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+       if (result == KeYFileChooser.APPROVE_OPTION) {
+           File file = fileChooser.getSelectedFile();
+           ProofSaver saver = new ProofBundleSaver(proof, file);
 
            String errorMsg;
            try {
@@ -441,7 +442,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
            if (errorMsg != null) {
                mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
            } else {
-              proof.setProofFile(path.toFile());
+              proof.setProofFile(file);
            }
        }
    }
@@ -471,7 +472,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
            defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
            selectedFile = new File(selectedFile.getParentFile(), defaultName);
        }
-       return new Pair<File, String>(selectedFile, defaultName);
+       return new Pair<>(selectedFile, defaultName);
    }
 
     /**

@@ -40,11 +40,9 @@ public final class OpenExampleAction extends MainWindowAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        KeYFileChooser keYFileChooser =
-                KeYFileChooser.getFileChooser("Select file to load proof or problem");
         File file = ExampleChooser.showInstance(Main.getExamplesDir());
         if(file != null) {
-            keYFileChooser.selectFile(file);
+            KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file);
             mainWindow.loadProblem(file);
         }
     }

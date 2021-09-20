@@ -3,7 +3,6 @@ package org.key_project.ui.interactionlog;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -25,7 +24,6 @@ import org.key_project.ui.interactionlog.model.UserNoteInteraction;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.DropTarget;
@@ -209,19 +207,6 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         interactionLog.getInteractions().forEach(interactionListModel::addElement);
     }
 
-    private KeYFileChooser getFileChooser() {
-        if (fileChooser == null) {
-            fileChooser = KeYFileChooser.getFileChooser("Save file");
-            fileChooser.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
-            if (currentProof != null) {
-                File file = currentProof.getProofFile();
-                if (file != null)
-                    fileChooser.setCurrentDirectory(file.getParentFile());
-            }
-        }
-        return fileChooser;
-    }
-
     @Override
     public void onInteraction(Interaction interaction) {
         rebuildList();
@@ -384,12 +369,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYFileChooser fileChooser = KeYFileChooser.getFileChooser("Load interaction log");
-            fileChooser.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Load interaction log");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
 
-            if (fileChooser.showOpenDialog(InteractionLogView.this)) {
+            if (fc.showOpenDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
                 try {
-                    File file = fileChooser.getSelectedFile();
+                    File file = fc.getSelectedFile();
                     recorder.readInteractionLog(file);
                     //addInteractionLog(importedLog);
                 } catch (Exception exception) {
@@ -419,12 +404,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYFileChooser fileChooser = getFileChooser();
-            if (fileChooser.showSaveDialog(InteractionLogView.this)) {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Save file");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+            if (fc.showSaveDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog,
-                            fileChooser.getSelectedFile());
+                            fc.getSelectedFile());
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
@@ -547,8 +533,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYFileChooser fc = getFileChooser();
-            if (fc.showSaveDialog(InteractionLogView.this)) {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Save File");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+            if (fc.showSaveDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
                 save(fc.getSelectedFile());
             }
         }

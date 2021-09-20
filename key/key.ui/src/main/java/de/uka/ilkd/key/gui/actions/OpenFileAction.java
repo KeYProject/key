@@ -41,13 +41,13 @@ public class OpenFileAction extends MainWindowAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        KeYFileChooser keYFileChooser = 
-            KeYFileChooser.getFileChooser("Select file to load proof or problem");
+        KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to load proof or problem");
+        fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
-        boolean loaded = keYFileChooser.showOpenDialog(mainWindow);
+        int result = fc.showOpenDialog(mainWindow);
 
-        if (loaded) {
-            File file = keYFileChooser.getSelectedFile();
+        if (result == KeYFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
 
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file.toPath())) {
@@ -75,6 +75,5 @@ public class OpenFileAction extends MainWindowAction {
             }
             mainWindow.loadProblem(file);
         }
-
     }
 }

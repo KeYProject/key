@@ -302,9 +302,9 @@ public class ShowProofStatistics extends MainWindowAction {
             KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
                     "Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
-            fileChooser.selectFile(new File(fileName + "." + fileExtension));
-            boolean approved = fileChooser.showSaveDialog(this);
-            if (approved) {
+            fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
+            int result = fileChooser.showSaveDialog(this);
+            if (result == KeYFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try(BufferedWriter writer = new BufferedWriter(
                             new OutputStreamWriter(new FileOutputStream(file)));) {
