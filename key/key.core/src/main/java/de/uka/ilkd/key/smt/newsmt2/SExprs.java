@@ -18,6 +18,10 @@ import java.util.Set;
  */
 public class SExprs {
 
+    private SExprs() {
+        throw new Error("do not instantiate");
+    }
+
     /**
      * The string prefix used for sort names in SMT,
      */
@@ -155,6 +159,14 @@ public class SExprs {
                 " to " + type + ": " + exp);
     }
 
+    /**
+     * Takes a list of {@link SExpr}s and converts it to a list of the given
+     * type, if possible.
+     * @param exprs the list to convert
+     * @param type the desired target type
+     * @return A fresh list with the same SExpr, but with the desired type
+     * @throws SMTTranslationException if an impossible conversion is attempted
+     */
     public static List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
         List<SExpr> result = new ArrayList<>();
         for (SExpr expr : exprs) {
@@ -221,10 +233,34 @@ public class SExprs {
         return new SExpr("cast", Type.UNIVERSE, coerce(exp, Type.UNIVERSE), sortExp);
     }
 
+    /**
+     * Produce an anssertion. The argument will be coerced to Bool.
+     *
+     * @param assertion the SExpr to wrap.
+     * @return a freshly created assert SExpr.
+     * @throws SMTTranslationException if coercion fails
+     */
     public static SExpr assertion(SExpr assertion) throws SMTTranslationException {
         return new SExpr("assert", coerce(assertion, Type.BOOL));
     }
 
+    /**
+     * Collects the :pattern annations from any nesting depth in a term and
+     * brings it to toplevel.
+     *
+     * Example:
+     * <pre>
+     *     (and (! (.A.) :pattern ((p1))) (! (.B.) :pattern ((p2))) )
+     * </pre>
+     * yields
+     * <pre>
+     *     (! (and (.A.) (.B:)) :pattern ((p1)(p2)))
+     * </pre>
+     *
+     * @param matrix the SExpr to pull the patterns from
+     * @return either matrix (if no patterns present) or a
+     * term (!... :pattern ...)
+     */
     public static SExpr pullOutPatterns(SExpr matrix) {
         Set<SExpr> collected = new HashSet<>();
         matrix = filterAndCollectPatterns(matrix, collected);
@@ -256,6 +292,8 @@ public class SExprs {
         }
         return new SExpr(matrix.getName(), matrix.getType(), children);
     }
+
+    // The following are simple application methods and should be self-explaining.
 
     public static SExpr instanceOf(SExpr var, SExpr sortExpr) {
         return new SExpr("instanceof", Type.BOOL, var, sortExpr);
