@@ -100,6 +100,11 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public void addSettingsListener(SettingsListener l) {
         listenerList.add(l);
     }
+    
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
+    }
 
     protected void fireSettingsChange() {
         for (SettingsListener listener : listenerList) {

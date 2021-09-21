@@ -9,6 +9,8 @@ import de.uka.ilkd.key.smt.SolverType;
 
 import javax.swing.*;
 
+import java.io.IOException;
+
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
 /**
@@ -114,8 +116,16 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
-            final String versionString = solverType.getRawVersion();
-            info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            final String versionString;
+            try {
+                versionString = solverType.getRawVersion();
+                info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            } catch (RuntimeException re) {
+                // this case occurs for instance, if there user can see e.g. z3 but has not the permission
+                // to execute the solver
+                info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
+                        (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
+            }
         }
         JTextField txt = addTextField("Installed", info, "", null);
         txt.setEditable(false);

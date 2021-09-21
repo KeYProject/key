@@ -79,6 +79,11 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
         listeners.add(l);
     }
 
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listeners.remove(l);
+    }
+
     public void copy(NewSMTTranslationSettings newTranslationSettings) {
         this.map.clear();
         this.map.putAll(newTranslationSettings.map);

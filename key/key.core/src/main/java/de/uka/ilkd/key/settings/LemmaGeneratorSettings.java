@@ -55,6 +55,11 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings
         public void addSettingsListener(SettingsListener l) {
                listeners.add(l);
         }
+        
+        @Override
+        public void removeSettingsListener(SettingsListener l) {
+            listeners.remove(l);
+        }
 
         @Override
         public void readSettings(Properties props) {

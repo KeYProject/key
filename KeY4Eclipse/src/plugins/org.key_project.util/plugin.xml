@@ -9,5 +9,4 @@
             class="org.key_project.util.eclipse.setup.SetupStartup">
       </startup>
    </extension>
-
 </plugin>

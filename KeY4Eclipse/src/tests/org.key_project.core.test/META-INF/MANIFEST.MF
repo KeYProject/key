@@ -7,10 +7,10 @@ Bundle-Activator: org.key_project.core.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
- org.junit;bundle-version="4.8.1",
- org.key_project.util;bundle-version="1.0.0",
- org.key_project.util.test;bundle-version="1.0.0",
- org.key_project.core;bundle-version="1.0.0"
+ org.junit,
+ org.key_project.util,
+ org.key_project.util.test,
+ org.key_project.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project
@@ -22,7 +22,6 @@ Export-Package: de.uka.ilkd.key.java,
  de.uka.ilkd.key.parser,
  de.uka.ilkd.key.parser.messages,
  de.uka.ilkd.key.parser.proofjava,
- de.uka.ilkd.key.parser.schemajava,
  de.uka.ilkd.key.proof,
  de.uka.ilkd.key.proof.io,
  de.uka.ilkd.key.proof.io.consistency,

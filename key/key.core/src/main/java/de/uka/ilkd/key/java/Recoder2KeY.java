@@ -376,6 +376,40 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
+     * Helper method for parsing a single compilation unit when a FileRepo is present.
+     * @param fileRepo the FileRepo that provides the InputStream
+     * @param filename the name of the file to read
+     * @return the parsed compilation unit
+     * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
+     */
+    private CompilationUnit readViaFileRepo(FileRepo fileRepo, String filename)
+        throws ParseExceptionInFile {
+        try (InputStream is = fileRepo.getInputStream(Paths.get(filename));
+             Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(fr)) {
+            return servConf.getProgramFactory().parseCompilationUnit(br);
+        } catch (Exception e) {
+            throw new ParseExceptionInFile(filename, e);
+        }
+    }
+
+    /**
+     * Helper method for parsing a single compilation unit directly from a file, in case no FileRepo
+     * is present.
+     * @param filename the name of the file to read
+     * @return the parsed compilation unit
+     * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
+     */
+    private CompilationUnit readWithoutFileRepo(String filename) throws ParseExceptionInFile {
+        try (Reader fr = new FileReader(filename);
+             BufferedReader br = new BufferedReader(fr)) {
+            return servConf.getProgramFactory().parseCompilationUnit(br);
+        } catch (Exception e) {
+            throw new ParseExceptionInFile(filename, e);
+        }
+    }
+
+    /**
      * parse a list of java files.
      *
      * Each element of the array is treated as a filename to read in.
@@ -397,17 +431,10 @@ public class Recoder2KeY implements JavaReader {
 
                 if (fileRepo != null) {
                     // open stream via FileRepo
-                    try (InputStream is = fileRepo.getInputStream(Paths.get(filename));
-                         Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
-                         BufferedReader br = new BufferedReader(fr)) {
-                        cu = servConf.getProgramFactory().parseCompilationUnit(br);
-                    }
+                    cu = readViaFileRepo(fileRepo, filename);
                 } else {
                     // fallback without FileRepo
-                    try (Reader fr = new FileReader(filename);
-                         BufferedReader br = new BufferedReader(fr)) {
-                        cu = servConf.getProgramFactory().parseCompilationUnit(br);
-                    }
+                    cu = readWithoutFileRepo(filename);
                 }
 
                 cu.setDataLocation(new DataFileLocation(filename));
@@ -457,7 +484,7 @@ public class Recoder2KeY implements JavaReader {
      *            unit
      * @return a list of KeY structured compilation units.
      */
-    private List<recoder.java.CompilationUnit> recoderCompilationUnits(String[] cUnitStrings) {
+    List<recoder.java.CompilationUnit> recoderCompilationUnits(String[] cUnitStrings) {
 
         parseSpecialClasses();
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
