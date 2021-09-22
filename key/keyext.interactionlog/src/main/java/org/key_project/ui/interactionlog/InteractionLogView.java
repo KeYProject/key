@@ -373,7 +373,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             KeYFileChooser fc = KeYFileChooser.getFileChooser("Load interaction log");
             fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
 
-            if (fc.showOpenDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
+            if (fc.showOpenDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 try {
                     File file = fc.getSelectedFile();
                     recorder.readInteractionLog(file);
@@ -407,7 +407,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public void actionPerformed(ActionEvent e) {
             KeYFileChooser fc = KeYFileChooser.getFileChooser("Save file");
             fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
-            if (fc.showSaveDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog,
@@ -540,7 +540,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public void actionPerformed(ActionEvent e) {
             KeYFileChooser fc = KeYFileChooser.getFileChooser("Save File");
             fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
-            if (fc.showSaveDialog(InteractionLogView.this) == KeYFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 save(fc.getSelectedFile());
             }
         }
@@ -679,9 +679,9 @@ class MultiLineInputPrompt {
             box.add(okButton);
             box.add(cancelButton);
 
-            okButton.addActionListener((evt) -> accept(area.getText()));
-            cancelButton.addActionListener((evt) -> cancel());
-            dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            okButton.addActionListener(evt -> accept(area.getText()));
+            cancelButton.addActionListener(evt -> cancel());
+            dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {

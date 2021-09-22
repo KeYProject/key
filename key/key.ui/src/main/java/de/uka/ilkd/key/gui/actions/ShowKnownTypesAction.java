@@ -75,23 +75,18 @@ public class ShowKnownTypesAction extends MainWindowAction {
             }
             {
                 final JButton okButton = new JButton("OK");
-                okButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.setVisible(false);
-                        dialog.dispose();
-                    }
+                okButton.addActionListener(e -> {
+                    dialog.setVisible(false);
+                    dialog.dispose();
                 });
                 {
                     JPanel panel = new JPanel();
                     panel.add(okButton);
                     pane.add(panel, BorderLayout.SOUTH);
                     dialog.getRootPane().setDefaultButton(okButton);
-                    ActionListener escapeListener = new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            if(event.getActionCommand().equals("ESC")) {
-                                okButton.doClick();
-                            }
+                    ActionListener escapeListener = event -> {
+                        if(event.getActionCommand().equals("ESC")) {
+                            okButton.doClick();
                         }
                     };
                     okButton.registerKeyboardAction(escapeListener, "ESC",

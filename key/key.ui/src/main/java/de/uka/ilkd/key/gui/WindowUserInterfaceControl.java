@@ -16,27 +16,14 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -395,7 +382,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<File, String> f = fileName(proof, fileExtension);
         final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
         File file = null;
-        if (result == KeYFileChooser.APPROVE_OPTION) {          // saved
+        if (result == JFileChooser.APPROVE_OPTION) {          // saved
             file = fc.getSelectedFile();
             final String filename = file.getAbsolutePath();
             ProofSaver saver;
@@ -435,7 +422,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
         Pair<File, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
-        if (result == KeYFileChooser.APPROVE_OPTION) {
+        if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             ProofSaver saver = new ProofBundleSaver(proof, file);
 
@@ -489,12 +476,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     public void proofDisposing(final ProofDisposedEvent e) {
         super.proofDisposing(e);
         // Remove proof from user interface
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                mainWindow.getProofList().removeProof(e.getSource());
-            }
-        });
+        ThreadUtilities.invokeAndWait(() -> mainWindow.getProofList().removeProof(e.getSource()));
     }
 
    @Override
@@ -640,12 +622,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
         //ok button
         final JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-            }
-        });
+        okButton.addActionListener(e -> dialog.setVisible(false));
         Dimension buttonDim = new Dimension(100, 27);
         okButton.setPreferredSize(buttonDim);
         okButton.setMinimumSize(buttonDim);
@@ -655,12 +632,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         dialog.getRootPane().setDefaultButton(okButton);
 
         okButton.registerKeyboardAction(
-            new ActionListener() {
-                @Override
-               public void actionPerformed(ActionEvent event) {
-                    if(event.getActionCommand().equals("ESC")) {
-                        okButton.doClick();
-                    }
+            event -> {
+                if(event.getActionCommand().equals("ESC")) {
+                    okButton.doClick();
                 }
             },
             "ESC",

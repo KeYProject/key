@@ -170,7 +170,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
                 result = fileChooser.showOpenDialog((Component) e.getSource());
             }
-            if (result == KeYFileChooser.APPROVE_OPTION) {
+            if (result == JFileChooser.APPROVE_OPTION) {
                 textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         });

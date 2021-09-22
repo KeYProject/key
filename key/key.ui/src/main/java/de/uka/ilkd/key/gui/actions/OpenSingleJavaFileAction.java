@@ -51,7 +51,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
         int result = fc.showOpenDialog(mainWindow);
 
 
-        if (result == KeYFileChooser.APPROVE_OPTION) {
+        if (result == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             mainWindow.addRecentFile(file.getAbsolutePath());
 

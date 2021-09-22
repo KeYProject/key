@@ -87,12 +87,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
         insertionTaclets = createInsertionList();
 
         final JMenuItem menuItem = new JMenuItem("Open Dialog");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {              
-                    openDialog();
-            }
-        });
+        menuItem.addActionListener(e -> openDialog());
 
         menuItem.setToolTipText("Browse applicable taclets.");
 
@@ -128,12 +123,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
 
         final DefaultTacletMenuItem appItem = new DefaultTacletMenuItem(this, app, notInfo,
             services);
-        appItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                processTacletSelected(e);
-            }
-        });
+        appItem.addActionListener(this::processTacletSelected);
         add(appItem);
         setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") + ")");
     }
@@ -200,23 +190,20 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
 
         displayHiddenFormula.setEditable(false);
 
-        selectionList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getSource() instanceof JList) {
-                    final JList<?> list = (JList<?>)e.getSource();
-                    if (list.getSelectedIndex() >= 0) {
-                        if (list.getSelectedValue() instanceof TacletAppListItem) {
-                            displayHiddenFormula.
-                                setText(((TacletAppListItem)list.getSelectedValue()).
-                                    longDescription());
-                        }
-                    } else {
-                        displayHiddenFormula.setText("");
+        selectionList.addListSelectionListener(e -> {
+            if (e.getSource() instanceof JList) {
+                final JList<?> list = (JList<?>)e.getSource();
+                if (list.getSelectedIndex() >= 0) {
+                    if (list.getSelectedValue() instanceof TacletAppListItem) {
+                        displayHiddenFormula.
+                            setText(((TacletAppListItem)list.getSelectedValue()).
+                                longDescription());
                     }
-                    displayHiddenFormula.setCaretPosition(0);
+                } else {
+                    displayHiddenFormula.setText("");
                 }
+                displayHiddenFormula.setCaretPosition(0);
             }
-
         });
 
         final JScrollPane formulaDisplaySP = new JScrollPane(displayHiddenFormula);
@@ -240,31 +227,27 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
         selectedTaclet = null;
 
         final JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selectedTaclet = null;
-                dialog.setVisible(false);
-                dialog.dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            selectedTaclet = null;
+            dialog.setVisible(false);
+            dialog.dispose();
         });
 
         final JButton applyButton  = new JButton("Apply");
-        applyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                final TacletAppListItem selectedItem =
-                    selectionList.getSelectedValue();
+        applyButton.addActionListener(e -> {
+            final TacletAppListItem selectedItem =
+                selectionList.getSelectedValue();
 
-                if (selectedItem == null) { // should never be true
-                    selectedTaclet = null;
-                } else {
-                    selectedTaclet = selectedItem.getTacletApp();
-                }
-
-                dialog.setVisible(false);
-                dialog.dispose();
-                processTacletSelected(new ActionEvent(InsertionTacletBrowserMenuItem.this,
-                    0, ""));
+            if (selectedItem == null) { // should never be true
+                selectedTaclet = null;
+            } else {
+                selectedTaclet = selectedItem.getTacletApp();
             }
+
+            dialog.setVisible(false);
+            dialog.dispose();
+            processTacletSelected(new ActionEvent(InsertionTacletBrowserMenuItem.this,
+                0, ""));
         });
 
         final JPanel buttonPanel = new JPanel();

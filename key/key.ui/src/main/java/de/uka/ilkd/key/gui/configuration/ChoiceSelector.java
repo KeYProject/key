@@ -97,20 +97,17 @@ public class ChoiceSelector extends JDialog {
     /** layout */
     protected void layoutChoiceSelector() {
         setIconImage(IconFactory.keyLogo());
-        JPanel listPanel=new JPanel();
+        JPanel listPanel = new JPanel();
         listPanel.setLayout(new BorderLayout());
-        String[] cats = category2DefaultChoice.keySet().toArray(new String[category2DefaultChoice.size()]);
+        String[] cats = category2DefaultChoice.keySet().toArray(new String[0]);
         Arrays.sort(cats);
         {
             catList = new JList<>(cats);
             catList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             catList.setSelectedIndex(0);
-            catList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    setChoiceList();				
-                }});
+            catList.addListSelectionListener(e -> setChoiceList());
             JScrollPane catListScroll = new
-                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             catListScroll.setBorder(new TitledBorder("Category"));
             catListScroll.getViewport().setView(catList);
@@ -122,20 +119,18 @@ public class ChoiceSelector extends JDialog {
         {
             choiceList = new JList<>();
             choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);
-            choiceList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    Object selectedValue = choiceList.getSelectedValue();
-                    if (selectedValue instanceof ChoiceEntry) {
-                       setDefaultChoice(((ChoiceEntry) selectedValue).getChoice());
-                    }
-                    else {
-                       setDefaultChoice(null);
-                    }
-                }});
+            choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]), true);
+            choiceList.addListSelectionListener(e -> {
+                ChoiceEntry selectedValue = choiceList.getSelectedValue();
+                if (selectedValue != null) {
+                    setDefaultChoice(selectedValue.getChoice());
+                } else {
+                    setDefaultChoice(null);
+                }
+            });
 
-            JScrollPane choiceScrollPane = new 	    
-                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+            JScrollPane choiceScrollPane =
+                new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             choiceScrollPane.getViewport().setView(choiceList);
             choiceScrollPane.setBorder(new TitledBorder("Choice"));
@@ -158,57 +153,51 @@ public class ChoiceSelector extends JDialog {
         JPanel buttonPanel = new JPanel();
         {
             JButton okButton = new JButton("OK");
-            okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if(changed){
-                        int res = JOptionPane.showOptionDialog
-                                (ChoiceSelector.this,
-                                        "Your changes will become effective when "+
-                                                "the next problem is loaded.\n", 
-                                                "Taclet Options", 
-                                                JOptionPane.DEFAULT_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE, null,
-                                                new Object[]{"OK", "Cancel"}, "OK");
-                        if (res==0){
-                            settings.setDefaultChoices(
-                                    category2DefaultChoice);
-                        }
+            okButton.addActionListener(e -> {
+                if (changed) {
+                    int res = JOptionPane.showOptionDialog
+                            (ChoiceSelector.this,
+                                    "Your changes will become effective when " +
+                                            "the next problem is loaded.\n",
+                                            "Taclet Options",
+                                            JOptionPane.DEFAULT_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE, null,
+                                            new Object[] {"OK", "Cancel"}, "OK");
+                    if (res == 0) {
+                        settings.setDefaultChoices(
+                                category2DefaultChoice);
                     }
-                    setVisible(false);
-                    dispose();
                 }
+                setVisible(false);
+                dispose();
             });
             buttonPanel.add(okButton);
             getRootPane().setDefaultButton(okButton);
         }
         {
             final JButton cancelButton = new JButton("Cancel");
-            cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    setVisible(false);
-                    dispose();
-                }
+            cancelButton.addActionListener(e -> {
+                setVisible(false);
+                dispose();
             });
-            ActionListener escapeListener = new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    if(event.getActionCommand().equals("ESC")) {
-                        cancelButton.doClick();
-                    }
+            ActionListener escapeListener = event -> {
+                if(event.getActionCommand().equals("ESC")) {
+                    cancelButton.doClick();
                 }
             };
             cancelButton.registerKeyboardAction(
                     escapeListener,
                     "ESC",
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);	
+                    JComponent.WHEN_IN_FOCUSED_WINDOW);
             buttonPanel.add(cancelButton);
         }
 
-	getContentPane().setLayout(new BorderLayout());
-	getContentPane().add(listPanel, BorderLayout.CENTER);
-	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-	
-	setResizable(false);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(listPanel, BorderLayout.CENTER);
+        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+        setResizable(false);
     }
 
 

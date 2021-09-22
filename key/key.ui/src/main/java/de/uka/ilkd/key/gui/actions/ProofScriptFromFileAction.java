@@ -72,7 +72,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
             fc.setCurrentDirectory(dir);
             int res = fc.showOpenDialog(mainWindow);
-            if(res == KeYFileChooser.APPROVE_OPTION) {
+            if(res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
                 lastDirectory = selectedFile.getParentFile();
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, selectedFile);

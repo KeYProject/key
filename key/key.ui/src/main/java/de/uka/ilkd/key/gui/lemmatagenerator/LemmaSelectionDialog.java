@@ -152,13 +152,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         private JButton getOkButton() {
                 if (okButton == null) {
                         okButton = new JButton("OK");
-                        okButton.addActionListener(new ActionListener() {
-
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                        tacletsSelected();
-                                }
-                        });
+                        okButton.addActionListener(e -> tacletsSelected());
                         okButton.setPreferredSize(getCancelButton().getPreferredSize());
                 }
                 return okButton;

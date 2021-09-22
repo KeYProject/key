@@ -9,8 +9,6 @@ import de.uka.ilkd.key.smt.SolverType;
 
 import javax.swing.*;
 
-import java.io.IOException;
-
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
 /**

@@ -21,22 +21,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -50,22 +35,27 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 public class LoadUserTacletsDialog extends JPanel {
     private static final long serialVersionUID = 1L;
+
+    /** the text to be displayed when the "Help" button is pressed */
     private static final String HELP_TEXT =
-        "In this dialog you can choose the files that are used for loading user-defined taclets:\n\n" +
-            "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that they can be used " +
-            "for the current proof. For each taclet an extra proof obligation is built that must be provable, in order" +
-            " to sustain the correctness of the calculus.\n" +
-            "\nDefinitions:\n" +
-            "This file contains the signature (function symbols, predicate symbols, sorts)" +
-            " that are used for creating the proof obligations mentioned above. In most cases it should be the same file" +
-            " as indicated in 'User-Defined Taclets'.\n" +
-            "\nAxioms:\nIn order to prove the correctness of the created lemmata," +
-            " for some user-defined taclets the introduction " +
-            "of additional axioms is necessary. At this point you can add them.\n" +
-            "Beware of the fact that it is crucial for the correctness of the calculus that the used axioms are consistent." +
-            "It is the responsibility of the user to guarantee this consistency.\n\n" +
-            "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
-            "are only loaded for the lemmata, but not for the current proof.";
+        "In this dialog you can choose the files that are used for loading user-defined taclets:" +
+        "\n\n" +
+        "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that " +
+        "they can be used for the current proof. For each taclet an extra proof obligation is " +
+        "built that must be provable, in order to sustain the correctness of the calculus.\n\n" +
+        "Definitions:\n" +
+        "This file contains the signature (function symbols, predicate symbols, sorts)" +
+        " that are used for creating the proof obligations mentioned above. In most cases it " +
+        "should be the same file as indicated in 'User-Defined Taclets'.\n\n" +
+        "Axioms:\nIn order to prove the correctness of the created lemmata," +
+        " for some user-defined taclets the introduction " +
+        "of additional axioms is necessary. At this point you can add them.\n" +
+        "Beware of the fact that it is crucial for the correctness of the calculus that the used " +
+        "axioms are consistent." +
+        "It is the responsibility of the user to guarantee this consistency.\n\n" +
+        "Technical Remarks:\nThe axioms must be stored in another file than the user-defined " +
+        "taclets. Furthermore the axioms are only loaded for the lemmata, but not for the " +
+        "current proof.";
 
     /** warning text that will be shown when loading taclets without proving them */
     private static final String INFO_TEXT =
@@ -74,6 +64,7 @@ public class LoadUserTacletsDialog extends JPanel {
             "In case that the taclets that you want to load are unsound,\n" +
             "the calculus will become unsound!";
 
+    /** this dialog can be in one of two modes (started from different actions) */
     public enum Mode {
         /** only prove taclets but do not add them to current proof */
         PROVE,
@@ -187,14 +178,11 @@ public class LoadUserTacletsDialog extends JPanel {
         this.add(Box.createVerticalStrut(15));
         this.add(getUserTacletFileBox());
         this.add(Box.createVerticalStrut(10));
-        switch (mode) {
-        case LOAD:
+        if (mode == Mode.LOAD) {
             // with a checkbox and the background to choose.
             this.add(getJustificationBox());
-            break;
-        case PROVE:
+        } else if (mode == Mode.PROVE) {
             this.add(getAxiomFilePanel());
-            break;
         }
         this.add(Box.createVerticalGlue());
         this.add(Box.createVerticalStrut(5));
@@ -311,7 +299,7 @@ public class LoadUserTacletsDialog extends JPanel {
     private File chooseFiles(String title) {
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(title);
         fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
-        if (fileChooser.showOpenDialog(this) != KeYFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
             // user pressed OK button
             return fileChooser.getSelectedFile();
         } else {
@@ -454,13 +442,10 @@ public class LoadUserTacletsDialog extends JPanel {
     private JDialog getDialog() {
         if (dialog == null) {
             dialog = new JDialog(MainWindow.getInstance());
-            switch (mode) {
-            case LOAD:
+            if (mode == Mode.LOAD) {
                 dialog.setTitle("Load user-defined taclets into proof");
-                break;
-            case PROVE:
+            } else if (mode == Mode.PROVE) {
                 dialog.setTitle("Prove user-defined taclets");
-                break;
             }
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             Container pane = dialog.getContentPane();

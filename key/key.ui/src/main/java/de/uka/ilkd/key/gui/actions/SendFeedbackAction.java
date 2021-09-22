@@ -360,7 +360,7 @@ public class SendFeedbackAction extends AbstractAction {
                 fileChooser.setFileFilter(KeYFileChooser.ZIP_FILTER);
 
                 int answer = fileChooser.showSaveDialog(parent);
-                if (answer == KeYFileChooser.APPROVE_OPTION) {
+                if (answer == JFileChooser.APPROVE_OPTION) {
                     saveMetaDataToFile(fileChooser.getSelectedFile(), message.getText());
                     JOptionPane.showMessageDialog(parent,
                             String.format("Your message has been saved to the file %s.",
