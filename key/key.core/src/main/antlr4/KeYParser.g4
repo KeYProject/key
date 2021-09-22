@@ -546,8 +546,10 @@ integer:
   (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
-floatnum: //called floatnum because "float" collide with the Java language
-  (MINUS)? FLOAT_LITERAL
+floatnum: // called floatnum because "float" collide with the Java language
+    (MINUS)? FLOAT_LITERAL  #floatLiteral
+  | (MINUS)? DOUBLE_LITERAL #doubleLiteral
+  | (MINUS)? REAL_LITERAL   #realLiteral
 ;
 
 char_literal:

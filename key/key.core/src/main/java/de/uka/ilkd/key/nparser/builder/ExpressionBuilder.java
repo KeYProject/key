@@ -14,6 +14,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
+import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
+import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
@@ -1425,13 +1428,27 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitFloatnum(KeYParser.FloatnumContext ctx) {
+    public Object visitFloatLiteral(FloatLiteralContext ctx) {
         String txt = ctx.getText(); // full text of node incl. unary minus.
         char lastChar = txt.charAt(txt.length() - 1);
-        boolean isFloat = lastChar == 'F' || lastChar == 'f';
-        return isFloat
-                ? toFPNotation(txt)
-                : toDFPNotation(txt);
+        assert lastChar == 'F' || lastChar == 'f';
+        return toFPNotation(txt);
+    }
+
+    @Override
+    public Object visitDoubleLiteral(DoubleLiteralContext ctx) {
+        String txt = ctx.getText(); // full text of node incl. unary minus.
+        char lastChar = txt.charAt(txt.length() - 1);
+        assert lastChar == 'D' || lastChar == 'd';
+        return toDFPNotation(txt.substring(0, txt.length() - 1));
+    }
+
+    @Override
+    public Object visitRealLiteral(RealLiteralContext ctx) {
+        String txt = ctx.getText(); // full text of node incl. unary minus.
+        char lastChar = txt.charAt(txt.length() - 1);
+        assert lastChar == 'R' || lastChar == 'r';
+        throw new Error("not yet implemented");
     }
 
     @Override
