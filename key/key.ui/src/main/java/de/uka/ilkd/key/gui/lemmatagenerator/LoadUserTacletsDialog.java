@@ -299,7 +299,7 @@ public class LoadUserTacletsDialog extends JPanel {
     private File chooseFiles(String title) {
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(title);
         fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
-        if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // user pressed OK button
             return fileChooser.getSelectedFile();
         } else {
