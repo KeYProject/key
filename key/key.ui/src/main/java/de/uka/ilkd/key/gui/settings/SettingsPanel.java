@@ -26,8 +26,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -185,7 +185,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected <T> JComboBox<T> addComboBox(String title,
                                            String info, int selectionIndex,
-                                           @Nullable Validator<T> validator, T... items) {
+                                           Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {

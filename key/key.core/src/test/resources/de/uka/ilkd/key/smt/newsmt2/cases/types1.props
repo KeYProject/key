@@ -1,0 +1,22 @@
+### comment
+
+revealed a bug (would produce (instance 42 sort_any))
+
+Failed also if the translation was
+   (assert (not (instanceof (i2u 42) sort_any)))
+
+Added (assert (subtype sort_int sort_any))
+
+### KeY
+
+\problem {
+   any::instance(42) = TRUE
+}
+
+### contains.1
+
+(assert (not (= (b2u (instanceof (i2u 42) sort_any)) (b2u true))))
+
+### expected
+
+valid

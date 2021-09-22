@@ -45,6 +45,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
@@ -62,7 +63,6 @@ public class ProgressDialog extends JDialog{
         private JScrollPane scrollPane;
 
         private JProgressBar progressBar;
-        private ClickableMessageBox statusMessages;
         private final ProgressDialogListener listener;
         public enum Modus {stopModus,discardModus}
 
@@ -117,30 +117,13 @@ public class ProgressDialog extends JDialog{
                 contentPane.add(getScrollPane(), constraints);
                 constraints.gridy ++;
                 constraints.weighty = 1.0;
-                contentPane.add(getStatusMessageBox(), constraints);
                 constraints.gridy ++;
                 constraints.weighty = 0.0;
                 constraints.insets.bottom = 5;
                 contentPane.add(buttonBox, constraints);
                 this.pack();
         }
-        
-        
 
-        
-        public void addInformation(String title,Color color, Object information){
-        	
-        		getStatusMessages().add(information, title, color);
-        		if(!getStatusMessageBox().isVisible()){
-        			getStatusMessageBox().setVisible(true);        
-        			this.pack();
-        		}
-        }
-        
-        
-        
-
-        
         public void setProgress(int value){
                 getProgressBar().setValue(value);
         }
@@ -153,43 +136,7 @@ public class ProgressDialog extends JDialog{
                 
                 return progressBar;
         }
-        
-        public ClickableMessageBox getStatusMessages() {
 
-        	if(statusMessages == null){
-        		statusMessages = new ClickableMessageBox();
-           		statusMessages.add(new ClickableMessageBoxListener() {
-					
-					@Override
-					public void eventMessageClicked(Object object) {
-						  listener.additionalInformationChosen(object);
-						
-					}
-				});
-          	}        
-        	return statusMessages;
-		}
-     
-        public Box getStatusMessageBox() {
-        	if(statusMessageBox == null){
-        		statusMessageBox = Box.createVerticalBox();
-        		JScrollPane pane = new JScrollPane(getStatusMessages());
-        		Dimension dim = pane.getPreferredSize();
-        		dim.height = 80;
-        		pane.setPreferredSize(dim);
-        		statusMessageBox.add(pane);
-        		statusMessageBox.add(new JLabel("For more information please click on the particular message."));
-        		statusMessageBox.setVisible(false);
-        	}
-        	
-        	return statusMessageBox;
-		}
-        
-
-        
-   
-        
-        
         private JButton getApplyButton() {
                 if(applyButton == null){
                        applyButton = new JButton("Apply");
@@ -198,7 +145,12 @@ public class ProgressDialog extends JDialog{
                         
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            try {
                                 listener.applyButtonClicked();
+                            } catch(Exception exception) {
+                                // There may be exceptions during rule application that should not be lost.
+                                ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                            }
                         }
                 });
                        
