@@ -68,7 +68,7 @@ lexer grammar KeYLexer;
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
-       if (token.getType() == NUM_LITERAL) {//rewrite NUM_LITERALs to identifier when preceeded by an '('
+       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceeded by an '('
            for (int k = 1; k <= MAX_K; k++) {
                int codePoint = _input.LA(k);
                if (Character.isWhitespace(codePoint)) continue;

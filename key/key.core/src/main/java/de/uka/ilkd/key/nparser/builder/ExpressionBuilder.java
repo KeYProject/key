@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -1093,12 +1094,12 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
-        Sort sortId = accept(ctx.sortId()); //TODO
+        Sort sortId = accept(ctx.sortId());
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
-        if (ctx.name.NUM_LITERAL() != null) {//number
-            return toZNotation(ctx.name.NUM_LITERAL().getText(), functions());
+        if (ctx.name.INT_LITERAL() != null) {//number
+            return toZNotation(ctx.name.INT_LITERAL().getText(), functions());
         }
 
         assert parts != null && varfuncid != null;
@@ -1125,7 +1126,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            String firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
+            String firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.INT_LITERAL().getText()
                     : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
@@ -1424,9 +1425,92 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitNumber(KeYParser.NumberContext ctx) {
-        return toZNotation(ctx.getText(), functions());
+    public Object visitFloatnum(KeYParser.FloatnumContext ctx) {
+        String txt = ctx.getText(); // full text of node incl. unary minus.
+        char lastChar = txt.charAt(txt.length() - 1);
+        boolean isFloat = lastChar == 'F' || lastChar == 'f';
+        return isFloat
+                ? toFPNotation(txt)
+                : toDFPNotation(txt);
     }
+
+    @Override
+    public Object visitInteger(KeYParser.IntegerContext ctx) {
+        return toZNotation(ctx.getText());
+    }
+
+    private Term toZNotation(String number) {
+        return getTermFactory().createTerm(
+                functions().lookup(new Name("Z")), toNum(number));
+    }
+
+    private Term toCNotation(String number) {
+        return getTermFactory().createTerm(
+                functions().lookup(new Name("C")), toNum(number));
+    }
+
+    private Term toFPNotation(String number) {
+        String decBitString = Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
+        return getTermFactory().createTerm(
+                functions().lookup(new Name("FP")),
+                toNum(decBitString)
+        ); // toNum("0")); // soon to disappear
+    }
+
+    private Term toDFPNotation(String number) {
+        String decBitString = Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
+        return getTermFactory().createTerm(
+                functions().lookup(new Name("DFP")),
+                toNum(decBitString)
+        ); // toNum("0")); // soon to disappear
+    }
+
+    private Term toNum(String number) {
+        String s = number;
+        final boolean negative = (s.charAt(0) == '-');
+        if (negative) {
+            s = number.substring(1, s.length());
+        }
+        if(s.startsWith("0x")) {
+            try {
+                BigInteger bi = new BigInteger(s.substring(2),16);
+                s = bi.toString();
+            } catch(NumberFormatException nfe) {
+                Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
+            }
+        }
+        Term result = getTermFactory().createTerm(functions().lookup(new Name("#")));
+
+        for(int i = 0; i<s.length(); i++){
+            result = getTermFactory().createTerm(functions().lookup(new Name(s.substring(i,i+1))), result);
+        }
+
+        if (negative) {
+            result = getTermFactory().createTerm(functions().lookup(new Name("neglit")), result);
+        }
+
+        return result;
+    }
+
+    /*private Term makeBinaryTerm(String opName, Term a, Term a1) {
+        LDT ldt = services.getTypeConverter().getLDTFor(a.sort());
+        if (ldt != null) {
+            Function op = ldt.getFunctionFor(opName, services);
+            if (op == null) {
+                semanticError("Cannot resolve symbol '" + opName + "' for sort " + a.sort());
+            } else {
+                a = getTermFactory().createTerm(op, a, a1);
+                return a;
+            }
+        }
+        Function op = (Function) functions().lookup(new Name(opName));
+        if(op == null) {
+            semanticError("Function symbol '" + opName + "' not found.");
+        }
+        a = getTermFactory().createTerm(op, a, a1);
+        return a;
+    }*/
+
 
     private Term termForParsedVariable(ParsableVariable v, ParserRuleContext ctx) {
         if (v instanceof LogicVariable || v instanceof ProgramVariable) {
