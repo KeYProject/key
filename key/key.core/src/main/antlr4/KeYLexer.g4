@@ -455,6 +455,29 @@ NUM_LITERAL:
     (DIGIT | '_')+ ('l'|'L')?
 ;
 
+fragment EXP_SUFFIX:
+   ('e'|'E') ('+'|'-')? (DIGIT)+
+   ;
+
+// reals, floats and doubles are all rationals here.
+fragment RATIONAL_LITERAL:
+      (DIGIT)+ ('.' (DIGIT)*) (EXP_SUFFIX)?
+    | '.' (DIGIT)+ (EXP_SUFFIX)?
+    ;
+
+FLOAT_LITERAL:
+    RATIONAL_LITERAL ('f' | 'F')
+    ;
+
+DOUBLE_LITERAL:
+    RATIONAL_LITERAL ('d' | 'D')
+    ;
+
+REAL_LITERAL:
+    RATIONAL_LITERAL ('r' | 'R')
+    ;
+
+
 /**
   * Here we have to accept all strings of ki01           ERROR_CHAR 0:\                                                 nd \\[a-z_]
   * and make the decision our selves as to what to do with it
