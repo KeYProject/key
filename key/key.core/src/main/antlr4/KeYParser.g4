@@ -119,7 +119,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | NUM_LITERAL
+  simple_ident (DOT simple_ident)* | INT_LITERAL
 ;
 
 simple_ident_dots_comma_list
@@ -542,7 +542,7 @@ argument_list
 ;
 
 number:
-  (MINUS)? (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 char_literal:

@@ -163,6 +163,7 @@ DIFFERENTFIELDS:'\\differentFields';
 ISREFERENCE:'\\isReference';
 ISREFERENCEARRAY:'\\isReferenceArray';
 ISSTATICFIELD : '\\isStaticField';
+ISINSTRICTFP : '\\isInStrictFp';
 ISSUBTYPE : '\\sub';
 EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
@@ -451,7 +452,7 @@ fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
 
-NUM_LITERAL:
+INT_LITERAL:
     (DIGIT | '_')+ ('l'|'L')?
 ;
 
