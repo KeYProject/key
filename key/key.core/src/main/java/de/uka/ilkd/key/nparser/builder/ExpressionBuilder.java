@@ -3,6 +3,8 @@ package de.uka.ilkd.key.nparser.builder;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
@@ -282,8 +284,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
             final String opTok = ctx.op.get(i).getText();
+            // it's either + or -.
             String operator = opTok.equals("+") ? "add" : "sub";
+            Name sortName = last.sort().name();
+
+            if (sortName.equals(FloatLDT.NAME)) {
+                operator += "Float";
+            } else if (sortName.equals(DoubleLDT.NAME)) {
+                operator += "Double";
+            }
+
             Function op = functions().lookup(new Name(operator));
+            assert op != null : "Could not find '" + operator + "' function symbol.";
             Term cur = terms.get(i);
             last = binaryTerm(ctx, op, last, cur);
         }
