@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.testgen;
 import java.io.IOException;
 import java.util.*;
 
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -158,10 +159,13 @@ public abstract class AbstractTestGenerator {
     piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
     final ProofDependentSMTSettings pdSettings = proof.getSettings()
           .getSMTSettings().clone();
+    final NewSMTTranslationSettings newSettings =
+            new NewSMTTranslationSettings(proof.getSettings()
+              .getNewSMTSettings());
     pdSettings.invariantForall = settings.invariantForAll();
     // invoke z3 for counterexamples
     final SMTSettings smtsettings = new SMTSettings(pdSettings,
-          piSettings, proof);
+          piSettings, newSettings, proof);
     launcher = new SolverLauncher(smtsettings);
     launcher.addListener(new SolverLauncherListener() {
        @Override

@@ -60,6 +60,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
         getChildren().add(new TranslationOptions());
         getChildren().add(new TacletTranslationOptions());
+        getChildren().add(new NewTranslationOptions());
 
         for (SolverType options : SolverType.ALL_SOLVERS) {
             getChildren().add(new SolverOptions(options));

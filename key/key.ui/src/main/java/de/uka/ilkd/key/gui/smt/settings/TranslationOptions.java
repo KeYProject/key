@@ -165,7 +165,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public String getDescription() {
-        return "SMT Translation";
+        return "SMT Translation (Old)";
     }
 
     @Override

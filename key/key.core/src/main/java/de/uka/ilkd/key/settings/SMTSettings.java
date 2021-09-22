@@ -30,13 +30,17 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         private final ProofIndependentSMTSettings piSettings;
         private final Proof proof;
         private LinkedList<Taclet> taclets = null;
-        
+    private final NewSMTTranslationSettings newTranslationSettings;
 
-        public SMTSettings(ProofDependentSMTSettings pdSettings,
-                        ProofIndependentSMTSettings piSettings, Proof proof) {
+
+    public SMTSettings(ProofDependentSMTSettings pdSettings,
+                        ProofIndependentSMTSettings piSettings,
+                       NewSMTTranslationSettings newTransSettings,
+                       Proof proof) {
                 super();
                 this.pdSettings = pdSettings;
                 this.piSettings = piSettings;
+                this.newTranslationSettings = newTransSettings;
                 this.proof   = proof;
                 
         }
@@ -44,6 +48,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         public void copy(SMTSettings settings){
                 pdSettings.copy(settings.pdSettings);
                 piSettings.copy(settings.piSettings);
+                newTranslationSettings.copy(settings.newTranslationSettings);
                 taclets = settings.taclets;
         }
         
@@ -227,8 +232,15 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 			return pdSettings.invariantForall;
 		}
 
-        
+    @Override
+    public NewSMTTranslationSettings getNewSettings() {
+        return newTranslationSettings;
+    }
 
+
+    public NewSMTTranslationSettings getNewTranslationSettings() {
+        return newTranslationSettings;
+    }
         
        
         

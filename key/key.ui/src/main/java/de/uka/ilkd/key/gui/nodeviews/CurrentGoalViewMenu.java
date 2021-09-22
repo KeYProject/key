@@ -240,7 +240,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getSolverUnions();
+                .getSMTSettings().getSolverUnions(Main.isExperimentalMode());
         if (!solverUnions.isEmpty()) {
             addSeparator();
         }
@@ -554,7 +554,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
                 Thread thread = new Thread(() -> {
                     SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                            goal.proof().getSettings().getNewSMTSettings(),
+                            goal.proof());
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, goal.proof()));
                     Collection<SMTProblem> list = new LinkedList<SMTProblem>();
