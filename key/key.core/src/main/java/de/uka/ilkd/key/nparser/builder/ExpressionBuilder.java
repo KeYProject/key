@@ -17,6 +17,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
+import de.uka.ilkd.key.nparser.KeYParser.Weak_arith_termContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
@@ -260,6 +261,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termL = accept(ctx.a);
         Term termR = accept(ctx.b);
 
+        if(termR == null) {
+            return updateOrigin(termL, ctx);
+        }
+
         String op_name = "";
         if (ctx.LESS() != null)
             op_name = "lt";
@@ -269,12 +274,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op_name = "gt";
         if (ctx.GREATEREQUAL() != null)
             op_name = "geq";
-        Function op = functions().lookup(new Name(op_name));
-        if (op == null) {
-            return updateOrigin(termL, ctx);
-            //semanticError(ctx, "Function symbol '" + op_name + "' not found.");
-        }
-        return binaryTerm(ctx, op, termL, termR);
+        return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
+
     }
 
     @Override
@@ -289,18 +290,29 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             final String opTok = ctx.op.get(i).getText();
             // it's either + or -.
-            Sort sort = last.sort();
-            LDT ldt = services.getTypeConverter().getLDTFor(sort);
             String opname = opTok.equals("+") ? "add" : "sub";
-            Function op = ldt.getFunctionFor(opname, services);
-            if(op == null) {
-                semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
-            }
             Term cur = terms.get(i);
-            last = binaryTerm(ctx, op, last, cur);
+            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
         }
         return last;
     }
+
+    private Term binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, Term last, Term cur) {
+        Sort sort = last.sort();
+        if (sort == null) {
+            semanticError(ctx, "No sort for %s", last);
+        }
+        LDT ldt = services.getTypeConverter().getLDTFor(sort);
+        if (ldt == null) {
+            semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
+        }
+        Function op = ldt.getFunctionFor(opname, services);
+        if(op == null) {
+            semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
+        }
+        return binaryTerm(ctx, op, last, cur);
+    }
+
 
     @Override
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
@@ -308,16 +320,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.b.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
-        Function op = services.getTypeConverter().
-                getLDTFor(termL.sort()).getFunctionFor("mul", services);
-        if(op == null) {
-            semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", "mul", termL.sort());
-        }
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
             Term cur = terms.get(i);
-            last = binaryTerm(ctx, op, last, cur);
+            last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
         }
         return last;
     }
@@ -328,11 +335,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.b == null) return termL;
 
         Term termR = accept(ctx.b);
-        Function div = functions().lookup("div");
-        Function mod = functions().lookup("mod");
-
-        Function op = ctx.SLASH() != null ? div : mod;
-        return binaryTerm(ctx, op, termL, termR);
+        String opName = ctx.SLASH() != null ? "div" : "mod";
+        return binaryLDTSpecificTerm(ctx, opName, termL, termR);
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
