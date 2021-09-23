@@ -229,10 +229,22 @@ public class ExpressionBuilder extends DefaultBuilder {
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(Z,
                         getTermFactory().createTerm(neglit, num)));
             } else if (result.sort() != Sort.FORMULA) {
-                Function negation = functions().lookup(new Name("neg"));
-                return capsulateTf(ctx, () -> getTermFactory().createTerm(negation, result));
+                Sort sort = result.sort();
+                if (sort == null) {
+                    semanticError(ctx, "No sort for %s", result);
+                }
+                LDT ldt = services.getTypeConverter().getLDTFor(sort);
+                if (ldt == null) {
+                    // falling back to integer ldt (for instance for untyped schema variables)
+                    ldt = services.getTypeConverter().getIntegerLDT();
+                }
+                Function op = ldt.getFunctionFor("neg", services);
+                if(op == null) {
+                    semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
+                }
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(op, result));
             } else {
-                semanticError(ctx, "Formula cannot be prefixed with '-'");
+                semanticError(ctx, "Formulas cannot be prefixed with '-'");
             }
         }
         return result;
@@ -241,7 +253,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitNegation_term(KeYParser.Negation_termContext ctx) {
         Term termL = accept(ctx.sub);
-        if (ctx.NOT() != null) return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
+        if (ctx.NOT() != null) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
+        }
         else return termL;
     }
 
@@ -304,7 +318,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         LDT ldt = services.getTypeConverter().getLDTFor(sort);
         if (ldt == null) {
-            semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
+            // falling back to integer ldt (for instance for untyped schema variables)
+            ldt = services.getTypeConverter().getIntegerLDT();
         }
         Function op = ldt.getFunctionFor(opname, services);
         if(op == null) {

@@ -30,7 +30,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(@Nullable Token t, String format, Throwable e) {
-        super(format + getPosition(t), e);
+        super(format + " at " + getPosition(t), e);
         offendingSymbol = t;
     }
 
