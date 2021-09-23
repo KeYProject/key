@@ -509,6 +509,7 @@ public final class IntegerLDT extends LDT {
             case "add": return getAdd();
             case "sub": return getSub();
             case "mod": return getMod();
+            case "neg": return getNeg();
         }
         return null;
     }

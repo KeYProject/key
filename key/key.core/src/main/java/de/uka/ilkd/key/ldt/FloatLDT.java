@@ -67,6 +67,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     private final Function mulFloatIEEE;
     private final Function divFloatIEEE;
     private final Function absFloat;
+    private final Function negFloat;
 
     private final Function isNormal;
     private final Function isSubnormal;
@@ -101,6 +102,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         mulFloatIEEE        = addFunction(services, "mulFloat");
         divFloatIEEE        = addFunction(services, "divFloat");
         absFloat            = addFunction(services, "absFloat");
+        negFloat            = addFunction(services, "negFloat");
 
         isNormal            = addFunction(services, "floatIsNormal");
         isSubnormal         = addFunction(services, "floatIsSubnormal");
@@ -215,6 +217,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
             case "mul": return getMul();
             case "add": return getAdd();
             case "sub": return getSub();
+            case "neg": return getNeg();
         }
         return null;
     }
@@ -365,6 +368,10 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     public Function getAbs() {
         return absFloat;
+    }
+
+    public Function getNeg() {
+        return negFloat;
     }
 
 }

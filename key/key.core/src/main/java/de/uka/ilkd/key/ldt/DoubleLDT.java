@@ -60,6 +60,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     private final Function mulDouble;
     private final Function divDouble;
     private final Function doubleAbs;
+    private final Function negDouble;
 
     private final Function isNormal;
     private final Function isSubnormal;
@@ -105,6 +106,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
         mulDouble             = addFunction(services, "mulDouble");
         divDouble             = addFunction(services, "divDouble");
         doubleAbs             = addFunction(services, "absDouble");
+        negDouble             = addFunction(services, "negDouble");
 
         isNormal              = addFunction(services, "doubleIsNormal");
         isSubnormal           = addFunction(services, "doubleIsSubnormal");
@@ -201,6 +203,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             case "mul": return getMul();
             case "add": return getAdd();
             case "sub": return getSub();
+            case "neg": return getNeg();
         }
         return null;
     }
@@ -394,6 +397,10 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     public Function getAbs() {
         return doubleAbs;
+    }
+
+    public Function getNeg() {
+        return negDouble;
     }
 
     public Function getSinDouble() {

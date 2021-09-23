@@ -240,7 +240,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
                 Function op = ldt.getFunctionFor("neg", services);
                 if(op == null) {
-                    semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
+                    semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(op, result));
             } else {
