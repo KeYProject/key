@@ -269,7 +269,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op_name = "gt";
         if (ctx.GREATEREQUAL() != null)
             op_name = "geq";
-        Function op = (Function) functions().lookup(new Name(op_name));
+        Function op = functions().lookup(new Name(op_name));
         if (op == null) {
             return updateOrigin(termL, ctx);
             //semanticError(ctx, "Function symbol '" + op_name + "' not found.");
@@ -289,17 +289,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             final String opTok = ctx.op.get(i).getText();
             // it's either + or -.
-            String operator = opTok.equals("+") ? "add" : "sub";
-            Name sortName = last.sort().name();
-
-            if (sortName.equals(FloatLDT.NAME)) {
-                operator += "Float";
-            } else if (sortName.equals(DoubleLDT.NAME)) {
-                operator += "Double";
+            Sort sort = last.sort();
+            LDT ldt = services.getTypeConverter().getLDTFor(sort);
+            String opname = opTok.equals("+") ? "add" : "sub";
+            Function op = ldt.getFunctionFor(opname, services);
+            if(op == null) {
+                semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
             }
-
-            Function op = functions().lookup(new Name(operator));
-            assert op != null : "Could not find '" + operator + "' function symbol.";
             Term cur = terms.get(i);
             last = binaryTerm(ctx, op, last, cur);
         }
@@ -312,8 +308,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.b.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
-        Function op = functions().lookup(new Name("mul"));
-        assert op != null : "Could not find `mul` function symbol.";
+        Function op = services.getTypeConverter().
+                getLDTFor(termL.sort()).getFunctionFor("mul", services);
+        if(op == null) {
+            semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", "mul", termL.sort());
+        }
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {

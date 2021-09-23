@@ -54,6 +54,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 
+import javax.annotation.Nullable;
+
 
 /** 
  * This class inherits from LDT and implements all method that are
@@ -493,7 +495,23 @@ public final class IntegerLDT extends LDT {
             return null;
         }
     }
-    
+
+    @Nullable
+    @Override
+    public Function getFunctionFor(String op, Services services) {
+        switch (op) {
+            case "gt": return getGreaterThan();
+            case "geq": return getGreaterOrEquals();
+            case "lt": return getLessThan();
+            case "leq": return getLessOrEquals();
+            case "div": return getDiv();
+            case "mul": return getMul();
+            case "add": return getAdd();
+            case "sub": return getSub();
+            case "mod": return getMod();
+        }
+        return null;
+    }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 

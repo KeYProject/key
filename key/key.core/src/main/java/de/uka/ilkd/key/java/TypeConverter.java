@@ -47,8 +47,6 @@ public final class TypeConverter {
     // Maps LDT names to LDT instances.
     private final Map<Name, LDT> LDTs = new HashMap<>();
 
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-
     private HeapLDT heapLDT = null;
     //private IntegerLDT integerLDT = null;
 
@@ -63,20 +61,13 @@ public final class TypeConverter {
 
     private void init(Map<Name, LDT> map) {
         LDTs.putAll(map);
-        models = ImmutableSLList.<LDT>nil();
-        for (LDT ldt : LDTs.values()) {
-            models = models.prepend(ldt);
-        }
         heapLDT = getHeapLDT();
         //integerLDT = getIntegerLDT();
     }
 
-    public ImmutableList<LDT> getModels() {
-        return models;
-    }
 
-    public LDT getModelFor(Sort s) {
-        for (LDT ldt : models) {
+    public LDT getLDTFor(Sort s) {
+        for (LDT ldt : LDTs.values()) {
             if (s.equals(ldt.targetSort())) {
                 return ldt;
             }
@@ -544,7 +535,7 @@ public final class TypeConverter {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             Function function = (Function) term.op();
-            for (LDT model : models) {
+            for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
                 }
@@ -560,7 +551,7 @@ public final class TypeConverter {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
         } else if (term.op() instanceof Function) {
             Function function = (Function) term.op();
-            for (LDT model : models) {
+            for (LDT model : LDTs.values()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
                 }
@@ -601,7 +592,7 @@ public final class TypeConverter {
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
         } else if (t.op() instanceof Function) {
-            for (LDT ldt : models) {
+            for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
                     result = services.getJavaInfo().getKeYJavaType(type);
