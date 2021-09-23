@@ -226,6 +226,40 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
         return (c-'0'>=0) && (c-'0'<=9);
     }
 
+    // Todo: needed???
+    public long longBits(Term t, IntegerLDT integerLDT) {
+
+        boolean neg = false;
+
+        if (t.op() == doubleLit) {
+            t = t.sub(0);
+        }
+
+        if (t.op() == integerLDT.getNegativeNumberSign()) {
+            neg = true;
+            t = t.sub(0);
+        }
+
+        StringBuffer sb = new StringBuffer("");
+        while (isNumberLiteral(t.op())) {
+            sb.append(t.op().name());
+            t = t.sub(0);
+        }
+        // numbers must end with a sharp
+        if (t.op() != integerLDT.getNumberTerminator()) {
+            throw new NumberFormatException("Not supported: " + t);
+        }
+
+        if (neg) {
+            sb.append("-");
+        }
+
+        sb.reverse();
+        return Long.parseLong(sb.toString());
+
+    }
+
+
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
         Function f = (Function)t.op();
