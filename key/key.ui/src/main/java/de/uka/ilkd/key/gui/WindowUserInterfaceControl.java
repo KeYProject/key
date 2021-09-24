@@ -605,64 +605,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        final JDialog dialog = new JDialog(MainWindow.getInstance(),
-                                           SLEnvInput.getLanguage() + " warning",
-                                           true);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container pane = dialog.getContentPane();
-        pane.setLayout(new BorderLayout());
-
-        //top label
-        JLabel label = new JLabel("The following non-fatal "
-                                  + "problems occurred when translating your "
-                                  + SLEnvInput.getLanguage() + " specifications:");
-        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-        pane.add(label, BorderLayout.NORTH);
-
-        //scrollable warning list
-        JScrollPane scrollpane = new JScrollPane();
-        scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList<PositionedString> list =
-                new JList<PositionedString>(
-                        warnings.toArray(new PositionedString[warnings.size()])
-                        );
-        list.setBorder(BorderFactory.createLoweredBevelBorder());
-        scrollpane.setViewportView(list);
-        pane.add(scrollpane, BorderLayout.CENTER);
-
-        //ok button
-        final JButton button = new JButton("OK");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-            }
-        });
-        Dimension buttonDim = new Dimension(100, 27);
-        button.setPreferredSize(buttonDim);
-        button.setMinimumSize(buttonDim);
-        JPanel panel = new JPanel();
-        panel.add(button);
-        pane.add(panel, BorderLayout.SOUTH);
-        dialog.getRootPane().setDefaultButton(button);
-
-        button.registerKeyboardAction(
-            new ActionListener() {
-                @Override
-               public void actionPerformed(ActionEvent event) {
-                    if(event.getActionCommand().equals("ESC")) {
-                        button.doClick();
-                    }
-                }
-            },
-            "ESC",
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        dialog.setSize(700, 300);
-        dialog.setLocationRelativeTo(MainWindow.getInstance());
-        dialog.setVisible(true);
-        dialog.dispose();
+        WarningsDialog.showIfNecessary(mainWindow, warnings);
     }
 
    /**
