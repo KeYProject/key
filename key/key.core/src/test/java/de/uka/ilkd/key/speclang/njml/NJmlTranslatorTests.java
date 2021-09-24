@@ -9,13 +9,14 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Alexander Weigl
@@ -80,5 +81,37 @@ public class NJmlTranslatorTests {
                 "Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
                         "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
                 message.toString());
+    }
+
+
+    @Test
+    public void testMarkerDecision() {
+        JmlMarkerDecision m = new JmlMarkerDecision(null);
+        assertFalse(m.isActiveJmlSpec("+OPENJML"));
+        assertFalse(m.isActiveJmlSpec("-key+key"));
+        assertTrue(m.isActiveJmlSpec("+key"));
+        assertTrue(m.isActiveJmlSpec("+KEY"));
+    }
+
+    @Test
+    public void testEnabledKeysLexer() {
+        String contract = "/*-key@ invariant x == 54; */";
+        JmlLexer lex = JmlFacade.createLexer(contract);
+        List<? extends Token> toks = lex.getAllTokens();
+        for (Token tok : toks) {
+            System.out.println(tok);
+        }
+    }
+
+
+    @Test
+    public void testIgnoreOpenJML() {
+        jmlIO.clearWarnings();
+        String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
+        ImmutableList<TextualJMLConstruct> result =
+                jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
+        assertNotNull(result);
+        assertEquals("Too many invariants found.", 1, result.size());
+        ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
     }
 }
