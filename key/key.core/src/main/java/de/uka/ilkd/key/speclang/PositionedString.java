@@ -102,8 +102,12 @@ public class PositionedString {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PositionedString)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PositionedString)) {
+            return false;
+        }
         PositionedString that = (PositionedString) o;
         return text.equals(that.text) && Objects.equals(fileName, that.fileName) && Objects.equals(pos, that.pos);
     }

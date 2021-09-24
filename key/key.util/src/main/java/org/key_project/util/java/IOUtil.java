@@ -409,15 +409,15 @@ public final class IOUtil {
     /**
      * Tries to open a stream with the given file name.
      *
-     * @param fileName either an URL or a file name
+     * @param resourceLocation either a URL or a file name
      * @throws IOException if file could not be opened
      */
-    public static InputStream openStream(String fileName) throws IOException {
+    public static InputStream openStream(String resourceLocation) throws IOException {
         try {
-            URL url = new URL(fileName);
+            URL url = new URL(resourceLocation);
             return url.openStream();
         } catch (MalformedURLException e) {
-            return new FileInputStream(fileName);
+            return new FileInputStream(resourceLocation);
         }
     }
 

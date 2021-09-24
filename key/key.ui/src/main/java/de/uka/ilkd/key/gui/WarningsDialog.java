@@ -189,16 +189,7 @@ public class WarningsDialog extends JDialog {
             });
 
             if (isJava(ps.fileName)) {
-                try {
-                    JavaDocument doc = new JavaDocument();
-                    txtSource.setDocument(doc);
-                    doc.insertString(0, source, new SimpleAttributeSet());
-                    DefaultHighlighter dh = new DefaultHighlighter();
-                    txtSource.setHighlighter(dh);
-                    addWarnings(dh, ps.fileName);
-                } catch (BadLocationException e) {
-                    throw new RuntimeException(e);
-                }
+                showJavaSourceCode(ps, source);
             } else {
                 txtSource.setText(source);
             }
@@ -206,6 +197,19 @@ public class WarningsDialog extends JDialog {
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void showJavaSourceCode(PositionedString ps, String source) {
+        try {
+            JavaDocument doc = new JavaDocument();
+            txtSource.setDocument(doc);
+            doc.insertString(0, source, new SimpleAttributeSet());
+            DefaultHighlighter dh = new DefaultHighlighter();
+            txtSource.setHighlighter(dh);
+            addWarnings(dh, ps.fileName);
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -221,11 +225,11 @@ public class WarningsDialog extends JDialog {
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, ps.pos);
         int end = offset;
-        for (; end < source.length() && !Character.isWhitespace(source.charAt(end)); end++) {
+        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
+            end++;
         }
         try {
-            dh.addHighlight(offset, end,
-                    new BracketMatchingTextArea.BorderPainter(Color.RED));
+            dh.addHighlight(offset, end, new BracketMatchingTextArea.BorderPainter(Color.RED));
         } catch (BadLocationException ignore) {
             // ignore
         }
@@ -315,8 +319,10 @@ public class WarningsDialog extends JDialog {
 
             return panel;
         }
+    }
 
-        public static void main(String[] args) {
+    /*//Debugging
+    public static void main(String[] args) {
             PositionedString a = new PositionedString("Multiline text\nTest\n",
                     "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
                     new Position(20, 25));
@@ -334,6 +340,5 @@ public class WarningsDialog extends JDialog {
             WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
             warningsDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             warningsDialog.setVisible(true);
-        }
-    }
+        }*/
 }
