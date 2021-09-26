@@ -119,7 +119,7 @@ public class JmlMarkerDecision {
         return false;
     }
 
-    boolean isActiveJmlSpec(String foundKeys) {
+    public boolean isActiveJmlSpec(String foundKeys) {
         if (foundKeys.isEmpty()) {
             //a JML annotation with no keys is always included,
             return true;
@@ -138,10 +138,17 @@ public class JmlMarkerDecision {
         for (String marker : keys) {
             plusKeyFound = plusKeyFound || isPositive(marker);
             enabledPlusKeyFound = enabledPlusKeyFound || isPositive(marker) && isEnabled(marker);
-            enabledNegativeKeyFound = enabledNegativeKeyFound || !isPositive(marker) && isEnabled(marker);
+            enabledNegativeKeyFound = enabledNegativeKeyFound || isNegative(marker) && isEnabled(marker);
+            if ("-".equals(marker) || "+".equals(marker)) {
+                return false;
+            }
         }
-        // it is only a comment if "+" encountered, but not "+key"
-        return (plusKeyFound && enabledPlusKeyFound) && !enabledNegativeKeyFound;
+
+        return (!plusKeyFound || enabledPlusKeyFound) && !enabledNegativeKeyFound;
+    }
+
+    private boolean isNegative(String marker) {
+        return marker.charAt(0) == '-';
     }
 
     private boolean isEnabled(String marker) {
