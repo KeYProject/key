@@ -163,25 +163,30 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 // Rest assured, KeY does probably some magic later
                 return commentIndex;
             }
-            // append new empty statement to statement block
             StatementBlock block = (StatementBlock) pe;
-            Statement newEmpty = pe.getFactory().createEmptyStatement();
-            ASTList<Statement> body = block.getBody();
-            body.add(newEmpty);
-            block.setBody(body);
-
-            // append comments to empty statement
-            ASTList<Comment> cml = new ASTArrayList<Comment>();
-            newEmpty.setComments(cml);
             while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
-                current.setPrefixed(false);
-                cml.add(current);
-                commentIndex += 1;
-                if (commentIndex == commentCount) {
-                    return commentIndex;
+                if (current.getText().contains("@")) {
+                    // append new empty statement to statement block
+                    Statement newEmpty = pe.getFactory().createEmptyStatement();
+                    ASTList<Statement> body = block.getBody();
+                    body.add(newEmpty);
+                    block.setBody(body);
+
+                    // attach comment to empty statement
+                    ASTList<Comment> cml = new ASTArrayList<Comment>();
+                    newEmpty.setComments(cml);
+                    current.setPrefixed(true);
+                    cml.add(current);
+                } else {
+                    // again, skip "pure" comments
+                    current.setPrefixed(true);
+                    attachComment(current, last);
                 }
-                current = comments.get(commentIndex);
-                cpos = current.getStartPosition();
+                commentIndex += 1;
+                if (commentIndex < commentCount) {
+                    current = comments.get(commentIndex);
+                    cpos = current.getStartPosition();
+                }
             }
         }
         return commentIndex;
