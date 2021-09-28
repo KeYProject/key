@@ -11,7 +11,7 @@ public class MenuSendFeedackAction extends MainWindowAction {
 
     public MenuSendFeedackAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Send Feedback");
+        setName("Send Feedback...");
     }
 
    /**

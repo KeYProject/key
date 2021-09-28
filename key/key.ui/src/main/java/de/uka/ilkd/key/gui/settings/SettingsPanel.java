@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.settings;
 
 
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import net.miginfocom.layout.AC;
@@ -23,11 +24,10 @@ import net.miginfocom.swing.MigLayout;
 import javax.annotation.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.List;
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -158,14 +158,20 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         btnFileChooser.setContentAreaFilled(false);*/
 
         btnFileChooser.addActionListener(e -> {
-            JFileChooser f = new JFileChooser(textField.getText());
-            int c = 0;
-            if (isSave)
-                c = f.showSaveDialog((Component) e.getSource());
-            else
-                c = f.showOpenDialog((Component) e.getSource());
-            if (c == JFileChooser.APPROVE_OPTION) {
-                textField.setText(f.getSelectedFile().getAbsolutePath());
+            KeYFileChooser fileChooser;
+            int result;
+            if (isSave) {
+                fileChooser = KeYFileChooser.getFileChooser("Save file");
+                fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
+                result = fileChooser.showSaveDialog((Component) e.getSource(),
+                    new File(textField.getText()));
+            } else {
+                fileChooser = KeYFileChooser.getFileChooser("Open file");
+                fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
+                result = fileChooser.showOpenDialog((Component) e.getSource());
+            }
+            if (result == JFileChooser.APPROVE_OPTION) {
+                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         });
         pCenter.add(box);
@@ -185,7 +191,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected <T> JComboBox<T> addComboBox(String title,
                                            String info, int selectionIndex,
-                                           Validator<T> validator, T... items) {
+                                           @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {

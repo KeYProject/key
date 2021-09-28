@@ -19,129 +19,134 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.core.Main;
 
+/**
+ * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class
+ * is a singleton, the only instance is created lazily and can be obtained via
+ * {@link #getFileChooser(String)}. This has the benefit of remembering the last visited directory
+ * across different load/save actions of the user. To keep it simple, the choosable file filters
+ * contain all file extensions that are relevant in KeY. The predefined constants can be used to
+ * set the corresponding filter via {@link #setFileFilter(FileFilter)}. Usually it is a good idea to
+ * do this right after calling {@link #getFileChooser(String)}.
+ *
+ * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the
+ *                          need for delegating many methods)
+ */
+public final class KeYFileChooser extends JFileChooser {
 
-public class KeYFileChooser {
+    /** default file filter for loading files */
+    public static final FileFilter DEFAULT_FILTER = new FileNameExtensionFilter(
+        "Java files, (compressed) KeY files, proof bundles, and source directories",
+        "java", "key", "proof", "proof.gz", "zproof");
 
-    /** The Constant for the default file filter. */
-    public final static FileFilter DEFAULT_FILTER = new FileFilter() {
-        public boolean accept(File f) {
-            return
-                            f.isDirectory()
-                            || "java".equals(IOUtil.getFileExtension(f))
-                            || "key".equals(IOUtil.getFileExtension(f))
-                            || "proof".equals(IOUtil.getFileExtension(f))
-                            || f.getName().endsWith(".proof.gz")
-                            || f.getName().endsWith(".zproof");
-        }
-
-        public String getDescription() {
-            return "Java files, (compressed) KeY files, proof packages, and source directories";
-        }
-    };
+    /** file filter for *.key files */
+    public static final FileFilter KEY_FILTER = new FileNameExtensionFilter(
+        "KeY files",
+        "key");
 
     /** The Constant for the filter for statistics files. */
-    public final static FileFilter STATISTICS_FILTER = new FileFilter() {
-        public boolean accept(File f) {
-            return f.getName().endsWith(".html") || f.getName().endsWith(".csv")
-                    || f.isDirectory();
-        }
+    public static final FileFilter STATISTICS_FILTER = new FileNameExtensionFilter(
+        "proof statistics files (.csv, .html)", "csv", "html");
 
-        public String getDescription() {
-            return "proof statistics files (.csv, .html)";
-        }
-    };
+    /** filter for single java source files */
+    public static final FileFilter JAVA_FILTER = new FileNameExtensionFilter(
+        "Java source files (.java)", "java");
 
-    /** The Constant for the filter for compressed files. */
-    public final static FileFilter COMPRESSED_FILTER = new FileFilter() {
-        public boolean accept(File f) {
-            return f.getName().endsWith(".proof.gz") || f.isDirectory();
-        }
+    /** filter for compressed proof files */
+    public static final FileFilter COMPRESSED_FILTER = new FileNameExtensionFilter(
+        "compressed proof files (.proof.gz)", "proof.gz");
 
-        public String getDescription() {
-            return "compressed KeY proof files (.proof.gz)";
-        }
-    };
+    /** filter for interaction log files */
+    public static final FileFilter INTERACTION_LOG_FILTER = new FileNameExtensionFilter(
+        "interaction logs (.xml)", "xml");
+
+    /** filter for zip archives */
+    public static final FileFilter ZIP_FILTER = new FileNameExtensionFilter(
+        "ZIP archives (.zip)", "zip");
+
+    /** filter for proof bundles */
+    public static final FileFilter PROOF_BUNDLE_FILTER = new FileNameExtensionFilter(
+        "proof bundles (.zproof)", "zproof");
 
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
 
     private static KeYFileChooser INSTANCE;
 
-    private final JFileChooser fileChooser;
+    private static final long serialVersionUID = -7598570660247063980L;
 
+    /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
+    /** this is used to reset the path if the user presses the cancel button */
     private File resetFile = null;
+
+    private KeYFileChooser(File initDir) {
+        super(initDir);
+
+        // for simplicity, we always show all filters
+        addChoosableFileFilter(DEFAULT_FILTER);
+        addChoosableFileFilter(STATISTICS_FILTER);
+        addChoosableFileFilter(JAVA_FILTER);
+        addChoosableFileFilter(COMPRESSED_FILTER);
+        addChoosableFileFilter(INTERACTION_LOG_FILTER);
+        addChoosableFileFilter(ZIP_FILTER);
+        addChoosableFileFilter(PROOF_BUNDLE_FILTER);
+        setFileFilter(DEFAULT_FILTER);
+    }
 
     public boolean useCompression() {
         return getSelectedFile().getName().endsWith(".proof.gz");
     }
 
-    public KeYFileChooser(File initDir) {
-        fileChooser = new JFileChooser(initDir) {
-            private static final long serialVersionUID = -7598570660247063980L;
-
-            public void approveSelection() {
-                File file = getSelectedFile();
-                if (saveDialog && file.exists() &&
-                                showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
-                    return;
-                }
-                super.approveSelection();
-            }
-        };
-        fileChooser.addChoosableFileFilter(STATISTICS_FILTER);
-        fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
-        fileChooser.setFileFilter(DEFAULT_FILTER);
+    @Override
+    public void approveSelection() {
+        File file = getSelectedFile();
+        if (saveDialog && file.exists() &&
+            showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
+            return;
+        }
+        super.approveSelection();
     }
 
     public void prepare() {
-        File selFile = fileChooser.getSelectedFile();
+        File selFile = getSelectedFile();
 
         if (selFile == null) {
-            if (fileChooser.getCurrentDirectory() == null) {
-                fileChooser.setCurrentDirectory(HOME_DIR);
+            if (getCurrentDirectory() == null) {
+                setCurrentDirectory(HOME_DIR);
             }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
             if (!filename.endsWith(".proof")) {
-                fileChooser.setSelectedFile(new File(filename+".proof"));
+                setSelectedFile(new File(filename + ".proof"));
             }
         } else if (selFile.isDirectory()) {
-            fileChooser.setCurrentDirectory(selFile);
+            setCurrentDirectory(selFile);
         }
     }
 
+    @Override
     public void setDialogTitle(String title) {
         if (title != null) {
-            fileChooser.setDialogTitle (title);
+            super.setDialogTitle (title);
         } else {
-            fileChooser.setDialogTitle ("Select file to load");
+            super.setDialogTitle ("Select file to load");
         }
-    }
-
-    /**
-     * Sets the file filter.
-     *
-     * @param fileFilter the new file filter
-     */
-    public void setFileFilter(FileFilter fileFilter) {
-        fileChooser.setFileFilter(fileFilter);
     }
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        fileChooser.setFileSelectionMode(b
-                        ? JFileChooser.FILES_ONLY
-                                        : JFileChooser.FILES_AND_DIRECTORIES);
+        setFileSelectionMode(b ? JFileChooser.FILES_ONLY : JFileChooser.FILES_AND_DIRECTORIES);
     }
 
-    public boolean showSaveDialog(Component parent) {
+    @Override
+    public int showSaveDialog(Component parent) {
         return showSaveDialog(parent, null, null);
     }
 
@@ -151,12 +156,12 @@ public class KeYFileChooser {
      * @param parent the main window
      * @param originalFile the original file to be saved, if it exists and is a proof, this will be the suggestion
      * @param extension the desired file name extension (usually ".proof")
-     * @return
+     * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
-    public boolean showSaveDialog(Component parent, File originalFile, String extension) {
+    public int showSaveDialog(Component parent, File originalFile, String extension) {
         File selectedFile;
         if (originalFile == null) {
-            selectedFile = fileChooser.getCurrentDirectory();
+            selectedFile = getCurrentDirectory();
         } else {
             selectedFile = originalFile.getAbsoluteFile();
             if (selectedFile.isFile() || (!selectedFile.exists() && selectedFile.getName().contains("."))) {
@@ -185,89 +190,81 @@ public class KeYFileChooser {
         }
 
 
-        fileChooser.setSelectedFile(resetFile);
+        setSelectedFile(resetFile);
         setSaveDialog(true);
 
         return showSaveDialog(parent, selectedFile);
     }
 
-    public boolean showSaveDialog(Component parent, File selectedFile) {
+    /**
+     * Shows the dialog with the given file/directory as currently selected.
+     * @param parent the Component the dialog is over
+     * @param selectedFile the file or directory that shall be currently selected
+     * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
+     */
+    public int showSaveDialog(Component parent, File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.isDirectory()) {
-                fileChooser.setSelectedFile(null);
-                fileChooser.setCurrentDirectory(selectedFile);
+                setSelectedFile(null);
+                setCurrentDirectory(selectedFile);
             } else {
-                fileChooser.setSelectedFile(selectedFile);
-                fileChooser.updateUI(); // Might prevent empty filename suggestion?
+                setSelectedFile(selectedFile);
+                updateUI(); // Might prevent empty filename suggestion?
             }
         }
 
+        if (resetFile == null) {
+            resetFile = getCurrentDirectory();
+        }
+
         setSaveDialog(true);
-        int result = fileChooser.showSaveDialog(parent);
-        return (result == JFileChooser.APPROVE_OPTION);
+        int result = super.showSaveDialog(parent);
+        if (result != APPROVE_OPTION) {
+            resetPath();
+        }
+        return result;
     }
 
-    public void resetPath() {
+    private void resetPath() {
         assert resetFile != null;
         if (resetFile.isDirectory()) {
-            fileChooser.setSelectedFile(null);
-            fileChooser.setCurrentDirectory(resetFile);
+            setSelectedFile(null);
+            setCurrentDirectory(resetFile);
         } else {
-            fileChooser.setSelectedFile(resetFile);
+            setSelectedFile(resetFile);
         }
-        fileChooser.updateUI();
+        updateUI();
         resetFile = null;
     }
 
-    public File getCurrentDirectory() {
-        return fileChooser.getCurrentDirectory();
-    }
-
-    public boolean showOpenDialog(Component component) {
+    @Override
+    public int showOpenDialog(Component component) {
         setSaveDialog(false);
 
-        final File file = fileChooser.getSelectedFile() != null ?
-                        fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
-                        resetFile = file;
-                        if (file.isDirectory()) {
-                            fileChooser.setSelectedFile(null);
-                            fileChooser.setCurrentDirectory(file);
-                        } else {
-                            fileChooser.setSelectedFile(file);
-                        }
-                        fileChooser.updateUI();
+        final File file = getSelectedFile() != null ? getSelectedFile() : getCurrentDirectory();
+        resetFile = file;
+        if (file.isDirectory()) {
+            setSelectedFile(null);
+            setCurrentDirectory(file);
+        } else {
+            setSelectedFile(file);
+        }
+        updateUI();
 
-                        int result = fileChooser.showOpenDialog(component);
-                        boolean res = (result == JFileChooser.APPROVE_OPTION);
-                        if (!res) {
-                            this.resetPath();
-                        } else {
-                            resetFile = null;
-                        }
-                        return res;
-    }
-
-    public File getSelectedFile() {
-        return fileChooser.getSelectedFile();
-    }
-
-    public void selectFile(File f) {
-        fileChooser.setSelectedFile(f);
-    }
-
-    public void setCurrentDirectory(File f) {
-        fileChooser.setCurrentDirectory(f);
+        int result = super.showOpenDialog(component);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            resetPath();
+        } else {
+            resetFile = null;
+        }
+        return result;
     }
 
     private int showOverwriteDialog(File file) {
-        return JOptionPane.showOptionDialog(fileChooser, "File " +
+        return JOptionPane.showOptionDialog(this, "File " +
                         file.getAbsolutePath() + " already exists. Overwrite?",
                         "Save warning", JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE, null, null, null);
-    }
-
-    public JFileChooser getFileChooser(){
-        return fileChooser;
     }
 
     /**
@@ -286,8 +283,9 @@ public class KeYFileChooser {
         if (INSTANCE == null) {
             File initDir = Main.getWorkingDir();
             INSTANCE = new KeYFileChooser(initDir);
-            KeYFileChooserBookmarkPanel bookmarkPanel =
-                    new KeYFileChooserBookmarkPanel(INSTANCE.fileChooser);
+            // not the best design probably: this constructor has the side effect of connecting
+            // the new bookmark panel to the file chooser.
+            new KeYFileChooserBookmarkPanel(INSTANCE);
         }
 
         INSTANCE.setDialogTitle(title);

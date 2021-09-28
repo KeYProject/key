@@ -826,7 +826,7 @@ public final class MainWindow extends JFrame {
     }
 
     private JMenu createSelectionMenu() {
-        JMenu goalSelection = new JMenu("Select Goal ...");
+        JMenu goalSelection = new JMenu("Select Goal");
         goalSelection.add(goalSelectAboveAction);
         goalSelection.add(goalSelectBelowAction);
         return goalSelection;
@@ -865,7 +865,7 @@ public final class MainWindow extends JFrame {
         proof.add(new SearchNextAction(this));
         proof.add(new SearchPreviousAction(this));
         {
-            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+            JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
                 searchModeMenu.add(new SearchModeChangeAction(this, mode));
@@ -1102,27 +1102,6 @@ public final class MainWindow extends JFrame {
 
     public void popupWarning(Object message, String title) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
-    }
-
-    /**
-     * Brings up a dialog displaying a message.
-     *
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-            popupInformationMessage(message, title);
-        } else {
-            if (!(message instanceof Component)) {
-                throw new InternalError("only messages of type " + Component.class + " supported, yet");
-            }
-            JFrame dlg = new JFrame(title);
-            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            dlg.getContentPane().add((Component) message);
-            dlg.pack();
-            GuiUtilities.setCenter(dlg, this);
-            dlg.setVisible(true);
-        }
     }
 
     public TaskTree getProofList() {

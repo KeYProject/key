@@ -52,7 +52,7 @@ public class LemmaGenerationBatchModeAction extends MainWindowAction {
     public LemmaGenerationBatchModeAction(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Show information about proving taclets by using the batch mode.");
-        putValue(NAME, "Taclets Using the Batch Mode");
+        putValue(NAME, "Taclets Using the Batch Mode...");
         putValue(SHORT_DESCRIPTION, "A short description for using the batch mode.");
     }
 

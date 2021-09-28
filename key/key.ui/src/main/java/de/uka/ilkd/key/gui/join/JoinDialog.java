@@ -65,7 +65,7 @@ public class JoinDialog extends StdDialog{
 
             @Override
             public void userInputChanged(String input, boolean valid, String reason) {
-                getOkayButton().setEnabled(valid);
+                getOkButton().setEnabled(valid);
                 
             }
         
