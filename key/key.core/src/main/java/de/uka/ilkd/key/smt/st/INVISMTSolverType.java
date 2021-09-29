@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.smt.st;
 
+import de.uka.ilkd.key.smt.VersionChecker;
+
 /**
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-public class InvismtSolverType extends Z3SolverType {
+public class INVISMTSolverType extends Z3SolverType {
     @Override
     public String getName() {
         return "INVISMT";
@@ -22,7 +24,7 @@ public class InvismtSolverType extends Z3SolverType {
 
     @Override
     public String getDefaultSolverCommand() {
-        return "invismt.sh";
+        return "invismt";
     }
 
     @Override
@@ -33,5 +35,14 @@ public class InvismtSolverType extends Z3SolverType {
     @Override
     public String[] getSupportedVersions() {
         return new String[]{"1.0"};
+    }
+
+    @Override
+    public String getRawVersion() {
+        if (isInstalled(true)) {
+            return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
+        } else {
+            return null;
+        }
     }
 }

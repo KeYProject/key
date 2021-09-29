@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
@@ -75,7 +75,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
 		pdSettings.invariantForall = settings.invariantForAll();
 		// invoke z3 for counterexamples
-		final SMTSettings smtsettings = new SMTSettings(pdSettings,
+		final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
 				piSettings, new NewSMTTranslationSettings(), null);
 		return new SolverLauncher(smtsettings);
 	}

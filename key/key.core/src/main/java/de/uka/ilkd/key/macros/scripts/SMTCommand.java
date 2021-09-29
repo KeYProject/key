@@ -5,7 +5,7 @@ import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.st.SolverType;
@@ -54,7 +54,7 @@ public class SMTCommand
         }
         
         for (Goal goal : goals) {
-            SMTSettings settings = new SMTSettings(
+            DefaultSMTSettings settings = new DefaultSMTSettings(
                     goal.proof().getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     goal.proof().getSettings().getNewSMTSettings(),

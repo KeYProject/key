@@ -44,7 +44,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
@@ -63,7 +63,7 @@ public class SolverListener implements SolverLauncherListener {
         private boolean [][] problemProcessed;
         private int         finishedCounter;
         private Timer timer = new Timer();
-        private final SMTSettings settings;
+        private final DefaultSMTSettings settings;
         private final Proof smtProof;
         private final static ColorSettings.ColorProperty RED =
                 ColorSettings.define("[solverListener]red", "",
@@ -194,7 +194,7 @@ public class SolverListener implements SolverLauncherListener {
         }
         
 
-        public SolverListener(SMTSettings settings, Proof smtProof) {
+        public SolverListener(DefaultSMTSettings settings, Proof smtProof) {
                 this.settings = settings;
                 this.smtProof = smtProof;
         }
@@ -212,7 +212,7 @@ public class SolverListener implements SolverLauncherListener {
             for (InternSMTProblem problem : problems) {
                problem.createInformation();
             }
-            if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
+            if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.ProgressMode.CLOSE) {
                 applyEvent(launcher);
             }
         }

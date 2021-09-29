@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
@@ -161,7 +161,7 @@ public abstract class AbstractTestGenerator {
               .getNewSMTSettings());
     pdSettings.invariantForall = settings.invariantForAll();
     // invoke z3 for counterexamples
-    final SMTSettings smtsettings = new SMTSettings(pdSettings,
+    final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
           piSettings, newSettings, proof);
     launcher = new SolverLauncher(smtsettings);
     launcher.addListener(new SolverLauncherListener() {

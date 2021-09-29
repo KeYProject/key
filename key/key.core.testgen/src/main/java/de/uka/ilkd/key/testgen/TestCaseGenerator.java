@@ -1150,7 +1150,7 @@ public class TestCaseGenerator {
     private String createIntSet(){
 
         StringBuffer res  = new StringBuffer();
-        long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound;
+        long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().getIntBound();
 
         long low = (long) - Math.pow(2, size-1);
         long hi = (long) (Math.pow(2, size-1)-1);

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.Debug;
  * Next the macro {@link SemanticsBlastingMacro} is performed on the new {@link Proof}
  * and when done the SMT solver is started. The progress of the SMT solver and
  * the final result can be observed by a {@link SolverLauncherListener} instantiated.
- * by {@link #createSolverListener(SMTSettings)}.
+ * by {@link #createSolverListener(DefaultSMTSettings)}.
  */
 public abstract class AbstractCounterExampleGenerator {
    /**
@@ -75,7 +75,7 @@ public abstract class AbstractCounterExampleGenerator {
       }
 
       //invoke z3 for counterexamples
-      SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+      DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
               ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
               proof.getSettings().getNewSMTSettings(), proof);
       SolverLauncher launcher = new SolverLauncher(settings);
@@ -126,9 +126,9 @@ public abstract class AbstractCounterExampleGenerator {
    /**
     * Creates the {@link SolverLauncherListener} which handles the results
     * of the launched SMT solver.
-    * @param settings The {@link SMTSettings}.
+    * @param settings The {@link DefaultSMTSettings}.
     * @param proof The {@link Proof} on which the SMT solver will be performed.
     * @return The {@link SolverLauncherListener} to use.
     */
-   protected abstract SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof);
+   protected abstract SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof);
 }

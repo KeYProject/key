@@ -6,9 +6,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.util.LineProperties;
-import org.hamcrest.core.StringContains;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -26,14 +25,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static org.junit.Assert.*;
 
@@ -148,7 +144,7 @@ public class MasterHandlerTest {
         Proof proof = env.getLoadedProof();
         Sequent sequent = proof.root().sequent();
 
-        SMTSettings settings = new SMTSettings(
+        DefaultSMTSettings settings = new DefaultSMTSettings(
                 proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 proof.getSettings().getNewSMTSettings(),
