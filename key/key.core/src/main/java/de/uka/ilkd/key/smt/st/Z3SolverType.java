@@ -7,7 +7,7 @@ import de.uka.ilkd.key.smt.*;
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-class Z3SolverType extends AbstractSolverType {
+public class Z3SolverType extends AbstractSolverType {
     @Override
     public String getDefaultSolverCommand() {
         return "z3";

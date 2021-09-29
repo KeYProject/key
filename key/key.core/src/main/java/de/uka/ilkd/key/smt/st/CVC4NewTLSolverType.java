@@ -8,7 +8,7 @@ import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-class CVC4NewTLSolverType extends AbstractSolverType {
+public class CVC4NewTLSolverType extends AbstractSolverType {
 
     // TODO move to AbstractSolverType?
     @Override

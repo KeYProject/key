@@ -7,7 +7,7 @@ import de.uka.ilkd.key.smt.*;
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-class CVC4SolverType extends AbstractSolverType {
+public class CVC4SolverType extends AbstractSolverType {
 
     // TODO move to AbstractSolverType?
     @Override

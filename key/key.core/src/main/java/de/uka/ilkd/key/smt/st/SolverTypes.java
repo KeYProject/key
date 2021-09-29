@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.st;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -41,10 +42,15 @@ public class SolverTypes {
      */
     public static final SolverType CVC4_NEW_TL_SOLVER = new CVC4NewTLSolverType();
 
+    private static Collection<SolverType> SOLVERS = new ArrayList<>(8);
+
     public static Collection<SolverType> getSolverTypes() {
-        ServiceLoader<SolverType> loader = ServiceLoader.load(SolverType.class);
-        return StreamSupport
-                .stream(loader.spliterator(), false)
-                .collect(Collectors.toList());
+        if (SOLVERS.isEmpty()) {
+            ServiceLoader<SolverType> loader = ServiceLoader.load(SolverType.class);
+            SOLVERS = StreamSupport
+                    .stream(loader.spliterator(), false)
+                    .collect(Collectors.toList());
+        }
+        return SOLVERS;
     }
 }

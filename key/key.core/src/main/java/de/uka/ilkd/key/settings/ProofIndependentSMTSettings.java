@@ -27,7 +27,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-	
+
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 
         private static final String TIMEOUT="[SMTSettings]SolverTimeout";
@@ -45,8 +45,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
         private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
-        
-        /* The following properties are used to set the bit sizes for bounded 
+
+        /* The following properties are used to set the bit sizes for bounded
          * counter example generation.
          */
         private static final String INT_BOUND = "[SMTSettings]intBound";
@@ -54,13 +54,13 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private static final String FIELD_BOUND = "[SMTSettings]fieldBound";
         private static final String OBJECT_BOUND = "[SMTSettings]objectBound";
         private static final String LOCSET_BOUND = "[SMTSettings]locsetBound";
-        private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;        
+        private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
 
-   
+
         private static final String SOLVER_PARAMETERS  = "[SMTSettings]solverParametersV1";
         private static final String SOLVER_COMMAND       = "[SMTSettings]solverCommand";
         private static final String SOLVER_CHECK_FOR_SUPPORT  = "[SMTSettings]checkForSupport";
-  
+
         public final static int    PROGRESS_MODE_USER = 0;
         public final static int    PROGRESS_MODE_CLOSE = 1;
         public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
@@ -72,16 +72,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         public boolean showResultsAfterExecution    = false;
         public boolean storeSMTTranslationToFile    = false;
         public boolean storeTacletTranslationToFile = false;
-        
+
         public long    timeout                      = 2000;
         public int     maxConcurrentProcesses       = 2;
-    
+
         public int     modeOfProgressDialog         = PROGRESS_MODE_USER;
 
         public String   pathForSMTTranslation      = "";
         public String   pathForTacletTranslation   = "";
         public String   activeSolver               = "";
-        
+
 
 
         public long intBound    = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
@@ -91,7 +91,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         public long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
 
         private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
-    
+
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>();
         private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<SolverTypeCollection>();
@@ -102,9 +102,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
                 copy(data);
         }
-        
-        
-        
+
+
+
         public int getMaxConcurrentProcesses() {
 			return maxConcurrentProcesses;
 		}
@@ -137,7 +137,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
                         dataOfSolvers.put(entry.getKey(), entry.getValue().clone());
                 }
-                solverUnions =  new LinkedList<SolverTypeCollection>(); 
+                solverUnions =  new LinkedList<SolverTypeCollection>();
                 for(SolverTypeCollection solverUnion : data.solverUnions){
                         solverUnions.add(solverUnion);
                 }
@@ -146,7 +146,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         }
 
 
-        private static final ProofIndependentSMTSettings DEFAULT_DATA = 
+        private static final ProofIndependentSMTSettings DEFAULT_DATA =
                 new ProofIndependentSMTSettings();
 
         public static ProofIndependentSMTSettings getDefaultSettingsData(){
@@ -158,11 +158,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         }
 
         private ProofIndependentSMTSettings() {
-                dataOfSolvers.put(SolverTypes.Z3_SOLVER, new SolverData(SolverTypes.Z3_SOLVER));
+                for (SolverType type : SolverTypes.getSolverTypes()){
+                        /*dataOfSolvers.put(SolverTypes.Z3_SOLVER, new SolverData(SolverTypes.Z3_SOLVER));
                 dataOfSolvers.put(SolverTypes.Z3_NEW_TL_SOLVER, new SolverData(SolverTypes.Z3_NEW_TL_SOLVER));
                 dataOfSolvers.put(SolverTypes.Z3_CE_SOLVER, new SolverData(SolverTypes.Z3_CE_SOLVER));
                 dataOfSolvers.put(SolverTypes.CVC4_SOLVER, new SolverData(SolverTypes.CVC4_SOLVER));
                 dataOfSolvers.put(SolverTypes.CVC4_NEW_TL_SOLVER, new SolverData(SolverTypes.CVC4_NEW_TL_SOLVER));
+                      */
+                        dataOfSolvers.put(type, new SolverData(type));
+                }
+
 
                 // single solvers with new translation
                 solverUnions.add(new SolverTypeCollection("Z3",1, SolverTypes.Z3_NEW_TL_SOLVER));
@@ -200,11 +205,11 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         public void setCommand(SolverType type, String command){
                 dataOfSolvers.get(type).solverCommand = command;
         }
-        
+
         public void setParameters(SolverType type, String parameters){
             dataOfSolvers.get(type).solverParameters = parameters;
         }
-        
+
 
         public Collection<SolverData> getDataOfSolvers(){
                 return dataOfSolvers.values();
@@ -227,7 +232,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
                 modeOfProgressDialog     = SettingsConverter.read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
                 maxConcurrentProcesses   = SettingsConverter.read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
-                checkForSupport	         = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);                
+                checkForSupport	         = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
                 intBound                 = SettingsConverter.read(props, INT_BOUND, intBound);
                 heapBound                = SettingsConverter.read(props, HEAP_BOUND, heapBound);
                 seqBound                 = SettingsConverter.read(props, FIELD_BOUND, seqBound);
@@ -236,12 +241,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
                 for(SolverData solverData : dataOfSolvers.values()){
                         solverData.readSettings(props);
-                }     
+                }
         }
 
 
 
-    
+
 
 
         public void writeSettings(Properties props){
@@ -263,7 +268,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                         solverData.writeSettings(props);
                 }
         }
-        
+
 
 
 
@@ -271,7 +276,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 public String solverParameters = "";
                 public String solverCommand = "";
                 public final SolverType type;
-                
+
                 public SolverData(SolverType type){
                         this(type,type.getDefaultSolverCommand(),type.getDefaultSolverParameters());
                        }
@@ -307,7 +312,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                         return type.getName();
                 }
         }
-        
+
       public void setActiveSolverUnion(SolverTypeCollection solverUnion){
               if(activeSolverUnion != solverUnion){
                       activeSolverUnion = solverUnion;
@@ -348,12 +353,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 }
                 return res;
         }
-      
+
       public void fireSettingsChanged() {
               for (SettingsListener aListenerList : listeners) {
                       aListenerList.settingsChanged(new EventObject(this));
               }
- 
+
       }
 
       @Override
@@ -362,7 +367,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
       }
-      
+
       @Override
       public void removeSettingsListener(SettingsListener l) {
           listeners.remove(l);

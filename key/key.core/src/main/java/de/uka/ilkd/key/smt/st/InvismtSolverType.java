@@ -1,24 +1,13 @@
 package de.uka.ilkd.key.smt.st;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTTranslator;
-import de.uka.ilkd.key.smt.SolverListener;
-
 /**
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-class InvismtSolverType extends AbstractSolverType {
-    @Override
-    public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services) {
-        return null;
-    }
-
+public class InvismtSolverType extends Z3SolverType {
     @Override
     public String getName() {
-        return "InviSMT";
+        return "INVISMT";
     }
 
     @Override
@@ -37,27 +26,12 @@ class InvismtSolverType extends AbstractSolverType {
     }
 
     @Override
-    public SMTTranslator createTranslator(Services services) {
-        return null;
-    }
-
-    @Override
-    public String[] getDelimiters() {
-        return new String[0];
-    }
-
-    @Override
-    public boolean supportsIfThenElse() {
-        return false;
-    }
-
-    @Override
     public String getVersionParameter() {
-        return null;
+        return "--version";
     }
 
     @Override
     public String[] getSupportedVersions() {
-        return new String[0];
+        return new String[]{"1.0"};
     }
 }
