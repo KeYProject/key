@@ -45,15 +45,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
@@ -293,7 +290,7 @@ public class SolverListener implements SolverLauncherListener {
 
 
 
-                boolean ce = solverTypes.contains(SolverType.Z3_CE_SOLVER);
+                boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
 
 
 
@@ -481,7 +478,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(GREEN.get(),x,y);
-                if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
+                if(problem.solver.getType()== SolverTypes.Z3_CE_SOLVER){
                 	progressModel.setText("No Counterexample.",x,y);
         		}
                 else{
@@ -493,7 +490,7 @@ public class SolverListener implements SolverLauncherListener {
 
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
                 String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
-            if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
+            if(problem.solver.getType()== SolverTypes.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(RED.get(),x,y);
                 progressModel.setText("Counter Example" + timeInfo,x,y);

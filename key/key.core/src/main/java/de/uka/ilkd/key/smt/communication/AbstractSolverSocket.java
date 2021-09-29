@@ -2,7 +2,8 @@ package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import javax.annotation.Nonnull;
@@ -82,15 +83,15 @@ public abstract class AbstractSolverSocket {
     public static AbstractSolverSocket createSocket(@Nonnull SolverType type,
                                                     ModelExtractor query) {
         String name = type.getName();
-        if (type == SolverType.Z3_SOLVER) {
+        if (type == SolverTypes.Z3_SOLVER) {
             return new Z3Socket(name, query);
-        } else if (type == SolverType.Z3_CE_SOLVER) {
+        } else if (type == SolverTypes.Z3_CE_SOLVER) {
             return new Z3CESocket(name, query);
-        } else if (type == SolverType.Z3_NEW_TL_SOLVER) {
+        } else if (type == SolverTypes.Z3_NEW_TL_SOLVER) {
             return new Z3Socket(name, query);
-        } else if (type == SolverType.CVC4_SOLVER) {
+        } else if (type == SolverTypes.CVC4_SOLVER) {
             return new CVC4Socket(name, query);
-        } else if (type == SolverType.CVC4_NEW_TL_SOLVER) {
+        } else if (type == SolverTypes.CVC4_NEW_TL_SOLVER) {
             return new CVC4Socket(name, query);
         }
         return null;

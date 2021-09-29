@@ -5,7 +5,8 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 
 
 import javax.swing.*;
@@ -62,7 +63,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
-        for (SolverType options : SolverType.ALL_SOLVERS) {
+        for (SolverType options : SolverTypes.getSolverTypes()) {
             getChildren().add(new SolverOptions(options));
         }
     }

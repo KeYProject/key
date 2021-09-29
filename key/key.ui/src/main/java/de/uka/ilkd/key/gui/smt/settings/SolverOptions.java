@@ -5,7 +5,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.swing.*;
 

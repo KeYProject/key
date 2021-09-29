@@ -26,6 +26,8 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 /**
@@ -41,7 +43,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  * @author ?
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
-final class SMTSolverImplementation implements SMTSolver, Runnable {
+public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     /** used to generate unique ids for each running solver instance */
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
@@ -118,8 +120,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
      * @param services the services needed to translate the problem to SMT format
      * @param myType the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
      */
-    SMTSolverImplementation(SMTProblem problem, SolverListener listener,
-                            Services services, SolverType myType) {
+    public SMTSolverImplementation(SMTProblem problem, SolverListener listener,
+                                   Services services, SolverType myType) {
         this.problem = problem;
         this.listener = listener;
         this.services = services;
@@ -282,7 +284,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     private String[] translateToCommand(Sequent sequent)
         throws IllegalFormulaException {
-        if (getType() == SolverType.Z3_CE_SOLVER) {
+        if (getType() == SolverTypes.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 

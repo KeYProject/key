@@ -15,15 +15,14 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.util.Debug;
 
 /**
  * Implementations of this class are used find a counter example for a given
- * {@link Sequent} using the SMT solver {@link SolverType#Z3_CE_SOLVER}.
+ * {@link Sequent} using the SMT solver {@link SolverTypes#Z3_CE_SOLVER}.
  * <p>
  * <b>This class provides the full logic independent from the a user interface.</b>
  * Subclasses are used to realize the user interface specific functionality.
@@ -41,7 +40,7 @@ public abstract class AbstractCounterExampleGenerator {
     * @return {@code true} solver is available, {@code false} solver is not available.
     */
    public static boolean isSolverAvailable() {
-      return SolverType.Z3_CE_SOLVER.isInstalled(true);
+      return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
    }
    
    /**
@@ -55,7 +54,7 @@ public abstract class AbstractCounterExampleGenerator {
                                     Proof oldProof, 
                                     Sequent oldSequent) throws ProofInputException {
       if (!isSolverAvailable()) {
-         throw new IllegalStateException("Can't find SMT solver " + SolverType.Z3_CE_SOLVER.getName());
+         throw new IllegalStateException("Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
       }
       
       final Proof proof = createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
@@ -83,7 +82,7 @@ public abstract class AbstractCounterExampleGenerator {
       launcher.addListener(createSolverListener(settings, proof));
 
       List<SolverType> solvers = new LinkedList<SolverType>();
-      solvers.add(SolverType.Z3_CE_SOLVER);
+      solvers.add(SolverTypes.Z3_CE_SOLVER);
 
       launcher.launch(solvers,
               SMTProblem.createSMTProblems(proof),
