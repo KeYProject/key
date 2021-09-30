@@ -6,9 +6,12 @@ import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
@@ -21,10 +24,10 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -58,7 +61,11 @@ public class WarningsDialog extends JDialog {
     private String urlFurtherInformation;
 
     public WarningsDialog(Frame owner, Set<PositionedString> warnings) {
-        super(owner, SLEnvInput.getLanguage() + " warning(s)", true);
+        this(owner, SLEnvInput.getLanguage() + " warning(s)", warnings);
+    }
+
+    public WarningsDialog(Frame owner, String title, Set<PositionedString> warnings) {
+        super(owner, title, true);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.warnings = new ArrayList<>(warnings);
@@ -163,6 +170,44 @@ public class WarningsDialog extends JDialog {
         }
     }
 
+    public static void showDialog(Frame parent, Throwable exception) {
+        WarningsDialog dlg = new WarningsDialog(parent, exception);
+        if(parent!=null) {
+            dlg.setLocationRelativeTo(parent);
+        }
+        dlg.setVisible(true);
+        dlg.dispose();
+    }
+
+    private WarningsDialog(Frame parent, Throwable exception) {
+        this(parent, "Parser Messages", extractMessage(exception));
+    }
+
+    private static Set<PositionedString> extractMessage(Throwable exception) {
+        Location location;
+        try {
+            location = ExceptionTools.getLocation(exception);
+            // set text
+            StringWriter sw = new StringWriter();
+            // sw.append("(").append(exc.getClass().toString()).append(")\n");
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            String errorMessage = sw.toString();
+            String filename = new File(location.getFileURL().toURI()).toString();
+
+            // as always, the parser generated position is one of in column and line
+            Position pos = new Position(location.getLine() - 1, location.getColumn() - 1);
+
+            PositionedString ps = new PositionedString(errorMessage, filename, pos);
+            return Set.of(ps);
+        } catch (MalformedURLException | URISyntaxException e) {
+            // We must not suppress the dialog here -> catch and print only to error stream
+            System.err.println("Creating a Location failed for " + exception);
+            e.printStackTrace();
+        }
+        return Set.of(new PositionedString("Constructing the error message failed!"));
+    }
+
     private void accept() {
         ignoredWarnings.addAll(warnings);
         setVisible(false);
@@ -232,6 +277,7 @@ public class WarningsDialog extends JDialog {
             dh.addHighlight(offset, end, new BracketMatchingTextArea.BorderPainter(Color.RED));
         } catch (BadLocationException ignore) {
             // ignore
+            // TODO: this should be logged somewhere
         }
     }
 
