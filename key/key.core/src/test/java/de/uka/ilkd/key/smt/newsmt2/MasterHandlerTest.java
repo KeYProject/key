@@ -168,7 +168,7 @@ public class MasterHandlerTest {
 
         // TODO Run Z3 on the SMT translation
         // FIXME This is a hack.
-        Process proc = new ProcessBuilder("z3", "-in", "-T:5").start();
+        Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
         OutputStream os = proc.getOutputStream();
         os.write(translation.getBytes());
         os.write("\n\n(check-sat)".getBytes());
