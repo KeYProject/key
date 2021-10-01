@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.st;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ServiceLoader;
@@ -15,32 +16,9 @@ public class SolverTypes {
 
     }
 
-    /**
-     * Class for the Z3 solver. It makes use of the SMT2-format.
-     */
-    public static final SolverType Z3_SOLVER = new Z3SolverType();
-    /**
-     * Z3 with new modular translator
-     */
-    public static final SolverType Z3_NEW_TL_SOLVER = new Z3NewTLSolverType();
-
-    /**
-     * Class for the Z3 solver. It makes use of the SMT2-format.
-     */
-
-    public static final SolverType Z3_CE_SOLVER = new Z3CounterExampleSolverType();
-
-    /**
-     * CVC4 is the successor to CVC3.
-     *
-     * @author bruns
-     */
-    public static final SolverType CVC4_SOLVER = new CVC4SolverType();
-
-    /**
-     * CVC4 with the new translation
-     */
-    public static final SolverType CVC4_NEW_TL_SOLVER = new CVC4NewTLSolverType();
+    public static <T extends SolverType> T get(Class<T> clazz) {
+        return (T) getSolverTypes().stream().filter(it -> it.getClass().equals(clazz)).findFirst().orElse(null);
+    }
 
     private static Collection<SolverType> SOLVERS = new ArrayList<>(8);
 
@@ -53,4 +31,34 @@ public class SolverTypes {
         }
         return SOLVERS;
     }
+
+    /**
+     * Class for the Z3 solver. It makes use of the SMT2-format.
+     */
+    public static final SolverType Z3_SOLVER = get(Z3SolverType.class);
+
+
+    /**
+     * Z3 with new modular translator
+     */
+    public static final SolverType Z3_NEW_TL_SOLVER = get(Z3NewTLSolverType.class);
+
+    /**
+     * Class for the Z3 solver. It makes use of the SMT2-format.
+     */
+
+    public static final SolverType Z3_CE_SOLVER = get(Z3CounterExampleSolverType.class);
+
+    /**
+     * CVC4 is the successor to CVC3.
+     *
+     * @author bruns
+     */
+    public static final SolverType CVC4_SOLVER = get(CVC4SolverType.class);
+
+    /**
+     * CVC4 with the new translation
+     */
+    public static final SolverType CVC4_NEW_TL_SOLVER = new CVC4NewTLSolverType();
+
 }
