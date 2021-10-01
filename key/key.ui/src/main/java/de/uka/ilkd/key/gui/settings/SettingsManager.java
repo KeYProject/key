@@ -66,6 +66,16 @@ public class SettingsManager {
         }
     }
 
+    public static NewSMTTranslationSettings getNewSmtSettings(MainWindow window) {
+        Proof proof = window.getMediator().getSelectedProof();
+        ProofDependentSMTSettings pdSettings;
+        if (proof == null) {
+            return ProofSettings.DEFAULT_SETTINGS.getNewSMTSettings();
+        } else {
+            return proof.getSettings().getNewSMTSettings();
+        }
+    }
+
     public static ProofIndependentSMTSettings getSmtPiSettings() {
         return ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
     }

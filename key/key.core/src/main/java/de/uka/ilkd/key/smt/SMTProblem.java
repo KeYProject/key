@@ -121,7 +121,8 @@ public class SMTProblem {
                 }
                 if (valid != null && invalid != null) {
                         throw new RuntimeException(
-                                        "FATAL ERROR: The results are inconsistent!");
+                                        "FATAL ERROR: The results are inconsistent for goal " +
+                                                goal.node().serialNr() + "!");
                 }
                 if (valid != null) {
                         return valid;
@@ -147,7 +148,7 @@ public class SMTProblem {
                 solvers.add(solver);
         }
         
-        private static Term sequentToTerm(Sequent s, Services services) {
+        public static Term sequentToTerm(Sequent s, Services services) {
 
             ImmutableList<Term> ante = ImmutableSLList.nil();
 

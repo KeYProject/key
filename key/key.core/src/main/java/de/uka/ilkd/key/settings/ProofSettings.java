@@ -82,6 +82,7 @@ public class ProofSettings {
     private final StrategySettings strategySettings = new StrategySettings();
     private ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings = ProofDependentSMTSettings.getDefaultSettingsData();
+    private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private Properties lastLoadedProperties = null;
     private TermLabelSettings termLabelSettings = new TermLabelSettings();
 
@@ -95,6 +96,7 @@ public class ProofSettings {
         addSettings(choiceSettings);
         addSettings(smtSettings);
         addSettings(termLabelSettings);
+        addSettings(newSMTSettings);
     }
 
     /*
@@ -254,6 +256,10 @@ public class ProofSettings {
      */
     public ProofDependentSMTSettings getSMTSettings() {
         return smtSettings;
+    }
+
+    public NewSMTTranslationSettings getNewSMTSettings() {
+        return newSMTSettings;
     }
 
     /**

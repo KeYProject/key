@@ -1,0 +1,4 @@
+<!-- The function symbols required for Java arithmetics -->
+<entry key="prec.taclets">
+    precOfInt
+</entry>

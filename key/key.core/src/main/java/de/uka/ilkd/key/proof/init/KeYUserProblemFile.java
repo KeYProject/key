@@ -208,7 +208,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         Token token = ctx.findProof();
         if (token != null) {
             CharStream stream = file.getCharStream();
-            ProofReplayer.run(token, stream, prl);
+            // also pass the file to be able to produce exceptions with locations
+            ProofReplayer.run(token, stream, prl, file.url());
         }
     }
 

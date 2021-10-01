@@ -154,7 +154,7 @@ public class ContractConfigurator extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));        
         pack();
-        setLocation(70, 70);        
+        setLocationRelativeTo(getOwner());
         setVisible(true);
     }
       

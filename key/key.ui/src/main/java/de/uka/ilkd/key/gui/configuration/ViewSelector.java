@@ -54,10 +54,10 @@ public class ViewSelector extends JDialog {
      * @param parent The parent widget of this ViewSelector 
      */
     public ViewSelector(JFrame parent) {  
-	super(parent, "Maximum line number for tooltips", true);
-	layoutViewSelector(); 
-	pack();
-	setLocation(70,70);
+        super(parent, "Maximum line number for tooltips", true);
+        layoutViewSelector();
+        pack();
+        setLocationRelativeTo(parent);
     }
 
 

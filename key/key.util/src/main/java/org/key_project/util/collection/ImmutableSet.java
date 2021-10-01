@@ -16,6 +16,7 @@ package org.key_project.util.collection;
 import javax.annotation.Nonnull;
 
 import java.util.*;
+
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
@@ -73,7 +74,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     }
 
 
-    static <T> ImmutableSet<T> fromCollection(@Nonnull Collection<T> seq) {
+    static <T> ImmutableSet<T> fromCollection(@Nonnull Collection<? extends T> seq) {
         return fromSet(new HashSet<>(seq));
     }
 

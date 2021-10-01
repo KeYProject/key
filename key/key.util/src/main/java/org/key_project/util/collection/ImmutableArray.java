@@ -16,7 +16,13 @@ package org.key_project.util.collection;
 import javax.annotation.Nonnull;
 
 import java.lang.reflect.Array;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -46,25 +52,17 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
 
-    /** creates a new <S>Array
-     * @param list a LinkedList (order is preserved)
-     */
-    @SuppressWarnings("unchecked")
-    public ImmutableArray(List<S> list) {
-        content = (S[]) list.toArray();
-    }
-
     /**
      * creates a new immutable array with the contents of the given collection.
      *
-     * The order of elements is defined by the collection
+     * The order of elements is defined by the collection.
      *
-     * @param seq non-null
+     * @param list a non-null collection (order is preserved)
      */
-    public ImmutableArray(@Nonnull Collection<S> seq) {
-        this(new ArrayList<>(seq));
+    @SuppressWarnings("unchecked")
+    public ImmutableArray(@Nonnull Collection<? extends S> list) {
+        content = (S[]) list.toArray();
     }
-
 
     /** gets the element at the specified position
      * @param pos an int describing the position
@@ -210,7 +208,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     /**
      * Convert an {@link ImmutableArray} to a {@link List}.
      *
-     * @return This element converted to a {@link List}.
+     * @return A freshly created {@link List} containing the elements of this array.
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();

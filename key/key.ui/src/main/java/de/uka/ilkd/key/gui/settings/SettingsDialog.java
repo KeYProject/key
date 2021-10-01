@@ -114,7 +114,7 @@ public class SettingsDialog extends JDialog {
         private static final long serialVersionUID = -4975054687458772222L;
 
         public AcceptAction() {
-            setName("Accept");
+            setName("OK");
         }
 
         @Override

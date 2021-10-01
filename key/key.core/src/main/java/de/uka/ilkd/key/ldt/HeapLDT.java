@@ -208,7 +208,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, TermServices services) {
+    public SortDependingFunction getSelect(Sort instanceSort, TermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
