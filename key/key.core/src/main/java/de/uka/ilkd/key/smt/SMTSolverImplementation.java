@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -239,7 +240,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
                 socket.messageIncoming(processLauncher.getPipe(), msg);
                 msg = processLauncher.getPipe().readMessage();
             }
-        } catch (Throwable e) {
+        } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
         } finally {
             // Close everything.
@@ -252,18 +253,19 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     private void interruptionOccurred(Throwable e) {
         ReasonOfInterruption reason = getReasonOfInterruption();
+        setReasonOfInterruption(ReasonOfInterruption.Exception, e);
         switch (reason) {
-        case Exception:
-        case NoInterruption:
-            setReasonOfInterruption(ReasonOfInterruption.Exception, e);
-            listener.processInterrupted(this, problem, e);
-            break;
-        case Timeout:
-            listener.processTimeout(this, problem);
-            break;
-        case User:
-            listener.processUser(this, problem);
-            break;
+            case Exception:
+            case NoInterruption:
+                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+                listener.processInterrupted(this, problem, e);
+                break;
+            case Timeout:
+                listener.processTimeout(this, problem);
+                break;
+            case User:
+                listener.processUser(this, problem);
+                break;
         }
     }
 

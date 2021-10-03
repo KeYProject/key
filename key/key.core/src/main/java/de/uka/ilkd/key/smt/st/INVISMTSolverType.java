@@ -19,7 +19,7 @@ public class INVISMTSolverType extends Z3SolverType {
 
     @Override
     public String getDefaultSolverParameters() {
-        return "";
+        return "-in";
     }
 
     @Override
