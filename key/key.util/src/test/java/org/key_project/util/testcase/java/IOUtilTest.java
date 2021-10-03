@@ -926,7 +926,7 @@ public class IOUtilTest extends TestCase {
    @Test
    public void testCopy() throws IOException {
       doTestCopy(null);
-      assertFalse(IOUtil.copy(null, null));
+      assertFalse(IOUtil.copy((InputStream) null, null));
       assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
       doTestCopy("One Line");
       doTestCopy("First Line\n\rSecond Line");
