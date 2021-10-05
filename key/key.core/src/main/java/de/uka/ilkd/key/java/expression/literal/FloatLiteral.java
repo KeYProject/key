@@ -45,7 +45,7 @@ public class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(float value) {
-        this.value="" + value + 'F';
+        this.value="" + value;
     }
 
     /**
@@ -56,8 +56,7 @@ public class FloatLiteral extends Literal {
 
     public FloatLiteral(ExtList children,String value) {
 	super(children);
-        this.value=(value.endsWith("F") || value.endsWith("f")) ? value :
-              (value + 'F');
+	this.value=value;
     }
 
     /**
@@ -66,8 +65,7 @@ public class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(String value) {
-        this.value=(value.endsWith("F") || value.endsWith("f")) ? value :
-              (value + 'F');
+	this.value=value;
     }
 
     /** tests if equals
