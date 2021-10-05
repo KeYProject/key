@@ -165,24 +165,26 @@ public class ExceptionDialog extends JDialog {
         }
         StringBuilder message = new StringBuilder(orgMsg);
 
-        try {
-            // read the content via URLs openStream() method
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
-            List<String> list = br.lines()
-                    // optimization: read only as far as necessary
-                    .limit(location.getLine())
-                    .collect(Collectors.toList());
-            String line = list.get(location.getLine() - 1);
-            String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
-            message.append(StringUtil.NEW_LINE).
-                    append(StringUtil.NEW_LINE).
-                    append(line).
-                    append(StringUtil.NEW_LINE).
-                    append(pointLine);
-        } catch (IOException e) {
-            System.err.println("Creating an error line did not work for " + location);
-            e.printStackTrace();
+        if(location != null) {
+            try {
+                // read the content via URLs openStream() method
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
+                List<String> list = br.lines()
+                        // optimization: read only as far as necessary
+                        .limit(location.getLine())
+                        .collect(Collectors.toList());
+                String line = list.get(location.getLine() - 1);
+                String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
+                message.append(StringUtil.NEW_LINE).
+                        append(StringUtil.NEW_LINE).
+                        append(line).
+                        append(StringUtil.NEW_LINE).
+                        append(pointLine);
+            } catch (IOException e) {
+                System.err.println("Creating an error line did not work for " + location);
+                e.printStackTrace();
+            }
         }
 
         exTextArea.setText(message.toString());
