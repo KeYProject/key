@@ -103,7 +103,7 @@ public class ContractFactoryTest {
                             "@  signals_only RuntimeException;\n" +
                             "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
-        Assert.assertEquals("empty", woLabels.toString());
+        Assert.assertEquals("empty<<impl>>", woLabels.toString());
     }
 
     /**
@@ -158,7 +158,7 @@ public class ContractFactoryTest {
                 contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, c1));
             }
         }
-        Assert.assertEquals(contractSet.size(), 2);
+        Assert.assertEquals(2, contractSet.size());
 
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];
         int i = 0;

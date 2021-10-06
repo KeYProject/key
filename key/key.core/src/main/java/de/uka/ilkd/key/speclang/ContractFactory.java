@@ -580,7 +580,10 @@ public class ContractFactory {
                             // found origin label -> merge origins
                             Origin o1 = ((OriginTermLabel) ol).getOrigin();
                             Origin o2 = ((OriginTermLabel) l).getOrigin();
-                            uol = new OriginTermLabel(Set.of(o1, o2));
+                            Set<Origin> origins = new HashSet<>();
+                            origins.add(o1);
+                            origins.add(o2);
+                            uol = new OriginTermLabel(origins);
                             newLabels.add(uol);
                             break;
                         }
