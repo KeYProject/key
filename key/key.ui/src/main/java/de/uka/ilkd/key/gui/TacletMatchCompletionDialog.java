@@ -116,6 +116,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 		// reload previously set GUI
 		mainWindow.loadPreferences(this);
+		setLocationRelativeTo(parent);
 
 		setVisible(true);
 	}

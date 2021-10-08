@@ -16,6 +16,7 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 
 public interface SMTSettings {
 
@@ -137,6 +138,6 @@ public interface SMTSettings {
     public boolean checkForSupport();
     
     public boolean invarianForall();
-  
 
+    NewSMTTranslationSettings getNewSettings();
 }

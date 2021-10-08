@@ -294,7 +294,7 @@ public class SolverLauncher implements SolverListener {
 	    session.addCurrentlyRunning(solver);
 	    // This cast is okay since there is only the class
 	    // SMTSolverImplementation that implements SMTSolver.
-	    ((SMTSolverImplementation) solver).start(solverTimeout, settings);
+	    solver.start(solverTimeout, settings);
 	    i++;
 
 	}

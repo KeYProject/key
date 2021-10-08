@@ -199,7 +199,6 @@ public class HeatmapOptionsDialog extends JDialog {
         okButton.addActionListener(action);
 
         pack();
-        setLocation(123,122);
         setAlwaysOnTop(true);
         setResizable(false);
     }

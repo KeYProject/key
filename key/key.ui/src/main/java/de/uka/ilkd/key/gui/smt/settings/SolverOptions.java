@@ -9,8 +9,6 @@ import de.uka.ilkd.key.smt.SolverType;
 
 import javax.swing.*;
 
-import java.io.IOException;
-
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
 /**
@@ -53,7 +51,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JButton createDefaultButton() {
-        JButton toDefaultButton = new JButton("Set parameters to default.");
+        JButton toDefaultButton = new JButton("Set parameters to default");
         toDefaultButton.addActionListener(arg0 -> {
             solverParameters.setText(solverType.getDefaultSolverParameters());
             //settings.setParameters(solverType, solverParameters.getText());
@@ -90,7 +88,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JButton createCheckSupportButton() {
-        JButton checkForSupportButton = new JButton("Check for support.");
+        JButton checkForSupportButton = new JButton("Check for support");
         checkForSupportButton.setEnabled(solverType.isInstalled(false));
         checkForSupportButton.addActionListener(arg0 -> {
             solverType.checkForSupport();
