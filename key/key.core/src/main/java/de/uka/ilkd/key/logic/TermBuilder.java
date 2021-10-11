@@ -1259,11 +1259,8 @@ public class TermBuilder {
         int bitPattern = Float.floatToIntBits(value);
         String patternStr = Integer.toUnsignedString(bitPattern);
         Term numberTerm = numberTerm(patternStr);
-        // NOTE: The following needs to be removed in future since
-        // FP will only take one argument soon.
-        Term redundantZero = numberTerm("0");
         return func(services.getTypeConverter().getFloatLDT().getFloatSymbol(),
-                numberTerm, redundantZero);
+                numberTerm);
     }
 
     /**
@@ -1276,11 +1273,8 @@ public class TermBuilder {
         long bitPattern = Double.doubleToLongBits(value);
         String patternStr = Long.toUnsignedString(bitPattern);
         Term numberTerm = numberTerm(patternStr);
-        // NOTE: The following needs to be removed in future since
-        // FP will only take one argument soon.
-        Term redundantZero = numberTerm("0");
         return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
-                numberTerm, redundantZero);
+                numberTerm);
     }
 
     public Term add(Term t1, Term t2) {
