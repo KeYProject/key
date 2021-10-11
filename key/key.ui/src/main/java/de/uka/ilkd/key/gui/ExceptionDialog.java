@@ -181,7 +181,7 @@ public class ExceptionDialog extends JDialog {
                         append(line).
                         append(StringUtil.NEW_LINE).
                         append(pointLine);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.err.println("Creating an error line did not work for " + location);
                 e.printStackTrace();
             }
