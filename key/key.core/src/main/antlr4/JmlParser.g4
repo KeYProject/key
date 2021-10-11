@@ -291,12 +291,14 @@ expressionlist: expression (COMMA expression)*;
 constant: javaliteral;
 javaliteral
   : integerliteral
+  | fractionalliteral
   | stringliteral
   | charliteral
   ;
 stringliteral: STRING_LITERAL;
 charliteral: CHAR_LITERAL;
 integerliteral: (HEXLITERAL | DECLITERAL | OCTLITERAL | BINLITERAL);
+fractionalliteral: FLOAT_LITERAL | DOUBLE_LITERAL | REAL_LITERAL;
 jmlprimary
   : RESULT                                                                            #primaryResult
   | EXCEPTION                                                                         #primaryException
