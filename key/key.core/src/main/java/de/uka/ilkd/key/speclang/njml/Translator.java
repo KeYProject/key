@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
@@ -74,7 +76,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     // Helper objects
     private final JMLResolverManager resolverManager;
-    private final JavaIntegerSemanticsHelper intHelper;
+    private final JMLArithmeticHelper arithmeticHelper;
 
     Translator(Services services,
                KeYJavaType specInClass,
@@ -102,8 +104,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        intHelper = new JavaIntegerSemanticsHelper(services, this.exc);
-        this.termFactory = new JmlTermFactory(this.exc, services, intHelper);
+        arithmeticHelper = new JMLArithmeticHelper(services, this.exc);
+        this.termFactory = new JmlTermFactory(this.exc, services, arithmeticHelper);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
                 specInClass, selfVar, this.exc);
@@ -465,9 +467,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = seq.get(0);
         for (int i = 1; i < seq.size(); i++) {
             SLExpression expr = seq.get(i);
-            if (intHelper.isIntegerTerm(result)) {
+            if (arithmeticHelper.isIntegerTerm(result)) {
                 try {
-                    result = intHelper.buildPromotedOrExpression(result, expr);
+                    result = arithmeticHelper.buildPromotedOrExpression(result, expr);
                 } catch (SLTranslationException e) {
                     raiseError(ctx, e);
                 }
@@ -488,9 +490,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
+            if (arithmeticHelper.isIntegerTerm(result)) {
                 try {
-                    result = intHelper.buildPromotedXorExpression(result, expr);
+                    result = arithmeticHelper.buildPromotedXorExpression(result, expr);
                 } catch (SLTranslationException e) {
                     raiseError(ctx, e);
                 }
@@ -513,9 +515,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
+            if (arithmeticHelper.isIntegerTerm(result)) {
                 try {
-                    result = intHelper.buildPromotedAndExpression(result, expr);
+                    result = arithmeticHelper.buildPromotedAndExpression(result, expr);
                 } catch (SLTranslationException e) {
                     raiseError(ctx, e);
 
@@ -704,13 +706,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
             try {
                 switch (op.getType()) {
                     case JmlLexer.MULT:
-                        result = intHelper.buildMulExpression(result, e);
+                        result = arithmeticHelper.buildMultExpression(result, e);
                         break;
                     case JmlLexer.DIV:
-                        result = intHelper.buildDivExpression(result, e);
+                        result = arithmeticHelper.buildDivExpression(result, e);
                         break;
                     case JmlLexer.MOD:
-                        result = intHelper.buildModExpression(result, e);
+                        result = arithmeticHelper.buildModExpression(result, e);
                         break;
                     default:
                         raiseError(ctx, "Unexpected syntax case.");
@@ -732,7 +734,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             assert result.isTerm();
             try {
-                return intHelper.buildPromotedUnaryPlusExpression(result);
+                return arithmeticHelper.buildPromotedUnaryPlusExpression(result);
             } catch (SLTranslationException e) {
                 raiseError(ctx, e);
             }
@@ -759,7 +761,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             assert result.isTerm();
             try {
-                return intHelper.buildUnaryMinusExpression(result);
+                return arithmeticHelper.buildUnaryMinusExpression(result);
             } catch (SLTranslationException e) {
                 raiseError(ctx, e);
             }
@@ -795,7 +797,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert e != null;
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             try {
-                return intHelper.buildPromotedNegExpression(e);
+                return arithmeticHelper.buildPromotedNegExpression(e);
             } catch (SLTranslationException e1) {
                 raiseError(ctx, e1);
 
@@ -1068,6 +1070,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+    @Override
+    public SLExpression visitFractionalliteral(JmlParser.FractionalliteralContext ctx) {
+        SLExpression result = null;
+        String text = ctx.getText();
+        try {
+            if (ctx.FLOAT_LITERAL() != null) {
+                Term floatLit = services.getTypeConverter().getFloatLDT().translateLiteral(new FloatLiteral(text), services);
+                result = new SLExpression(floatLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_FLOAT));
+            } else if (ctx.DOUBLE_LITERAL() != null) {
+                Term doubleLit = services.getTypeConverter().getDoubleLDT().translateLiteral(new DoubleLiteral(text), services);
+                result = new SLExpression(doubleLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE));
+            } else if (ctx.REAL_LITERAL() != null) {
+                throw new Error("not yet implemented; needed real ldt");
+            } else {
+                raiseError(ctx, "Unexpected literal %s", text);
+            }
+        } catch(NumberFormatException ex) {
+            raiseError(ctx, ex);
+        }
+
+        return result;
+    }
 
     @Override
     public Object visitPrimaryResult(JmlParser.PrimaryResultContext ctx) {

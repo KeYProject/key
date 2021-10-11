@@ -31,7 +31,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
+import de.uka.ilkd.key.speclang.translation.JMLArithmeticHelper;
 import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -57,7 +57,7 @@ public final class JmlTermFactory {
     public Services services;
     public final TermBuilder tb;
     public final SLExceptionFactory exc;
-    public final JavaIntegerSemanticsHelper intHelper;
+    public final JMLArithmeticHelper arithmeticHelper;
     public final List<PositionedString> warnings = new ArrayList<>();
     public static final Map<String, String> jml2jdl;
 
@@ -80,12 +80,12 @@ public final class JmlTermFactory {
 
     public JmlTermFactory(SLExceptionFactory exc,
                           Services services,
-                          JavaIntegerSemanticsHelper intHelper) {
+                          JMLArithmeticHelper arithHelper) {
 
         this.exc = exc;
         this.services = services;
         this.tb = services.getTermBuilder();
-        this.intHelper = intHelper;
+        this.arithmeticHelper = arithHelper;
     }
 
     //region reach
@@ -420,10 +420,10 @@ public final class JmlTermFactory {
         if (resultType == null)
             resultType = services.getTypeConverter().getKeYJavaType(t2);
 
-        final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, exc);
+        final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
         try {
-            return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
+            return arith.buildCastExpression(resultType, new SLExpression(t, resultType));
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
@@ -602,9 +602,9 @@ public final class JmlTermFactory {
                 if (type != services.getTypeConverter().getBooleanType()) {
                     throw exc.createException0("Cannot cast from boolean to " + type + ".");
                 }
-            } else if (intHelper.isIntegerTerm(result)) {
+            } else if (arithmeticHelper.isIntegerTerm(result)) {
                 try {
-                    return intHelper.buildCastExpression(type, result);
+                    return arithmeticHelper.buildCastExpression(type, result);
                 } catch (SLTranslationException e) {
                     throw new RuntimeException(e);
                 }
@@ -625,7 +625,7 @@ public final class JmlTermFactory {
         checkNotBigint(a);
         checkNotBigint(e);
         try {
-            return intHelper.buildRightShiftExpression(a, e);
+            return arithmeticHelper.buildRightShiftExpression(a, e);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
         }
@@ -636,7 +636,7 @@ public final class JmlTermFactory {
         checkNotBigint(result);
         checkNotBigint(e);
         try {
-            return intHelper.buildLeftShiftExpression(result, e);
+            return arithmeticHelper.buildLeftShiftExpression(result, e);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
         }
@@ -646,7 +646,7 @@ public final class JmlTermFactory {
         checkNotBigint(left);
         checkNotBigint(right);
         try {
-            return intHelper.buildUnsignedRightShiftExpression(left, right);
+            return arithmeticHelper.buildUnsignedRightShiftExpression(left, right);
         } catch (SLTranslationException e1) {
             throw new RuntimeException(e1);
         }
@@ -657,7 +657,7 @@ public final class JmlTermFactory {
     //region arithmetic operations
     public SLExpression add(SLExpression left, SLExpression right) {
         try {
-            return intHelper.buildAddExpression(left, right);
+            return arithmeticHelper.buildAddExpression(left, right);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
@@ -666,7 +666,7 @@ public final class JmlTermFactory {
 
     public SLExpression substract(SLExpression left, SLExpression right) {
         try {
-            return intHelper.buildSubExpression(left, right);
+            return arithmeticHelper.buildSubExpression(left, right);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
@@ -786,7 +786,7 @@ public final class JmlTermFactory {
         final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
         // cast to specific JML type (fixes bug #1347)
         try {
-            return this.intHelper.buildCastExpression(promo, bsumExpr);
+            return this.arithmeticHelper.buildCastExpression(promo, bsumExpr);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
