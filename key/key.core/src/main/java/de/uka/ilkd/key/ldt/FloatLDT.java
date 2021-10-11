@@ -154,27 +154,8 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public Term translateLiteral(Literal lit, Services services) {
         assert lit instanceof FloatLiteral : "Literal '"+lit+"' is not a float literal.";
         String s = ((FloatLiteral)lit).getValue();
-        final boolean negative = (s.charAt(0) == '-');
-
-
-        int floatBits = Float.floatToIntBits(Float.parseFloat(s));
-        String bitString = Integer.toBinaryString(floatBits);
-        int number = Integer.parseInt(bitString, 2);
-
-
-        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-        Term intTerm, fractionTerm;
-
-        if (negative) {
-            intTerm = intLDT.translateLiteral(new IntLiteral("-" + number), services).sub(0);
-        } else {
-            intTerm = intLDT.translateLiteral(new IntLiteral(number), services).sub(0);
-        }
-
-        //Set the second number to 0 for now
-        fractionTerm = intLDT.translateLiteral(new IntLiteral(0), services).sub(0);
-
-        return services.getTermFactory().createTerm(floatLit, intTerm, fractionTerm);
+        Float flValue = Float.parseFloat(s);
+        return services.getTermBuilder().fpTerm(flValue);
     }
 
     @Override

@@ -173,23 +173,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public Term translateLiteral(Literal lit, Services services) {
         assert lit instanceof DoubleLiteral : "Literal '"+lit+"' is not a double literal.";
         String s = ((DoubleLiteral)lit).getValue();
-        final boolean negative = (s.charAt(0) == '-');
-
-
-        long doubleBits = Double.doubleToLongBits(Double.parseDouble(s));
-        // String bitString = Long.toBinaryString(doubleBits);
-        // long number = Long.parseLong(bitString, 2);
-        long number = doubleBits;
-
-        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-        Term intTerm, fractionTerm;
-
-        intTerm = services.getTermBuilder().zTerm(number).sub(0);
-
-        // Set the second number to 0 for now
-        fractionTerm = intLDT.translateLiteral(new LongLiteral(0), services).sub(0);
-
-        return services.getTermFactory().createTerm(doubleLit, intTerm, fractionTerm);
+        double doubleVal = Double.parseDouble(s);
+        return services.getTermBuilder().dfpTerm(doubleVal);
     }
 
     @Override
@@ -230,7 +215,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     // Todo: needed???
-    public long longBits(Term t, IntegerLDT integerLDT) {
+    private long longBits(Term t, IntegerLDT integerLDT) {
 
         boolean neg = false;
 
