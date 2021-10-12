@@ -41,7 +41,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
-        this(ctx.start, "", ex);
+        this(ctx.start, ex.getMessage(), ex);
     }
 
     @Nullable

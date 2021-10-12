@@ -620,26 +620,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 1; i < expressions.size(); i++) {
             Function f = null;
             Token op = ctx.op.get(i - 1);
-            switch (op.getType()) {
-                case JmlLexer.LT:
-                    f = intLDT.getLessThan();
-                    break;
-                case JmlLexer.GT:
-                    f = intLDT.getGreaterThan();
-                    break;
-                case JmlLexer.GEQ:
-                    f = intLDT.getGreaterOrEquals();
-                    break;
-                case JmlLexer.LEQ:
-                    f = intLDT.getLessOrEquals();
-                    break;
-                default:
-                    raiseError(ctx, "Unexpected syntax case.");
-            }
-
             SLExpression left = expressions.get(i - 1);
             SLExpression right = expressions.get(i);
-            SLExpression rel = new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
+            SLExpression rel = null;
+            try {
+                // TODO Should perhaps the helper use the same exceptions as this?
+                rel = arithmeticHelper.buildComparisonExpression(left, right, op.getText());
+            } catch (SLTranslationException e) {
+                raiseError(ctx, e);
+            }
             if (result == null) {
                 result = rel;
             } else {
