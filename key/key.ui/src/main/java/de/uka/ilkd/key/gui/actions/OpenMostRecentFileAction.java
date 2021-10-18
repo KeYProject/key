@@ -48,9 +48,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
             final String recentFile = mainWindow.getRecentFiles().getMostRecent().getAbsolutePath();
             if (recentFile != null) {
                 File file = new File(recentFile);
-                KeYFileChooser fileChooser =
-                    KeYFileChooser.getFileChooser("Select file to load proof or problem");
-                fileChooser.selectFile(file);
+                KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file);
 
                 if (ProofSelectionDialog.isProofBundle(file.toPath())) {
                     Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());

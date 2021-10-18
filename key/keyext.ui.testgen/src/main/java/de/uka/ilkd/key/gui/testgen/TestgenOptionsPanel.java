@@ -102,7 +102,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private JTextField getOpenJMLPanel() {
         return addFileChooserPanel("Location of openjml:",
                 "", INFO_OPEN_JML_PATH,
-                true, e -> {
+                false, e -> {
                     settings.setOpenjmlPath(openJMLPanel.getText());
                     settings.fireSettingsChanged();
                 });
@@ -111,7 +111,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private JTextField getObjenesisPanel() {
         return addFileChooserPanel("Location of objenesis:",
                 "", INFO_OBJENESIS_PATH,
-                true, e -> {
+                false, e -> {
                     settings.setObjenesisPath(objenesisPanel.getText());
                     settings.fireSettingsChanged();
                 });

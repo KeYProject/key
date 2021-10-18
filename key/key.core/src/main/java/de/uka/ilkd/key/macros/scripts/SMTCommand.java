@@ -55,6 +55,7 @@ public class SMTCommand
             SMTSettings settings = new SMTSettings(
                     goal.proof().getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    goal.proof().getSettings().getNewSMTSettings(),
                     goal.proof());
             SolverLauncher launcher = new SolverLauncher(settings);
             Collection<SMTProblem> probList = new LinkedList<SMTProblem>();

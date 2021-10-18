@@ -24,7 +24,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
+
 import de.uka.ilkd.key.gui.actions.*;
+
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -824,7 +826,7 @@ public final class MainWindow extends JFrame {
     }
 
     private JMenu createSelectionMenu() {
-        JMenu goalSelection = new JMenu("Select Goal ...");
+        JMenu goalSelection = new JMenu("Select Goal");
         goalSelection.add(goalSelectAboveAction);
         goalSelection.add(goalSelectBelowAction);
         return goalSelection;
@@ -863,7 +865,7 @@ public final class MainWindow extends JFrame {
         proof.add(new SearchNextAction(this));
         proof.add(new SearchPreviousAction(this));
         {
-            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+            JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
                 searchModeMenu.add(new SearchModeChangeAction(this, mode));
@@ -918,7 +920,7 @@ public final class MainWindow extends JFrame {
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
-                getSMTSettings().getUsableSolverUnions();
+                getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
 
         if (solverUnions == null || solverUnions.isEmpty()) {
             updateDPSelectionMenu();
@@ -1100,27 +1102,6 @@ public final class MainWindow extends JFrame {
 
     public void popupWarning(Object message, String title) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
-    }
-
-    /**
-     * Brings up a dialog displaying a message.
-     *
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-            popupInformationMessage(message, title);
-        } else {
-            if (!(message instanceof Component)) {
-                throw new InternalError("only messages of type " + Component.class + " supported, yet");
-            }
-            JFrame dlg = new JFrame(title);
-            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            dlg.getContentPane().add((Component) message);
-            dlg.pack();
-            GuiUtilities.setCenter(dlg, this);
-            dlg.setVisible(true);
-        }
     }
 
     public TaskTree getProofList() {
@@ -1706,7 +1687,8 @@ public final class MainWindow extends JFrame {
                 public void run() {
 
                     SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                            proof.getSettings().getNewSMTSettings(), proof);
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, proof));
                     launcher.launch(solverUnion.getTypes(),

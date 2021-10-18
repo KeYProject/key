@@ -71,27 +71,26 @@ public abstract class ApplyTacletDialog extends JDialog {
 			     KeYMediator mediator) { 
 
         super(parent, "Choose Taclet Instantiation", false);
-//	setSize(800,700);
-//	setLocation(70,50);
 
-	this.mediator = mediator;
-	this.model = model;
+        this.mediator = mediator;
+        this.model = model;
 
-	applyButton  = new JButton("Apply");
-	cancelButton = new JButton("Cancel");
-    
-	mediator.requestModalAccess(this); 
-	addWindowListener(new WindowAdapter() {
-                @Override
-		public void windowClosed(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();		    
-		}
+        applyButton  = new JButton("Apply");
+        cancelButton = new JButton("Cancel");
 
-                @Override
-		public void windowClosing(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();
-		}
+        mediator.requestModalAccess(this);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                ApplyTacletDialog.this.closeDlg();
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                ApplyTacletDialog.this.closeDlg();
+            }
 	    });
+
 
         getRootPane().setDefaultButton(applyButton);
     }

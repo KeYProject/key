@@ -42,22 +42,21 @@ public class ShowKnownTypesAction extends MainWindowAction {
     private static final long serialVersionUID = 4368162229726580799L;
 
     public ShowKnownTypesAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Show Known Types");
+        super(mainWindow);
+        setName("Show Known Types");
 
-	getMediator().enableWhenProofLoaded(this);
-
+        getMediator().enableWhenProofLoaded(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	showTypeHierarchy();
+        showTypeHierarchy();
     }
 
     private void showTypeHierarchy() {
         Proof currentProof = getMediator().getSelectedProof();
         if(currentProof == null) {
-        	mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
+            mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
                     "If you wish to see the types "
                     + "for a proof you have to load one first"));
         } else {
@@ -75,31 +74,24 @@ public class ShowKnownTypesAction extends MainWindowAction {
                 tabbedPane.addTab("Package view", scrollpane);
             }
             {
-                final JButton button = new JButton("OK");
-                button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.setVisible(false);
-                        dialog.dispose();
-                    }
+                final JButton okButton = new JButton("OK");
+                okButton.addActionListener(e -> {
+                    dialog.setVisible(false);
+                    dialog.dispose();
                 });
                 {
                     JPanel panel = new JPanel();
-                    panel.add(button);
+                    panel.add(okButton);
                     pane.add(panel, BorderLayout.SOUTH);
-                    dialog.getRootPane().setDefaultButton(button);
-                    ActionListener escapeListener = new ActionListener() {
-                	public void actionPerformed(ActionEvent event) {
-                	    if(event.getActionCommand().equals("ESC")) {
-                		button.doClick();
-                	    }
-                	}
+                    dialog.getRootPane().setDefaultButton(okButton);
+                    ActionListener escapeListener = event -> {
+                        if(event.getActionCommand().equals("ESC")) {
+                            okButton.doClick();
+                        }
                     };
-                    button.registerKeyboardAction(
-                	    escapeListener,
-                	    "ESC",
-                	    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                	    JComponent.WHEN_IN_FOCUSED_WINDOW);
-
+                    okButton.registerKeyboardAction(escapeListener, "ESC",
+                        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                        JComponent.WHEN_IN_FOCUSED_WINDOW);
                 }
             }
             dialog.setSize(300, 400);
@@ -107,5 +99,4 @@ public class ShowKnownTypesAction extends MainWindowAction {
             dialog.setVisible(true);
         }
     }
-
 }

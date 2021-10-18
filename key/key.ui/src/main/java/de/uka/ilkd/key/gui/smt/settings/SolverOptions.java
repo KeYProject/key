@@ -51,7 +51,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JButton createDefaultButton() {
-        JButton toDefaultButton = new JButton("Set parameters to default.");
+        JButton toDefaultButton = new JButton("Set parameters to default");
         toDefaultButton.addActionListener(arg0 -> {
             solverParameters.setText(solverType.getDefaultSolverParameters());
             //settings.setParameters(solverType, solverParameters.getText());
@@ -88,7 +88,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JButton createCheckSupportButton() {
-        JButton checkForSupportButton = new JButton("Check for support.");
+        JButton checkForSupportButton = new JButton("Check for support");
         checkForSupportButton.setEnabled(solverType.isInstalled(false));
         checkForSupportButton.addActionListener(arg0 -> {
             solverType.checkForSupport();
@@ -114,8 +114,16 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
-            final String versionString = solverType.getRawVersion();
-            info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            final String versionString;
+            try {
+                versionString = solverType.getRawVersion();
+                info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            } catch (RuntimeException re) {
+                // this case occurs for instance, if there user can see e.g. z3 but has not the permission
+                // to execute the solver
+                info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
+                        (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
+            }
         }
         JTextField txt = addTextField("Installed", info, "", null);
         txt.setEditable(false);

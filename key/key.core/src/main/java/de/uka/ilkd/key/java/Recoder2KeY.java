@@ -484,7 +484,7 @@ public class Recoder2KeY implements JavaReader {
      *            unit
      * @return a list of KeY structured compilation units.
      */
-    private List<recoder.java.CompilationUnit> recoderCompilationUnits(String[] cUnitStrings) {
+    List<recoder.java.CompilationUnit> recoderCompilationUnits(String[] cUnitStrings) {
 
         parseSpecialClasses();
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();

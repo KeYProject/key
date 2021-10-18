@@ -330,7 +330,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * The Class BorderPainter is a simple highlight painter that just draws a rectangle around the selection.
      *
      */
-    static private class BorderPainter implements HighlightPainter {
+    public static class BorderPainter implements HighlightPainter {
 
         private final Color highlightColor;
 

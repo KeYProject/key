@@ -251,15 +251,7 @@ private void setValid(String result){
         vertBox.add(userInput);
         final StdDialog dialog = new StdDialog(title,
                 vertBox, 5, helpText!= null);
-        userInput.addListener(new CheckedUserInputListener(){
-
-            @Override
-            public void userInputChanged(String input, boolean valid, String reason) {
-               dialog.getOkayButton().setEnabled(valid);                
-            }
-
-	    
-        });
+        userInput.addListener((input, valid, reason) -> dialog.getOkButton().setEnabled(valid));
 
         dialog.getHelpButton().addActionListener(new ActionListener() {
             
@@ -269,16 +261,16 @@ private void setValid(String result){
                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
-        
+
         userInput.setInput(defaultInput);
         Dimension dim = dialog.getPreferredSize();
-        dialog.setSize(Math.max(dim.width,dialog.getOkayButton().getWidth()*4),dim.height);
+        dialog.setSize(Math.max(dim.width, dialog.getOkButton().getWidth() * 4), dim.height);
         dialog.setVisible(true);
-        
-        if(dialog.okayButtonHasBeenPressed()){
+
+        if (dialog.okButtonHasBeenPressed()) {
             return userInput.getInput();
         }
-        return null;  
+        return null;
     }
     
     

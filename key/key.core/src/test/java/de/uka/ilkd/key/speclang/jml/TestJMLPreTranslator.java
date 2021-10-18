@@ -13,17 +13,23 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.Token;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.List;
 
 import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
 import static junit.framework.TestCase.assertEquals;
@@ -37,6 +43,30 @@ public class TestJMLPreTranslator {
     }
 
     //region lexing
+    @Test
+    public void testMarkerDecision() {
+        JmlMarkerDecision m = new JmlMarkerDecision(null);
+        assertFalse(m.isActiveJmlSpec("+OPENJML"));
+        assertFalse(m.isActiveJmlSpec("-key+key"));
+        assertTrue(m.isActiveJmlSpec("-other"));
+        assertTrue(m.isActiveJmlSpec("+key"));
+        assertTrue(m.isActiveJmlSpec("+KEY"));
+        assertFalse(m.isActiveJmlSpec("-"));
+        assertTrue(m.isActiveJmlSpec("key"));
+        assertFalse(m.isActiveJmlSpec("+"));
+
+    }
+
+    @Test
+    public void testEnabledKeysLexer() {
+        String contract = "/*-key@ invariant x == 54; */";
+        JmlLexer lex = JmlFacade.createLexer(contract);
+        List<? extends Token> toks = lex.getAllTokens();
+        for (Token tok : toks) {
+            System.out.println(tok);
+        }
+    }
+
     @Test
     public void testLexer1() {
         String in = "/*@ normal_behavior\n"
@@ -105,7 +135,8 @@ public class TestJMLPreTranslator {
     public void testLexer10() {
         lex("//-@ behaviour", SL_COMMENT);
         lex("//+key+@ behaviour", SL_COMMENT);
-        lex("//key@ behaviour", SL_COMMENT);
+        //unclear which is wanted for "//key@ behaviour"
+        // currently "key" is ignored
     }
 
     private void lex(String in, int... expected) {

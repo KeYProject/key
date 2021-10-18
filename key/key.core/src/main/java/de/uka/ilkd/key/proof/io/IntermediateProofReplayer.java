@@ -602,6 +602,7 @@ public class IntermediateProofReplayer {
                 SMTSettings settings = new SMTSettings(
                     proof.getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(),
                     proof);
                 SolverLauncher launcher = new SolverLauncher(settings);
                 // launcher.addListener(new SolverListener(settings, proof));
