@@ -5,7 +5,7 @@ class MyClass {
     //@ model \locset footprint;
     //@ represents footprint = this.*;
     //@ accessible footprint: footprint;
-       
+
     //@ invariant attr2 != 0;
     //@ accessible \inv: footprint;
 
@@ -14,20 +14,18 @@ class MyClass {
       @ ensures \fresh(footprint);
       @*/
     MyClass() {
-	attr2++;
+        attr2++;
     }
-    
-    
+
     /*@ normal_behavior
       @   assignable footprint;
       @   ensures \result == i + 27 && attr == \result;
       @   ensures \new_elems_fresh(footprint);
       @*/
     int add27(int i) {
-	attr = i + 27;
-	return attr;
+        attr = i + 27;
+        return attr;
     }
-    
 
     /*@ normal_behavior
       @   requires attr2 != 358;
@@ -40,9 +38,9 @@ class MyClass {
       @   signals_only RuntimeException;
       @*/
     private void loop1() {
-	if(attr2 == 358) {
-	    throw new RuntimeException();
-	}
+        if(attr2 == 358) {
+            throw new RuntimeException();
+        }
         /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27) && \inv;
           @ assignable footprint;
           @*/
@@ -50,8 +48,7 @@ class MyClass {
             add27(0);
         }
     }
-    
-    
+
     /*@ normal_behavior
       @   assignable a[*]; 
       @   ensures (\forall int x; 0 <= x && x < a.length; a[x] == \old(attr2));
@@ -67,7 +64,6 @@ class MyClass {
         }
     }
 
-    
     /*@ normal_behavior
       @   assignable a[*];
       @   ensures (\forall int x, y; 0 < x && x < y && y < a.length; a[x] <= a[y]);

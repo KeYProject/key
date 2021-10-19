@@ -27,34 +27,34 @@ class Saddleback {
       @ modifies \nothing;
       @*/
     public /*@nullable*/ int[] search(int[][] array, int value) {
-	int x = 0;
-	int y = array[0].length - 1;
+        int x = 0;
+        int y = array[0].length - 1;
 
-	/*@
-	  @ loop_invariant
-	  @   0 <= x && x <= array.length &&
-	  @  -1 <= y && y < array[0].length &&
-	  @   (\forall int j,i; 0<=i && i < array.length && 
-	  @                     0<=j && j < array[0].length ;
-	  @      (i < x || j > y) ==> array[i][j] != value);
-	  @
-	  @ decreases array.length - x + y;
-	  @ modifies \nothing;
-	  @*/
-	while(x < array.length && y >= 0) {
+        /*@
+          @ loop_invariant
+          @   0 <= x && x <= array.length &&
+          @  -1 <= y && y < array[0].length &&
+          @   (\forall int j,i; 0<=i && i < array.length &&
+          @                     0<=j && j < array[0].length ;
+          @      (i < x || j > y) ==> array[i][j] != value);
+          @
+          @ decreases array.length - x + y;
+          @ modifies \nothing;
+          @*/
+        while(x < array.length && y >= 0) {
 
-	     if(array[x][y] == value) {
-	    		return new int[] { x, y };
-	    }
+            if(array[x][y] == value) {
+                return new int[] { x, y };
+            }
 
-	     if(array[x][y] < value) {
-	     	x++;
-	     } else {
-	     	y--;
-	     }
+            if(array[x][y] < value) {
+                x++;
+            } else {
+                y--;
+            }
 
-	}
+        }
 
-	return null;
+        return null;
     }
 }
