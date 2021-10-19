@@ -2,6 +2,10 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -42,6 +46,11 @@ public class Z3SolverType extends AbstractSolverType {
             return null;
         }
         return tmp.substring(tmp.indexOf("version"));
+    }
+
+    @Override
+    public @Nonnull AbstractSolverSocket getSocket(ModelExtractor query) {
+        return new Z3Socket(getName(), query);
     }
 
     @Override

@@ -2,6 +2,10 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.CVC4Socket;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -62,6 +66,11 @@ public class CVC4SolverType extends AbstractSolverType {
     @Override
     public String[] getSupportedVersions() {
         return new String[]{"version 1.3"};
+    }
+
+    @Override
+    public @Nonnull AbstractSolverSocket getSocket(ModelExtractor query) {
+        return new CVC4Socket(getName(), query);
     }
 
 }

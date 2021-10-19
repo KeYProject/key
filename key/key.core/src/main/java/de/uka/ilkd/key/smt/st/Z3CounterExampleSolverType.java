@@ -2,6 +2,10 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.Z3CESocket;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -13,14 +17,10 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
         return "z3";
     }
 
-    ;
-
     @Override
     public String getDefaultSolverParameters() {
         return "-in -smt2";
     }
-
-    ;
 
     @Override
     public SMTSolver createSolver(SMTProblem problem,
@@ -39,28 +39,25 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
         return "-version";
     }
 
-    ;
-
     @Override
     public String[] getSupportedVersions() {
         return new String[]{"version 4.3.1"};
     }
 
-    ;
+    @Override
+    public @Nonnull AbstractSolverSocket getSocket(ModelExtractor query) {
+        return new Z3CESocket(getName(), query);
+    }
 
     @Override
     public String[] getDelimiters() {
         return new String[]{"\n", "\r"};
     }
 
-    ;
-
     @Override
     public boolean supportsIfThenElse() {
         return true;
     }
-
-    ;
 
     @Override
     public SMTTranslator createTranslator(Services services) {

@@ -40,4 +40,9 @@ public interface Pipe {
      * automatically close.
      */
     void close();
+
+    /**
+     *
+     */
+    void sendEOF();
 }

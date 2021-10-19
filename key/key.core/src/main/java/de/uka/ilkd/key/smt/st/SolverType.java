@@ -14,13 +14,12 @@
 package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTTranslator;
-import de.uka.ilkd.key.smt.SolverListener;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -141,5 +140,13 @@ public interface SolverType {
      * returns true if and only if the support has been checked for the currently installed solver.
      */
     boolean supportHasBeenChecked();
+
+    /**
+     * Creates a new solver socket that can handle the communication for the given solver type.
+     * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
+     *              solvers this can be null)
+     * @return the newly created socket
+     */
+    @Nonnull AbstractSolverSocket getSocket(ModelExtractor query);
 }
 

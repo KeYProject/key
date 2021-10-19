@@ -142,4 +142,13 @@ public class SimplePipe implements Pipe {
 
         process.destroy();
     }
+
+    @Override
+    public void sendEOF() {
+        try {
+            processWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

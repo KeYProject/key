@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
@@ -30,6 +25,12 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a concrete instance of a running solver process on the KeY side. Amongst others
@@ -54,7 +55,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     /** the socket that handles solver results and interactively communicates with the running
      * external solver process*/
-    private final AbstractSolverSocket socket;
+    private final @Nonnull AbstractSolverSocket socket;
 
     /** the ModelExtractor used to generate counterexamples (only used for CE solver type) */
     private ModelExtractor query;
@@ -234,6 +235,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         try {
             processLauncher.launch(commands);
             processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
+            processLauncher.getPipe().sendEOF();
 
             String msg = processLauncher.getPipe().readMessage();
             while (msg != null) {
