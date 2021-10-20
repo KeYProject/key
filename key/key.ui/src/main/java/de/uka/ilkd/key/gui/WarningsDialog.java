@@ -4,17 +4,19 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
-import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
+import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.parsing.LocatableException;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -23,15 +25,19 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A dialog for showing multiple warnings with a preview window.
@@ -48,93 +54,245 @@ import java.util.regex.Pattern;
  * @version 1 (6/8/21)
  */
 public class WarningsDialog extends JDialog {
+    private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
-    private final List<PositionedString> warnings;
+    private final List<PositionedIssueString> warnings;
     private final Map<String, String> fileContentsCache = new HashMap<>();
+
+    private final JTextField fTextField = new JTextField();
+    private final JTextField lTextField = new JTextField();
+    private final JTextField cTextField = new JTextField();
     private final JTextPane txtSource = new JTextPane();
-    private final JList<PositionedString> listWarnings;
+    private final JTextArea txtStacktrace = new JTextArea();
+
+    private final JList<PositionedIssueString> listWarnings;
     private final JButton btnFurtherInformation = new JButton("Further Information", IconFactory.help(16));
     private final JButton btnOpenFile = new JButton("Edit File", IconFactory.editFile(16));
+    private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
+    private final JCheckBox chkDetails = new JCheckBox("Show Details");
+    private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true) ;
+    private final JSplitPane splitBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+    private final JPanel stacktracePanel = new JPanel(new BorderLayout());
+
+    /** flag to switch between dialog for warnings and critical issues where parsing is aborted.
+     * In the latter case only a single exception is show, which can also not be ignored */
+    private final boolean critical;
+
+    /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace). */
+    private final transient ItemListener detailsBoxListener = e -> {
+        int width = getWidth();
+        int height = getHeight();
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+
+            // the stacktrace gets a maximum height of 300px
+            int stPrefHeight = Math.min(stacktracePanel.getPreferredSize().height, 300);
+            setSize(new Dimension(width, height + stPrefHeight));
+            int centerHeight = splitCenter.getHeight();
+            // recalculate the sizes, in particular of the top component of splitBottom
+            validate();
+            // ensure that the top components look the same as before
+            splitBottom.setDividerLocation(centerHeight + 1);
+            splitBottom.setResizeWeight(0.66);
+        } else {
+            // ensure that the stacktrace stays minimized when resizing the dialog manually
+            splitBottom.setDividerLocation(1.0);
+            splitBottom.setResizeWeight(1.0);
+            if (stacktracePanel.isShowing()) {
+                // fold the stacktrace, but keep the rest of the dialog as is
+                int stHeight = stacktracePanel.getHeight();
+                setSize(new Dimension(width, height - stHeight));
+            }
+        }
+        //repaint();        // not sure but this is probably not needed...
+    };
 
     @Nullable
     private String urlFurtherInformation;
 
-    public WarningsDialog(Frame owner, Set<PositionedString> warnings) {
-        this(owner, SLEnvInput.getLanguage() + " warning(s)", warnings);
-    }
-
-    public WarningsDialog(Frame owner, String title, Set<PositionedString> warnings) {
+    private WarningsDialog(Frame owner, String title, Set<PositionedIssueString> warnings,
+                           boolean critical) {
         super(owner, title, true);
+
+        this.critical = critical;
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.warnings = new ArrayList<>(warnings);
         this.warnings.sort(Comparator.comparing(o -> o.fileName));
 
         setLayout(new BorderLayout());
-        JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
-        add(splitCenter, BorderLayout.CENTER);
 
-        //top label
-        final String head = String.format(
+        // set descriptive text in top label
+        final String head;
+        if (critical) {
+            head = String.format(
                 "The following non-fatal problems occurred when translating your %s specifications:",
                 SLEnvInput.getLanguage());
-
+        } else {
+            head = "The following exception occurred:";
+        }
         JLabel label = new JLabel(head);
-        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
+        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
         add(label, BorderLayout.NORTH);
-
-        listWarnings = new JList<>(this.warnings.toArray(new PositionedString[0]));
-        listWarnings.addListSelectionListener(e -> updatePreview());
-        listWarnings.addListSelectionListener(e -> updateFurtherInformation(listWarnings.getSelectedValue().text));
-        listWarnings.addListSelectionListener(e ->
-                btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
-        listWarnings.setCellRenderer(new PositionedStringRenderer());
-        listWarnings.setBorder(BorderFactory.createLoweredBevelBorder());
-
-        JScrollPane scrWarnings = new JScrollPane(listWarnings);
-        scrWarnings.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrWarnings.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        splitCenter.setLeftComponent(scrWarnings);
-
-        JScrollPane scrPreview = new JScrollPane(txtSource);
-        splitCenter.setRightComponent(scrPreview);
-
-        TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
-        scrPreview.setRowHeaderView(lineNumbers);
 
         Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (font == null) {
             // make sure a monospaced font is used
             font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         }
+
+        // label
+        //     scrWarnings
+        //       listWarnings
+        //   ----splitCenter
+        //     sourcePanel
+        //       locPanel: fTextField lTextField cTextField
+        //       scrPreview: nowrap: txtSource
+        //       pSouth
+        //         chkIgnoreWarnings
+        //         pButtons: btnOK btnFurtherInformation btnOpenFile chkDetails
+        // ----splitBottom
+        //   stacktracePanel
+        //     stTextArea
+
+        listWarnings = new JList<>(this.warnings.toArray(new PositionedIssueString[0]));
+
+        JScrollPane scrWarnings = createWarningsPane(font);
+        splitCenter.setTopComponent(scrWarnings);
+
+        JPanel sourcePanel = createSourcePanel(font);
+        splitCenter.setBottomComponent(sourcePanel);
+        splitCenter.setDividerLocation(-1);
+        splitCenter.setResizeWeight(0.5);
+        splitCenter.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        splitBottom.setTopComponent(splitCenter);
+        configureStacktracePanel(font);
+        splitBottom.setBottomComponent(stacktracePanel);
+        splitBottom.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        add(splitBottom, BorderLayout.CENTER);
+
+        // minimizing the stacktrace unchecks the details checkbox
+        splitBottom.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+            e -> {
+                // temporarily remove item listener to prevent infinite loop
+                chkDetails.removeItemListener(detailsBoxListener);
+                int newLoc = (int) e.getNewValue();
+                chkDetails.setSelected(newLoc < splitBottom.getMaximumDividerLocation());
+                chkDetails.addItemListener(detailsBoxListener);
+            }
+        );
+
+        // ensures that the buttons fit into a single row
+        setMinimumSize(new Dimension(530, 300));
+
+        splitBottom.setDividerLocation(1.0);
+        splitBottom.setResizeWeight(1.0);
+        stacktracePanel.setMinimumSize(new Dimension(0, 0));
+
+        // show the dialog with a size of 700*800 or smaller
+        Dimension pref = getPreferredSize();
+        Dimension minPref = new Dimension(Math.min(pref.width, 700), Math.min(pref.height, 800));
+        setPreferredSize(minPref);
+
+        pack();
+        chkDetails.setSelected(false);
+        setLocationRelativeTo(owner);
+    }
+
+    // creates stacktrace area, but do not show
+    private void configureStacktracePanel(Font font) {
+        txtStacktrace.setFont(font);
+        txtStacktrace.setEditable(false);
+        txtStacktrace.setTabSize(4);
+        txtStacktrace.setLineWrap(false);
+
+        stacktracePanel.setBorder(BorderFactory.createTitledBorder("Stack Trace"));
+        JScrollPane scrStacktrace = new JScrollPane(txtStacktrace);
+        stacktracePanel.add(scrStacktrace);
+    }
+
+    private JScrollPane createWarningsPane(Font font) {
+        // trigger updates of preview and stacktrace
+        listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
+        listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
+        // enable/disable "further information", "open file", and "show details"
+        listWarnings.addListSelectionListener(
+            e -> updateFurtherInformation(listWarnings.getSelectedValue().text));
+        listWarnings.addListSelectionListener(e ->
+            btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+        listWarnings.addListSelectionListener(e -> {
+            if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
+                chkDetails.setSelected(false);
+                chkDetails.setEnabled(false);
+                /* disable the bottom split and hide the divider (we can not use setEnabled(false)
+                 * on the splitpane because this has side effects on some children!) */
+                splitBottom.setDividerSize(0);
+                stacktracePanel.setVisible(false);
+            } else {
+                // enable the bottom split and show the divider
+                splitBottom.setDividerSize(splitCenter.getDividerSize());
+                stacktracePanel.setVisible(true);
+                chkDetails.setEnabled(true);
+            }
+            repaint();
+        });
+        listWarnings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listWarnings.setCellRenderer(new PositionedStringRenderer());
+        listWarnings.setSelectedIndex(0);
+
+        JScrollPane scrWarnings;
+        if (warnings.size() == 1) {
+            JTextArea issueTextArea = new JTextArea();
+            issueTextArea.setEditable(false);
+            issueTextArea.setTabSize(4);
+            issueTextArea.setLineWrap(false);
+            issueTextArea.setFont(font);
+            PositionedString value = this.warnings.get(0);
+            issueTextArea.setText(value.text);
+            scrWarnings = new JScrollPane(issueTextArea);
+        } else {
+            scrWarnings = new JScrollPane(listWarnings);
+        }
+        return scrWarnings;
+    }
+
+    private JPanel createSourcePanel(Font font) {
+        txtSource.setEditable(false);
         txtSource.setFont(font);
 
+        // workaround to disable automatic line wrapping and enable horizontal scrollbar instead
+        JPanel nowrap = new JPanel(new BorderLayout());
+        nowrap.add(txtSource);
+        JScrollPane scrPreview = new JScrollPane();
+        scrPreview.setViewportView(nowrap);
+        scrPreview.getVerticalScrollBar().setUnitIncrement(30);
+        scrPreview.getHorizontalScrollBar().setUnitIncrement(30);
 
-        final JButton btnOk = new JButton("OK");
-        btnOk.addActionListener(e -> accept());
+        TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
+        scrPreview.setRowHeaderView(lineNumbers);
+
+        final JButton btnOK = new JButton("OK");
+        btnOK.addActionListener(e -> accept());
         Dimension buttonDim = new Dimension(100, 27);
-        btnOk.setPreferredSize(buttonDim);
-        btnOk.setMinimumSize(buttonDim);
-
+        btnOK.setPreferredSize(buttonDim);
+        btnOK.setMinimumSize(buttonDim);
+        btnOK.setMaximumSize(new Dimension(Integer.MAX_VALUE, 27));
 
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        pButtons.add(btnOk);
+        pButtons.add(btnOK);
         pButtons.add(btnFurtherInformation);
         pButtons.add(btnOpenFile);
+        pButtons.add(chkDetails);
 
-        JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
-        pSouth.add(chkIgnoreWarnings);
-        pSouth.add(pButtons);
-        add(pSouth, BorderLayout.SOUTH);
-        getRootPane().setDefaultButton(btnOk);
+        chkDetails.addItemListener(detailsBoxListener);
 
         btnFurtherInformation.addActionListener(e -> {
             if (urlFurtherInformation != null && !urlFurtherInformation.isEmpty()) {
                 try {
                     Objects.requireNonNull(Desktop.getDesktop())
-                            .browse(URI.create(urlFurtherInformation));
+                        .browse(URI.create(urlFurtherInformation));
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
                 }
@@ -146,86 +304,159 @@ public class WarningsDialog extends JDialog {
             if (selectedValue.hasFilename()) {
                 try {
                     Objects.requireNonNull(Desktop.getDesktop())
-                            .open(new File(selectedValue.fileName));
+                        .open(new File(selectedValue.fileName));
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
                 }
             }
         });
 
-        btnOk.registerKeyboardAction(
-                event -> {
-                    if (event.getActionCommand().equals("ESC")) {
-                        btnOk.doClick();
-                    }
-                },
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        btnOK.registerKeyboardAction(
+            event -> {
+                if (event.getActionCommand().equals("ESC")) {
+                    btnOK.doClick();
+                }
+            },
+            "ESC",
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setSize(700, 500);
-        splitCenter.setDividerLocation(250);
-        if (owner != null) {
-            setLocationRelativeTo(owner);
+        // by default, do not ignore any warnings
+        chkIgnoreWarnings.setSelected(false);
+        if (!critical) {
+            pSouth.add(chkIgnoreWarnings);
         }
+        pSouth.add(pButtons);
+        getRootPane().setDefaultButton(btnOK);
+
+        JPanel sourcePanel = new JPanel(new BorderLayout());
+        JPanel locPanel = new JPanel();
+
+        fTextField.setEditable(false);
+        lTextField.setEditable(false);
+        cTextField.setEditable(false);
+        locPanel.add(fTextField);
+        locPanel.add(lTextField);
+        locPanel.add(cTextField);
+
+        sourcePanel.add(locPanel, BorderLayout.NORTH);
+        sourcePanel.add(scrPreview);
+        sourcePanel.add(pSouth, BorderLayout.SOUTH);
+        return sourcePanel;
     }
 
-    public static void showDialog(Frame parent, Throwable exception) {
-        WarningsDialog dlg = new WarningsDialog(parent, exception);
-        if(parent!=null) {
-            dlg.setLocationRelativeTo(parent);
-        }
+    public static void showExceptionDialog(Frame parent, Throwable exception) {
+        Set<PositionedIssueString> msg = Set.of(extractMessage(exception));
+        WarningsDialog dlg = new WarningsDialog(parent, "Parser Error", msg, true);
         dlg.setVisible(true);
         dlg.dispose();
     }
 
-    private WarningsDialog(Frame parent, Throwable exception) {
-        this(parent, "Parser Messages", extractMessage(exception));
+    public static void showWarningsIfNecessary(MainWindow mainWindow, ImmutableSet<PositionedString> warnings) {
+        Set<PositionedString> warn = warnings.toSet();
+        warn.removeAll(ignoredWarnings);
+        // do not show warnings dialog if all warnings are ignored
+        if (!warn.isEmpty()) {
+            // ensure that each warning has at least an empty additionalInfo
+            Set<PositionedIssueString> issues = warnings.stream()
+                .map(o -> o instanceof PositionedIssueString ? (PositionedIssueString)o
+                    : new PositionedIssueString(o, ""))
+                .collect(Collectors.toSet());
+
+            WarningsDialog dialog = new WarningsDialog(mainWindow,
+                SLEnvInput.getLanguage() + " warning(s)", issues, false);
+            dialog.setVisible(true);
+            dialog.dispose();
+        }
     }
 
-    private static Set<PositionedString> extractMessage(Throwable exception) {
-        Location location;
-        try {
-            location = ExceptionTools.getLocation(exception);
-            // set text
-            StringWriter sw = new StringWriter();
-            // sw.append("(").append(exc.getClass().toString()).append(")\n");
+    private static PositionedIssueString extractMessage(Throwable exception) {
+        try (StringWriter sw = new StringWriter()) {
             PrintWriter pw = new PrintWriter(sw);
+            Location location = ExceptionTools.getLocation(exception);
             exception.printStackTrace(pw);
-            String errorMessage = sw.toString();
-            String filename = new File(location.getFileURL().toURI()).toString();
-
-            // as always, the parser generated position is one of in column and line
-            Position pos = new Position(location.getLine() - 1, location.getColumn() - 1);
-
-            PositionedString ps = new PositionedString(errorMessage, filename, pos);
-            return Set.of(ps);
-        } catch (MalformedURLException | URISyntaxException e) {
-            // We must not suppress the dialog here -> catch and print only to error stream
-            System.err.println("Creating a Location failed for " + exception);
-            e.printStackTrace();
+            String message = exception.getMessage();
+            String info = sw.toString();
+            String filename = "";
+            Position pos = Position.UNDEFINED;
+            if (Location.isValidLocation(location)) {
+                 filename = new File(location.getFileURL().toURI()).toString();
+                // the parser generated position is one off in column and line
+                 pos = new Position(location.getLine() - 1, location.getColumn() - 1);
+            }
+            return new PositionedIssueString(message, filename, pos, info);
+        } catch (URISyntaxException | IOException e) {
+            // We must not suppress the dialog here -> catch and print only to debug stream
+            Debug.out("Creating a Location failed for " + exception, e);
         }
-        return Set.of(new PositionedString("Constructing the error message failed!"));
+        return new PositionedIssueString("Constructing the error message failed!");
     }
 
     private void accept() {
-        ignoredWarnings.addAll(warnings);
+        if (!critical && chkIgnoreWarnings.isSelected()) {
+            ignoredWarnings.addAll(warnings);
+        }
         setVisible(false);
     }
 
-    public static void showIfNecessary(MainWindow mainWindow, ImmutableSet<PositionedString> warnings) {
-        Set<PositionedString> warn = warnings.toSet();
-        warn.removeAll(ignoredWarnings);
-        WarningsDialog dialog = new WarningsDialog(mainWindow, warn);
-        dialog.setVisible(true);
-        dialog.dispose();
+    /**
+     * Small data class that in addition to the information already contained by PositionedString
+     * (text, filename, position) contains a String for additional information which can be used
+     * to store a stacktrace if present.
+     */
+    private static class PositionedIssueString extends PositionedString {
+
+        /** contains additional information, e.g., a stacktrace */
+        private final @Nonnull String additionalInfo;
+
+        public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
+                                     @Nullable Position pos, @Nonnull String additionalInfo) {
+            super(text, fileName, pos);
+            this.additionalInfo = additionalInfo;
+        }
+
+        public PositionedIssueString(@Nonnull String text) {
+            this(text, null, null, "");
+        }
+
+        public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {
+            this(o.text, o.fileName, o.pos, additionalInfo);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
+            PositionedIssueString that = (PositionedIssueString) o;
+            return additionalInfo.equals(that.additionalInfo);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), additionalInfo);
+        }
     }
 
-    private void updatePreview() {
+    private void updatePreview(PositionedIssueString issue) {
+        // update text fields with position information
+        if (!issue.fileName.isEmpty()) {
+            fTextField.setText("File: " + issue.fileName);
+        } else {
+            fTextField.setText("");
+        }
+        cTextField.setText("Column: " + (issue.pos.getColumn() + 1));
+        lTextField.setText("Line: " + (issue.pos.getLine() + 1));
+
         try {
-            PositionedString ps = listWarnings.getSelectedValue();
-            String source = fileContentsCache.computeIfAbsent(ps.fileName, fn -> {
-                try (InputStream stream = IOUtil.openStream(ps.fileName)) {
+            String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                try (InputStream stream = IOUtil.openStream(issue.fileName)) {
                     return IOUtil.readFrom(stream);
                 } catch (IOException e) {
                     Debug.out("Unknown IOException!", e);
@@ -233,16 +464,22 @@ public class WarningsDialog extends JDialog {
                 }
             });
 
-            if (isJava(ps.fileName)) {
-                showJavaSourceCode(ps, source);
+            if (isJava(issue.fileName)) {
+                showJavaSourceCode(issue, source);
             } else {
                 txtSource.setText(source);
             }
-            int offset = getOffsetFromLineColumn(source, ps.pos);
+            // ensure that the currently selected problem is shown in view
+            int offset = getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        validate();
+    }
+
+    private void updateStackTrace(PositionedIssueString issue) {
+        txtStacktrace.setText(issue.additionalInfo);
     }
 
     private void showJavaSourceCode(PositionedString ps, String source) {
@@ -252,21 +489,19 @@ public class WarningsDialog extends JDialog {
             doc.insertString(0, source, new SimpleAttributeSet());
             DefaultHighlighter dh = new DefaultHighlighter();
             txtSource.setHighlighter(dh);
-            addWarnings(dh, ps.fileName);
+            addHighlights(dh, ps.fileName);
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void addWarnings(DefaultHighlighter dh, String fileName) {
+    private void addHighlights(DefaultHighlighter dh, String fileName) {
         warnings.stream()
                 .filter(ps -> fileName.equals(ps.fileName))
-                .forEach(ps -> {
-                    addWarnings(dh, ps);
-                });
+                .forEach(ps -> addHighlights(dh, ps));
     }
 
-    private void addWarnings(DefaultHighlighter dh, PositionedString ps) {
+    private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, ps.pos);
         int end = offset;
@@ -274,17 +509,21 @@ public class WarningsDialog extends JDialog {
             end++;
         }
         try {
-            dh.addHighlight(offset, end, new BracketMatchingTextArea.BorderPainter(Color.RED));
+            if (critical) {
+                dh.addHighlight(offset, end,
+                    new SquigglyUnderlinePainter(Color.RED, 2, 1f));
+            } else {
+                dh.addHighlight(offset, end,
+                    new SquigglyUnderlinePainter(Color.ORANGE, 2, 1f));
+            }
         } catch (BadLocationException ignore) {
             // ignore
-            // TODO: this should be logged somewhere
         }
     }
 
 
     private void updateFurtherInformation(String text) {
-        Pattern regex = Pattern.compile("https?://[^\\s]+");
-        Matcher m = regex.matcher(text);
+        Matcher m = HTTP_REGEX.matcher(text);
         if (m.find()) {
             this.urlFurtherInformation = m.group();
             btnFurtherInformation.setEnabled(true);
@@ -335,9 +574,7 @@ public class WarningsDialog extends JDialog {
         @Override
         public Component getListCellRendererComponent(JList<? extends PositionedString> list, PositionedString value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
-            final String text = String.format("%s\n\nFilename: %s@%d:%d",
-                    value.text, value.fileName, value.pos.getLine(), value.pos.getColumn());
-            area.setText(text);
+            area.setText(value.text);
             area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             if (isSelected) {
                 area.setBackground(list.getSelectionBackground());
@@ -367,24 +604,32 @@ public class WarningsDialog extends JDialog {
         }
     }
 
-    /*//Debugging
+    //Debugging
     public static void main(String[] args) {
-            PositionedString a = new PositionedString("Multiline text\nTest\n",
-                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
-                    new Position(20, 25));
-            PositionedString b = new PositionedString("Multiline text\nTest\n More information: https://google.de",
-                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                    new Position(35, 10));
-            PositionedString c = new PositionedString("Blubb",
-                    "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                    new Position(36, 0));
+        PositionedIssueString a = new PositionedIssueString("Multiline text\nTest\n",
+                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
+                    new Position(20, 25), "");
+        PositionedIssueString b = new PositionedIssueString("Multiline text\nTest\n More information: https://google.de",
+                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                    new Position(35, 10), "");
+        PositionedIssueString c = new PositionedIssueString("Blubb",
+                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                    new Position(36, 0), "");
 
-            HashSet<PositionedString> warnings = new HashSet<>();
-            warnings.add(a);
-            warnings.add(b);
-            warnings.add(c);
-            WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
-            warningsDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            warningsDialog.setVisible(true);
-        }*/
+        ImmutableSet<PositionedIssueString> warnings = DefaultImmutableSet.nil();
+        warnings = warnings.add(a);
+        warnings = warnings.add(b);
+        warnings = warnings.add(c);
+        Exception npe = new NullPointerException("Fake Null Pointer exception");
+        try {
+            Location loc = new Location(Paths.get("/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java").toUri().toURL(), 35, 10);
+            Exception e = new LocatableException("Fake locatable Exception", npe, loc);
+            PositionedIssueString pis = extractMessage(e);
+            warnings = warnings.add(extractMessage(e));
+            //WarningsDialog.showWarningsIfNecessary(null, warnings);
+            WarningsDialog.showExceptionDialog(null, e);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 }
