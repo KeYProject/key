@@ -40,20 +40,29 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * A dialog for showing multiple warnings with a preview window.
+ * A dialog for showing (possibly multiple) issues with a preview window. It can either display
+ * multiple non-critical warnings, or a single critical exception.
  * <p>
  * This dialog has support to:
  * <ul>
  *     <li>hide listed warnings for the current session</li>
- *     <li>show the warning in a little preview window (with syntax highlighting)</li>
+ *     <li>show the issue in a little preview window (with syntax highlighting)</li>
  *     <li>if an URL is in the description, it is possible to open this web page</li>
  *     <li>if a file name is associated with the warning, the user can open its editor</li>
+ *     <li>if the message contains a stacktrace, it is optionally displayed</li>
  * </ul>
  *
+ * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
+ *           since this conforms to 1) the line numbers shown in the dialog and 2) the
+ *           usual representation in text editors.
+ *
  * @author Alexander Weigl
+ * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
+ *                          all parser error messages in KeY
  * @version 1 (6/8/21)
+ * @version 2 (10/20/21)
  */
-public class WarningsDialog extends JDialog {
+public final class IssueDialog extends JDialog {
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
@@ -110,9 +119,9 @@ public class WarningsDialog extends JDialog {
     @Nullable
     private String urlFurtherInformation;
 
-    private WarningsDialog(Frame owner, String title, Set<PositionedIssueString> warnings,
-                           boolean critical) {
-        super(owner, title, true);
+    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+                        boolean critical) {
+        super(owner, title, ModalityType.APPLICATION_MODAL);
 
         this.critical = critical;
 
@@ -125,11 +134,11 @@ public class WarningsDialog extends JDialog {
         // set descriptive text in top label
         final String head;
         if (critical) {
+            head = "The following exception occurred:";
+        } else {
             head = String.format(
                 "The following non-fatal problems occurred when translating your %s specifications:",
                 SLEnvInput.getLanguage());
-        } else {
-            head = "The following exception occurred:";
         }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
@@ -294,7 +303,7 @@ public class WarningsDialog extends JDialog {
                     Objects.requireNonNull(Desktop.getDesktop())
                         .browse(URI.create(urlFurtherInformation));
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
+                    JOptionPane.showMessageDialog(IssueDialog.this, ex.getMessage());
                 }
             }
         });
@@ -306,7 +315,7 @@ public class WarningsDialog extends JDialog {
                     Objects.requireNonNull(Desktop.getDesktop())
                         .open(new File(selectedValue.fileName));
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
+                    JOptionPane.showMessageDialog(IssueDialog.this, ex.getMessage());
                 }
             }
         });
@@ -345,9 +354,9 @@ public class WarningsDialog extends JDialog {
         return sourcePanel;
     }
 
-    public static void showExceptionDialog(Frame parent, Throwable exception) {
+    public static void showExceptionDialog(Window parent, Throwable exception) {
         Set<PositionedIssueString> msg = Set.of(extractMessage(exception));
-        WarningsDialog dlg = new WarningsDialog(parent, "Parser Error", msg, true);
+        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true);
         dlg.setVisible(true);
         dlg.dispose();
     }
@@ -363,7 +372,7 @@ public class WarningsDialog extends JDialog {
                     : new PositionedIssueString(o, ""))
                 .collect(Collectors.toSet());
 
-            WarningsDialog dialog = new WarningsDialog(mainWindow,
+            IssueDialog dialog = new IssueDialog(mainWindow,
                 SLEnvInput.getLanguage() + " warning(s)", issues, false);
             dialog.setVisible(true);
             dialog.dispose();
@@ -381,8 +390,7 @@ public class WarningsDialog extends JDialog {
             Position pos = Position.UNDEFINED;
             if (Location.isValidLocation(location)) {
                  filename = new File(location.getFileURL().toURI()).toString();
-                // the parser generated position is one off in column and line
-                 pos = new Position(location.getLine() - 1, location.getColumn() - 1);
+                 pos = new Position(location.getLine(), location.getColumn());
             }
             return new PositionedIssueString(message, filename, pos, info);
         } catch (URISyntaxException | IOException e) {
@@ -451,8 +459,8 @@ public class WarningsDialog extends JDialog {
         } else {
             fTextField.setText("");
         }
-        cTextField.setText("Column: " + (issue.pos.getColumn() + 1));
-        lTextField.setText("Line: " + (issue.pos.getLine() + 1));
+        cTextField.setText("Column: " + issue.pos.getColumn());
+        lTextField.setText("Line: " + issue.pos.getLine());
 
         try {
             String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
@@ -465,10 +473,14 @@ public class WarningsDialog extends JDialog {
             });
 
             if (isJava(issue.fileName)) {
-                showJavaSourceCode(issue, source);
+                showJavaSourceCode(source);
             } else {
                 txtSource.setText(source);
             }
+            DefaultHighlighter dh = new DefaultHighlighter();
+            txtSource.setHighlighter(dh);
+            addHighlights(dh, issue.fileName);
+
             // ensure that the currently selected problem is shown in view
             int offset = getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
@@ -482,14 +494,11 @@ public class WarningsDialog extends JDialog {
         txtStacktrace.setText(issue.additionalInfo);
     }
 
-    private void showJavaSourceCode(PositionedString ps, String source) {
+    private void showJavaSourceCode(String source) {
         try {
             JavaDocument doc = new JavaDocument();
             txtSource.setDocument(doc);
             doc.insertString(0, source, new SimpleAttributeSet());
-            DefaultHighlighter dh = new DefaultHighlighter();
-            txtSource.setHighlighter(dh);
-            addHighlights(dh, ps.fileName);
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
@@ -536,9 +545,10 @@ public class WarningsDialog extends JDialog {
         return fileName.endsWith(".java");
     }
 
-
+    // as far as I can tell, this method treats lines and columns as zero-based
     public static int getOffsetFromLineColumn(String source, Position pos) {
-        return getOffsetFromLineColumn(source, pos.getLine(), pos.getColumn());
+        // Position has 1-based line and column, we need them 0-based
+        return getOffsetFromLineColumn(source, pos.getLine() - 1, pos.getColumn() - 1);
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {
@@ -614,9 +624,9 @@ public class WarningsDialog extends JDialog {
                     new Position(35, 10), "");
         PositionedIssueString c = new PositionedIssueString("Blubb",
                     "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                    new Position(36, 0), "");
+                    new Position(36, 1), "");
 
-        ImmutableSet<PositionedIssueString> warnings = DefaultImmutableSet.nil();
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         warnings = warnings.add(a);
         warnings = warnings.add(b);
         warnings = warnings.add(c);
@@ -626,8 +636,8 @@ public class WarningsDialog extends JDialog {
             Exception e = new LocatableException("Fake locatable Exception", npe, loc);
             PositionedIssueString pis = extractMessage(e);
             warnings = warnings.add(extractMessage(e));
-            //WarningsDialog.showWarningsIfNecessary(null, warnings);
-            WarningsDialog.showExceptionDialog(null, e);
+            IssueDialog.showWarningsIfNecessary(null, warnings);
+            //IssueDialog.showExceptionDialog(null, e);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

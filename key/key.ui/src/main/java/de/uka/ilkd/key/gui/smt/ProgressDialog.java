@@ -45,7 +45,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 
@@ -148,7 +148,7 @@ public class ProgressDialog extends JDialog{
                                 listener.applyButtonClicked();
                             } catch(Exception exception) {
                                 // There may be exceptions during rule application that should not be lost.
-                                ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                                IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                             }
                         }
                 });

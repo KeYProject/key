@@ -213,7 +213,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
-                WarningsDialog.showExceptionDialog(mainWindow, result);
+                IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
@@ -590,7 +590,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        WarningsDialog.showWarningsIfNecessary(mainWindow, warnings);
+        IssueDialog.showWarningsIfNecessary(mainWindow, warnings);
     }
 
    /**

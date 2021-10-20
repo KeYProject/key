@@ -212,7 +212,7 @@ public final class ProofSelectionDialog extends JDialog {
             dialog.setVisible(true);
             proofPath = dialog.proofToLoad;
         } catch (IOException exc) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
         }
         return proofPath;
     }
