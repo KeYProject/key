@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
@@ -66,6 +67,7 @@ public final class IssueDialog extends JDialog {
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
+    private Throwable throwable;
     private final List<PositionedIssueString> warnings;
     private final Map<String, String> fileContentsCache = new HashMap<>();
 
@@ -119,10 +121,16 @@ public final class IssueDialog extends JDialog {
     @Nullable
     private String urlFurtherInformation;
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+    private IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
                         boolean critical) {
+        this(owner, title, issues, critical, null);
+    }
+
+    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+                        boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
+        this.throwable = throwable;
         this.critical = critical;
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -193,17 +201,18 @@ public final class IssueDialog extends JDialog {
         );
 
         // ensures that the buttons fit into a single row
-        setMinimumSize(new Dimension(530, 300));
+        setMinimumSize(new Dimension(630, 300));
 
         splitBottom.setDividerLocation(1.0);
         splitBottom.setResizeWeight(1.0);
         stacktracePanel.setMinimumSize(new Dimension(0, 0));
 
-        // show the dialog with a size of 700*800 or smaller
+        // show the dialog with a size of 900*800 or smaller
         Dimension pref = getPreferredSize();
-        Dimension minPref = new Dimension(Math.min(pref.width, 700), Math.min(pref.height, 800));
+        Dimension minPref = new Dimension(Math.min(pref.width, 900), Math.min(pref.height, 800));
         setPreferredSize(minPref);
 
+        pack();
         pack();
         chkDetails.setSelected(false);
         setLocationRelativeTo(owner);
@@ -260,6 +269,8 @@ public final class IssueDialog extends JDialog {
             PositionedString value = this.warnings.get(0);
             issueTextArea.setText(value.text);
             scrWarnings = new JScrollPane(issueTextArea);
+            // ensure that the start of the error message is visible
+            issueTextArea.setCaretPosition(0);
         } else {
             scrWarnings = new JScrollPane(listWarnings);
         }
@@ -288,11 +299,17 @@ public final class IssueDialog extends JDialog {
         btnOK.setMinimumSize(buttonDim);
         btnOK.setMaximumSize(new Dimension(Integer.MAX_VALUE, 27));
 
+        final JButton btnSendFeedback = new JButton(new SendFeedbackAction(this, throwable));
+        Dimension feedbackBtnDim = new Dimension(130, buttonDim.height);
+        btnSendFeedback.setMinimumSize(feedbackBtnDim);
+        btnSendFeedback.setPreferredSize(feedbackBtnDim);
+
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOK);
         pButtons.add(btnFurtherInformation);
         pButtons.add(btnOpenFile);
+        pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
         chkDetails.addItemListener(detailsBoxListener);

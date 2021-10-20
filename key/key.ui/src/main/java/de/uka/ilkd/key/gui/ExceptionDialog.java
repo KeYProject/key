@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author refactored by mattias
  */
+@Deprecated
 public class ExceptionDialog extends JDialog {
 
     public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);

@@ -36,6 +36,7 @@ import org.key_project.util.java.IOUtil;
  *
  * @author Kai Wallisch
  */
+@Deprecated
 public class EditSourceFileAction extends AbstractAction {
     private static final long serialVersionUID = -2540941448174197032L;
 
