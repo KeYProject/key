@@ -11,12 +11,14 @@ pipeline {
 
   stages {
     stage('Clean') {
-        sh 'javac -version'
-        sh 'key/scripts/jenkins/startupClean.sh'
+        steps{
+            sh 'javac -version'
+            sh 'key/scripts/jenkins/startupClean.sh'
+        }
     }
 
     stage('Compile') {
-        sh 'key/scripts/jenkins/deployAll.sh'
+        steps { sh 'key/scripts/jenkins/deployAll.sh' }
     }
 
     stage('Tests') {
@@ -27,7 +29,7 @@ pipeline {
     }
     
     stage('Docs') {
-        sh 'key/scripts/jenkins/generateDoc.sh'
+        steps{sh 'key/scripts/jenkins/generateDoc.sh'}
     }
   }
 }
