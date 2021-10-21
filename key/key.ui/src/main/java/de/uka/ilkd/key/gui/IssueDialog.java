@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.KeYDesktop;
+import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -325,6 +327,10 @@ public final class IssueDialog extends JDialog {
             }
         });
 
+        EditSourceFileAction action = new EditSourceFileAction(this, throwable);
+        btnOpenFile.addActionListener(action);
+
+        /*
         btnOpenFile.addActionListener(e -> {
             final PositionedString selectedValue = listWarnings.getSelectedValue();
             if (selectedValue.hasFilename()) {
@@ -336,6 +342,7 @@ public final class IssueDialog extends JDialog {
                 }
             }
         });
+         */
 
         btnOK.registerKeyboardAction(
             event -> {
@@ -373,7 +380,7 @@ public final class IssueDialog extends JDialog {
 
     public static void showExceptionDialog(Window parent, Throwable exception) {
         Set<PositionedIssueString> msg = Set.of(extractMessage(exception));
-        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true);
+        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
     }
@@ -478,6 +485,8 @@ public final class IssueDialog extends JDialog {
         }
         cTextField.setText("Column: " + issue.pos.getColumn());
         lTextField.setText("Line: " + issue.pos.getLine());
+
+        btnOpenFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
             String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
