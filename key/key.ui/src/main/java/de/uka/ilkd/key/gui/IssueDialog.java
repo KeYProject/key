@@ -379,7 +379,7 @@ public final class IssueDialog extends JDialog {
     }
 
     public static void showExceptionDialog(Window parent, Throwable exception) {
-        Set<PositionedIssueString> msg = Set.of(extractMessage(exception));
+        Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
