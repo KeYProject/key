@@ -29,4 +29,5 @@ pipeline {
     stage('Docs') {
         sh 'key/scripts/jenkins/generateDoc.sh'
     }
+  }
 }
