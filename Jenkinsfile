@@ -18,16 +18,34 @@ pipeline {
     }
 
     stage('Compile') {
-        steps { sh 'key/scripts/jenkins/deployAll.sh' }
+        steps { 
+          dir 'key'
+          sh './gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+          }
     }
 
-    stage('Tests') {
+    stage('Tests: JUnit') {
       steps {
-        sh 'key/scripts/jenkins/runTests.sh'
+        dir 'key'
+        sh './gradlew --continue test testProveRules testRunAllProofs' 
         junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
       }    
     }
-    
+
+    stage('Test: testProveRules') {
+      steps {
+        dir 'key'
+        sh './gradlew --continue testProveRules' 
+      }    
+    }    
+
+    stage('Test: testRunAllProofs') {
+      steps {
+        dir 'key'
+        sh './gradlew --continue testRunAllProofs' 
+      }    
+    }    
+
     stage('Docs') {
         steps{sh 'key/scripts/jenkins/generateDoc.sh'}
     }
