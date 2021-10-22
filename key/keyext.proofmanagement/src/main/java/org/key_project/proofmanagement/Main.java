@@ -129,19 +129,11 @@ public final class Main {
         }
     }
 
-    // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
-    private static void check(CommandLine commandLine) {
-
-        List<String> arguments = commandLine.getArguments();
-        if (arguments.size() != 1) {
-            commandLine.printUsage(System.out);
-        }
-
-        String pathStr = arguments.get(0);
+    public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
+                              Path bundlePath, Path reportPath) {
 
         // we accumulate results in this variable
         CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
-        Path bundlePath = Paths.get(pathStr);
         try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
 
             globalResult.setPbh(pbh);
@@ -149,27 +141,25 @@ public final class Main {
             // add file tree to result
             globalResult.setFileTree(pbh.getFileTree());
 
-            if (commandLine.isSet("--missing")) {
+            if (missing) {
                 new MissingProofsChecker().check(pbh, globalResult);
             }
-            if (commandLine.isSet("--settings")) {
+            if (settings) {
                 new SettingsChecker().check(pbh, globalResult);
             }
-            if (commandLine.isSet("--replay")) {
+            if (replay) {
                 new ReplayChecker().check(pbh, globalResult);
             }
-            if (commandLine.isSet("--dependency")) {
+            if (dependency) {
                 new DependencyChecker().check(pbh, globalResult);
             }
             globalResult.print("All checks done!");
             globalResult.print("Global result: " + globalResult.getGlobalState());
 
             // generate report
-            if (commandLine.isSet("--report")) {
-                String outFileName = commandLine.getString("--report", "");
-                Path output = Paths.get(outFileName).toAbsolutePath();
+            if (reportPath != null) {
                 try {
-                    HTMLReport.print(globalResult, output);
+                    HTMLReport.print(globalResult, reportPath);
                 } catch (IOException | URISyntaxException e) {
                     System.err.println("Error creating the report: ");
                     e.printStackTrace();
@@ -183,6 +173,27 @@ public final class Main {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("ProofManagement interrupted due to critical error.");
         }
+    }
+
+    // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
+    private static void check(CommandLine commandLine) {
+
+        List<String> arguments = commandLine.getArguments();
+        if (arguments.size() != 1) {
+            commandLine.printUsage(System.out);
+        }
+
+        Path reportPath = null;
+        if (commandLine.isSet("--report")) {
+            String outFileName = commandLine.getString("--report", "");
+            reportPath = Paths.get(outFileName).toAbsolutePath();
+        }
+
+        String pathStr = arguments.get(0);
+        Path bundlePath = Paths.get(pathStr);
+        check(commandLine.isSet("--missing"), commandLine.isSet("--settings"),
+            commandLine.isSet("--replay"), commandLine.isSet("--dependency"),
+            bundlePath, reportPath);
     }
 
     // merge [-f|--force] [-n|--no-check] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
@@ -206,7 +217,7 @@ public final class Main {
             // TODO:
         }
 
-        // TODO: use result, print message, clean up particularly created zips
+        // TODO: use result, print message, clean up created zips
         ProofBundleMerger.merge(inputs, output);
 
         // perform a check with given commands
