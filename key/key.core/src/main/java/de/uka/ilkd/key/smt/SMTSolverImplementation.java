@@ -336,7 +336,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     @Override
     public void interrupt(ReasonOfInterruption reason) {
 
-        // order of assignments is important;
+        // order of assignments is important
         setReasonOfInterruption(reason);
         setSolverState(SolverState.Stopped);
         if (solverTimeout != null) {
