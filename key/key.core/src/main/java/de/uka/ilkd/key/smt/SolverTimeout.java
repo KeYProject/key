@@ -21,12 +21,9 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  * The class controls the timer that checks for a solver whether it exceeds a pre-defined timeout.
  */
 class SolverTimeout extends TimerTask {
-	// TODO caution this is not thread safe
-	static int counter = 0;
-	int id = ++counter;
-	final SMTSolver solver;
-	final Session session;
-	final long timeout;
+	private final SMTSolver solver;
+	private final Session session;
+	private final long timeout;
 
 	public SolverTimeout(SMTSolver solver, Session session, long timeout) {
 		this.solver = solver;
@@ -35,9 +32,7 @@ class SolverTimeout extends TimerTask {
 	}
 
 	public SolverTimeout(SMTSolver solver, long timeout) {
-		this.solver = solver;
-		this.session = null;
-		this.timeout = timeout;
+		this(solver, null, timeout);
 	}
 
 	@Override
