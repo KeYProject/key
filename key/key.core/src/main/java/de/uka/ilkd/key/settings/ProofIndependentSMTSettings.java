@@ -18,6 +18,7 @@ import de.uka.ilkd.key.smt.st.INVISMTSolverType;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -51,6 +52,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
     private static final String SOLVER_PARAMETERS = "[SMTSettings]solverParametersV1";
     private static final String SOLVER_COMMAND = "[SMTSettings]solverCommand";
+    private static final String PROP_TIMEOUT = "[SMTSettings]timeout";
     private static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
@@ -172,7 +174,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     }
 
 
-    private final HashMap<SolverType, SolverData> dataOfSolvers = new LinkedHashMap<>();
+    private final Map<SolverType, SolverData> dataOfSolvers = new LinkedHashMap<>();
     private boolean showResultsAfterExecution = false;
     private boolean storeSMTTranslationToFile = false;
     private boolean storeTacletTranslationToFile = false;
@@ -248,8 +250,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     }
 
 
-    private static final ProofIndependentSMTSettings DEFAULT_DATA =
-            new ProofIndependentSMTSettings();
+    private static final ProofIndependentSMTSettings DEFAULT_DATA = new ProofIndependentSMTSettings();
 
     public static ProofIndependentSMTSettings getDefaultSettingsData() {
         return DEFAULT_DATA.clone();
@@ -306,6 +307,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
     public Collection<SolverData> getDataOfSolvers() {
         return dataOfSolvers.values();
+    }
+    public @Nullable SolverData getSolverData(SolverType type) {
+        return dataOfSolvers.get(type);
     }
 
 
@@ -418,6 +422,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     public static class SolverData {
         private String solverParameters = "";
         private String solverCommand = "";
+        private long timeout = -1;
         private final SolverType type;
 
         public SolverData(SolverType type) {
@@ -433,6 +438,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private void readSettings(Properties props) {
             setSolverParameters(SettingsConverter.read(props,
                     SOLVER_PARAMETERS + getType().getName(), getSolverParameters()));
+            setTimeout(SettingsConverter.read(props, PROP_TIMEOUT + getType().getName(), getTimeout()));
             setSolverCommand(SettingsConverter.read(props,
                     SOLVER_COMMAND + getType().getName(), getSolverCommand()));
             getType().setSolverParameters(getSolverParameters());
@@ -443,6 +449,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private void writeSettings(Properties props) {
             SettingsConverter.store(props, SOLVER_PARAMETERS + getType().getName(), getSolverParameters());
             SettingsConverter.store(props, SOLVER_COMMAND + getType().getName(), getSolverCommand());
+            SettingsConverter.store(props, PROP_TIMEOUT + getType().getName(), getTimeout());
             getType().setSolverParameters(getSolverParameters());
             getType().setSolverCommand(getSolverCommand());
         }
@@ -474,6 +481,14 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
         public SolverType getType() {
             return type;
+        }
+
+        public long getTimeout() {
+            return timeout;
+        }
+
+        public void setTimeout(long timeout) {
+            this.timeout = timeout;
         }
     }
 }

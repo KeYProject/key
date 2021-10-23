@@ -24,6 +24,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             BUNDLE.getString("SOLVER_SUPPORTED"),
             BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
             BUNDLE.getString("SOLVER_UNSUPPORTED")};
+    private static final String INFO_SOLVER_TIMEOUT = "SOLVER_TIMEOUT";
 
     private static final int SOLVER_SUPPORTED = 0;
 
@@ -35,6 +36,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
+    private final JSpinner solverTimeout;
 
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
@@ -44,17 +46,18 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         solverName = createSolverName();
         solverInstalled = createSolverInstalled();
         solverCommand = createSolverCommand();
+        solverTimeout = createSolverTimeout();
         solverParameters = createSolverParameters();
         solverSupported = createSolverSupported();
         createDefaultButton();
         createCheckSupportButton();
     }
 
+
     protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
         toDefaultButton.addActionListener(arg0 -> {
             solverParameters.setText(solverType.getDefaultSolverParameters());
-            //settings.setParameters(solverType, solverParameters.getText());
         });
         addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
@@ -86,6 +89,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         txt.setEditable(false);
         return txt;
     }
+
+    private JSpinner createSolverTimeout() {
+        return addNumberField("Timeout", -1, Integer.MAX_VALUE, 1,
+                BUNDLE.getString(INFO_SOLVER_TIMEOUT), null);
+    }
+
 
     protected JButton createCheckSupportButton() {
         JButton checkForSupportButton = new JButton("Check for support");

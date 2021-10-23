@@ -116,6 +116,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
     /**
+     * The timeout in seconds for this SMT solver run.
+     */
+    private long timeout =-1;
+
+    /**
      * Creates a new instance an SMT solver.
      * @param problem the problem to send to the external solver process
      * @param listener the listener that has to be informed when the solver state changes
@@ -186,10 +191,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public long getTimeout() {
-        if (solverTimeout == null) {
-            return -1;
-        }
-        return solverTimeout.getTimeout();
+        return timeout;
+    }
+
+    @Override
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
     @Override

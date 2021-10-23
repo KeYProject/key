@@ -23,16 +23,14 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 class SolverTimeout extends TimerTask {
 	private final SMTSolver solver;
 	private final Session session;
-	private final long timeout;
 
-	public SolverTimeout(SMTSolver solver, Session session, long timeout) {
+	public SolverTimeout(SMTSolver solver, Session session) {
 		this.solver = solver;
 		this.session = session;
-		this.timeout = timeout;
 	}
 
-	public SolverTimeout(SMTSolver solver, long timeout) {
-		this(solver, null, timeout);
+	public SolverTimeout(SMTSolver solver) {
+		this(solver, null);
 	}
 
 	@Override
@@ -43,9 +41,4 @@ class SolverTimeout extends TimerTask {
 			solver.interrupt(ReasonOfInterruption.Timeout);
 		}
 	}
-
-	public long getTimeout() {
-		return timeout;
-	}
-
 }
