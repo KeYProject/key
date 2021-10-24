@@ -1,22 +1,16 @@
 package org.key_project.exploration.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Objects;
-
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.exploration.ExplorationModeModel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 /**
  * Common functionalities for proof exploration actions.
@@ -25,51 +19,46 @@ public abstract class ExplorationAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1662459714803539089L;
 
-    public ExplorationAction(MainWindow mw){
+    public ExplorationAction(MainWindow mw) {
         super(mw);
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+    }
 
     Term promptForTerm(MainWindow window, Term term) {
         final String initialValue = term == null
                 ? ""
                 : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
-        
+
         Term result = null;
-        
+
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
             if (input == null) return null;
 
-            DefaultTermParser dtp = new DefaultTermParser();
-
-            Reader reader = new StringReader(input);
-            Services services = window.getMediator().getServices();
-            NamespaceSet nss = window.getMediator().getServices().getNamespaces();
-            AbbrevMap scm = new AbbrevMap(); //TODO where to get abbrev map?
-            
+            KeyIO io = new KeyIO(window.getMediator().getServices());
             try {
-                result = dtp.parse(reader, null, services, nss, scm);
-                
+                result = io.parseExpression(input);
+
                 if (term != null && !result.sort().equals(term.sort())) {
                     JOptionPane.showMessageDialog(window,
-                            "" + result + " is of sort " + result.sort()
-                            + ", but we need a term of sort " + term.sort(), 
+                            String.format("%s is of sort %s, but we need a term of sort %s",
+                                    result, result.sort(), term.sort()),
                             "Sort mismatch", JOptionPane.ERROR_MESSAGE);
                     result = null;
                 }
-            } catch (ParserException e) {
-                JOptionPane.showMessageDialog(window, e.getMessage(), 
+            } catch (BuildingException e) {
+                JOptionPane.showMessageDialog(window, e.getMessage(),
                         "Malformed input", JOptionPane.ERROR_MESSAGE);
             }
         }
-        
+
         return result;
     }
 
-    public ExplorationModeModel getModel(){
+    public ExplorationModeModel getModel() {
         return Objects.requireNonNull(getMediator().lookup(ExplorationModeModel.class));
     }
 }

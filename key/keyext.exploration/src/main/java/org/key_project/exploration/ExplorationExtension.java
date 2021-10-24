@@ -45,7 +45,7 @@ public class ExplorationExtension implements KeYGuiExtension,
 
     private ExplorationStepsList leftPanel;
 
-    private ContextMenuAdapter adapter = new ContextMenuAdapter() {
+    private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
             if (model.isExplorationModeSelected()) {
@@ -59,6 +59,7 @@ public class ExplorationExtension implements KeYGuiExtension,
     };
 
 
+    @Nonnull
     @Override
     public List<Action> getContextActions(@Nonnull KeYMediator mediator,
                                           @Nonnull ContextMenuKind kind,
@@ -66,6 +67,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
+    @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
@@ -82,6 +84,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
+                // ignored
             }
 
             @Override
@@ -103,8 +106,9 @@ public class ExplorationExtension implements KeYGuiExtension,
 
     }
 
+    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
         return Collections.singleton(leftPanel);
     }
@@ -132,9 +136,9 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
             ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
 
     @Override
-    public void style(Style style, GUIAbstractTreeNode treeNode) {
+    public void style(@Nonnull Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
-        ExplorationNodeData data = null;
+        ExplorationNodeData data;
         try {
             data = node.lookup(ExplorationNodeData.class);
 

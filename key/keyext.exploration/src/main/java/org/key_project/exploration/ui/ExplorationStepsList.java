@@ -38,16 +38,16 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     private final JList<Node> listExplorations = new JList<>(listModelExploration);
     private final DefaultTreeModel treeModelExploration = new DefaultTreeModel(null);
     private final JTree treeExploration = new JTree(treeModelExploration);
-    private final KeYMediator mediator;
+    private final transient KeYMediator mediator;
 
-    private final RuleAppListener ruleAppListener = e1 -> {
+    private final transient RuleAppListener ruleAppListener = e1 -> {
         createModel(e1.getSource());
         TreePath selectionPath = treeExploration.getSelectionModel().getSelectionPath();
         setTreeExpandedState(treeExploration, true);
         treeExploration.setSelectionPath(selectionPath);
     };
 
-    private Proof currentProof;
+    private transient Proof currentProof;
 
 
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
@@ -98,7 +98,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     @Override
-    public @Nonnull Collection<CAction> getTitleCActions() {
+    public @Nonnull
+    Collection<CAction> getTitleCActions() {
         CButton helpButton = new CButton(null, IconFactory.HELP.get());
         helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
         return Collections.singleton(helpButton);
@@ -305,7 +306,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     private static class MyTreeNode extends DefaultMutableTreeNode {
-        private Node data;
+        private transient Node data;
 
         MyTreeNode(Node data) {
             super(data);
@@ -344,12 +345,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             }
             if (selectedValue != null) {
                 mediator.getUI().getProofControl().pruneTo(selectedValue);
-                if(explorationNode == null) {
+                if (explorationNode == null) {
                     explorationNode = selectedValue;
                 }
             }
 
-            if(explorationNode!=null) {
+            if (explorationNode != null) {
                 ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
                 explorationNode.deregister(lookup, ExplorationNodeData.class);
                 //update list and tree with current proof
@@ -370,8 +371,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public void actionPerformed(ActionEvent e) {
             Node selectedValue = listExplorations.getSelectedValue();
             if (selectedValue != null) {
-                Node selected = (Node) selectedValue;
-                mediator.getSelectionModel().setSelectedNode(selected);
+                mediator.getSelectionModel().setSelectedNode(selectedValue);
             }
         }
     }

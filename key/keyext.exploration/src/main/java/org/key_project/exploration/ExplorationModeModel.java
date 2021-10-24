@@ -1,8 +1,6 @@
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 
 import javax.annotation.Nonnull;
@@ -27,9 +25,9 @@ public class ExplorationModeModel {
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";
     public static final String PROP_EXPLORE_TACLET_APP_STATE = "exploreTacletAppState";
 
-    private Map<Proof, AtomicInteger> taintedProofs = new WeakHashMap<>();
+    private final Map<Proof, AtomicInteger> taintedProofs = new WeakHashMap<>();
 
-    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * Mode which rules to use in actions mode
@@ -66,8 +64,6 @@ public class ExplorationModeModel {
 
     /**
      * Check whether actions mode is selected
-     *
-     * @return
      */
     public boolean isExplorationModeSelected() {
         return explorationModeSelected;
@@ -94,8 +90,6 @@ public class ExplorationModeModel {
 
     /**
      * Return the number of tainted exploration nodes in a Proof
-     * @param p
-     * @return
      */
     public AtomicInteger get(Proof p) {
         return taintedProofs.computeIfAbsent(p, e -> new AtomicInteger(0));
@@ -134,6 +128,6 @@ public class ExplorationModeModel {
      * simplified with hidden branch app should be used
      */
     public enum ExplorationState {
-        WHOLE_APP, SIMPLIFIED_APP;
+        WHOLE_APP, SIMPLIFIED_APP
     }
 }

@@ -2,7 +2,6 @@ package org.key_project.exploration;
 
 import de.uka.ilkd.key.proof.Node;
 
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -14,11 +13,12 @@ import java.util.Objects;
  */
 public class ExplorationNodeData {
 
-    private  String explorationAction;
+    private String explorationAction;
 
-    public static @Nonnull ExplorationNodeData get(@Nonnull Node node) {
+    public static @Nonnull
+    ExplorationNodeData get(@Nonnull Node node) {
         @Nullable ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
-        if(data == null) {
+        if (data == null) {
             data = new ExplorationNodeData();
             node.register(data, ExplorationNodeData.class);
         }
@@ -43,7 +43,8 @@ public class ExplorationNodeData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ExplorationNodeData)) return false;
+        if (o == null) return false;
+        if (o.getClass() != getClass()) return false;
         ExplorationNodeData that = (ExplorationNodeData) o;
         return Objects.equals(getExplorationAction(), that.getExplorationAction());
     }

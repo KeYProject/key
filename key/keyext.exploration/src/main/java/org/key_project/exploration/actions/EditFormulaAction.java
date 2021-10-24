@@ -1,14 +1,14 @@
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
-import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.ProofExplorationService;
-import org.key_project.util.collection.ImmutableList;
 
 import java.awt.event.ActionEvent;
 
@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
  * @version 2 (25.05.18)
  */
 public class EditFormulaAction extends ExplorationAction {
-    private final PosInSequent posInSeq;
+    private final transient PosInSequent posInSeq;
 
     public EditFormulaAction(PosInSequent pis) {
         this(pis, MainWindow.getInstance());
@@ -34,9 +34,7 @@ public class EditFormulaAction extends ExplorationAction {
     }
 
     /**
-     *
      * If action is chosen in context menu
-     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -58,25 +56,4 @@ public class EditFormulaAction extends ExplorationAction {
                 tb.replace(sf.formula(), pio.posInTerm(), newTerm));
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
-
-    /*public TacletApp changeFormula(PosInOccurrence pos, Term replaceWith) {
-        RewriteTacletBuilder changeBuilder = new RewriteTacletBuilder();
-        changeBuilder.setName(new Name("change_formula"));
-        changeBuilder.setFind(pos.subTerm());
-
-        ImmutableList<RewriteTacletGoalTemplate> templates = ImmutableSLList.nil();
-        templates = templates.append(new RewriteTacletGoalTemplate(replaceWith));
-        changeBuilder.setTacletGoalTemplates(templates);
-
-        FindTaclet taclet = changeBuilder.getTaclet();
-        Set<SchemaVariable> svs = taclet.collectSchemaVars();
-        Iterator<SchemaVariable> it = svs.iterator();
-        TacletApp tacapp = PosTacletApp.createPosTacletApp(taclet,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS, pos, getMediator().getServices());
-        if (it.hasNext()) {
-            tacapp = tacapp.addCheckedInstantiation(it.next(),
-                    pos.sequentFormula().formula(), getMediator().getServices(), false);
-        }
-        return tacapp;
-    }*/
 }

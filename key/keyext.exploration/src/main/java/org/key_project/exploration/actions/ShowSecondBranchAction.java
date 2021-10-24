@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
  * @version 1 (22.07.19)
  */
 public class ShowSecondBranchAction extends KeyAction {
-    private final ExplorationModeModel model;
+    private final transient ExplorationModeModel model;
 
     public ShowSecondBranchAction(ExplorationModeModel model) {
         this.model = model;
@@ -33,7 +33,7 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         setName(isSelected() ? "Hide justification" : "Show justification");
 
-        Icon secondBranch = null;
+        Icon secondBranch;
         if(model.isShowSecondBranches()) {
             secondBranch = Icons.SECOND_BRANCH_HIDE.get(16);
         } else {

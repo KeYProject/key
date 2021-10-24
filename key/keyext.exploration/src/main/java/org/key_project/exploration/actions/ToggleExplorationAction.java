@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
  */
 public class ToggleExplorationAction extends KeyAction {
     public static final String MENU_PATH = "View.Exploration";
-    private final ExplorationModeModel model;
+    private final transient ExplorationModeModel model;
 
     public ToggleExplorationAction(ExplorationModeModel model) {
         this.model = model;
@@ -30,7 +30,6 @@ public class ToggleExplorationAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         boolean explorationModeSelected = model.isExplorationModeSelected();
         model.setExplorationModeSelected(!explorationModeSelected);
     }

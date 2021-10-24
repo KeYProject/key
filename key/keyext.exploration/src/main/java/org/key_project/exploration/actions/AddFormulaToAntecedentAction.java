@@ -3,7 +3,6 @@ package org.key_project.exploration.actions;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.ProofExplorationService;
 
 import javax.annotation.Nonnull;
