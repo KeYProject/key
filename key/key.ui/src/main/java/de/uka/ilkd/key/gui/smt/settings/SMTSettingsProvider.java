@@ -60,6 +60,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
         getChildren().add(new TranslationOptions());
         getChildren().add(new TacletTranslationOptions());
+        getChildren().add(new NewTranslationOptions());
 
         for (SolverType options : SolverType.ALL_SOLVERS) {
             getChildren().add(new SolverOptions(options));
@@ -134,7 +135,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JCheckBox createSolverSupportCheck() {
-        return addCheckBox("Check for support when a solver is started.",
+        return addCheckBox("Check for support when a solver is started",
                 BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
                 false,
                 e -> settings.checkForSupport = solverSupportCheck.isSelected());

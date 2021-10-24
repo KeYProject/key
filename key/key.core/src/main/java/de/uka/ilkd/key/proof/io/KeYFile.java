@@ -243,7 +243,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File  ctx = getParseContext();
-                includes = ctx.getIncludes(file.file().getParentFile().toURI().toURL());
+                includes = ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI().toURL());
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }

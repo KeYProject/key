@@ -436,7 +436,7 @@ public class ProofTreePopupFactory {
 
         public Notes(ProofTreeContext context) {
             super(context);
-            setName("Edit Notes");
+            setName("Edit Notes...");
             setIcon(IconFactory.editFile(ICON_SIZE));
         }
 

@@ -39,7 +39,7 @@ import java.awt.event.ActionEvent;
 public class CounterExampleAction extends MainWindowAction {
     private static final long serialVersionUID = -1931682474791981751L;
 
-    private static final String NAME = "Generate Counterexample";
+    private static final String NAME = "Search for Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 
     public CounterExampleAction(MainWindow mainWindow) {

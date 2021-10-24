@@ -89,8 +89,10 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
     private static final Position ZERO_POSITION = new Position(0, 0);
 
+    // attaches a single comment to a ProgramElement
     private static void attachComment(Comment c, ProgramElement pe) {
         ProgramElement dest = pe;
+        // never reached, proably buggy code...
         if (!c.isPrefixed()) {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
@@ -125,41 +127,155 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         cml.add(c);
     }
 
+    // appends all comments with pos < endPos to the end of the last a block
+    private static int appendComments(ProgramElement last,
+                                      List<Comment> comments,
+                                      int commentIndex,
+                                      Position endPos) {
+        int commentCount = comments.size();
+
+        while (commentIndex < commentCount) {
+            Comment current = comments.get(commentIndex);
+            Position cpos = current.getStartPosition();
+
+            if (endPos != null && cpos.compareTo(endPos) > 0) {
+                return commentIndex;
+            }
+
+            if ( ! current.getText().contains("@")) {
+                // "pure" comment without @ (we only need JML annotations)
+                // place it somewhere, doesn't matter
+                current.setPrefixed(true);
+                attachComment(current, last);
+                commentIndex +=1;
+                continue;
+            }
+
+            ProgramElement pe = last;
+            while (pe.getEndPosition().compareTo(cpos) < 0) {
+                if (pe.getASTParent() == null) {
+                    return commentIndex;
+                }
+                pe = pe.getASTParent();
+            }
+            if (!(pe instanceof StatementBlock)) {
+                // -- conservative with old behavior of postWork --
+                // Rest assured, KeY does probably some magic later
+                return commentIndex;
+            }
+            StatementBlock block = (StatementBlock) pe;
+            while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
+                if (current.getText().contains("@")) {
+                    // append new empty statement to statement block
+                    Statement newEmpty = pe.getFactory().createEmptyStatement();
+                    ASTList<Statement> body = block.getBody();
+                    body.add(newEmpty);
+                    block.setBody(body);
+
+                    // attach comment to empty statement
+                    ASTList<Comment> cml = new ASTArrayList<Comment>();
+                    newEmpty.setComments(cml);
+                    current.setPrefixed(true);
+                    cml.add(current);
+                } else {
+                    // again, skip "pure" comments
+                    current.setPrefixed(true);
+                    attachComment(current, last);
+                }
+                commentIndex += 1;
+                if (commentIndex < commentCount) {
+                    current = comments.get(commentIndex);
+                    cpos = current.getStartPosition();
+                }
+            }
+        }
+        return commentIndex;
+    }
+
+    private static Position getPrevBlockEnd(ProgramElement pePrev, ProgramElement peNext) {
+        Position startPos = peNext.getFirstElement().getStartPosition();
+        ProgramElement pe = pePrev;
+        Position endPos = ZERO_POSITION;
+        while (pe != null) {
+            if (pe.getEndPosition().compareTo(startPos) > 0) {
+                return endPos;
+            }
+            endPos = pe.getEndPosition();
+            pe = pe.getASTParent();
+        }
+        return endPos;
+    }
+
+    private static void makeParentRolesValid(ProgramElement programElem) {
+        TreeWalker tw = new TreeWalker(programElem);
+        while (tw.next()) {
+            ProgramElement pe = tw.getProgramElement();
+            if (pe instanceof NonTerminalProgramElement) {
+                ((NonTerminalProgramElement)pe).makeParentRoleValid();
+            }
+        }
+    }
+
     /**
        Perform post work on the created element. Creates parent links
        and assigns comments.
      */
-    private static void postWork(ProgramElement pe) {
+    private static void postWork(ProgramElement programElem) {
+        makeParentRolesValid(programElem);
+
         List<Comment> comments = ProofJavaParser.getComments();
         int commentIndex = 0;
         int commentCount = comments.size();
-        Position cpos = ZERO_POSITION;
-        Comment current = null;
-        if (commentIndex < commentCount) {
+        if (commentCount == 0) {
+            return;
+        }
+        Comment current = comments.get(commentIndex);
+        Position cpos = current.getFirstElement().getStartPosition();
+
+        ProgramElement pePrev = programElem;
+        ProgramElement peNext = programElem;
+        TreeWalker tw = new TreeWalker(programElem);
+        while (tw.next()) {
+            peNext = tw.getProgramElement();
+
+            if (peNext.getFirstElement() == null) {
+                // Apparently, these are nodes with no source and no position... skip them
+                continue;
+            }
+
+            Position startPos = peNext.getFirstElement().getStartPosition();
+            if (startPos.compareTo(cpos) < 0) {
+                pePrev = peNext;
+                continue;
+            }
+            Position endPos = getPrevBlockEnd(pePrev, peNext);
+
+            commentIndex = appendComments(pePrev, comments, commentIndex, endPos);
+            if (commentIndex == commentCount) {
+                return;
+            }
             current = comments.get(commentIndex);
             cpos = current.getFirstElement().getStartPosition();
-        }
-        TreeWalker tw = new TreeWalker(pe);
-        while (tw.next()) {
-            pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement)pe).makeParentRoleValid();
+            while ((commentIndex < commentCount) && startPos.compareTo(cpos) > 0) {
+                // Attach comments to the next node
+                current.setPrefixed(true);
+                attachComment(current, peNext);
+                commentIndex += 1;
+                if (commentIndex == commentCount) {
+                    return;
+                }
+                current = comments.get(commentIndex);
+                cpos = current.getFirstElement().getStartPosition();
             }
-	    if (pe.getFirstElement()!=null) {
-		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount)
-		       && pos.compareTo(cpos) > 0) {
-		    current.setPrefixed(true);
-		    attachComment(current, pe);
-		    commentIndex += 1;
-		    if (commentIndex < commentCount) {
-			current = comments.get(commentIndex);
-			cpos = current.getFirstElement().getStartPosition();
-		    }
-		}
-            }
+            pePrev = peNext;
         }
+        // Append remaining comments to the previous block
+        commentIndex = appendComments(pePrev, comments, commentIndex, null);
+
         if (commentIndex < commentCount) {
+            // -- conservative with old behovior of this method ---
+            // Attach all still remaining comments to the compilation unit
+            ProgramElement pe = peNext;
             while (pe.getASTParent() != null) {
                 pe = pe.getASTParent();
             }

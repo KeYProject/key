@@ -847,20 +847,20 @@ public final class IOUtil {
     /**
      * Tries to open a stream with the given file name.
      *
-     * @param fileName either an URL or a file name
+     * @param resourceLocation either an URL or a file name
      * @throws IOException if file could not be opened
      */
-    public static InputStream openStream(String fileName) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
+    public static InputStream openStream(String resourceLocation) throws IOException {
+        final Matcher matcher = URL_JAR_FILE.matcher(resourceLocation);
         if (matcher.matches()) {
             return openStreamFileInJar(matcher);
         }
 
         try {
-            URL url = new URL(fileName);
+            URL url = new URL(resourceLocation);
             return url.openStream();
         } catch (MalformedURLException e) {
-            return new FileInputStream(fileName);
+            return new FileInputStream(resourceLocation);
         }
     }
 
