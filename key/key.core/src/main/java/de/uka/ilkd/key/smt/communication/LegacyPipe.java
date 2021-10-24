@@ -60,7 +60,7 @@ class LegacyPipe implements Pipe {
      */
     private final SolverCommunication session;
     private OutputStreamWriter outputWriter;
-    private BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
     private Exception thrownException;
     private Process process;
 

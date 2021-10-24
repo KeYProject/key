@@ -15,15 +15,9 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import javax.annotation.Nonnull;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -89,7 +83,7 @@ public interface SolverType {
     SMTTranslator createTranslator(Services services);
 
     /**
-     * The delimiters of the messages that are sent from the solver to KeY. For example it could be "\n"
+     * The delimiters of the messages that are sent from the solver to KeY. For example, it could be "\n"
      */
     String[] getDelimiters();
 

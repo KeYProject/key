@@ -45,8 +45,8 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner locsetBoundField;
     private final JCheckBox solverSupportCheck;
 
-    private ProofIndependentSMTSettings settings;
-    private List<SettingsProvider> children = new ArrayList<>();
+    private transient ProofIndependentSMTSettings settings;
+    private transient List<SettingsProvider> children = new ArrayList<>();
 
 
     public SMTSettingsProvider() {
@@ -82,9 +82,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     @Override
     public JComponent getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
-        if (window.getMediator().getSelectedProof() == null) {
-            //TODO maybe special handling
-        }
         setSmtSettings(pi.clone());
         return this;
     }
@@ -111,7 +108,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e * 1000));
+                e -> settings.setTimeout(e * 1000L));
     }
 
     private JSpinner createIntBoundField() {
@@ -146,10 +143,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:",
                 "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
-                true, e -> {
-                    settings.setPathForSMTTranslation(saveToFilePanel.getText());
-                    //TODO settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
-                });
+                true, e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
     private String getProgressMode(ProgressMode index) {

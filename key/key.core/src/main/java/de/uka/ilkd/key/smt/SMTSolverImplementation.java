@@ -47,26 +47,41 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
-    /** used to generate unique ids for each running solver instance */
+    /**
+     * used to generate unique ids for each running solver instance
+     */
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
 
-    /** the unique id of this solver */
+    /**
+     * the unique id of this solver
+     */
     private final int id = ID_COUNTER.incrementAndGet();
 
-    /** the socket that handles solver results and interactively communicates with the running
-     * external solver process*/
-    private final @Nonnull AbstractSolverSocket socket;
+    /**
+     * the socket that handles solver results and interactively communicates with the running
+     * external solver process
+     */
+    private final @Nonnull
+    AbstractSolverSocket socket;
 
-    /** the ModelExtractor used to generate counterexamples (only used for CE solver type) */
+    /**
+     * the ModelExtractor used to generate counterexamples (only used for CE solver type)
+     */
     private ModelExtractor query;
 
-    /** The SMT problem that is related to this solver */
+    /**
+     * The SMT problem that is related to this solver
+     */
     private final SMTProblem problem;
 
-    /** It is possible that a solver has a listener. */
+    /**
+     * It is possible that a solver has a listener.
+     */
     private final SolverListener listener;
 
-    /** starts a external process and returns the result */
+    /**
+     * starts a external process and returns the result
+     */
     private final ExternalProcessLauncher processLauncher;
 
     /**
@@ -81,23 +96,35 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      */
     private final SolverCommunication solverCommunication = new SolverCommunication();
 
-    /** The thread that is associated with this solver. */
+    /**
+     * The thread that is associated with this solver.
+     */
     private Thread thread;
 
-    /** The timeout that is associated with this solver. Represents the
-     *  timertask that is started when the solver is started. */
+    /**
+     * The timeout that is associated with this solver. Represents the
+     * timertask that is started when the solver is started.
+     */
     private SolverTimeout solverTimeout;
 
-    /** stores the reason for interruption if present (e.g. User, Timeout, Exception) */
+    /**
+     * stores the reason for interruption if present (e.g. User, Timeout, Exception)
+     */
     private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
 
-    /** the state the solver is currently in */
+    /**
+     * the state the solver is currently in
+     */
     private SolverState solverState = SolverState.Waiting;
 
-    /** the type of this solver (Z3, CVC4, Z3_CE, ...) */
+    /**
+     * the type of this solver (Z3, CVC4, Z3_CE, ...)
+     */
     private final SolverType type;
 
-    /** Stores the settings that are used for the execution. */
+    /**
+     * Stores the settings that are used for the execution.
+     */
     private SMTSettings smtSettings;
 
     /**
@@ -106,26 +133,33 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      */
     private String problemString = "NOT YET COMPUTED";
 
-    /** Stores the taclet translation that is associated with this solver. */
+    /**
+     * Stores the taclet translation that is associated with this solver.
+     */
     private TacletSetTranslation tacletTranslation;
 
-    /** If there was an exception while executing the solver it is stored in this attribute. */
+    /**
+     * If there was an exception while executing the solver it is stored in this attribute.
+     */
     private Throwable exception;
 
-    /** the exceptions that may occur during taclet translation */
+    /**
+     * the exceptions that may occur during taclet translation
+     */
     private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
     /**
      * The timeout in seconds for this SMT solver run.
      */
-    private long timeout =-1;
+    private long timeout = -1;
 
     /**
      * Creates a new instance an SMT solver.
-     * @param problem the problem to send to the external solver process
+     *
+     * @param problem  the problem to send to the external solver process
      * @param listener the listener that has to be informed when the solver state changes
      * @param services the services needed to translate the problem to SMT format
-     * @param myType the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
+     * @param myType   the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
      */
     public SMTSolverImplementation(SMTProblem problem, SolverListener listener,
                                    Services services, SolverType myType) {
@@ -142,7 +176,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * instance of <code>SolverLauncher</code>. If you want to start a
      * solver please have a look at <code>SolverLauncher</code>.
      *
-     * @param timeout the timeout to use for the solver
+     * @param timeout  the timeout to use for the solver
      * @param settings the SMTSettings to use for this solver
      */
     @Override
@@ -156,7 +190,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     @Override
     public ReasonOfInterruption getReasonOfInterruption() {
         return isRunning() ? ReasonOfInterruption.NoInterruption
-            : reasonOfInterruption;
+                : reasonOfInterruption;
     }
 
     public Throwable getException() {
@@ -230,7 +264,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         String[] commands;
         try {
             commands = translateToCommand(problem.getSequent());
-        } catch (Throwable e) {
+        } catch (IllegalFormulaException e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
             setSolverState(SolverState.Stopped);
@@ -251,6 +285,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
+            Thread.currentThread().interrupt();
         } finally {
             // Close everything.
             solverTimeout.cancel();
@@ -294,7 +329,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     private String[] translateToCommand(Sequent sequent)
-        throws IllegalFormulaException {
+            throws IllegalFormulaException {
         if (getType() == SolverTypes.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
@@ -308,27 +343,24 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             }
 
             KeYJavaType typeOfClassUnderTest =
-                specrep.getProofOblInput(originalProof).getContainerType();
+                    specrep.getProofOblInput(originalProof).getContainerType();
 
             SMTObjTranslator objTrans =
-                new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
+                    new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
             problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
-            // problemTypeInformation = objTrans.getTypes();
-            ModelExtractor query = objTrans.getQuery();
-            getSocket().setQuery(query);
+            ModelExtractor transQuery = objTrans.getQuery();
+            getSocket().setQuery(transQuery);
             tacletTranslation = null;
 
         } else {
             SMTTranslator trans = getType().createTranslator(services);
-            //instantiateTaclets(trans);
             problemString = indent(trans.translateProblem(sequent, services, smtSettings)
-                .toString());
-//            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
-            if(trans instanceof AbstractSMTTranslator) {
+                    .toString());
+            if (trans instanceof AbstractSMTTranslator) {
                 // Since taclet translation in the old form is no longer used,
                 // this will likely disappear.
                 exceptionsForTacletTranslation.addAll(
-                    ((AbstractSMTTranslator) trans).getExceptionsOfTacletTranslation());
+                        ((AbstractSMTTranslator) trans).getExceptionsOfTacletTranslation());
             }
         }
 
@@ -342,7 +374,6 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public void interrupt(ReasonOfInterruption reason) {
-
         // order of assignments is important
         setReasonOfInterruption(reason);
         setSolverState(SolverState.Stopped);
@@ -351,7 +382,6 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         }
         if (thread != null) {
             processLauncher.stop();
-            //processLauncher.getPipe().close();
             thread.interrupt();
         }
     }
@@ -378,24 +408,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public String getRawSolverOutput() {
-
         StringBuilder output = new StringBuilder();
-
         for (Message m : solverCommunication.getOutMessages()) {
             String s = m.getContent();
             output.append(s).append("\n");
         }
-
-        // queries are now included in message list of SolverCommunication
-        /*
-        if(getSocket().getQuery()!=null){
-            ModelExtractor mq = getSocket().getQuery();
-            Model m = mq.getModel();
-            if(m!=null){
-                output.append("\n\n");
-                output.append(m);
-            }
-        }*/
         return output.toString();
     }
 

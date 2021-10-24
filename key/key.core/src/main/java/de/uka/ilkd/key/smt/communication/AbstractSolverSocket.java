@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
-import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
-import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

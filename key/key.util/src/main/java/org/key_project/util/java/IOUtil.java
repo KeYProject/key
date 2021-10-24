@@ -907,8 +907,9 @@ public final class IOUtil {
     private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
         String jarFile = matcher.group(1);
         String file = matcher.group(2);
-        ZipFile zipFile = new ZipFile(jarFile);
-        ZipEntry entry = zipFile.getEntry(file);
-        return zipFile.getInputStream(entry);
+        try (ZipFile zipFile = new ZipFile(jarFile)) {
+            ZipEntry entry = zipFile.getEntry(file);
+            return zipFile.getInputStream(entry);
+        }
     }
 }

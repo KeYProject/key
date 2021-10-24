@@ -45,7 +45,6 @@ public class Z3CESocket extends AbstractSolverSocket {
             case WAIT_FOR_RESULT:
                 if (msg.equals("unsat")) {
                     sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                    //pipe.sendMessage("(get-proof)\n");
                     pipe.sendMessage("(exit)");
                     sc.setState(WAIT_FOR_DETAILS);
                 }
@@ -66,18 +65,12 @@ public class Z3CESocket extends AbstractSolverSocket {
             case WAIT_FOR_DETAILS:
                 // Currently we rely on the solver to terminate after receiving "(exit)". If this does
                 // not work in future, it may be that we have to forcibly close the pipe.
-//            if (msg.equals("success")) {
-//                pipe.close();
-//            }
                 break;
 
             case WAIT_FOR_QUERY:
                 if (!msg.equals("success")) {
                     getQuery().messageIncoming(pipe, msg);
                 }
-//            else {
-//                pipe.close();
-//            }
                 break;
 
             case WAIT_FOR_MODEL:
@@ -92,6 +85,8 @@ public class Z3CESocket extends AbstractSolverSocket {
                     }
                 }
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + sc.getState());
         }
     }
 }

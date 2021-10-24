@@ -136,15 +136,6 @@ class BufferedMessageReader {
         StringWriter sw = new StringWriter();
         IOUtil.copy(reader, sw);
         return sw.toString();
-
-        /*char[] buf = new char[1024];
-        StringBuilder result = new StringBuilder();
-        int len = reader.read(buf);
-        while (len >= 0) {
-            result.append(buf, 0, len);
-            len = reader.read(buf);
-        }
-        return result.toString();*/
     }
 
     public Reader getReader() {
