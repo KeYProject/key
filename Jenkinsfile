@@ -1,53 +1,51 @@
 pipeline {
-  agent {
-    docker {
-      image 'wadoon/key-test-docker:jdk11'
-    }
-  }
-
-  environment {
-      GRADLE_OPTS = '-Dorg.gradle.daemon=false'
-  }
-
-  stages {
-    stage('Clean') {
-        steps{
-            sh 'javac -version'
-            sh 'key/scripts/jenkins/startupClean.sh'
+    agent {
+        docker {
+            image 'wadoon/key-test-docker:jdk11'
         }
     }
 
-    stage('Compile') {
-        steps { 
-          dir 'key'
-          sh './gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
-          }
+    environment {
+        GRADLE_OPTS = '-Dorg.gradle.daemon=false'
     }
 
-    stage('Tests: JUnit') {
-      steps {
-        dir 'key'
-        sh './gradlew --continue test testProveRules testRunAllProofs' 
-        junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
-      }    
+    stages {
+        stage('Clean') {
+            steps{
+                sh 'javac -version'
+                sh 'key/scripts/jenkins/startupClean.sh'
+            }
+        }
+
+        stage('Compile') {
+            steps { 
+                sh 'cd key && ./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+            }
+        }
+
+        stage('Tests: JUnit') {
+            steps {
+                sh 'cd key && ./gradlew --continue test' 
+                junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+            }    
+        }
+
+        stage('Test: testProveRules') {
+            steps {
+                sh 'cd key && ./gradlew --continue testProveRules'
+                junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+            }    
+        }    
+
+        stage('Test: testRunAllProofs') {
+            steps {
+                sh 'cd key && ./gradlew --continue testRunAllProofs' 
+                junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+            }    
+        }    
+
+        stage('Docs') {
+            steps{ sh 'key/scripts/jenkins/generateDoc.sh'}
+        }
     }
-
-    stage('Test: testProveRules') {
-      steps {
-        dir 'key'
-        sh './gradlew --continue testProveRules' 
-      }    
-    }    
-
-    stage('Test: testRunAllProofs') {
-      steps {
-        dir 'key'
-        sh './gradlew --continue testRunAllProofs' 
-      }    
-    }    
-
-    stage('Docs') {
-        steps{sh 'key/scripts/jenkins/generateDoc.sh'}
-    }
-  }
 }
