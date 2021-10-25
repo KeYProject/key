@@ -1,123 +1,123 @@
 (1/58) -- recoder.java.declaration.InterfaceDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heap> fp();
-  * /*@ model_behavior       accessible<heap> fpLock()
-  * /*@ model_behavior       accessible<heap> \nothing
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       accessible<heapAtPre> \no
-  * /*@ model_behavior       requires \old(lockRef())
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heap> fp();
+  * /*@ model_behavior         accessible<heap> fpLock
+  * /*@ model_behavior         accessible<heap> \nothi
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         accessible<heapAtPre> \
+  * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
 (59/1) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
   * //@ public instance ghost LockSpec spec;
-  * /*@ normal_behavior       requires spec.lockStatus
+  * /*@ normal_behavior         requires spec.lockStat
   * /*@instance ghost @*/
 (69/69) -- recoder.java.declaration.MethodDeclaration
   * //@ public instance ghost LockSpec spec;
-  * /*@ normal_behavior       requires spec.lockStatus
+  * /*@ normal_behavior         requires spec.lockStat
 (69/69) -- recoder.java.declaration.modifier.Native
   * /*@ helper @*/
 (77/77) -- recoder.java.declaration.MethodDeclaration
-  * /*@ normal_behavior       requires spec.lockStatus
+  * /*@ normal_behavior         requires spec.lockStat
 (77/77) -- recoder.java.declaration.modifier.Native
   * /*@ helper @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
@@ -132,7 +132,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -146,7 +146,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -160,7 +160,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model two_state @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -174,7 +174,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model two_state @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -188,7 +188,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -202,7 +202,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -216,7 +216,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (0/1) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
@@ -230,7 +230,7 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
 (-1/82) -- recoder.java.reference.TypeReference
   * /*@ non_null @*/
@@ -246,4 +246,4 @@
   * /*@ model two_state boolean unlockTransfer() { ret
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
-  * /*@ normal_behavior         requires lockStatus(\d
+  * /*@ normal_behavior          requires lockStatus(\

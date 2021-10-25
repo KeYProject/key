@@ -2221,7 +2221,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     "We expected, that the first and last character to be curly braces.", ctx);
 
         bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
-        if (!bodyString.startsWith("return "))
+
+        // There could also be some other valid cases, e.g. "return(int)4;"
+        // For simplicity, I only added the linebreak to avoid unnecessary complexity.
+        if (!bodyString.startsWith("return ") && !bodyString.startsWith("return\n"))
             raiseError(ctx, "return expected, instead: " + bodyString);
         int beginIndex = bodyString.indexOf(" ") + 1;
         int endIndex = bodyString.lastIndexOf(";");
