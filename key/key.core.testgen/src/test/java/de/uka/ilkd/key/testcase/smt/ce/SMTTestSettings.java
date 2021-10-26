@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testcase.smt.ce;
 
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
@@ -122,5 +123,10 @@ public boolean invarianForall() {
 	return false;
 }
 
-    
+    @Override
+    public NewSMTTranslationSettings getNewSettings() {
+        return new NewSMTTranslationSettings();
+    }
+
+
 }

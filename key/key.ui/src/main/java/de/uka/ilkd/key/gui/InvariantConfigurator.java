@@ -208,6 +208,7 @@ public class InvariantConfigurator {
 
                 parse();
                 this.pack();
+                setLocationRelativeTo(getOwner());
                 this.setVisible(true);
             }
 

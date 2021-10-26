@@ -16,11 +16,11 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.proof.Proof;
@@ -50,13 +50,16 @@ public class ProofScriptFromFileAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        File dir;
+        File dir = null;
         if(lastDirectory != null) {
             dir = lastDirectory;
         } else {
             Proof currentProof = mediator.getSelectedProof();
             if(currentProof != null) {
-                dir = currentProof.getProofFile().getParentFile();
+                File currentFile = currentProof.getProofFile();
+                if (currentFile != null) {
+                    dir = currentFile.getParentFile();
+                }
             } else {
                 dir = new File(".");
             }
@@ -65,7 +68,9 @@ public class ProofScriptFromFileAction extends AbstractAction {
         try {
             MainWindow mainWindow = MainWindow.getInstance();
 
-            JFileChooser fc = new JFileChooser(dir);
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to load");
+            fc.setFileFilter(fc.getAcceptAllFileFilter());
+            fc.setCurrentDirectory(dir);
             int res = fc.showOpenDialog(mainWindow);
             if(res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();

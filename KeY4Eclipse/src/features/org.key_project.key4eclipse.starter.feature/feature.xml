@@ -131,8 +131,19 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          version="0.0.0"/>
 
    <requires>
-      <import feature="org.eclipse.platform" version="4.2.0"/>
-      <import feature="org.eclipse.jdt" version="3.7.2"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.key_project.util"/>
+      <import plugin="org.key_project.core"/>
+      <import plugin="org.key_project.ui"/>
+      <import plugin="org.key_project.key4eclipse.starter.core"/>
+      <import plugin="org.key_project.key4eclipse.common.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.expressions"/>
    </requires>
 
    <plugin

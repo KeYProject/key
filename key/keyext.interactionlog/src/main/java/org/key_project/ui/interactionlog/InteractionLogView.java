@@ -3,6 +3,7 @@ package org.key_project.ui.interactionlog;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
@@ -23,7 +24,6 @@ import org.key_project.ui.interactionlog.model.UserNoteInteraction;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.DropTarget;
@@ -86,7 +86,6 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setCurrentProof(e.getSource().getSelectedProof());
         }
     };
-    private JFileChooser fileChooser;
 
     public InteractionLogView(MainWindow window, KeYMediator mediator) {
         // register the recorder in the proof control
@@ -207,18 +206,6 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         interactionLog.getInteractions().forEach(interactionListModel::addElement);
     }
 
-    private JFileChooser getFileChooser() {
-        if (fileChooser == null) {
-            fileChooser = new JFileChooser();
-            if (currentProof != null) {
-                File file = currentProof.getProofFile();
-                if (file != null)
-                    fileChooser.setCurrentDirectory(file.getParentFile());
-            }
-        }
-        return fileChooser;
-    }
-
     @Override
     public void onInteraction(Interaction interaction) {
         rebuildList();
@@ -327,9 +314,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -1452819623911938236L;
 
         ExportMUScriptAction() {
-            setName("Export as Proof Script");
+            setName("Export as Proof Script...");
             setIcon(IconFactory.EXPORT_MU_SCRIPT.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(2);
             lookupAcceleratorKey();
         }
 
@@ -352,6 +340,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Copy MUScript");
             setSmallIcon(IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(5);
             lookupAcceleratorKey();
         }
 
@@ -371,7 +360,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = 7081382326391914209L;
 
         LoadAction() {
-            setName("Load");
+            setName("Load...");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
             setIcon(ICON_LOAD.get(SMALL_ICON_SIZE));
             setPriority(0);
@@ -381,13 +370,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter(
-                    "InteractionLog", "xml"));
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Load interaction log");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+
+            if (fc.showOpenDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 try {
-                    File file = fileChooser.getSelectedFile();
+                    File file = fc.getSelectedFile();
                     recorder.readInteractionLog(file);
                     //addInteractionLog(importedLog);
                 } catch (Exception exception) {
@@ -406,7 +394,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
 
         SaveAction() {
-            setName("Save");
+            setName("Save...");
             setIcon(IconFactory.INTERLOG_SAVE.get());
             setMenuPath(MENU_ILOG);
             setPriority(1);
@@ -417,13 +405,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = getFileChooser();
-            int returnValue = fileChooser.showSaveDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Save file");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+            if (fc.showSaveDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog,
-                            fileChooser.getSelectedFile());
+                            fc.getSelectedFile());
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
@@ -439,10 +427,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -4194158336899285273L;
 
         AddUserNoteAction() {
-            setName("Add Note");
+            setName("Add Note...");
             setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
+            setPriority(9);
             lookupAcceleratorKey();
         }
 
@@ -473,6 +462,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             setIcon(ICON_TOGGLE_FAVOURITE.get(SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG);
+            setPriority(8);
             lookupAcceleratorKey();
         }
 
@@ -491,6 +481,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Jump into Tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
             setMenuPath(MENU_ILOG);
+            setPriority(6);
             lookupAcceleratorKey();
         }
 
@@ -515,6 +506,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(NAME, "Reapply Action");
             putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_ILOG);
+            setPriority(7);
             lookupAcceleratorKey();
         }
 
@@ -546,9 +538,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fc = getFileChooser();
-            int choice = fc.showSaveDialog((Component) e.getSource());
-            if (choice == JFileChooser.APPROVE_OPTION) {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Save File");
+            fc.setFileFilter(KeYFileChooser.INTERACTION_LOG_FILTER);
+            if (fc.showSaveDialog(InteractionLogView.this) == JFileChooser.APPROVE_OPTION) {
                 save(fc.getSelectedFile());
             }
         }
@@ -560,10 +552,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -5601133423736836904L;
 
         public ExportKPSAction() {
-            setName("Export as KPS …");
+            setName("Export as KPS...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             setIcon(IconFactory.INTERLOG_EXPORT_KPS.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(3);
             lookupAcceleratorKey();
         }
 
@@ -580,10 +573,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = 1108419704071886953L;
 
         public ExportMarkdownAction() {
-            setName("Export as Markdown …");
+            setName("Export as Markdown...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             setIcon(IconFactory.INTERLOG_EXPORT_MARKDOWN.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            setPriority(4);
             lookupAcceleratorKey();
         }
 
@@ -600,7 +594,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -2526178400655285314L;
 
         public ShowExtendedActionsAction() {
-            setName("More …");
+            setName("More...");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
             setIcon(IconFactory.INTERLOW_EXTENDED_ACTIONS.get());
             lookupAcceleratorKey();
@@ -674,20 +668,20 @@ class MultiLineInputPrompt {
         if (dialog == null) {
             dialog = new JDialog(JOptionPane.getFrameForComponent(parent));
             dialog.setModal(true);
-            dialog.setTitle("Enter note...");
+            dialog.setTitle("Enter note");
 
             JPanel root = new JPanel(new BorderLayout(10, 10));
             JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
             root.add(box, BorderLayout.SOUTH);
             JTextArea area = new JTextArea(text);
-            JButton btnOk = new JButton("OK");
-            JButton btnCancel = new JButton("Cancel");
-            box.add(btnOk);
-            box.add(btnCancel);
+            JButton okButton = new JButton("OK");
+            JButton cancelButton = new JButton("Cancel");
+            box.add(okButton);
+            box.add(cancelButton);
 
-            btnOk.addActionListener((evt) -> accept(area.getText()));
-            btnCancel.addActionListener((evt) -> cancel());
-            dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            okButton.addActionListener(evt -> accept(area.getText()));
+            cancelButton.addActionListener(evt -> cancel());
+            dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
@@ -699,7 +693,12 @@ class MultiLineInputPrompt {
             root.add(new JScrollPane(area), BorderLayout.CENTER);
 
             dialog.setSize(300, 200);
-            dialog.setLocationRelativeTo(parent);
+            // center over main window if the parent is currently hidden (e.g., inside a tabbedPane)
+            if (parent == null || !parent.isShowing()) {
+                dialog.setLocationRelativeTo(MainWindow.getInstance());
+            } else {
+                dialog.setLocationRelativeTo(parent);
+            }
 
         }
         return dialog;

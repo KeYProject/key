@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -87,6 +86,10 @@ public class SolverListener implements SolverLauncherListener {
                 final SMTSolver solver;
                 final SMTProblem problem;
                 final LinkedList<Information> information = new LinkedList<Information>();
+            private boolean stopped = false;
+            private boolean running = false;
+
+            private long timeToSolve;
 
                 public InternSMTProblem(int problemIndex, int solverIndex,
                                 SMTProblem problem, SMTSolver solver) {
@@ -108,12 +111,12 @@ public class SolverListener implements SolverLauncherListener {
                 public SMTProblem getProblem() {
                         return problem;
                 }
-                
+
                 private void addInformation(String title, String content){
                         information.add(new Information(title, content, solver.name()));
                 }
-                
-                public boolean createInformation(){
+
+                public void createInformation(){
                         if (solver.getException() != null) {
 
                                 StringWriter writer = new StringWriter();
@@ -124,18 +127,17 @@ public class SolverListener implements SolverLauncherListener {
                                                 .toString()
                                                 + "\n\n"
                                                 + writer
-                                                                .toString());     
-                                
+                                                                .toString());
+
 
                         }
-                        addInformation("Translation", solver.getTranslation());
+                        addInformation("Solver Input", solver.getRawSolverInput());
                         if (solver.getTacletTranslation() != null) {
                                 addInformation("Taclets", solver
                                                 .getTacletTranslation()
                                                 .toString());
                         }
-                        addInformation("Solver Output",
-                                        solver.getSolverOutput());
+                        addInformation("Solver Output", solver.getRawSolverOutput());
 
                         Collection<Throwable> exceptionsOfTacletTranslation = solver
                                         .getExceptionsOfTacletTranslation();
@@ -154,14 +156,15 @@ public class SolverListener implements SolverLauncherListener {
                                 }
                                 addInformation("Warning", exceptionText);
                         }
-                        return solver.getException() != null;
-                }
-                
-                public SMTSolver getSolver() {
-                        return solver;
+
+                    if (solver.getType().supportHasBeenChecked() && !solver.getType().isSupportedVersion()) {
+                        addInformation("Solver Support", computeSolverTypeWarningMessage(solver.getType()));
+                    }
+
+                    solver.getException();
                 }
 
-                public LinkedList<Information> getInformation() {
+            public LinkedList<Information> getInformation() {
                         return information;
                 }
 
@@ -170,6 +173,27 @@ public class SolverListener implements SolverLauncherListener {
                         return solver.name() +" applied on "+problem.getName();
                 }
 
+            String getTimeInSecAsString() {
+                long intPart = timeToSolve / 1000;
+                long decPart = timeToSolve % 1000;
+                String decString = decPart >= 100 ? Long.toString(decPart) :
+                        decPart >= 10 ? "0" + decPart : "00" + decPart;
+                return intPart + "." + decString + "s";
+            }
+
+            void startTime() {
+                if (!running) {
+                    timeToSolve = System.currentTimeMillis();
+                    running = true;
+                }
+            }
+
+            void stopTime() {
+                if (!stopped) {
+                    timeToSolve = System.currentTimeMillis() - timeToSolve;
+                    stopped = true;
+                }
+            }
         }
         
 
@@ -180,37 +204,23 @@ public class SolverListener implements SolverLauncherListener {
 
         @Override
         public void launcherStopped(SolverLauncher launcher,
-                        Collection<SMTSolver> problemSolvers) {
-                timer.cancel();
-                
-  
-                storeInformation();
-                List<InternSMTProblem> problemsWithException = new LinkedList<InternSMTProblem>();
-                progressModel.setEditable(true);
-                refreshDialog();
-                progressDialog.setModus(Modus.discardModus);
-                for (InternSMTProblem problem : problems) {
-                        if(problem.createInformation()){
-                                problemsWithException.add(problem);
-                        }
+                                    Collection<SMTSolver> problemSolvers) {
+            timer.cancel();
 
-                }
-                if (!problemsWithException.isEmpty()) {
-                	 for(InternSMTProblem problem : problemsWithException){
-                		progressDialog.addInformation(createExceptionTitle(problem), Color.RED,problem);
-                	 }
-                } else {
-                        if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
-                                applyEvent(launcher);
-                        }
-                }
-        }
-        
-        public static String createExceptionTitle(InternSMTProblem problem) {
-           return "Exception for "+problem.toString()+".";
+
+            storeInformation();
+            progressModel.setEditable(true);
+            refreshDialog();
+            progressDialog.setModus(Modus.discardModus);
+            for (InternSMTProblem problem : problems) {
+               problem.createInformation();
+            }
+            if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
+                applyEvent(launcher);
+            }
         }
 
-        private String getTitle(SMTProblem p) {
+    private String getTitle(SMTProblem p) {
                 String title = "";
                 Iterator<SMTSolver> it = p.getSolvers().iterator();
                 while (it.hasNext()) {
@@ -270,44 +280,25 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                boolean problemContainsUpdOrDL = false;
-                String names[] = new String[smtproblems.size()]; //never read
-                int x = 0,y=0;
-                for (SMTProblem problem : smtproblems) {
-                        y = 0;
-                        for (SMTSolver solver : problem.getSolvers()) {
-                                this.problems.add(new InternSMTProblem(x, y,
-                                                problem, solver));
-                                y++;
-                        }
-                        names[x] = problem.getName();
-                        x++;
-                        if (containsModalityOrQueryOrUpdate(problem.getTerm())) {
-                            problemContainsUpdOrDL = true;
-                        }
+            int x = 0, y = 0;
+            for (SMTProblem problem : smtproblems) {
+                y = 0;
+                for (SMTSolver solver : problem.getSolvers()) {
+                    this.problems.add(new InternSMTProblem(x, y,
+                            problem, solver));
+                    y++;
                 }
+                x++;
+            }
 
-       
-                
+
+
                 boolean ce = solverTypes.contains(SolverType.Z3_CE_SOLVER);
-                
-                    
+
+
 
                 progressDialog = new ProgressDialog(
                                 progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
-
-                for(SolverType type : solverTypes){
-                	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
-                		addWarning(type);
-                	}
-                }
-
-                if (problemContainsUpdOrDL) {
-                    progressDialog.addInformation("One or more proof goals contain heap updates, method calls," +
-                            " and/or modalities. The SMT translation of these will be incomplete," +
-                                    " and the result will likely be unhelpful.",
-                            new Color(200,150,0), null);
-                }
          
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -407,6 +398,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void running(InternSMTProblem problem) {
+            problem.startTime();
                 long progress = calculateProgress(problem);
                 progressModel.setProgress((int)progress, problem.getSolverIndex(),problem.getProblemIndex());
                 float remainingTime = calculateRemainingTime(problem);
@@ -426,6 +418,8 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void stopped(InternSMTProblem problem) {
+            problem.stopTime();
+
                 int x = problem.getSolverIndex();
                 int y = problem.getProblemIndex();
                 
@@ -448,7 +442,7 @@ public class SolverListener implements SolverLauncherListener {
                         unsuccessfullyStopped(problem,x,y);
                 } else {
                  
-                        unknownStopped(problem,x,y);
+                        unknownStopped(x,y);
                 }
            
         }
@@ -483,35 +477,35 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void successfullyStopped(InternSMTProblem problem, int x, int y) {
-                
-        		
-        	
+                String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
+
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(GREEN.get(),x,y);
                 if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
-                	progressModel.setText("No Counterexample.",x,y);           
+                	progressModel.setText("No Counterexample.",x,y);
         		}
                 else{
-                	progressModel.setText("Valid.",x,y);
+                	progressModel.setText("Valid" + timeInfo ,x,y);
                 }
-                
-               
+
+
         }
 
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
+                String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
             if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(RED.get(),x,y);
-                progressModel.setText("Counter Example.",x,y);
+                progressModel.setText("Counter Example" + timeInfo,x,y);
             } else {
                 progressModel.setProgress(0, x, y);
                 Color c = new Color(200, 150, 0);
                 progressModel.setTextColor(c, x, y);
-                progressModel.setText("Possible Counter Example.", x, y);
+                progressModel.setText("Possible Counter Example" + timeInfo, x, y);
             }
         }
 
-        private void unknownStopped(InternSMTProblem problem, int x, int y) {
+        private void unknownStopped(int x, int y) {
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(Color.BLUE,x,y);
                 progressModel.setText("Unknown.",x,y);
@@ -596,14 +590,6 @@ public class SolverListener implements SolverLauncherListener {
         }
 
 		
-		public void addWarning(SolverType type) {
-			progressDialog.addInformation(computeSolverTypeWarningTitle(type), Color.ORANGE, computeSolverTypeWarningMessage(type));			
-		}
-		
-		public static String computeSolverTypeWarningTitle(SolverType type) {
-		   return "Warning: Your version of "+type.toString()+" may not be supported by KeY.";
-		}
-		
       public static String computeSolverTypeWarningMessage(SolverType type) {
          StringBuffer message = new StringBuffer();
          message.append("You are using a version of "+type.getName()+
@@ -686,10 +672,10 @@ public class SolverListener implements SolverLauncherListener {
      * @param term The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
      */
-    public static boolean containsModalityOrQueryOrUpdate(Term term) {
+    public static boolean containsModalityOrQuery(Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
-        return visitor.isContainsModQueryOrUpd();
+        return visitor.containsModOrQuery();
     }
 
     /**
@@ -701,7 +687,7 @@ public class SolverListener implements SolverLauncherListener {
         /**
          * The result.
          */
-        boolean containsModQueryOrUpd = false;
+        boolean containsModQuery = false;
 
         /**
          * {@inheritDoc}
@@ -709,12 +695,8 @@ public class SolverListener implements SolverLauncherListener {
         @Override
         public void visit(Term visited) {
             if (visited.op() instanceof Modality
-                || visited.op() instanceof IProgramMethod
-                || visited.op() instanceof ElementaryUpdate
-                || visited.op() instanceof UpdateJunctor
-                || visited.op() instanceof UpdateSV
-                || visited.op() instanceof UpdateApplication) {
-                containsModQueryOrUpd = true;
+                || visited.op() instanceof IProgramMethod) {
+                containsModQuery = true;
             }
         }
 
@@ -723,8 +705,8 @@ public class SolverListener implements SolverLauncherListener {
          * @return {@code true} contains at least one modality, query, or update; {@code false} contains no modalities,
          * no queries, and no updates.
          */
-        public boolean isContainsModQueryOrUpd() {
-            return containsModQueryOrUpd;
+        public boolean containsModOrQuery() {
+            return containsModQuery;
         }
     }
 

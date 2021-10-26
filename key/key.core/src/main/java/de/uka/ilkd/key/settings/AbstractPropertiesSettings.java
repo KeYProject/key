@@ -90,15 +90,18 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     @Override
     public void writeSettings(Properties props) {
-        propertyEntries.forEach(it -> {
-            it.update();
-        });
+        propertyEntries.forEach(PropertyEntry::update);
         props.putAll(properties);
     }
 
     @Override
     public void addSettingsListener(SettingsListener l) {
         listenerList.add(l);
+    }
+    
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
     }
 
     protected void fireSettingsChange() {

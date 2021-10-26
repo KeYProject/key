@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 public class TestGenerationAction extends MainWindowAction {
     private static final long serialVersionUID = -4911859008849602897L;
 
-    private static final String NAME = "Generate Testcases";
+    private static final String NAME = "Generate Testcases...";
     private static final String TOOLTIP = "Generate test cases for open goals";
 
     public TestGenerationAction(MainWindow mainWindow) {

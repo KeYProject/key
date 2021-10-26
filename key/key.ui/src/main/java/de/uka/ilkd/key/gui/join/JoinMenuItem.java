@@ -51,15 +51,15 @@ public class JoinMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                 mediator.stopInterface(true);
-                 JoinDialog dialog = new JoinDialog(partner,
-                		 		proof,PredicateEstimator.STD_ESTIMATOR,proof.getServices());
-                 dialog.setVisible(true);
-                 if(dialog.okayButtonHasBeenPressed()){
-                	 start(dialog.getSelectedPartner(),proof,mediator);
-                 }else{
-                	 mediator.startInterface(true);
-                 }
+                mediator.stopInterface(true);
+                JoinDialog dialog = new JoinDialog(partner, proof, PredicateEstimator.STD_ESTIMATOR,
+                    proof.getServices());
+                dialog.setVisible(true);
+                if (dialog.okButtonHasBeenPressed()) {
+                    start(dialog.getSelectedPartner(), proof, mediator);
+                } else {
+                    mediator.startInterface(true);
+                }
 
             }
         });

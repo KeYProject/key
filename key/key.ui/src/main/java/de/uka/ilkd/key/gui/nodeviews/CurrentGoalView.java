@@ -235,6 +235,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the text being printed
      */
     synchronized void printSequentImmediately() {
+        if (getMainWindow().getMediator().getSelectedNode() == null) {
+            // only print when a node is selected
+            // (avoids NPE when no proof is loaded and font size is changed)
+            return;
+        }
+
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());

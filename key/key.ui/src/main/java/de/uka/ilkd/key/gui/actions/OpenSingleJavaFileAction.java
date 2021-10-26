@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -45,27 +43,16 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        KeYFileChooser keYFileChooser = new KeYFileChooser(Main.getWorkingDir());
-        JFileChooser jfc = keYFileChooser.getFileChooser();
-        jfc.setDialogTitle("Select a Java file");
-        jfc.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.getName().endsWith(".java") || f.isDirectory();
-            }
+        KeYFileChooser fc = KeYFileChooser.getFileChooser("Select a Java file");
+        fc.setFileFilter(KeYFileChooser.JAVA_FILTER);
 
-            @Override
-            public String getDescription() {
-                return "Java Source Files";
-            }
-        });
-        jfc.setAcceptAllFileFilterUsed(false);
-        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        int result = jfc.showOpenDialog(mainWindow);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileSelectionMode(KeYFileChooser.FILES_ONLY);
+        int result = fc.showOpenDialog(mainWindow);
 
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = keYFileChooser.getSelectedFile();
+            File file = fc.getSelectedFile();
             mainWindow.addRecentFile(file.getAbsolutePath());
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();

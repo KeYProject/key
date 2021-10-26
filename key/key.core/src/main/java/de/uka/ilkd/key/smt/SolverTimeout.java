@@ -21,6 +21,7 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  * The class controls the timer that checks for a solver whether it exceeds a pre-defined timeout.
  */
 class SolverTimeout extends TimerTask {
+	// TODO caution this is not thread safe
 	static int counter = 0;
 	int id = ++counter;
 	final SMTSolver solver;

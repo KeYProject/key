@@ -126,8 +126,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private AbstractionPredicatesChoiceDialog() {
         super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, true);
-        setLocation(MAIN_WINDOW_INSTANCE.getLocation());
         setSize(INITIAL_SIZE);
+        setLocationRelativeTo(MAIN_WINDOW_INSTANCE);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         createDialog();
