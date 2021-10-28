@@ -14,7 +14,8 @@ import javax.swing.plaf.basic.*;
  *
  *  Class will only work for a JComboBox that uses a BasicComboPop.
  *
- * @see <https://tips4java.wordpress.com/2010/11/28/combo-box-popup/>
+ * @see <a href="https://tips4java.wordpress.com/2010/11/28/combo-box-popup">
+ *     https://tips4java.wordpress.com/2010/11/28/combo-box-popup</a>
  */
 public class BoundsPopupMenuListener implements PopupMenuListener {
     private boolean scrollBarRequired = true;
