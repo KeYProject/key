@@ -28,12 +28,12 @@ public class BlockContractExamplesWithoutPreconditions {
             if (from < 0) {
                 from = 0;
             }
-                
+
             if (from >= numbers.length) {
                 return 0;
             }
         }
-            
+
         int result = 0;
             
         /*@ maintaining from <= i && i <= numbers.length
