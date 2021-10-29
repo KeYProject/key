@@ -2216,16 +2216,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
         //remove multiline comments (this is only relevant for model methods with single comments.)
         bodyString = bodyString.replaceAll("/[*].*?[*]/", "");
 
-        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
+        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}') {
             raiseError("The body of the given model method is misformed. " +
-                    "We expected, that the first and last character to be curly braces.", ctx);
+                "We expected, that the first and last character to be curly braces.", ctx);
+        }
 
         bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
 
         // There could also be some other valid cases, e.g. "return(int)4;"
         // For simplicity, I only added the linebreak to avoid unnecessary complexity.
-        if (!bodyString.startsWith("return ") && !bodyString.startsWith("return\n"))
+        if (!bodyString.startsWith("return ") && !bodyString.startsWith("return\n")) {
             raiseError(ctx, "return expected, instead: " + bodyString);
+        }
         int beginIndex = bodyString.indexOf(" ") + 1;
         int endIndex = bodyString.lastIndexOf(";");
         bodyString = bodyString.substring(beginIndex, endIndex);
