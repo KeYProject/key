@@ -1,5 +1,5 @@
 public final class IntLinkedList implements IntList {
-        
+
     /*@nullable@*/ IntNode first;
     /*@nullable@*/ IntNode last;
     int size;

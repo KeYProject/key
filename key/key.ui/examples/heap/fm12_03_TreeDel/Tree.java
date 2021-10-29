@@ -1,6 +1,6 @@
 final class Tree {
 
-    /*@ nullable @*/ Tree left; 
+    /*@ nullable @*/ Tree left;
     /*@ nullable @*/ Tree right;
     int data;
 
@@ -148,8 +148,8 @@ final class Tree {
           }
       @*/
 
-     //@ invariant true;
-     //@ accessible \inv : \nothing;
+    //@ invariant true;
+    //@ accessible \inv : \nothing;
 
     /*@ normal_behavior
       @ requires t.treeInv();
@@ -161,38 +161,38 @@ final class Tree {
       @ assignable t.footprint();
       @*/
     static /*@ helper nullable @*/ Tree deleteMin (Tree t) {
-       Tree tt, p2, p;
+        Tree tt, p2, p;
 
-       p = t.left;
-       if (p == null) {
-           t = t.right;
-       } else {
-           p2 = t; tt = p.left;
+        p = t.left;
+        if (p == null) {
+            t = t.right;
+        } else {
+            p2 = t; tt = p.left;
 
-           /*@ loop_invariant t.treeInv();
-             @ loop_invariant t.treeInvUntilLeft(p2);
-             @ loop_invariant p != null;
-	     @ loop_invariant p.treeInv();
-             @ loop_invariant p2 != null;
-             @ loop_invariant p2.treeInv();
-             @ loop_invariant tt == null || tt.treeInv();
-             @ loop_invariant p.left == tt;
-             @ loop_invariant p2.left == p;
-             @ loop_invariant t.leftSubTree(p2);
-             @ loop_invariant \subset(\singleton(p2.left), t.footprint());
-             // These two are actually redundant (I am almost sure)
-             // @ loop_invariant t.treeRep() == \seq_concat(p2.treeRep(), t.treeRepUntilLeft(p2));
-             // @ loop_invariant t.footprint() == \set_union(t.footprintUntilLeft(p2), p2.footprint());
-             @ loop_invariant \disjoint(t.footprintUntilLeft(p2), p2.footprint());
-             @ decreasing tt == null ? 0 : (tt.height+1);
-             @ assignable \strictly_nothing;
-             @*/
-           while (tt != null) {
-               p2 = p; p = tt; tt = p.left;
-           }
-           p2.left = p.right;
-       }
-       return t;
+            /*@ loop_invariant t.treeInv();
+              @ loop_invariant t.treeInvUntilLeft(p2);
+              @ loop_invariant p != null;
+              @ loop_invariant p.treeInv();
+              @ loop_invariant p2 != null;
+              @ loop_invariant p2.treeInv();
+              @ loop_invariant tt == null || tt.treeInv();
+              @ loop_invariant p.left == tt;
+              @ loop_invariant p2.left == p;
+              @ loop_invariant t.leftSubTree(p2);
+              @ loop_invariant \subset(\singleton(p2.left), t.footprint());
+              // These two are actually redundant (I am almost sure)
+              // @ loop_invariant t.treeRep() == \seq_concat(p2.treeRep(), t.treeRepUntilLeft(p2));
+              // @ loop_invariant t.footprint() == \set_union(t.footprintUntilLeft(p2), p2.footprint());
+              @ loop_invariant \disjoint(t.footprintUntilLeft(p2), p2.footprint());
+              @ decreasing tt == null ? 0 : (tt.height+1);
+              @ assignable \strictly_nothing;
+              @*/
+            while (tt != null) {
+                p2 = p; p = tt; tt = p.left;
+            }
+            p2.left = p.right;
+        }
+        return t;
     }
 
 }
