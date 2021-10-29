@@ -193,6 +193,15 @@ public interface Term extends SVSubstitute, Sorted {
     boolean equalsModIrrelevantTermLabels(Object o);
 
     /**
+     * Checks if {@code o} is a term syntactically equal to this one, ignoring <b>all</b> term
+     * labels.
+     *
+     * @param o an object
+     * @return {@code true} iff {@code o} is a term syntactically equal to this ignoring term labels
+     */
+    boolean equalsModTermLabels(Object o);
+
+    /**
      * Returns an human-readable source of this term. For example the filename
      * with line and offset.
      */
