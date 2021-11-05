@@ -136,26 +136,21 @@ public class ProgressDialog extends JDialog{
                 return progressBar;
         }
 
-        private JButton getApplyButton() {
-                if(applyButton == null){
-                       applyButton = new JButton("Apply");
-                       applyButton.setEnabled(false);
-                       applyButton.addActionListener(new ActionListener() {
-                        
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            try {
-                                listener.applyButtonClicked();
-                            } catch(Exception exception) {
-                                // There may be exceptions during rule application that should not be lost.
-                                IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
-                            }
-                        }
-                });
-                       
+    private JButton getApplyButton() {
+        if(applyButton == null) {
+            applyButton = new JButton("Apply");
+            applyButton.setEnabled(false);
+            applyButton.addActionListener(e -> {
+                try {
+                    listener.applyButtonClicked();
+                } catch(Exception exception) {
+                    // There may be exceptions during rule application that should not be lost.
+                    IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
-                return applyButton;
+            });
         }
+        return applyButton;
+    }
         
         private JScrollPane getScrollPane() {
                 if(scrollPane == null){

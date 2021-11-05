@@ -13,9 +13,13 @@ import java.awt.*;
  * @author Wolfram Pfeifer
  */
 public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
-
+    /** the color of the highlights to paint */
     private final Color highlightColor;
+
+    /** the stroke of the highlights to paint (for the line width) */
     private final Stroke stroke;
+
+    /** the size, i.e., radius, of a single squiggle */
     private final int squiggleSize;
 
     /**
