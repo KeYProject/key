@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYDesktop;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -10,6 +9,7 @@ import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
@@ -22,19 +22,17 @@ import org.key_project.util.java.IOUtil;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.SimpleAttributeSet;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
@@ -66,11 +64,18 @@ import java.util.stream.Collectors;
  * @version 2 (10/20/21)
  */
 public final class IssueDialog extends JDialog {
+    /** regex to find web urls in string messages */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
+
+    /** warnings which have been marked to be ignored by the user (in this KeY run) */
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
-    private Throwable throwable;
+    /** the single critical issue that is shown in this dialog */
+    private final Throwable throwable;
+
+    /** the warnings that are shown in this dialog */
     private final List<PositionedIssueString> warnings;
+
     private final Map<String, String> fileContentsCache = new HashMap<>();
 
     private final JTextField fTextField = new JTextField();
@@ -80,11 +85,13 @@ public final class IssueDialog extends JDialog {
     private final JTextArea txtStacktrace = new JTextArea();
 
     private final JList<PositionedIssueString> listWarnings;
-    private final JButton btnFurtherInformation = new JButton("Further Information", IconFactory.help(16));
+
+    // replaced by the possibility to click links directly
+    //private final JButton btnFurtherInformation = new JButton("Further Information", IconFactory.help(16));
     private final JButton btnOpenFile = new JButton("Edit File", IconFactory.editFile(16));
     private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
-    private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true) ;
+    private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JSplitPane splitBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JPanel stacktracePanel = new JPanel(new BorderLayout());
 
@@ -136,7 +143,21 @@ public final class IssueDialog extends JDialog {
         this.critical = critical;
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.warnings = new ArrayList<>(warnings);
+        this.warnings = new ArrayList<>();
+        // TODO: I hope that this works with all error messages ...
+        // decorate weblinks with html ref tags, escape special symbols (e.g. line breaks)
+        warnings.forEach(pis -> {
+            String escaped = LogicPrinter.escapeHTML(pis.text, true);
+            Matcher m = HTTP_REGEX.matcher(escaped);
+            StringBuilder sb = new StringBuilder();
+            while (m.find()) {
+                String repl = "<a href=\"" + m.group() + "\">" + m.group() + "</a>";
+                m.appendReplacement(sb, repl);
+            }
+            m.appendTail(sb);
+            this.warnings.add(new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
+                pis.additionalInfo));
+        });
         this.warnings.sort(Comparator.comparing(o -> o.fileName));
 
         setLayout(new BorderLayout());
@@ -232,13 +253,21 @@ public final class IssueDialog extends JDialog {
         stacktracePanel.add(scrStacktrace);
     }
 
+    private static PositionedIssueString getSelectedValue(JList<PositionedIssueString> list) {
+        int row = list.getSelectedIndex();
+        if (row >= 0) {
+            return list.getSelectedValue();
+        }
+        return null;
+    }
+
     private JScrollPane createWarningsPane(Font font) {
         // trigger updates of preview and stacktrace
         listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
         listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "further information", "open file", and "show details"
-        listWarnings.addListSelectionListener(
-            e -> updateFurtherInformation(listWarnings.getSelectedValue().text));
+        /*listWarnings.addListSelectionListener(
+            e -> updateFurtherInformation(listWarnings.getSelectedValue().text));*/
         listWarnings.addListSelectionListener(e ->
             btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
@@ -257,26 +286,131 @@ public final class IssueDialog extends JDialog {
             }
             repaint();
         });
+
+        // react to mouse clicks on links by opening the url in the systems default browser
+        listWarnings.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = listWarnings.locationToIndex(e.getPoint());
+                ListCellRenderer<? super PositionedIssueString> renderer = listWarnings.getCellRenderer();
+                PositionedIssueString value = listWarnings.getModel().getElementAt(row);
+                JTextPane textPane =
+                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row, false, false);
+                // this line is very important, otherwise textPane would have a size of 0x0!!!
+                textPane.setBounds(listWarnings.getCellBounds(row, row));
+                Rectangle cellRect = listWarnings.getCellBounds(row, row);
+                int x = e.getX() - cellRect.x;
+                int y = e.getY() - cellRect.y;
+
+                MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(), e.getModifiersEx(), x, y, e.getClickCount(), false);
+
+                Element elem = getHyperlinkElement(translated);
+                if (e != null) {
+                    if (elem != null) {
+                        Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
+                        if (attribute instanceof AttributeSet) {
+                            AttributeSet set = (AttributeSet) attribute;
+                            String href = (String) set.getAttribute(HTML.Attribute.HREF);
+                            if (href != null) {
+                                try {
+                                    textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane, HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
+                                } catch (MalformedURLException exc) {
+                                    exc.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // react to hovering over links by changing the cursor to hand
+        listWarnings.addMouseMotionListener(new MouseMotionAdapter() {
+            boolean entered = false;
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int row = listWarnings.locationToIndex(e.getPoint());
+                ListCellRenderer<? super PositionedIssueString> renderer = listWarnings.getCellRenderer();
+                PositionedIssueString value = listWarnings.getModel().getElementAt(row);
+                JTextPane textPane =
+                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row, false, false);
+                // this line is very important, otherwise textPane would have a size of 0x0!!!
+                textPane.setBounds(listWarnings.getCellBounds(row, row));
+                Rectangle cellRect = listWarnings.getCellBounds(row, row);
+                int x = e.getX() - cellRect.x;
+                int y = e.getY() - cellRect.y;
+
+                MouseEvent translated =
+                    new MouseEvent(textPane, e.getID(), e.getWhen(), e.getModifiersEx(), x, y,
+                        e.getClickCount(), false);
+
+                Element elem = getHyperlinkElement(translated);
+                if (e != null) {
+                    if (elem != null) {
+                        Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
+                        if (attribute instanceof AttributeSet) {
+                            AttributeSet set = (AttributeSet) attribute;
+                            String href = (String) set.getAttribute(HTML.Attribute.HREF);
+                            if (href != null && !entered) {
+
+                                entered = true;
+                                listWarnings.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            }
+                        }
+                    } else if (entered) {
+                        entered = false;
+                        listWarnings.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
+            }
+        });
+
         listWarnings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listWarnings.setCellRenderer(new PositionedStringRenderer());
+        listWarnings.setCellRenderer(new PositionedStringListRenderer());
         listWarnings.setSelectedIndex(0);
+        listWarnings.setEnabled(true);
+        listWarnings.setFocusable(true);
 
         JScrollPane scrWarnings;
-        if (warnings.size() == 1) {
-            JTextArea issueTextArea = new JTextArea();
-            issueTextArea.setEditable(false);
-            issueTextArea.setTabSize(4);
-            issueTextArea.setLineWrap(false);
-            issueTextArea.setFont(font);
+        if (this.warnings.size() == 1) {
+            JTextPane issueTextPane = new JTextPane();
+            issueTextPane.setEditable(false);
+            issueTextPane.setFont(font);
+            issueTextPane.setContentType("text/html");
+            issueTextPane.addHyperlinkListener(hle -> {
+                if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(hle.getURL().toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
             PositionedString value = this.warnings.get(0);
-            issueTextArea.setText(value.text);
-            scrWarnings = new JScrollPane(issueTextArea);
+            issueTextPane.setText(value.text);
+            scrWarnings = new JScrollPane(issueTextPane);
             // ensure that the start of the error message is visible
-            issueTextArea.setCaretPosition(0);
+            issueTextPane.setCaretPosition(0);
         } else {
             scrWarnings = new JScrollPane(listWarnings);
+
         }
         return scrWarnings;
+    }
+
+    private static Element getHyperlinkElement(MouseEvent event) {
+        JEditorPane editor = (JEditorPane) event.getSource();
+        int pos = editor.getUI().viewToModel(editor, event.getPoint());
+        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument) {
+            HTMLDocument hdoc = (HTMLDocument) editor.getDocument();
+            Element elem = hdoc.getCharacterElement(pos);
+            if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
+                return elem;
+            }
+        }
+        return null;
     }
 
     private JPanel createSourcePanel(Font font) {
@@ -309,13 +443,14 @@ public final class IssueDialog extends JDialog {
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOK);
-        pButtons.add(btnFurtherInformation);
+        //pButtons.add(btnFurtherInformation);
         pButtons.add(btnOpenFile);
         pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
         chkDetails.addItemListener(detailsBoxListener);
 
+        /*
         btnFurtherInformation.addActionListener(e -> {
             if (urlFurtherInformation != null && !urlFurtherInformation.isEmpty()) {
                 try {
@@ -325,24 +460,10 @@ public final class IssueDialog extends JDialog {
                     JOptionPane.showMessageDialog(IssueDialog.this, ex.getMessage());
                 }
             }
-        });
+        });*/
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
         btnOpenFile.addActionListener(action);
-
-        /*
-        btnOpenFile.addActionListener(e -> {
-            final PositionedString selectedValue = listWarnings.getSelectedValue();
-            if (selectedValue.hasFilename()) {
-                try {
-                    Objects.requireNonNull(Desktop.getDesktop())
-                        .open(new File(selectedValue.fileName));
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(IssueDialog.this, ex.getMessage());
-                }
-            }
-        });
-         */
 
         btnOK.registerKeyboardAction(
             event -> {
@@ -556,7 +677,7 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-
+    /*
     private void updateFurtherInformation(String text) {
         Matcher m = HTTP_REGEX.matcher(text);
         if (m.find()) {
@@ -565,21 +686,24 @@ public final class IssueDialog extends JDialog {
         } else {
             btnFurtherInformation.setEnabled(false);
         }
-    }
+    }*/
 
     private boolean isJava(String fileName) {
         return fileName.endsWith(".java");
     }
 
-    // as far as I can tell, this method treats lines and columns as zero-based
     public static int getOffsetFromLineColumn(String source, Position pos) {
         // Position has 1-based line and column, we need them 0-based
         return getOffsetFromLineColumn(source, pos.getLine() - 1, pos.getColumn() - 1);
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {
-        if (line < 0) throw new IllegalArgumentException();
-        if (column < 0) throw new IllegalArgumentException();
+        if (line < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (column < 0) {
+            throw new IllegalArgumentException();
+        }
 
         int pos = 0;
         char[] c = source.toCharArray();
@@ -588,41 +712,50 @@ public final class IssueDialog extends JDialog {
                 --line;
             }
         }
-        if (line == 0) return pos + column;
+        if (line == 0) {
+            return pos + column;
+        }
 
         throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
     }
 
+    private class PositionedStringListRenderer implements ListCellRenderer<PositionedString> {
+        private final JTextPane textPane = new JTextPane();
 
-    private static class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
-        private final JTextArea area = new JTextArea(5, 69);
-        private final JPanel panel = new JPanel();
-
-        PositionedStringRenderer() {
-            area.setLineWrap(true);
-            area.setWrapStyleWord(true);
-            BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-            panel.setLayout(layout);
-            panel.add(area);
+        PositionedStringListRenderer() {
+            textPane.addHyperlinkListener(hle -> {
+                if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(hle.getURL().toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
         }
-
 
         @Override
         public Component getListCellRendererComponent(JList<? extends PositionedString> list, PositionedString value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
-            area.setText(value.text);
-            area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            textPane.setContentType("text/html");
+            textPane.setText(value.text);
+            textPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
-                area.setBackground(list.getSelectionBackground());
-                area.setForeground(list.getSelectionForeground());
+                textPane.setBackground(list.getSelectionBackground());
+                textPane.setForeground(list.getSelectionForeground());
             } else {
-                area.setBackground(list.getBackground());
-                area.setForeground(list.getForeground());
+                textPane.setBackground(list.getBackground());
+                textPane.setForeground(list.getForeground());
             }
 
-            area.setEnabled(list.isEnabled());
-            area.setFont(list.getFont());
+            textPane.setEnabled(true);
+            textPane.setEditable(false);
+            textPane.setFont(list.getFont());
 
+            /*
             Border border = null;
             if (cellHasFocus) {
                 if (isSelected) {
@@ -633,10 +766,8 @@ public final class IssueDialog extends JDialog {
                 }
             } else {
                 border = new EmptyBorder(1, 1, 1, 1);
-            }
-            panel.setBorder(border);
-
-            return panel;
+            }*/
+            return textPane;
         }
     }
 
@@ -645,7 +776,7 @@ public final class IssueDialog extends JDialog {
         PositionedIssueString a = new PositionedIssueString("Multiline text\nTest\n",
                     "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
                     new Position(20, 25), "");
-        PositionedIssueString b = new PositionedIssueString("Multiline text\nTest\n More information: https://google.de",
+        PositionedIssueString b = new PositionedIssueString("Multiline text\nTest\nMore information: https://google.de",
                     "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
                     new Position(35, 10), "");
         PositionedIssueString c = new PositionedIssueString("Blubb",
@@ -659,11 +790,11 @@ public final class IssueDialog extends JDialog {
         Exception npe = new NullPointerException("Fake Null Pointer exception");
         try {
             Location loc = new Location(Paths.get("/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java").toUri().toURL(), 35, 10);
-            Exception e = new LocatableException("Fake locatable Exception", npe, loc);
+            Exception e = new LocatableException("Fake locatable Exception\nTest\nMore information: https://google.de", npe, loc);
             PositionedIssueString pis = extractMessage(e);
             warnings = warnings.add(extractMessage(e));
-            IssueDialog.showWarningsIfNecessary(null, warnings);
-            //IssueDialog.showExceptionDialog(null, e);
+            //IssueDialog.showWarningsIfNecessary(null, warnings);
+            IssueDialog.showExceptionDialog(null, e);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
