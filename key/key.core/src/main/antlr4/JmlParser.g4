@@ -16,12 +16,12 @@ classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/ | method_specification
-  | method_declaration | field_declaration | represents_clause
-  | history_constraint | initially_clause | class_axiom
+  : class_invariant /*| depends_clause*/     | method_specification
+  | method_declaration  | field_declaration  | represents_clause
+  | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause  | set_statement | nowarn_pragma
-  | accessible_clause | assert_statement | assume_statement
+  | datagroup_clause    | set_statement      | nowarn_pragma
+  | accessible_clause   | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -64,7 +64,7 @@ clauseEOF: clause EOF;
 clause
   :
   ( ensures_clause   | requires_clause     | measured_by_clause
-  | captures_clause | diverges_clause     | working_space_clause
+  | captures_clause  | diverges_clause     | working_space_clause
   | duration_clause  | when_clause         | assignable_clause | accessible_clause
   | signals_clause   | signals_only_clause | variant_function  | name_clause
   | breaks_clause    | continues_clause    | returns_clause    | separates_clause
@@ -177,7 +177,7 @@ loop_specification
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
-variant_function: DECREASING expression SEMI_TOPLEVEL;
+variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
 assume_statement: ASSUME expression SEMI_TOPLEVEL;
