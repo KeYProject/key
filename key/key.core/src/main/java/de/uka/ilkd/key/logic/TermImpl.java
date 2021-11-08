@@ -553,21 +553,28 @@ public class TermImpl implements Term {
 
     @Override
     public boolean equalsModTermLabels(Object o) {
-       if(o == this) {
-          return true;
-       }
+        if (o == this) {
+            return true;
+        }
 
+        if (!(o instanceof TermImpl)) {
+            return false;
+        }
 
-       if(o == null || !(o instanceof TermImpl)) {
-          return false;
-       }
+        final TermImpl t = (TermImpl) o;
 
-       final TermImpl t = (TermImpl) o;
+        if (!(op.equals(t.op)
+            && boundVars.equals(t.boundVars)
+            && javaBlock.equals(t.javaBlock))) {
+            return false;
+        }
 
-       return op.equals(t.op)
-             && subs.equals(t.subs)
-             && boundVars.equals(t.boundVars)
-             && javaBlock.equals(t.javaBlock);
+        for (int i = 0; i < subs.size(); ++i) {
+            if (!subs.get(i).equalsModTermLabels(t.subs.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

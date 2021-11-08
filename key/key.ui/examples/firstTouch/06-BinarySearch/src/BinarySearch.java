@@ -20,11 +20,11 @@ class BinarySearch {
         while(r > l + 1) {
             int mid = l + (r - l) / 2;
             if(a[mid] == v) {
-               return mid;
+                return mid;
             } else if(a[mid] > v) {
-               r = mid;
+                r = mid;
             } else {
-               l = mid;
+                l = mid;
             }
         }
 

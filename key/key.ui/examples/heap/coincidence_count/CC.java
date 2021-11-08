@@ -18,7 +18,6 @@
  *
  * @author Mattias Ulbrich <ulbrich@kit.edu>
  */
-
 class CC {
 
     /*@ public normal_behaviour
@@ -55,7 +54,7 @@ class CC {
             } else if(b[j] < a[i]) {
                 j++;
             } else {
-                i++; 
+                i++;
                 j++;
                 result++;
             }

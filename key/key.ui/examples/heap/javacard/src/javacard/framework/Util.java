@@ -35,73 +35,73 @@ public class Util {
            assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
       @*/
     public static final short arrayCopyNonAtomic(/*@ nullable @*/ byte[] src, short srcOffset,
-            /*@ nullable @*/ byte[] dest, short destOffset, short length)
-            throws NullPointerException, ArrayIndexOutOfBoundsException {
+        /*@ nullable @*/ byte[] dest, short destOffset, short length)
+        throws NullPointerException, ArrayIndexOutOfBoundsException {
 
         if (src == null || dest == null)
             throw JCSystem.npe;
         if (length < 0 || srcOffset < 0 || destOffset < 0
-                || srcOffset  > (short)(src.length - length)
-                || destOffset > (short)(dest.length - length))
+            || srcOffset  > (short)(src.length - length)
+            || destOffset > (short)(dest.length - length))
             throw JCSystem.aioobe;
 
         if(src == dest && srcOffset == destOffset) {
-          return (short) (destOffset + length);
+            return (short) (destOffset + length);
         }
         final boolean changeTransient =
-          (JCSystem.nativeKeYGetTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT);
+            (JCSystem.nativeKeYGetTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT);
         if(changeTransient) {
-          JCSystem.nativeKeYSetTransient(dest, JCSystem.CLEAR_ON_RESET);
+            JCSystem.nativeKeYSetTransient(dest, JCSystem.CLEAR_ON_RESET);
         }
         if(src != dest || srcOffset > destOffset) {
-          /*@
-             loop_invariant i >= 0 && i <= length &&
-                srcOffset + i >= 0 && srcOffset + i <= src.length &&
-                destOffset + i >= 0 && destOffset + i <= dest.length &&
-               (\forall short j; j >= 0 && j< length;
-                   dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
-               )
-             ;
-             loop_invariant<savedHeap>
-               (\forall short j; j >= 0 && j < length; 
-                  \backup(dest[destOffset + j]) ==
-                    ((j >= i || \backup(\transactionUpdated(dest))) ?
-                        \old(\backup(dest[destOffset + j])) :
-                        \old(src[srcOffset + j]))
-               );
-             decreases length - i;
-             assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
-          @*/
-          for(short i=0;i<length;i++) {
-              dest[destOffset + i] = src[srcOffset + i];
-          }
+            /*@
+               loop_invariant i >= 0 && i <= length &&
+                  srcOffset + i >= 0 && srcOffset + i <= src.length &&
+                  destOffset + i >= 0 && destOffset + i <= dest.length &&
+                 (\forall short j; j >= 0 && j< length;
+                     dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+                 )
+               ;
+               loop_invariant<savedHeap>
+                 (\forall short j; j >= 0 && j < length;
+                    \backup(dest[destOffset + j]) ==
+                      ((j >= i || \backup(\transactionUpdated(dest))) ?
+                          \old(\backup(dest[destOffset + j])) :
+                          \old(src[srcOffset + j]))
+                 );
+               decreases length - i;
+               assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+            @*/
+            for(short i=0;i<length;i++) {
+                dest[destOffset + i] = src[srcOffset + i];
+            }
         }else{
-          /*@
-             loop_invariant i >= 0 && i <= length &&
-                srcOffset + length - i >= 0 && srcOffset + length - i  <= src.length &&
-                destOffset + length - i >= 0 && destOffset + length - i <= dest.length
-                &&
-                (\forall short j; j >= 0 && j < length; 
-                    dest[destOffset + j] == (j >= length - i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
-                )
-             ;
-             loop_invariant<savedHeap>
-               (\forall short j; j >= 0 && j < length; 
-                  \backup(dest[destOffset + j]) ==
-                    ((j < length - i || \backup(\transactionUpdated(dest))) ?
-                        \old(\backup(dest[destOffset + j])) :
-                        \old(src[srcOffset + j]))
-               );
-             decreases length - i;
-             assignable dest[destOffset..destOffset+length-1];
-             assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
-          @*/
-          for(short i=0; i<length; i++) {
-            dest[destOffset + (length - 1) - i] = src[srcOffset + (length - 1) - i];
-          }
+            /*@
+               loop_invariant i >= 0 && i <= length &&
+                  srcOffset + length - i >= 0 && srcOffset + length - i  <= src.length &&
+                  destOffset + length - i >= 0 && destOffset + length - i <= dest.length
+                  &&
+                  (\forall short j; j >= 0 && j < length;
+                      dest[destOffset + j] == (j >= length - i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+                  )
+               ;
+               loop_invariant<savedHeap>
+                 (\forall short j; j >= 0 && j < length;
+                    \backup(dest[destOffset + j]) ==
+                      ((j < length - i || \backup(\transactionUpdated(dest))) ?
+                          \old(\backup(dest[destOffset + j])) :
+                          \old(src[srcOffset + j]))
+                 );
+               decreases length - i;
+               assignable dest[destOffset..destOffset+length-1];
+               assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+            @*/
+            for(short i=0; i<length; i++) {
+                dest[destOffset + (length - 1) - i] = src[srcOffset + (length - 1) - i];
+            }
         }
-        if(changeTransient) {      
-          JCSystem.nativeKeYSetTransient(dest, JCSystem.NOT_A_TRANSIENT_OBJECT);
+        if(changeTransient) {
+            JCSystem.nativeKeYSetTransient(dest, JCSystem.NOT_A_TRANSIENT_OBJECT);
         }
         return (short) (destOffset + length);
     }
@@ -135,88 +135,88 @@ public class Util {
            assignable<savedHeap> \transactionUpdated(dest);
       @*/
     public static final short arrayCopy(/*@ nullable @*/ byte[] src, short srcOffset,
-            /*@ nullable @*/ byte[] dest, short destOffset, short length)
-            throws NullPointerException, ArrayIndexOutOfBoundsException {
+        /*@ nullable @*/ byte[] dest, short destOffset, short length)
+        throws NullPointerException, ArrayIndexOutOfBoundsException {
 
         if (src == null || dest == null)
             throw JCSystem.npe;
         if (length < 0 || srcOffset < 0 || destOffset < 0
-                || srcOffset  > (short)(src.length - length)
-                || destOffset > (short)(dest.length - length))
+            || srcOffset  > (short)(src.length - length)
+            || destOffset > (short)(dest.length - length))
             throw JCSystem.aioobe;
 
         if(src == dest && srcOffset == destOffset) {
-          return (short) (destOffset + length);
+            return (short) (destOffset + length);
         }
         final boolean startTransaction = (JCSystem.getTransactionDepth() == 0);
         if(startTransaction) {
-          JCSystem.beginTransaction();
+            JCSystem.beginTransaction();
         }
         if(src != dest || srcOffset > destOffset) {
-          /*@
-             loop_invariant i >= 0 && i <= length &&
-                srcOffset + i >= 0 && srcOffset + i <= src.length &&
-                destOffset + i >= 0 && destOffset + i <= dest.length 
-               &&
-               (\forall short j; j >= 0 && j< length;
-                   dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
-               )
-             ;
-             loop_invariant<savedHeap> true 
-                &&
-               ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0)  ==> \backup(\transactionUpdated(dest))) 
-                &&
-               (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest))) 
-                &&
-               (startTransaction ||
-                 (\forall short j; j >= 0 && j < length; 
-                  \backup(dest[destOffset + j]) ==
-                    ((j >= i || JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT) ?
-                        \old(\backup(dest[destOffset + j])) :
-                        \old(src[srcOffset + j]))
+            /*@
+               loop_invariant i >= 0 && i <= length &&
+                  srcOffset + i >= 0 && srcOffset + i <= src.length &&
+                  destOffset + i >= 0 && destOffset + i <= dest.length
+                 &&
+                 (\forall short j; j >= 0 && j< length;
+                     dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
                  )
-                )
-             ;
-             decreases length - i;
-             assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
-             assignable<savedHeap> \transactionUpdated(dest);
-          @*/
-          for(short i=0;i<length;i++) {
-              dest[destOffset + i] = src[srcOffset + i];
-          }
-        }else{
-          /*@
-             loop_invariant i >= 0 && i <= length &&
-                srcOffset + length - i >= 0 && srcOffset + length - i  <= src.length &&
-                destOffset + length - i >= 0 && destOffset + length - i <= dest.length
-                &&
-                (\forall short j; j >= 0 && j < length; 
-                    dest[destOffset + j] == (j >= length - i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
-                )
-             ;
-             loop_invariant<savedHeap>
-                ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0)  ==> \backup(\transactionUpdated(dest))) &&
-               (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest))) 
-                &&
-               (startTransaction || 
-                 (\forall short j; j >= 0 && j < length; 
-                  \backup(dest[destOffset + j]) ==
-                    ((j < length - i || JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT) ?
-                       \old(\backup(dest[destOffset + j])) :
-                        \old(src[srcOffset + j]))
-                 )
-               )
                ;
-             decreases length - i;
-             assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
-             assignable<savedHeap> \transactionUpdated(dest);
-          @*/
-          for(short i=0; i<length; i++) {
-            dest[destOffset + (length - 1) - i] = src[srcOffset + (length - 1) - i];
-          }
+               loop_invariant<savedHeap> true
+                  &&
+                 ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0)  ==> \backup(\transactionUpdated(dest)))
+                  &&
+                 (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest)))
+                  &&
+                 (startTransaction ||
+                   (\forall short j; j >= 0 && j < length;
+                    \backup(dest[destOffset + j]) ==
+                      ((j >= i || JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT) ?
+                          \old(\backup(dest[destOffset + j])) :
+                          \old(src[srcOffset + j]))
+                   )
+                  )
+               ;
+               decreases length - i;
+               assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+               assignable<savedHeap> \transactionUpdated(dest);
+            @*/
+            for(short i=0;i<length;i++) {
+                dest[destOffset + i] = src[srcOffset + i];
+            }
+        }else{
+            /*@
+               loop_invariant i >= 0 && i <= length &&
+                  srcOffset + length - i >= 0 && srcOffset + length - i  <= src.length &&
+                  destOffset + length - i >= 0 && destOffset + length - i <= dest.length
+                  &&
+                  (\forall short j; j >= 0 && j < length;
+                      dest[destOffset + j] == (j >= length - i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+                  )
+               ;
+               loop_invariant<savedHeap>
+                  ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0)  ==> \backup(\transactionUpdated(dest))) &&
+                 (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest)))
+                  &&
+                 (startTransaction ||
+                   (\forall short j; j >= 0 && j < length;
+                    \backup(dest[destOffset + j]) ==
+                      ((j < length - i || JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT) ?
+                         \old(\backup(dest[destOffset + j])) :
+                          \old(src[srcOffset + j]))
+                   )
+                 )
+                 ;
+               decreases length - i;
+               assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+               assignable<savedHeap> \transactionUpdated(dest);
+            @*/
+            for(short i=0; i<length; i++) {
+                dest[destOffset + (length - 1) - i] = src[srcOffset + (length - 1) - i];
+            }
         }
         if(startTransaction) {
-          JCSystem.commitTransaction();
+            JCSystem.commitTransaction();
         }
         return (short) (destOffset + length);
     }
@@ -241,17 +241,17 @@ public class Util {
            assignable \strictly_nothing;
     @*/
     public static final byte arrayCompare(/*@ nullable @*/ byte[] src, short srcOffset,
-            /*@ nullable @*/ byte[] dest, short destOffset, short length)
-            throws NullPointerException, ArrayIndexOutOfBoundsException {
-         if (src == null || dest == null)
+        /*@ nullable @*/ byte[] dest, short destOffset, short length)
+        throws NullPointerException, ArrayIndexOutOfBoundsException {
+        if (src == null || dest == null)
             throw JCSystem.npe;
-         if (length < 0 || srcOffset < 0 || destOffset < 0
-                || srcOffset  > (short)(src.length - length)
-                || destOffset > (short)(dest.length - length))
+        if (length < 0 || srcOffset < 0 || destOffset < 0
+            || srcOffset  > (short)(src.length - length)
+            || destOffset > (short)(dest.length - length))
             throw JCSystem.aioobe;
 
         if(src == dest && srcOffset == destOffset) {
-          return (byte)0;
+            return (byte)0;
         }
 
         /*@ loop_invariant i>=0 && i <= length &&
@@ -260,12 +260,12 @@ public class Util {
             assignable \strictly_nothing;
           @*/
         for(short i=0; i<length; i++) {
-           if(src[srcOffset + i] < dest[destOffset + i]) {
-              return (byte)-1;
-           }
-           if(src[srcOffset + i] > dest[destOffset + i]) {
-              return (byte)1;
-           }
+            if(src[srcOffset + i] < dest[destOffset + i]) {
+                return (byte)-1;
+            }
+            if(src[srcOffset + i] > dest[destOffset + i]) {
+                return (byte)1;
+            }
         }
         return (byte)0;
     }
@@ -295,43 +295,43 @@ public class Util {
            signals_only NullPointerException, ArrayIndexOutOfBoundsException;
            assignable<heap><savedHeap> bArray[bOffset..bOffset+length-1]; @*/
     public static final short arrayFillNonAtomic(/*@ nullable @*/ byte[] bArray, short bOffset,
-            short length, byte value)
-            throws NullPointerException, ArrayIndexOutOfBoundsException {
+                                                                  short length, byte value)
+        throws NullPointerException, ArrayIndexOutOfBoundsException {
 
         if (bArray == null)
             throw JCSystem.npe;
-        if (length < 0 || bOffset < 0 
-                || bOffset  > (short)(bArray.length - length))
+        if (length < 0 || bOffset < 0
+            || bOffset  > (short)(bArray.length - length))
             throw JCSystem.aioobe;
 
         final boolean changeTransient =
-          (JCSystem.nativeKeYGetTransient(bArray) == JCSystem.NOT_A_TRANSIENT_OBJECT);
+            (JCSystem.nativeKeYGetTransient(bArray) == JCSystem.NOT_A_TRANSIENT_OBJECT);
         if(changeTransient) {
-          JCSystem.nativeKeYSetTransient(bArray, JCSystem.CLEAR_ON_RESET);
+            JCSystem.nativeKeYSetTransient(bArray, JCSystem.CLEAR_ON_RESET);
         }
 
-          /*@
-             loop_invariant i >= 0 && i <= length &&
-                bOffset + i >= 0 && bOffset + i <= bArray.length &&
-               (\forall short j; j >= 0 && j< length;
-                   bArray[bOffset + j] == (j<i ? value : \old(bArray[bOffset + j]))
-               )
-             ;
-             loop_invariant<savedHeap>
-               (\forall short j; j >= 0 && j < length; 
-                  \backup(bArray[bOffset + j]) ==
-                    ((j >= i || \backup(\transactionUpdated(bArray))) ?
-                        \old(\backup(bArray[bOffset + j])) :
-                        value)
-               );
-             decreases length - i;
-             assignable<heap><savedHeap> bArray[bOffset..bOffset+length-1];
-          @*/
-          for(short i=0;i<length;i++) {
-              bArray[bOffset + i] = value;
-          }
-        if(changeTransient) {      
-          JCSystem.nativeKeYSetTransient(bArray, JCSystem.NOT_A_TRANSIENT_OBJECT);
+        /*@
+           loop_invariant i >= 0 && i <= length &&
+              bOffset + i >= 0 && bOffset + i <= bArray.length &&
+             (\forall short j; j >= 0 && j< length;
+                 bArray[bOffset + j] == (j<i ? value : \old(bArray[bOffset + j]))
+             )
+           ;
+           loop_invariant<savedHeap>
+             (\forall short j; j >= 0 && j < length;
+                \backup(bArray[bOffset + j]) ==
+                  ((j >= i || \backup(\transactionUpdated(bArray))) ?
+                      \old(\backup(bArray[bOffset + j])) :
+                      value)
+             );
+           decreases length - i;
+           assignable<heap><savedHeap> bArray[bOffset..bOffset+length-1];
+        @*/
+        for(short i=0;i<length;i++) {
+            bArray[bOffset + i] = value;
+        }
+        if(changeTransient) {
+            JCSystem.nativeKeYSetTransient(bArray, JCSystem.NOT_A_TRANSIENT_OBJECT);
         }
         return (short) (bOffset + length);
     }

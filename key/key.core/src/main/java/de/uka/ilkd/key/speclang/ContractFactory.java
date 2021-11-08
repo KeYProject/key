@@ -13,11 +13,10 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -25,7 +24,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -39,6 +37,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
+
+import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
 
 /**
  * Contracts should only be created through methods of this class
@@ -540,7 +540,6 @@ public class ContractFactory {
             Term m2 = other.getMod(h, t.originalSelfVar,
                                    t.originalParamVars,
                                    services);
-            Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
             if (m1 != null || m2 != null) {
                 Term nm;
                 if (m1 == null) {
@@ -548,17 +547,59 @@ public class ContractFactory {
                 } else if (m2 == null) {
                     nm = m1;
                 } else {
-                    nm = tb.intersect(m1,
-                                      tb.ife(otherPre, m2, tb.allLocs()));
+                    nm = tb.intersect(m1, tb.ife(otherPre, m2, tb.allLocs()));
 
                     // check if the other mod is the same as the one in the uniform store.
-                    if(uniformMod.containsKey(h) && !uniformMod.get(h).equals(m2)) {
+                    // To obtain meaningful results, check for equality ignoring all term labels!
+                    if (uniformMod.containsKey(h) && !uniformMod.get(h).equalsModTermLabels(m2)) {
                         uniformMod.remove(h);
+                    } else {
+                        // merge term labels (in particular origin labels) of both modifies terms
+                        uniformMod.put(h, mergeTermLabels(uniformMod.get(h), m2, tb));
                     }
                 }
                 mods.put(h, nm);
             }
         }
+    }
+
+    /** Merges the labels of the given terms, such that the resulting term contains the labels of
+     * the input terms. An exception of this are origin labels: These are combined into a single
+     * one containing both origins. */
+    private static Term mergeTermLabels(Term uniformMod, Term otherMod, TermBuilder tb) {
+        List<TermLabel> labels = uniformMod.getLabels().toList();
+        List<TermLabel> newLabels = new ArrayList<>(labels);
+        for (TermLabel ol : otherMod.getLabels()) {
+            if (!labels.contains(ol)) {
+                // origin labels need to be handled specially to correctly merge their origins
+                if (ol instanceof OriginTermLabel) {
+                    // find current uniform origin and merge it with other origin
+                    OriginTermLabel uol = null;
+                    for (TermLabel l : labels) {
+                        if (l instanceof OriginTermLabel) {
+                            // found origin label -> merge origins
+                            Origin o1 = ((OriginTermLabel) ol).getOrigin();
+                            Origin o2 = ((OriginTermLabel) l).getOrigin();
+                            Set<Origin> origins = new HashSet<>();
+                            origins.add(o1);
+                            origins.add(o2);
+                            uol = new OriginTermLabel(origins);
+                            newLabels.add(uol);
+                            break;
+                        }
+                    }
+                    // if uniformMod has no origin, use other origin
+                    if (uol == null) {
+                        newLabels.add(ol);
+                    }
+                } else {
+                    // copy all non-origin labels
+                    newLabels.add(ol);
+                }
+            }
+        }
+        // update (overwrite) the labels of the uniform mod with the found ones
+        return tb.label(uniformMod, new ImmutableArray<>(newLabels));
     }
 
     private static Map<ProgramVariable, Term>
@@ -705,7 +746,7 @@ public class ContractFactory {
         return new FunctionalOperationContractImpl(
                 INVALID_ID, name, t.kjt, t.pm, t.specifiedIn,
                 moda, pres,
-                new LinkedHashMap<LocationVariable, Term>(), // (*)
+                new LinkedHashMap<>(), // (*)
                 mby, posts, freePosts, axioms, mods, deps, hasMod,
                 t.originalSelfVar, t.originalParamVars,
                 t.originalResultVar, t.originalExcVar,
@@ -728,28 +769,22 @@ public class ContractFactory {
                                               FunctionalOperationContract[] others) {
         // MU: Bugfix #1489
         // Do not modify the data stores in t but make new copies
-        Map<LocationVariable, Term> mods =
-                new LinkedHashMap<LocationVariable, Term>(t.originalMods);
-        Map<ProgramVariable, Term> deps =
-                new LinkedHashMap<ProgramVariable, Term>(t.originalDeps);
+        Map<LocationVariable, Term> mods = new LinkedHashMap<>(t.originalMods);
+        Map<ProgramVariable, Term> deps = new LinkedHashMap<>(t.originalDeps);
 
         // keep this to check if every contract has the same mod
         // then no if-then-else cascades are needed.
-        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<>();
 
         // collect information
-        Map<LocationVariable, Term> pres =
-                new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
+        Map<LocationVariable, Term> pres = new LinkedHashMap<>(t.originalPres.size());
         for (LocationVariable h : t.originalPres.keySet()) {
             pres.put(h, t.originalPres.get(h));
         }
         Term mby = t.originalMby;
-        Map<LocationVariable, Boolean> hasMod =
-                new LinkedHashMap<LocationVariable, Boolean>();
-        Map<LocationVariable, Term> posts =
-                new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
-        Map<LocationVariable, Term> freePosts =
-                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
+        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+        Map<LocationVariable, Term> posts = new LinkedHashMap<>(t.originalPosts.size());
+        Map<LocationVariable, Term> freePosts = new LinkedHashMap<>(t.originalFreePosts.size());
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             hasMod.put(h, false);
             Term oriPost = t.originalPosts.get(h);
@@ -770,7 +805,7 @@ public class ContractFactory {
             }
         }
 
-        Map<LocationVariable, Term> axioms = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
         if (t.originalAxioms != null) { // TODO: what about the others?
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 Term oriAxiom = t.originalAxioms.get(h);
@@ -796,7 +831,7 @@ public class ContractFactory {
     private FunctionalOperationContract union(FunctionalOperationContractImpl t,
                                               FunctionalOperationContract[] others) {
         // determine names
-        StringBuffer nameSB = new StringBuffer(t.getName());
+        StringBuilder nameSB = new StringBuilder(t.getName());
         for (FunctionalOperationContract other : others) {
             nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
         }
