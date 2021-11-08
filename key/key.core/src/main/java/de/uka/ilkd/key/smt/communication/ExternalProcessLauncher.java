@@ -79,7 +79,7 @@ public class ExternalProcessLauncher {
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
             pipe = new SimplePipe(input, messageDelimiters, output, session, process);
-            catchLivenessThrowOutput();
+            //catchLivenessThrowOutput();
         } catch (IOException ex) {
             stop();
             throw ex;

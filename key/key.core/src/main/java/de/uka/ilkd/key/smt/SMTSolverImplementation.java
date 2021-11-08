@@ -276,7 +276,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         try {
             processLauncher.launch(commands);
             processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
-            processLauncher.getPipe().sendEOF();
+            //processLauncher.getPipe().sendEOF();
 
             String msg = processLauncher.getPipe().readMessage();
             while (msg != null) {

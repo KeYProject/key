@@ -67,8 +67,7 @@ public abstract class AbstractSolverSocket {
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
      */
-    public abstract void messageIncoming(@Nonnull Pipe pipe,
-                                         @Nonnull String msg) throws IOException;
+    public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException;
 
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
