@@ -557,8 +557,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-    	SLExpression result = accept(ctx.shiftexpr(0));
-    	SLExpression right = accept(ctx.shiftexpr(1));
+        SLExpression result = accept(ctx.shiftexpr(0));
+        SLExpression right = accept(ctx.shiftexpr(1));
         assert result != null && right != null;
 
         if (result.isTerm() || right.isTerm()) {
@@ -578,7 +578,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
-        	Sort os = right.getType().getSort();
+            Sort os = right.getType().getSort();
             Function ioFunc = os.getInstanceofSymbol(services);
             result = new SLExpression(
                     tb.equals(
@@ -1270,7 +1270,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             final Term objTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             return new SLExpression(tb.singleton(objTerm, fieldTerm));
-        }catch (IndexOutOfBoundsException e1) {
+        } catch (IndexOutOfBoundsException e1) {
             raiseError(ctx, "The given expression %s is not a valid reference.", e);
         }
         return null;
@@ -1343,7 +1343,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         assert typ != null;
         Term resTerm = tb.equals(tb.var(
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
+                        javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
                 tb.TRUE());
         return new SLExpression(resTerm);
     }
@@ -2216,13 +2216,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
         //remove multiline comments (this is only relevant for model methods with single comments.)
         bodyString = bodyString.replaceAll("/[*].*?[*]/", "");
 
-        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
+        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}') {
             raiseError("The body of the given model method is misformed. " +
-                    "We expected, that the first and last character to be curly braces.", ctx);
+                "We expected, that the first and last character to be curly braces.", ctx);
+        }
 
         bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
-        if (!bodyString.startsWith("return "))
+
+        // There could also be some other valid cases, e.g. "return(int)4;"
+        // For simplicity, I only added the linebreak to avoid unnecessary complexity.
+        if (!bodyString.startsWith("return ") && !bodyString.startsWith("return\n")) {
             raiseError(ctx, "return expected, instead: " + bodyString);
+        }
         int beginIndex = bodyString.indexOf(" ") + 1;
         int endIndex = bodyString.lastIndexOf(";");
         bodyString = bodyString.substring(beginIndex, endIndex);
@@ -2331,8 +2336,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
-        return accept(ctx.expression());
+    public SLExpression visitVariant_function(JmlParser.Variant_functionContext ctx) {
+        List<SLExpression> exprs = mapOf(ctx.expression());
+        Optional<SLExpression> t = exprs.stream()
+                .reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
+        return new SLExpression(t.orElse(exprs.get(0)).getTerm());
     }
 
     @Override

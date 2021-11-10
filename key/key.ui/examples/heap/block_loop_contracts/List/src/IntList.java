@@ -1,5 +1,5 @@
 public interface IntList {
-    
+
     //@ public ghost instance \locset footprint;
     //@ public ghost instance \seq seq;
 

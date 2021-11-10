@@ -4,7 +4,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "5.0.0"
+    id 'com.github.johnrengelman.shadow' version "7.1.0"
 }
 
 dependencies {
@@ -57,5 +57,9 @@ run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["KeyDebugFlag"] = "on"
     //args << "--experimental"
+
+    // this can be used to solve a problem where the OS hangs during debugging of popup menus
+    // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
+    //jvmArgs += "-Dsun.awt.disablegrab=true"
 }
 

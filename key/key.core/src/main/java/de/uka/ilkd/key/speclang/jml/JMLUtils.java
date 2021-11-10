@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.TreeSet;
 
+@Deprecated
 public abstract class JMLUtils {
     /**
      * The feature identifier for JML "feature switches" which will be (de-)activate JML comments for KeY.

@@ -9,13 +9,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.antlr.v4.runtime.Token;
+import org.junit.Assert;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Alexander Weigl
@@ -38,6 +40,17 @@ public class NJmlTranslatorTests {
         TB = services.getTermBuilder();
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         jmlIO = new JmlIO().services(services).classType(testClassType);
+    }
+
+    @Test
+    public void testIgnoreOpenJML() {
+        jmlIO.clearWarnings();
+        String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
+        ImmutableList<TextualJMLConstruct> result =
+                jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
+        assertNotNull(result);
+        Assert.assertEquals("Too many invariants found.", 1, result.size());
+        ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
     }
 
     @Test
