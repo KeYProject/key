@@ -3,7 +3,7 @@
         $contract(contract=entry.contract)$
     </td>
     <td><div title="$entry.sourceFile$"> $entry.shortSrc$ </div></td>
-    <td><div title="$entry.proofFile$"> $entry.proofFile.fileName$ </div></td>
+    <td><div title="$entry.proofFile.toFile$"> $entry.proofFile.toFile.getName$</div></td> $! using toFile is a workaround (since Path is Iterable, otherwise there is a stack overflow) !$
     <td><a href="#settings-$entry.settingsId$">#$entry.settingsId; format="%02d"$</a></td>
     <td>$entry.loadingState$</td>
     <td>$entry.replayState$</td>

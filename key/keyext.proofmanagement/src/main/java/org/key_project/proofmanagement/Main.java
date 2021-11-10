@@ -163,6 +163,9 @@ public final class Main {
                 } catch (IOException | URISyntaxException e) {
                     System.err.println("Error creating the report: ");
                     e.printStackTrace();
+                } catch (Throwable e) {
+                    System.err.println("Error creating the report: ");
+                    e.printStackTrace();
                 }
             }
         } catch (IOException e) {
@@ -172,6 +175,9 @@ public final class Main {
         } catch (ProofManagementException e) {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("ProofManagement interrupted due to critical error.");
+        } catch (Throwable e) {
+            System.err.println("Error creating the report: ");
+            e.printStackTrace();
         }
     }
 

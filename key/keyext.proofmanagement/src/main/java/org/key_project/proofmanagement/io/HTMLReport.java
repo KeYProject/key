@@ -75,7 +75,7 @@ public final class HTMLReport {
 
         // provide access to getter methods with a name equal to the property (without "get")
         // (needed to access some KeY properties, e.g. Proof.name()
-        group.registerModelAdaptor(Object.class, new ObjectModelAdaptor() {
+        group.registerModelAdaptor(Object.class, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self, Object o,
                                                    Object property, String propertyName)
@@ -93,16 +93,16 @@ public final class HTMLReport {
         });
 
         // provide access to entrySet property of Maps
-        group.registerModelAdaptor(Map.class, new MapModelAdaptor() {
+        Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>)(Class)Map.class;
+        group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
-            public Object getProperty(Interpreter interp, ST self, Object o, Object property,
+            public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
                                       String propertyName)
-                    throws STNoSuchPropertyException {
-                Map<?, ?> map = (Map<?, ?>) o;
+                throws STNoSuchPropertyException {
                 if (property.equals("entrySet")) {
                     return map.entrySet();
                 }
-                return super.getProperty(interp, self, o, property, propertyName);
+                return super.getProperty(interp, self, map, property, propertyName);
             }
         });
 
