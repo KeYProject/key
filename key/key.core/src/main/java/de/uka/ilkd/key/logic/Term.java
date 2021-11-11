@@ -192,8 +192,6 @@ public interface Term extends SVSubstitute, Sorted {
      */
     boolean equalsModIrrelevantTermLabels(Object o);
 
-    public boolean equalsModTermLabels(Object o);
-
     /**
      * Checks if {@code o} is a term syntactically equal to this one, ignoring <b>all</b> term
      * labels.
