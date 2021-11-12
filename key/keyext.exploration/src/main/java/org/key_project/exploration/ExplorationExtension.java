@@ -72,8 +72,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
-            explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model)));
-            explorationToolbar.add(new JCheckBox(new ShowInteractiveBranchesAction(model)));
+            explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
+            explorationToolbar.add(new JCheckBox(new ShowInteractiveBranchesAction(model, mainWindow)));
         }
         return explorationToolbar;
     }
@@ -111,8 +111,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     @Override
     public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         return Arrays.asList(
-                new ToggleExplorationAction(model),
-                new ShowInteractiveBranchesAction(model));
+                new ToggleExplorationAction(model, mainWindow),
+                new ShowInteractiveBranchesAction(model, mainWindow));
     }
 }
 

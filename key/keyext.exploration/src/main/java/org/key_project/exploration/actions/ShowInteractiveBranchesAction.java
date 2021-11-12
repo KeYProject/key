@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
 public class ShowInteractiveBranchesAction extends KeyAction {
     private final transient ExplorationModeModel model;
 
-    public ShowInteractiveBranchesAction(ExplorationModeModel model) {
+    public ShowInteractiveBranchesAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
         setName("Hide justification");
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
