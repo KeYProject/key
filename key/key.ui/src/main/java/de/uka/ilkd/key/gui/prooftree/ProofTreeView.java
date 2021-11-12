@@ -676,6 +676,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             lastGoalNode = null;
             setProof(e.getSource().getSelectedProof());
             delegateView.validate();
+            
+            // Redraw the tree in case the ProofTreeViewFilters have changed
+            // since the last time the proof was loaded.
+            delegateModel.updateTree(null);
         }
 
         /**
