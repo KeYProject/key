@@ -19,25 +19,25 @@ pipeline {
 
         stage('Compile') {
             steps { 
-                sh 'cd key && gradle --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+                sh 'cd key && ./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
             }
         }
 
         stage('Test: JUnit') {
             steps {
-                sh 'cd key && gradle --continue test'
+                sh 'cd key && ./gradlew --continue test'
             }
         }
 
         stage('Test: testProveRules') {
             steps {
-                sh 'cd key && gradle --continue testProveRules'
+                sh 'cd key && ./gradlew --continue testProveRules'
             }
         }    
 
         stage('Test: testRunAllProofs') {
             steps {
-                sh 'cd key && gradle --continue testRunAllProofs'
+                sh 'cd key && ./gradlew --continue testRunAllProofs'
             }
         }
 
