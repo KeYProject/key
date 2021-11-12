@@ -792,11 +792,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
-            stylers.add((style, treeNode) -> checkNotes(style, treeNode));
             stylers.add((style, treeNode) -> closedGoal(style, treeNode));
             stylers.add((style, node) -> oneStepSimplification(style, node));
-            stylers.add((style, treeNode) -> renderNonLeaf(style, treeNode));
             stylers.add((style, node) -> renderLeaf(style, node));
+            stylers.add((style, treeNode) -> renderNonLeaf(style, treeNode));
+            stylers.add((style, treeNode) -> checkNotes(style, treeNode));
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
@@ -806,6 +806,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private void closedGoal(Style style, GUIAbstractTreeNode treeNode) {
             try {
                 GUIBranchNode node = ((GUIBranchNode) treeNode);
+                
+                style.set(KEY_ICON, getIcon());
                 if (node.isClosed()) {
                     // all goals below this node are closed
                     style.set(KEY_ICON, IconFactory.provedFolderIcon(iconHeight));
@@ -843,7 +845,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
             try {
-                if (!node.isLeaf()) return;
+                if (!node.getNode().leaf() || node instanceof GUIBranchNode) return;
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
                 if (goal == null || leaf.isClosed()) {
@@ -873,6 +875,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderNonLeaf(Style style, GUIAbstractTreeNode treeNode) {
             Node node = treeNode.getNode();
+            if (node.leaf() || treeNode instanceof GUIBranchNode) return;
             style.set(KEY_COLOR_FOREGROUND, Color.black);
             String tooltipText = "An inner node of the proof";
             final String notes = node.getNodeInfo().getNotes();
@@ -962,7 +965,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 //set default
                 setBorder(BorderFactory.createLineBorder(Color.WHITE));
             }
-
 
             int fontStyle =
                     (style.getBoolean(KEY_FONT_BOLD) ? Font.BOLD : Font.PLAIN) |
