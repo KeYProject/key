@@ -12,6 +12,9 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.prooftree.*;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeListener;
+
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
@@ -58,6 +61,12 @@ public class ExplorationExtension implements KeYGuiExtension,
         }
     };
 
+    private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
+        
+        public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
+            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class), ExplorationNodeData.class);
+        }
+    };
 
     @Nonnull
     @Override
@@ -90,8 +99,12 @@ public class ExplorationExtension implements KeYGuiExtension,
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 leftPanel.setProof(mediator.getSelectedProof());
+
+                mediator.getSelectedProof().removeProofTreeListener(proofTreeListener);
+                mediator.getSelectedProof().addProofTreeListener(proofTreeListener);
             }
         });
+        
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
