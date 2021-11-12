@@ -7,31 +7,23 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
 import java.net.URL;
 
 public class ProofExplorationServiceTest {
-
     ProofExplorationService expService;
-
     Proof currentProof;
-
     File location;
-
     KeYEnvironment<?> env;
 
     @Before
     public void setup() throws ProblemLoaderException {
-        URL url = getClass().getClassLoader().getResource("org/key_project/exploration/testAdditions.key");
-        assert url != null;
-        location = new File(url.getPath());
-        env = KeYEnvironment.load(location, null, null, null); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
+        location = new File("src/test/resources//org/key_project/exploration/testAdditions.key");
+        Assume.assumeTrue("File testAdditions.key not found.", location.exists());
+        env = KeYEnvironment.load(location);
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());
     }
@@ -94,7 +86,6 @@ public class ProofExplorationServiceTest {
 
     /**
      * Test tests that the added term is added correctly and that meta data was added as well
-     *
      */
     @Test
     public void testAdditionSucc() {
