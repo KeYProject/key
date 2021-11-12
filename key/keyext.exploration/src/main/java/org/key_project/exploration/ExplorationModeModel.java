@@ -1,7 +1,10 @@
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import javax.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
@@ -21,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see ExplorationExtension
  */
 public class ExplorationModeModel {
-    public static final String PROP_SHOW_SECOND_BRANCH = "showSecondBranches";
+
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";
     public static final String PROP_EXPLORE_TACLET_APP_STATE = "exploreTacletAppState";
 
@@ -40,11 +43,6 @@ public class ExplorationModeModel {
      * boolean flag indicating whether actions mode is turned on and special rules are shown to the user
      */
     private boolean explorationModeSelected = false;
-    /**
-     * Boolean flag whether to show the second branch or not in sound apps
-     * Default: second branch is shown
-     */
-    private boolean showSecondBranches = true;
 
     /**
      * Get the state which kind of taclet to use
@@ -84,8 +82,8 @@ public class ExplorationModeModel {
     /**
      * Returns whether the justification branch should be visible.
      */
-    public boolean isShowSecondBranches() {
-        return showSecondBranches;
+    public boolean isShowInteractiveBranches() {
+        return !ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideInteractiveGoals();
     }
 
     /**
@@ -98,13 +96,12 @@ public class ExplorationModeModel {
     /**
      * Triggers a property change event, and the rerendering of the proof tree.
      *
-     * @see #PROP_SHOW_SECOND_BRANCH
-     * @see #isShowSecondBranches()
+     * @see #isShowInteractiveBranches()
      */
-    public void setShowSecondBranches(boolean showSecondBranches) {
-        boolean old = this.showSecondBranches;
-        this.showSecondBranches = showSecondBranches;
-        changeSupport.firePropertyChange(PROP_SHOW_SECOND_BRANCH, old, showSecondBranches);
+    public void setShowInteractiveBranches(boolean showInteractiveBranches) {
+        GUIProofTreeModel delegateModel =
+                MainWindow.getInstance().getProofTreeView().getDelegateModel();
+        delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, !showInteractiveBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

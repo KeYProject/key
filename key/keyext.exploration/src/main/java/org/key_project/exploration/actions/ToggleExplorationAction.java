@@ -30,7 +30,6 @@ public class ToggleExplorationAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean explorationModeSelected = model.isExplorationModeSelected();
-        model.setExplorationModeSelected(!explorationModeSelected);
+        model.setExplorationModeSelected(!model.isExplorationModeSelected());
     }
 }

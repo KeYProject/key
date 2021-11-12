@@ -72,8 +72,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
-            explorationToolbar.add(new JToggleButton(new ToggleExplorationAction(model)));
-            explorationToolbar.add(new JToggleButton(new ShowSecondBranchAction(model)));
+            explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model)));
+            explorationToolbar.add(new JCheckBox(new ShowInteractiveBranchesAction(model)));
         }
         return explorationToolbar;
     }
@@ -92,18 +92,7 @@ public class ExplorationExtension implements KeYGuiExtension,
                 leftPanel.setProof(mediator.getSelectedProof());
             }
         });
-
-        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
-                e -> {
-                    GUIProofTreeModel delegateModel =
-                            window.getProofTreeView().getDelegateModel();
-
-                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
-                            !model.isShowSecondBranches());
-                });
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
-
-
     }
 
     @Nonnull
@@ -123,7 +112,7 @@ public class ExplorationExtension implements KeYGuiExtension,
     public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         return Arrays.asList(
                 new ToggleExplorationAction(model),
-                new ShowSecondBranchAction(model));
+                new ShowInteractiveBranchesAction(model));
     }
 }
 
