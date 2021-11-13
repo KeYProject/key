@@ -15,16 +15,17 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    implementation 'com.miglayout:miglayout-swing:5.2'
+    api 'com.miglayout:miglayout-swing:5.2'
 
-    implementation group: group, name: 'docking-frames-common', version: '1.0'
-    implementation group: group, name: 'docking-frames-core', version: '1.0'
+    api group: group, name: 'docking-frames-common', version: '1.0'
+    api group: group, name: 'docking-frames-core', version: '1.0'
 
     implementation "org.antlr:antlr4-runtime:4.7.1"
 
     runtimeOnly project(":keyext.ui.testgen")
 
     runtimeOnly project(":keyext.interactionlog")
+    runtimeOnly project(":keyext.exploration")
     //runtimeOnly project(":keyext.script.ui")
 }
 
@@ -55,7 +56,7 @@ application {
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["KeyDebugFlag"] = "on"
-    //args << "--experimental"
+    args << "--experimental"
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)

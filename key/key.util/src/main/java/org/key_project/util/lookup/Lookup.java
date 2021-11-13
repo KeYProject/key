@@ -113,6 +113,13 @@ public class Lookup {
         if (parent != null) parent.deregister(obj, service);
     }
 
+    public <T> void deregister(Class<T> service) {
+        getList(service).clear();
+        firePropertyChange(service);
+        if (parent != null) parent.deregister(service);
+    }
+
+
     public void dispose() {
         if (parent != null) parent.children.remove(this);
     }
