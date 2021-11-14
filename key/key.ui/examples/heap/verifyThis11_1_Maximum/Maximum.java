@@ -43,4 +43,3 @@ public class Maximum {
         return x;
     }
 }
-        

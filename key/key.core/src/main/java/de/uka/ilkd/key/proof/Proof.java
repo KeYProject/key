@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.lookup.Lookup;
 
 
 /**
@@ -152,6 +154,9 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
      */
     private File proofFile;
+
+    @Nullable
+    private Lookup userData;
 
     /**
      * constructs a new empty proof with name
@@ -1315,5 +1320,57 @@ public class Proof implements Named {
                 getServices().getProfile().getStrategyFactory(activeStrategyName) :
                     getServices().getProfile().getDefaultStrategyFactory();
 
+    }
+
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @Nonnull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 }
