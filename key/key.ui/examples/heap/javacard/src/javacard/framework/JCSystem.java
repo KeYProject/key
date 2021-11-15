@@ -47,8 +47,8 @@ public final class JCSystem {
           assignable<savedHeap> \strictly_nothing;
       @*/
     public static byte isTransient(Object o) {
-       if(o == null) { return 0; }
-       return nativeKeYGetTransient(o);
+        if(o == null) { return 0; }
+        return nativeKeYGetTransient(o);
     }
 
     private static /*@ spec_public @*/ byte _transactionDepth = (byte)0;
@@ -61,7 +61,7 @@ public final class JCSystem {
           assignable<savedHeap> \strictly_nothing;
           @*/
     public static byte getTransactionDepth() {
-      return _transactionDepth;
+        return _transactionDepth;
     }
 
     /*@ spec_public nullable @*/ static NegativeArraySizeException nase = new NegativeArraySizeException();
@@ -85,7 +85,7 @@ public final class JCSystem {
           assignable \nothing;
       @*/
     public static /*@ non_null @*/ boolean[] makeTransientBooleanArray(short length, byte event)
-            throws SystemException, NegativeArraySizeException {
+        throws SystemException, NegativeArraySizeException {
         if (event != CLEAR_ON_RESET && event != CLEAR_ON_DESELECT) {
             SystemException.throwIt(SystemException.ILLEGAL_VALUE);
         }
@@ -118,7 +118,7 @@ public final class JCSystem {
           assignable \nothing;
       @*/
     public static /*@ non_null @*/ byte[] makeTransientByteArray(short length, byte event)
-            throws SystemException, NegativeArraySizeException {
+        throws SystemException, NegativeArraySizeException {
         if (event != CLEAR_ON_RESET && event != CLEAR_ON_DESELECT) {
             SystemException.throwIt(SystemException.ILLEGAL_VALUE);
         }
@@ -151,7 +151,7 @@ public final class JCSystem {
           assignable \nothing;
       @*/
     public static /*@ non_null @*/ short[] makeTransientShortArray(short length, byte event)
-            throws SystemException, NegativeArraySizeException {
+        throws SystemException, NegativeArraySizeException {
         if (event != CLEAR_ON_RESET && event != CLEAR_ON_DESELECT) {
             SystemException.throwIt(SystemException.ILLEGAL_VALUE);
         }
@@ -185,7 +185,7 @@ public final class JCSystem {
           assignable \nothing;
       @*/
     public static /*@ nullable @*/ java.lang.Object[] makeTransientObjectArray(short length, byte event)
-            throws SystemException, NegativeArraySizeException {
+        throws SystemException, NegativeArraySizeException {
         if (event != CLEAR_ON_RESET && event != CLEAR_ON_DESELECT) {
             SystemException.throwIt(SystemException.ILLEGAL_VALUE);
         }

@@ -75,5 +75,4 @@ public class ReverseArray {
             System.out.println(ra.a[i]);
         }
     }
-
 }

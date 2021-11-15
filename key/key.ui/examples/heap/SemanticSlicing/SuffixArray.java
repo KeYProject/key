@@ -6,8 +6,8 @@ public final class SuffixArray {
     public final /*@ spec_public nullable @*/ int[] suffixes;
 
     /*@
-	public invariant this.a != null && this.suffixes != null;
-	public invariant
+    public invariant this.a != null && this.suffixes != null;
+    public invariant
       @           (\forall int i; 0 <= i && i < a.length;
       @           (\exists int j; 0 <= j && j < a.length; suffixes[j]==i));
       @           // suffixes is a permutation on indices

@@ -2,7 +2,7 @@
 final class DoubleLinkedList {
 
     final static class Node {
-        /*@ nullable @*/ Node l, r; 
+        /*@ nullable @*/ Node l, r;
     }
 
     /*@ nullable @*/ Node head;
@@ -67,7 +67,6 @@ final class DoubleLinkedList {
         head = nodes[0];
     }
 
-
     /*@ normal_behavior
       @ requires (Node)s[k] == x;
       @ requires 0 < k < len-1;
@@ -95,7 +94,7 @@ final class DoubleLinkedList {
         x.l.r = x;
         x.r.l = x;
     }
- 
+
     /*@ normal_behavior
       @ requires 0 < k < len-1;
       @ requires (Node)s[k] == x;
@@ -105,5 +104,4 @@ final class DoubleLinkedList {
         remove(x,k);
         unremove(x,k);
     }
-   
 }

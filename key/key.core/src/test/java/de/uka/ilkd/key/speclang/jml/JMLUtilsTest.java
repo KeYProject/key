@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.splitJmlMarker;
 
+@Deprecated
 public class JMLUtilsTest extends TestCase {
 
     public void testSplitJmlFeatures() {

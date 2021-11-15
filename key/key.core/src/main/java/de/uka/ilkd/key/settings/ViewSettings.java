@@ -149,6 +149,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
 
+    private static final String HIDE_INTERACTIVE_GOALS = "[View]hideInteractiveGoals";
+
     /**
      * A list of bookmark of favourite folders of the user. Can be manipulated with
      * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
@@ -204,6 +206,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    private PropertyEntry<Boolean> hideInteractiveGoals = createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
     /**
      * User-definable folder bookmarks.
@@ -532,6 +536,15 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     public void setUIFontSizeFactor(double factor) {
         this.uiFontSizeFactor.set(factor);
+    }
+
+
+    public boolean getHideInteractiveGoals() {
+        return hideInteractiveGoals.get();
+    }
+
+    public void setHideInteractiveGoals(boolean active) {
+        hideInteractiveGoals.set(active);
     }
 
     /**

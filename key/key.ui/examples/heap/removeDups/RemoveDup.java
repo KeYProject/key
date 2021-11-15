@@ -13,13 +13,13 @@
 
 /**
  * This class provides the static method removeDup. 
- * 
+ *
  * It takes an int-array and returns an array containing the same integer
  * values but no duplicates.
  *
  * The specification for removeDup was part of a KIT Formal Systems exam
  * in Feb 2014.
- * 
+ *
  * @author Mattias Ulbrich
  */
 class RemoveDup {
