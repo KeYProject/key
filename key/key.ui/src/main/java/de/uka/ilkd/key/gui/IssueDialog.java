@@ -30,7 +30,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -61,7 +60,7 @@ import java.util.stream.Collectors;
  * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
  *                          all parser error messages in KeY
  * @version 1 (6/8/21)
- * @version 2 (10/20/21)
+ * @version 2 (11/15/21)
  */
 public final class IssueDialog extends JDialog {
     /** regex to find web urls in string messages */
@@ -87,7 +86,6 @@ public final class IssueDialog extends JDialog {
     private final JList<PositionedIssueString> listWarnings;
 
     // replaced by the possibility to click links directly
-    //private final JButton btnFurtherInformation = new JButton("Further Information", IconFactory.help(16));
     private final JButton btnOpenFile = new JButton("Edit File", IconFactory.editFile(16));
     private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
@@ -99,7 +97,9 @@ public final class IssueDialog extends JDialog {
      * In the latter case only a single exception is show, which can also not be ignored */
     private final boolean critical;
 
-    /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace). */
+    /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
+     * Performs some calculations to make the dialog only expand/collapse the stacktrace panel, but
+     * keep the rest of the dialog looking the same as before. */
     private final transient ItemListener detailsBoxListener = e -> {
         int width = getWidth();
         int height = getHeight();
@@ -124,15 +124,44 @@ public final class IssueDialog extends JDialog {
                 setSize(new Dimension(width, height - stHeight));
             }
         }
-        //repaint();        // not sure but this is probably not needed...
     };
-
-    @Nullable
-    private String urlFurtherInformation;
 
     private IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
                         boolean critical) {
         this(owner, title, issues, critical, null);
+    }
+
+    /**
+     * Escapes special HTML chars the Strings of the warning messages and decorates weblinks such
+     * that they are clickable.
+     * @param warnings the warnings to decorate
+     * @return the list of decorated and escaped (otherwise unchanged) warnings
+     */
+    private static List<PositionedIssueString> decorateHTML(Set<PositionedIssueString> warnings) {
+        return warnings.stream().map(pis -> {
+            Matcher m = HTTP_REGEX.matcher(pis.text);
+
+            StringBuilder sb = new StringBuilder();
+            int start = 0;
+            while (m.find()) {
+                // escape special HTML chars (not in link!)
+                String notMatched = pis.text.substring(start, m.start());
+                String escaped = LogicPrinter.escapeHTML(notMatched, true);
+
+                // decorate link with anchor tag
+                String repl = "<a href=\"" + m.group() + "\">" + m.group() + "</a>";
+                sb.append(escaped);
+                sb.append(repl);
+                start = m.end();
+            }
+            // there may be a tail which has to be escaped as well ...
+            String tail = pis.text.substring(start);
+            String escapedTail = LogicPrinter.escapeHTML(tail, true);
+            sb.append(escapedTail);
+
+            return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
+                pis.additionalInfo);
+        }).collect(Collectors.toList());
     }
 
     private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
@@ -143,24 +172,25 @@ public final class IssueDialog extends JDialog {
         this.critical = critical;
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.warnings = new ArrayList<>();
-        // TODO: I hope that this works with all error messages ...
-        // decorate weblinks with html ref tags, escape special symbols (e.g. line breaks)
-        warnings.forEach(pis -> {
-            String escaped = LogicPrinter.escapeHTML(pis.text, true);
-            Matcher m = HTTP_REGEX.matcher(escaped);
-            StringBuilder sb = new StringBuilder();
-            while (m.find()) {
-                String repl = "<a href=\"" + m.group() + "\">" + m.group() + "</a>";
-                m.appendReplacement(sb, repl);
-            }
-            m.appendTail(sb);
-            this.warnings.add(new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
-                pis.additionalInfo));
-        });
+        this.warnings = decorateHTML(warnings);
         this.warnings.sort(Comparator.comparing(o -> o.fileName));
 
         setLayout(new BorderLayout());
+
+        ///////// component overview (more indention means deeper nested):
+        // label
+        //     scrWarnings
+        //       listWarnings
+        //   ----splitCenter
+        //     sourcePanel
+        //       locPanel: fTextField lTextField cTextField
+        //       scrPreview: nowrap: txtSource
+        //       pSouth
+        //         chkIgnoreWarnings
+        //         pButtons: btnOK btnFurtherInformation btnOpenFile chkDetails
+        // ----splitBottom
+        //   stacktracePanel
+        //     stTextArea
 
         // set descriptive text in top label
         final String head;
@@ -180,20 +210,6 @@ public final class IssueDialog extends JDialog {
             // make sure a monospaced font is used
             font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         }
-
-        // label
-        //     scrWarnings
-        //       listWarnings
-        //   ----splitCenter
-        //     sourcePanel
-        //       locPanel: fTextField lTextField cTextField
-        //       scrPreview: nowrap: txtSource
-        //       pSouth
-        //         chkIgnoreWarnings
-        //         pButtons: btnOK btnFurtherInformation btnOpenFile chkDetails
-        // ----splitBottom
-        //   stacktracePanel
-        //     stTextArea
 
         listWarnings = new JList<>(this.warnings.toArray(new PositionedIssueString[0]));
 
@@ -253,21 +269,11 @@ public final class IssueDialog extends JDialog {
         stacktracePanel.add(scrStacktrace);
     }
 
-    private static PositionedIssueString getSelectedValue(JList<PositionedIssueString> list) {
-        int row = list.getSelectedIndex();
-        if (row >= 0) {
-            return list.getSelectedValue();
-        }
-        return null;
-    }
-
     private JScrollPane createWarningsPane(Font font) {
         // trigger updates of preview and stacktrace
         listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
         listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
-        // enable/disable "further information", "open file", and "show details"
-        /*listWarnings.addListSelectionListener(
-            e -> updateFurtherInformation(listWarnings.getSelectedValue().text));*/
+        // enable/disable "open file" and "show details"
         listWarnings.addListSelectionListener(e ->
             btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
@@ -292,31 +298,33 @@ public final class IssueDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
-                ListCellRenderer<? super PositionedIssueString> renderer = listWarnings.getCellRenderer();
+                ListCellRenderer<? super PositionedIssueString> renderer =
+                    listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane =
-                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row, false, false);
+                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
+                        false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
                 int x = e.getX() - cellRect.x;
                 int y = e.getY() - cellRect.y;
 
-                MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(), e.getModifiersEx(), x, y, e.getClickCount(), false);
+                MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(),
+                    e.getModifiersEx(), x, y, e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
-                if (e != null) {
-                    if (elem != null) {
-                        Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                        if (attribute instanceof AttributeSet) {
-                            AttributeSet set = (AttributeSet) attribute;
-                            String href = (String) set.getAttribute(HTML.Attribute.HREF);
-                            if (href != null) {
-                                try {
-                                    textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane, HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
-                                } catch (MalformedURLException exc) {
-                                    exc.printStackTrace();
-                                }
+                if (elem != null) {
+                    Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
+                    if (attribute instanceof AttributeSet) {
+                        AttributeSet set = (AttributeSet) attribute;
+                        String href = (String) set.getAttribute(HTML.Attribute.HREF);
+                        if (href != null) {
+                            try {
+                                textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
+                                    HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
+                            } catch (MalformedURLException exc) {
+                                exc.printStackTrace();
                             }
                         }
                     }
@@ -326,15 +334,18 @@ public final class IssueDialog extends JDialog {
 
         // react to hovering over links by changing the cursor to hand
         listWarnings.addMouseMotionListener(new MouseMotionAdapter() {
+            /** ensures that the cursor is only set once when entered/exited */
             boolean entered = false;
 
             @Override
             public void mouseMoved(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
-                ListCellRenderer<? super PositionedIssueString> renderer = listWarnings.getCellRenderer();
+                ListCellRenderer<? super PositionedIssueString> renderer =
+                    listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane =
-                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row, false, false);
+                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
+                        false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
@@ -346,22 +357,20 @@ public final class IssueDialog extends JDialog {
                         e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
-                if (e != null) {
-                    if (elem != null) {
-                        Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                        if (attribute instanceof AttributeSet) {
-                            AttributeSet set = (AttributeSet) attribute;
-                            String href = (String) set.getAttribute(HTML.Attribute.HREF);
-                            if (href != null && !entered) {
-
-                                entered = true;
-                                listWarnings.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                            }
+                if (elem != null) {
+                    Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
+                    if (attribute instanceof AttributeSet) {
+                        AttributeSet set = (AttributeSet) attribute;
+                        String href = (String) set.getAttribute(HTML.Attribute.HREF);
+                        if (href != null && !entered) {
+                            entered = true;
+                            listWarnings.setCursor(
+                                Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         }
-                    } else if (entered) {
-                        entered = false;
-                        listWarnings.setCursor(Cursor.getDefaultCursor());
                     }
+                } else if (entered) {
+                    entered = false;
+                    listWarnings.setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
@@ -374,6 +383,8 @@ public final class IssueDialog extends JDialog {
 
         JScrollPane scrWarnings;
         if (this.warnings.size() == 1) {
+            // In the special case with a single warning/error, a textpane is shown instead of the
+            // list. Note that for simplicity, the list is still initialized.
             JTextPane issueTextPane = new JTextPane();
             issueTextPane.setEditable(false);
             issueTextPane.setFont(font);
@@ -395,11 +406,16 @@ public final class IssueDialog extends JDialog {
             issueTextPane.setCaretPosition(0);
         } else {
             scrWarnings = new JScrollPane(listWarnings);
-
         }
         return scrWarnings;
     }
 
+    /**
+     * Gets the hyper link element (i.e., the anchor tag of the HTMLDocument) the mouse cursor
+     * currently points to.
+     * @param event the mouse event, needed to get the position of the cursor
+     * @return the corresponding tag element or null if the mouse does not currently point to one
+     */
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
@@ -443,24 +459,11 @@ public final class IssueDialog extends JDialog {
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOK);
-        //pButtons.add(btnFurtherInformation);
         pButtons.add(btnOpenFile);
         pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
         chkDetails.addItemListener(detailsBoxListener);
-
-        /*
-        btnFurtherInformation.addActionListener(e -> {
-            if (urlFurtherInformation != null && !urlFurtherInformation.isEmpty()) {
-                try {
-                    Objects.requireNonNull(Desktop.getDesktop())
-                        .browse(URI.create(urlFurtherInformation));
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(IssueDialog.this, ex.getMessage());
-                }
-            }
-        });*/
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
         btnOpenFile.addActionListener(action);
@@ -499,6 +502,12 @@ public final class IssueDialog extends JDialog {
         return sourcePanel;
     }
 
+    /**
+     * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
+     * shown in the dialog.
+     * @param parent the parent of the dialog (will be blocked)
+     * @param exception the exception to display
+     */
     public static void showExceptionDialog(Window parent, Throwable exception) {
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
@@ -506,7 +515,13 @@ public final class IssueDialog extends JDialog {
         dlg.dispose();
     }
 
-    public static void showWarningsIfNecessary(MainWindow mainWindow, ImmutableSet<PositionedString> warnings) {
+    /**
+     * Shows the dialog of a set of (non-critical) parser warnings.
+     * @param parent the parent of the dialog (will be blocked)
+     * @param warnings the set of warnings, will be sorted by file when displaying
+     */
+    public static void showWarningsIfNecessary(Window parent,
+                                               ImmutableSet<PositionedString> warnings) {
         Set<PositionedString> warn = warnings.toSet();
         warn.removeAll(ignoredWarnings);
         // do not show warnings dialog if all warnings are ignored
@@ -517,13 +532,19 @@ public final class IssueDialog extends JDialog {
                     : new PositionedIssueString(o, ""))
                 .collect(Collectors.toSet());
 
-            IssueDialog dialog = new IssueDialog(mainWindow,
+            IssueDialog dialog = new IssueDialog(parent,
                 SLEnvInput.getLanguage() + " warning(s)", issues, false);
             dialog.setVisible(true);
             dialog.dispose();
         }
     }
 
+    /**
+     * Extracts message, position, and stracktrace from the given exception. To be successful, the
+     * exception must have a location (see {@link ExceptionTools#getLocation(Throwable)}).
+     * @param exception the exception to extract the data from
+     * @return a new PositionedIssueString created from the data
+     */
     private static PositionedIssueString extractMessage(Throwable exception) {
         try (StringWriter sw = new StringWriter()) {
             PrintWriter pw = new PrintWriter(sw);
@@ -677,17 +698,6 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-    /*
-    private void updateFurtherInformation(String text) {
-        Matcher m = HTTP_REGEX.matcher(text);
-        if (m.find()) {
-            this.urlFurtherInformation = m.group();
-            btnFurtherInformation.setEnabled(true);
-        } else {
-            btnFurtherInformation.setEnabled(false);
-        }
-    }*/
-
     private boolean isJava(String fileName) {
         return fileName.endsWith(".java");
     }
@@ -719,10 +729,12 @@ public final class IssueDialog extends JDialog {
         throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
     }
 
-    private class PositionedStringListRenderer implements ListCellRenderer<PositionedString> {
+    private static class PositionedStringListRenderer
+        implements ListCellRenderer<PositionedString> {
         private final JTextPane textPane = new JTextPane();
 
         PositionedStringListRenderer() {
+            // react to hyperlink events by opening them in default browser
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     Desktop desktop = Desktop.getDesktop();
@@ -736,10 +748,12 @@ public final class IssueDialog extends JDialog {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends PositionedString> list, PositionedString value,
-                                                      int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends PositionedString> list,
+                                                      PositionedString value,  int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
             textPane.setContentType("text/html");
             textPane.setText(value.text);
+            // use a compound border to have both: a bit more space and small lines between the rows
             textPane.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -754,49 +768,7 @@ public final class IssueDialog extends JDialog {
             textPane.setEnabled(true);
             textPane.setEditable(false);
             textPane.setFont(list.getFont());
-
-            /*
-            Border border = null;
-            if (cellHasFocus) {
-                if (isSelected) {
-                    border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
-                }
-                if (border == null) {
-                    border = UIManager.getBorder("List.focusCellHighlightBorder");
-                }
-            } else {
-                border = new EmptyBorder(1, 1, 1, 1);
-            }*/
             return textPane;
-        }
-    }
-
-    //Debugging
-    public static void main(String[] args) {
-        PositionedIssueString a = new PositionedIssueString("Multiline text\nTest\n",
-                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
-                    new Position(20, 25), "");
-        PositionedIssueString b = new PositionedIssueString("Multiline text\nTest\nMore information: https://google.de",
-                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                    new Position(35, 10), "");
-        PositionedIssueString c = new PositionedIssueString("Blubb",
-                    "/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                    new Position(36, 1), "");
-
-        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-        warnings = warnings.add(a);
-        warnings = warnings.add(b);
-        warnings = warnings.add(c);
-        Exception npe = new NullPointerException("Fake Null Pointer exception");
-        try {
-            Location loc = new Location(Paths.get("/home/wolfram/Desktop/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java").toUri().toURL(), 35, 10);
-            Exception e = new LocatableException("Fake locatable Exception\nTest\nMore information: https://google.de", npe, loc);
-            PositionedIssueString pis = extractMessage(e);
-            warnings = warnings.add(extractMessage(e));
-            //IssueDialog.showWarningsIfNecessary(null, warnings);
-            IssueDialog.showExceptionDialog(null, e);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         }
     }
 }
