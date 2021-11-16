@@ -26,7 +26,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
@@ -39,8 +39,8 @@ import de.uka.ilkd.key.util.KeYConstants;
 import org.key_project.util.java.IOUtil;
 
 /**
- * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
- * button was pressed.
+ * Action that executes if "Send Feedback..." was pressed. There are currently two locations:
+ * In {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
  *
  * @author Kai Wallisch
  *
@@ -367,7 +367,7 @@ public class SendFeedbackAction extends AbstractAction {
                                     fileChooser.getSelectedFile()));
                 }
             } catch (Exception e) {
-                ExceptionDialog.showDialog(parent, e);
+                IssueDialog.showExceptionDialog(parent, e);
             }
 
             dialog.dispose();

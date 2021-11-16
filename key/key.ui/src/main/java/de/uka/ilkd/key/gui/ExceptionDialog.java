@@ -37,7 +37,9 @@ import java.util.stream.Collectors;
  * Dialog to display error messages.
  *
  * @author refactored by mattias
+ * @deprecated 10/20/21, use new {@link de.uka.ilkd.key.gui.IssueDialog} instead
  */
+@Deprecated
 public class ExceptionDialog extends JDialog {
 
     public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
