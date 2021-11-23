@@ -93,9 +93,7 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected void lookupAcceleratorKey(KeyStroke defaultValue) {
-        KeyStrokeManager.lookupAndOverride(this, getClass().getName());
-        //KeyStroke found = KeyStrokeManager.get(this, defaultValue);
-        //setAcceleratorKey(found);
+        KeyStrokeManager.lookupAndOverride(this, defaultValue.toString());
     }
 
     protected String getTooltip() {
