@@ -29,7 +29,7 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
-        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this, getClass().getName()));
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
         KeyStrokeManager.registerAction(this);
     }
 
@@ -38,7 +38,11 @@ public abstract class MainWindowAction extends KeyAction {
     }
 
     protected void setAcceleratorKey(KeyStroke keyStroke) {
+        boolean trigger = getAcceleratorKey() == null;
         putValue(ACCELERATOR_KEY, keyStroke);
+        if (trigger) {
+            lookupAcceleratorKey();
+        }
     }
 
     protected KeYMediator getMediator() {
