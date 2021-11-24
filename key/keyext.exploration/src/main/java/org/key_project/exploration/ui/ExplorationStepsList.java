@@ -320,6 +320,11 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public void setData(Node data) {
             this.data = data;
         }
+        
+        @Override
+        public String toString() {
+            return Integer.toString(data.serialNr());
+        }
     }
     //endregion
 
