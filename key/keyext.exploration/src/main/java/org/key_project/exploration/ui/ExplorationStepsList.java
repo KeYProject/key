@@ -71,6 +71,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
+    public Proof getProof() {return currentProof;}
+
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
         if (model != null && !model.isDisposed()) {
