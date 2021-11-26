@@ -9,12 +9,14 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.prooftree.*;
+import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
+import de.uka.ilkd.key.gui.prooftree.Style;
+import de.uka.ilkd.key.gui.prooftree.Styler;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
@@ -28,6 +30,7 @@ import java.util.List;
 
 /**
  * Entry point for the Proof Exploration Extension.
+ *
  * @author Alexander Weigl
  * @version 1 (16.04.19)
  */
@@ -62,7 +65,7 @@ public class ExplorationExtension implements KeYGuiExtension,
     };
 
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
-        
+
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class), ExplorationNodeData.class);
         }
@@ -98,13 +101,20 @@ public class ExplorationExtension implements KeYGuiExtension,
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
-                leftPanel.setProof(mediator.getSelectedProof());
-
-                mediator.getSelectedProof().removeProofTreeListener(proofTreeListener);
-                mediator.getSelectedProof().addProofTreeListener(proofTreeListener);
+                Proof oldProof = leftPanel.getProof();
+                Proof newProof = mediator.getSelectedProof();
+                if (oldProof != newProof) {
+                    leftPanel.setProof(newProof);
+                    if (oldProof != null) {
+                        oldProof.removeProofTreeListener(proofTreeListener);
+                    }
+                    if (newProof != null) {
+                        newProof.addProofTreeListener(proofTreeListener);
+                    }
+                }
             }
         });
-        
+
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
@@ -122,7 +132,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @Nonnull
+    List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         return Arrays.asList(
                 new ToggleExplorationAction(model, mainWindow),
                 new ShowInteractiveBranchesAction(model, mainWindow));
