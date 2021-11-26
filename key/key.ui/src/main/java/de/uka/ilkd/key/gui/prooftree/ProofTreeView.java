@@ -679,7 +679,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            delegateModel.updateTree(null);
+            if(delegateModel!=null) {
+                delegateModel.updateTree(null);
+            }
         }
 
         /**

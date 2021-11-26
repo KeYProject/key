@@ -71,6 +71,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
+    public Proof getProof() {return currentProof;}
+
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
         if (model != null && !model.isDisposed()) {
@@ -319,6 +321,11 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
         public void setData(Node data) {
             this.data = data;
+        }
+        
+        @Override
+        public String toString() {
+            return Integer.toString(data.serialNr());
         }
     }
     //endregion

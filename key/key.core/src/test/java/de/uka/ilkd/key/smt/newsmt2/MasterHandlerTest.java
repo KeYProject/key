@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.LineProperties;
 import org.hamcrest.core.StringContains;
 import org.junit.Assume;
@@ -161,6 +162,9 @@ public class MasterHandlerTest {
 
     @Test
     public void testZ3() throws Exception {
+
+        Assume.assumeTrue("Z3 is not installed, this testcase is ignored.",
+                SolverType.Z3_SOLVER.isInstalled(false));
 
         String expectation = props.get("expected");
         Assume.assumeTrue("No Z3 expectation.", expectation != null);
