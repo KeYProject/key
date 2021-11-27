@@ -185,6 +185,10 @@ public final class InnerNodeView extends SequentView {
 
     @Override
     public String getTitle() {
+        // If a leaf becomes an inner node, it is already closed.
+        if (node.leaf()) {
+            return "Closed Goal";
+        }
         return "Inner Node";
     }
 
