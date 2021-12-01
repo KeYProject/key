@@ -1,23 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
@@ -26,6 +8,26 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.java.IOUtil;
+
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error
@@ -39,20 +41,26 @@ import org.key_project.util.java.IOUtil;
 public class EditSourceFileAction extends AbstractAction {
     private static final long serialVersionUID = -2540941448174197032L;
 
-    /** tooltip of save buttons and textarea if the file is not writeable
-     * (e.g. inside a zip archive) */
+    /**
+     * tooltip of save buttons and textarea if the file is not writeable
+     * (e.g. inside a zip archive)
+     */
     private static final String READONLY_TOOLTIP = "The resource is readonly, " +
             "probably the URL points into a zip/jar archive!";
 
-    /** The parent window. */
+    /**
+     * The parent window.
+     */
     private final Window parent;
-    /** The exception. */
+    /**
+     * The exception.
+     */
     private final Throwable exception;
 
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent the parent
+     * @param parent    the parent
      * @param exception the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
@@ -96,9 +104,9 @@ public class EditSourceFileAction extends AbstractAction {
         parserMessage.setBorder(new TitledBorder("Parser Message"));
         JScrollPane parserMessageScrollPane = new JScrollPane(parserMessage);
         parserMessageScrollPane
-        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         parserMessageScrollPane
-        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         return parserMessageScrollPane;
     }
 
@@ -173,7 +181,8 @@ public class EditSourceFileAction extends AbstractAction {
         return textPane;
     }
 
-    private static @Nullable File tryGetFile(@Nullable URL sourceURL) {
+    private static @Nullable
+    File tryGetFile(@Nullable URL sourceURL) {
         File sourceFile = null;
         if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
             try {
@@ -271,9 +280,9 @@ public class EditSourceFileAction extends AbstractAction {
             sourceScrollPane.setRowHeaderView(lineNumbers);
 
             sourceScrollPane.setVerticalScrollBarPolicy(
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             sourceScrollPane.setHorizontalScrollBarPolicy(
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             JPanel buttonPanel = createButtonPanel(location.getFileURL(), txtSource, dialog);
 
@@ -285,6 +294,12 @@ public class EditSourceFileAction extends AbstractAction {
             container.add(buttonPanel, BorderLayout.SOUTH);
 
             dialog.pack();
+            int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width - 25;
+            int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height - 25;
+            int width = Math.min(dialog.getWidth(), screenWidth);
+            int height = Math.min(dialog.getHeight(), screenHeight);
+            dialog.setSize(width, height);
+
             dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
         } catch (IOException ioe) {
