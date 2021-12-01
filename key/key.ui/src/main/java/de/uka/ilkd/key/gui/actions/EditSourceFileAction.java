@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.parser.Location;
@@ -38,9 +39,7 @@ import java.util.TimerTask;
  * @author Kai Wallisch
  * @author Wolfram Pfeifer: syntax highlighting
  */
-public class EditSourceFileAction extends AbstractAction {
-    private static final long serialVersionUID = -2540941448174197032L;
-
+public class EditSourceFileAction extends KeyAction {
     /**
      * tooltip of save buttons and textarea if the file is not writeable
      * (e.g. inside a zip archive)
@@ -64,9 +63,11 @@ public class EditSourceFileAction extends AbstractAction {
      * @param exception the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
-        super("Edit Source File");
+        setName("Edit File");
+        setIcon(IconFactory.editFile(16));
         this.parent = parent;
         this.exception = exception;
+        setEnabled(exception != null);
     }
 
     /**
@@ -243,6 +244,14 @@ public class EditSourceFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
+        if (exception == null) {
+            JOptionPane.showMessageDialog(
+                    SwingUtilities.windowForComponent((Component) arg0.getSource()),
+                    "The given exception does not carry any positional information.",
+                    "Position not available", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
             final Location location = ExceptionTools.getLocation(exception);
             if (!Location.isValidLocation(location)) {
