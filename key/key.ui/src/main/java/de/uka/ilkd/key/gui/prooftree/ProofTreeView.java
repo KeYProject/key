@@ -876,7 +876,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 }
                 if (notes != null) {
                     toolTipText += ".\nNotes: " + notes;
-                    // TODO Change icon as well?
                 }
                 style.set(KEY_TOOLTIP, toolTipText);
             } catch (ClassCastException ignored) {
