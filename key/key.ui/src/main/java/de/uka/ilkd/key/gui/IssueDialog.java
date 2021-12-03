@@ -86,7 +86,7 @@ public final class IssueDialog extends JDialog {
     private final JList<PositionedIssueString> listWarnings;
 
     // replaced by the possibility to click links directly
-    private final JButton btnOpenFile = new JButton("Edit File", IconFactory.editFile(16));
+    private final JButton btnOpenFile = new JButton();
     private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
     private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
@@ -466,7 +466,7 @@ public final class IssueDialog extends JDialog {
         chkDetails.addItemListener(detailsBoxListener);
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
-        btnOpenFile.addActionListener(action);
+        btnOpenFile.setAction(action);
 
         btnOK.registerKeyboardAction(
             event -> {
