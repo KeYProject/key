@@ -32,6 +32,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class is used to perform program transformations needed for the symbolic
  * execution of a switch-case statement.
@@ -222,17 +225,15 @@ public class SwitchToIf extends ProgramTransformer {
      *            the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
-        int n = 0;
-        int k = 0;
-        Statement[] stats;
-        for (int i = count; i < s.getBranchCount(); i++) {
-            n += s.getBranchAt(i).getStatementCount();
-        }
-        stats = new Statement[n];
-        for (int i = count; i < s.getBranchCount(); i++) {
+        List<Statement> stats = new ArrayList<>();
+        outer: for (int i = count; i < s.getBranchCount(); i++) {
             for (int j = 0; j < s.getBranchAt(i).getStatementCount(); j++) {
-                stats[k] = s.getBranchAt(i).getStatementAt(j);
-                k++;
+                Statement statement = s.getBranchAt(i).getStatementAt(j);
+                stats.add(statement);
+                if (statement instanceof JumpStatement) {
+                    //unconditional jump to outside the case (?)
+                    break outer;
+                }
             }
         }
         return KeYJavaASTFactory.block(stats);
