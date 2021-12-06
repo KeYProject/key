@@ -20,7 +20,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -110,8 +109,8 @@ public class InvariantConfigurator {
 
         class InvariantDialog extends JDialog {
             private final LocationVariable HEAP_LDT = services.getTypeConverter().getHeapLDT().getHeap();
-            private static final Color COLOR_SUCCESS = Color.GREEN;
-            private static final Color COLOR_ERROR = Color.RED;
+            private final Color COLOR_SUCCESS = Color.GREEN;
+            private final Color COLOR_ERROR = Color.RED;
 
             private static final String INVARIANT_REQUIRED = "Invariant is required!";
             private static final String VARIANT_REQUIRED = "Variant required!";
@@ -448,7 +447,7 @@ public class InvariantConfigurator {
 
             }
 
-            public static JTextArea createInputTextArea(String title, String text) {
+            public JTextArea createInputTextArea(String title, String text) {
                 JTextArea inputTextArea = new JTextArea(text);
                 inputTextArea.setBorder(
                         BorderFactory.createTitledBorder(
