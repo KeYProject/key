@@ -1,71 +1,80 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.FlowLayout;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.IOUtil;
+
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.TitledBorder;
-
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.ExceptionTools;
-import org.key_project.util.java.IOUtil;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * Used by {@link ExceptionDialog} to open the source file containing an error
- * for editing.
+ * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error
+ * for editing. In particular, the cursor is moved directly to the location of the issue.
+ * For Java files, also syntax highlighting is supported (refreshes when nothing has been typed for
+ * some milliseconds in the editor).
  *
  * @author Kai Wallisch
+ * @author Wolfram Pfeifer: syntax highlighting
  */
-public class EditSourceFileAction extends AbstractAction {
-    private static final long serialVersionUID = -2540941448174197032L;
-
-    /** tooltip of save buttons and textarea if the file is not writeable
-     * (e.g. inside a zip archive) */
+public class EditSourceFileAction extends KeyAction {
+    /**
+     * tooltip of save buttons and textarea if the file is not writeable
+     * (e.g. inside a zip archive)
+     */
     private static final String READONLY_TOOLTIP = "The resource is readonly, " +
             "probably the URL points into a zip/jar archive!";
 
-    /** The parent dialog. */
-    private final ExceptionDialog parent;
-    /** The exception. */
+    /**
+     * The parent window.
+     */
+    private final Window parent;
+    /**
+     * The exception.
+     */
     private final Throwable exception;
 
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent the parent
+     * @param parent    the parent
      * @param exception the exception
      */
-    public EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
-        super("Edit Source File");
+    public EditSourceFileAction(final Window parent, final Throwable exception) {
+        setName("Edit File");
+        setIcon(IconFactory.editFile(16));
         this.parent = parent;
         this.exception = exception;
+        setEnabled(exception != null);
     }
 
     /**
      * Moves the caret in a {@link JTextArea} to the specified position. Assumes
      * the first position in the textarea is in line 1 column 1.
      */
-    private static void textAreaGoto(JTextArea textArea, int line, int col) {
+    private static void textAreaGoto(JTextComponent textArea, int line, int col) {
         String text = textArea.getText();
         int i = 0;
         while (i < text.length() && line > 1) {
@@ -96,17 +105,14 @@ public class EditSourceFileAction extends AbstractAction {
         parserMessage.setBorder(new TitledBorder("Parser Message"));
         JScrollPane parserMessageScrollPane = new JScrollPane(parserMessage);
         parserMessageScrollPane
-        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         parserMessageScrollPane
-        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         return parserMessageScrollPane;
     }
 
-    private static JTextArea createTextArea(final Location location,
-                                            final int columnNumber) throws IOException {
-        final JTextArea textArea = new JTextArea(30, columnNumber) {
-            private static final long serialVersionUID = 1L;
-
+    private static JTextPane createSrcTextPane(final Location location) throws IOException {
+        final JTextPane textPane = new JTextPane() {
             @Override
             public void addNotify() {
                 super.addNotify();
@@ -114,44 +120,90 @@ public class EditSourceFileAction extends AbstractAction {
                 textAreaGoto(this, location.getLine(), location.getColumn());
             }
         };
-        // read the content via URLs openStream() method
-        String source = IOUtil.readFrom(location.getFileURL().openStream());
+        String source = IOUtil.readFrom(location.getFileURL());
 
-        textArea.setText(source);
-        textArea.setFont(ExceptionDialog.MESSAGE_FONT);
-        textArea.setLineWrap(false);
-        textArea.setBorder(new TitledBorder(location.getFileURL().toString()));
-        return textArea;
+        if (location.getFileURL().toString().endsWith(".java")) {
+            JavaDocument doc = new JavaDocument();
+            try {
+                doc.insertString(0, source, new SimpleAttributeSet());
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+            textPane.setDocument(doc);
+
+            // when no key is pressed for 0.8 seconds, update (redo) the syntax highlighting
+            textPane.addKeyListener(new KeyAdapter() {
+                private Timer timer = new Timer();
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    restartTimer();
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    restartTimer();
+                }
+
+                private void restartTimer() {
+                    timer.cancel();
+                    timer = new Timer();
+                    final TimerTask task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            int pos = textPane.getCaretPosition();
+                            String content = textPane.getText();
+                            try {
+                                // creating a completely new document seems to be more than
+                                // necessary, but works well enough for the moment
+                                JavaDocument newDoc = new JavaDocument();
+                                newDoc.insertString(0, content, new SimpleAttributeSet());
+                                textPane.setDocument(newDoc);
+                                textPane.setCaretPosition(pos);
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
+                            }
+                            textPane.repaint();
+                        }
+                    };
+                    timer.schedule(task, 800);
+                }
+            });
+        } else {
+            textPane.setText(source);
+        }
+
+        Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        if (font == null) {
+            // make sure a monospaced font is used
+            font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        }
+        textPane.setFont(font);
+        return textPane;
     }
 
-
-    private static File tryGetFile(URL sourceURL) {
+    private static @Nullable
+    File tryGetFile(@Nullable URL sourceURL) {
         File sourceFile = null;
         if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
             try {
                 sourceFile = Paths.get(sourceURL.toURI()).toFile();
             } catch (URISyntaxException e) {
-                // TODO: error reporting
-                e.printStackTrace();
+                Debug.out(e);
             }
         }
         return sourceFile;
     }
 
     private JPanel createButtonPanel(final URL sourceURL,
-                                     final JTextArea textArea,
+                                     final JTextPane textPane,
                                      final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");
         JButton reloadButton = new JButton("Save, Close and Reload");
         JButton cancelButton = new JButton("Cancel");
-        ActionListener closeAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                dialog.dispose();
-            }
-        };
+        ActionListener closeAction = event -> dialog.dispose();
         cancelButton.addActionListener(closeAction);
 
         final File sourceFile = tryGetFile(sourceURL);
@@ -159,33 +211,29 @@ public class EditSourceFileAction extends AbstractAction {
             // make content read-only and show tooltips
             saveButton.setEnabled(false);
             reloadButton.setEnabled(false);
-            textArea.setEditable(false);
+            textPane.setEditable(false);
             saveButton.setToolTipText(READONLY_TOOLTIP);
             reloadButton.setToolTipText(READONLY_TOOLTIP);
-            textArea.setToolTipText(READONLY_TOOLTIP);
+            textPane.setToolTipText(READONLY_TOOLTIP);
         } else {
-            ActionListener saveAction = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    try {
-                        Files.write(sourceFile.toPath(), textArea.getText().getBytes());
-                    } catch (IOException ioe) {
-                        String message = "Cannot write to file:\n" + ioe.getMessage();
-                        JOptionPane.showMessageDialog(parent, message);
-                    }
+            ActionListener saveAction = event -> {
+                try {
+                    Files.write(sourceFile.toPath(), textPane.getText().getBytes());
+                } catch (IOException ioe) {
+                    String message = "Cannot write to file:\n" + ioe.getMessage();
+                    JOptionPane.showMessageDialog(parent, message);
                 }
             };
-            ActionListener reloadAction = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    parent.setVisible(false);
-                    MainWindow.getInstance().loadProblem(sourceFile);
-                }
+            ActionListener reloadAction = event -> {
+                parent.setVisible(false);
+                MainWindow.getInstance().loadProblem(sourceFile);
             };
             saveButton.addActionListener(saveAction);
-            reloadButton.addActionListener(saveAction);
-            reloadButton.addActionListener(closeAction);
-            reloadButton.addActionListener(reloadAction);
+            reloadButton.addActionListener(event -> {
+                saveAction.actionPerformed(event);
+                closeAction.actionPerformed(event);
+                reloadAction.actionPerformed(event);
+            });
         }
 
         buttonPanel.add(saveButton);
@@ -196,6 +244,14 @@ public class EditSourceFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
+        if (exception == null) {
+            JOptionPane.showMessageDialog(
+                    SwingUtilities.windowForComponent((Component) arg0.getSource()),
+                    "The given exception does not carry any positional information.",
+                    "Position not available", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
             final Location location = ExceptionTools.getLocation(exception);
             if (!Location.isValidLocation(location)) {
@@ -211,52 +267,53 @@ public class EditSourceFileAction extends AbstractAction {
             }
             final JDialog dialog = new JDialog(parent, prefix + location.getFileURL(),
                     Dialog.ModalityType.DOCUMENT_MODAL);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
             final int columnNumber = 75;
 
             final JScrollPane parserMessageScrollPane =
                     createParserMessageScrollPane(exception, columnNumber);
 
-            final JTextArea textArea = createTextArea(location, columnNumber);
-            JScrollPane textAreaScrollPane = new JScrollPane(textArea);
-            textAreaScrollPane
-            .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-            textAreaScrollPane
-            .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            final JTextPane txtSource = createSrcTextPane(location);
 
-            JPanel buttonPanel = createButtonPanel(location.getFileURL(), textArea, dialog);
+            // workaround to disable automatic line wrapping and enable horizontal scrollbar instead
+            JPanel nowrap = new JPanel(new BorderLayout());
+            nowrap.add(txtSource);
+            JScrollPane sourceScrollPane = new JScrollPane();
+            sourceScrollPane.setViewportView(nowrap);
+            sourceScrollPane.getVerticalScrollBar().setUnitIncrement(30);
+            sourceScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
+            sourceScrollPane.setBorder(new TitledBorder(location.getFileURL().toString()));
+
+            TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
+            sourceScrollPane.setRowHeaderView(lineNumbers);
+
+            sourceScrollPane.setVerticalScrollBarPolicy(
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+            sourceScrollPane.setHorizontalScrollBarPolicy(
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+            JPanel buttonPanel = createButtonPanel(location.getFileURL(), txtSource, dialog);
 
             Container container = dialog.getContentPane();
-            //container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
             JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             splitPane.setTopComponent(parserMessageScrollPane);
-            splitPane.setBottomComponent(textAreaScrollPane);
+            splitPane.setBottomComponent(sourceScrollPane);
             container.add(splitPane, BorderLayout.CENTER);
             container.add(buttonPanel, BorderLayout.SOUTH);
 
             dialog.pack();
-            centerDialogRelativeToMainWindow(dialog);
+            int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width - 25;
+            int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height - 25;
+            int width = Math.min(dialog.getWidth(), screenWidth);
+            int height = Math.min(dialog.getHeight(), screenHeight);
+            dialog.setSize(width, height);
+
+            dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
         } catch (IOException ioe) {
             String message = "Cannot open file:\n" + ioe.getMessage();
             JOptionPane.showMessageDialog(parent, message);
         }
-    }
-
-    /**
-     * Center dialog relative to main window.
-     *
-     * @param dialog the dialog
-     */
-    static void centerDialogRelativeToMainWindow(final JDialog dialog) {
-        dialog.setLocationRelativeTo(MainWindow.getInstance());
-//      Rectangle bounds = dialog.getBounds();
-//      Rectangle mainWindowBounds = MainWindow.getInstance().getBounds();
-//      int x = Math.max(0, mainWindowBounds.x
-//            + (mainWindowBounds.width - bounds.width) / 2);
-//      int y = Math.max(0, mainWindowBounds.y
-//            + (mainWindowBounds.height - bounds.height) / 2);
-//      dialog.setBounds(x, y, bounds.width, bounds.height);
     }
 }

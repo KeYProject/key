@@ -190,7 +190,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
             System.err.println("Scripting was cancelled.");
             Debug.printStackTrace(ex);
         } catch (Throwable ex) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);
