@@ -505,7 +505,7 @@ public final class ProofManagementDialog extends JDialog {
 
                 }
             } catch (ProofInputException exc) {
-                ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.setProof(proof);

@@ -125,7 +125,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
             mediator.removeInterruptedListener(this);
             if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not report this
                 // This should actually never happen.
-                ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
 
             mediator.getUI().taskFinished(info);

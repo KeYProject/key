@@ -342,7 +342,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 								((SVInstantiationExceptionWithPosition) exc).getColumn(),
 								((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 					}
-					ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, exc);
+					IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
 					return ;
 				}
 				InstantiationFileHandler.saveListFor(model[current()]);

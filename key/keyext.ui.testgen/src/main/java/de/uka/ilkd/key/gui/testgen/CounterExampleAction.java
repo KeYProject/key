@@ -18,7 +18,7 @@ import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -119,7 +119,7 @@ public class CounterExampleAction extends MainWindowAction {
             getMediator().addInterruptedListener(worker);
             worker.execute();
         } catch (Exception exc) {
-            ExceptionDialog.showDialog(mainWindow, exc);
+            IssueDialog.showExceptionDialog(mainWindow, exc);
         }
     }
 
