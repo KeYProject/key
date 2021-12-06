@@ -19,7 +19,7 @@ import java.io.File;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
@@ -80,7 +80,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
                 psw.execute();
             }
         } catch (Exception ex) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
     }
 }

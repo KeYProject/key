@@ -37,7 +37,9 @@ import java.util.stream.Collectors;
  * Dialog to display error messages.
  *
  * @author refactored by mattias
+ * @deprecated 10/20/21, use new {@link de.uka.ilkd.key.gui.IssueDialog} instead
  */
+@Deprecated
 public class ExceptionDialog extends JDialog {
 
     public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
@@ -51,7 +53,7 @@ public class ExceptionDialog extends JDialog {
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
-        if(parent!=null) {
+        if (parent != null) {
             dlg.setLocationRelativeTo(parent);
         }
         dlg.setVisible(true);
@@ -61,13 +63,15 @@ public class ExceptionDialog extends JDialog {
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
         this.exception = exception;
-        try {
-            location = ExceptionTools.getLocation(exception);
-        } catch (MalformedURLException e) {
-            // We must not suppress the dialog here -> catch and print only to error stream
-            location = null;
-            System.err.println("Creating a Location failed for " + exception);
-            e.printStackTrace();
+        if (exception != null) {
+            try {
+                location = ExceptionTools.getLocation(exception);
+            } catch (MalformedURLException e) {
+                // We must not suppress the dialog here -> catch and print only to error stream
+                location = null;
+                System.err.println("Creating a Location failed for " + exception);
+                e.printStackTrace();
+            }
         }
         init();
     }
@@ -84,10 +88,10 @@ public class ExceptionDialog extends JDialog {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Container contentPane = getContentPane();
-                if (e.getStateChange() == ItemEvent.SELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     contentPane.add(stScroll, new GridBagConstraints(0, 3, 1, 1, 1., 10.,
                             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                                    0, 0, 0, 0), 0, 0));
+                            0, 0, 0, 0), 0, 0));
                 } else {
                     contentPane.remove(stScroll);
                 }
@@ -105,7 +109,7 @@ public class ExceptionDialog extends JDialog {
         closeButton.addActionListener(closeListener);
         getRootPane().setDefaultButton(closeButton);
 
-        JCheckBox detailsBox  = new JCheckBox("Show Details");
+        JCheckBox detailsBox = new JCheckBox("Show Details");
         detailsBox.setSelected(false);
         detailsBox.addItemListener(detailsBoxListener);
 
@@ -118,7 +122,7 @@ public class ExceptionDialog extends JDialog {
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);
         editSourceFileButton.addActionListener(action);
-        if(!Location.isValidLocation(location)) {
+        if (!Location.isValidLocation(location)) {
             editSourceFileButton.setEnabled(false);
         }
         bPanel.add(editSourceFileButton);
@@ -172,16 +176,16 @@ public class ExceptionDialog extends JDialog {
                  BufferedReader br = new BufferedReader(isr)) {
 
                 List<String> list = br.lines()
-                    // optimization: read only as far as necessary
-                    .limit(location.getLine())
-                    .collect(Collectors.toList());
+                        // optimization: read only as far as necessary
+                        .limit(location.getLine())
+                        .collect(Collectors.toList());
                 String line = list.get(location.getLine() - 1);
                 String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
                 message.append(StringUtil.NEW_LINE).
-                    append(StringUtil.NEW_LINE).
-                    append(line).
-                    append(StringUtil.NEW_LINE).
-                    append(pointLine);
+                        append(StringUtil.NEW_LINE).
+                        append(line).
+                        append(StringUtil.NEW_LINE).
+                        append(pointLine);
             } catch (IOException e) {
                 System.err.println("Creating an error line did not work for " + location);
                 e.printStackTrace();
@@ -241,22 +245,22 @@ public class ExceptionDialog extends JDialog {
         cp.setLayout(new GridBagLayout());
 
         cp.add(createExcTextAreaScroll(),
-                    new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+                        0, 0, 0, 0), 0, 0));
 
         JPanel locationPanel = createLocationPanel();
 
-        if(locationPanel != null) {
+        if (locationPanel != null) {
             cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                    0, 0, 0, 0), 0, 0));
         }
 
         JPanel buttonPanel = createButtonPanel();
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 0), 0, 0));
+                0, 0, 0, 0), 0, 0));
 
         // not displayed, only created;
         stTextArea = createStacktraceTextArea();

@@ -391,12 +391,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (proof != null && !proof.isDisposed()) {
             proof.removeRuleAppListener(proofListener);
         }
+        
+        Proof oldProof = proof;
         proof = p;
+        
         if (proof != null) {
             proof.addRuleAppListener(proofListener);
-        }
-
-        if (proof != null) {
             delegateModel = models.get(p);
             if (delegateModel == null) {
                 delegateModel = new GUIProofTreeModel(p);
@@ -408,6 +408,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = new ProofTreeExpansionState(delegateView,
                     delegateModel.getExpansionState());
             delegateView.expandRow(0);
+            
+            // Redraw the tree in case the ProofTreeViewFilters have changed
+            // since the last time the proof was loaded.
+            if (oldProof == null || !oldProof.equals(proof)) {
+                delegateModel.updateTree(null);
+            }            
+            
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
         } else {
@@ -676,10 +683,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             lastGoalNode = null;
             setProof(e.getSource().getSelectedProof());
             delegateView.validate();
-            
-            // Redraw the tree in case the ProofTreeViewFilters have changed
-            // since the last time the proof was loaded.
-            delegateModel.updateTree(null);
         }
 
         /**

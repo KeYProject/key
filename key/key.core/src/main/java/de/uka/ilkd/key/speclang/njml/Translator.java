@@ -968,7 +968,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = lookupIdentifier(lookupName, receiver, params, ctx);
         if (result == null) {
-            if (fullyQualifiedName.indexOf('.') < 0) {
+            if (fullyQualifiedName.indexOf('.') < 0 && selfVar != null) {
                 //resolve by prefixing an `this.`
                 result = lookupIdentifier(lookupName, getThisReceiver(), params, ctx);
             }
