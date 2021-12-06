@@ -566,7 +566,9 @@ public final class Main {
         File examplesDir = getExamplesDir() == null ?
                 ExampleChooser.lookForExamples() :
                 new File(getExamplesDir());
-        if (!examplesDir.exists()) {
+        if (examplesDir.exists()) {
+            setExamplesDir(examplesDir.getAbsolutePath());
+        } else {
             setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
         }
     }
