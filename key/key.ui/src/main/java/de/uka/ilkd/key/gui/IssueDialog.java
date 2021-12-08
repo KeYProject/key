@@ -387,6 +387,8 @@ public final class IssueDialog extends JDialog {
             // list. Note that for simplicity, the list is still initialized.
             JTextPane issueTextPane = new JTextPane();
             issueTextPane.setEditable(false);
+            // this is needed to have the font settings respected when using html content type:
+            issueTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             issueTextPane.setFont(font);
             issueTextPane.setContentType("text/html");
             issueTextPane.addHyperlinkListener(hle -> {
