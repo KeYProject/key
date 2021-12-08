@@ -41,7 +41,6 @@ import java.util.List;
  */
 public class SwitchToIf extends ProgramTransformer {
 
-    public static int labelCount = 0;
     private boolean noNewBreak = true;
 
     /**
@@ -58,11 +57,12 @@ public class SwitchToIf extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         Switch sw = (Switch) pe;
-        Label l = new ProgramElementName("_l" + labelCount);
-        labelCount++;
-        Break newBreak = KeYJavaASTFactory.breakStatement(l);
 
         VariableNamer varNamer = services.getVariableNamer();
+
+        Label l = varNamer.getTemporaryNameProposal("_l");
+        Break newBreak = KeYJavaASTFactory.breakStatement(l);
+
         ProgramElementName name = varNamer.getTemporaryNameProposal("_var");
 
         final ExecutionContext ec = insts.getExecutionContext();
