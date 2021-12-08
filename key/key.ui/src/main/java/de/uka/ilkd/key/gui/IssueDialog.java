@@ -380,6 +380,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.setSelectedIndex(0);
         listWarnings.setEnabled(true);
         listWarnings.setFocusable(true);
+        listWarnings.setFont(font);
 
         JScrollPane scrWarnings;
         if (this.warnings.size() == 1) {
@@ -769,6 +770,8 @@ public final class IssueDialog extends JDialog {
 
             textPane.setEnabled(true);
             textPane.setEditable(false);
+            // this is needed to have the font settings respected when using html content type:
+            textPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             textPane.setFont(list.getFont());
             return textPane;
         }
