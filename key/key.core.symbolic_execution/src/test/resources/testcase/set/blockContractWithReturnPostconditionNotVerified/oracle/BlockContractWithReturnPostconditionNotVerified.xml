@@ -13,26 +13,6 @@ post returned = TRUE
 mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
-               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
-                  <callStackEntry path="/0/0/0"/>
-                  <callStackEntry path="/0"/>
-                  <branchStatement name="if (x_3==2)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                     <callStackEntry path="/0/0/0"/>
-                     <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <callStackEntry path="/0/0/0"/>
-                        <statement name="returned_1=true;" pathCondition="true" pathConditionChanged="false">
-                           <callStackEntry path="/0/0/0"/>
-                           <statement name="result_0_1=-4711;" pathCondition="true" pathConditionChanged="false">
-                              <callStackEntry path="/0/0/0"/>
-                              <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="false">
-                              </termination>
-                              <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
-                           </statement>
-                        </statement>
-                     </branchCondition>
-                     <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
-                  </branchStatement>
-               </branchCondition>
                <branchCondition name="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="true" branchCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Usage">
                   <callStackEntry path="/0/0/0"/>
                   <callStackEntry path="/0"/>
@@ -55,11 +35,10 @@ mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditio
                   </branchCondition>
                </branchCondition>
             </blockContract>
-            <methodReturnEntry path="/0/0/0/0/1/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
-      <methodReturnEntry path="/0/0/0/0/1/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
 </start>
