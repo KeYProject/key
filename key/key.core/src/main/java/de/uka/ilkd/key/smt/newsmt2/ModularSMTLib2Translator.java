@@ -67,7 +67,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         if(!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
             for (Term t : master.getUnknownValues().keySet()) {
-                sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString() + "\n");
+                sb.append("; " + master.getUnknownValues().get(t).toString() + " :  "
+                        + t.toString().replace("\n", "") + "\n");
+                // Remove linebreaks from the term's toString as that would lead to errors in the SMT translation.
             }
         }
 
