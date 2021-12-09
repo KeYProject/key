@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
@@ -14,8 +13,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.parsing.LocatableException;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
@@ -32,7 +29,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -85,8 +81,7 @@ public final class IssueDialog extends JDialog {
 
     private final JList<PositionedIssueString> listWarnings;
 
-    // replaced by the possibility to click links directly
-    private final JButton btnOpenFile = new JButton();
+    private final JButton btnEditFile = new JButton();
     private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
     private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
@@ -187,7 +182,7 @@ public final class IssueDialog extends JDialog {
         //       scrPreview: nowrap: txtSource
         //       pSouth
         //         chkIgnoreWarnings
-        //         pButtons: btnOK btnFurtherInformation btnOpenFile chkDetails
+        //         pButtons: btnOK btnEditFile chkDetails
         // ----splitBottom
         //   stacktracePanel
         //     stTextArea
@@ -275,7 +270,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "open file" and "show details"
         listWarnings.addListSelectionListener(e ->
-            btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+            btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
                 chkDetails.setSelected(false);
@@ -449,27 +444,26 @@ public final class IssueDialog extends JDialog {
 
         final JButton btnOK = new JButton("OK");
         btnOK.addActionListener(e -> accept());
-        Dimension buttonDim = new Dimension(100, 27);
+        Dimension buttonDim = new Dimension(100, 29);
         btnOK.setPreferredSize(buttonDim);
         btnOK.setMinimumSize(buttonDim);
-        btnOK.setMaximumSize(new Dimension(Integer.MAX_VALUE, 27));
-
         final JButton btnSendFeedback = new JButton(new SendFeedbackAction(this, throwable));
-        Dimension feedbackBtnDim = new Dimension(130, buttonDim.height);
+        Dimension feedbackBtnDim = new Dimension(btnSendFeedback.getPreferredSize().width,
+            buttonDim.height);
         btnSendFeedback.setMinimumSize(feedbackBtnDim);
         btnSendFeedback.setPreferredSize(feedbackBtnDim);
 
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOK);
-        pButtons.add(btnOpenFile);
+        pButtons.add(btnEditFile);
         pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
         chkDetails.addItemListener(detailsBoxListener);
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
-        btnOpenFile.setAction(action);
+        btnEditFile.setAction(action);
 
         btnOK.registerKeyboardAction(
             event -> {
@@ -631,7 +625,7 @@ public final class IssueDialog extends JDialog {
         cTextField.setText("Column: " + issue.pos.getColumn());
         lTextField.setText("Line: " + issue.pos.getLine());
 
-        btnOpenFile.setEnabled(issue.pos != Position.UNDEFINED);
+        btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
             String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
