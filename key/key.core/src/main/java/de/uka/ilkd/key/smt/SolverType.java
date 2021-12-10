@@ -257,7 +257,7 @@ public interface SolverType  {
 
 		@Override
 		public String[] getSupportedVersions() {
-			return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1", "version 4.8.8", "version 4.8.9", "version 4.8.10", "version 4.8.11", "version 4.8.12", "version 4.8.14"};
+			return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1", "version 4.8.8", "version 4.8.9", "version 4.8.10", "version 4.8.11", "version 4.8.12", "version 4.8.13", "version 4.8.14"};
 		}
 
 		@Override
