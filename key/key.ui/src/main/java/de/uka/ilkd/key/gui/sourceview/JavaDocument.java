@@ -555,6 +555,12 @@ public class JavaDocument extends DefaultStyledDocument {
             strpos = i - offs;
             processChar(Character.toString(str.charAt(strpos)));
         }
-        currentPos = offs;
+        // place the internal "cursor" of the document after the inserted String, reset internal
+        // state to defaults (fixes problems when editing a document)
+        currentPos = endpos;
+        tokenStart = endpos;
+        token = "";
+        mode = Mode.NORMAL;
+        state = CommentState.NO;
     }
 }
