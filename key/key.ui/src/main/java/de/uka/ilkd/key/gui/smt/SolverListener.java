@@ -251,8 +251,8 @@ public class SolverListener implements SolverLauncherListener {
         }
         
         private void showInformation(InternSMTProblem problem){	
-        	    InformationWindow window = new InformationWindow(
-                        MainWindow.getInstance(), problem.solver,problem.information,
+        	    new InformationWindow(
+                        progressDialog, problem.solver,problem.information,
                         "Information for "+ problem.toString());
         }
 

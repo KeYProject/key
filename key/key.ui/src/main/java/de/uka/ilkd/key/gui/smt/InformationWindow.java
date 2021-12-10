@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.util.Collection;
 
 import javax.swing.*;
@@ -85,7 +84,7 @@ public class InformationWindow extends JDialog {
     
     private JTabbedPane tabbedPane;
 	private Model model;
-	public InformationWindow(JFrame parent, SMTSolver solver, Collection<Information> information, String title){
+	public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information, String title){
 		super(parent);
 		this.setTitle(title);
 		initModel(solver);
