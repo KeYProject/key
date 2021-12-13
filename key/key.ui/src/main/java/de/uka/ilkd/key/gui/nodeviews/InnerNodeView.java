@@ -90,6 +90,7 @@ public final class InnerNodeView extends SequentView {
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3, 0, 0, 0, Color.black),
                 new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setEditable(false);
 
 //        updateUI();
         printSequent();

@@ -391,12 +391,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (proof != null && !proof.isDisposed()) {
             proof.removeRuleAppListener(proofListener);
         }
+        
+        Proof oldProof = proof;
         proof = p;
+        
         if (proof != null) {
             proof.addRuleAppListener(proofListener);
-        }
-
-        if (proof != null) {
             delegateModel = models.get(p);
             if (delegateModel == null) {
                 delegateModel = new GUIProofTreeModel(p);
@@ -408,6 +408,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = new ProofTreeExpansionState(delegateView,
                     delegateModel.getExpansionState());
             delegateView.expandRow(0);
+            
+            // Redraw the tree in case the ProofTreeViewFilters have changed
+            // since the last time the proof was loaded.
+            if (oldProof == null || !oldProof.equals(proof)) {
+                delegateModel.updateTree(null);
+            }            
+            
             delegateView.setSelectionPath(delegateModel.getSelection());
             delegateView.scrollPathToVisible(delegateModel.getSelection());
         } else {
@@ -676,12 +683,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             lastGoalNode = null;
             setProof(e.getSource().getSelectedProof());
             delegateView.validate();
-            
-            // Redraw the tree in case the ProofTreeViewFilters have changed
-            // since the last time the proof was loaded.
-            if(delegateModel!=null) {
-                delegateModel.updateTree(null);
-            }
         }
 
         /**
@@ -850,27 +851,34 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (!node.getNode().leaf() || node instanceof GUIBranchNode) return;
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
+                String toolTipText;
+                final String notes = leaf.getNodeInfo().getNotes();
+
                 if (goal == null || leaf.isClosed()) {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_GREEN_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
-                    style.set(KEY_TOOLTIP, "A closed goal");
+                    toolTipText = "A closed goal";
                 } else if (goal.isLinked()) {
                     style.set(KEY_COLOR_FOREGROUND, PINK_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleLinked(20, 20));
                     ProofTreeView.this.setToolTipText("Linked Goal");
-                    style.set(KEY_TOOLTIP, "Linked goal - no automatic rule application");
+                    toolTipText = "Linked goal - no automatic rule application";
                 } else if (!goal.isAutomatic()) {
                     style.set(KEY_COLOR_FOREGROUND, ORANGE_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleInteractive(20, 20));
                     ProofTreeView.this.setToolTipText("Disabled Goal");
-                    style.set(KEY_TOOLTIP, "Interactive goal - no automatic rule application");
+                    toolTipText = "Interactive goal - no automatic rule application";
                 } else {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_RED_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHole(20, 20));
                     ProofTreeView.this.setToolTipText("Open Goal");
-                    style.set(KEY_TOOLTIP, "An open goal");
+                    toolTipText = "An open goal";
                 }
+                if (notes != null) {
+                    toolTipText += ".\nNotes: " + notes;
+                }
+                style.set(KEY_TOOLTIP, toolTipText);
             } catch (ClassCastException ignored) {
             }
         }

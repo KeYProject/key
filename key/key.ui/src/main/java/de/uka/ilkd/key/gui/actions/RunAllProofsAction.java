@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
@@ -31,7 +32,7 @@ public class RunAllProofsAction extends MainWindowAction {
     public static final String ENV_VARIABLE = "KEY_RUNALLPROOFS_UI_FILE";
     private static final @Nullable String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
     private static final String DEFAULT_FILE = "runallproofsui.txt";
-    private final File EXAMPLE_DIR = ExampleChooser.lookForExamples();
+    private final File EXAMPLE_DIR;
     private List<File> files;
 
     /**
@@ -61,12 +62,17 @@ public class RunAllProofsAction extends MainWindowAction {
 
     public RunAllProofsAction(MainWindow mainWindow) {
         super(mainWindow);
+        
+        Main.ensureExamplesAvailable();
+        EXAMPLE_DIR = new File(Main.getExamplesDir());
+        
         try {
             files = loadFiles();
         } catch (IOException e) {
             files = new ArrayList<>();
             e.printStackTrace();
         }
+        
         setName("Run all proofs");
         //setEnabled(Debug.ENABLE_DEBUG);
         setTooltip("Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");

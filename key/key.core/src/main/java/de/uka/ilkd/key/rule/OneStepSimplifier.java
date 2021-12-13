@@ -566,7 +566,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         if (active != newActive || lastProof != proof) {
             active = newActive;
-            if(active && proof != null && !proof.closed()) {
+            if(active && proof != null) {
                 initIndices(proof);
             } else {
                 shutdownIndices();
