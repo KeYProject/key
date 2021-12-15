@@ -1,5 +1,5 @@
 example.name = Understanding Proof Situations
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.file = PostIncMod.java
 example.additionalFile.1 = PostIncMod.java
 example.additionalFile.2 = PostIncCorrected.java

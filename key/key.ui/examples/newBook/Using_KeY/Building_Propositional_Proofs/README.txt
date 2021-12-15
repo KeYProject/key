@@ -1,5 +1,5 @@
 example.name = Building Propositional Proofs
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.file = andCommutes.key
 example.additionalFile.1 = andCommutes.key
 
