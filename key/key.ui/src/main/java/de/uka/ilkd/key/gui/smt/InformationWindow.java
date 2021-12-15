@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.util.Collection;
 
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
@@ -88,8 +84,8 @@ public class InformationWindow extends JDialog {
     
     private JTabbedPane tabbedPane;
 	private Model model;
-	public InformationWindow( SMTSolver solver, Collection<Information> information, String title){
-		super();
+	public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information, String title){
+		super(parent);
 		this.setTitle(title);
 		initModel(solver);
 		for(Information el : information){
@@ -101,8 +97,6 @@ public class InformationWindow extends JDialog {
        this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
        this.setLocationByPlatform(true);
-
-       
        this.setVisible(true);
    }
    
