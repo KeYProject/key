@@ -161,10 +161,8 @@ public class TestJMLTranslator {
     @Test
     public void testPrimitiveField() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
         Term result = jmlIO.parseExpression("this.i");
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
         assertTrue(termContains(result, selfVar));
     }
 
@@ -313,7 +311,6 @@ public class TestJMLTranslator {
     @Test
     public void testOld() {
         ProgramVariable excVar = buildExcVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         Term result = jmlIO
                 .exceptionVariable(excVar)
@@ -355,16 +352,12 @@ public class TestJMLTranslator {
     @Test
     public void testNonNullElements() {
 
-        ProgramVariable array = javaInfo.getAttribute(
-                "testPackage.TestClass::array");
-
         Term result = jmlIO
                 .atPres(atPres)
                 .parseExpression(
                         "\\nonnullelements(this.array)");
 
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
         assertTrue(termContains(result, TB.NULL()));
     }
 
