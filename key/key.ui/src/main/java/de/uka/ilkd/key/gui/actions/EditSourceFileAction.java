@@ -125,6 +125,9 @@ public class EditSourceFileAction extends KeyAction {
             }
         };
         String source = IOUtil.readFrom(location.getFileURL());
+        // workaround for #1641: replace all carriage returns, since JavaDocument can currently
+        // not handle them
+        source = source.replace("\r", "");
 
         if (location.getFileURL().toString().endsWith(".java")) {
             JavaDocument doc = new JavaDocument();
@@ -225,7 +228,10 @@ public class EditSourceFileAction extends KeyAction {
         } else {
             ActionListener saveAction = event -> {
                 try {
-                    Files.write(sourceFile.toPath(), textPane.getText().getBytes());
+                    // workaround for #1641: replace "\n" with system dependent line separators when
+                    // saving
+                    String text = textPane.getText().replace("\n", System.lineSeparator());
+                    Files.write(sourceFile.toPath(), text.getBytes());
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);
