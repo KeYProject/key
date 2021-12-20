@@ -15,11 +15,14 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @autor Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
@@ -29,7 +32,12 @@ public class FloatHandler implements SMTHandler {
     public static final Type FLOAT = new Type("Float", "f2u", "u2f");
     public static final Type DOUBLE = new Type("Double", "d2u", "u2d");
 
+    /** Java's FP semantics is always "round to nearest even". */
+    private static final String ROUNDING_MODE = "RNE";
+
     private final Map<Operator, String> fpOperators = new HashMap<>();
+    private final Set<String> roundingOperators = new HashSet<>();
+
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     private Services services;
@@ -102,6 +110,9 @@ public class FloatHandler implements SMTHandler {
 //        mathOperators.put(doubleLDT.getExpDouble(), SMTTermFloatOp.Op.EXPDOUBLE);
 //        mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
 
+        // These operators take a round mode argument:
+        roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div"));
+
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
@@ -129,6 +140,10 @@ public class FloatHandler implements SMTHandler {
             ImmutableArray<Term> subs = term.subs();
 
             List<SExpr> translatedSubs = new LinkedList<>();
+
+            if(roundingOperators.contains(fpOp)) {
+                translatedSubs.add(new SExpr(ROUNDING_MODE));
+            }
 
             for (Term t : subs) {
                 Type type = getType(t.sort());
