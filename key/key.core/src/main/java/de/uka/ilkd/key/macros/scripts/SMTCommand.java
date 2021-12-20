@@ -52,23 +52,38 @@ public class SMTCommand
         }
         
         for (Goal goal : goals) {
-            SMTSettings settings = new SMTSettings(
-                    goal.proof().getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    goal.proof().getSettings().getNewSMTSettings(),
-                    goal.proof());
-            SolverLauncher launcher = new SolverLauncher(settings);
-            Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
-            probList.add(new SMTProblem(goal));
-            launcher.launch(su.getTypes(), probList, goal.proof().getServices());
-    
-            for (SMTProblem problem : probList) {
-                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
-                            .setTitle(args.solver);
-                    problem.getGoal().apply(app);
-                }
-            }
+            runSMT(args, su, goal);
+        }
+    }
+
+    private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
+        SMTSettings settings = new SMTSettings(
+                goal.proof().getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                goal.proof());
+
+        if(args.timeout >= 0) {
+            settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
+        }
+
+        SolverLauncher launcher = new SolverLauncher(settings);
+        Collection<SMTProblem> probList = new LinkedList<>();
+        probList.add(new SMTProblem(goal));
+        TimerListener timerListener = new TimerListener();
+        launcher.addListener(timerListener);
+        launcher.launch(su.getTypes(), probList, goal.proof().getServices());
+
+        for (SMTProblem problem : probList) {
+            SMTSolverResult finalResult = problem.getFinalResult();
+            if (finalResult.isValid() == ThreeValuedTruth.VALID) {
+                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
+                        .setTitle(args.solver);
+                problem.getGoal().apply(app);
+}
+            System.err.println("SMT Runtime, goal " +
+                    goal.node().serialNr() + ": " +
+                    timerListener.getRuntime() + " ms; " +
+                    finalResult);
         }
     }
 
