@@ -555,7 +555,8 @@ public final class IssueDialog extends JDialog {
                  filename = new File(location.getFileURL().toURI()).toString();
                  pos = new Position(location.getLine(), location.getColumn());
             }
-            return new PositionedIssueString(message, filename, pos, info);
+            return new PositionedIssueString(
+                    message == null ? exception.toString() : message, filename, pos, info);
         } catch (URISyntaxException | IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             Debug.out("Creating a Location failed for " + exception, e);
