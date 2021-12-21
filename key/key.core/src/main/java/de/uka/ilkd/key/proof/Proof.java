@@ -490,7 +490,7 @@ public class Proof implements Named {
      * @see #closedGoals()
      */
     public ImmutableList<Goal> allGoals() {
-        return openGoals.append(closedGoals);
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
     }
 
     /**
