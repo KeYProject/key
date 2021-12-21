@@ -60,7 +60,7 @@ public class MacroKeyBinding extends AbstractAction {
             }
         }
 
-        System.out.println("macro key binding -- pio=" + posInOcc);
+        // System.out.println("macro key binding -- pio=" + posInOcc);
 
         if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
             mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
