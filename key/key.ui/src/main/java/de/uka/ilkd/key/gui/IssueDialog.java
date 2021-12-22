@@ -549,15 +549,15 @@ public final class IssueDialog extends JDialog {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
-            String filename = "";
+            String resourceLocation = "";
             Position pos = Position.UNDEFINED;
             if (Location.isValidLocation(location)) {
-                 filename = new File(location.getFileURL().toURI()).toString();
-                 pos = new Position(location.getLine(), location.getColumn());
+                resourceLocation = location.getFileURL().toString();
+                pos = new Position(location.getLine(), location.getColumn());
             }
             return new PositionedIssueString(
-                    message == null ? exception.toString() : message, filename, pos, info);
-        } catch (URISyntaxException | IOException e) {
+                    message == null ? exception.toString() : message, resourceLocation, pos, info);
+        } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             Debug.out("Creating a Location failed for " + exception, e);
         }
@@ -619,7 +619,7 @@ public final class IssueDialog extends JDialog {
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
         if (!issue.fileName.isEmpty()) {
-            fTextField.setText("File: " + issue.fileName);
+            fTextField.setText("URL: " + issue.fileName);
         } else {
             fTextField.setText("");
         }
