@@ -685,7 +685,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private void setLastMousePosition(Point p) {
-        System.out.println("setLast Pos " + p);
+        // System.out.println("setLast Pos " + p);
         Point old = this.lastMousePosition;
         lastMousePosition=p;
         firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);
