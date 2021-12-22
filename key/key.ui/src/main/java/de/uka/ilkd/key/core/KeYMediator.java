@@ -691,6 +691,7 @@ public class KeYMediator {
                     }
                 }
             });
+            OneStepSimplifier.refreshOSS(e.getSource());
             pruningInProcess = false;
         }
 
