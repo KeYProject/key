@@ -245,8 +245,14 @@ public abstract class AbstractFileRepo implements FileRepo {
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
 
         for (Path p : files) {
+
             // use the correct name for saving!
-            zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
+            // fix for #1655: replace separators to conform to zip specification (only slashes)!
+            String entryName = getSaveName(p).toString();
+            if (File.separatorChar != '/') {
+                entryName = entryName.replace(File.separatorChar, '/');
+            }
+            zos.putNextEntry(new ZipEntry(entryName));
 
             InputStream is;
             // filtering for *.key/*.proof files
