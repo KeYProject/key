@@ -14,7 +14,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -29,9 +28,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.html.HTMLEditorKit;
 
-import bibliothek.util.Version;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
@@ -49,6 +46,9 @@ import org.key_project.util.java.IOUtil;
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations:
  * In {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
  *
+ * For a documentation of the backend of the auto-send mechanism, refer to the
+ * file key-report.php in the same directory as this file.
+ *
  * @author Kai Wallisch, Mattias Ulbrich
  *
  */
@@ -64,7 +64,7 @@ public class SendFeedbackAction extends AbstractAction {
     /**
      * This is the url to which the feedback will be sent.
      */
-    private static final String REPORT_URL ="https://formal.kastel.kit.edu/ulbrich/key-report.php";
+    private static final String REPORT_URL ="https://formal.kastel.kit.edu/key/key-report.php";
 
     private static String serializeStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
@@ -374,6 +374,21 @@ public class SendFeedbackAction extends AbstractAction {
         }
 
         private void sendReport(String message) {
+
+            String[] msgs = {
+//            tp.setEditable(false);
+//            tp.setBackground(UIManager.getColor("label.background"));
+//            tp.setEditorKit(new HTMLEditorKit());
+//            tp.setText("<html>" +
+                    "The data you have collected and the description text will now be sent via",
+                    "https to the server formal.kastel.kit.edu, stored on the server and forwarded",
+                    "to the KeY mailing list.", "", "Click OK if you want to send the report now."
+            };
+            int answer = JOptionPane.showConfirmDialog(parent, msgs, "Ready to send?", JOptionPane.YES_NO_OPTION);
+            if (answer != JOptionPane.YES_OPTION) {
+                return;
+            }
+
             try {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 saveMetaData(buffer, message);
