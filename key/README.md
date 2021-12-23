@@ -7,7 +7,7 @@ This folder contains the interactive theorem prover KeY for the verification of 
 You can find more information on KeY on our [website](https://key-project.org) or in use the
 documentation in the companion repository [key-docs](https://git.key-project.org/key/key-docs).
 
-The current version is 2.8.0, licensed under GPL v2.
+The current version is 2.10.0, licensed under GPL v2.
 
 
 ## Requirements:
