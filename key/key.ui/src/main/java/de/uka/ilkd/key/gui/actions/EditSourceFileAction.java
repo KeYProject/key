@@ -13,9 +13,7 @@ import org.key_project.util.java.IOUtil;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +44,12 @@ public class EditSourceFileAction extends KeyAction {
      */
     private static final String READONLY_TOOLTIP = "The resource is readonly, " +
             "probably the URL points into a zip/jar archive!";
+
+    /** The interval in milliseconds for refreshing the syntax highlighting of the shown file:
+     * If after a change in the text field  no other char is pressed for this period, the document
+     * is completely re-highlighted.
+     * If desired, this could be set much lower (also seems to work with ~50). */
+    private static final int SYNTAX_HIGHLIGHTING_REFRESH_INTERVAL = 800;
 
     /**
      * The parent window.
@@ -111,7 +115,7 @@ public class EditSourceFileAction extends KeyAction {
         return parserMessageScrollPane;
     }
 
-    private static JTextPane createSrcTextPane(final Location location) throws IOException {
+    private JTextPane createSrcTextPane(final Location location) throws IOException {
         final JTextPane textPane = new JTextPane() {
             @Override
             public void addNotify() {
@@ -121,6 +125,9 @@ public class EditSourceFileAction extends KeyAction {
             }
         };
         String source = IOUtil.readFrom(location.getFileURL());
+        // workaround for #1641: replace all carriage returns, since JavaDocument can currently
+        // not handle them
+        source = source.replace("\r", "");
 
         if (location.getFileURL().toString().endsWith(".java")) {
             JavaDocument doc = new JavaDocument();
@@ -131,17 +138,13 @@ public class EditSourceFileAction extends KeyAction {
             }
             textPane.setDocument(doc);
 
-            // when no key is pressed for 0.8 seconds, update (redo) the syntax highlighting
+            // when no char is inserted for the specified interval, refresh the syntax highlighting
+            // note: When other keys are pressed or held down (e.g. arrow keys) nothing is done.
             textPane.addKeyListener(new KeyAdapter() {
                 private Timer timer = new Timer();
 
                 @Override
-                public void keyPressed(KeyEvent e) {
-                    restartTimer();
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
+                public void keyTyped(KeyEvent e) {
                     restartTimer();
                 }
 
@@ -151,22 +154,29 @@ public class EditSourceFileAction extends KeyAction {
                     final TimerTask task = new TimerTask() {
                         @Override
                         public void run() {
-                            int pos = textPane.getCaretPosition();
-                            String content = textPane.getText();
-                            try {
-                                // creating a completely new document seems to be more than
-                                // necessary, but works well enough for the moment
-                                JavaDocument newDoc = new JavaDocument();
-                                newDoc.insertString(0, content, new SimpleAttributeSet());
-                                textPane.setDocument(newDoc);
-                                textPane.setCaretPosition(pos);
-                            } catch (BadLocationException ex) {
-                                ex.printStackTrace();
+                            // synchronized to avoid inserting chars during document updating
+                            synchronized (textPane) {
+                                int pos = textPane.getCaretPosition();
+                                int start = textPane.getSelectionStart();
+                                int end = textPane.getSelectionEnd();
+                                String content = textPane.getText();
+                                try {
+                                    // creating a completely new document seems to be more than
+                                    // necessary, but works well enough for the moment
+                                    JavaDocument newDoc = new JavaDocument();
+                                    newDoc.insertString(0, content, new SimpleAttributeSet());
+                                    textPane.setDocument(newDoc);
+                                    textPane.setCaretPosition(pos);
+                                    textPane.setSelectionStart(start);
+                                    textPane.setSelectionEnd(end);
+                                } catch (BadLocationException ex) {
+                                    ex.printStackTrace();
+                                }
+                                textPane.repaint();
                             }
-                            textPane.repaint();
                         }
                     };
-                    timer.schedule(task, 800);
+                    timer.schedule(task, SYNTAX_HIGHLIGHTING_REFRESH_INTERVAL);
                 }
             });
         } else {
@@ -218,7 +228,10 @@ public class EditSourceFileAction extends KeyAction {
         } else {
             ActionListener saveAction = event -> {
                 try {
-                    Files.write(sourceFile.toPath(), textPane.getText().getBytes());
+                    // workaround for #1641: replace "\n" with system dependent line separators when
+                    // saving
+                    String text = textPane.getText().replace("\n", System.lineSeparator());
+                    Files.write(sourceFile.toPath(), text.getBytes());
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);

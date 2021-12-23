@@ -1,5 +1,5 @@
 example.name = executeByProving.key
-example.path = New Book/Using KeY/Building Dynamic Logic Proofs
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover/Building Dynamic Logic Proofs
 example.file = executeByProving.key
 example.additionalFile.1 = executeByProving.key
 

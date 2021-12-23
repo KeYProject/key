@@ -984,8 +984,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+    private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
+        ImmutableList<SLExpression> params = ctx.param_decl()
+                .stream().map(it -> lookupIdentifier(it.p.getText(), null, null, it))
+                .collect(ImmutableSLList.toImmutableList());
+        return getSlParametersWithHeap(params);
+    }
+
     private SLParameters visitParameters(JmlParser.ExpressionlistContext ctx) {
         ImmutableList<SLExpression> params = accept(ctx);
+        return getSlParametersWithHeap(params);
+    }
+
+    private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             Term p;
@@ -2194,43 +2205,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        if (ctx.BODY() == null) return new SLExpression(tb.tt());
-
-        String equality = getEqualityExpressionOfModelMethod(ctx);
-        ParserRuleContext equal = JmlFacade.parseExpr(equality);
-        return accept(equal);
-    }
-
-    /**
-     * Translates the given context of a model method into a parsable term of equality.
-     */
-    @Nonnull
-    static String getEqualityExpressionOfModelMethod(@Nonnull JmlParser.Method_declarationContext ctx) {
-        String bodyString = ctx.BODY() == null ? ";" : ctx.BODY().getText();
-        bodyString = bodyString.trim();
-
-        // "at"-signs for from the beginning of lines
-        bodyString = bodyString.replaceAll("\n[ ]*@", "\n");
-        // remove single line comments
-        bodyString = bodyString.replaceAll("//[^\n]+?\n", "\n");
-        //remove multiline comments (this is only relevant for model methods with single comments.)
-        bodyString = bodyString.replaceAll("/[*].*?[*]/", "");
-
-        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}') {
-            raiseError("The body of the given model method is misformed. " +
-                "We expected, that the first and last character to be curly braces.", ctx);
+        if (ctx.method_body() == null) {
+            return new SLExpression(tb.tt());
         }
-
-        bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
-
-        // There could also be some other valid cases, e.g. "return(int)4;"
-        // For simplicity, I only added the linebreak to avoid unnecessary complexity.
-        if (!bodyString.startsWith("return ") && !bodyString.startsWith("return\n")) {
-            raiseError(ctx, "return expected, instead: " + bodyString);
-        }
-        int beginIndex = bodyString.indexOf(" ") + 1;
-        int endIndex = bodyString.lastIndexOf(";");
-        bodyString = bodyString.substring(beginIndex, endIndex);
 
         String paramsString;
         List<JmlParser.Param_declContext> paramDecls = ctx.param_list().param_decl();
@@ -2239,8 +2216,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         else
             paramsString = "()"; //default no params
 
-        return ctx.IDENT() + paramsString + " == (" + bodyString + ")";
+        ParserRuleContext equal = JmlFacade.parseExpr(ctx.IDENT() + paramsString);
+        Object a = accept(equal);
+
+        SLExpression body = accept(ctx.method_body().expression());
+        SLParameters params = visitParameters(ctx.param_list());
+        SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
+
+        return termFactory.eq(apply, body);
     }
+
 
     @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {

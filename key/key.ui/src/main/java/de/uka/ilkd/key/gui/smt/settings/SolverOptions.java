@@ -169,7 +169,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         solverType.setSolverParameters(params);
         SettingsManager.getSmtPiSettings().setCommand(solverType, command);
         SettingsManager.getSmtPiSettings().setParameters(solverType, params);
-        
+        window.updateSMTSelectMenu();
         setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui
     }
 }

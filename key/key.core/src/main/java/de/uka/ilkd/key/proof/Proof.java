@@ -465,11 +465,32 @@ public class Proof implements Named {
     }
 
     /**
-     * returns the list of open goals
+     * Returns the list of open goals.
      * @return list with the open goals
      */
     public ImmutableList<Goal> openGoals() {
         return openGoals;
+    }
+
+    /**
+     * Returns the list of closed goals, needed to make pruning in closed branches
+     * possible. If the list needs too much memory, pruning can be disabled via the
+     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * @return list with the closed goals
+     */
+    public ImmutableList<Goal> closedGoals() {
+        return closedGoals;
+    }
+    
+    /**
+     * Returns the list of all, open and closed, goals.
+     * @return list with all goals.
+     * 
+     * @see #openGoals()
+     * @see #closedGoals()
+     */
+    public ImmutableList<Goal> allGoals() {
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
     }
 
     /**

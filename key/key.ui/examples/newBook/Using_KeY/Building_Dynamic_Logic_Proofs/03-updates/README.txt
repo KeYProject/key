@@ -1,5 +1,5 @@
 example.name = updates.key
-example.path = New Book/Using KeY/Building Dynamic Logic Proofs
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover/Building Dynamic Logic Proofs
 example.file = updates.key
 example.additionalFile.1 = updates.key
 
