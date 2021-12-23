@@ -89,6 +89,7 @@ public abstract class SequentView extends JEditorPane {
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
+    public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
 
     private final MainWindow mainWindow;
 
@@ -348,7 +349,12 @@ public abstract class SequentView extends JEditorPane {
      * and highlighted mouse position.
      */
     public PosInSequent getLastPosInSequent() {
-        return getPosInSequent(lastMousePosition);
+        if(lastMousePosition.equals(OUTSIDE_MOUSE_POSITION)) {
+            // point to toplevel if mouse was outside.
+            return PosInSequent.createSequentPos();
+        } else {
+            return getPosInSequent(lastMousePosition);
+        }
     }
 
     /**
@@ -466,6 +472,7 @@ public abstract class SequentView extends JEditorPane {
     public void disableHighlights() {
         disableHighlight(currentHighlight);
         disableHighlight(additionalJavaHighlight);
+        setLastMousePosition(OUTSIDE_MOUSE_POSITION);
     }
 
     /**
@@ -678,6 +685,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private void setLastMousePosition(Point p) {
+        // System.out.println("setLast Pos " + p);
         Point old = this.lastMousePosition;
         lastMousePosition=p;
         firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);

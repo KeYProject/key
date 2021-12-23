@@ -1,5 +1,5 @@
 example.name = Further Features
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.file = generalProjection.key
 example.additionalfile.1 = generalProjection.key
 

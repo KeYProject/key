@@ -35,7 +35,6 @@ public class SMTOptionsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         SettingsManager.getInstance().showSettingsDialog(mainWindow, SettingsManager.SMT_SETTINGS);
-        mainWindow.updateSMTSelectMenu();
 
         /*
         ProofDependentSMTSettings pdSettings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();

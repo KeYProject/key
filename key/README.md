@@ -7,7 +7,7 @@ This folder contains the interactive theorem prover KeY for the verification of 
 You can find more information on KeY on our [website](https://key-project.org) or in use the
 documentation in the companion repository [key-docs](https://git.key-project.org/key/key-docs).
 
-The current version is 2.8.0, licensed under GPL v2.
+The current version is 2.10.0, licensed under GPL v2.
 
 
 ## Requirements:
@@ -37,7 +37,7 @@ if you plan to make changes here.
 Assuming you are in directory `key/`, the directory of this README file,
 then you can create a runnable and deployable version with one of these commands:
 
-1. With `./gradlew :key.ui:run` you can run the user interface of KeY directly from the repository.
+1. With `./gradlew :key.ui:run` you can run the user interface of KeY directly from the repository. Use `./gradlew :key.ui:run --args='--experimantal'` to enable experimental features.
 
 2. Use `./gradlew classes` to compile KeY, includes running JavaCC and Antlr, additional use `./gradlew testClasses` if
    you also want to compile the JUnit test classes.

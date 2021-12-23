@@ -1029,7 +1029,7 @@ public final class AuxiliaryContractBuilders {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equalsModIrrelevantTermLabels(strictlyNothing())) {
+                if (!contract.hasModifiesClause(heap)) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 } else {
                     frameCondition

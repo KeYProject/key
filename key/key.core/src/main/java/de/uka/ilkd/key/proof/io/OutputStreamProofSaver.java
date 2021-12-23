@@ -258,7 +258,12 @@ public class OutputStreamProofSaver {
     }
 
     protected String getBasePath() throws IOException {
-        return getJavaSourceLocation(proof).getCanonicalPath();
+        File javaSourceLocation = getJavaSourceLocation(proof);
+        if(javaSourceLocation != null) {
+            return javaSourceLocation.getCanonicalPath();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -272,6 +277,10 @@ public class OutputStreamProofSaver {
         String tmp = header;
         try {
             basePath = getBasePath();
+            if (basePath == null) {
+                // if \javaSource has not been set, do not modify paths.
+                return header;
+            }
 
             // locate filenames in header
             for (final String s : search) {

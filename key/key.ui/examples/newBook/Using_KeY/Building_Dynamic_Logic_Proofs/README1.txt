@@ -1,5 +1,5 @@
 example.name = Building Dynamic Logic Proofs - Calling Methods
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.additionalFile.1 = methodCall.key
 example.additionalFile.2 = methodCall2.key
 example.additionalFile.3 = methodExample/Person.java
