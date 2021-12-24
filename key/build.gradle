@@ -46,7 +46,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key_project"
-version = "2.10.0$build"
+version = "2.11.0$build"
 
 sonarqube {
     properties {
@@ -96,9 +96,11 @@ subprojects {
         testImplementation project(':key.util')
     }
 
-    // Setting UTF-8 as the java source encoding.
     tasks.withType(JavaCompile) {
+        // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
+	// Setting the release to Java 11
+	options.release = 11
     }
 
     tasks.withType(Javadoc) {

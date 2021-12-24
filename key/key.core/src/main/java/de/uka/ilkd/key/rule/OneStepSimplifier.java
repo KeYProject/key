@@ -169,9 +169,9 @@ public final class OneStepSimplifier implements BuiltInRule {
         assert Immutables.isDuplicateFree(result) :
             "If this fails unexpectedly, add a call to Immutables.removeDuplicates.";
 
-        //remove apps in appsTakenOver from taclet indices of all open goals
+        //remove apps in appsTakenOver from taclet indices of all goals
         for(NoPosTacletApp app : appsTakenOver) {
-            for(Goal goal : proof.openGoals()) {
+            for(Goal goal : proof.allGoals()) {
                 goal.ruleAppIndex().removeNoPosTacletApp(app);
             }
         }
@@ -214,7 +214,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     public synchronized void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
-                for(Goal g : lastProof.openGoals()) {
+                // We need to treat all goals here instead of just open goals;
+                // otherwise pruning a  (partially) closed proof leads to errors where
+                // some rule applications are missing.
+                for(Goal g : lastProof.allGoals()) {
                     g.ruleAppIndex().addNoPosTacletApp(appsTakenOver);
                     g.getRuleAppManager().clearCache();
                     g.ruleAppIndex().clearIndexes();
@@ -564,7 +567,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                 .get(StrategyProperties.OSS_OPTIONS_KEY)
                 .equals(StrategyProperties.OSS_ON);
 
-        if (active != newActive || lastProof != proof) {
+        if (active != newActive || lastProof != proof || // The setting or proof has changed.
+                (isShutdown() && !proof.closed())) { // A closed proof was pruned.
             active = newActive;
             if(active && proof != null && !proof.closed()) {
                 initIndices(proof);

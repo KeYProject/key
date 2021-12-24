@@ -714,7 +714,8 @@ public class OriginTermLabel implements TermLabel {
             assert line >= 0;
 
             // wrap fileName into URI
-            if (fileName.equals("no file")) {
+            // bugfix #1622: do not interpret "<unknown>" as file name
+            if (fileName.equals("no file") || fileName.equals("<unknown>")) {
                 this.fileName = null;
             } else {
                 this.fileName = new File(fileName).toURI();

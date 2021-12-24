@@ -118,6 +118,7 @@ MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred -> pushMode(expr);
 REQUIRES: ('requires' (Pfree|Pred) | 'pre' Pred) -> pushMode(expr);
+RETURN: 'return' -> pushMode(expr);
 RETURNS: 'returns' -> pushMode(expr);
 RESPECTS: 'respects' -> pushMode(expr);
 SEPARATES: 'separates' -> pushMode(expr);
@@ -135,7 +136,8 @@ NEST_END: '|}' ;
 C_RBRACKET: ']' -> type(RBRACKET);
 C_LBRACKET: '[' -> type(LBRACKET);
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
-BODY_START: '{' -> more, pushMode(body);
+C_LBRACE: '{' -> type(LBRACE);
+C_RBRACE: '}' -> type(RBRACE);
 C_EQUAL: '=' -> type(EQUAL_SINGLE), pushMode(expr);
 C_LPAREN: '(' -> type(LPAREN);
 C_RPAREN: ')' -> type(RPAREN);
@@ -407,16 +409,7 @@ INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 
-E_BODY_START: '{' -> more, pushMode(body);
 E_ERROR_CHAR: . -> type(ERROR_CHAR);
-
-mode body;
-BRACE: '{' ->  more, pushMode(body);
-END_BODY: {_modeStack.peek() != body}? '}' -> popMode, type(BODY);
-END_BRACE: '}' -> more, popMode;
-//S: '"' ~('"') '"' -> more;
-//not working, IGNORE: '@' -> skip, more;
-ANY_CHAR: . -> more;
 
 mode mlComment;
 ML_COMMENT_END: ('*/'|EOF) -> type(COMMENT), channel(HIDDEN), popMode;
