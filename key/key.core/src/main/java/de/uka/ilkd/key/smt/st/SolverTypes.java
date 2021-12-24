@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.smt.st;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ServiceLoader;
@@ -17,17 +16,19 @@ public class SolverTypes {
     }
 
     public static <T extends SolverType> T get(Class<T> clazz) {
-        return (T) getSolverTypes().stream().filter(it -> it.getClass().equals(clazz)).findFirst().orElse(null);
+        return (T) getSolverTypes().stream().filter(it -> it.getClass().equals(clazz))
+                .findFirst().orElse(null);
     }
 
-    private static Collection<SolverType> SOLVERS = new ArrayList<>(8);
+    private static final Collection<SolverType> SOLVERS = new ArrayList<>(8);
 
     public static Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             ServiceLoader<SolverType> loader = ServiceLoader.load(SolverType.class);
-            SOLVERS = StreamSupport
-                    .stream(loader.spliterator(), false)
-                    .collect(Collectors.toList());
+            var s =
+                    StreamSupport.stream(loader.spliterator(), false)
+                            .collect(Collectors.toList());
+            SOLVERS.addAll(s);
         }
         return SOLVERS;
     }

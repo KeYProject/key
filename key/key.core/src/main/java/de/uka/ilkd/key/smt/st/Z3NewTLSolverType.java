@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
  */
 public class Z3NewTLSolverType extends AbstractSolverType {
 
-
     @Override
     public String getDefaultSolverCommand() {
         return "z3";
@@ -58,7 +57,9 @@ public class Z3NewTLSolverType extends AbstractSolverType {
 
     @Override
     public String[] getSupportedVersions() {
-        return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1", "version 4.8.8", "version 4.8.9", "version 4.8.10", "version 4.8.11", "version 4.8.12"};
+        return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1", "version 4.8.8",
+                "version 4.8.9", "version 4.8.10", "version 4.8.11", "version 4.8.12", "version 4.8.13",
+                "version 4.8.14"};
     }
 
     @Override
@@ -90,6 +91,6 @@ public class Z3NewTLSolverType extends AbstractSolverType {
 //                                    + "}"
 //                                    + "\n\n"
 //                                    + "You can activate quantifier elimination by appending QUANT_FM=true to"
-//                                    + " the execution command.";
+//                                    + " the execution command."
     }
 }
