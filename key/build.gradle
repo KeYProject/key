@@ -89,13 +89,15 @@ subprojects {
 
     dependencies {
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
-        testImplementation 'junit:junit:4.12'
+        testImplementation 'junit:junit:4.13.2'
         testImplementation project(':key.util')
     }
 
-    // Setting UTF-8 as the java source encoding.
     tasks.withType(JavaCompile) {
+        // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
+	// Setting the release to Java 11
+	options.release = 11
     }
 
     tasks.withType(Javadoc) {
