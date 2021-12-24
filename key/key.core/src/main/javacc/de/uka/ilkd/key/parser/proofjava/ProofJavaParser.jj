@@ -1998,6 +1998,7 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
+  | <DL_EMBEDDED_FUNCTION>
   )
   {
     Identifier id = factory.createIdentifier(token.image);

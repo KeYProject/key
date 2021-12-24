@@ -143,6 +143,11 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                         Collections.<Expression>emptyList());
             } else if ("\\map".equals(type.getName())) {
                 return EmptyMapLiteral.INSTANCE;
+            }else if(type.getName().equals("\\dl_int")) {
+                return new IntLiteral(0);
+            }
+            else if(type.getName().startsWith("\\dl_")) {
+                return new DLEmbeddedExpression(type.getName() + "_atom", Collections.emptyList());
             }
         }
         Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
@@ -328,7 +333,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	        cdc.walk(unit);
 	    }
 	    classDeclarations = cdc.result();
-	    
+
 	    typeDeclaration2allSupertypes = new LinkedHashMap<TypeDeclaration, List<ClassType>>();
 	    for (TypeDeclaration td : cdc.types()) {
 		typeDeclaration2allSupertypes.put(td, td.getAllSupertypes());
@@ -395,10 +400,10 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     private static class TypeAndClassDeclarationCollector extends SourceVisitorExtended {
-        
+
         private HashSet<ClassDeclaration> result = new LinkedHashSet<ClassDeclaration>();
 	private HashSet<TypeDeclaration> types   = new LinkedHashSet<TypeDeclaration>();
-        
+
         public TypeAndClassDeclarationCollector(){
             super();
         }
