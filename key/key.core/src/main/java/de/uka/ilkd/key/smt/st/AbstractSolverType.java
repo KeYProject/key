@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.st;
 
-import de.uka.ilkd.key.smt.VersionChecker;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.*;
 
 import java.io.File;
 
@@ -32,6 +33,21 @@ abstract class AbstractSolverType implements SolverType {
         }
     }
 
+    /**
+     * Create a new {@link SMTSolverImplementation} with given {@link SMTProblem}, {@link SolverListener}
+     * and {@link Services} objects and the {@link SolverType} object at hand.
+     *
+     * @param problem the {@link SMTProblem} of the created SMTSolverImplementation
+     * @param listener the {@link SolverListener} of the created SMTSolverImplementation
+     * @param services the {@link SolverType} of the created SMTSolverImplementation
+     * @return a new {@link SMTSolverImplementation} with this object as its {@link SolverType}
+     */
+    @Override
+    public SMTSolver createSolver(SMTProblem problem,
+                                  SolverListener listener, Services services) {
+        return new SMTSolverImplementation(problem, listener,
+                services, this);
+    }
 
     /**
      * check, if this solver is installed and can be used.

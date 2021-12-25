@@ -23,13 +23,6 @@ public class Z3SolverType extends AbstractSolverType {
     }
 
     @Override
-    public SMTSolver createSolver(SMTProblem problem,
-                                  SolverListener listener, Services services) {
-        return new SMTSolverImplementation(problem, listener,
-                services, this);
-    }
-
-    @Override
     public String getName() {
         return "Z3 (Legacy Translation)";
     }
@@ -73,8 +66,7 @@ public class Z3SolverType extends AbstractSolverType {
         return new SmtLib2Translator(services,
                 new AbstractSMTTranslator.Configuration(false, false));
     }
-
-
+    
     @Override
     public String getInfo() {
         return "";

@@ -14,14 +14,6 @@ import javax.annotation.Nonnull;
  */
 public class CVC4NewTLSolverType extends AbstractSolverType {
 
-    // TODO move to AbstractSolverType?
-    @Override
-    public SMTSolver createSolver(SMTProblem problem,
-                                  SolverListener listener, Services services) {
-        return new SMTSolverImplementation(problem, listener,
-                services, this);
-    }
-
     @Override
     public String getName() {
         return "CVC4";

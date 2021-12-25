@@ -25,13 +25,6 @@ public class Z3NewTLSolverType extends AbstractSolverType {
     }
 
     @Override
-    public SMTSolver createSolver(SMTProblem problem,
-                                  SolverListener listener, Services services) {
-        return new SMTSolverImplementation(problem, listener,
-                services, this);
-    }
-
-    @Override
     public String getName() {
         return "Z3";
     }
