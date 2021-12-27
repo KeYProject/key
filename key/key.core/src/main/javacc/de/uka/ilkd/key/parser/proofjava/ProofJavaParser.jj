@@ -2710,11 +2710,11 @@ Expression UnaryExpression() :
 |
   result = PreDecrementExpression()
 |
-  result = UnaryExpressionNotPlusMinus()
+  result = GeneralEscapeExpression()
 |
   result = ADTGetter()
 |
-  result = GeneralEscapeExpression()
+  result = UnaryExpressionNotPlusMinus()
 )
   {
     checkConstruction(result);
