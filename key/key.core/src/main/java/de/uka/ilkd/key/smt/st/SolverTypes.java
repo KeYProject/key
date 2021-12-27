@@ -60,6 +60,11 @@ public class SolverTypes {
     /**
      * CVC4 with the new translation
      */
-    public static final SolverType CVC4_NEW_TL_SOLVER = new CVC4NewTLSolverType();
+    public static final SolverType CVC4_NEW_TL_SOLVER = get(CVC4NewTLSolverType.class);
+
+    /**
+     * Princess with the modular translator.
+     */
+    public static final SolverType PRINCESS = get(PrincessSolverType.class);
 
 }

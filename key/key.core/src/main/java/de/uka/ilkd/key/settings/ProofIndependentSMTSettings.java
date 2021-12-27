@@ -268,6 +268,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         // single solvers with new translation
         solverUnions.add(new SolverTypeCollection("Z3", 1, SolverTypes.Z3_NEW_TL_SOLVER));
         solverUnions.add(new SolverTypeCollection("CVC4", 1, SolverTypes.CVC4_NEW_TL_SOLVER));
+        solverUnions.add(new SolverTypeCollection("Princess", 1, SolverTypes.PRINCESS));
         solverUnions.add(new SolverTypeCollection("INVISMT", 1, SolverTypes.get(INVISMTSolverType.class)));
 
         // single solvers with legacy translation
