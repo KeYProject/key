@@ -308,7 +308,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     public Collection<SolverData> getDataOfSolvers() {
         return dataOfSolvers.values();
     }
-    public @Nullable SolverData getSolverData(SolverType type) {
+
+    public @Nullable
+    SolverData getSolverData(SolverType type) {
         return dataOfSolvers.get(type);
     }
 
@@ -430,9 +432,14 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         }
 
         private SolverData(SolverType type, String command, String parameters) {
+            this(type, command, parameters, -1);
+        }
+
+        public SolverData(SolverType type, String command, String parameters, long timeout) {
             this.type = type;
-            this.setSolverCommand(command);
-            this.setSolverParameters(parameters);
+            setSolverCommand(command);
+            setSolverParameters(parameters);
+            setTimeout(timeout);
         }
 
         private void readSettings(Properties props) {
@@ -456,7 +463,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
         public SolverData clone() {
-            return new SolverData(getType(), getSolverCommand(), getSolverParameters());
+            return new SolverData(getType(), getSolverCommand(), getSolverParameters(), getTimeout());
         }
 
         public String toString() {

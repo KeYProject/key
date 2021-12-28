@@ -91,8 +91,11 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private JSpinner createSolverTimeout() {
-        return addNumberField("Timeout", -1, Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_SOLVER_TIMEOUT), null);
+        var model = new SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(-1L), Long.valueOf(Long.MAX_VALUE),
+                Long.valueOf(1L));
+        var jsp = createNumberTextField(model, null);
+        addTitledComponent("Timeout", jsp, BUNDLE.getString(INFO_SOLVER_TIMEOUT));
+        return jsp;
     }
 
 
@@ -109,13 +112,15 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(), BUNDLE.getString(INFO_SOLVER_PARAMETERS),
-                e -> {});
+                e -> {
+                });
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command",
                 solverType.getSolverCommand(),
-                BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {});
+                BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {
+                });
     }
 
 
@@ -161,9 +166,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             solverCommand.setText(solverData.getSolverCommand());
             solverParameters.setText(solverData.getSolverParameters());
-            solverTimeout.setValue(solverData.getTimeout());
+            solverTimeout.setValue((Long) solverData.getTimeout());
             solverName.setText(solverType.getName());
-        }else{
+        } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
         }
 
@@ -183,7 +188,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
-            long timeout = (long) solverTimeout.getValue();
+            long timeout = ((Long) solverTimeout.getValue());
 
             solverData.setTimeout(timeout);
             solverData.setSolverCommand(command);
@@ -191,12 +196,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);
-        SettingsManager.getSmtPiSettings().setCommand(solverType, command);
-        SettingsManager.getSmtPiSettings().setParameters(solverType, params);
-        window.updateSMTSelectMenu();
+            SettingsManager.getSmtPiSettings().setCommand(solverType, command);
+            SettingsManager.getSmtPiSettings().setParameters(solverType, params);
+            window.updateSMTSelectMenu();
 
             setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui
-        }else{
+        } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
         }
     }
