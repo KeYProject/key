@@ -1,2 +1,0 @@
-Guide:
-http://www.eclipse.org/legal/guidetolegaldoc2.php
