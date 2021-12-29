@@ -166,7 +166,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             solverCommand.setText(solverData.getSolverCommand());
             solverParameters.setText(solverData.getSolverParameters());
-            solverTimeout.setValue((Long) solverData.getTimeout());
+            solverTimeout.setValue((Long) solverData.getTimeout()/1000L);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
@@ -188,7 +188,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
-            long timeout = ((Long) solverTimeout.getValue());
+            long timeout = ((Long) solverTimeout.getValue())*1000L;
 
             solverData.setTimeout(timeout);
             solverData.setSolverCommand(command);
@@ -196,8 +196,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);
-            SettingsManager.getSmtPiSettings().setCommand(solverType, command);
-            SettingsManager.getSmtPiSettings().setParameters(solverType, params);
+            // This is not necessary as it just calls solverData.setSolver... again
+            // SettingsManager.getSmtPiSettings().setCommand(solverType, command);
+            // SettingsManager.getSmtPiSettings().setParameters(solverType, params);
             window.updateSMTSelectMenu();
 
             setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui
