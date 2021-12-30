@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -157,7 +158,7 @@ public class Recoder2KeYConverter {
      * locClass2finalVar stores the final variables that need to be passed
      * to the constructor of an anonymous class.
      */
-    protected HashMap<?, ?> locClass2finalVar = null;
+    protected Map<?, ?> locClass2finalVar = null;
 
     /**
      * stores the URI of the class that is currently processed
