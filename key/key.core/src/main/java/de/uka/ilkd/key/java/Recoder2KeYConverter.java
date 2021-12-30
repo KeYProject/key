@@ -67,6 +67,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
+import static java.lang.String.format;
+
 /**
  * Objects of this class can be used to transform an AST returned by the recoder
  * library to the corresponding yet immutable KeY data structures.
@@ -134,7 +136,7 @@ public class Recoder2KeYConverter {
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
 	new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
@@ -143,7 +145,7 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
 	new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
@@ -151,7 +153,7 @@ public class Recoder2KeYConverter {
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
 	new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
@@ -730,7 +732,7 @@ public class Recoder2KeYConverter {
     }
 
     public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
-        ExtList children = collectChildren(e);	
+        ExtList children = collectChildren(e);
 	return new AllObjects(children);
     }
 
@@ -765,7 +767,7 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
 	return new SeqReverse(children);
     }
-    
+
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
@@ -775,22 +777,64 @@ public class Recoder2KeYConverter {
      * counterpart.
      */
     public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.EscapeExpression e) {
+        final var PREFIX = "\\dl_DEFAULT_VALUE_";
+        final var DEFVALUE = "@defaultValue(";
         ExtList children = collectChildren(e);
         String name = e.getFunctionName();
-        Named named = namespaceSet.functions().lookup(new Name(name));
 
-        if(named == null || !(named instanceof Function)) {
-            // TODO provide position information?!
-            throw new ConvertException("In an embedded DL expression, " + name
-                    + " is not a known DL function name. Line/Col:" + e.getStartPosition());
+        if(name.startsWith(PREFIX)) { // handle default value resolution
+            String sortName = name.substring(PREFIX.length()).trim();
+            Sort sort = namespaceSet.sorts().lookup(sortName);
+            if(sort == null){
+                throw new ConvertException(
+                        format("Requested to find the default value of an unknown sort '%s'. " +
+                                "Line/Col:%s", sortName, e.getStartPosition()));
+            }
+
+            var doc = sort.getDocumentation();
+
+            if(doc == null){
+                throw new ConvertException(
+                        format("Requested to find the default value for the sort '%s', " +
+                                "which does not have a documentary comment. The sort is defined at %s. " +
+                                "Line/Col: %s", sortName, sort.getOrigin(), e.getStartPosition()));
+            }
+
+            int pos = doc.indexOf(DEFVALUE);
+            if (pos >= 0) {
+                int start = doc.indexOf('(', pos) + 1;
+                int closing = doc.indexOf(')', pos);
+
+                if(closing<0){
+                    throw new ConvertException(
+                            format("Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
+                                    sortName, sort.getOrigin()));
+                }
+
+                // set this as the function name, as the user had written \dl_XXX
+                name = doc.substring(start, closing);
+            } else {
+                throw new ConvertException(
+                        format("Could not infer the default value for the given sort '%s'. " +
+                                "The sort found was as '%s' and the sort's documentation is '%s'. " +
+                                "Did you forget @defaultValue(XXX) in the documentation?Line/Col: %s",
+                                sortName, sort, doc, e.getStartPosition()));
+            }
         }
 
-	        Function f = (Function) named;
-        DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
-        
-        expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
-						  .getContainingClassType(e)));
-        
+
+        Function named = namespaceSet.functions().lookup(new Name(name));
+
+        if(named == null) {
+            // TODO provide position information?!
+            throw new ConvertException(
+                    format("In an embedded DL expression, %s is not a known DL function name. Line/Col:%s",
+                            name, e.getStartPosition()));
+        }
+
+        DLEmbeddedExpression expression = new DLEmbeddedExpression(named, children);
+        expression.check(services, getKeYJavaType(
+                getServiceConfiguration().getCrossReferenceSourceInfo().getContainingClassType(e)));
         return expression;
     }
 
@@ -928,12 +972,12 @@ public class Recoder2KeYConverter {
         final LocationVariable locVar = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 services.getNamespaces().sorts().lookup("boolean"));
-        
+
         final Comment[] comments = new Comment[mps.getComments().size()];
         for (int i = 0; i < mps.getComments().size(); i++) {
             comments[i] = convert(mps.getComments().get(i));
         }
-        
+
         return new MergePointStatement(locVar, comments);
     }
 
@@ -1914,7 +1958,7 @@ public class Recoder2KeYConverter {
     }
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
-        return new ArrayInitializer(collectChildrenAndComments(arg), 
+        return new ArrayInitializer(collectChildrenAndComments(arg),
                 getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 
@@ -2176,14 +2220,14 @@ public class Recoder2KeYConverter {
 
     public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
         return new EmptyStatement(collectChildrenAndComments(m));
-    }   
-    
+    }
+
     //modifiers
-    
+
     public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
         return new Abstract(collectChildrenAndComments(m));
     }
-    
+
     public Public convert(recoder.java.declaration.modifier.Public m) {
         return new Public(collectChildrenAndComments(m));
     }
@@ -2203,7 +2247,7 @@ public class Recoder2KeYConverter {
     public Final convert(recoder.java.declaration.modifier.Final m) {
         return new Final(collectChildrenAndComments(m));
     }
-    
+
     public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
         return new StrictFp(collectChildrenAndComments(m));
     }

@@ -7,7 +7,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -134,8 +136,10 @@ public class DeclarationBuilder extends DefaultBuilder {
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
-        for (String sortId : sortIds) {
-            Name sort_name = new Name(sortId);
+        var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
+        for (var idCtx : ctx.sortIds.simple_ident_dots()) {
+            String sortId = accept(idCtx);
+            Name sortName = new Name(sortId);
 
             ImmutableSet<Sort> ext =
                     sortExt == null ? ImmutableSet.empty() :
@@ -145,23 +149,30 @@ public class DeclarationBuilder extends DefaultBuilder {
                             DefaultImmutableSet.fromCollection(sortOneOf);
 
             // attention: no expand to java.lang here!
-            if (sorts().lookup(sort_name) == null) {
+            if (sorts().lookup(sortName) == null) {
                 Sort s = null;
                 if (isGenericSort) {
-                    int i;
-
                     try {
-                        s = new GenericSort(sort_name, ext, oneOf);
+                        var gs = new GenericSort(sortName, ext, oneOf);
+                        gs.setDocumentation(documentation);
+                        gs.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        s = gs;
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
                     }
-                } else if (new Name("any").equals(sort_name)) {
+                } else if (new Name("any").equals(sortName)) {
                     s = Sort.ANY;
                 } else {
                     if (isProxySort) {
-                        s = new ProxySort(sort_name, ext);
+                        var ps = new ProxySort(sortName, ext);
+                        ps.setDocumentation(documentation);
+                        ps.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        s = ps;
                     } else {
-                        s = new SortImpl(sort_name, ext, isAbstractSort);
+                        var si = new SortImpl(sortName, ext, isAbstractSort);
+                        si.setDocumentation(documentation);
+                        si.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        s = si;
                     }
                 }
                 assert s != null;
@@ -173,6 +184,7 @@ public class DeclarationBuilder extends DefaultBuilder {
         }
         return createdSorts;
     }
+
 
     @Override
     public Object visitOption_decls(KeYParser.Option_declsContext ctx) {

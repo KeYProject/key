@@ -20,6 +20,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import javax.annotation.Nullable;
+
 /**
  * Abstract base class for implementations of the Sort interface.
  */
@@ -28,6 +30,15 @@ public abstract class AbstractSort implements Sort {
     private final Name name;
     private ImmutableSet<Sort> ext;
     private final boolean isAbstract;
+
+    /**
+     * Documentation for this sort given by the an associated documentation comment.
+     * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
+     */
+    private String documentation;
+
+    /** Information of the origin of this sort */
+    private String origin;
 
     public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         this.name = name;
@@ -120,5 +131,25 @@ public abstract class AbstractSort implements Sort {
 
     public String declarationString() {
         return name.toString();
+    }
+
+    public void setDocumentation(@Nullable String documentation) {
+        this.documentation = documentation;
+    }
+
+    @Nullable
+    @Override
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    @Nullable
+    @Override
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(@Nullable String origin) {
+        this.origin = origin;
     }
 }

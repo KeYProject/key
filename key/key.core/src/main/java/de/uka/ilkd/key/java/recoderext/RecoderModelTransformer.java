@@ -114,7 +114,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 default:
                     if (type.getName().startsWith("\\dl_")) {
                         //The default value of a type is resolved later, then we know the Sort of the type
-                        return new DLEmbeddedExpression(type.getName() + "_DEFAULT_VALUE",
+                        return new DLEmbeddedExpression("\\dl_DEFAULT_VALUE_"+type.getName().substring(4),
                                 Collections.emptyList());
                     }
             }
