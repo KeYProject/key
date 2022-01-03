@@ -66,7 +66,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -1824,7 +1823,7 @@ public final class MainWindow extends JFrame {
 
         @Override
         public String toString() {
-            return "Multiple Solvers At Once";
+            return "Multiple Solvers";
         }
 
         @Override
