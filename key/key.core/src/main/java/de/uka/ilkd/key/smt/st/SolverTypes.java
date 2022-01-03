@@ -28,7 +28,7 @@ public class SolverTypes {
                             .collect(Collectors.toList());
             SOLVERS.addAll(s);
         }
-        return SOLVERS;
+        return new ArrayList<>(SOLVERS);
     }
 
     /**

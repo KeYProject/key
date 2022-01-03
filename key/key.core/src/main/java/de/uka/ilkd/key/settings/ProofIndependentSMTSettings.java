@@ -278,8 +278,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
             legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 
-        // TODO change this so that the user can customize their solver unions
-
     }
 
 
