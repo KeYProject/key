@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.smt.st.SolverTypes;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -60,11 +62,16 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         seqBoundField = createSeqBoundField();
         solverSupportCheck = createSolverSupportCheck();
 
-        getChildren().add(new TranslationOptions());
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
-        for (SolverType options : SolverTypes.getSolverTypes()) {
+        Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
+        if (!Main.isExperimentalMode()) {
+            solverTypes.removeAll(SolverTypes.getLegacy());
+        } else {
+            getChildren().add(new TranslationOptions());
+        }
+        for (SolverType options : solverTypes) {
             getChildren().add(new SolverOptions(options));
         }
     }
