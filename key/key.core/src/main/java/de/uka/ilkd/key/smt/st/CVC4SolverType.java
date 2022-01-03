@@ -2,8 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.CVC4Socket;
+import de.uka.ilkd.key.smt.communication.*;
 
 import javax.annotation.Nonnull;
 
@@ -63,6 +62,11 @@ public class CVC4SolverType extends AbstractSolverType {
     @Override
     public @Nonnull AbstractSolverSocket getSocket(ModelExtractor query) {
         return new CVC4Socket(getName(), query);
+    }
+
+    @Override
+    public @Nonnull SMTProcessLauncher getLauncher(SolverCommunication communication) {
+        return new ExternalProcessLauncher(communication, getDelimiters());
     }
 
 }

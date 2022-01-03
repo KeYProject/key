@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.smt.VersionChecker;
+import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SMTProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SolverCommunication;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -44,5 +49,11 @@ public class INVISMTSolverType extends Z3SolverType {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public @Nonnull
+    SMTProcessLauncher getLauncher(SolverCommunication communication) {
+        return new ExternalProcessLauncher(communication, getDelimiters());
     }
 }

@@ -3,8 +3,7 @@ package de.uka.ilkd.key.smt.st;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTTranslator;
-import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.PrincessSocket;
+import de.uka.ilkd.key.smt.communication.*;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import javax.annotation.Nonnull;
@@ -62,5 +61,11 @@ public class PrincessSolverType extends AbstractSolverType {
     @Override
     public AbstractSolverSocket getSocket(ModelExtractor query) {
         return new PrincessSocket(NAME, query);
+    }
+
+    @Override
+    public @Nonnull
+    SMTProcessLauncher getLauncher(SolverCommunication communication) {
+        return new ExternalProcessLauncher(communication, getDelimiters());
     }
 }

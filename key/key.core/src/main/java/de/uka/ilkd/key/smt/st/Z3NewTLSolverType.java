@@ -2,8 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.Z3Socket;
+import de.uka.ilkd.key.smt.communication.*;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import javax.annotation.Nonnull;
@@ -85,5 +84,11 @@ public class Z3NewTLSolverType extends AbstractSolverType {
 //                                    + "\n\n"
 //                                    + "You can activate quantifier elimination by appending QUANT_FM=true to"
 //                                    + " the execution command."
+    }
+
+    @Override
+    public @Nonnull
+    SMTProcessLauncher getLauncher(SolverCommunication communication) {
+        return new ExternalProcessLauncher(communication, getDelimiters());
     }
 }

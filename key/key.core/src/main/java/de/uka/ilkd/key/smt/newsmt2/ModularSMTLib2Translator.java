@@ -24,6 +24,23 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  */
 public class ModularSMTLib2Translator implements SMTTranslator {
 
+    private String preamble;
+
+    /**
+     * The preamble may have to be customized, e.g. depending on the SMT solver that is used.
+     * @param preamble the customized preamble String
+     */
+    public ModularSMTLib2Translator(String preamble) {
+        this.preamble = preamble;
+    }
+
+    /**
+     * If the preamble doesn't have to be customized, it may be the one from {@link SMTHandlerServices#getPreamble()}.
+     */
+    public ModularSMTLib2Translator() {
+        this.preamble = SMTHandlerServices.getInstance().getPreamble();
+    }
+
     @Override
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
@@ -40,7 +57,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         StringBuilder sb = new StringBuilder();
 
         sb.append("; --- Preamble");
-        sb.append(SMTHandlerServices.getInstance().getPreamble());
+        sb.append(preamble);
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(sequent, services, master, sequentAsserts);

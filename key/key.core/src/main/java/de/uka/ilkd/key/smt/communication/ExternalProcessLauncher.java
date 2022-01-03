@@ -29,7 +29,7 @@ import java.io.*;
  *
  * @author Wolfram Pfeifer (overhaul)
  */
-public class ExternalProcessLauncher {
+public class ExternalProcessLauncher implements SMTProcessLauncher {
     /**
      * the store of all messages send to and received from the external process
      */
@@ -71,6 +71,7 @@ public class ExternalProcessLauncher {
      * @param command command (program and arguments) which is used to start the external process
      * @throws IOException if an I/O error occurs
      */
+    @Override
     public void launch(final String[] command) throws IOException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
@@ -106,6 +107,7 @@ public class ExternalProcessLauncher {
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
+    @Override
     public void stop() {
         if (process != null) {
             process.destroy();
@@ -114,6 +116,7 @@ public class ExternalProcessLauncher {
         //pipe.close();
     }
 
+    @Override
     public Pipe getPipe() {
         return pipe;
     }

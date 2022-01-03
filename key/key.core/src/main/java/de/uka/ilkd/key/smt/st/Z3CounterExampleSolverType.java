@@ -2,8 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.Z3CESocket;
+import de.uka.ilkd.key.smt.communication.*;
 
 import javax.annotation.Nonnull;
 
@@ -75,5 +74,10 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
         //                                        + " the execution command.";
     }
 
+    @Override
+    public @Nonnull
+    SMTProcessLauncher getLauncher(SolverCommunication communication) {
+        return new ExternalProcessLauncher(communication, getDelimiters());
+    }
 
 }

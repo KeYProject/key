@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SMTProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.st.SolverType;
@@ -82,7 +83,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * starts a external process and returns the result
      */
-    private final ExternalProcessLauncher processLauncher;
+    private final SMTProcessLauncher processLauncher;
 
     /**
      * The services object is stored in order to have the possibility to
@@ -167,8 +168,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         this.listener = listener;
         this.services = services;
         this.type = myType;
+        // TODO Why not just call type.getSocket(query)?
         this.socket = AbstractSolverSocket.createSocket(type, query);
-        processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
+        processLauncher = myType.getLauncher(solverCommunication);
     }
 
     /**

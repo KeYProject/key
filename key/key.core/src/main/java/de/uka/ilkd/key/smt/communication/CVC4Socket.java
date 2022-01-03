@@ -6,6 +6,7 @@ import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * The socket for CVC4.
@@ -27,7 +28,7 @@ public class CVC4Socket extends AbstractSolverSocket {
     @Override
     public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
-        if ("".equals(msg)) {
+        if ("".equals(msg.trim())) {
             return;
         }
 

@@ -87,11 +87,6 @@ public abstract class AbstractSolverSocket {
             case WAIT_FOR_RESULT:
                 if (msg.equals("unsat")) {
                     sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                    // TODO: proof production is currently completely disabled, since it does not work
-                    //  with the legacy Z3 translation (proof-production not enabled) and also not
-                    //  really needed
-                    // pipe.sendMessage("(get-proof)");
-
                     pipe.sendMessage("(exit)");
                     sc.setState(WAIT_FOR_DETAILS);
                 }
