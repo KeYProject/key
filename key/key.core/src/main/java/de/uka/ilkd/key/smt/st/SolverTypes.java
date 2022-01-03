@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.smt.st;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -66,5 +64,25 @@ public class SolverTypes {
      * Princess with the modular translator.
      */
     public static final SolverType PRINCESS = get(PrincessSolverType.class);
+
+    /**
+     * MathSAT with the modular translator.
+     */
+    public static final SolverType MATHSAT = get(MathSATSolverType.class);
+
+    /**
+     * CVC5 is the successor to CVC4.
+     */
+    public static final SolverType CVC5 = get(CVC5SolverType.class);
+
+    /**
+     * Return the solvers using legacy translation.
+     * TODO make this less hardcoded? Legacy basically means:
+     * TODO solver.createTranslator() is of class SmtLib2Translator instead of the modular one.
+     */
+    private static Set<SolverType> legacy = new HashSet<>(List.of(Z3_SOLVER, CVC4_SOLVER));
+    public static Collection<SolverType> getLegacy() {
+        return new HashSet(legacy);
+    }
 
 }
