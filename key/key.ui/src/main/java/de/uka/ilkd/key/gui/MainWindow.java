@@ -57,16 +57,16 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 import javax.annotation.Nonnull;
 
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @HelpInfo()
@@ -618,7 +619,6 @@ public final class MainWindow extends JFrame {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                         .setActiveSolverUnion(action.solverUnion);
             }
-
         });
 
         updateSMTSelectMenu();
@@ -944,13 +944,18 @@ public final class MainWindow extends JFrame {
     }
 
     private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions) {
-        SMTInvokeAction actions[] = new SMTInvokeAction[unions.size()];
+        int size = unions.size();
+        SMTInvokeAction actions[] = new SMTInvokeAction[size > 1 ? size + 1 : size];
 
         int i = 0;
         for (SolverTypeCollection union : unions) {
 
             actions[i] = new SMTInvokeAction(union);
             i++;
+        }
+
+        if (size > 1) {
+            actions[size] = new SMTInvokeMultipleAction(unions);
         }
 
         smtComponent.setItems(actions);
@@ -1640,7 +1645,6 @@ public final class MainWindow extends JFrame {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             selectedProofChanged(e);
-
         }
 
     }
@@ -1649,7 +1653,7 @@ public final class MainWindow extends JFrame {
      * This action is responsible for the invocation of an SMT solver For
      * example the toolbar button is parameterized with an instance of this action
      */
-    private final class SMTInvokeAction extends MainWindowAction {
+    private class SMTInvokeAction extends MainWindowAction {
         /**
          *
          */
@@ -1720,4 +1724,138 @@ public final class MainWindow extends JFrame {
         }
 
     }
+
+    private final class SMTInvokeMultipleAction extends SMTInvokeAction {
+
+        SolverTypeCollection solverUnion;
+        Collection<SolverTypeCollection> possibleSolvers;
+
+        public SMTInvokeMultipleAction(Collection<SolverTypeCollection> solverUnions) {
+            super(SolverTypeCollection.EMPTY_COLLECTION);
+            this.solverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+            this.possibleSolvers = solverUnions;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            boolean b = possibleSolvers.size() > 1
+                    && mediator != null
+                    && mediator.getSelectedProof() != null
+                    && !mediator.getSelectedProof().closed();
+            return b;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!mediator.ensureProofLoaded()) {
+                MainWindow.this.popupWarning("No proof loaded.", "Oops...");
+                return;
+            }
+            final Proof proof = mediator.getSelectedProof();
+
+            JDialog choiceDialog = new JDialog(mainWindow);
+            JPanel solverChoice = new JPanel();
+            List<UnionCheckBox> choiceOptions = new LinkedList<>();
+            JButton start = new JButton("Start Solvers");
+            start.setEnabled(false);
+            JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    choiceDialog.setEnabled(false);
+                    choiceDialog.setVisible(false);
+                }
+            });
+            start.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new SMTInvokeAction(createSolverTypeCollection(choiceOptions)).actionPerformed(e);
+                    choiceDialog.setEnabled(false);
+                    choiceDialog.setVisible(false);
+                }
+            });
+
+            for (SolverTypeCollection union: possibleSolvers){
+                UnionCheckBox chooseUnion = new UnionCheckBox(union);
+                chooseUnion.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        if (createSolverTypeCollection(choiceOptions).equals(SolverTypeCollection.EMPTY_COLLECTION)) {
+                            start.setEnabled(false);
+                            return;
+                        }
+                        start.setEnabled(true);
+                    }
+                });
+                choiceOptions.add(chooseUnion);
+                solverChoice.add(chooseUnion);
+            }
+
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.add(start);
+            buttonPanel.add(cancel);
+            buttonPanel.setMinimumSize(new Dimension(600, 100));
+            solverChoice.setMinimumSize(new Dimension(600, 100));
+
+            choiceDialog.add(solverChoice, BorderLayout.NORTH);
+            choiceDialog.add(buttonPanel, BorderLayout.SOUTH);
+            choiceDialog.setMinimumSize(new Dimension(600, 200));
+            choiceDialog.setEnabled(true);
+            choiceDialog.setVisible(true);
+            choiceDialog.setTitle("Choose Multiple Solvers");
+
+        }
+
+        private SolverTypeCollection createSolverTypeCollection(Collection<UnionCheckBox> checkBoxes) {
+            Set<SolverType> types = new HashSet<>();
+            StringBuilder builder = new StringBuilder();
+            for (UnionCheckBox box: checkBoxes.stream().filter(c -> c.isSelected()).collect(Collectors.toList())) {
+                types.addAll(box.getUnion().getTypes());
+            }
+            if (types.size() < 2) {
+                return SolverTypeCollection.EMPTY_COLLECTION;
+            }
+            for (SolverType type: types) {
+                builder.append(type.getName() + ", ");
+            }
+            builder.delete(builder.length()-2, builder.length());
+            return new SolverTypeCollection(builder.toString(), types.size(), types);
+        }
+
+        @Override
+        public String toString() {
+            return "Multiple Solvers At Once";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof SMTInvokeMultipleAction)) {
+                return false;
+            }
+            return this.solverUnion.equals(((SMTInvokeMultipleAction) obj).solverUnion)
+                    && this.possibleSolvers.equals(((SMTInvokeMultipleAction) obj).possibleSolvers);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(possibleSolvers);
+        }
+
+    }
+
+    private class UnionCheckBox extends JCheckBox {
+
+        private SolverTypeCollection union;
+
+        private UnionCheckBox(SolverTypeCollection union) {
+            super(union.name());
+            this.union = union;
+        }
+
+        private SolverTypeCollection getUnion() {
+            return union;
+        }
+
+    }
+
 }
