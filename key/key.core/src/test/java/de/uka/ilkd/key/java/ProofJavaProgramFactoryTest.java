@@ -16,6 +16,8 @@ import recoder.java.JavaProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
+import recoder.java.statement.LoopStatement;
+import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
@@ -23,6 +25,7 @@ import recoder.java.declaration.TypeDeclaration;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
+import recoder.java.reference.VariableReference;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,19 +85,50 @@ public class ProofJavaProgramFactoryTest {
         assertContainsComment(forLoop, it -> it.equals("//@ ghost int k1_old = k1;"));
         assertContainsComment(forLoop, it -> it.startsWith("/*@ loop_invariant"));
 
-        LocalVariableDeclaration ghost3 = (LocalVariableDeclaration) m.getBody().getStatementAt(2);
-        Assert.assertTrue(ghost3.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k0_old", ghost3.getVariables().get(0).getName());
+        StatementBlock loopBody = (StatementBlock) forLoop.getBody();
 
-        LocalVariableDeclaration ghost4 = (LocalVariableDeclaration) m.getBody().getStatementAt(3);
-        Assert.assertTrue(ghost4.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k1_old", ghost4.getVariables().get(0).getName());
+        CopyAssignment ghost3 = (CopyAssignment) loopBody.getStatementAt(3);
+        VariableReference var3 = (VariableReference) ghost3.getChildAt(0);
+        Assert.assertEquals("k0_old", var3.getName());
 
+        CopyAssignment ghost4 = (CopyAssignment) loopBody.getStatementAt(5);
+        VariableReference var4 = (VariableReference) ghost4.getChildAt(0);
+        Assert.assertEquals("k1_old", var4.getName());
+
+        EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
         EmptyStatement lastStatementInForLoop = (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
-        assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k0_old = k0;"));
+        assertContainsComment(empty1, it -> it.equals("//@ set k0_old = k0;"));
         assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k1_old = k1;"));
 
     }
+
+    @Test
+    public void testAttachCommentsCompilationUnit_SetStatements() throws IOException {
+        File inputFile = new File(FindResources.getTestResourcesDirectory(),
+                "de/uka/ilkd/key/java/recoderext/SetInMethodBody.java");
+        final CompilationUnit cu = getCompilationUnit(inputFile);
+
+        Optional<Method> ofib = findMethod(cu, "SetInMethodBody", "foo");
+        System.out.println(cu);
+        Assert.assertTrue("Could not find method SetInMethodBody#foo()", ofib.isPresent());
+        MethodDeclaration m = (MethodDeclaration) ofib.get();
+        assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
+
+        CopyAssignment assign1 = (CopyAssignment) m.getBody().getStatementAt(0);
+        VariableReference var1 = (VariableReference) assign1.getChildAt(0);
+        Assert.assertEquals("message", var1.getName());
+
+        EmptyStatement empty1 = (EmptyStatement) m.getBody().getStatementAt(1);
+        assertContainsComment(empty1, it -> it.equals("//@ set message = arg0;"));
+
+        CopyAssignment assign2 = (CopyAssignment) m.getBody().getStatementAt(2);
+        VariableReference var2 = (VariableReference) assign2.getChildAt(0);
+        Assert.assertEquals("cause", var2.getName());
+
+        EmptyStatement empty2 = (EmptyStatement) m.getBody().getStatementAt(3);
+        assertContainsComment(empty2, it -> it.equals("//@ set cause = arg1;"));
+    }
+
 
 
     @Test

@@ -560,8 +560,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-    	SLExpression result = accept(ctx.shiftexpr(0));
-    	SLExpression right = accept(ctx.shiftexpr(1));
+        SLExpression result = accept(ctx.shiftexpr(0));
+        SLExpression right = accept(ctx.shiftexpr(1));
         assert result != null && right != null;
 
         if (result.isTerm() || right.isTerm()) {
@@ -581,7 +581,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
-        	Sort os = right.getType().getSort();
+            Sort os = right.getType().getSort();
             Function ioFunc = os.getInstanceofSymbol(services);
             result = new SLExpression(
                     tb.equals(
@@ -960,7 +960,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = lookupIdentifier(lookupName, receiver, params, ctx);
         if (result == null) {
-            if (fullyQualifiedName.indexOf('.') < 0) {
+            if (fullyQualifiedName.indexOf('.') < 0 && selfVar != null) {
                 //resolve by prefixing an `this.`
                 result = lookupIdentifier(lookupName, getThisReceiver(), params, ctx);
             }
@@ -976,8 +976,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+    private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
+        ImmutableList<SLExpression> params = ctx.param_decl()
+                .stream().map(it -> lookupIdentifier(it.p.getText(), null, null, it))
+                .collect(ImmutableSLList.toImmutableList());
+        return getSlParametersWithHeap(params);
+    }
+
     private SLParameters visitParameters(JmlParser.ExpressionlistContext ctx) {
         ImmutableList<SLExpression> params = accept(ctx);
+        return getSlParametersWithHeap(params);
+    }
+
+    private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             Term p;
@@ -1297,7 +1308,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             final Term objTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             return new SLExpression(tb.singleton(objTerm, fieldTerm));
-        }catch (IndexOutOfBoundsException e1) {
+        } catch (IndexOutOfBoundsException e1) {
             raiseError(ctx, "The given expression %s is not a valid reference.", e);
         }
         return null;
@@ -1370,7 +1381,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         assert typ != null;
         Term resTerm = tb.equals(tb.var(
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
+                        javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
                 tb.TRUE());
         return new SLExpression(resTerm);
     }
@@ -2221,38 +2232,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        if (ctx.BODY() == null) return new SLExpression(tb.tt());
-
-        String equality = getEqualityExpressionOfModelMethod(ctx);
-        ParserRuleContext equal = JmlFacade.parseExpr(equality);
-        return accept(equal);
-    }
-
-    /**
-     * Translates the given context of a model method into a parsable term of equality.
-     */
-    @Nonnull
-    static String getEqualityExpressionOfModelMethod(@Nonnull JmlParser.Method_declarationContext ctx) {
-        String bodyString = ctx.BODY() == null ? ";" : ctx.BODY().getText();
-        bodyString = bodyString.trim();
-
-        // "at"-signs for from the beginning of lines
-        bodyString = bodyString.replaceAll("\n[ ]*@", "\n");
-        // remove single line comments
-        bodyString = bodyString.replaceAll("//[^\n]+?\n", "\n");
-        //remove multiline comments (this is only relevant for model methods with single comments.)
-        bodyString = bodyString.replaceAll("/[*].*?[*]/", "");
-
-        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
-            raiseError("The body of the given model method is misformed. " +
-                    "We expected, that the first and last character to be curly braces.", ctx);
-
-        bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
-        if (!bodyString.startsWith("return "))
-            raiseError(ctx, "return expected, instead: " + bodyString);
-        int beginIndex = bodyString.indexOf(" ") + 1;
-        int endIndex = bodyString.lastIndexOf(";");
-        bodyString = bodyString.substring(beginIndex, endIndex);
+        if (ctx.method_body() == null) {
+            return new SLExpression(tb.tt());
+        }
 
         String paramsString;
         List<JmlParser.Param_declContext> paramDecls = ctx.param_list().param_decl();
@@ -2261,8 +2243,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         else
             paramsString = "()"; //default no params
 
-        return ctx.IDENT() + paramsString + " == (" + bodyString + ")";
+        ParserRuleContext equal = JmlFacade.parseExpr(ctx.IDENT() + paramsString);
+        Object a = accept(equal);
+
+        SLExpression body = accept(ctx.method_body().expression());
+        SLParameters params = visitParameters(ctx.param_list());
+        SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
+
+        return termFactory.eq(apply, body);
     }
+
 
     @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
@@ -2358,8 +2348,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
-        return accept(ctx.expression());
+    public SLExpression visitVariant_function(JmlParser.Variant_functionContext ctx) {
+        List<SLExpression> exprs = mapOf(ctx.expression());
+        Optional<SLExpression> t = exprs.stream()
+                .reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
+        return new SLExpression(t.orElse(exprs.get(0)).getTerm());
     }
 
     @Override

@@ -13,21 +13,15 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import com.sun.java.accessibility.util.Translator;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Before;
 import org.junit.Test;
@@ -167,10 +161,8 @@ public class TestJMLTranslator {
     @Test
     public void testPrimitiveField() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
         Term result = jmlIO.parseExpression("this.i");
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
         assertTrue(termContains(result, selfVar));
     }
 
@@ -319,7 +311,6 @@ public class TestJMLTranslator {
     @Test
     public void testOld() {
         ProgramVariable excVar = buildExcVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         Term result = jmlIO
                 .exceptionVariable(excVar)
@@ -361,16 +352,12 @@ public class TestJMLTranslator {
     @Test
     public void testNonNullElements() {
 
-        ProgramVariable array = javaInfo.getAttribute(
-                "testPackage.TestClass::array");
-
         Term result = jmlIO
                 .atPres(atPres)
                 .parseExpression(
                         "\\nonnullelements(this.array)");
 
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
         assertTrue(termContains(result, TB.NULL()));
     }
 

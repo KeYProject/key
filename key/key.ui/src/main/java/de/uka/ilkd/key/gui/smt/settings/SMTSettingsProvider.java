@@ -4,7 +4,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -136,7 +135,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JCheckBox createSolverSupportCheck() {
-        return addCheckBox("Check for support when a solver is started.",
+        return addCheckBox("Check for support when a solver is started",
                 BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
                 false,
                 e -> settings.checkForSupport = solverSupportCheck.isSelected());

@@ -90,6 +90,7 @@ public final class InnerNodeView extends SequentView {
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3, 0, 0, 0, Color.black),
                 new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setEditable(false);
 
 //        updateUI();
         printSequent();
@@ -185,6 +186,10 @@ public final class InnerNodeView extends SequentView {
 
     @Override
     public String getTitle() {
+        // If a leaf becomes an inner node, it is already closed.
+        if (node.leaf()) {
+            return "Closed Goal";
+        }
         return "Inner Node";
     }
 

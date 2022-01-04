@@ -4,18 +4,18 @@
  */
 public class Initially {
 
-  protected /*@spec_public@*/ int x;
-  //@ public initially x > 0;
+    protected /*@spec_public@*/ int x;
+    //@ public initially x > 0;
 
-  public Initially (int y) {
-    x = (y>0?y:-y+1);
-  }
+    public Initially (int y) {
+        x = (y>0?y:-y+1);
+    }
 
-  public Initially (boolean b) {
-    x = b ? 1: 42;
-  }
+    public Initially (boolean b) {
+        x = b ? 1: 42;
+    }
 
-  public Initially (Object[] a) {
-    x = a.length+1;
-  }
+    public Initially (Object[] a) {
+        x = a.length+1;
+    }
 }

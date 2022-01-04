@@ -13,30 +13,13 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -75,7 +58,6 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
@@ -231,7 +213,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
-                ExceptionDialog.showDialog(mainWindow, result);
+                IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
@@ -389,17 +371,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      */
     public File saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
-        jFC.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
+        final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
+        fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
         Pair<File, String> f = fileName(proof, fileExtension);
-        final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
+        final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
         File file = null;
-        if (saved) {
-            file = jFC.getSelectedFile();
+        if (result == JFileChooser.APPROVE_OPTION) {          // saved
+            file = fc.getSelectedFile();
             final String filename = file.getAbsolutePath();
             ProofSaver saver;
-            if (jFC.useCompression()) {
+            if (fc.useCompression()) {
                 saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
             } else {
                 saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
@@ -417,34 +399,42 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 proof.setProofFile(file);
             }
-        } else {
-            jFC.resetPath();
         }
         return file;
     }
 
-   public void saveProofBundle(Proof proof) {
-       final MainWindow mainWindow = MainWindow.getInstance();
-       final BundleFileChooser fileChooser = BundleFileChooser.getFileChooser("Choose filename to save proof");
+    /**
+     * Saves the proof as a bundle, i.e., as a zip archive containing all dependencies (Java
+     * sources, classpath and bootclasspath if present, other included key files, e.g., user-defined
+     * taclets).
+     * @param proof the proof to save
+     */
+    public void saveProofBundle(Proof proof) {
+        final MainWindow mainWindow = MainWindow.getInstance();
+        final KeYFileChooser fileChooser =
+            KeYFileChooser.getFileChooser("Choose filename to save proof");
+        fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-       final boolean saved = fileChooser.showSaveDialog(mainWindow, proof.getProofFile());
-       if (saved) {
-           Path path = fileChooser.getSaveFile();
-           ProofSaver saver = new ProofBundleSaver(proof, path.toFile());
+        Pair<File, String> f = fileName(proof, ".zproof");
+        final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            ProofSaver saver = new ProofBundleSaver(proof, file);
 
-           String errorMsg;
-           try {
-               errorMsg = saver.save();
-           } catch (IOException e) {
-               errorMsg = e.toString();
-           }
-           if (errorMsg != null) {
-               mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
-           } else {
-              proof.setProofFile(path.toFile());
-           }
-       }
-   }
+            String errorMsg;
+            try {
+                errorMsg = saver.save();
+            } catch (IOException e) {
+                errorMsg = e.toString();
+            }
+            if (errorMsg != null) {
+                mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: "
+                    + errorMsg));
+            } else {
+                proof.setProofFile(file);
+            }
+        }
+    }
 
    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
        // TODO: why do we use GUI components here?
@@ -471,7 +461,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
            defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
            selectedFile = new File(selectedFile.getParentFile(), defaultName);
        }
-       return new Pair<File, String>(selectedFile, defaultName);
+       return new Pair<>(selectedFile, defaultName);
    }
 
     /**
@@ -481,12 +471,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     public void proofDisposing(final ProofDisposedEvent e) {
         super.proofDisposing(e);
         // Remove proof from user interface
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                mainWindow.getProofList().removeProof(e.getSource());
-            }
-        });
+        ThreadUtilities.invokeAndWait(() -> mainWindow.getProofList().removeProof(e.getSource()));
     }
 
    @Override
@@ -605,64 +590,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        final JDialog dialog = new JDialog(MainWindow.getInstance(),
-                                           SLEnvInput.getLanguage() + " warning",
-                                           true);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container pane = dialog.getContentPane();
-        pane.setLayout(new BorderLayout());
-
-        //top label
-        JLabel label = new JLabel("The following non-fatal "
-                                  + "problems occurred when translating your "
-                                  + SLEnvInput.getLanguage() + " specifications:");
-        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-        pane.add(label, BorderLayout.NORTH);
-
-        //scrollable warning list
-        JScrollPane scrollpane = new JScrollPane();
-        scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList<PositionedString> list =
-                new JList<PositionedString>(
-                        warnings.toArray(new PositionedString[warnings.size()])
-                        );
-        list.setBorder(BorderFactory.createLoweredBevelBorder());
-        scrollpane.setViewportView(list);
-        pane.add(scrollpane, BorderLayout.CENTER);
-
-        //ok button
-        final JButton button = new JButton("OK");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-            }
-        });
-        Dimension buttonDim = new Dimension(100, 27);
-        button.setPreferredSize(buttonDim);
-        button.setMinimumSize(buttonDim);
-        JPanel panel = new JPanel();
-        panel.add(button);
-        pane.add(panel, BorderLayout.SOUTH);
-        dialog.getRootPane().setDefaultButton(button);
-
-        button.registerKeyboardAction(
-            new ActionListener() {
-                @Override
-               public void actionPerformed(ActionEvent event) {
-                    if(event.getActionCommand().equals("ESC")) {
-                        button.doClick();
-                    }
-                }
-            },
-            "ESC",
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        dialog.setSize(700, 300);
-        dialog.setLocationRelativeTo(MainWindow.getInstance());
-        dialog.setVisible(true);
-        dialog.dispose();
+        IssueDialog.showWarningsIfNecessary(mainWindow, warnings);
     }
 
    /**

@@ -559,13 +559,6 @@ public final class SourceView extends JComponent {
 
             try (InputStream is = repo.getInputStream(fileURI.toURL())) {
                 if (is != null) {
-                    // fileName and file.getAbsolutePath() should be equal here,
-                    // but because of a bug somewhere in Recoder2KeY, on Windows, fileName
-                    // is of the (illegal!) form "/C:/path/to/file/" which the File constructor
-                    // silently converts to the correct form "C:\path\to\file".
-                    // Using file.getAbsolutePath() instead of fileName makes the SourceView
-                    // behave weirdly on Windows systems.
-
                     Tab tab = new Tab(fileURI, is);
                     tabs.put(fileURI, tab);
                     // filename as tab title, complete file URI as tooltip
@@ -724,7 +717,13 @@ public final class SourceView extends JComponent {
                                             }
                                         }
                                         if (posInf != null && posInf.getURI() != null) {
-                                            node.getNodeInfo().addRelevantFile(posInf.getURI());
+                                            // sometimes the useful file info is only stored in
+                                            // parentClassURI for some reason ...
+                                            if (!posInf.getURI().equals(PositionInfo.UNKNOWN_URI)) {
+                                                node.getNodeInfo().addRelevantFile(posInf.getURI());
+                                            } else if (!posInf.getParentClassURI().equals(PositionInfo.UNKNOWN_URI)) {
+                                                node.getNodeInfo().addRelevantFile(posInf.getParentClassURI());
+                                            }
                                         }
                                     }
                                 }

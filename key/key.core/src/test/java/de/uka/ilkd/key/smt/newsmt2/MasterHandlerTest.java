@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.LineProperties;
 import org.hamcrest.core.StringContains;
 import org.junit.Assume;
@@ -162,13 +163,16 @@ public class MasterHandlerTest {
     @Test
     public void testZ3() throws Exception {
 
+        Assume.assumeTrue("Z3 is not installed, this testcase is ignored.",
+                SolverType.Z3_SOLVER.isInstalled(false));
+
         String expectation = props.get("expected");
         Assume.assumeTrue("No Z3 expectation.", expectation != null);
         expectation = expectation.toLowerCase().trim();
 
         // TODO Run Z3 on the SMT translation
         // FIXME This is a hack.
-        Process proc = new ProcessBuilder("z3", "-in", "-T:5").start();
+        Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
         OutputStream os = proc.getOutputStream();
         os.write(translation.getBytes());
         os.write("\n\n(check-sat)".getBytes());

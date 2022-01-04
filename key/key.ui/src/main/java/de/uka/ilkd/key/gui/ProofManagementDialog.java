@@ -252,8 +252,6 @@ public final class ProofManagementDialog extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(),
                 BoxLayout.Y_AXIS));
         pack();
-        final Point mainLoc = mainWindow.getLocation();
-        setLocation(mainLoc.x + 20, mainLoc.y + 20);
     }
 
     @Override
@@ -507,7 +505,7 @@ public final class ProofManagementDialog extends JDialog {
 
                 }
             } catch (ProofInputException exc) {
-                ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.setProof(proof);

@@ -128,15 +128,15 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         logArea.setText("Running script from URL '" + url + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 interruptionPerformed();
             }
         });
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(cancel);
+        panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
 
         dlg.setSize(750, 400);
@@ -190,7 +190,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
             System.err.println("Scripting was cancelled.");
             Debug.printStackTrace(ex);
         } catch (Throwable ex) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);

@@ -36,8 +36,8 @@ public class CardRuntimeException extends java.lang.RuntimeException {
       @   assignable \nothing;
       @*/
     public CardRuntimeException(short reason) {
-       this();
-       setReason(reason);
+        this();
+        setReason(reason);
     }
 
     /*@ public normal_behavior

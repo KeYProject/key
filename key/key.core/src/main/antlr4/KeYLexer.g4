@@ -408,7 +408,7 @@ STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<';
-IMPLICIT_IDENT: '<' (LETTER)+ '>' -> type(IDENT);
+IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;

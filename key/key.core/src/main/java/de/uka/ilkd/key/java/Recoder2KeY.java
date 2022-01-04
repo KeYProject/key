@@ -455,8 +455,11 @@ public class Recoder2KeY implements JavaReader {
             transformModel(cUnits);
         } catch (Exception ex) {
             if(ex.getCause() instanceof UnresolvedReferenceException) {
-                String extraMsg = "Consider using a classpath if this is a classtype that cannot be resolved\n";
-                reportError(extraMsg + ex.getCause().getMessage(), ex);
+                String extraMsg = "Consider using a classpath in your input file if this is a " +
+                    "classtype that cannot be resolved (see " +
+                    "https://key-project.org/docs/user/Classpath for more details).";
+                String msg = String.format("%s%n%s", ex.getCause().getMessage(), extraMsg);
+                reportError(msg, ex);
             } else {
                 reportError(ex.getMessage(), ex);
             }

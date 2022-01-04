@@ -30,7 +30,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -45,11 +44,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
-import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
-import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 
 
 
@@ -78,7 +76,8 @@ public class ProgressDialog extends JDialog{
 
     public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
                           int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
-        	    table = new ProgressTable(resolution,listener,labelTitles); 
+        super(MainWindow.getInstance());
+        	    table = new ProgressTable(resolution,listener,labelTitles);
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 table.setModel(model,titles);
                 this.listener = listener;
@@ -137,26 +136,21 @@ public class ProgressDialog extends JDialog{
                 return progressBar;
         }
 
-        private JButton getApplyButton() {
-                if(applyButton == null){
-                       applyButton = new JButton("Apply");
-                       applyButton.setEnabled(false);
-                       applyButton.addActionListener(new ActionListener() {
-                        
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            try {
-                                listener.applyButtonClicked();
-                            } catch(Exception exception) {
-                                // There may be exceptions during rule application that should not be lost.
-                                ExceptionDialog.showDialog(ProgressDialog.this, exception);
-                            }
-                        }
-                });
-                       
+    private JButton getApplyButton() {
+        if(applyButton == null) {
+            applyButton = new JButton("Apply");
+            applyButton.setEnabled(false);
+            applyButton.addActionListener(e -> {
+                try {
+                    listener.applyButtonClicked();
+                } catch(Exception exception) {
+                    // There may be exceptions during rule application that should not be lost.
+                    IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
-                return applyButton;
+            });
         }
+        return applyButton;
+    }
         
         private JScrollPane getScrollPane() {
                 if(scrollPane == null){

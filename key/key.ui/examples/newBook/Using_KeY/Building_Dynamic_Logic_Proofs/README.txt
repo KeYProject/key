@@ -1,5 +1,5 @@
 example.name = Building Dynamic Logic Proofs - DL Examples
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.additionalFile.1 = activeStmt.key
 example.additionalFile.2 = exchange.key
 example.additionalFile.3 = executeByProving.key

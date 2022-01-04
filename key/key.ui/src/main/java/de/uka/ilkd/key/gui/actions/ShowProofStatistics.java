@@ -30,13 +30,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -302,9 +296,9 @@ public class ShowProofStatistics extends MainWindowAction {
             KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
                     "Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
-            fileChooser.selectFile(new File(fileName + "." + fileExtension));
-            boolean approved = fileChooser.showSaveDialog(this);
-            if (approved) {
+            fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try(BufferedWriter writer = new BufferedWriter(
                             new OutputStreamWriter(new FileOutputStream(file)));) {

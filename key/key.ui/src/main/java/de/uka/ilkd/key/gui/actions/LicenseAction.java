@@ -86,13 +86,13 @@ public class LicenseAction extends MainWindowAction {
         pane.addTab("KeY License", createLicenseViewer(readStream(lic, KEY_FALLBACK)));
         pane.addTab("Third party libraries", createLicenseViewer(readStream(thirdPartyLic, "")));
 
-        JButton ok = new JButton("OK");
-        ok.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
+        JButton okButton = new JButton("OK");
+        okButton.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
                 .getTopLevelAncestor()).dispose());
-        fr.getContentPane().add(ok, BorderLayout.SOUTH);
+        fr.getContentPane().add(okButton, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         fr.setSize(600, 900);
-        fr.setLocationRelativeTo(null);
+        fr.setLocationRelativeTo(mainWindow);
         fr.setVisible(true);
     }
 
