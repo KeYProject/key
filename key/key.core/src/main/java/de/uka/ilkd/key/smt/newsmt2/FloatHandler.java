@@ -123,6 +123,13 @@ public class FloatHandler implements SMTHandler {
             masterHandler.getTranslationState().remove("sqrtDouble.axioms");
             masterHandler.getTranslationState().remove("sqrtFloat.axioms");
         }
+
+        // sorts are defined here, declare it as already defined
+        masterHandler.addKnownSymbol("sort_double");
+        masterHandler.addSort(doubleLDT.targetSort());
+        masterHandler.addKnownSymbol("sort_float");
+        masterHandler.addSort(floatLDT.targetSort());
+
     }
 
     @Override
