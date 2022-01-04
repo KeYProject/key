@@ -15,7 +15,9 @@ package de.uka.ilkd.key.logic;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
@@ -108,10 +110,9 @@ public class TestTermBuilder extends TestCase {
     private void testDoubleLongPatterns(String number) {
         double doubleVal = Double.parseDouble(number);
         Term doubleTerm = tb.dfpTerm(doubleVal);
-        long longPattern = Double.doubleToLongBits(doubleVal);
-        Term longTerm = tb.zTerm(longPattern);
+        DoubleLiteral literal = services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
         assertEquals("for double value " + number,
-                longTerm.sub(0), doubleTerm.sub(0));
+                doubleVal, Double.parseDouble(literal.getValue()));
     }
     
     public void testDoubleLongPatterns() {
@@ -123,6 +124,25 @@ public class TestTermBuilder extends TestCase {
         testDoubleLongPatterns("123e-2");
         testDoubleLongPatterns("22e307");
         testDoubleLongPatterns("-22e307");
+    }
+
+    private void testFloatPatterns(String number) {
+        float floatval = Float.parseFloat(number);
+        Term floatTerm = tb.fpTerm(floatval);
+        FloatLiteral literal = services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
+        assertEquals("for double value " + number,
+                floatval, Float.parseFloat(literal.getValue()));
+    }
+
+    public void testFloatPatterns() {
+        testFloatPatterns("1");
+        testFloatPatterns("0.");
+        testFloatPatterns("-1");
+        testFloatPatterns("-0.");
+        testFloatPatterns("123.33");
+        testFloatPatterns("123e-2");
+        testFloatPatterns("22e37");
+        testFloatPatterns("-22e37");
     }
     
 }

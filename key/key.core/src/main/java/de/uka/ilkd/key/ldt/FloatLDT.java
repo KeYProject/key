@@ -210,7 +210,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
         if(!containsFunction((Function) t.op())) {
             return null;
         }
@@ -219,15 +219,11 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
         if(f == floatLit) {
-            //Use IntegerLDT to translate the Integer & Fraction to literals
-            IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
-                    children, services);
-            long bits = il1.getValue();
-            assert bits == (int) bits :
-                    "At this point, we assumed that the long would be an int.";
-            Float f1 = Float.intBitsToFloat((int) bits);
-
-            return new FloatLiteral(f1.toString());
+            // Use IntegerLDT to translate to literals
+            String digits = intLDT.toNumberString(t.sub(0));
+            int bits = Integer.parseUnsignedInt(digits);
+            float f1 = Float.intBitsToFloat(bits);
+            return new FloatLiteral(Float.toString(f1));
         }
         throw new RuntimeException("FloatLDT: Cannot convert term to program: "+t);
     }

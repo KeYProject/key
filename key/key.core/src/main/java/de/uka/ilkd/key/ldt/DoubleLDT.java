@@ -209,25 +209,20 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
         return containsFunction(f) && (f.arity()==0);
     }
 
-    private static boolean isNumberLiteral(Operator f) {
-        char c = f.name().toString().charAt(0);
-        return (c-'0'>=0) && (c-'0'<=9);
-    }
-
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
         Function f = (Function)t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
         if(f == doubleLit) {
-            //Use IntegerLDT to translate the Integer & Fraction to literals
-            IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
-                    children, services);
-            long bits = il1.getValue();
+            // Use IntegerLDT to translate to literals
+            String digits = intLDT.toNumberString(t.sub(0));
+            long bits = Long.parseUnsignedLong(digits);
             Double d1 = Double.longBitsToDouble(bits);
 
             return new DoubleLiteral(d1.toString());
         }
+
         throw new RuntimeException("DoubleLDT: Cannot convert term to program: " + t);
     }
 
