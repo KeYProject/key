@@ -349,7 +349,7 @@ public final class JavaInfo {
 	    Name ldtName = type.getCorrespondingLDTName();
 	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
 	    final Sort sort;
-	    sort = (Sort) sorts.lookup(ldtName);
+	    sort = sorts.lookup(ldtName);
 	    assert sort != null : "could not find sort for type: " + type;
 	    result = new KeYJavaType(type, sort);
 	    if(type2KJTCache != null) {
