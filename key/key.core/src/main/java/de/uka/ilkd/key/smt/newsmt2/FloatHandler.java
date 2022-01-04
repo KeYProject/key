@@ -64,20 +64,26 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getSub(), "fp.sub");
         fpOperators.put(floatLDT.getMul(), "fp.mul");
         fpOperators.put(floatLDT.getDiv(), "fp.div");
-//        fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
-//        fpOperators.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
-//        fpOperators.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
-//        fpOperators.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
-//        fpOperators.put(floatLDT.getJavaMax(), SMTTermFloatOp.Op.FPMAX);
-//        fpOperators.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
-//        fpOperators.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
-//        fpOperators.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
-//        fpOperators.put(floatLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
-//        fpOperators.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
-//        fpOperators.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
-//        fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
-//        fpOperators.put(floatLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
-//
+
+// From the smtlib manual on floats:
+//        (fp.isNormal (_ FloatingPoint eb sb) Bool)
+//        (fp.isSubnormal (_ FloatingPoint eb sb) Bool)
+//        (fp.isZero (_ FloatingPoint eb sb) Bool)
+//        (fp.isInfinite (_ FloatingPoint eb sb) Bool)
+//        (fp.isNaN (_ FloatingPoint eb sb) Bool)
+//        (fp.isNegative (_ FloatingPoint eb sb) Bool)
+//        (fp.isPositive (_ FloatingPoint eb sb) Bool)
+
+        fpOperators.put(floatLDT.getIsPositive(), "fp.isPositive");
+        fpOperators.put(floatLDT.getAbs(), "fp.abs");
+        fpOperators.put(floatLDT.getIsNaN(), "fp.isNaN");
+        fpOperators.put(floatLDT.getIsZero(), "fp.isZero");
+        fpOperators.put(floatLDT.getIsNormal(), "fp.isNormal");
+        fpOperators.put(floatLDT.getIsSubnormal(), "fp.isSubnormal");
+        fpOperators.put(floatLDT.getIsInfinite(), "fp.isInfinite");
+        fpOperators.put(floatLDT.getIsNegative(), "fp.isNegative");
+        fpOperators.put(floatLDT.getIsPositive(), "fp.isPositive");
+
 //        // Double predicates and operations, translated identically to float operations
         fpOperators.put(doubleLDT.getLessThan(), "fp.lt");
         fpOperators.put(doubleLDT.getGreaterThan(), "fp.gt");
@@ -89,20 +95,19 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getMul(), "fp.mul");
         fpOperators.put(doubleLDT.getDiv(), "fp.div");
 
+        fpOperators.put(doubleLDT.getIsPositive(), "fp.isPositive");
+        fpOperators.put(doubleLDT.getAbs(), "fp.abs");
+        fpOperators.put(doubleLDT.getIsNaN(), "fp.isNaN");
+        fpOperators.put(doubleLDT.getIsZero(), "fp.isZero");
+        fpOperators.put(doubleLDT.getIsNormal(), "fp.isNormal");
+        fpOperators.put(doubleLDT.getIsSubnormal(), "fp.isSubnormal");
+        fpOperators.put(doubleLDT.getIsInfinite(), "fp.isInfinite");
+        fpOperators.put(doubleLDT.getIsNegative(), "fp.isNegative");
+        fpOperators.put(doubleLDT.getIsPositive(), "fp.isPositive");
+
         // Our own functions which are not built in.
         fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
         fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtFloat");
-
-//        fpOperators.put(doubleLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
-//        fpOperators.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
-//        fpOperators.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
-//        fpOperators.put(doubleLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
-//        fpOperators.put(doubleLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
-//        fpOperators.put(doubleLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
-//        fpOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
-//        fpOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
-//        fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
-//        fpOperators.put(doubleLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
 //
 //        mathOperators.put(doubleLDT.getSinDouble(), SMTTermFloatOp.Op.SINDOUBLE);
 //        mathOperators.put(doubleLDT.getCosDouble(), SMTTermFloatOp.Op.COSDOUBLE);
