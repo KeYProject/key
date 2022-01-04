@@ -8,6 +8,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,12 +45,11 @@ public class SMTCommand
             throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
-        final List<Goal> goals = new ArrayList<>();
-        
-        if (args.allGoals) {
-            goals.addAll(state.getProof().openEnabledGoals().stream().collect(Collectors.toList()));
+        ImmutableList<Goal> goals;
+        if (args.all) {
+             goals = state.getProof().openGoals();
         } else {
-            goals.add(state.getFirstOpenAutomaticGoal());
+             goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
         
         for (Goal goal : goals) {
@@ -60,6 +61,7 @@ public class SMTCommand
         SMTSettings settings = new SMTSettings(
                 goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                goal.proof().getSettings().getNewSMTSettings(),
                 goal.proof());
 
         if(args.timeout >= 0) {
@@ -87,14 +89,15 @@ public class SMTCommand
         }
     }
 
-    private SolverTypeCollection computeSolvers(String value) {
+    private SolverTypeCollection computeSolvers(String value) throws ScriptException {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<SolverType>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
-            if (type != null) {
-                types.add(type);
+            if (type == null) {
+                throw new ScriptException("Unknown SMT solver: " + name);
             }
+            types.add(type);
         }
         return new SolverTypeCollection(value, 1, types);
     }
@@ -103,8 +106,44 @@ public class SMTCommand
         @Option("solver")
         public String solver = "Z3";
         
-        @Option(value = "allgoals", required = false)
-        public boolean allGoals = false;
+        @Option(value = "all", required = false)
+        public boolean all = false;
+
+        @Option(value = "timeout", required = false)
+        public int timeout = -1;
     }
 
+    private static class TimerListener implements SolverLauncherListener {
+        private long start;
+        private long stop;
+
+        @Override
+        public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
+            this.start = System.currentTimeMillis();
+        }
+
+        @Override
+        public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
+            this.stop = System.currentTimeMillis();
+        }
+
+        public long getRuntime() {
+            return stop - start;
+        }
+    }
+
+    private class SMTSettingsTimeoutWrapper extends SMTSettings {
+        private final int timeout;
+
+        public SMTSettingsTimeoutWrapper(SMTSettings settings, int timeout) {
+            super(settings.getPdSettings(), settings.getPiSettings(),
+                    settings.getNewTranslationSettings(), settings.getProof());
+            this.timeout = timeout;
+        }
+
+        @Override
+        public long getTimeout() {
+            return timeout;
+        }
+    }
 }
