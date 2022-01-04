@@ -4,14 +4,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
@@ -25,7 +22,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * @autor Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
+ * @author Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
  */
 public class FloatHandler implements SMTHandler {
 
@@ -35,6 +32,11 @@ public class FloatHandler implements SMTHandler {
     /** Java's FP semantics is always "round to nearest even". */
     private static final String ROUNDING_MODE = "RNE";
 
+    public static final BooleanProperty DISABLE_SQRT_AXIOMS_PROPERTY =
+            new BooleanProperty("disableSqrtAxiomatization",
+                    "Disable axiomatization for sqrt",
+                    "Disable quantified axioms for floating point sqrt which can increase runtime by a lot.");
+
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();
 
@@ -42,9 +44,7 @@ public class FloatHandler implements SMTHandler {
     private DoubleLDT doubleLDT;
     private Services services;
 
-    // TODO Take this from the smt settings (once available)
     private boolean disableSqrtAxiomatizing;
-    private Properties snippets;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
@@ -52,7 +52,7 @@ public class FloatHandler implements SMTHandler {
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
         doubleLDT = services.getTypeConverter().getDoubleLDT();
-        //disableSqrtAxiomatizing = services.getProof().getSettings().getSMTSettings().disableSqrtAxiomatizing;
+        disableSqrtAxiomatizing = DISABLE_SQRT_AXIOMS_PROPERTY.get(services);
 
         // operators with arguments
         fpOperators.put(floatLDT.getLessThan(), "fp.lt");
@@ -88,6 +88,11 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getSub(), "fp.sub");
         fpOperators.put(doubleLDT.getMul(), "fp.mul");
         fpOperators.put(doubleLDT.getDiv(), "fp.div");
+
+        // Our own functions which are not built in.
+        fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
+        fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtFloat");
+
 //        fpOperators.put(doubleLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
 //        fpOperators.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
 //        fpOperators.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
@@ -114,6 +119,10 @@ public class FloatHandler implements SMTHandler {
         roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div"));
 
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        if(disableSqrtAxiomatizing) {
+            masterHandler.getTranslationState().remove("sqrtDouble.axioms");
+            masterHandler.getTranslationState().remove("sqrtFloat.axioms");
+        }
     }
 
     @Override
