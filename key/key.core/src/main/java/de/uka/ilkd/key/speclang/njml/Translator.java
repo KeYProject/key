@@ -24,6 +24,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
+import de.uka.ilkd.key.speclang.njml.JmlParser.PrimaryFloatingPointContext;
 import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
@@ -1179,6 +1180,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.translateMapExpressionToJDL(ctx.SEQ2MAP().getText(), list, services);
     }
 
+    @Override
+    public Object visitPrimaryFloatingPoint(PrimaryFloatingPointContext ctx) {
+        SLExpression argument = accept(ctx.expression());
+        LDT ldt = services.getTypeConverter().getLDTFor(argument.getTerm().sort());
+        if (ldt == null) {
+            throw new RuntimeException("What is the right edception?");
+        }
+        String opName = ctx.getStart().getText();
+        assert opName.startsWith("\\fp_");
+        Function op = ldt.getFunctionFor(opName.substring(4), services);
+
+        return new SLExpression(tb.func(op, argument.getTerm()));
+    }
 
     @Override
     public Object visitPrimaryNotMod(JmlParser.PrimaryNotModContext ctx) {
