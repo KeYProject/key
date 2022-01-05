@@ -1750,9 +1750,10 @@ public final class MainWindow extends JFrame {
                 MainWindow.this.popupWarning("No proof loaded.", "Oops...");
                 return;
             }
-            final Proof proof = mediator.getSelectedProof();
 
             JDialog choiceDialog = new JDialog(mainWindow);
+            choiceDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            choiceDialog.setLocationByPlatform(true);
             JPanel solverChoice = new JPanel();
             List<UnionCheckBox> choiceOptions = new LinkedList<>();
             JButton start = new JButton("Start Solvers");
@@ -1761,16 +1762,14 @@ public final class MainWindow extends JFrame {
             cancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    choiceDialog.setEnabled(false);
-                    choiceDialog.setVisible(false);
+                    choiceDialog.dispose();
                 }
             });
             start.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     new SMTInvokeAction(createSolverTypeCollection(choiceOptions)).actionPerformed(e);
-                    choiceDialog.setEnabled(false);
-                    choiceDialog.setVisible(false);
+                    choiceDialog.dispose();
                 }
             });
 
@@ -1799,10 +1798,9 @@ public final class MainWindow extends JFrame {
             choiceDialog.add(solverChoice, BorderLayout.NORTH);
             choiceDialog.add(buttonPanel, BorderLayout.SOUTH);
             choiceDialog.setMinimumSize(new Dimension(600, 200));
+            choiceDialog.setTitle("Choose Multiple Solvers");
             choiceDialog.setEnabled(true);
             choiceDialog.setVisible(true);
-            choiceDialog.setTitle("Choose Multiple Solvers");
-
         }
 
         private SolverTypeCollection createSolverTypeCollection(Collection<UnionCheckBox> checkBoxes) {
