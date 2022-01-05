@@ -26,9 +26,9 @@ public class ObjectTypeIdentifier extends Identifier {
         super(id);
     }
 
-    protected void setText(String text) {
-        id = text.intern();
-    }
+    //protected void setText(String text) {
+        //id = text.intern();
+    //}
     
     /**
      * Deep clone.

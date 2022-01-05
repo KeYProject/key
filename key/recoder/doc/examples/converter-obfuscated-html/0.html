@@ -1,0 +1,77 @@
+<HTML><HEAD><TITLE>_0</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+/*
+ * 1.1+Swing version.
+ */
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#3">event</A>.*;
+
+public class <U><A NAME="4">_0</A></U> extends <A HREF="XRef.html#5">_32</A>
+                                implements <A HREF="XRef.html#7">ChangeListener</A> {
+
+    <A HREF="XRef.html#5">_32</A> <U><A NAME="8">_1</A></U>;
+
+    public <U><A NAME="9">_0</A></U>(<A HREF="XRef.html#5">_32</A> <U><A NAME="a">_2</A></U>) {
+        this.<A HREF="XRef.html#8">_1</A> = <A HREF="XRef.html#a">_2</A>;
+        <A HREF="XRef.html#a">_2</A>.<A HREF="XRef.html#b">addChangeListener</A>(this);
+    }
+
+    public void <U><A NAME="c">stateChanged</A></U>(<A HREF="XRef.html#d">ChangeEvent</A> <U><A NAME="e">_3</A></U>) {
+        <A HREF="XRef.html#f">_67</A>();
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="h">getMaximum</A></U>() {
+        <A HREF="XRef.html#g">int</A> <U><A NAME="i">_4</A></U> = <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#j">getMaximum</A>();
+        <A HREF="XRef.html#k">double</A> <U><A NAME="l">_5</A></U> = <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#m">_42</A>() / <A HREF="XRef.html#n">_39</A>;
+        if (<A HREF="XRef.html#o">_41</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In FollowerRangeModel getMaximum");
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("  dataModel.getMaximum = " + <A HREF="XRef.html#i">_4</A>
+                                + "; multiply by " + <A HREF="XRef.html#l">_5</A>
+                                + "; result: " + <A HREF="XRef.html#i">_4</A> * <A HREF="XRef.html#l">_5</A>);
+        }
+        return (<A HREF="XRef.html#g">int</A>)(<A HREF="XRef.html#i">_4</A> * <A HREF="XRef.html#l">_5</A>);
+    }
+
+    public void <U><A NAME="s">setMaximum</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="t">_6</A></U>) {
+        <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#u">setMaximum</A>((<A HREF="XRef.html#g">int</A>)(<A HREF="XRef.html#t">_6</A> *
+                     (<A HREF="XRef.html#n">_39</A> / <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#m">_42</A>())));
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="v">getValue</A></U>() {
+        return (<A HREF="XRef.html#g">int</A>)<A HREF="XRef.html#w">_48</A>();
+    }
+
+    public void <U><A NAME="x">setValue</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="y">_7</A></U>) {
+        <A HREF="XRef.html#z">_49</A>((<A HREF="XRef.html#k">double</A>)<A HREF="XRef.html#y">_7</A>);
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="w">_48</A></U>() {
+        return <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#10">_48</A>()
+               * <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#m">_42</A>()
+               / <A HREF="XRef.html#n">_39</A>;
+    }
+
+    public void <U><A NAME="z">_49</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="11">_8</A></U>) {
+        <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#12">_49</A>(<A HREF="XRef.html#11">_8</A> * <A HREF="XRef.html#n">_39</A>
+                     / <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#m">_42</A>());
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="13">getExtent</A></U>() {
+        return super.<A HREF="XRef.html#14">getExtent</A>();
+    }
+
+    public void <U><A NAME="15">setExtent</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="16">_9</A></U>) {
+        super.<A HREF="XRef.html#17">setExtent</A>(<A HREF="XRef.html#16">_9</A>);
+    }
+
+    public void <U><A NAME="18">setRangeProperties</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="19">_10</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="1a">_11</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="1b">_12</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="1c">_13</A></U>,
+                                   <A HREF="XRef.html#1d">boolean</A> <U><A NAME="1e">_14</A></U>) {
+        <A HREF="XRef.html#k">double</A> <U><A NAME="1f">_15</A></U> = <A HREF="XRef.html#n">_39</A> / <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#m">_42</A>();
+        <A HREF="XRef.html#8">_1</A>.<A HREF="XRef.html#1g">_58</A>(<A HREF="XRef.html#19">_10</A> * <A HREF="XRef.html#1f">_15</A>, <A HREF="XRef.html#1a">_11</A>, <A HREF="XRef.html#1b">_12</A>,
+                                     (<A HREF="XRef.html#g">int</A>)(<A HREF="XRef.html#1c">_13</A> * <A HREF="XRef.html#1f">_15</A>), <A HREF="XRef.html#1e">_14</A>);
+    }
+}
+</PRE></BODY></HTML>

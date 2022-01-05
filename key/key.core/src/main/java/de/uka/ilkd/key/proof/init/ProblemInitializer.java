@@ -593,6 +593,7 @@ public final class ProblemInitializer {
                 }
                 for (ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                    if(pm == null) continue; //weigl 2021-11-10
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }

@@ -1,0 +1,54 @@
+<HTML><HEAD><TITLE>_70</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#1t">text</A>.*;
+
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#1w">Toolkit</A>;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1x">text</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1y">util</A>.<A HREF="XRef.html#1z">Locale</A>;
+
+public class <U><A NAME="20">_70</A></U> extends <A HREF="XRef.html#21">PlainDocument</A> {
+    private <A HREF="XRef.html#22">Format</A> <U><A NAME="23">_71</A></U>;
+
+    public <U><A NAME="24">_70</A></U>(<A HREF="XRef.html#22">Format</A> <U><A NAME="25">_72</A></U>) {
+        <A HREF="XRef.html#23">_71</A> = <A HREF="XRef.html#25">_72</A>;
+    }
+
+    public <A HREF="XRef.html#22">Format</A> <U><A NAME="26">_73</A></U>() {
+        return <A HREF="XRef.html#23">_71</A>;
+    }
+
+    public void <U><A NAME="27">insertString</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="28">_74</A></U>, <A HREF="XRef.html#1j">String</A> <U><A NAME="29">_75</A></U>, <A HREF="XRef.html#2a">AttributeSet</A> <U><A NAME="2b">_76</A></U>)
+        throws <A HREF="XRef.html#2c">BadLocationException</A> {
+
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2d">_77</A></U> = <A HREF="XRef.html#2e">getText</A>(0, <A HREF="XRef.html#2f">getLength</A>());
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2g">_78</A></U> = <A HREF="XRef.html#2d">_77</A>.<A HREF="XRef.html#2h">substring</A>(0, <A HREF="XRef.html#28">_74</A>);
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2i">_79</A></U> = <A HREF="XRef.html#2d">_77</A>.<A HREF="XRef.html#2h">substring</A>(<A HREF="XRef.html#28">_74</A>, <A HREF="XRef.html#2d">_77</A>.<A HREF="XRef.html#2j">length</A>());
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2k">_80</A></U> = <A HREF="XRef.html#2g">_78</A> + <A HREF="XRef.html#29">_75</A> + <A HREF="XRef.html#2i">_79</A>;
+
+        try {
+            <A HREF="XRef.html#23">_71</A>.<A HREF="XRef.html#2l">parseObject</A>(<A HREF="XRef.html#2k">_80</A>);
+            super.<A HREF="XRef.html#2m">insertString</A>(<A HREF="XRef.html#28">_74</A>, <A HREF="XRef.html#29">_75</A>, <A HREF="XRef.html#2b">_76</A>);
+        } catch (<A HREF="XRef.html#2n">ParseException</A> <U><A NAME="2o">_81</A></U>) {
+            <A HREF="XRef.html#1w">Toolkit</A>.<A HREF="XRef.html#2p">getDefaultToolkit</A>().<A HREF="XRef.html#2q">beep</A>();
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2r">err</A>.<A HREF="XRef.html#r">println</A>("insertString: could not parse: "
+                               + <A HREF="XRef.html#2k">_80</A>);
+        }
+    }
+
+    public void <U><A NAME="2s">remove</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="2t">_82</A></U>, <A HREF="XRef.html#g">int</A> <U><A NAME="2u">_83</A></U>) throws <A HREF="XRef.html#2c">BadLocationException</A> {
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2v">_84</A></U> = <A HREF="XRef.html#2e">getText</A>(0, <A HREF="XRef.html#2f">getLength</A>());
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2w">_85</A></U> = <A HREF="XRef.html#2v">_84</A>.<A HREF="XRef.html#2h">substring</A>(0, <A HREF="XRef.html#2t">_82</A>);
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2x">_86</A></U> = <A HREF="XRef.html#2v">_84</A>.<A HREF="XRef.html#2h">substring</A>(<A HREF="XRef.html#2u">_83</A> + <A HREF="XRef.html#2t">_82</A>, <A HREF="XRef.html#2v">_84</A>.<A HREF="XRef.html#2j">length</A>());
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="2y">_87</A></U> = <A HREF="XRef.html#2w">_85</A> + <A HREF="XRef.html#2x">_86</A>;
+
+        try {
+            if (<A HREF="XRef.html#2y">_87</A>.<A HREF="XRef.html#2j">length</A>() != 0) <A HREF="XRef.html#23">_71</A>.<A HREF="XRef.html#2l">parseObject</A>(<A HREF="XRef.html#2y">_87</A>);
+            super.<A HREF="XRef.html#2z">remove</A>(<A HREF="XRef.html#2t">_82</A>, <A HREF="XRef.html#2u">_83</A>);
+        } catch (<A HREF="XRef.html#2n">ParseException</A> <U><A NAME="30">_88</A></U>) {
+            <A HREF="XRef.html#1w">Toolkit</A>.<A HREF="XRef.html#2p">getDefaultToolkit</A>().<A HREF="XRef.html#2q">beep</A>();
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2r">err</A>.<A HREF="XRef.html#r">println</A>("remove: could not parse: " + <A HREF="XRef.html#2y">_87</A>);
+        }
+    }
+}
+</PRE></BODY></HTML>
