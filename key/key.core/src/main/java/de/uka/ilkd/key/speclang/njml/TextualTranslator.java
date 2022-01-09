@@ -411,7 +411,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLAssertStatement b = new TextualJMLAssertStatement(
                 TextualJMLAssertStatement.Kind.ASSUME,
                 new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSUME));
-        constructs = constructs.prepend(b);
+        constructs = constructs.append(b);
         return null;
     }
 
@@ -421,7 +421,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLAssertStatement b = new TextualJMLAssertStatement(
                 TextualJMLAssertStatement.Kind.ASSERT,
                 new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
-        constructs = constructs.prepend(b);
+        constructs = constructs.append(b);
         return null;
     }
 
