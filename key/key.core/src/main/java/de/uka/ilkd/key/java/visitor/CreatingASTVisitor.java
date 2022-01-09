@@ -1521,6 +1521,18 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
+    public void performActionOnJmlAssert(JmlAssert x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new JmlAssert(x, changeList);
+            }
+        };
+        def.doAction(x);
+
+    }
+
     /**
      * returns the position of pe2 in the virtual child array of pe1
      * @param pe1 A {@link NonTerminalProgramElement}

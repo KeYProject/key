@@ -414,4 +414,11 @@ public interface Visitor {
 
     void performActionOnCcatchBreakWildcardParameterDeclaration(
             CcatchBreakWildcardParameterDeclaration ccatchBreakWildcardParameterDeclaration);
+
+    /**
+     * Performs action on JML assert statement.
+     *
+     * @param jmlAssert the statement to perform the action on.
+     */
+    void performActionOnJmlAssert(JmlAssert jmlAssert);
 }

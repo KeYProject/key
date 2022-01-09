@@ -965,4 +965,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionOnJmlAssert(JmlAssert x) {
+        doDefaultAction(x);
+    }
 }
