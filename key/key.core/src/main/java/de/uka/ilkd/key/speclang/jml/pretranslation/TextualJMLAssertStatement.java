@@ -25,16 +25,11 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     /**
      * Transforms a rule context to a text representation.
      * Does the same as `context.getText` but inserts a space between all children of RuleContexts.
-     *
+     * <p>
      * This assumes the following tree layout:
      * `RuleContext (-> RuleContext)* -> Some leaf`
      */
-    private static String ruleContextToText(RuleContext context) {
-        if (context.getChildCount() == 0) {
-            return "";
-        }
-
-        StringBuilder builder = new StringBuilder();
+    private static void ruleContextToText(StringBuilder builder, RuleContext context) {
         for (int i = 0; i < context.getChildCount(); i++) {
             if (i > 0) {
                 builder.append(' ');
@@ -42,18 +37,17 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
             var child = context.getChild(i);
             if (child instanceof RuleContext) {
-                builder.append(ruleContextToText((RuleContext) child));
+                ruleContextToText(builder, (RuleContext) child);
             } else {
                 builder.append(child.getText());
             }
         }
-
-        return builder.toString();
     }
 
     public String getClauseText() {
-        var text = ruleContextToText(context.first);
-        return text.substring(kind.toString().length());
+        var builder = new StringBuilder();
+        ruleContextToText(builder, context.first);
+        return builder.substring(kind.toString().length());
     }
 
     public Kind getKind() {
@@ -75,5 +69,4 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
             return name;
         }
     };
-
 }
