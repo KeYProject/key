@@ -29,7 +29,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
      * This assumes the following tree layout:
      * `RuleContext (-> RuleContext)* -> Some leaf`
      */
-    private static void ruleContextToText(StringBuilder builder, RuleContext context) {
+    public static void ruleContextToText(StringBuilder builder, RuleContext context) {
         for (int i = 0; i < context.getChildCount(); i++) {
             if (i > 0) {
                 builder.append(' ');
