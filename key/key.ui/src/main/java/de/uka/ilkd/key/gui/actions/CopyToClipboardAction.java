@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
@@ -46,10 +47,6 @@ public class CopyToClipboardAction extends MainWindowAction {
         PosInSequent pis = goalView.getMousePosInSequent();
         if (pis == null)
             return;
-        String s = goalView.getHighlightedText(pis);
-        java.awt.datatransfer.StringSelection ss =
-                new java.awt.datatransfer.StringSelection(s);
-        java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
-        toolkit.getSystemClipboard().setContents(ss, ss);
+        GuiUtilities.copyHighlightToClipboard(goalView, pis);
     }
 }
