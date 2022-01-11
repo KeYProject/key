@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Semisequent;
@@ -25,6 +27,16 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     @Override
     public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
+        // Check formula syntax here, only BuildingExceptions are allowed
+        var formula = arguments.get("formula");
+        if (formula != null) {
+            try {
+                state.toTerm(formula, null);
+            } catch(BuildingException e) {
+                // Ignored
+            }
+        }
+
         return state.getValueInjector().inject(this, new Parameters(),
                 arguments);
     }
@@ -44,7 +56,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
         } else if (args.formula != null && args.number == null
                 && args.branch == null) {
-            g = findGoalWith(args.formula, state.getProof());
+            g = findGoalWithFormula(args.formula, state.getProof());
         } else if (args.branch != null && args.formula == null
                 && args.number == null) {
             g = findGoalWith(args.branch, state.getProof());
@@ -86,10 +98,26 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private Goal findGoalWith(Term formula, Proof proof)
+    private boolean findFormulaInLeaf(String formula, Node node) {
+        // We have to set the goal since it changes the variables that exist
+        // And the formula can only be valid if they do exist
+        state.setGoal(node);
+        try {
+            var term = state.toTerm(formula, null);
+            return contains(node.sequent(), term);
+        } catch(BuildingException e) {
+            return false;
+        } catch(ParserException | ScriptException e) {
+            // Should not happen, let's print it anyways
+            new Exception("Syntax was checked earlier and should be valid here", e).printStackTrace();
+            return false;
+        }
+    }
+
+    private Goal findGoalWithFormula(String formula, Proof proof)
             throws ScriptException {
         return findGoalWith(
-                node -> node.leaf() && contains(node.sequent(), formula),
+                node -> node.leaf() && findFormulaInLeaf(formula, node),
                 node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
@@ -162,7 +190,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
-        public Term formula;
+        public String formula;
         /**
          * The number of the goal to select, starts with 0.
          * Negative indices are also allowed: -1 is the last goal, -2 the second-to-last, etc.
