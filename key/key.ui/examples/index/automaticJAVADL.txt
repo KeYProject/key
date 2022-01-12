@@ -203,6 +203,7 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./standard_key/java_dl/jml-assert/assert_assume_order.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
