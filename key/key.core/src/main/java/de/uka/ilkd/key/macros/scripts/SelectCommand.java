@@ -41,6 +41,24 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                 arguments);
     }
 
+    private enum Selection {
+        Both,
+        Succedent,
+        Antecedent;
+
+        public static Selection fromString(String value) {
+            if (value == null) {
+                return Both;
+            } else if (value.equalsIgnoreCase("succedent")) {
+                return Succedent;
+            } else if (value.equalsIgnoreCase("antecedent")) {
+                return Antecedent;
+            } else {
+                return null;
+            }
+        }
+    }
+
     @Override
     public void execute(Parameters args)
             throws ScriptException, InterruptedException {
@@ -56,7 +74,12 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
         } else if (args.formula != null && args.number == null
                 && args.branch == null) {
-            g = findGoalWithFormula(args.formula, state.getProof());
+            var selection = Selection.fromString(args.succedent);
+            if (selection == null) {
+                throw new IllegalArgumentException(
+                        "A limitation in a select command has to be either empty, succedent or antecedent");
+            }
+            g = findGoalWithFormula(args.formula, state.getProof(), selection);
         } else if (args.branch != null && args.formula == null
                 && args.number == null) {
             g = findGoalWith(args.branch, state.getProof());
@@ -98,13 +121,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private boolean findFormulaInLeaf(String formula, Node node) {
+    private boolean findFormulaInLeaf(String formula, Node node, Selection selection) {
         // We have to set the goal since it changes the variables that exist
         // And the formula can only be valid if they do exist
         state.setGoal(node);
         try {
             var term = state.toTerm(formula, null);
-            return contains(node.sequent(), term);
+            return contains(node.sequent(), term, selection);
         } catch(BuildingException e) {
             return false;
         } catch(ParserException | ScriptException e) {
@@ -114,10 +137,10 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         }
     }
 
-    private Goal findGoalWithFormula(String formula, Proof proof)
+    private Goal findGoalWithFormula(String formula, Proof proof, Selection selection)
             throws ScriptException {
         return findGoalWith(
-                node -> node.leaf() && findFormulaInLeaf(formula, node),
+                node -> node.leaf() && findFormulaInLeaf(formula, node, selection),
                 node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
@@ -168,9 +191,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         throw new ScriptException("There is no such goal");
     }
 
-    private boolean contains(Sequent seq, Term formula) {
-        return contains(seq.antecedent(), formula)
-                || contains(seq.succedent(), formula);
+    private boolean contains(Sequent seq, Term formula, Selection selection) {
+        return (selection != Selection.Succedent && contains(seq.antecedent(), formula)) ||
+                (selection != Selection.Antecedent && contains(seq.succedent(), formula));
     }
 
     private boolean contains(Semisequent semiseq, Term formula) {
@@ -191,6 +214,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public String formula;
+        /** match only on succedent or antecedent */
+        @Option(value = "#2", required = false)
+        public String succedent;
         /**
          * The number of the goal to select, starts with 0.
          * Negative indices are also allowed: -1 is the last goal, -2 the second-to-last, etc.
