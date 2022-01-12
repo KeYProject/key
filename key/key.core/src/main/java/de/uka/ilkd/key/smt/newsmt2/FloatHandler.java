@@ -83,6 +83,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getIsInfinite(), "fp.isInfinite");
         fpOperators.put(floatLDT.getIsNegative(), "fp.isNegative");
         fpOperators.put(floatLDT.getIsPositive(), "fp.isPositive");
+        fpOperators.put(floatLDT.getEquals(), "fp.eq");
 
 //        // Double predicates and operations, translated identically to float operations
         fpOperators.put(doubleLDT.getLessThan(), "fp.lt");
@@ -104,10 +105,17 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsInfinite(), "fp.isInfinite");
         fpOperators.put(doubleLDT.getIsNegative(), "fp.isNegative");
         fpOperators.put(doubleLDT.getIsPositive(), "fp.isPositive");
+        fpOperators.put(doubleLDT.getEquals(), "fp.eq");
 
-        // Our own functions which are not built in.
-        fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
-        fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtFloat");
+        if(disableSqrtAxiomatizing) {
+            // Our own functions which are not built in.
+            fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
+            // fpOperators.put(floatLDT.getSqrtFloat(), "sqrtFloat");
+        } else {
+            // Use the builtin sqrt functions:
+            fpOperators.put(doubleLDT.getSqrtDouble(), "fp.sqrt");
+            // fpOperators.put(floatLDT.getSqrtFloat(), "fp.sqrt");
+        }
 //
 //        mathOperators.put(doubleLDT.getSinDouble(), SMTTermFloatOp.Op.SINDOUBLE);
 //        mathOperators.put(doubleLDT.getCosDouble(), SMTTermFloatOp.Op.COSDOUBLE);
@@ -121,20 +129,9 @@ public class FloatHandler implements SMTHandler {
 //        mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
 
         // These operators take a round mode argument:
-        roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div"));
+        roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div", "fp.sqrt"));
 
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
-        if(disableSqrtAxiomatizing) {
-            masterHandler.getTranslationState().remove("sqrtDouble.axioms");
-            masterHandler.getTranslationState().remove("sqrtFloat.axioms");
-        }
-
-        // sorts are defined here, declare it as already defined
-        masterHandler.addKnownSymbol("sort_double");
-        masterHandler.addSort(doubleLDT.targetSort());
-        masterHandler.addKnownSymbol("sort_float");
-        masterHandler.addSort(floatLDT.targetSort());
-
     }
 
     @Override
@@ -149,6 +146,9 @@ public class FloatHandler implements SMTHandler {
 
         trans.introduceSymbol("float");
         trans.introduceSymbol("double");
+        // sorts are defined here, declare them as already defined
+        //trans.addSort(doubleLDT.targetSort());
+        //trans.addSort(floatLDT.targetSort());
 
         Operator op = term.op();
         String fpOp = fpOperators.get(op);
