@@ -410,6 +410,7 @@ public final class MainWindow extends JFrame {
      */
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
+        // Fixme: is this needed? Automode stopped is always fired and sets another one
         result.addKeYSelectionListener(proofListener);
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
@@ -1606,6 +1607,8 @@ public final class MainWindow extends JFrame {
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
+            // Fixme: proofListener will be added twice without the remove here (see getMainWindowMediator)
+            getMediator().removeKeYSelectionListener(proofListener);
             getMediator().addKeYSelectionListener(proofListener);
         }
 
