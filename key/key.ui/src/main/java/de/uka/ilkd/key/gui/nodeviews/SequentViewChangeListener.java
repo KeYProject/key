@@ -34,8 +34,12 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
         // reprint sequent
         int lw = sequentView.computeLineWidth();
         if (lw != SequentView.getLineWidth()) {
-            SequentView.setLineWidth(lw);
-            sequentView.printSequent();
+            // When switching sequents, ancestorResized is called while the sequentView has an empty rect
+            // Skip this repaint
+            if (!sequentView.getVisibleRect().isEmpty()) {
+                SequentView.setLineWidth(lw);
+                sequentView.printSequent();
+            }
 
             // Update the search results, they are lost otherwise! (MU)
             // But only update them if we have the correct SequentView
