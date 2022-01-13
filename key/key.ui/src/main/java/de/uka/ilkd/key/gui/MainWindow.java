@@ -1616,9 +1616,7 @@ public final class MainWindow extends JFrame {
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
-            // Fixme: proofListener will be added twice without the remove here (see getMainWindowMediator)
-            getMediator().removeKeYSelectionListener(proofListener);
-            getMediator().addKeYSelectionListener(proofListener);
+            getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
         /**
