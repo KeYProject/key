@@ -13,72 +13,71 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ThisReference;
 import recoder.java.reference.TypeReference;
 
-public class SpecialReferenceWrapper extends ThisReference 
-    implements Expression, KeYRecoderExtension, ReferencePrefix {
-   
+public class SpecialReferenceWrapper extends ThisReference
+        implements Expression, KeYRecoderExtension, ReferencePrefix {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8843308796536009121L;
     protected TypeReference typeRef;
     protected ReferencePrefix myprefix;
 
-    
-    protected StatementContainer statementParent=null;
+
+    protected StatementContainer statementParent = null;
 
     public SpecialReferenceWrapper() {
-	expressionParent=null;
+        expressionParent = null;
     }
 
 
-    public SpecialReferenceWrapper(TypeReference typeRef, 
-				   ReferencePrefix myprefix) {
-	this.typeRef = typeRef;
-	this.myprefix  = myprefix;
-	expressionParent=null;
+    public SpecialReferenceWrapper(TypeReference typeRef,
+                                   ReferencePrefix myprefix) {
+        this.typeRef = typeRef;
+        this.myprefix = myprefix;
+        expressionParent = null;
     }
 
     protected SpecialReferenceWrapper(SpecialReferenceWrapper proto) {
         super(proto);
-	expressionParent=null;
+        expressionParent = null;
     }
 
 
     /**
-     Make parent role valid.
+     * Make parent role valid.
      */
     public void makeParentRoleValid() {
-    }  
- 
-    /**
-     Get AST parent.
-     @return the non terminal program element.
-     */
-    public NonTerminalProgramElement getASTParent() {        
-	return expressionParent;
     }
-   
 
-   /**
-     Get expression container.
-     @return the expression container.
+    /**
+     * Get AST parent.
+     *
+     * @return the non terminal program element.
+     */
+    public NonTerminalProgramElement getASTParent() {
+        return expressionParent;
+    }
+
+
+    /**
+     * Get expression container.
+     *
+     * @return the expression container.
      */
     public ExpressionContainer getExpressionContainer() {
         return expressionParent;
-    } 
+    }
 
     /**
-     Set expression container.
-     @param c an expression container.
+     * Set expression container.
+     *
+     * @param c an expression container.
      */
     public void setExpressionContainer(ExpressionContainer c) {
         expressionParent = c;
@@ -87,48 +86,50 @@ public class SpecialReferenceWrapper extends ThisReference
     //don't think we need it
     public void accept(SourceVisitor v) {
     }
-    
+
     public SpecialReferenceWrapper deepClone() {
-	return new SpecialReferenceWrapper(typeRef, myprefix);
+        return new SpecialReferenceWrapper(typeRef, myprefix);
     }
 
     /**
-     Get statement container.
-     @return the statement container.
+     * Get statement container.
+     *
+     * @return the statement container.
      */
     public StatementContainer getStatementContainer() {
-	return statementParent;
+        return statementParent;
     }
 
     /**
-     Set statement container.
-     @param c a statement container.
+     * Set statement container.
+     *
+     * @param c a statement container.
      */
     public void setStatementContainer(StatementContainer c) {
-	statementParent=c;
+        statementParent = c;
     }
 
     public TypeReference getTypeReference() {
-	return typeRef;
+        return typeRef;
     }
 
     /**
-         Set type reference
-        
+     * Set type reference
      */
     public void setTypeReference(TypeReference ref) {
-	this.typeRef=ref;
+        this.typeRef = ref;
     }
 
     public ReferencePrefix getReferencePrefix() {
-	return myprefix;
+        return myprefix;
     }
 
     /**
-     Set reference suffix.
-     @param myprefix a reference prefix.
+     * Set reference suffix.
+     *
+     * @param myprefix a reference prefix.
      */
     public void setReferencePrefix(ReferencePrefix myprefix) {
-	this.myprefix=myprefix;
+        this.myprefix = myprefix;
     }
 }

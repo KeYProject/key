@@ -1,0 +1,422 @@
+package recoder.java;
+
+import recoder.*;
+import recoder.convenience.TreeWalker;
+import recoder.list.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
+import recoder.java.reference.*;
+import recoder.java.expression.*;
+import recoder.java.expression.literal.*;
+import recoder.java.expression.operator.*;
+import recoder.java.statement.*;
+import recoder.parser.*;
+import recoder.util.Debug;
+
+import java.io.*;
+
+public class JavaProgramFactory implements Service, ProgramFactory {
+
+    /**
+     Protected constructor - use {@link #getInstance} instead.
+     */
+    protected JavaProgramFactory() {}
+
+    /** 
+     The singleton instance of the program factory.
+     */
+    private static JavaProgramFactory theFactory = new JavaProgramFactory();
+
+    /** 
+	The singleton instance of the program factory.
+     */
+    private static ServiceConfiguration serviceConfiguration;
+    
+
+    /**
+       Called by the service configuration indicating that all services
+       are known. Services may now start communicating or linking among
+       their configuration partners. The service configuration can be
+       memorized if it has not been passed in by a constructor already.
+       @param cfg the service configuration this services has been assigned to.
+     */
+    public void initialize(ServiceConfiguration cfg) {
+	if (serviceConfiguration == null) {
+	    serviceConfiguration = cfg;
+	} else {
+	    Debug.assert(serviceConfiguration != cfg,
+			 "A JavaProgramFactory is a singleton and may be part of one and only one service configuration. We appologize for the inconveniences.");
+	}
+    }
+
+    /**
+       Returns the service configuration this service is a part of.
+       @return the configuration of this service.
+     */
+    public ServiceConfiguration getServiceConfiguration() {
+	return serviceConfiguration;
+    }
+
+    /** 
+     Returns the single instance of this class.
+     */
+    public static JavaProgramFactory getInstance() {
+        return theFactory;
+    }
+
+    /** 
+     For internal reuse.
+     */
+    private static JavaCCParser parser = new JavaCCParser(System.in);
+
+    private static void attachComment(Comment c, ProgramElement pe) {
+	ProgramElement dest = pe;
+	if (!c.isPrefixed()) {
+	    NonTerminalProgramElement ppe = dest.getASTParent();
+	    int i = 0;
+	    if (ppe != null) {
+		for (int s = ppe.getChildCount();
+		     ppe.getChildAt(i) != dest;
+		     i++);
+	    }
+	    if (i == 0) { // before syntactical parent
+		    c.setPrefixed(true);
+	    } else {
+		dest = ppe.getChildAt(i - 1);
+		
+		while (dest instanceof NonTerminalProgramElement) {
+		    ppe = (NonTerminalProgramElement)dest;
+		    i = ppe.getChildCount();
+		    if (i == 0) {
+			break;
+		    }
+		    dest = ppe.getChildAt(i - 1);
+		}
+	    }
+	}
+	if (c instanceof SingleLineComment && c.isPrefixed() &&
+	    dest.getLinefeeds() < 1) {
+	    dest.setLinefeeds(1);
+	}
+	CommentMutableList cml = dest.getComments();
+	if (cml == null) {
+	    dest.setComments(cml = new CommentArrayList());
+	}  
+	cml.add(c);
+    }
+    
+    /**
+     Perform post work on the created element. Calls makeAllParentRolesValid
+     if the element is a non-terminal and assigns comments.
+     */
+    private static void postWork(ProgramElement pe) {
+	CommentMutableList comments = parser.getComments();
+	int commentIndex = 0;
+	int commentCount = comments.size();
+	int cline = 0;
+	int ccolumn = 0;
+	Comment current = null;
+	if (commentIndex < commentCount) {
+	    current = comments.getComment(commentIndex);
+	    cline = current.getParsedLine();
+	    ccolumn = current.getParsedColumn();
+	}
+        TreeWalker tw = new TreeWalker(pe);
+        while (tw.next()) {
+            pe = tw.getProgramElement();
+	    if (pe instanceof NonTerminalProgramElement) {
+		((NonTerminalProgramElement)pe).makeParentRoleValid();
+	    }
+	    int line = pe.getParsedLine();
+	    int column = pe.getParsedColumn();
+	    while (commentIndex < commentCount &&
+		   (line > cline || (line == cline && column >= ccolumn))) {
+		attachComment(current, pe);
+		commentIndex += 1;
+		if (commentIndex < commentCount) {
+		    current = comments.getComment(commentIndex);
+		    cline = current.getParsedLine();
+		    ccolumn = current.getParsedColumn();
+		}
+	    }
+	}
+	if (commentIndex < commentCount) {
+	    while (pe.getASTParent() != null) {
+		pe = pe.getASTParent();
+	    }
+	    CommentMutableList cml = pe.getComments();
+	    if (cml == null) {
+		pe.setComments(cml = new CommentArrayList());
+	    }  
+	    do {
+		current = comments.getComment(commentIndex);
+		current.setPrefixed(false);
+		cml.add(current);
+		commentIndex += 1;
+	    }
+	    while (commentIndex < commentCount);
+	}		
+    }
+
+    /**
+     Parse a {@link CompilationUnit} from the given reader.
+     */
+    public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        CompilationUnit res = parser.CompilationUnit();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link TypeDeclaration} from the given reader.
+     */
+    public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        TypeDeclaration res = parser.TypeDeclaration();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link FieldDeclaration} from the given reader.
+     */
+    public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        FieldDeclaration res = parser.FieldDeclaration();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link MethodDeclaration} from the given reader.
+     */
+    public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        MethodDeclaration res = parser.MethodDeclaration();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link MemberDeclaration} from the given reader.
+     */
+    public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        MemberDeclaration res = parser.ClassBodyDeclaration();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link ParameterDeclaration} from the given reader.
+     */
+    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        ParameterDeclaration res = parser.FormalParameter();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link ConstructorDeclaration} from the given reader.
+     */
+    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        ConstructorDeclaration res = parser.ConstructorDeclaration();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse a {@link TypeReference} from the given reader.
+     */
+    public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        TypeReference res = parser.ResultType();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse an {@link Expression} from the given reader.
+     */
+    public Expression parseExpression(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        Expression res = parser.Expression();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     Parse some {@link Statement}s from the given reader.
+     */
+    public StatementMutableList parseStatements(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        StatementMutableList res = parser.GeneralizedStatements();
+        for (int i = 0; i < res.size(); i += 1) {
+            postWork(res.getStatement(i));
+        }
+        return res;
+    }
+
+    /**
+     * Parse a {@link StatementBlock} from the given string.
+     */
+    public StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException {
+        parser.initialize(in);
+        StatementBlock res = parser.Block();
+        postWork(res);
+        return res;
+    }
+
+    /**
+     * Parse a {@link CompilationUnit} from the given string.
+     */
+    public CompilationUnit parseCompilationUnit(String in) throws ParserException {
+        try {
+            return parseCompilationUnit(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse {@link CompilationUnit}s from the given string.
+     */
+    public CompilationUnitMutableList parseCompilationUnits(String[] ins) throws ParserException {
+        try {
+            CompilationUnitMutableList cus = new CompilationUnitArrayList();
+            for (int i = 0; i < ins.length; i++) {
+                CompilationUnit cu = parseCompilationUnit(new FileReader(ins[i]));
+                cus.add(cu);
+            }
+            return cus;
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link TypeDeclaration} from the given string.
+     */
+    public TypeDeclaration parseTypeDeclaration(String in) throws ParserException {
+        try {
+            return parseTypeDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link MemberDeclaration} from the given string.
+     */
+    public MemberDeclaration parseMemberDeclaration(String in) throws ParserException {
+        try {
+            return parseMemberDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link FieldDeclaration} from the given string.
+     */
+    public FieldDeclaration parseFieldDeclaration(String in) throws ParserException {
+        try {
+            return parseFieldDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link MethodDeclaration} from the given string.
+     */
+    public MethodDeclaration parseMethodDeclaration(String in) throws ParserException {
+        try {
+            return parseMethodDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link ParameterDeclaration} from the given string.
+     */
+    public ParameterDeclaration parseParameterDeclaration(String in) throws ParserException {
+        try {
+            return parseParameterDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link ConstructorDeclaration} from the given string.
+     */
+    public ConstructorDeclaration parseConstructorDeclaration(String in) throws ParserException {
+        try {
+            return parseConstructorDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link TypeReference} from the given string.
+     */
+    public TypeReference parseTypeReference(String in) throws ParserException {
+        try {
+            return parseTypeReference(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse an {@link Expression} from the given string.
+     */
+    public Expression parseExpression(String in) throws ParserException {
+        try {
+            return parseExpression(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a list of {@link Statement}s from the given string.
+     */
+    public StatementMutableList parseStatements(String in) throws ParserException {
+        try {
+            return parseStatements(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Demo program reading a single source file and writing it back to
+     * stdout using the default {@link PrettyPrinter}.
+     */
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.err.println("Requires a java source file as argument");
+            System.exit(1);
+        }
+        try {
+            CompilationUnit cu = getInstance().parseCompilationUnit(new FileReader(args[0]));
+            PrettyPrinter pp = new PrettyPrinter(new PrintWriter(System.out));
+            cu.prettyPrint(pp);
+            pp.close();
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+            ioe.printStackTrace();
+        } catch (ParserException pe) {
+            System.err.println(pe);
+            pe.printStackTrace();
+        }
+    }
+}
