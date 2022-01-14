@@ -257,7 +257,7 @@ public class InitConfig {
     /**
      * returns the activated taclets of this initial configuration
      */
-    public Iterable<Taclet> activatedTaclets() {
+    public Collection<Taclet> activatedTaclets() {
        if (activatedTacletCache == null) {
           fillActiveTacletCache();
        }
