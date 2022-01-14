@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -37,7 +36,7 @@ import java.util.Map;
  * @see FunctionPredicateBuilder for level-1 declarations
  */
 public class DeclarationBuilder extends DefaultBuilder {
-    private Map<String, String> category2Default = new HashMap<>();
+    private final Map<String, String> category2Default = new HashMap<>();
 
     public DeclarationBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -53,21 +52,18 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
-        String var_name;
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
-            List<String> var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
-            KeYJavaType kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
-            assert var_names != null;
-            for (String varName : var_names) {
-                var_name = varName;
-                ProgramElementName pvName = new ProgramElementName(var_name);
+            List<String> varNames = accept(ctx.simple_ident_comma_list(i));
+            KeYJavaType kjt = accept(ctx.keyjavatype(i));
+            assert varNames != null;
+            for (String varName : varNames) {
+                ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
                 if (name != null) {
                     // commented out as pv do not have unique name (at the moment)
-                    //  throw new AmbigiousDeclException
-                    //  	(var_name, getSourceName(), getLine(), getColumn());
-                    if (!(name instanceof ProgramVariable) || (name instanceof ProgramVariable &&
-                            !((ProgramVariable) name).getKeYJavaType().equals(kjt))) {
+                    //  throw new AmbigiousDeclException(varName, getSourceName(), getLine(), getColumn())
+                    if (!(name instanceof ProgramVariable) ||
+                            !((ProgramVariable) name).getKeYJavaType().equals(kjt)) {
                         programVariables().add(new LocationVariable
                                 (pvName, kjt));
                     }
@@ -84,7 +80,6 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
-        //System.out.println("choice: " + cat);
         for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
             String name = cat + ":" + catctx.getText();
@@ -93,31 +88,15 @@ public class DeclarationBuilder extends DefaultBuilder {
                 c = new Choice(catctx.getText(), cat);
                 choices().add(c);
             }
-            if (!category2Default.containsKey(cat)) {
-                category2Default.put(cat, name);
-            }
+            category2Default.putIfAbsent(cat, name);
         }
-        if (!category2Default.containsKey(cat)) {
+        category2Default.computeIfAbsent(cat, it -> {
             choices().add(new Choice("On", cat));
             choices().add(new Choice("Off", cat));
-            category2Default.put(cat, cat + ":On");
-        }
+            return cat + ":On";
+        });
         return null;
     }
-
-    /*@Override
-    public Object visitChoice_option(KeYParser.Choice_optionContext ctx) {
-        String name = currentChoiceCategory + ":" + ctx.choice_.getText();
-        Choice c = choices().lookup(new Name(name));
-        if (c == null) {
-            c = new Choice(ctx.choice_.getText(), currentChoiceCategory);
-            choices().add(c);
-        }
-        if (!category2Default.containsKey(currentChoiceCategory)) {
-            category2Default.put(currentChoiceCategory, name);
-        }
-        return c;
-    }*/
 
     @Override
     public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
@@ -129,7 +108,6 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
-        List<String> sortIds = accept(ctx.sortIds);
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
@@ -216,7 +194,6 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
-        //mapOf(ctx.activated_choice());
         return null;
     }
 
