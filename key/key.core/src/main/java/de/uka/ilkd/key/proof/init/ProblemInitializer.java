@@ -267,7 +267,8 @@ public final class ProblemInitializer {
             fileRepo.setBootClassPath(bootClassPath);
         }
 
-        // Read INCLUDES?
+        // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
+        //                 this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
                     envInput.getProfile(), fileRepo);
