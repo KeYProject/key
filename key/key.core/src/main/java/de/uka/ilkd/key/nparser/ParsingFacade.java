@@ -3,10 +3,10 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
-import javax.annotation.Nonnull;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,8 @@ public abstract class ParsingFacade {
      * @param ctxs non-null list
      * @return
      */
-    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
+    public static @Nonnull
+    ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -142,7 +143,8 @@ public abstract class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @Nonnull String getValue(@Nonnull KeYParser.String_valueContext ctx) {
+    public static @Nonnull
+    String getValueDocumentation(@Nonnull KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");
@@ -160,5 +162,14 @@ public abstract class ParsingFacade {
     public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
         KeYParser p = createParser(stream);
         return p.id_declaration();
+    }
+
+    @Nullable
+    public static String getValueDocumentation(@Nullable TerminalNode docComment) {
+        if (docComment == null) {
+            return null;
+        }
+        String value = docComment.getText();
+        return value.substring(3, value.length() - 2);//remove leading "/*!" and trailing "*/"
     }
 }

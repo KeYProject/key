@@ -366,6 +366,13 @@ public class KeYCrossReferenceSourceInfo
         if (t != null) {
             return t;
         }
+
+        if(name.startsWith("\\dl_")) {
+            var pt = new PrimitiveType(name, this);
+            name2primitiveType.put(name, pt);
+            return pt;
+        }
+
         if (name.equals("void")) {
             return null;
         }

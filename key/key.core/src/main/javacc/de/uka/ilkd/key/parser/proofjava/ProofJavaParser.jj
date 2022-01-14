@@ -1998,6 +1998,7 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
+  | <DL_EMBEDDED_FUNCTION>
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2709,11 +2710,11 @@ Expression UnaryExpression() :
 |
   result = PreDecrementExpression()
 |
-  result = UnaryExpressionNotPlusMinus()
+  result = GeneralEscapeExpression()
 |
   result = ADTGetter()
 |
-  result = GeneralEscapeExpression()
+  result = UnaryExpressionNotPlusMinus()
 )
   {
     checkConstruction(result);

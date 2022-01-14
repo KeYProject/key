@@ -61,7 +61,7 @@ public final class ProblemInitializer {
     private static InitConfig baseConfig;
     private final Services services;
     private final ProgressMonitor progMon;
-    private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
+    private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
     private final ProblemInitializerListener listener;
     /**
      * the FileRepo responsible for consistency between source code and proofs
@@ -82,10 +82,9 @@ public final class ProblemInitializer {
     //-------------------------------------------------------------------------
 
     public ProblemInitializer(Profile profile) {
-        assert profile != null;
         this.progMon = null;
         this.listener = null;
-        this.services = new Services(profile);
+        this.services = new Services(Objects.requireNonNull(profile));
     }
 
     private void progressStarted(Object sender) {
@@ -172,12 +171,9 @@ public final class ProblemInitializer {
             setProgress(i);
         }
 
-        LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
-            @Override
-            public void reportStatus(String status, final int progress) {
-                ProblemInitializer.this.reportStatus(status);
-                ProblemInitializer.this.setProgress(progress);
-            }
+        LDTInput ldtInp = new LDTInput(keyFile, (status, progress) -> {
+            ProblemInitializer.this.reportStatus(status);
+            ProblemInitializer.this.setProgress(progress);
         }, initConfig.getProfile());
 
         //read the LDTInput
@@ -213,20 +209,20 @@ public final class ProblemInitializer {
      * in the cfile directory.
      * Helper for readJava().
      */
-    private Vector<String> getClasses(String f) throws ProofInputException {
+    private List<String> getClasses(String f) throws ProofInputException {
         File cfile = new File(f);
-        Vector<String> v = new Vector<String>();
+        List<String> v = new ArrayList<>();
         if (cfile.isDirectory()) {
             String[] list = cfile.list();
             // mu(2008-jan-28): if the directory is not readable for the current user
             // list is set to null, which results in a NullPointerException.
             if (list != null) {
-                for (int i = 0; i < list.length; i++) {
-                    String fullName = cfile.getPath() + File.separator + list[i];
+                for (String s : list) {
+                    String fullName = cfile.getPath() + File.separator + s;
                     File n = new File(fullName);
                     if (n.isDirectory()) {
                         v.addAll(getClasses(fullName));
-                    } else if (list[i].endsWith(".java")) {
+                    } else if (s.endsWith(".java")) {
                         v.add(fullName);
                     }
                 }
@@ -271,10 +267,17 @@ public final class ProblemInitializer {
             fileRepo.setBootClassPath(bootClassPath);
         }
 
+        // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
+        //                 this allows to use included symbols inside JML.
+        for (var fileName : includes.getRuleSets()) {
+            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
+            readEnvInput(keyFile, initConfig);
+        }
+
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
                                            initConfig.namespaces());
-        //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
@@ -339,7 +342,6 @@ public final class ProblemInitializer {
                 newFuncNS.addSafely(n);
             }
         }
-        //System.out.println(initConfig.funcNS().hashCode() + " ---> " + newFuncNS.hashCode());
         initConfig.getServices().getNamespaces().setVariables(newVarNS);
         initConfig.getServices().getNamespaces().setSorts(newSortNS);
         initConfig.getServices().getNamespaces().setFunctions(newFuncNS);
@@ -360,7 +362,7 @@ public final class ProblemInitializer {
             warnings = warnings.union(envInput.read());
 
             // reset the variables namespace
-            initConfig.namespaces().setVariables(new Namespace<QuantifiableVariable>());
+            initConfig.namespaces().setVariables(new Namespace<>());
         }
     }
 
@@ -480,7 +482,6 @@ public final class ProblemInitializer {
                             progMon,
                             profile);
                     readEnvInput(tacletBaseFile, currentBaseConfig);
-                    //List<KeYFile> exploredFiles = explore(tacletBaseFile);
                 }
                 // remove traces of the generic sorts within the base configuration
                 cleanupNamespaces(currentBaseConfig);
@@ -522,7 +523,7 @@ public final class ProblemInitializer {
             ic.getActivatedChoices().forEach(i -> out.format("\t%s\n", i));
 
             out.format("Activated Taclets: \n");
-            final List<Taclet> taclets = new ArrayList<Taclet>();
+            final List<Taclet> taclets = new ArrayList<>();
             for (Taclet t : ic.activatedTaclets()) taclets.add(t);
             taclets.sort(Comparator.comparing((a) -> a.name().toString()));
             for (Taclet taclet : taclets) {
