@@ -648,7 +648,7 @@ public final class IssueDialog extends JDialog {
             addHighlights(dh, issue.fileName);
 
             // ensure that the currently selected problem is shown in view
-            int offset = getOffsetFromLineColumn(source, issue.pos);
+            int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
             e.printStackTrace();
@@ -677,6 +677,10 @@ public final class IssueDialog extends JDialog {
     }
 
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
+        // if we have no position there is no highlight
+        if (ps.pos.isNegative()) {
+            return;
+        }
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, ps.pos);
         int end = offset;
