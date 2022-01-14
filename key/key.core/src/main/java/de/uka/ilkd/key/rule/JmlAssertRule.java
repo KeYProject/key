@@ -1,15 +1,9 @@
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,28 +31,6 @@ public class JmlAssertRule implements BuiltInRule {
     private static final Name NAME = new Name("JML assert");
     public static final JmlAssertRule INSTANCE = new JmlAssertRule();
 
-    public static Optional<SourceElement> getFirstActiveStatement(PosInOccurrence occurrence) {
-        Term formula = occurrence.subTerm();
-        Term target = formula;
-        //TODO: this just works for one update so you have to simplify them first
-        //      should this be changed to allow any number of chained updates?
-        if (formula.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(formula);
-        }
-
-        SourceElement element = target.javaBlock().program().getFirstElement();
-        while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
-               && !(element instanceof StatementBlock
-                    && ((StatementBlock) element).isEmpty())) {
-            if (element instanceof StatementContainer) {
-                element = ((StatementContainer) element).getStatementAt(0);
-            } else {
-                element = element.getFirstElement();
-            }
-        }
-        return Optional.ofNullable(element);
-    }
-
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
         //TODO: copied from blockcontractrules see if it is correct here
@@ -69,7 +41,12 @@ public class JmlAssertRule implements BuiltInRule {
         if (Transformer.inTransformer(occurrence)) {
             return false;
         }
-        return getFirstActiveStatement(occurrence).filter(JmlAssert.class::isInstance).isPresent();
+
+        Term target = occurrence.subTerm();
+        if (target.op() instanceof UpdateApplication) {
+            target = UpdateApplication.getTarget(target);
+        }
+        return JavaTools.getActiveStatement(target.javaBlock()) instanceof JmlAssert;
     }
 
     @Override
@@ -97,7 +74,8 @@ public class JmlAssertRule implements BuiltInRule {
             target = UpdateApplication.getTarget(formula);
         }
 
-        final JmlAssert jmlAssert = getFirstActiveStatement(occurrence)
+        final JmlAssert jmlAssert = Optional
+                .ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
                 .filter(JmlAssert.class::isInstance)
                 .map(JmlAssert.class::cast)
                 .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
@@ -120,11 +98,11 @@ public class JmlAssertRule implements BuiltInRule {
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {
             result = goal.split(2);
-            setUpUsageGoal(result.head(), occurrence, update, target, condition, jmlAssert, tb, services);
+            setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
             setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
         } else if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSUME) {
             result = goal.split(1);
-            setUpUsageGoal(result.head(), occurrence, update, target, condition, jmlAssert, tb, services);
+            setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
         } else {
             throw new RuleAbortException(String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
@@ -132,18 +110,17 @@ public class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update, Term condition, TermBuilder tb) {
+    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence,
+                                   Term update, Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target, Term condition, JmlAssert jmlAssert, TermBuilder tb, Services services) {
+    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
+                                Term update, Term target, Term condition,
+                                TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
-
-        //TODO: this is there to create a new program without the first active statement
-        //      there probably is a better way to do that
-        final Statement prog = (Statement) new ProgramElementReplacer(target.javaBlock().program(), services).replace(jmlAssert, KeYJavaASTFactory.emptyStatement());
-        final JavaBlock javaBlock = JavaBlock.createJavaBlock(prog instanceof StatementBlock ? (StatementBlock) prog : new StatementBlock(prog));
+        final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final Term newTerm = tb.apply(update,
                                       tb.imp(condition,
                                              tb.prog((Modality) target.op(),
