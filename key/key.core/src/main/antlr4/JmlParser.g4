@@ -41,25 +41,27 @@ modifier
   | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
  ;
 
+entity_name: ident COLON;
 
-
-class_axiom: AXIOM expression SEMI_TOPLEVEL;
-initially_clause: INITIALLY expression SEMI_TOPLEVEL;
-class_invariant: INVARIANT expression SEMI_TOPLEVEL;
+class_axiom:      AXIOM     entity_name? expression SEMI_TOPLEVEL;
+initially_clause: INITIALLY entity_name? expression SEMI_TOPLEVEL;
+class_invariant:  INVARIANT entity_name? expression SEMI_TOPLEVEL;
 //axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
   (modifier)?
-  behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
-           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
+  ( behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
+             | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR)
+    entity_name?
+  )?
   spec_body
 ;
 
 /*spec_var_decls: (old_clause | FORALL expression)+;
 spec_header: requires_clause+;*/
 
-spec_body: a+=clause+ (NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
+spec_body: a+=clause+ (entity_name? NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
 clauseEOF: clause EOF;
 clause
   :
@@ -73,25 +75,38 @@ clause
 
 // clauses
 targetHeap : SPECIAL_IDENT+;
-ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
-requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
-measured_by_clause: MEASURED_BY predornot (COMMA predornot)* SEMI_TOPLEVEL;
-captures_clause: CAPTURES predornot SEMI_TOPLEVEL;
-diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
-working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
-duration_clause: DURATION predornot SEMI_TOPLEVEL;
-when_clause: WHEN predornot SEMI_TOPLEVEL;
+ensures_clause: ENSURES targetHeap? entity_name? predornot SEMI_TOPLEVEL;
+requires_clause: REQUIRES targetHeap? entity_name? predornot SEMI_TOPLEVEL;
+measured_by_clause: MEASURED_BY entity_name? predornot (COMMA predornot)* SEMI_TOPLEVEL;
+captures_clause: CAPTURES entity_name? predornot SEMI_TOPLEVEL;
+diverges_clause: DIVERGES entity_name? predornot SEMI_TOPLEVEL;
+working_space_clause: WORKING_SPACE entity_name? predornot SEMI_TOPLEVEL;
+duration_clause: DURATION entity_name? predornot SEMI_TOPLEVEL;
+when_clause: WHEN entity_name? predornot SEMI_TOPLEVEL;
 accessible_clause
 :
-  ACCESSIBLE targetHeap?
-                    (lhs=expression COLON)? rhs=storeRefUnion
-                    (MEASURED_BY mby=expression)?
-    SEMI_TOPLEVEL;
-assignable_clause: (ASSIGNABLE|MODIFIES|MODIFIABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+  ACCESSIBLE
+  targetHeap?
+  entity_name?
+  (lhs=expression COLON)? rhs=storeRefUnion
+  (MEASURED_BY mby=expression)?
+  SEMI_TOPLEVEL
+;
+
+assignable_clause
+:
+    (ASSIGNABLE|MODIFIES|MODIFIABLE)
+    targetHeap?
+    entity_name?
+    (storeRefUnion | STRICTLY_NOTHING)
+    SEMI_TOPLEVEL
+;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
-  : REPRESENTS lhs=expression
+  : REPRESENTS
+    entity_name?
+    lhs=expression
     (((LARROW|EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
     | (SUCH_THAT predicate))
     SEMI_TOPLEVEL
@@ -138,11 +153,11 @@ loop_determines_clause
     SEMI_TOPLEVEL
   ;
 
-signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*)  SEMI_TOPLEVEL;
-breaks_clause: BREAKS LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-continues_clause: CONTINUES LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
+signals_clause:      SIGNALS      entity_name? LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+breaks_clause:       BREAKS       entity_name? LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+continues_clause:    CONTINUES    entity_name? LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+returns_clause:      RETURNS      entity_name? predornot? SEMI_TOPLEVEL;
+signals_only_clause: SIGNALS_ONLY entity_name? (NOTHING |referencetype (COMMA referencetype)*)  SEMI_TOPLEVEL;
 
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
@@ -152,16 +167,16 @@ method_declaration: type IDENT param_list (method_body|SEMI_TOPLEVEL);
 method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? t=IDENT (LBRACKET RBRACKET)* p=IDENT;
-history_constraint: CONSTRAINT expression;
+history_constraint: CONSTRAINT entity_name? expression;
 datagroup_clause: (in_group_clause | maps_into_clause);
-monitors_for_clause: MONITORS_FOR expression;
-readable_if_clause: READABLE expression;
-writable_if_clause: WRITABLE expression;
+monitors_for_clause: MONITORS_FOR entity_name? expression;
+readable_if_clause: READABLE entity_name? expression;
+writable_if_clause: WRITABLE entity_name? expression;
 in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET name EQUAL_SINGLE expression SEMI_TOPLEVEL;
+set_statement: SET entity_name? name EQUAL_SINGLE expression SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?
@@ -177,17 +192,17 @@ loop_specification
     | assignable_clause
     | variant_function)*;
 
-loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
-variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
+loop_invariant: LOOP_INVARIANT targetHeap? entity_name? expression SEMI_TOPLEVEL;
+variant_function: DECREASING entity_name? expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
-assume_statement: ASSUME expression SEMI_TOPLEVEL;
+assume_statement: ASSUME entity_name? expression SEMI_TOPLEVEL;
 initialiser: EQUAL_SINGLE expression;
 block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT entity_name? expression | UNREACHABLE) SEMI_TOPLEVEL;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
