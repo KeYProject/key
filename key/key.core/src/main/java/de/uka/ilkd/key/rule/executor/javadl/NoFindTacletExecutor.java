@@ -105,8 +105,12 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
             currentGoal.setSequent(currentSequent);
 
-            currentGoal.setBranchLabel(gt.name());
-            TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
+            var nfn = gt.getBranchNamingFunction();
+            if(nfn==null) currentGoal.setBranchLabel(null);
+            else currentGoal.setBranchLabel(nfn.getName(services, currentSequent, tacletApp, termLabelState));
+
+            TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
+                    ruleApp.rule(), currentGoal, null, null);
         }
 
         return newGoals;

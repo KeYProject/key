@@ -479,6 +479,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
+ESC_IDENT:  ( '\\' (LETTER | '_' | '#' | '$') (IDCHAR)*);
 ERROR_CHAR: .;
 
 mode modDiamond;

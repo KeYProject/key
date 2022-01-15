@@ -709,7 +709,7 @@ option_list
 
 goalspec
 :
-  (name=string_value COLON)?
+  ((plainname=string_value|fnname=naming_function) COLON)?
   ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?
@@ -718,6 +718,8 @@ goalspec
   | addRList=addrules
   )
 ;
+
+naming_function: ESC_IDENT;
 
 replacewith:  REPLACEWITH LPAREN o=termorseq RPAREN;
 add:          ADD LPAREN s=seq RPAREN;

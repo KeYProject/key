@@ -22,13 +22,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -163,7 +163,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             Sequent addSeq = Sequent.createAnteSequent(semi);
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
-            addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
+            addGoalTemplate(null, null, null, addSeq, noTaclets, noSV, null, ctx);
             b.setName(new Name(name));
             b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
@@ -818,19 +818,31 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
+    @Nullable
+    public BranchNamingFunction visitNaming_function(KeYParser.Naming_functionContext ctx) {
+        String name = ctx.ESC_IDENT().getText();
+        return BranchingNamingFunctions.find(name);
+    }
+
+    @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
         ImmutableSet<Choice> soc = this.goalChoice;
-        String name = accept(ctx.string_value());
+
+        String name = accept(ctx.plainname);
+        BranchNamingFunction fn = accept(ctx.fnname);
+        if (name == null && ctx.fnname != null) {
+            name = ctx.fnname.ESC_IDENT().getText();
+        }
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
-        ImmutableSLList<Taclet> addRList = ImmutableSLList.<Taclet>nil();
-        DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.<SchemaVariable>nil();
+        ImmutableSLList<Taclet> addedRules = ImmutableSLList.nil();
+        DefaultImmutableSet<SchemaVariable> addedProgramVariables = DefaultImmutableSet.nil();
 
         @Nullable Object rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) addSeq = accept(ctx.add());
-        if (ctx.addrules() != null) addRList = accept(ctx.addrules()); //modifies goalChoice
-        if (ctx.addprogvar() != null) addpv = accept(ctx.addprogvar());
-        addGoalTemplate(name, rwObj, addSeq, addRList, addpv, soc, ctx);
+        if (ctx.addrules() != null) addedRules = accept(ctx.addrules()); //modifies goalChoice
+        if (ctx.addprogvar() != null) addedProgramVariables = accept(ctx.addprogvar());
+        addGoalTemplate(name, fn, rwObj, addSeq, addedRules, addedProgramVariables, soc, ctx);
         return null;
     }
 
@@ -868,7 +880,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     */
 
 
-    private @Nonnull TacletBuilder<?> createTacletBuilderFor(
+    private @Nonnull
+    TacletBuilder<?> createTacletBuilderFor(
             Object find, int applicationRestriction, ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();
@@ -905,13 +918,10 @@ public class TacletPBuilder extends ExpressionBuilder {
                 format("Could not find a suitable TacletBuilder for {0}", find));
     }
 
-    private void addGoalTemplate(String id,
-                                 Object rwObj,
-                                 Sequent addSeq,
-                                 ImmutableList<Taclet> addRList,
-                                 ImmutableSet<SchemaVariable> pvs,
-                                 @Nullable ImmutableSet<Choice> soc,
-                                 ParserRuleContext ctx) {
+    private void addGoalTemplate(
+            @Nullable String id, @Nullable BranchNamingFunction fn,
+            @Nullable Object rwObj, Sequent addSeq, ImmutableList<Taclet> addRList,
+            ImmutableSet<SchemaVariable> pvs, @Nullable ImmutableSet<Choice> soc, ParserRuleContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
@@ -948,6 +958,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (gt == null)
             throw new NullPointerException("Could not find a suitable goal template builder for: " + b.getClass());
         gt.setName(id);
+        gt.setBranchNamingFunction(fn);
         b.addTacletGoalTemplate(gt);
         if (soc != null) b.addGoal2ChoicesMapping(gt, soc);
     }

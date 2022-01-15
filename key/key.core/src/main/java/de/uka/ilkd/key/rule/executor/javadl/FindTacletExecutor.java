@@ -142,7 +142,12 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
 
             currentGoal.setSequent(currentSequent);
 
-            currentGoal.setBranchLabel(gt.name());
+            var nfn = gt.getBranchNamingFunction();
+            if(nfn==null)
+                currentGoal.setBranchLabel(null);
+            else
+                currentGoal.setBranchLabel(
+                        nfn.getName(services, currentSequent, tacletApp, termLabelState));
 
             TermLabelManager.refactorSequent(termLabelState, services,
                     ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
