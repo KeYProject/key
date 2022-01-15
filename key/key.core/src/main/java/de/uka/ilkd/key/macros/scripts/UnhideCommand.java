@@ -18,6 +18,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Proof script command to insert a formula hidden earlier in the proof.
+ *
+ * Usage:
+ * <pre>
+ *     unhide "f1, f2 ==> f3, f4"
+ * </pre>
+ *
+ * All formulas in the parameter sequent are re-added to the sequent.
+ *
+ * @author Mattias Ulbrich
+ */
 public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
     public static final String INSERT_HIDDEN_PATTERN = "insert_hidden_taclet_[0-9]+";
@@ -70,6 +82,8 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
             }
         }
     }
+
+    @Override
     public String getName() {
         return "unhide";
     }

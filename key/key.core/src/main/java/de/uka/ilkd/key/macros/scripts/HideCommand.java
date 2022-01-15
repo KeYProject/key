@@ -23,7 +23,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Proof script command to hide a formula from the sequent.
+ *
+ * Usage:
+ * <pre>
+ *     hide "f1, f2 ==> f3, f4"
+ * </pre>
+ *
+ * All formulas in the parameter sequent are hidden using hide_left or using
+ * hide_right.
+ *
+ * @author Mattias Ulbrich
+ */
 public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
+
     private static final Name HIDE_LEFT = new Name("hide_left");
     private static final Name HIDE_RIGHT = new Name("hide_right");
 
@@ -81,8 +95,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         return "hide";
     }
 
-    public class Parameters {
-        /** A formula defining the goal to select */
+    public static class Parameters {
         @Option("#2")
         public Sequent sequent;
     }
