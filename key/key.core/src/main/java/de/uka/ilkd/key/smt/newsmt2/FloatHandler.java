@@ -116,7 +116,7 @@ public class FloatHandler implements SMTHandler {
             fpOperators.put(doubleLDT.getSqrtDouble(), "fp.sqrt");
             // fpOperators.put(floatLDT.getSqrtFloat(), "fp.sqrt");
         }
-//
+
 //        mathOperators.put(doubleLDT.getSinDouble(), SMTTermFloatOp.Op.SINDOUBLE);
 //        mathOperators.put(doubleLDT.getCosDouble(), SMTTermFloatOp.Op.COSDOUBLE);
 //        mathOperators.put(doubleLDT.getAcosDouble(), SMTTermFloatOp.Op.ACOSDOUBLE);
@@ -146,9 +146,6 @@ public class FloatHandler implements SMTHandler {
 
         trans.introduceSymbol("float");
         trans.introduceSymbol("double");
-        // sorts are defined here, declare them as already defined
-        //trans.addSort(doubleLDT.targetSort());
-        //trans.addSort(floatLDT.targetSort());
 
         Operator op = term.op();
         String fpOp = fpOperators.get(op);
