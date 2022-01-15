@@ -874,7 +874,7 @@ public class OriginTermLabel implements TermLabel {
          * None. Used when no other spec type fits and for terms whose origin was
          * not set upon their creation.
          */
-        NONE("<none>");
+        NONE("<none>"), AXIOM("axiom");
 
         /**
          * This {@code SpecType}'s string representation.

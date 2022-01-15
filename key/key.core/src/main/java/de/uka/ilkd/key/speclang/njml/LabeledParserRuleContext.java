@@ -5,7 +5,9 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
@@ -13,24 +15,34 @@ import javax.annotation.Nullable;
 public class LabeledParserRuleContext {
     @Nonnull
     public final ParserRuleContext first;
-    @Nullable
-    public final TermLabel second;
 
-    public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
-        this.first = first;
-        this.second = second;
+    @Nonnull
+    public final List<TermLabel> second;
+
+    public LabeledParserRuleContext(@Nonnull ParserRuleContext first, TermLabel second) {
+        this.first = Objects.requireNonNull(first);
+        if (second != null) {
+            this.second = Collections.singletonList(second);
+        } else {
+            this.second = Collections.emptyList();
+        }
     }
 
-
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
-        this.first = first;
-        second = null;
+        this(first, (TermLabel) null);
     }
 
     public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
         this(ctx, constructTermLabel(ctx, specType));
+    }
+
+    public LabeledParserRuleContext(@Nonnull ParserRuleContext first, List<TermLabel> second) {
+        this.first = first;
+        if (second != null) {
+            this.second = Collections.unmodifiableList(second);
+        } else {
+            this.second = Collections.emptyList();
+        }
     }
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {

@@ -13,33 +13,36 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.Objects;
 
 
 /**
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-    private final ParserRuleContext inv;
-
-    public TextualJMLClassInv(ImmutableList<String> mods,
-                              ParserRuleContext inv, String name) {
-        super(mods);
-        assert inv != null;
-        this.inv = inv;
-        this.name = name;
-        setPosition(inv);
-    }
+    private final JmlParser.Class_invariantContext inv;
 
     public TextualJMLClassInv(ImmutableList<String> mods, JmlParser.Class_invariantContext ctx) {
         super(mods, null);
-        inv = ctx;
+        inv = Objects.requireNonNull(ctx);
     }
 
-    public ParserRuleContext getInv() {
-        return inv;
+    public String getName() {
+        if (name == null && inv.entity_name() != null) {
+            name = inv.entity_name().ident().getText();
+        }
+        return name;
+    }
+
+    public LabeledParserRuleContext getInv() {
+        return new LabeledParserRuleContext(inv, createTermLabel(
+                OriginTermLabel.SpecType.INVARIANT,
+                inv.start, getName()));
     }
 
 
@@ -61,10 +64,6 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + inv.hashCode();
-    }
-
-    public String getName() {
-        return name;
+        return Objects.hash(mods, inv);
     }
 }

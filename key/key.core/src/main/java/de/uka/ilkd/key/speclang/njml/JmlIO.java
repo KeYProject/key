@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -222,10 +223,11 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr) {
         Term term = translateTerm(expr.first);
-        if (expr.second != null)
-            return services.getTermBuilder().addLabel(term, expr.second);
-        else
-            return term;
+        final var termBuilder = services.getTermBuilder();
+        for (TermLabel label : expr.second) {
+            term = termBuilder.addLabel(term, label);
+        }
+        return term;
     }
 
     /**
@@ -233,12 +235,10 @@ public class JmlIO {
      * Attach both given labels {@code type} and in labeled parse tree.
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
-        Term term = translateTerm(expr.first);
+        Term term = translateTerm(expr);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
-        if (expr.second != null)
-            return services.getTermBuilder().addLabel(term, expr.second);
-        else
-            return services.getTermBuilder().addLabel(term, origin);
+        final var termBuilder = services.getTermBuilder();
+        return termBuilder.addLabel(term, origin);
     }
 
 

@@ -22,7 +22,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 
 /**
- * Label attached to a predicates for instance in postconditions, loop invariants or precondition checks of applied operation contracts.
+ * Label attached to a predicates for instance in postconditions,
+ * loop invariants or precondition checks of applied operation contracts.
  */
 public class FormulaTermLabel implements TermLabel {
    /**
