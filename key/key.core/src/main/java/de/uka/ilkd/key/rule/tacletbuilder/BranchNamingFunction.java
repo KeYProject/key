@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -11,5 +11,5 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public interface BranchNamingFunction {
     String getName(Services services, SequentChangeInfo currentSequent,
-                   TacletApp tacletApp, TermLabelState termLabelState);
+                   TacletApp tacletApp, MatchConditions matchConditions);
 }

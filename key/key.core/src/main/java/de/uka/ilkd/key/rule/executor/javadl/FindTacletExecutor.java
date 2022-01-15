@@ -147,7 +147,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                 currentGoal.setBranchLabel(null);
             else
                 currentGoal.setBranchLabel(
-                        nfn.getName(services, currentSequent, tacletApp, termLabelState));
+                        nfn.getName(services, currentSequent, tacletApp, mc));
 
             TermLabelManager.refactorSequent(termLabelState, services,
                     ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);

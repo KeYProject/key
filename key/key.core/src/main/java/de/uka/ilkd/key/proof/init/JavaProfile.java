@@ -13,16 +13,12 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -107,6 +103,7 @@ public class JavaProfile extends AbstractProfile {
                         new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+        result = result.prepend(new TermLabelConfiguration(SpecNameLabel.NAME, SpecNameLabel.getFactory()));
         result = result.prepend(
             new TermLabelConfiguration(
                     ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,

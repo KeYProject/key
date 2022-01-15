@@ -817,21 +817,15 @@ public class TacletPBuilder extends ExpressionBuilder {
         return mapOf(ctx.option());
     }
 
-    @Override
-    @Nullable
-    public BranchNamingFunction visitNaming_function(KeYParser.Naming_functionContext ctx) {
-        String name = ctx.ESC_IDENT().getText();
-        return BranchingNamingFunctions.find(name);
-    }
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
         ImmutableSet<Choice> soc = this.goalChoice;
 
         String name = accept(ctx.plainname);
-        BranchNamingFunction fn = accept(ctx.fnname);
-        if (name == null && ctx.fnname != null) {
-            name = ctx.fnname.ESC_IDENT().getText();
+        BranchNamingFunction fn = null;
+        if (name != null) {
+            fn = BranchingNamingFunctions.find(name);
         }
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
