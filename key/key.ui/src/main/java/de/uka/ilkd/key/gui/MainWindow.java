@@ -24,9 +24,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
-
 import de.uka.ilkd.key.gui.actions.*;
-
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -59,8 +57,8 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -762,7 +760,7 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if(Main.isExperimentalMode()) {
+        if (Main.isExperimentalMode()) {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
             submenu.add(runAllProofsAction);
         }
@@ -783,14 +781,11 @@ public final class MainWindow extends JFrame {
         final de.uka.ilkd.key.settings.ViewSettings vs =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
-        laf.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).
-                        isSelected());
-                // TODO: inform that this requires a restart
-                System.out.println("Info: Look and feel changed for next start of KeY.");
-            }
+        laf.addActionListener(e -> {
+            vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).
+                    isSelected());
+            // TODO: inform that this requires a restart
+            System.out.println("Info: Look and feel changed for next start of KeY.");
         });
 //        view.add(laf); // uncomment this line to include the option in the menu
 
@@ -879,6 +874,9 @@ public final class MainWindow extends JFrame {
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        proof.addSeparator();
+        proof.add(new MakeNamedFormulaToAbbrevAction(this));
+        proof.addSeparator();
         return proof;
     }
 
