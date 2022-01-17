@@ -1,27 +1,20 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Optional;
@@ -80,20 +73,8 @@ public class JmlAssertRule implements BuiltInRule {
                 .map(JmlAssert.class::cast)
                 .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        //XXX: I think there should always be a ProgramPrefix around and stuff
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials((ProgramPrefix) target.javaBlock().program());
-        final IProgramMethod pm = info.getInnerMostMethodFrame().getProgramMethod();
-        JMLSpecFactory jsf = new JMLSpecFactory(services);
-
-        final ProgramVariableCollection pv = jsf.createProgramVariables(pm);
-
-        //TODO: seems like I still miss local variables here
-        JmlIO jmlIo = new JmlIO(services, pm.getContainerType(), pv.selfVar, pv.paramVars,
-                                pv.resultVar, pv.excVar, pv.atPres, pv.atBefores);
-
-        //TODO: is this enought to validate that condition is side effect free?
-        final Term condition = jmlIo.translateTerm(jmlAssert.getCondition(),
-                jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT : OriginTermLabel.SpecType.ASSUME);
+        //TODO: add wellFormed or other conditions?
+        final Term condition = jmlAssert.getCond();
 
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {

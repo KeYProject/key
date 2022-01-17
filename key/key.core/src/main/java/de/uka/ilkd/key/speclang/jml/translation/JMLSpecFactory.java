@@ -1439,6 +1439,27 @@ public class JMLSpecFactory {
     }
 
     /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        //TODO: seems like VariableCreator expects a Block, but seems to work with a JavaStatement
+        final AuxiliaryContract.Variables variables
+                = new AuxiliaryContract.VariablesCreator(jmlAssert, Collections.emptyList(), pm, services).create();
+        final ProgramVariableCollection pv = createProgramVariables(pm, jmlAssert, variables);
+        jmlIo.classType(pm.getContainerType())
+                .selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar)
+                .exceptionVariable(pv.excVar)
+                .atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        jmlAssert.translateCondition(jmlIo);
+    }
+
+    /**
      * Creates a program variable collection for a specified block. This collection contains all
      * program variables that occur freely in the block as parameters (i.e., in
      * {@link ProgramVariableCollection#paramVars}).

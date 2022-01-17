@@ -16,10 +16,14 @@ package de.uka.ilkd.key.speclang;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.java.visitor.JavaASTWalker;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -291,6 +295,24 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
+    private void transformJmlAsserts(final IProgramMethod pm) {
+        //TODO: ignore jml asserts in the recorderext AST and just create it here?
+        //      that way condition could be final, but the AST would be incomplete longer
+        //      (well, it is incomplete till the condition is translated to a Term,
+        //       but at least there isn't a missing statement)
+        Services services = initConfig.getServices();
+        JMLSpecFactory jsf = new JMLSpecFactory(services);
+        JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {
+            @Override
+            protected void doAction(final ProgramElement node) {
+                if (node instanceof JmlAssert) {
+                    jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                }
+            }
+        };
+        walker.start();
+    }
+
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
@@ -343,6 +365,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
+                transformJmlAsserts(pm);
             }
 
             //constructor contracts
@@ -366,7 +389,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         warnings = warnings.union(jmlWarnings);
         return warnings;
     }
-
 
 
     //-------------------------------------------------------------------------
