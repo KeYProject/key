@@ -139,10 +139,10 @@ subprojects {
 
     test {
         useJUnitPlatform()
-        useJUnit {
+        /*useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Interactive',
                     'org.key_project.util.testcategories.Performance'
-        }
+        }*/
 
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }

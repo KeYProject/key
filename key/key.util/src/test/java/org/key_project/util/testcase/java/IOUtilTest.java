@@ -13,36 +13,7 @@
 
 package org.key_project.util.testcase.java;
 
-import static org.junit.Assert.assertNotEquals;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.HelperClassForUtilityTests;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -54,11 +25,23 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Tests for {@link IOUtil}
  * @author Martin Hentschel
  */
-public class IOUtilTest extends TestCase {
+public class IOUtilTest {
    /**
     * Tests {@link IOUtil#getCurrentDirectory()}
     */
@@ -103,9 +86,9 @@ public class IOUtilTest extends TestCase {
          File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
          File noSubFile = HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
          List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
-         assertFalse(IOUtil.contains((Iterable<File>)null, yesFile));
+         assertFalse(IOUtil.contains((Iterable<File>) null, yesFile));
          assertFalse(IOUtil.contains(parents, null));
-         assertFalse(IOUtil.contains((Iterable<File>)null, null));
+         assertFalse(IOUtil.contains((Iterable<File>) null, null));
          assertFalse(IOUtil.contains(parents, yesDir.getParentFile()));
          assertTrue(IOUtil.contains(parents, yesDir));
          assertTrue(IOUtil.contains(parents, yesFile));
@@ -141,9 +124,9 @@ public class IOUtilTest extends TestCase {
          File noFile = HelperClassForUtilityTests.createFile(new File(noDir, "Hello.txt"), "Hello");
          File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
          File noSubFile = HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
-         assertFalse(IOUtil.contains((File)null, yesFile));
+         assertFalse(IOUtil.contains((File) null, yesFile));
          assertFalse(IOUtil.contains(yesDir, null));
-         assertFalse(IOUtil.contains((File)null, null));
+         assertFalse(IOUtil.contains((File) null, null));
          assertFalse(IOUtil.contains(yesDir, yesDir.getParentFile()));
          assertTrue(IOUtil.contains(yesDir, yesDir));
          assertTrue(IOUtil.contains(yesDir, yesFile));
@@ -299,12 +282,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(0, visitor.getVisitedFiles().size());
          // Test visiting
          IOUtil.visit(tempDir, visitor);
-         Collections.sort(visitor.getVisitedFiles(), new Comparator<File>() {
-            @Override
-            public int compare(File o1, File o2) {
-                return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-            }
-         }); // Ensure same order in all operating systems
+         visitor.getVisitedFiles().sort(Comparator.comparing(File::getAbsolutePath)); // Ensure same order in all operating systems
          assertEquals(8, visitor.getVisitedFiles().size());
          assertEquals(tempDir, visitor.getVisitedFiles().get(0));
          assertEquals(text, visitor.getVisitedFiles().get(1));
@@ -328,13 +306,13 @@ public class IOUtilTest extends TestCase {
       /**
        * The visited {@link File}s.
        */
-      private List<File> visitedFiles = new LinkedList<File>();
+      private final List<File> visitedFiles = new LinkedList<>();
 
       /**
        * {@inheritDoc}
        */
       @Override
-      public void visit(File file) throws IOException {
+      public void visit(File file) {
          visitedFiles.add(file);
       }
 
@@ -370,23 +348,13 @@ public class IOUtilTest extends TestCase {
          File text = new File(tempDir, "Text.txt");
          IOUtil.writeTo(new FileOutputStream(text), "Text.txt");
          // Create filter
-         IFilter<File> filter = new IFilter<File>() {
-            @Override
-            public boolean select(File element) {
-               return element.getName().contains("Sub");
-            }
-         };
+         IFilter<File> filter = element -> element.getName().contains("Sub");
          // Test null
          List<File> result = IOUtil.search(null, filter);
          assertEquals(0, result.size());
          // Test no filter
          result = IOUtil.search(tempDir, null); 
-         Collections.sort(result, new Comparator<File>() {
-             @Override
-             public int compare(File o1, File o2) {
-                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-             }
-          });  // Ensure same order in all operating systems
+         result.sort(Comparator.comparing(File::getAbsolutePath));  // Ensure same order in all operating systems
          assertEquals(8, result.size());
          assertEquals(tempDir, result.get(0));
          assertEquals(text, result.get(1));
@@ -398,12 +366,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(subSubB, result.get(7));
          // Test with filter
          result = IOUtil.search(tempDir, filter);
-         Collections.sort(result,new Comparator<File>() {
-             @Override
-             public int compare(File o1, File o2) {
-                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-             }
-          }); // Ensure same order in all operating systems
+         result.sort(Comparator.comparing(File::getAbsolutePath)); // Ensure same order in all operating systems
          assertEquals(4, result.size());
          assertEquals(subFile, result.get(0));
          assertEquals(subSubDir, result.get(1));
@@ -529,7 +492,7 @@ public class IOUtilTest extends TestCase {
       for (int i = 0; i < expectedIndices.length; i++) {
          int normalColumn = info.normalizeColumn(i, tabWidth);
          //System.out.println("normalizeColumn(" + i + ", " + tabWidth + ") = " + normalColumn + (normalColumn < text.toCharArray().length ? (" which is character '" + text.toCharArray()[normalColumn] + "'") : ""));
-         assertEquals(expectedIndices[i], normalColumn); 
+         assertEquals(expectedIndices[i], normalColumn);
       }
    }
    
@@ -540,7 +503,7 @@ public class IOUtilTest extends TestCase {
    public void testComputeLineInformation_File() throws IOException {
       // Get test file
       File textFile = new File(HelperClassForUtilityTests.RESOURCE_DIRECTORY + File.separator + "lineIndicesTest" + File.separator + "Text.txt");
-      assertTrue("File '" + textFile + "' does not exist.", textFile.isFile());
+      assertTrue(textFile.isFile(), "File '" + textFile + "' does not exist.");
       // Test null
       assertLineInformation((File)null);
       // Test unix file
@@ -572,10 +535,9 @@ public class IOUtilTest extends TestCase {
       assertTrue(source.exists());
       assertNotNull(newFileName);
       // Create new file content
-      CharArrayWriter writer = new CharArrayWriter();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(source)));
-      try {
-         String line = null;
+      try (CharArrayWriter writer = new CharArrayWriter();
+           BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(source)))) {
+         String line;
          while ((line = reader.readLine()) != null) {
             writer.write(line);
             writer.write(lineBreak);
@@ -588,20 +550,16 @@ public class IOUtilTest extends TestCase {
          }
          return target;
       }
-      finally {
-         reader.close();
-         writer.close();
-      }
    }
 
    /**
     * Makes sure that for the given text the correct line start indices are computed.
-    * @param text The text to test.
+    * @param file The text to test.
     * @param expectedIndices The expected line indices.
     * @throws IOException Occurred Exception.
     */
    protected void assertLineInformation(File file, int... expectedIndices) throws IOException {
-      LineInformation[] result = IOUtil.computeLineInformation(file != null ? file : null);
+      LineInformation[] result = IOUtil.computeLineInformation(file);
       assertNotNull(result);
       assertEquals(expectedIndices.length, result.length);
       for (int i = 0; i < expectedIndices.length; i++) {
@@ -669,16 +627,16 @@ public class IOUtilTest extends TestCase {
     */
    protected void assertLineInformation(String newLine, String... textLines) throws IOException {
       if (textLines != null) {
-         StringBuffer sb = new StringBuffer();
+         StringBuilder sb = new StringBuilder();
          LineInformation[] expectedInfos = new LineInformation[textLines.length];
          int lastIndex = 0;
          for (int i = 0; i < textLines.length; i++) {
             // Compute tabs
-            List<Integer> tabIndices = new LinkedList<Integer>();
+            List<Integer> tabIndices = new LinkedList<>();
             char[] lineChars = textLines[i].toCharArray();
             for (int j = 0; j < lineChars.length; j++) {
                if ('\t' == lineChars[j]) {
-                  tabIndices.add(Integer.valueOf(j));
+                  tabIndices.add(j);
                }
             }
             // Compute line
@@ -693,7 +651,7 @@ public class IOUtilTest extends TestCase {
          assertLineInformation(sb.length() >= 1 ? sb.toString() : null, expectedInfos);
       }
       else {
-         assertLineInformation((String)null, new LineInformation[0]);
+         assertLineInformation(null, new LineInformation[0]);
       }
    }
 
@@ -705,12 +663,12 @@ public class IOUtilTest extends TestCase {
     */
    protected void assertLineInformation(String text, LineInformation... expectedInfos) throws IOException {
       LineInformation[] result = IOUtil.computeLineInformation(text != null ? new ByteArrayInputStream(text.getBytes()) : null);
-      assertNotNull(text, result);
-      assertEquals(text, expectedInfos.length, result.length);
+      assertNotNull(result, text);
+      assertEquals(expectedInfos.length, result.length, text);
       for (int i = 0; i < expectedInfos.length; i++) {
          assertNotNull(expectedInfos[i]);
          assertNotNull(result[i]);
-         assertEquals(text + " at " + i, expectedInfos[i].getOffset(), result[i].getOffset());
+         assertEquals(expectedInfos[i].getOffset(), result[i].getOffset(), text + " at " + i);
          assertNotNull(expectedInfos[i].getTabIndices());
          assertNotNull(result[i].getTabIndices());
          assertEquals(expectedInfos[i].getTabIndices().length, result[i].getTabIndices().length);
@@ -755,8 +713,8 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testWriteTo_Charstet() throws Exception {
-      byte[] utf8 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-8"));
-      byte[] utf16 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-16"));
+      byte[] utf8 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", StandardCharsets.UTF_8);
+      byte[] utf16 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", StandardCharsets.UTF_16);
       assertNotEquals(utf8.length, utf16.length);
    }
    
@@ -771,7 +729,7 @@ public class IOUtilTest extends TestCase {
       // Create XML
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(encoding != null ? encoding.displayName() : null, sb);
-      Map<String, String> attributes = new LinkedHashMap<String, String>();
+      Map<String, String> attributes = new LinkedHashMap<>();
       attributes.put("text", XMLUtil.encodeText(text));
       XMLUtil.appendEmptyTag(0, "root", attributes, sb);
       // Write content
@@ -831,7 +789,7 @@ public class IOUtilTest extends TestCase {
    @Test
    public void testReadFrom_File() throws IOException {
       // Test null
-      assertNull(IOUtil.readFrom((File)null));
+      assertNull(IOUtil.readFrom((File) null));
       File tempFile = File.createTempFile("IOUtilTest", "testReadFrom_File");
       try {
          // Test not existing file
@@ -860,11 +818,7 @@ public class IOUtilTest extends TestCase {
          doTestReadFrom("One Line\n");
          doTestReadFrom("One Line\r\n");
          doTestReadFrom("One Line\n\r");
-         StringBuffer sb = new StringBuffer();
-         for (int i = 0; i < IOUtil.BUFFER_SIZE * 3; i++) {
-            sb.append("A");
-         }
-         doTestReadFrom(sb.toString());
+         doTestReadFrom("A".repeat(IOUtil.BUFFER_SIZE * 3));
       }
       catch (IOException e) {
          e.printStackTrace();
@@ -872,17 +826,12 @@ public class IOUtilTest extends TestCase {
       }
    }
    
-   /**
-    * Executes the assertions for {@link #testReadFrom()}.
-    * @param text The text to check.
-    * @throws IOException Occurred Exception.
-    */
    protected void doTestReadFrom(String text) throws IOException {
       if (text != null) {
          assertEquals(text, IOUtil.readFrom(new ByteArrayInputStream(text.getBytes())));
       }
       else {
-         assertNull(IOUtil.readFrom((InputStream)null));
+         assertNull(IOUtil.readFrom((InputStream) null));
       }
    }
    
@@ -934,11 +883,7 @@ public class IOUtilTest extends TestCase {
       doTestCopy("One Line\n");
       doTestCopy("One Line\r\n");
       doTestCopy("One Line\n\r");
-      StringBuffer sb = new StringBuffer();
-      for (int i = 0; i < IOUtil.BUFFER_SIZE * 3; i++) {
-         sb.append("A");
-      }
-      doTestCopy(sb.toString());
+      doTestCopy("A".repeat(IOUtil.BUFFER_SIZE * 3));
    }
    
    /**
@@ -964,7 +909,7 @@ public class IOUtilTest extends TestCase {
    }
    
    /**
-    * Tests {@link IOUtils#getClassLocation(Class)}
+    * Tests {@link IOUtil#getClassLocation(Class)}
     */
    @Test
    public void testGetClassLocation() {
@@ -973,7 +918,7 @@ public class IOUtilTest extends TestCase {
    }
    
    /**
-    * Tests {@link IOUtils#getProjectRoot(Class)}
+    * Tests {@link IOUtil#getProjectRoot(Class)}
     */
    @Test
    public void testGetProjectRoot() {
@@ -982,7 +927,7 @@ public class IOUtilTest extends TestCase {
    }
    
    /**
-    * Tests {@link IOUtils#toURI(java.net.URL)}
+    * Tests {@link IOUtil#toURI(java.net.URL)}
     * @throws MalformedURLException Occurred Exception
     */
    @Test
@@ -1007,7 +952,7 @@ public class IOUtilTest extends TestCase {
    }
    
    /**
-    * Tests {@link IOUtils#toFile(URL)}
+    * Tests {@link IOUtil#toFile(URL)}
     * @throws MalformedURLException Occurred Exception
     */
    @Test
@@ -1017,31 +962,24 @@ public class IOUtilTest extends TestCase {
       // Test file uri
       assertEquals(new File("/tmp/Test/Test.xml"), IOUtil.toFile(new URL("file:///tmp/Test/Test.xml")));
       // Test web
-      try {
-         IOUtil.toFile(new URL("http://www.google.de"));
-         fail("Exception expected");
-      }
-      catch (IllegalArgumentException e) {
-      }
+      assertThrows(IllegalArgumentException.class, () ->
+              IOUtil.toFile(new URL("http://www.google.de")));
    }
    
    /**
-    * Tests {@link IOUtils#toFileString(URL)}
+    * Tests {@link IOUtil#toFileString(URL)}
     * @throws MalformedURLException Occurred Exception
     */
-   @Test
+   @Test()
    public void testToFileString() throws MalformedURLException {
       // Test null
       assertNull(IOUtil.toFileString(null));
       // Test file uri
-      assertEquals(File.separator + "tmp" + File.separator + "Test" + File.separator + "Test.xml", IOUtil.toFileString(new URL("file:///tmp/Test/Test.xml")));
+      assertEquals(File.separator + "tmp" + File.separator + "Test" + File.separator + "Test.xml",
+              IOUtil.toFileString(new URL("file:///tmp/Test/Test.xml")));
       // Test web
-      try {
-         IOUtil.toFileString(new URL("http://www.google.de"));
-         fail("Exception expected");
-      }
-      catch (IllegalArgumentException e) {
-      }
+      assertThrows(IllegalArgumentException.class, () ->
+              IOUtil.toFileString(new URL("http://www.google.de")));
    }
    
    /**
@@ -1049,7 +987,7 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testValidateOSIndependentFileName() {
-      assertEquals(null, IOUtil.validateOSIndependentFileName(null));
+      assertNull(IOUtil.validateOSIndependentFileName(null));
       assertEquals("Hello_World", IOUtil.validateOSIndependentFileName("Hello World"));
       assertEquals("Hello_World_txt", IOUtil.validateOSIndependentFileName("Hello World.txt"));
       assertEquals("Hello__World_txt", IOUtil.validateOSIndependentFileName("Hello<>World.txt"));
