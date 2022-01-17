@@ -95,15 +95,22 @@ subprojects {
 
     dependencies {
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
-        testImplementation 'junit:junit:4.13.2'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+        testCompileOnly 'junit:junit:4.13.2'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+
         testImplementation project(':key.util')
     }
 
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-	// Setting the release to Java 11
-	options.release = 11
+        // Setting the release to Java 11
+        options.release = 11
     }
 
     tasks.withType(Javadoc) {
@@ -131,19 +138,17 @@ subprojects {
     }
 
     test {
-        // TODO consider moving this to key.core where it is repeated ...
-        // weigl: This has to be here. We repeat this in key.core because I was not sure whether
-        // it gets overwritten or not on a redeclaration of `test'.
-
+        useJUnitPlatform()
         useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
+            excludeCategories 'org.key_project.util.testcategories.Interactive',
+                    'org.key_project.util.testcategories.Performance'
         }
 
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
-        
+
         testLogging {
-           outputs.upToDateWhen {false}
+            outputs.upToDateWhen { false }
             showStandardStreams = true
         }
     }
@@ -177,14 +182,14 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type:JavaExec) {
+    task execute(type: JavaExec) {
         description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type:JavaExec) {
+    task executeInTests(type: JavaExec) {
         description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
@@ -208,7 +213,7 @@ subprojects {
     //         html.enabled = true
     //     }
     // }
-    
+
     task sourcesJar(type: Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
@@ -256,14 +261,14 @@ subprojects {
         repositories {
             maven {
                 name = "GitlabPackages"
-		        url "https://git.key-project.org/api/v4/projects/35/packages/maven"
-		        credentials(HttpHeaderCredentials) {
-			        name = 'Private-Token'
-			        value = System.getenv("TOKEN")
-		        }
-		        authentication {
-			        header(HttpHeaderAuthentication)
-		        }           
+                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    name = 'Private-Token'
+                    value = System.getenv("TOKEN")
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
         }
     }
@@ -274,8 +279,8 @@ subprojects {
         mapping {
             //find styles here:
             // http://code.mycila.com/license-maven-plugin/#supported-comment-types
-            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
-            javascript="SLASHSTAR_STYLE"
+            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript = "SLASHSTAR_STYLE"
         }
         mapping("key", "SLASHSTAR_STYLE")
     }
