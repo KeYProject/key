@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -657,5 +658,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 newFreeInvariants, newMods, newInfFlowSpecs, newVariant,
                 newSelfTerm, newLocalIns, newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
+    }
+
+    @Override
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        assert x.getCond() != null;
+        Term newCond = replaceVariablesInTerm(x.getCond());
+        //TODO: I think that is ok this way
+        stack.peek().add(newCond);
+        //TODO: use .equals() or some variant?
+        if (!newCond.equals(x.getCond())) {
+            changed();
+        }
+        super.performActionOnJmlAssert(x);
     }
 }

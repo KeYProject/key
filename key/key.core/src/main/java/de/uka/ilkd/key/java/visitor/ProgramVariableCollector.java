@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -279,4 +280,12 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(collector.result());
     }
 
+    @Override
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        assert x.getCond() != null;
+        TermProgramVariableCollector tpvc = services.getFactory()
+                .create(services);
+        x.getCond().execPostOrder(tpvc);
+        result.addAll(tpvc.result());
+    }
 }
