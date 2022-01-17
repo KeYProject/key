@@ -138,7 +138,9 @@ subprojects {
     }
 
     test {
-        useJUnitPlatform()
+        useJUnitPlatform {
+            includeEngines 'junit-vintage'
+        }
         /*useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Interactive',
                     'org.key_project.util.testcategories.Performance'
