@@ -141,8 +141,10 @@ public abstract class SequentView extends JEditorPane {
     private final HashMap<Color, HighlightPainter> color2Highlight
             = new LinkedHashMap<>();
 
-    /** the last observed mouse position for which a highlight was created */
-    private Point lastMousePosition;
+    /** The last observed mouse position for which a highlight was created.
+     * <code>OUTSIDE_MOUSE_POSITION</code> means no highlight is applied.
+     */
+    private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
 
     private SequentViewInputListener sequentViewInputListener;
 
@@ -679,6 +681,10 @@ public abstract class SequentView extends JEditorPane {
 
 
     public void highlight(Point p) {
+        if (p == null) {
+            throw new IllegalArgumentException("p is null");
+        }
+
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
         setLastMousePosition(p);
