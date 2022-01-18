@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -34,7 +34,7 @@ import org.junit.Test;
  * Tests for {@link TruthValueTracingUtil}.
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests example: /set/truthValueWeakeningTest
@@ -190,7 +190,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueBlockContractMagic42
     */
-	@Ignore
+	@Disabled
 	public void IGNORE_testBlockContractMagic42() throws Exception {
       // Create expected results
       ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
@@ -293,7 +293,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueAssignableAndLoop
     */
-	@Ignore
+	@Disabled
     public void IGNORE_testAssignableAndLoop() throws Exception {
       // Create expected results
       ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
@@ -810,7 +810,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-	@Ignore
+	@Disabled
 	public void IGNORE_testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
@@ -836,7 +836,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-	@Ignore
+	@Disabled
 	public void IGNORE_testArrayUtil() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
@@ -968,8 +968,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    
    /**
     * Performs an {@link TruthValueTracingUtil} test.
-    * @param javaPathInBaseDir The path to the java file inside the base directory.
-    * @param baseContractName The name of the contract.
+    * @param proofFilePathInBaseDir The path to the java file inside the base directory.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
@@ -1075,7 +1074,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, 
                                              ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
-      List<TruthValueTracingResult> currentResults = new LinkedList<TruthValueTracingResult>();
+      List<TruthValueTracingResult> currentResults = new LinkedList<>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
       while (iter.hasNext()) {
          IExecutionNode<?> next = iter.next();
@@ -1191,7 +1190,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       /**
        * The truth values of all labels.
        */
-      private final Map<String, TruthValue> labelResults = new HashMap<String, TruthValue>();
+      private final Map<String, TruthValue> labelResults = new HashMap<>();
 
       /**
        * Constructor.
