@@ -25,6 +25,7 @@ import java.util.Iterator;
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
     private static final long serialVersionUID = -3178292652264875668L;
+    private static final int indent = 4;
     private String ruleName;
     private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();
@@ -116,20 +117,38 @@ public final class RuleInteraction extends NodeInteraction {
         return out.toString();
     }
 
+    private int calculateParameterWidth() {
+        var width = 0;
+        for (String k : getArguments().keySet()) {
+            width = Math.max(firstWord(k).length(), width);
+        }
+
+        return width;
+    }
+
     @Override
     public String getProofScriptRepresentation() {
+        // indent parameters once
+        var width = Math.max("inst_".length() + calculateParameterWidth(), "formula".length()) + indent;
         StringWriter sout = new StringWriter();
         PrintWriter out = new PrintWriter(sout);
 
         out.format("rule %s%n", getRuleName());
-        out.format("\t     on='%s'%n\tformula='%s'%n",
+        out.format("%" + width + "s='%s'%n%" + width + "s='%s'",
+                "on",
                 getPosInOccurence().getTerm(),
+                "formula",
                 getPosInOccurence().getToplevelTerm()
         );
 
-        getArguments().forEach((k, v) ->
-                out.format("     inst_%s='%s'%n", firstWord(k), v.trim()));
-        out.format(";%n");
+        var format = "%n%" + width + "s='%s'";
+        // indent inner lines once again
+        var innerIndent = " ".repeat(2 + width + indent);
+        getArguments().forEach((k, v) -> {
+            var indented = v.replaceAll("(?m)^", innerIndent).trim();
+            out.format(format, "inst_" + firstWord(k), indented);
+        });
+        out.format(";");
         return sout.toString();
     }
 
