@@ -1,6 +1,6 @@
 ### smt-settings
 
-[NewSMT]disableSqrtAxiomatization = true
+[NewSMT]sqrtSMTTranslation = AXIOMS
 
 ### KeY
 

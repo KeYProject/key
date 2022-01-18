@@ -151,6 +151,8 @@ public class FloatHandler implements SMTHandler {
 
         trans.introduceSymbol("float");
         trans.introduceSymbol("double");
+        trans.addSort(doubleLDT.targetSort());
+        trans.addSort(floatLDT.targetSort());
 
         Operator op = term.op();
         String fpOp = fpOperators.get(op);

@@ -1,3 +1,7 @@
+### smt-settings
+
+[NewSMT]sqrtSMTTranslation = SMT
+
 ### KeY
 
 \problem { 2.0d = sqrtDouble(4.0d) }

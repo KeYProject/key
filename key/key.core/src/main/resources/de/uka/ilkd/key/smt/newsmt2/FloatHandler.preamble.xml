@@ -5,25 +5,25 @@
     <comment>These are the preamble snippets needed for handling floating point numbers</comment>
 
     <entry key="float.axioms">
-        (assert (forall ((f Float32)) (= (u2f (f2u f)) f)))
-        (assert (forall ((x U)) (=> (= (typeof x) sort_float) (= (f2u (u2f x)) x))))
-        (assert (forall ((x U)) (=> (instanceof x sort_float) (= (typeof x ) sort_float))))
-        (assert (forall ((f Float32)) (= (typeof (f2u f)) sort_float)))
+(assert (forall ((f Float32)) (= (u2f (f2u f)) f)))
+(assert (forall ((x U)) (=> (= (typeof x) sort_float) (= (f2u (u2f x)) x))))
+(assert (forall ((x U)) (=> (instanceof x sort_float) (= (typeof x ) sort_float))))
+(assert (forall ((f Float32)) (= (typeof (f2u f)) sort_float)))
 
-        (assert (forall ((d Float64)) (= (u2d (d2u d)) d)))
-        (assert (forall ((x U)) (=> (= (typeof x) sort_double) (= (d2u (u2d x)) x))))
-        (assert (forall ((x U)) (=> (instanceof x sort_double) (= (typeof x ) sort_double))))
-        (assert (forall ((d Float64)) (= (typeof (d2u d)) sort_double)))
+(assert (forall ((d Float64)) (= (u2d (d2u d)) d)))
+(assert (forall ((x U)) (=> (= (typeof x) sort_double) (= (d2u (u2d x)) x))))
+(assert (forall ((x U)) (=> (instanceof x sort_double) (= (typeof x ) sort_double))))
+(assert (forall ((d Float64)) (= (typeof (d2u d)) sort_double)))
     </entry>
 
     <entry key="float.decls">
-        (declare-fun u2f (U) Float32)
-        (declare-fun f2u (Float32) U)
-        (declare-const sort_float T)
+(declare-fun u2f (U) Float32)
+(declare-fun f2u (Float32) U)
+;(declare-const sort_float T)
 
-        (declare-fun u2d (U) Float64)
-        (declare-fun d2u (Float64) U)
-        (declare-const sort_double T)
+(declare-fun u2d (U) Float64)
+(declare-fun d2u (Float64) U)
+;(declare-const sort_double T)
     </entry>
 
     <entry key="sinDouble.axioms">
