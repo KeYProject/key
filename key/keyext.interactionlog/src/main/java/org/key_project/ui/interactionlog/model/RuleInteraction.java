@@ -92,6 +92,14 @@ public final class RuleInteraction extends NodeInteraction {
         return arguments;
     }
 
+    private HashMap<String, String> createInvocationArguments() {
+        var allArgs = new HashMap<>(getArguments());
+        allArgs.put("#2", getRuleName());
+        allArgs.put("on", getPosInOccurence().getTerm());
+        allArgs.put("formula", getPosInOccurence().getToplevelTerm());
+        return allArgs;
+    }
+
     public void setArguments(HashMap<String, String> arguments) {
         this.arguments = arguments;
     }
@@ -133,12 +141,12 @@ public final class RuleInteraction extends NodeInteraction {
     }
 
     @Override
-    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) {
         RuleCommand ruleCommand = new RuleCommand();
         EngineState state = new EngineState(goal.proof());
-        RuleCommand.Parameters parameter = null;
+        RuleCommand.Parameters parameter;
         try {
-            parameter = ruleCommand.evaluateArguments(state, getArguments());
+            parameter = ruleCommand.evaluateArguments(state, createInvocationArguments());
             ruleCommand.execute(uic, parameter, state);
         } catch (Exception e) {
             throw new IllegalStateException("Rule application", e);
