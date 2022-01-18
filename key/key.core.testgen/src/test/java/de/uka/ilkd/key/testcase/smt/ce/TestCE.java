@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -59,7 +60,7 @@ public class TestCE extends TestCommons {
 
     @Test
     public void testOverFlow1() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "overflow1.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "overflow1.key"), true));
     }
 
     private boolean correctResult(File file, boolean b) throws IOException, ProblemLoaderException {
@@ -68,52 +69,52 @@ public class TestCE extends TestCommons {
 
     @Test
     public void testOverFlow2() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "overflow2.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "overflow2.key"), true));
     }
 
     @Test
     public void testTypes1() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types1.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types1.key"), true));
     }
 
     @Test
     public void testTypes2() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types2.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types2.key"), true));
     }
 
     @Test
     public void testTypes3() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types3.key"), false));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types3.key"), false));
     }
 
     @Test
     public void testTypes4() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types4.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types4.key"), true));
     }
 
     @Test
     public void testTypes5() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types5.key"), false));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types5.key"), false));
     }
 
     @Test
     public void testTypes6() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types6.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types6.key"), true));
     }
 
     @Test
     public void testTypes7() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types7.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types7.key"), true));
     }
 
     @Test
     public void testTypes8() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types8.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types8.key"), true));
     }
 
     @Test
     public void testTypes9() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types9.key"), true));
+        Assert.assertTrue(this.correctResult(new File(testFile, "types9.key"), true));
     }
 
     @Test
@@ -122,23 +123,21 @@ public class TestCE extends TestCommons {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
-            assertNotNull(proof);
+            Assert.assertNotNull(proof);
             FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
             se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             TryCloseMacro close = new TryCloseMacro();
             close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             // should not be provable
-            assertTrue(proof.openGoals().size() > 0);
+            Assert.assertTrue(proof.openGoals().size() > 0);
             // there should be a counterexample for each goal...
             for (Goal g : proof.openGoals()) {
                 SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
                 sb.applyTo(env.getUi(), g.node(), null, null);
-                assertTrue(correctResult(g, false));
+                Assert.assertTrue(correctResult(g, false));
             }
         } finally {
-            if (env != null) {
-                env.dispose();
-            }
+            env.dispose();
         }
     }
 }

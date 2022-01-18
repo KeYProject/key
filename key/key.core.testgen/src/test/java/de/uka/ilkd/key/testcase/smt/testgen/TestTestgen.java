@@ -7,9 +7,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 import de.uka.ilkd.key.testcase.smt.ce.TestCommons;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTestgen extends TestCommons {
     public static final File testFile = new File(
@@ -57,18 +59,16 @@ public class TestTestgen extends TestCommons {
     @Test
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
-        assertTrue("File " + file + " does not exists!", file.exists());
+        assertTrue(file.exists(), "File " + file + " does not exists!");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
             TestGenMacro macro = new TestGenMacro();
             macro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
-            assertEquals(proof.openGoals().size(), 5);
+            assertEquals(5, proof.openGoals().size());
         } finally {
-            if (env != null) {
-                env.dispose();
-            }
+            env.dispose();
         }
     }
 
