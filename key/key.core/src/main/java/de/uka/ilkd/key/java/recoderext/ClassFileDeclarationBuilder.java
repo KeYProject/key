@@ -558,6 +558,15 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             Identifier id = factory.createIdentifier(name);
             params.add(factory.createParameterDeclaration(type, id));
         }
+
+        // modify last argument to vararg if method is vararg (#1664)
+        if(method.isVarArgMethod()) {
+            ParameterDeclaration lastParam = params.get(params.size()-1);
+            lastParam.setVarArg(true);
+            TypeReference tyref = lastParam.getTypeReference();
+            tyref.setDimensions(tyref.getDimensions() - 1);
+        }
+
         decl.setParameters(params);
 
         String[] exceptionsInfo = method.getExceptionsInfo();

@@ -67,7 +67,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public String visitString_value(KeYParser.String_valueContext ctx) {
-        return ParsingFacade.getValue(ctx);
+        return ParsingFacade.getValueDocumentation(ctx);
     }
 
 

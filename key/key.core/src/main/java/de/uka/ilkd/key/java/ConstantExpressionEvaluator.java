@@ -75,8 +75,7 @@ public class ConstantExpressionEvaluator {
     private recoder.java.Expression parseExpression(Expression expr) {
 	recoder.java.Expression recExpr = null;
 	try {
-	    recExpr = JavaProgramFactory.getInstance().
-		parseExpression(expr.toString());
+	    recExpr = JavaProgramFactory.getInstance().parseExpression(expr.toString());
 	} catch (recoder.ParserException exc) {
 	    System.err.println("Failed to parse \n"+expr+
 			       "\nas Java expression!");

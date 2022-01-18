@@ -1,0 +1,247 @@
+<TITLE>RECODER Examples</TITLE>
+<LINK REL=stylesheet TYPE="text/css" HREF="recoder.css">
+</HEAD>
+<BODY>
+
+<DIV ALIGN="right"><A HREF="../index.html">Home</A></DIV>
+
+<H1>RECODER Example Applications</H1>
+<P>
+This document describes a set of small example applications for RECODER.
+You should follow the instructions given here in a command shell.
+Users of non-Unix operating systems will have to adapt some commands.
+</P>
+
+<H2>Setup</H2>
+<P>
+<OL>
+<LI>Make sure you are using a current, stable JDK (at least 1.2 is required to
+    analyze the input programs).
+<LI>Make sure <CODE>recoder.jar</CODE> and <CODE>recoder-examples.jar</CODE>
+    are in your classpath.
+<LI>Change to the <CODE>examples</CODE> directory.
+<PRE>
+cd doc/examples
+</PRE>
+</OL>
+</P>
+<P>
+To compile the SOURCERER example, you need a
+current version of BeanShell in your classpath, available from
+<A HREF="www.beanshell.org">www.beanshell.org</A>.
+Beanshell is not required to run, however; the console will be
+simply be inactive if <CODE>bsh</CODE> can not be found.
+</P>
+
+<H2>Example Data</H2>
+<P>
+<DL>
+<DT><A HREF="examples/converter">converter</A>
+<DD>Taken from the Sun Java Tutorial, a Swing-based unit converter
+    mini application (7 files, 648 lines of code).
+<DT><A HREF="examples/collections/java/util">collections</A>
+<DD>The collections framework from the JDK 1.3 sources (30 files,
+    15770 lines of code) containing a lot of nested inner classes.
+</DL>
+</P>
+
+<A NAME="list"></A>
+<H2>Example Programs</H2>
+<P>
+For most of the examples you may also try out a different project file
+than the one used in the instructions.
+</P>
+
+<H3>Source to Source Transformation Examples</H3>
+<UL>
+<LI><A HREF="#obfuscate">A Simple Obfuscator</A>
+<P>
+<LI><A HREF="#instrumentalize">Global Code Instrumentalization</A>
+</UL>
+
+<H3>Source Analysis Examples</H3>
+<P>
+<UL>
+<LI><A HREF="#xreference">Cross Reference HTML Generator</A>
+<P>
+<LI><A HREF="#statistics">A Syntax Node Statistic Tool</A>
+<P>
+<LI><A HREF="#sourcerer">Sourcerer - Source Code Browsing Demo</A>
+</UL>
+
+<A NAME="obfuscate"></A>
+<H2>A Simple Obfuscator</H2>
+<P>
+This transformations replaces all names of variables, methods, classes
+and packages by artificial ones, when this is feasible. It leaves
+main methods and methods redefining bytecode methods as are, such that
+the resulting program will be executable.
+</P>
+<P>
+<OL>
+<LI>Perform function check for the Converter program:
+<PRE>
+cd converter
+javac *.java
+java Converter
+rm *.class
+cd ..
+</PRE>
+<LI>Run the transformation
+<PRE>
+java Obfuscate converter.prj
+</PRE>
+<LI>Inspect the modified source files. Check if they compile.
+Locate the <CODE>main</CODE> method.
+<PRE>
+cd output
+ls
+javac *.java
+grep main *.java
+</PRE>
+<LI>Execute the class containing the main method (the exact file name may
+differ between JVMs).
+<PRE>
+java _56
+</PRE>
+<LI>You can remove all files in that directory afterwards - they are no 
+longer needed.
+<PRE>
+rm *.*
+</PRE>
+<LI>Return to the base directory.
+<PRE>
+cd ..
+</PRE>
+</OL>
+[<A HREF="examples/src/application/Obfuscate.java">Source</A>] [<A HREF="#list">Top</A>]
+</P>
+
+
+<A NAME="instrumentalize"></A>
+<H2>Global Code Instrumentalization</H2>
+<P>
+This transformation inserts a debug statement in front of any single
+method call within the program. Sometimes expressions must be flattened
+to do so. The resulting program will be executable and report method
+callers and callees for each call contained in the sources.
+</P>
+<P>
+<SMALL>
+Note: The implementation is not yet really fast. We estimate a possible 
+speed-up of factor 10-100 as soon as the incremental model update works.
+</SMALL>
+</P>
+<P>
+<OL>
+<LI>Run the transformation.
+<PRE>
+java Instrumentalize converter.prj
+</PRE>
+<LI>Copy any unmodified files (<CODE>Unit.java</CODE>) into the modified 
+    directory. Inspect the modified files.
+<PRE>
+cp converter/Unit.java output
+cd output
+</PRE>
+<LI>Compile the results and execute the class containing the main method. 
+<PRE>
+javac *.java
+java Converter
+</PRE>
+<LI>You can remove all files in that directory afterwards - they are no 
+longer needed.
+<PRE>
+rm *.*
+</PRE>
+<LI>Return to the base directory.
+<PRE>
+cd ..
+</PRE>
+</OL>
+[<A HREF="examples/src/application/Instrumentalize.java">Source</A>] [<A HREF="#list">Top</A>]
+</P>
+  
+<A NAME="xreference"></A>
+<H2>A Poor Man's Cross Reference Viewer</H2>
+<P>
+This program will generate a bunch of HTML files containing pretty printed 
+variants of the original sources. References are hyperlinked to the entity 
+they refer to.
+</P>
+<P>
+<OL>
+<LI>Run the generator.
+<PRE>
+java XReferenceHTMLGenerator collections.prj
+</PRE>
+<LI>Browse the results with an HTML viewer of your choice that supports frames.
+<PRE>
+cd output
+netscape -remote openURL\("file:$PWD/index.html",new-window\) > /dev/null 2>&1 || exec netscape index.html &
+</PRE>
+<LI>You can remove all files in that directory afterwards - they are no longer
+    needed.
+<PRE>
+rm *.*
+</PRE>
+<LI>Return to the base directory.
+<PRE>
+cd ..
+</PRE>
+</OL>
+[<A HREF="examples/src/application/XReferenceHTMLGenerator.java">Source</A>]
+[<A HREF="#list">Top</A>]
+</P>
+
+
+<A NAME="statistics"></A>
+<H2>A Syntax Node Statistics Tool</H2>
+<P>
+This shell application shows the number of occurances of all encountered
+object types in the syntax forest of a project. For convenient classification,
+the existing type hierarchy is also taken into account.
+You can see from the results that the most frequent node is the identifier, 
+and that it is most frequently contained in variable references.
+</P>
+<P>
+<OL>
+<LI>Run the statistic tool on any input project.
+<PRE>
+java SyntaxStatistics collections.prj
+</PRE>
+</OL>
+[<A HREF="examples/src/application/SyntaxStatistics.java">Source</A>]
+[<A HREF="#list">Top</A>]
+</P>
+
+
+<A NAME="sourcerer"></A>
+<H2>Sourcerer - Source Code Browsing Demo</H2>
+<P>
+<IMG ALIGN="right" HSPACE="15" SRC="images/screenshot.jpg">
+This Swing application displays formatted sources and syntax trees
+of all compilation units in a project. It allows to navigate between
+declarations and referers. There are currently some auxiliary
+transformations that identify superfluous code fragments such as
+unused imports, interfaces, exceptions and type casts.
+If the example code is too small, try this on recoder itself
+(use a global path to the src directory as command argument). The browser
+is currently a proof of concept rather than a useful application but it
+already looks and feels okay. Some of the other examples will be integrated
+and further analyses and transformations will be added.
+</P>
+<P>
+<OL>
+<LI>Run the tool.
+<PRE>
+java sourcerer.Main converter.prj
+</PRE>
+</OL>
+<BR CLEAR="both">
+[<A HREF="examples/src/sourcerer/">Source</A>]
+[<A HREF="#list">Top</A>]
+</P>
+
+</BODY>
+</HTML>

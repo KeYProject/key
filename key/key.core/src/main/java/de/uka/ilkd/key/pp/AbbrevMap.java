@@ -133,7 +133,8 @@ public class AbbrevMap {
      * is mapped to the abbreviation.
      */
     public Term getTerm(String s) {
-        return stringterm.get(s).getTerm();
+        var term = stringterm.get(s);
+        return term == null ? null : term.getTerm();
     }
 
     /**

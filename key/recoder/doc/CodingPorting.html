@@ -1,0 +1,47 @@
+<HTML><HEAD>
+<TITLE>RECODER Downloads</TITLE>
+<LINK REL=stylesheet TYPE="text/css" HREF="recoder.css">
+</HEAD><BODY>
+
+<DIV ALIGN="right"><A HREF="../index.html">Home</A></DIV>
+
+
+<H1>Porting</H1>
+This describes how applications using recoder 0.75 must be changed in order to use 0.80
+
+<ul>
+<li>Identifier now has NonTerminalProgramElement instead of NamedProgramElement as parent
+<li>JavaDeclaration.getModifiers() now returns an unmodifiable copy of the 
+  modifiers without annotations. setModifiers() has been removed.
+  Use getDeclarationSpecifiers() and setDeclarationSpecifiers() instead.
+</li>
+</ul>
+
+<H1>Coding</H1>
+
+This describes (very, very) shortly how to implement adding a new model element.
+At this time, this is useful for people working on the core of recoder only, 
+namely as a simple and absolutely incomplete reminder of what to look at during development. 
+Check back later for useful information...
+
+<ul>
+<li> in class, make sure:
+    <ul>
+	<li> the constructors are being adapted, maybe new ones created
+	<li> makeParentRoleValid()
+	<li> getChildPositionCode() (also see next list item)
+	<li> getIndexOfChild()
+	<li> getChildCount()
+	<li> getChildAt() - child elements need to be reported in syntactical order!
+	<li> replaceChild() - make sure that if p == null => NullPointerException
+	</ul>
+	
+<li> ChangeHistory
+	<ul>
+	<li> undo() needs to be adjusted
+	</ul>
+</li>
+</ul>
+
+</BODY>
+</HTML>

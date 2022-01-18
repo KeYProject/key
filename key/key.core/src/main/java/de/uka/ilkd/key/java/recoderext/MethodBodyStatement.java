@@ -320,7 +320,8 @@ public class MethodBodyStatement extends JavaStatement implements
      *      Ensures that each child has "this" as syntactical parent.
      */
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
+        //TODO weigl makes no sense super.makeParentRoleValid();
+        // super.... is abstract
 
         if (bodySource != null) {
             bodySource.setParent(this);
