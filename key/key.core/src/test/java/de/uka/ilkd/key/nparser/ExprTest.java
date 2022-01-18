@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -45,7 +44,7 @@ public class ExprTest {
         KeyIO io = getIo();
         Term actual = io.parseExpression(expr);
         if (actual == null) {
-            ParseAllKeyFilesTest.debugLexer(ParsingFacade.createLexer(CharStreams.fromString(expr)));
+            DebugKeyLexer.debug(expr);
         }
         assertNotNull(actual);
         System.out.println(actual);
