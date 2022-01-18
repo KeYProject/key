@@ -13,22 +13,24 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
  * This class tests several methods of the JavaInfo class
  */
-public class TestJavaInfo extends TestCase {       
+public class TestJavaInfo {
     
     public static final String testfile = HelperClassForTests.TESTCASE_DIRECTORY + 
                                           File.separator + "javainfo" + 
@@ -45,6 +47,7 @@ public class TestJavaInfo extends TestCase {
         testcases++;
     }
     
+    @BeforeEach
     public void setUp() {
         if (down != 0) return;
         HelperClassForTests helper =  new HelperClassForTests();
@@ -53,51 +56,59 @@ public class TestJavaInfo extends TestCase {
         javaInfo = services.getJavaInfo();
     }
     
+    @AfterEach
     public void tearDown() {
         down ++;
         if (testcases>down) return;        
         services = null;
         javaInfo = null;
     }
-    
+
+    @Test
     public void testRetrieveArrayTypeByJLSName() {
-        assertTrue("Did not find [I", javaInfo.getKeYJavaType("[I") != null);
+        assertNotNull(javaInfo.getKeYJavaType("[I"), "Did not find [I");
 
-        assertTrue("Did not find [java.lang.Object", 
-                javaInfo.getKeYJavaType("[Ljava.lang.Object") != null);
+        assertNotNull(javaInfo.getKeYJavaType("[Ljava.lang.Object"),
+                "Did not find [java.lang.Object");
     }
     
+    @Test
     public void testRetrieveArrayTypeByAlternativeName() {
-        assertTrue("Did not find int[]", javaInfo.getKeYJavaType("int[]") != null);
+        assertNotNull(javaInfo.getKeYJavaType("int[]"), "Did not find int[]");
 
-        assertTrue("Did not find java.lang.Object[]", 
-                javaInfo.getKeYJavaType("java.lang.Object[]") != null);
+        assertNotNull(javaInfo.getKeYJavaType("java.lang.Object[]"),
+                "Did not find java.lang.Object[]");
     }
     
+    @Test
     public void testGetAllSubtypes() {
-        assertTrue("No subtypes of java.lang.Object?", javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject()) != null);
+        assertNotNull(javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject()),
+                "No subtypes of java.lang.Object?");
         // attention this test is not for fun, there are some methods deoending on
         // this property
-        assertTrue("The method getAllSubtypes must not contain the type itself", !javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject()).
-                 contains(javaInfo.getJavaLangObject()));        
+        assertFalse(javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject()).
+                contains(javaInfo.getJavaLangObject()),
+                "The method getAllSubtypes must not contain the type itself");
     }
     
+    @Test
     public void testGetAllSupertypes() {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
-        assertTrue("Did not find class java.lang.RuntimeException", rte != null);
+        assertNotNull(rte, "Did not find class java.lang.RuntimeException");
         final ImmutableList<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
-        
-        assertTrue("No supertypes of java.lang.RuntimeException?", 
-                allSupertypes != null);
+
+        assertNotNull(allSupertypes,
+                "No supertypes of java.lang.RuntimeException?");
        
-        assertTrue("The method getAllSupertypes must contain the type itself", 
-                allSupertypes.contains(rte));        
+        assertTrue(allSupertypes.contains(rte),
+                "The method getAllSupertypes must contain the type itself");
     }
     
+    @Test
     public void testFindArrayLength() {
         KeYJavaType intarray = javaInfo.getKeYJavaType("int[]");
-        assertTrue("Could not find length attribute for arrays: ", 
-                javaInfo.getAttribute("length", intarray) != null);
+        assertNotNull(javaInfo.getAttribute("length", intarray),
+                "Could not find length attribute for arrays: ");
         
     }
     
@@ -112,19 +123,18 @@ public class TestJavaInfo extends TestCase {
     };
     
     
+    @Test
     public void testFindImplicitAttributesForClassTypesOnly() {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
         for (String generalImplicitField : generalImplicitFields) {
-            assertTrue("Could not find " + generalImplicitField +
-                    "attribute for arrays.",
-                    javaInfo.lookupVisibleAttribute(generalImplicitField,
-                            obj) != null);
+            assertNotNull(javaInfo.lookupVisibleAttribute(generalImplicitField,
+                    obj), "Could not find " + generalImplicitField +
+                    "attribute for arrays.");
         }
         for (String anImplictFieldsClassOnly : implictFieldsClassOnly) {
-            assertTrue("Could not find " + anImplictFieldsClassOnly +
-                    "attribute for arrays.",
-                    javaInfo.lookupVisibleAttribute(anImplictFieldsClassOnly,
-                            obj) != null);
+            assertNotNull(javaInfo.lookupVisibleAttribute(anImplictFieldsClassOnly,
+                    obj), "Could not find " + anImplictFieldsClassOnly +
+                    "attribute for arrays.");
         }    
     }
     
@@ -133,39 +143,39 @@ public class TestJavaInfo extends TestCase {
      * attributes
      *
      */
+    @Test
     public void testFindAttributesLocallyDeclaredOnly() {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
         
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
-        
-        
-        assertTrue("Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED,
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj)!= null);
-        
-        assertTrue("Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED + 
+
+
+        assertNotNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj), "Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED);
+
+        assertNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte), "Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED +
                 " is locally declared in class java.lang.Object and should not be " +
-                "returned by this method for type java.lang.RuntimeException",
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte) == null);
+                "returned by this method for type java.lang.RuntimeException");
         
     }
     
     /**
      * tests if the common subtypes of two sorts are correctly determined
      */
-    public void testGetCommonSubtypes() {       
+    @Test
+    public void testGetCommonSubtypes() {
         
         final KeYJavaType ae = javaInfo.getKeYJavaType("java.lang.ArithmeticException");
         final KeYJavaType npe = javaInfo.getKeYJavaType("java.lang.NullPointerException");
-        
-        assertTrue(javaInfo.getCommonSubtypes(ae, npe).size() == 0);
+
+        assertEquals(0, javaInfo.getCommonSubtypes(ae, npe).size());
 
         final KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");        
         final KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         
         long start = System.currentTimeMillis();
 
-        final ImmutableList<KeYJavaType> commons = javaInfo.getCommonSubtypes(obj, rte);        
-        assertTrue(commons.equals(javaInfo.getAllSubtypes(rte).prepend(rte)));             
+        final ImmutableList<KeYJavaType> commons = javaInfo.getCommonSubtypes(obj, rte);
+        assertEquals(commons, javaInfo.getAllSubtypes(rte).prepend(rte));
 
         
         long end = System.currentTimeMillis();
@@ -177,12 +187,13 @@ public class TestJavaInfo extends TestCase {
             start = System.currentTimeMillis();
             final ImmutableList<KeYJavaType> commonsCache = 
                 javaInfo.getCommonSubtypes(obj, rte);
-            end = System.currentTimeMillis();            
-            assertTrue("Cache inconsistence", commonsCache.equals(commons));
+            end = System.currentTimeMillis();
+            assertEquals(commonsCache, commons, "Cache inconsistence");
             durationCache += end - start;            
         }        
-        assertTrue("Performance problem with caching common subsorts", 
-                durationCache/1000 < duration || duration == 0 && durationCache/1000 == 0);
+        assertTrue(durationCache / 1000 < duration
+                | duration == 0 && durationCache / 1000 == 0,
+                "Performance problem with caching common subsorts");
         
         
     }
@@ -190,20 +201,21 @@ public class TestJavaInfo extends TestCase {
     /**
      * test getPrimtiveKeYJavaType
      */
+    @Test
     public void testGetPrimitiveKJT() {
         final String[] primitiveTypeNames = new String[]{
                "long", "int", "short", "byte", "char", "boolean"
         };
 
         for (String primitiveTypeName : primitiveTypeNames) {
-            assertNotNull("Type" + primitiveTypeName + " not found",
-                    javaInfo.getPrimitiveKeYJavaType(primitiveTypeName));
+            assertNotNull(javaInfo.getPrimitiveKeYJavaType(primitiveTypeName),
+                    "Type" + primitiveTypeName + " not found");
         }
         
-        assertNull("Ooops, non primitive type found",
-                javaInfo.getPrimitiveKeYJavaType("java.lang.Object"));
-        assertNull("Ooops, non existing type found",
-                javaInfo.getPrimitiveKeYJavaType("myOwnType"));        
+        assertNull(javaInfo.getPrimitiveKeYJavaType("java.lang.Object"),
+                "Ooops, non primitive type found");
+        assertNull(javaInfo.getPrimitiveKeYJavaType("myOwnType"),
+                "Ooops, non existing type found");
     }   
     
 }

@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Set;
-
-import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
-
-import org.junit.Ignore;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
@@ -24,6 +13,19 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -35,7 +37,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
  * @since 2017-03
  */
 
-public class TestLocalSymbols extends TestCase {
+public class TestLocalSymbols {
     private static final File TEST_RESOURCES_DIR_PREFIX =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
 
@@ -69,8 +71,8 @@ public class TestLocalSymbols extends TestCase {
     private Services services;
     private NoPosTacletApp allRight;
 
-    @Override
-    protected void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         TacletForTests.parse();
         andRight = TacletForTests.getTaclet("and_right");
         allRight = TacletForTests.getTaclet("all_right");
@@ -78,7 +80,7 @@ public class TestLocalSymbols extends TestCase {
         services = TacletForTests.services();
     }
 
-    @Ignore("de.uka.ilkd.key.logic.TestLocalSymbols > testSkolemization STANDARD_ERROR\n" +
+    @Disabled("de.uka.ilkd.key.logic.TestLocalSymbols > testSkolemization STANDARD_ERROR\n" +
             "    No file. TacletForTests.parseTerm(((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & ((\\forall s varr; varr=const) | (\\forall s varr; const=varr)))(1, 12): sort\n" +
             "        s\n" +
             "    not declared \n")
@@ -121,6 +123,7 @@ public class TestLocalSymbols extends TestCase {
     }
 
     // there was a bug.
+    @Test
     public void testDoubleInstantiation() throws IOException, InterruptedException, ScriptException {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
@@ -168,7 +171,7 @@ public class TestLocalSymbols extends TestCase {
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  proofFileName);
-        assertTrue("Proof file does not exist"+ proofFile, proofFile.exists());
+        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(
@@ -177,7 +180,7 @@ public class TestLocalSymbols extends TestCase {
             return environment;
         }
         catch (ProblemLoaderException e) {
-            fail("Proof could not be loaded.");
+            Assertions.fail("Proof could not be loaded.");
             return null;
         }
     }

@@ -13,16 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -30,19 +20,29 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
-public class TestRecoder2KeY extends TestCase {
-	
-	
-	
-    public TestRecoder2KeY(String name) {
-	super(name);
-    }
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+public class TestRecoder2KeY {
+	
+	
+	
     private static Recoder2KeY c2k;
 
     // some non sense java blocks with lots of statements and expressions
-    private static String[] jblocks = new String[] {
+    private static final String[] jblocks = new String[] {
 	"{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
 	+"for (i=0, j=1; (i<42) && (i>0); i++, j--)\n"
 	+" { i=13; j=1; } "
@@ -74,7 +74,7 @@ public class TestRecoder2KeY extends TestCase {
     };
 
 
-    private static String[] jclasses=new String[] {
+    private static final String[] jclasses=new String[] {
 	"class A1 { public A1() { }} ",
 	
 	"package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"	
@@ -122,7 +122,8 @@ public class TestRecoder2KeY extends TestCase {
 	return sb.toString();
     }
 
-    public void setUp() {
+    @BeforeEach
+	public void setUp() {
 	if(c2k == null) {
 	    c2k=new Recoder2KeY
 	    (TacletForTests.services(), TacletForTests.services().getNamespaces());
@@ -131,6 +132,7 @@ public class TestRecoder2KeY extends TestCase {
     }
 
 
+	@Test
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
 	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
@@ -139,14 +141,14 @@ public class TestRecoder2KeY extends TestCase {
 	ProgramVariable prgVarCmp = (ProgramVariable)	    
 	    ((Operator)((StatementBlock)block.program()).
 			getStatementAt(0)).getChildAt(0);
-	assertTrue("ProgramVariables should be the same ones.", 
-		   prgVarCmp == pv);
+		assertSame(prgVarCmp, pv, "ProgramVariables should be the same ones.");
     }
 
     /** test compares the pretty print results from recoder and KeY modulo 
      * blanks and line feeds
      */
-    public void testJBlocks() {
+    @Test
+	public void testJBlocks() {
 	for (int i=0; i<jblocks.length; i++) {	    
 	    String keyProg
 		= removeBlanks(c2k.readBlockWithEmptyContext
@@ -156,8 +158,7 @@ public class TestRecoder2KeY extends TestCase {
 			       (jblocks[i], 
 				c2k.createEmptyContext())
 			       .toSource());
-	    assertEquals("Block :" + i + " rec:"+recoderProg+ "key:"+keyProg, 
-			 recoderProg, keyProg);	
+	    assertEquals(recoderProg, keyProg, "Block :" + i + " rec:" + recoderProg + "key:" + keyProg);
 	}
     }
 
@@ -175,7 +176,8 @@ public class TestRecoder2KeY extends TestCase {
     /** test compares the pretty print results from recoder and KeY modulo 
      * blanks and line feeds
      */
-    public void testJClasses() {
+    @Test
+	public void testJClasses() {
         for (String jclass : jclasses) {
             testClass(jclass);
         }
@@ -186,6 +188,7 @@ public class TestRecoder2KeY extends TestCase {
      * blanks and line feeds. Input is the Recoder2KeY.java file.
      * Not working: RECODER does not recognize imports
      */
+	@Test@Disabled
     public void xtestFileInput() {
 	char[] ch=new char[100000];
 	int n=0;

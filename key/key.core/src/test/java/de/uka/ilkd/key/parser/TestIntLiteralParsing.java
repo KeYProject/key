@@ -3,12 +3,14 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.antlr.runtime.RecognitionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This class provides tests for parsing int, long, and char literals.
@@ -32,7 +34,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "'\\f'", "C(2(1(#)))",
             "'\\r'", "C(3(1(#)))",
             "'\\\"'", "C(4(3(#)))",
-            "'\\\''", "C(9(3(#)))",
+            "'\\S''", "C(9(3(#)))",
             "'\\\\'", "C(2(9(#)))",
             "'0'", "C(8(4(#)))",
             "'9'", "C(7(5(#)))",
@@ -152,7 +154,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             String expected = testData[i * 2 + 1];
             System.err.println("Input: " + input);
             String actual = parseTerm(input).toString();
-            assertEquals(expected, actual);
+            Assertions.assertEquals(expected, actual);
         }
     }
 

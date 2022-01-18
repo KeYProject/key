@@ -11,34 +11,31 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
+/*
  * tests if match checks the variable conditions in Taclets. 
  */
 package de.uka.ilkd.key.rule.match.legacy;
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class TestLegacyTacletMatch extends TestCase {
+public class TestLegacyTacletMatch {
 
     private static TermBuilder TB;
 
@@ -54,18 +51,10 @@ public class TestLegacyTacletMatch extends TestCase {
     Taclet[] conflict;
     Services services;
 
-    public TestLegacyTacletMatch(String name) {
-        super(name);
-    }
-
-    public TestLegacyTacletMatch(String name, boolean b) {
-        super(name);
-        Debug.ENABLE_DEBUG = b;
-    }
-
+    @BeforeEach
     public void setUp() {
         File ruleFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + "/../de/uka/ilkd/key/rule/testRuleMatch.txt");
-        assertTrue("File '" + ruleFile + "' does not exist.", ruleFile.exists());
+        assertTrue(ruleFile.exists(), "File '" + ruleFile + "' does not exist.");
         TacletForTests.setStandardFile(ruleFile.getAbsolutePath());
         TacletForTests.parse();
 
@@ -105,6 +94,7 @@ public class TestLegacyTacletMatch extends TestCase {
 
     }
 
+    @AfterEach
     public void tearDown() {
         if_addrule_conflict = null;
         find_addrule_conflict = null;
@@ -119,6 +109,7 @@ public class TestLegacyTacletMatch extends TestCase {
         services = null;
     }
 
+    @Test
     public void testStatementListMatch() {
         Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break; "
                 +"int k=1; {int j = 1; j++;} int c = 56;}}} }\\> true");
@@ -131,15 +122,14 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, 
                         services);
 
-        assertNotNull("Matches have been expected.", svi);
+        assertNotNull(svi, "Matches have been expected.");
 
         SchemaVariable sv = TacletForTests.svLookup("#stmnt_list");
-        assertTrue("Expected list of statement to be instantiated.",
-                svi.getInstantiations().isInstantiated(sv));
-        assertTrue("The three statements behind the break should be matched.",
-                ((ImmutableArray<?>)svi.getInstantiations().getInstantiation(sv)).size() == 3);
+        assertTrue(svi.getInstantiations().isInstantiated(sv), "Expected list of statement to be instantiated.");
+        assertEquals(3, ((ImmutableArray<?>) svi.getInstantiations().getInstantiation(sv)).size(), "The three statements behind the break should be matched.");
     }
 
+    @Test
     public void testProgramMatch0() {
         Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break;} "
                 +"int k=1;}} }\\> true");
@@ -149,13 +139,11 @@ public class TestLegacyTacletMatch extends TestCase {
                 (match, taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
-        assertNotNull("There should be instantiations",svi);
-        assertTrue("#e2 should be instantiated",
-                svi.getInstantiations().isInstantiated(TacletForTests
-                        .svLookup("#e2")));
-        assertTrue("#p1 should be instantiated",
-                svi.getInstantiations().isInstantiated(TacletForTests
-                        .svLookup("#p1")));
+        assertNotNull(svi, "There should be instantiations");
+        assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
+                .svLookup("#e2")), "#e2 should be instantiated");
+        assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
+                .svLookup("#p1")), "#p1 should be instantiated");
 
         Term matchTwo = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=true; break;} "
                 +"}int k=1;} }\\> true");
@@ -191,8 +179,8 @@ public class TestLegacyTacletMatch extends TestCase {
 
         svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
                 (emptyBlock, empty_block_taclet.find(),
-                        MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-        assertTrue(svi != null);
+                        MatchConditions.EMPTY_MATCHCONDITIONS, services);
+        assertNotNull(svi);
 
         Term emptyBlock2 = 
                 TacletForTests.parseTerm("\\<{ { {} } }\\> true");
@@ -218,7 +206,7 @@ public class TestLegacyTacletMatch extends TestCase {
         svi = new LegacyTacletMatcher(var_decl_taclet).matchJavaBlock
                 (emptyBlock, var_decl_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-        assertNull(svi);    
+        assertNull(svi);
 
         Term emptyLabel = 
                 TacletForTests.parseTerm("\\<{ { l1:{} } }\\> true");
@@ -248,6 +236,7 @@ public class TestLegacyTacletMatch extends TestCase {
     }
 
 
+    @Test
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
         de.uka.ilkd.key.java.Recoder2KeY c2k
@@ -262,11 +251,11 @@ public class TestLegacyTacletMatch extends TestCase {
 
         JavaBlock javaBlock = JavaBlock.createJavaBlock
                 (new de.uka.ilkd.key.java.StatementBlock
-                        (new ImmutableArray<Statement>
-                        (new de.uka.ilkd.key.java.Statement[]{
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(2),
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(3)
-                        })));
+                        (new ImmutableArray<>
+                                (new de.uka.ilkd.key.java.Statement[]{
+                                        (de.uka.ilkd.key.java.Statement) sb.getChildAt(2),
+                                        (de.uka.ilkd.key.java.Statement) sb.getChildAt(3)
+                                })));
 
 
         Term match = TB.dia(javaBlock, TB.tt());
@@ -286,6 +275,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 .svLookup("#slhs2")));
     }
 
+    @Test
     public void testProgramMatch2() {
         Term match = TacletForTests.parseTerm("\\<{int i; int k;}\\>(\\<{for (int i=0;"
                 +" i<2; i++) {break;} "

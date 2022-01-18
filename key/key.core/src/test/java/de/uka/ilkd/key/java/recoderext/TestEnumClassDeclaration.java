@@ -13,25 +13,27 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.java.declaration.EnumDeclaration;
 
-public class TestEnumClassDeclaration extends TestCase {
+public class TestEnumClassDeclaration {
 
     ProgramFactory factory;
 
-    protected void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         factory = ProofJavaProgramFactory.getInstance();
         ServiceConfiguration sc = new DefaultServiceConfiguration();
         sc.getProjectSettings().setProperty("java5", "true");
         factory.initialize(sc);
     }
 
-    private static String[] enums =
+    private static final String[] enums =
             {
             // Simple
                     "enum A { a1, a2, a3 }",
@@ -41,6 +43,7 @@ public class TestEnumClassDeclaration extends TestCase {
                     "enum C { c1, c2(23); C(int i) { this(); } C() { j = 0; } int j; }"
                     };
 
+    @Test
     public void testSimple() throws ParserException {
         EnumDeclaration ed =
                 (EnumDeclaration) factory.parseCompilationUnit(enums[0]).getTypeDeclarationAt(
@@ -52,6 +55,7 @@ public class TestEnumClassDeclaration extends TestCase {
 
     }
 
+    @Test
     public void testTwo() throws ParserException {
         EnumDeclaration ed =
                 (EnumDeclaration) factory.parseCompilationUnit(enums[1]).getTypeDeclarationAt(
@@ -62,6 +66,7 @@ public class TestEnumClassDeclaration extends TestCase {
         System.out.println(ec.toSource());
     }
     
+    @Test
     public void test2Constr() throws ParserException {
         EnumDeclaration ed =
                 (EnumDeclaration) factory.parseCompilationUnit(enums[2]).getTypeDeclarationAt(

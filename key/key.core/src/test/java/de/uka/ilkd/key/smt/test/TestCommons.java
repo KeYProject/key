@@ -22,16 +22,16 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.experimental.categories.Category;
-import org.key_project.util.testcategories.Slow;
+import org.junit.jupiter.api.Tag;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Use this class for testing SMT: It provides a mechanism to load proofs and
@@ -39,20 +39,19 @@ import java.util.LinkedList;
  * tests.
  * 
  */
-@Category(Slow.class)
-public abstract class TestCommons extends TestCase {
+@Tag("slow")
+public abstract class TestCommons {
 	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tacletTranslation"
 	        + File.separator;
 	/** The set of taclets */
-	private Collection<Taclet> taclets = new LinkedList<Taclet>();
+	private final Collection<Taclet> taclets = new LinkedList<>();
 	InitConfig initConfig = null;
 	static protected ProblemInitializer initializer = null;
 	static protected Profile profile = init();
 
 	static Profile init() {
-		Profile p = new JavaProfile();
-		return p;
+		return new JavaProfile();
 	}
 
 	private TermServices services;
@@ -70,7 +69,7 @@ public abstract class TestCommons extends TestCase {
 
 	public abstract boolean toolNotInstalled();
 
-	protected boolean correctResult(String filepath, boolean isValid) throws IOException, ProblemLoaderException {
+	protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
 		if (toolNotInstalled()) {
 			return true;
 		}
@@ -101,7 +100,7 @@ public abstract class TestCommons extends TestCase {
 	 * @return the resulttype of the external solver
 	 * @throws ProblemLoaderException 
 	 */
-	protected SMTSolverResult checkFile(String filepath) throws IOException, ProblemLoaderException {
+	protected SMTSolverResult checkFile(String filepath) throws ProblemLoaderException {
 	   KeYEnvironment<?> p = loadProof(filepath);
 	   try {
 	      Proof proof = p.getLoadedProof();
@@ -148,7 +147,7 @@ public abstract class TestCommons extends TestCase {
 	
 	protected HashSet<String> getTacletNames() {
 		Collection<Taclet> set = getTaclets();
-		HashSet<String> names = new HashSet<String>();
+		HashSet<String> names = new HashSet<>();
 		for (Taclet taclet : set) {
 			names.add(taclet.name().toString());
 		}
@@ -175,11 +174,11 @@ public abstract class TestCommons extends TestCase {
 	 * 
 	 * @param file
 	 *            problem file.
-	 * @profile determines the profile that should be used.
+	 * @param pro determines the profile that should be used.
 	 * @return ProofAggregate of the problem file.
 	 */
 	protected ProofAggregate parse(File file, Profile pro) {
-	   assertTrue(file.exists());
+		assertTrue(file.exists());
 		ProofAggregate result = null;
 		try {
 			KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),
@@ -192,9 +191,8 @@ public abstract class TestCommons extends TestCase {
 			services = initConfig.getServices();
 			// po.close();
 		} catch (Exception e) {
-			assertTrue(
-			        "Error while loading problem file " + file + ":\n\n"
-			                + e.getMessage(), false);
+			fail("Error while loading problem file " + file + ":\n\n"
+					+ e.getMessage());
 		}
 		return result;
 	}

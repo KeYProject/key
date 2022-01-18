@@ -13,25 +13,28 @@
 
 package de.uka.ilkd.key.util;
 
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link SearchNodePreorderIterator}.
  * @author Martin Hentschel
  */
-public class TestSearchNodePreorderIterator extends TestCase {
+public class TestSearchNodePreorderIterator  {
    /**
     * Tests a tree of {@link Node}s with three levels after root.
     */
+   @Test
    public void testNodesThreeLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -56,6 +59,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with two levels after root.
     */
+   @Test
    public void testNodesTwoLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -77,6 +81,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with one level after root.
     */
+   @Test
    public void testNodesOneLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -92,6 +97,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
    /**
     * Tests only a root {@link Node}.
     */
+   @Test
    public void testEmptyRoot() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -107,7 +113,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
    protected void assertRoot(Node root) {
       // List children
       NodePreorderIterator iter = new NodePreorderIterator(root);
-      ImmutableList<Node> childList = ImmutableSLList.<Node>nil();
+      ImmutableList<Node> childList = ImmutableSLList.nil();
       while (iter.hasNext()) {
          Node next = iter.next();
          childList = childList.append(next);
@@ -132,7 +138,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
          assertEquals(previous, expectedChildList.head());
          expectedChildList = expectedChildList.take(1); // Remove head
       }
-      assertTrue("Child list still contains " + expectedChildList.size() + " elements.", expectedChildList.isEmpty());
+      assertTrue(expectedChildList.isEmpty(), "Child list still contains " + expectedChildList.size() + " elements.");
    }
 
    /**

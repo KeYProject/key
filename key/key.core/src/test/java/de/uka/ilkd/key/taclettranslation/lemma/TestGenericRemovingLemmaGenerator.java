@@ -23,36 +23,35 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.junit.Assert.*;
 
 public class TestGenericRemovingLemmaGenerator {
     @Test
     public void testRemovingGenericSorts() {
         TacletForTests.parse();
         NoPosTacletApp app = TacletForTests.getRules().lookup(new Name("TestRemovingGenericSorts"));
-        assertNotNull(app);
+        Assertions.assertNotNull(app);
 
         GenericRemovingLemmaGenerator g = new GenericRemovingLemmaGenerator();
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());
 
-        Set<Sort> sorts = new HashSet<Sort>();
+        Set<Sort> sorts = new HashSet<>();
         collectSorts(result.getFormula(TacletForTests.services()), sorts);
 
         Name nameG = new Name("G");
         boolean found = false;
         for (Sort sort : sorts) {
-            assertFalse("No generic sorts must survive", sort instanceof GenericSort);
+            Assertions.assertFalse(sort instanceof GenericSort, "No generic sorts must survive");
 
             if (!found && sort instanceof ProxySort && sort.name().equals(nameG)) {
                 found = true;
             }
         }
-        assertTrue("There is a proxy sort of the name 'G'", found);
+        Assertions.assertTrue(found, "There is a proxy sort of the name 'G'");
     }
 
     private void collectSorts(Term term, Set<Sort> sorts) {

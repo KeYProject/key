@@ -13,27 +13,31 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestDeclarationProgramVariableCollector  extends TestCase {
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class TestDeclarationProgramVariableCollector {
 
     // some non sense java blocks with lots of statements and expressions
-    private static String[] jblocks=new String[]{
+    private static final String[] jblocks=new String[]{
 	"{ int j1 = 0; int j2, j3, j4 = 0;}",
 	"{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
 	"{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }"
     };
 
     // names of variables expected to be collected in jblocks
-    private static String[][] expectedVars = new String[][]{
+    private static final String[][] expectedVars = new String[][]{
 	{"j1", "j2", "j3", "j4"},
 	{"j1", "j5"},
 	{"j0"}
@@ -45,12 +49,12 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
     private static int testCases = 0;
     private static int down = 0;
     
-    public TestDeclarationProgramVariableCollector(String name) {
-	super(name);
+    public TestDeclarationProgramVariableCollector() {
         testCases++;
     }
 
 
+    @BeforeEach
     public void setUp() {
         if (down != 0) return;
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
@@ -58,7 +62,8 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
 	    test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
 	}
     }
-    
+
+    @AfterEach
     public void tearDown() {
         down++;
         if (down < testCases) return;
@@ -79,6 +84,7 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
     }
     
 
+    @Test
     public void testVisitor() {
 	DeclarationProgramVariableCollector dpvc;
 	for (int i = 0; i < jblocks.length; i++) {
@@ -88,14 +94,14 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
 	    HashSet<String> names = toNames(dpvc.result());
 
 
-	    assertTrue("Too many variables collected. Collected:" + 
-		       dpvc.result() + " in " + jblocks[i], 
-		       dpvc.result().size() <= expectedVars[i].length);
+	    assertTrue(dpvc.result().size() <= expectedVars[i].length, "" +
+                "Too many variables collected. Collected:" +
+                        dpvc.result() + " in " + jblocks[i]);
 
 
 	    for (int j = 0; j < expectedVars[i].length; j++) {
-		assertTrue("Missing variable: "+expectedVars[i][j] + " of " + jblocks[i], 
-			   names.contains(expectedVars[i][j]));
+		assertTrue(names.contains(expectedVars[i][j]),
+                "Missing variable: " + expectedVars[i][j] + " of " + jblocks[i]);
 	    }	    
 	}
     }
