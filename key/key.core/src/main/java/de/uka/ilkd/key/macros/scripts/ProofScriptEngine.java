@@ -66,7 +66,6 @@ public class ProofScriptEngine {
     /**
      * Instantiates a new proof script engine.
      *
-     * @param script the script
      * @param script                the script
      * @param initiallySelectedGoal the initially selected goal
      */
@@ -127,7 +126,7 @@ public class ProofScriptEngine {
 
             if (commandMonitor != null
                     && stateMap.isEchoOn()
-                    && !name.startsWith(SYSTEM_COMMAND_PREFIX)) {
+                    && commandContext.AT() == null) {
                 commandMonitor.update(null, cmd);
             }
 
@@ -138,7 +137,7 @@ public class ProofScriptEngine {
                             + BuilderHelpers.getPosition(commandContext));
                 }
 
-                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
+                if (commandContext.AT() == null && stateMap.isEchoOn()) {
                     LOGGER.info("{}: {}", ++cnt, cmd);
                 }
 
@@ -159,9 +158,6 @@ public class ProofScriptEngine {
                             url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
                 } else {
                     LOGGER.info(
-                            "Proof already closed at command \"{}\" at line %d, terminating in line {}",
-                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
-                    System.out.format(
                             "Proof already closed at command \"%s\" at line %s, terminating.\n",
                             argMap.get(ScriptLineParser.LITERAL_KEY), BuilderHelpers.getPosition(commandContext));
                     break;
@@ -170,10 +166,6 @@ public class ProofScriptEngine {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
                 proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: %s\n\nCommand: %s",
-                                e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
-                        initialLocation.getFileURL(), mlp.getLine(),
-                        mlp.getColumn(), e);
                         "Error while executing script: " + e.getMessage()
                                 + "\n\nCommand: "
                                 + commandContext.cmd.getText(),

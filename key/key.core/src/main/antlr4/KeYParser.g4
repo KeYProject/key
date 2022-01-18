@@ -816,7 +816,7 @@ proofScriptEntry
 proofScript: proofScriptCommand+;
 proofScriptCommand
 :
-  cmd=IDENT proofScriptParameters? SEMI
+  AT? cmd=IDENT proofScriptParameters? SEMI
 ;
 
 proofScriptParameters: proofScriptParameter+;
