@@ -86,6 +86,10 @@ tasks.withType(Test) {
     enableAssertions = true
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 test {
     /*filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins

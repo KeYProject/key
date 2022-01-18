@@ -12,13 +12,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.key_project.util.helper.FindResources;
-import org.key_project.util.testcategories.Slow;
 
 import java.io.File;
 import java.util.*;
@@ -42,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Kai Wallisch
  */
-@RunWith(Parameterized.class)
-@Category(Slow.class)
+@Tag("slow")
 public class ProveRulesTest {
     /*
      * File object pointing to directory key/key.core.test
@@ -53,8 +49,6 @@ public class ProveRulesTest {
 
     static {
         PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
-        assertTrue(PROOF_DIRECTORY.exists(), "Directory containing taclet proofs cannot be found at location: "
-                + PROOF_DIRECTORY);
     }
 
 
@@ -102,6 +96,8 @@ public class ProveRulesTest {
 
     @TestFactory
     public Stream<DynamicTest> data() throws ProblemLoaderException {
+        assertTrue(PROOF_DIRECTORY.exists(), "Directory containing taclet proofs cannot be found at location: "
+                + PROOF_DIRECTORY);
 
         /*
          * Create a set containing names of taclets that shall be proven.
