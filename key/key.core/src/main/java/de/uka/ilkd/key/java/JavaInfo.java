@@ -321,21 +321,9 @@ public final class JavaInfo {
         if (type == null) throw new IllegalArgumentException("Given type is null");
 
 
-	if(name2KJTCache != null) {
-      result = name2KJTCache.get(type.getName());
-	}
-	
-	if(result == null) {
-	    Name ldtName = type.getCorrespondingLDTName();
-	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
-	    final Sort sort;
-	    sort = sorts.lookup(ldtName);
-	    assert sort != null : "could not find sort for type: " + type;
-	    result = new KeYJavaType(type, sort);
-	    if(type2KJTCache != null) {
-		type2KJTCache.put(type, result);
-	    }
-	}
+        if (type2KJTCache != null && type2KJTCache.containsKey(type)) {
+            return type2KJTCache.get(type);
+        }
 
         if (name2KJTCache != null && name2KJTCache.containsKey(type.getName())) {
             return name2KJTCache.get(type.getName());
@@ -356,7 +344,7 @@ public final class JavaInfo {
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
-        if (type2KJTCache != null) {
+        if(type2KJTCache != null) {
             type2KJTCache.put(type, result);
         }
 
