@@ -114,13 +114,13 @@ public final class RuleInteraction extends NodeInteraction {
         PrintWriter out = new PrintWriter(sout);
 
         out.format("rule %s%n", getRuleName());
-        out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
+        out.format("\t     on='%s'%n\tformula='%s'%n",
                 getPosInOccurence().getTerm(),
                 getPosInOccurence().getToplevelTerm()
         );
 
         getArguments().forEach((k, v) ->
-                out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim()));
+                out.format("     inst_%s='%s'%n", firstWord(k), v.trim()));
         out.format(";%n");
         return sout.toString();
     }
