@@ -107,7 +107,8 @@ test {
         // all test cases.
         // See these classes for configuring the test runs!
         // CAUTION! "excludeCategories" more filters are to be defined in the class!
-        includeTestsMatching "de.uka.ilkd.key.Tests"
+        exclude("interactive", "performance")
+        //includeTestsMatching "de.uka.ilkd.key.Tests"
     }
     // pass debug flag from command line:
     systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
@@ -120,7 +121,8 @@ testFast {
         // all test cases.
         // See these classes for configuring the test runs!
         // CAUTION! "excludeCategories" more filters are to be defined in the class!
-        includeTestsMatching "de.uka.ilkd.key.FastTests"
+        exclude("slow", "performance", "interactive")
+        //includeTestsMatching "de.uka.ilkd.key.FastTests"
     }
 }
 
