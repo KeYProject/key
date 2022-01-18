@@ -1,11 +1,15 @@
 package org.key_project.ui.interactionlog.model;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.EngineState;
 import de.uka.ilkd.key.macros.scripts.RuleCommand;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -14,10 +18,14 @@ import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * @author weigl
@@ -25,19 +33,22 @@ import java.util.Iterator;
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
     private static final long serialVersionUID = -3178292652264875668L;
+    private static final int indent = 4;
+    private final String topLevelTerm;
+    private final String term;
     private String ruleName;
-    private OccurenceIdentifier posInOccurence;
-    private HashMap<String, String> arguments = new HashMap<>();
-
-    public RuleInteraction() {
-        super();
-    }
+    private OccurenceIdentifier posInOccurrence;
+    private HashMap<SchemaVariable, String> arguments = new HashMap<>();
 
     public RuleInteraction(Node node, RuleApp app) {
         super(node);
 
         this.ruleName = app.rule().displayName();
-        this.posInOccurence = OccurenceIdentifier.get(app.posInOccurrence());
+
+        var posInOccurrence = app.posInOccurrence();
+        this.term = printTerm(posInOccurrence.subTerm());
+        this.topLevelTerm = printTerm(posInOccurrence.topLevel().subTerm());
+        this.posInOccurrence = OccurenceIdentifier.get(app.posInOccurrence());
 
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
@@ -51,13 +62,13 @@ public final class RuleInteraction extends NodeInteraction {
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> iter = tapp.instantiations().pairIterator();
             while (iter.hasNext()) {
                 ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = iter.next();
-                String p = entry.key().toString();
+                var p = entry.key();
 
                 Object inst = entry.value().getInstantiation();
                 String v;
 
                 if (inst instanceof Term) {
-                    v = LogicPrinter.quickPrintTerm((Term) inst, null);
+                    v = printTerm((Term) inst);
                 } else {
                     v = inst.toString();
                 }
@@ -67,17 +78,32 @@ public final class RuleInteraction extends NodeInteraction {
         }
     }
 
+    private static String printTerm(Term term) {
+        final NotationInfo ni = new NotationInfo();
+        LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, null,
+                new TermLabelVisibilityManager());
+        p.setLineWidth(100);
+        p.reset();
+
+        try {
+            p.printTerm(term);
+        } catch (IOException ioe) {
+            return term.toString();
+        }
+        return p.result().toString().trim();
+    }
+
     @Override
     public String toString() {
         return ruleName;
     }
 
-    public OccurenceIdentifier getPosInOccurence() {
-        return posInOccurence;
+    public OccurenceIdentifier getPosInOccurrence() {
+        return posInOccurrence;
     }
 
-    public void setPosInOccurence(OccurenceIdentifier posInOccurence) {
-        this.posInOccurence = posInOccurence;
+    public void setPosInOccurrence(OccurenceIdentifier posInOccurrence) {
+        this.posInOccurrence = posInOccurrence;
     }
 
     public String getRuleName() {
@@ -88,19 +114,28 @@ public final class RuleInteraction extends NodeInteraction {
         this.ruleName = ruleName;
     }
 
-    public HashMap<String, String> getArguments() {
+    public HashMap<SchemaVariable, String> getArguments() {
         return arguments;
     }
 
-    public void setArguments(HashMap<String, String> arguments) {
-        this.arguments = arguments;
+    private HashMap<String, String> createInstArguments() {
+        var allArgs = new HashMap<String, String>();
+        arguments.forEach((k, v) -> allArgs.put("inst_" + k.name().toString(), v));
+        return allArgs;
+    }
+
+    private HashMap<String, String> createInvocationArguments() {
+        var allArgs = createInstArguments();
+        allArgs.put("on", topLevelTerm);
+        allArgs.put("formula", term);
+        return allArgs;
     }
 
     @Override
     public String getMarkdown() {
         StringBuilder out = new StringBuilder();
         out.append(String.format("## Rule applied %s%n%n", getRuleName()));
-        out.append(String.format("* applied on%s%n", getPosInOccurence()));
+        out.append(String.format("* applied on%s%n", getPosInOccurrence()));
         out.append(String.format("* Parameters %n"));
         getArguments().forEach((key, value) ->
                 out.append(String.format("  * %s : %s%n", key, value)));
@@ -108,37 +143,54 @@ public final class RuleInteraction extends NodeInteraction {
         return out.toString();
     }
 
+    private static int calculateParameterWidth(Collection<String> args) {
+        var width = 0;
+        for (var k : args) {
+            width = Math.max(k.length(), width);
+        }
+
+        return width;
+    }
+
+    private static String indentStringWith(String value, String indent) {
+        return value.replaceAll("(?m)^", indent);
+    }
+
     @Override
     public String getProofScriptRepresentation() {
+        // indent parameters once
         StringWriter sout = new StringWriter();
         PrintWriter out = new PrintWriter(sout);
 
-        out.format("rule %s%n", getRuleName());
-        out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
-                getPosInOccurence().getTerm(),
-                getPosInOccurence().getToplevelTerm()
-        );
+        out.format("rule %s", getRuleName());
 
-        getArguments().forEach((k, v) ->
-                out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim()));
-        out.format(";%n");
+        var args = createInstArguments();
+        var width = calculateParameterWidth(args.keySet()) + indent;
+        var format = "%n%" + width + "s='%s'";
+
+        // indent inner lines once again
+        var innerIndent = " ".repeat(2 + width);
+
+        out.format(format, "on", indentStringWith(topLevelTerm, innerIndent).trim());
+        out.format(format, "formula", indentStringWith(term, innerIndent).trim());
+
+        args.forEach((k, v) ->  {
+            out.format(format, k, indentStringWith(v, innerIndent).trim());
+        });
+
+        out.format(";");
         return sout.toString();
     }
 
-    private String firstWord(String k) {
-        k = k.trim();
-        int p = k.indexOf(' ');
-        if (p <= 0) return k;
-        else return k.substring(0, p);
-    }
-
     @Override
-    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) {
         RuleCommand ruleCommand = new RuleCommand();
         EngineState state = new EngineState(goal.proof());
-        RuleCommand.Parameters parameter = null;
+        RuleCommand.Parameters parameter;
         try {
-            parameter = ruleCommand.evaluateArguments(state, getArguments());
+            var args = createInvocationArguments();
+            args.put("#2", getRuleName());
+            parameter = ruleCommand.evaluateArguments(state, args);
             ruleCommand.execute(uic, parameter, state);
         } catch (Exception e) {
             throw new IllegalStateException("Rule application", e);
