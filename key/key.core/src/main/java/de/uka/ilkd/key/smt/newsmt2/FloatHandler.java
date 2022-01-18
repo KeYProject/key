@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
@@ -32,10 +32,13 @@ public class FloatHandler implements SMTHandler {
     /** Java's FP semantics is always "round to nearest even". */
     private static final String ROUNDING_MODE = "RNE";
 
-    public static final BooleanProperty DISABLE_SQRT_AXIOMS_PROPERTY =
-            new BooleanProperty("disableSqrtAxiomatization",
-                    "Disable axiomatization for sqrt",
-                    "Disable quantified axioms for floating point sqrt which can increase runtime by a lot.");
+    public enum SqrtMode { SMT, AXIOMS }
+
+    public static final EnumProperty<SqrtMode> SQRT_PROPERTY =
+            new EnumProperty<SqrtMode>("sqrtSMTTranslation",
+                    "Translation of \"sqrt\" function",
+                    "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
+                    SqrtMode.class);
 
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();
@@ -44,7 +47,7 @@ public class FloatHandler implements SMTHandler {
     private DoubleLDT doubleLDT;
     private Services services;
 
-    private boolean disableSqrtAxiomatizing;
+    private boolean sqrtNative;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
@@ -52,7 +55,7 @@ public class FloatHandler implements SMTHandler {
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
         doubleLDT = services.getTypeConverter().getDoubleLDT();
-        disableSqrtAxiomatizing = DISABLE_SQRT_AXIOMS_PROPERTY.get(services);
+        sqrtNative = SQRT_PROPERTY.get(services) != SqrtMode.AXIOMS;
 
         // operators with arguments
         fpOperators.put(floatLDT.getLessThan(), "fp.lt");
@@ -84,6 +87,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getIsNegative(), "fp.isNegative");
         fpOperators.put(floatLDT.getIsPositive(), "fp.isPositive");
         fpOperators.put(floatLDT.getEquals(), "fp.eq");
+        fpOperators.put(floatLDT.getNeg(), "fp.neg");
 
 //        // Double predicates and operations, translated identically to float operations
         fpOperators.put(doubleLDT.getLessThan(), "fp.lt");
@@ -106,27 +110,28 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsNegative(), "fp.isNegative");
         fpOperators.put(doubleLDT.getIsPositive(), "fp.isPositive");
         fpOperators.put(doubleLDT.getEquals(), "fp.eq");
+        fpOperators.put(doubleLDT.getNeg(), "fp.neg");
 
-        if(disableSqrtAxiomatizing) {
-            // Our own functions which are not built in.
-            fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
-            // fpOperators.put(floatLDT.getSqrtFloat(), "sqrtFloat");
-        } else {
+        if (sqrtNative) {
             // Use the builtin sqrt functions:
             fpOperators.put(doubleLDT.getSqrtDouble(), "fp.sqrt");
             // fpOperators.put(floatLDT.getSqrtFloat(), "fp.sqrt");
+        } else {
+            // Our own functions which are not built in.
+            fpOperators.put(doubleLDT.getSqrtDouble(), "sqrtDouble");
+            // fpOperators.put(floatLDT.getSqrtFloat(), "sqrtFloat");
         }
 
-//        mathOperators.put(doubleLDT.getSinDouble(), SMTTermFloatOp.Op.SINDOUBLE);
-//        mathOperators.put(doubleLDT.getCosDouble(), SMTTermFloatOp.Op.COSDOUBLE);
-//        mathOperators.put(doubleLDT.getAcosDouble(), SMTTermFloatOp.Op.ACOSDOUBLE);
-//        mathOperators.put(doubleLDT.getAsinDouble(), SMTTermFloatOp.Op.ASINDOUBLE);
-//        mathOperators.put(doubleLDT.getTanDouble(), SMTTermFloatOp.Op.TANDOUBLE);
-//        mathOperators.put(doubleLDT.getAtan2Double(), SMTTermFloatOp.Op.ATAN2DOUBLE);
-//        mathOperators.put(doubleLDT.getSqrtDouble(), SMTTermFloatOp.Op.SQRTDOUBLE);
-//        mathOperators.put(doubleLDT.getPowDouble(), SMTTermFloatOp.Op.POWDOUBLE);
-//        mathOperators.put(doubleLDT.getExpDouble(), SMTTermFloatOp.Op.EXPDOUBLE);
-//        mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
+        /* Transcendentals as uninterpreted functions */
+        fpOperators.put(doubleLDT.getSinDouble(), "sinDouble");
+        fpOperators.put(doubleLDT.getCosDouble(), "cosDouble");
+        fpOperators.put(doubleLDT.getAcosDouble(), "acosDouble");
+        fpOperators.put(doubleLDT.getAsinDouble(), "asinDouble");
+        fpOperators.put(doubleLDT.getTanDouble(), "tanDouble");
+        fpOperators.put(doubleLDT.getAtan2Double(),"atan2Double");
+        fpOperators.put(doubleLDT.getPowDouble(), "powDouble");
+        fpOperators.put(doubleLDT.getExpDouble(), "exDouble");
+        fpOperators.put(doubleLDT.getAtanDouble(), "atanDouble");
 
         // These operators take a round mode argument:
         roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div", "fp.sqrt"));
@@ -248,5 +253,10 @@ public class FloatHandler implements SMTHandler {
             int digit = Integer.parseInt(term.op().name().toString());
             return 10 * intFromTerm(term.sub(0), services) + digit;
         }
+    }
+
+    @Override
+    public List<SMTHandlerProperty<?>> getProperties() {
+        return List.of(SQRT_PROPERTY);
     }
 }

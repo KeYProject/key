@@ -2,17 +2,3 @@
 <entry key="prec.taclets">
     precOfInt
 </entry>
-
-<entry key="sinDouble.dl"><![CDATA[
-  \forall double a; ( !doubleIsNaN(a) & !doubleIsInfinite(a) -> sinDouble(a) <= 1.0d & sinDouble(a) >= -1.0d)
-]]></entry>
-
-<!-- If the argument is NaN or an infinity, then the result is NaN.-->
-<entry key="sinDouble.dl.1"><![CDATA[
-  \forall double a; (doubleIsNaN(a) | doubleIsInfinite(a) -> doubleIsNaN(sinDouble(a))
-]]></entry>
-
-<!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
-<entry key="sinDouble.dl.2"><![CDATA[
-  sinDouble(0.0d) = 0.0d & sinDouble(-0.0d) = -0.0d
-]]></entry>

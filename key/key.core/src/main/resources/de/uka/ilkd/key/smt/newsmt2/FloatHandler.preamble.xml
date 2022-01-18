@@ -84,36 +84,36 @@
         (declare-fun atan2Double (Float64 Float64) Float64)
     </entry>
 
-<!--    <entry key="sqrtDouble.axioms">-->
-<!--        &lt;!&ndash; If the argument is NaN or less than zero, then the result is NaN&ndash;&gt;-->
-<!--        (assert (forall ((a Float64)) (=> (or (fp.isNaN a) (fp.lt a (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (sqrtDouble a)))))-->
+    <entry key="sqrtDouble.axioms">
+        <!-- If the argument is NaN or less than zero, then the result is NaN-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (sqrtDouble a)))))
 
-<!--        &lt;!&ndash; If the argument is positive infinity, then the result is positive infinity&ndash;&gt;-->
-<!--        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (sqrtDouble a))(fp.gt (sqrtDouble-->
-<!--        a) (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000))))))-->
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (sqrtDouble a))(fp.gt (sqrtDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
 
-<!--        &lt;!&ndash; If the argument is positive zero or negative zero, then the result is the same as the argument&ndash;&gt;-->
-<!--        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))))-->
-<!--        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b1 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))))-->
+        <!-- If the argument is positive zero or negative zero, then the result is the same as the argument-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
 
-<!--        &lt;!&ndash; (! isInfinite(a)) ==> ! isInfinite(sqrt(a))-> proved by a smt solver &ndash;&gt;-->
-<!--&lt;!&ndash;        (assert (forall ((a Float64)) (=> (not (fp.isInfinite a)) (not (fp.isInfinite (sqrtDouble a))))))&ndash;&gt;-->
+        <!-- (! isInfinite(a)) ==> ! isInfinite(sqrt(a)) -> proved by a smt solver -->
+<!--        (assert (forall ((a Float64)) (=> (not (fp.isInfinite a)) (not (fp.isInfinite (sqrtDouble a))))))-->
 
-<!--        &lt;!&ndash; (a != oo) && ( a > 1) ==> sqrt(a) < a -> proved by a smt solver &ndash;&gt;-->
-<!--        (assert (forall ((a Float64)) (=> (and (not (fp.isInfinite a)) (fp.gt a (fp #b0 #b01111111111-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))(fp.lt (sqrtDouble a) a))))-->
+        <!-- (a != oo) && ( a > 1) ==> sqrt(a) < a -> proved by a smt solver -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isInfinite a)) (fp.gt a (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(fp.lt (sqrtDouble a) a))))
 
-<!--        &lt;!&ndash; (! isNaN(a) && a >= 0 ) ==> ! isNaN(sqrt(a)) -> proved by a smt solver &ndash;&gt;-->
-<!--        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (fp.geq a (fp #b0 #b00000000000-->
-<!--        #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (sqrtDouble a))))))-->
-<!--    </entry>-->
+        <!-- (! isNaN(a) && a >= 0 ) ==> ! isNaN(sqrt(a)) -> proved by a smt solver -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (fp.geq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (sqrtDouble a))))))
+    </entry>
 
     <entry key="sqrtDouble.decls">
         (declare-fun sqrtDouble (Float64) Float64)
