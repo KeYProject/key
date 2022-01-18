@@ -4,12 +4,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
-import javax.annotation.Nonnull;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,16 +17,13 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (17.10.19)
  */
-@RunWith(Parameterized.class)
 public class ExprTest {
-    @Parameterized.Parameter
-    public String expr;
-
-    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
         try (InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
@@ -45,53 +39,23 @@ public class ExprTest {
         return seq;
     }
 
-    @Test
-    public void parseAndVisit() throws IOException {
+    @ParameterizedTest
+    @CsvFileSource(resources = "exprs.txt",delimiter = '^')
+    public void parseAndVisit(String expr) throws IOException {
         KeyIO io = getIo();
-        @Nonnull Term actual = io.parseExpression(expr);
+        Term actual = io.parseExpression(expr);
         if (actual == null) {
             ParseAllKeyFilesTest.debugLexer(ParsingFacade.createLexer(CharStreams.fromString(expr)));
         }
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         System.out.println(actual);
     }
 
     private KeyIO getIo() throws IOException {
         Services services = new Services(new JavaProfile());
-        /*NamespaceSet nss = services.getNamespaces();
-        NamespaceBuilder nssb = new NamespaceBuilder(nss);
-        nssb.addSort("numbers").addSort("int");
-        nssb.addSort("java.lang.Object").addSort("java.lang.Serializable").addSort("java.lang.Cloneable");
-        for (int i = 0; i < 9; i++) {
-            nssb.addFunction("numbers "+i+"(numbers)");
-        }
-        nssb.addProgramVariable("Heap", "heap");
-        nssb.addFunction("Field arr(int)");
-        nssb.addFunction("numbers #()")
-                .addFunction("int Z(numbers)")
-                .addFunction("numbers neglit(numbers)")
-                .addFunction("int add(int, int)")
-                .addFunction("int neg(int)")
-                .addFunction("int sub(int, int)")
-                .addFunction("int mul(int, int)")
-                .addFunction("int div(int, int)")
-                .addFunction("int mod(int, int)")
-                .addFunction("int pow(int, int)");
-        nssb.addPredicate("leq(int, int)")
-                .addPredicate("lt(int, int)")
-                .addPredicate("geq(int, int)")
-                .addPredicate("gt(int, int)");
-        ;
-
-        nssb.addVariable("aa", "int")
-                .addVariable("bb", "int")
-                .addVariable("cc", "int");
-         */
-
-        //services.getTypeConverter().init();
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
-        Assume.assumeNotNull(url);
+        Assumptions.assumeTrue(url != null);
         KeyIO io = new KeyIO(services);
         io.load(url).parseFile()
                 .loadDeclarations()
@@ -104,14 +68,4 @@ public class ExprTest {
                 .addProgramVariable("int", "x");
         return io;
     }
-
-
-/*    public static class Abc extends AbstractTestTermParser {
-        @Test
-        public void ttttt() throws ParserException {
-            DefaultTermParser dtp = new DefaultTermParser();
-            var term = dtp.parse(new StringReader("\\<{ byte a; }\\> (lt(a,150))"), null, services, nss, null);
-            System.out.println(term);
-        }
-    }*/
 }
