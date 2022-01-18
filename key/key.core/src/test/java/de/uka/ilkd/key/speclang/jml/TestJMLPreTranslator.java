@@ -142,9 +142,10 @@ public class TestJMLPreTranslator {
             t = lexer.nextToken();
             System.out.printf("%s\n", t);
             if (idx < expected.length) {
-                Assertions.assertEquals(expected[idx++], t.getType(), String.format("Token wanted '%s', but got '%s'. ",
+                Assertions.assertEquals(expected[idx], t.getType(), String.format("Token wanted '%s', but got '%s'. ",
                         lexer.getVocabulary().getDisplayName(expected[idx]),
                         lexer.getVocabulary().getDisplayName(t.getType())));
+                idx++;
             }
         } while (t.getType() != -1);
     }
