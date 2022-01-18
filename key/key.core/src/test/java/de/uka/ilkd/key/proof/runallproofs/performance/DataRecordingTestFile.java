@@ -4,7 +4,7 @@ import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
@@ -12,7 +12,6 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.Pair;
 
 @SuppressWarnings("serial")
 class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
@@ -23,7 +22,7 @@ class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
 
     @Override
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+                            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             DataRecordingStrategy strategy = new DataRecordingStrategy(loadedProof, this);

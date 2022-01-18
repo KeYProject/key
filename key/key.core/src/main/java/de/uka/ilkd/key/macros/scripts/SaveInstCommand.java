@@ -23,26 +23,26 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
+public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     public SaveInstCommand() {
         super(null);
     }
 
     @Override
-    public Map<String, String> evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+    public Map<String, Object> evaluateArguments(EngineState state,
+                                                 Map<String, Object> arguments) {
         return arguments;
     }
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl,
-            Map<String, String> args, EngineState stateMap)
+            Map<String, Object> args, EngineState stateMap)
             throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
-        for (Map.Entry<String, String> entry : args.entrySet()) {
+        for (Map.Entry<String, Object> entry : args.entrySet()) {
             String key = entry.getKey();
-            final String value = entry.getValue();
+            final var value = entry.getValue();
             if ("#1".equals(key)) {
                 continue;
             }
@@ -69,7 +69,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                 if (ruleApp instanceof TacletApp) {
                     final TacletApp tacletApp = (TacletApp) ruleApp;
                     final Object inst = tacletApp.matchConditions()
-                            .getInstantiations().lookupValue(new Name(value));
+                            .getInstantiations().lookupValue(new Name(value.toString()));
                     if (inst != null
                             && ((Term) inst).op() instanceof Function) {
                         abbrMap.put((Term) inst, key, true);

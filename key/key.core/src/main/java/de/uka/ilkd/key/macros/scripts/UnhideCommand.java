@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -47,7 +44,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+                                        Map<String, Object> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(),
                 arguments);
     }

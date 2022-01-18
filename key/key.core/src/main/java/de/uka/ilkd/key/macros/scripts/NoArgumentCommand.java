@@ -17,7 +17,7 @@ public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
     }
 
     @Override public Void evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+                                            Map<String, Object> arguments) {
         return null;
     }
 

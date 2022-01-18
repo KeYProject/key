@@ -3,25 +3,26 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
-public class LetCommand extends AbstractCommand<Map<String, String>> {
+public class LetCommand extends AbstractCommand<Map<String, Object>> {
 
     public LetCommand() {
         super(null);
     }
 
-    @Override public Map<String, String> evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+    @Override public Map<String, Object> evaluateArguments(EngineState state,
+                                                           Map<String, Object> arguments) {
         return arguments;
     }
 
     @Override public void execute(AbstractUserInterfaceControl uiControl,
-            Map<String, String> args, EngineState stateMap)
+            Map<String, Object> args, EngineState stateMap)
             throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
-        for (Map.Entry<String, String> entry : args.entrySet()) {
+        for (Map.Entry<String,Object> entry : args.entrySet()) {
             String key = entry.getKey();
             if ("#1".equals(key)) {
                 continue;
@@ -44,7 +45,9 @@ public class LetCommand extends AbstractCommand<Map<String, String>> {
                         key + " is already fixed in this script");
             }
             try {
-                abbrMap.put(stateMap.toTerm(entry.getValue(), null), key, true);
+                //TODO weigl
+                var v = entry.getValue().toString();
+                abbrMap.put(stateMap.toTerm(v, null), key, true);
             }
             catch (Exception e) {
                 throw new ScriptException(e);

@@ -44,7 +44,7 @@ public class JavascriptCommand
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-                                        Map<String, String> arguments) throws Exception {
+                                        Map<String, Object> arguments) throws Exception {
         return ValueInjector.injection(this, new Parameters(), arguments);
     }
 

@@ -13,6 +13,18 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.List;
+
+import de.uka.ilkd.key.nparser.KeyAst;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -182,8 +194,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
         if (problemLoader.hasProofScript()) {
             try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                   KeyAst.ProofScript script = problemLoader.readProofScript();
+                   ProofScriptEngine pse = new ProofScriptEngine(script);
                 this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
                         "Script started", 0));
                 pse.execute(this, proof);

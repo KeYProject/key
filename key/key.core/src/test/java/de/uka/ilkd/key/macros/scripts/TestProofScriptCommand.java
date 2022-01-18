@@ -2,11 +2,11 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.LineProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,8 +81,9 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        String script = props.get("script");
-        ProofScriptEngine pse = new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
+        var script = ParsingFacade.parseScript(new PositionedString(props.get("script"),
+                tmpKey.toFile().getAbsolutePath()));
+        ProofScriptEngine pse = new ProofScriptEngine(script);
 
         try {
             pse.execute(env.getUi(), proof);

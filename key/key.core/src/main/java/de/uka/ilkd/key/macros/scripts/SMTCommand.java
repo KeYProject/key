@@ -33,7 +33,7 @@ public class SMTCommand
     }
 
     @Override public SMTCommandArguments evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+                                                           Map<String, Object> arguments) throws Exception {
         return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
     }
 

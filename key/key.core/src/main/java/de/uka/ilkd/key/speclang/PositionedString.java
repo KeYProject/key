@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.runtime.Token;
@@ -65,6 +66,12 @@ public class PositionedString {
     public PositionedString(@Nonnull String text, Token t) {
         this(text, t.getInputStream().getSourceName(), new Position(t.getLine(), t.getCharPositionInLine()));
     }
+
+    public PositionedString(@Nonnull String text, org.antlr.v4.runtime.Token t) {
+        this(text, t.getTokenSource().getSourceName(),
+                new Position(t.getLine(), t.getCharPositionInLine()));
+    }
+
 
     public PositionedString(@Nonnull String text, String fileName) {
         this(text, fileName, null);

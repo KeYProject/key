@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class SMTCommandTest {
     @Test
     public void testInstantiation() throws Exception {
-        HashMap<String, String> args = new HashMap<>();
+        HashMap<String, Object> args = new HashMap<>();
         args.put("solver", "z3");
 
         SMTCommand cmd = new SMTCommand();

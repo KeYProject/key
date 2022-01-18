@@ -28,7 +28,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import javax.annotation.Nonnull;
@@ -196,7 +195,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+    public KeyAst.ProofScript readProofScript() {
         return getParseContext().findProofScript();
     }
 

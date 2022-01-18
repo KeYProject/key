@@ -3,7 +3,7 @@ package de.uka.ilkd.key.macros.scripts.meta;
 /**
  * Indicates a missing converter.
  * <p>
- * This is exception is raised if {@link StringConverter} is found for string to the
+ * This is exception is raised if {@link Converter} is found for string to the
  * desired type {@code T}.
  * The desired type is in the stored {@link ProofScriptArgument}.
  *

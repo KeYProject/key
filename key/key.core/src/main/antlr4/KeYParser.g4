@@ -60,7 +60,7 @@ problem
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
   )
-  proofScript?
+  proofScriptEntry?
 ;
 
 
@@ -806,10 +806,23 @@ preferences
 	KEYSETTINGS LBRACE (s=string_value)? RBRACE
 ;
 
-proofScript
+proofScriptEntry
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT
+    ( STRING_LITERAL
+    | proofScript
+    )
 ;
+proofScript: proofScriptCommand+;
+proofScriptCommand
+:
+  cmd=IDENT proofScriptParameters? SEMI
+;
+
+proofScriptParameters: proofScriptParameter+;
+proofScriptParameter :  ((pname=IDENT EQUALS)? expr=proofScriptExpression);
+proofScriptExpression: term;
+
 
 // PROOF
 proof: PROOF EOF;

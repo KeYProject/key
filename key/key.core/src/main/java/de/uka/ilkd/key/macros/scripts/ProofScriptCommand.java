@@ -31,7 +31,7 @@ public interface ProofScriptCommand<T> {
      * @param arguments
      * @return
      */
-    T evaluateArguments(EngineState state, Map<String, String> arguments)
+    T evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception;
 
     /**

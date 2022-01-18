@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Instances of this class are used to collect and access all
@@ -41,21 +40,21 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     */
    private final U ui;
-   
+
    /**
     * The loaded project.
     */
    private final InitConfig initConfig;
-   
+
    /**
-    * An optional {@link Proof} which was loaded by the specified proof file. 
+    * An optional {@link Proof} which was loaded by the specified proof file.
     */
    private final Proof loadedProof;
-   
+
    /**
     * An optional field denoting a script contained in the proof file.
     */
-   private final Pair<String, Location> proofScript;
+   private final KeyAst.ProofScript proofScript;
 
    /**
     * Indicates that this {@link KeYEnvironment} is disposed.
@@ -80,8 +79,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * Constructor
     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
+    * @param proofScript
     */
-   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof, Pair<String, Location> proofScript, ReplayResult replayResult) {
+   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
+                         KeyAst.ProofScript proofScript, ReplayResult replayResult) {
       this.ui = ui;
       this.initConfig = initConfig;
       this.loadedProof = loadedProof;
@@ -96,7 +97,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    public U getUi() {
       return ui;
    }
-   
+
    /**
     * Returns the {@link ProofControl} of {@link #getUi()}.
     * @return The {@link ProofControl} of {@link #getUi()}.
@@ -140,7 +141,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    public Profile getProfile() {
       return getInitConfig().getProfile();
    }
-   
+
    /**
     * Returns the loaded {@link Proof} if a proof file was loaded.
     * @return The loaded {@link Proof} if available and {@code null} otherwise.
@@ -166,7 +167,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    public Proof createProof(ProofOblInput input) throws ProofInputException {
       return ui.createProof(getInitConfig(), input);
    }
-   
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}.
     * The {@link MainWindow} is not involved in the whole process.
@@ -183,7 +184,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   List<File> includes) throws ProblemLoaderException {
       return load(null, location, classPaths, bootClassPath, includes, false);
    }
-   
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}.
     * The {@link MainWindow} is not involved in the whole process.
@@ -202,7 +203,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
       return load(null, location, classPaths, bootClassPath, includes, null, ruleCompletionHandler, false);
    }
-   
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}.
     * The {@link MainWindow} is not involved in the whole process.
@@ -211,7 +212,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
     * @param includes Optional includes to consider.
-    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will
+    *                                         be used as {@link Profile} of new proofs, {@code false} {@link Profile}
+    *                                          specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
@@ -219,11 +222,12 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   File location,
                                                                   List<File> classPaths,
                                                                   File bootClassPath,
-                                                                  List<File> includes, 
-                                                                  boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+                                                                  List<File> includes,
+                                                                  boolean forceNewProfileOfNewProofs)
+           throws ProblemLoaderException {
       return load(profile, location, classPaths, bootClassPath, includes, null, null, forceNewProfileOfNewProofs);
    }
-   
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}.
     * The {@link MainWindow} is not involved in the whole process.
@@ -248,14 +252,16 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   List<File> includes,
                                                                   Properties poPropertiesToForce,
                                                                   RuleCompletionHandler ruleCompletionHandler,
-                                                                  boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+                                                                  boolean forceNewProfileOfNewProofs)
+           throws ProblemLoaderException {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs); 
+      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
+              includes, poPropertiesToForce, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
 
-      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());
+      return new KeYEnvironment<>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());
    }
-   
+
    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {
       return load(keyFile, null, null, null);
    }
@@ -269,7 +275,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       }
       disposed = true;
    }
-   
+
    /**
     * Checks if this {@link KeYEnvironment} is disposed meaning that
     * {@link #dispose()} was already executed at least once.
@@ -279,7 +285,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       return disposed;
    }
 
-   public Pair<String, Location> getProofScript() {
+   public KeyAst.ProofScript getProofScript() {
 	   return proofScript;
    }
 

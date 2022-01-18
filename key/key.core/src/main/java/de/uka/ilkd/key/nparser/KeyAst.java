@@ -6,7 +6,7 @@ import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.speclang.PositionedString;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -16,6 +16,7 @@ import org.key_project.util.java.StringUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -52,8 +53,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public @Nullable
-        ProofSettings findProofSettings() {
+        @Nullable
+        public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
                 String text = StringUtil.trim(ctx.decls().pref.s.getText(), '"')
@@ -63,13 +64,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable
-        Triple<String, Integer, Integer> findProofScript() {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'),
-                        pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
+        @Nullable
+        public ProofScript findProofScript() {
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                var pctx = ctx.problem().proofScriptEntry();
+                if (pctx.STRING_LITERAL() != null) {
+                    var ps = new PositionedString(pctx.STRING_LITERAL().getText(), pctx.STRING_LITERAL().getSymbol());
+                    return ParsingFacade.parseScript(ps);
+                } else {
+                    return new KeyAst.ProofScript(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -129,6 +133,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
+        ProofScript(@Nonnull KeYParser.ProofScriptContext ctx) {
+            super(ctx);
+        }
+
+        public URL getUrl() {
+            try {
+                return new URL(ctx.start.getTokenSource().getSourceName());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 }

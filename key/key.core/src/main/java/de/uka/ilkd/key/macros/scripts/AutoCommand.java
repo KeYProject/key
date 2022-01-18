@@ -38,7 +38,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+                                        Map<String, Object> arguments) {
         Parameters args = new Parameters();
         try {
             ValueInjector.getInstance().inject(this, args, arguments);

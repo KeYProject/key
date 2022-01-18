@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.key_project.util.collection.ImmutableList;
 
 import javax.annotation.Nonnull;
 
@@ -31,8 +29,8 @@ public final class JmlFacade {
     /**
      * Creates an JML lexer for the give stream.
      */
-    public static @Nonnull
-    JmlLexer createLexer(@Nonnull CharStream stream) {
+    @Nonnull
+    public static JmlLexer createLexer(@Nonnull CharStream stream) {
         return new JmlLexer(stream);
     }
 
@@ -40,8 +38,8 @@ public final class JmlFacade {
      * Creates a JML lexer for the given string with position.
      * The position information of the lexer is changed accordingly.
      */
-    public static @Nonnull
-    JmlLexer createLexer(@Nonnull PositionedString ps) {
+    @Nonnull
+    public static JmlLexer createLexer(@Nonnull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
         JmlLexer lexer = createLexer(result);
         lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());

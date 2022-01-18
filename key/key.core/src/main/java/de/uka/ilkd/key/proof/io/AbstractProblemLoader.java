@@ -18,21 +18,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeyAst;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -57,7 +55,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -632,23 +629,13 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public Pair<String, Location> readProofScript() throws ProofInputException {
+    public KeyAst.ProofScript readProofScript() throws ProofInputException {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-
-            Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URL url = null;
-        try {
-            url = kupf.getInitialFile().toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new ProofInputException(e);
-        }
-        Location location = new Location(url, script.second, script.third);
-
-        return new Pair<String, Location>(script.first, location);
+        return kupf.readProofScript();
     }
 
-    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
+    public KeyAst.ProofScript getProofScript() throws ProblemLoaderException {
         if(hasProofScript()) {
             try {
                 return readProofScript();

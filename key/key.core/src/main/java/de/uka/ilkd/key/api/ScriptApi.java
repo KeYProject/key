@@ -81,7 +81,7 @@ public class ScriptApi {
      * @return
      */
     public <T> ProofScriptCommandCall<T> instantiateCommand(
-            ProofScriptCommand<T> command, Map<String, String> arguments)
+            ProofScriptCommand<T> command, Map<String, Object> arguments)
             throws Exception {
         return new ProofScriptCommandCall<>(command,
                 command.evaluateArguments(state, arguments));

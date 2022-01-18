@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.speclang.PositionedString;
 import org.antlr.v4.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,11 +83,16 @@ public final class ParsingFacade {
         return ci;
     }
 
-    private static KeYParser createParser(CharStream stream) {
-        KeYParser p = new KeYParser(new CommonTokenStream(createLexer(stream)));
+    private static KeYParser createParser(TokenSource lexer) {
+        KeYParser p = new KeYParser(new CommonTokenStream(lexer));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         return p;
+    }
+
+
+    private static KeYParser createParser(CharStream stream) {
+        return createParser(createLexer(stream));
     }
 
     public static KeYLexer createLexer(Path file) throws IOException {
@@ -95,6 +101,15 @@ public final class ParsingFacade {
 
     public static KeYLexer createLexer(CharStream stream) {
         return new KeYLexer(stream);
+    }
+
+    @Nonnull
+    public static KeYLexer createLexer(@Nonnull PositionedString ps) {
+        CharStream result = CharStreams.fromString(ps.text, ps.fileName);
+        var lexer = createLexer(result);
+        lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());
+        lexer.getInterpreter().setLine(ps.pos.getLine());
+        return lexer;
     }
 
     public static KeyAst.File parseFile(URL url) throws IOException {
@@ -144,6 +159,28 @@ public final class ParsingFacade {
         return seq;
     }
 
+    public static KeyAst.ProofScript parseScript(PositionedString ps) {
+        var rp = createParser(createLexer(ps));
+        KeyAst.ProofScript ast = new KeyAst.ProofScript(rp.proofScript());
+        rp.getErrorReporter().throwException(ps.text.split("\n"));
+        return ast;
+    }
+
+    public static KeyAst.ProofScript parseScript(File file) throws IOException {
+        return parseScript(CharStreams.fromFileName(file.getAbsolutePath()));
+    }
+
+    public static KeyAst.ProofScript parseScript(CharStream stream) {
+        var rp = createParser(stream);
+        KeyAst.ProofScript ast = new KeyAst.ProofScript(rp.proofScript());
+        rp.getErrorReporter().throwException();
+        return ast;
+    }
+
+    public static KeyAst.ProofScript parseScript(String text) {
+        return parseScript(CharStreams.fromString(text));
+    }
+
     /**
      * Translate a given context of a {@code string_value} grammar rule into a the literal value.
      * In particular it truncates, and substitutes quote escapes {@code \"}.
@@ -179,4 +216,7 @@ public final class ParsingFacade {
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);//remove leading "/*!" and trailing "*/"
     }
+
+
+
 }

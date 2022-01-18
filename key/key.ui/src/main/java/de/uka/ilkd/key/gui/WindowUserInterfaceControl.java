@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.nparser.KeyAst;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -221,13 +222,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 ProblemLoader problemLoader = (ProblemLoader) info.getSource();
                 if(problemLoader.hasProofScript()) {
-                    Pair<String, Location> scriptAndLoc;
+                    KeyAst.ProofScript scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
                         ProofScriptWorker psw =
-                                new ProofScriptWorker(mainWindow.getMediator(),
-                                                      scriptAndLoc.first,
-                                                      scriptAndLoc.second);
+                                new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {

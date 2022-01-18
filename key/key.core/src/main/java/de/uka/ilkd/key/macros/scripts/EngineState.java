@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.io.StringReader;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Observer;
-import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -21,6 +12,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.File;
+import java.io.StringReader;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Observer;
+import java.util.Optional;
 
 /**
  * @author Alexander Weigl
@@ -45,7 +44,7 @@ public class EngineState {
      * only shows explicit echo messages.
      */
     private boolean echoOn = true;
-    
+
     /**
      * If set to true, an already closed proof leads to an exception if another goal
      * should be picked. Otherwise, script execution terminates without an
@@ -55,9 +54,9 @@ public class EngineState {
 
     public EngineState(Proof proof) {
         this.proof = proof;
-        valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
-        valueInjector.addConverter(Sequent.class, this::toSequent);
-        valueInjector.addConverter(Sort.class, this::toSort);
+        valueInjector.addConverter(Term.class, String.class, (String s) -> toTerm(s, null));
+        valueInjector.addConverter(Sequent.class, String.class, this::toSequent);
+        valueInjector.addConverter(Sort.class, String.class, this::toSort);
     }
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
@@ -82,16 +81,12 @@ public class EngineState {
      * Returns the first open goal, which has to be automatic iff checkAutomatic
      * is true.
      *
-     * @param checkAutomatic
-     *            Set to true if the returned {@link Goal} should be automatic.
+     * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic
-     *         is true.
-     *
-     * @throws ProofAlreadyClosedException
-     *             If the proof is already closed when calling this method.
-     * @throws ScriptException
-     *             If there is no such {@link Goal}, or something else goes
-     *             wrong.
+     * is true.
+     * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
+     * @throws ScriptException             If there is no such {@link Goal}, or something else goes
+     *                                     wrong.
      */
     @SuppressWarnings("unused")
     public Goal getFirstOpenGoal(boolean checkAutomatic)
@@ -130,9 +125,7 @@ public class EngineState {
 
     /**
      * @return The first open and automatic {@link Goal}.
-     *
-     * @throws ScriptException
-     *             If there is no such {@link Goal}.
+     * @throws ScriptException If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);
@@ -158,7 +151,8 @@ public class EngineState {
         Goal result = null;
         Node node = rootNode;
 
-        loop: while (node != null) {
+        loop:
+        while (node != null) {
             if (node.isClosed()) {
                 return null;
             }
@@ -166,34 +160,34 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0:
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || result.isAutomatic()) {
-                    // We found our goal
-                    break loop;
-                }
-                node = choices.pollLast();
-                break;
+                case 0:
+                    result = getGoal(proof.openGoals(), node);
+                    if (!checkAutomatic || result.isAutomatic()) {
+                        // We found our goal
+                        break loop;
+                    }
+                    node = choices.pollLast();
+                    break;
 
-            case 1:
-                node = node.child(0);
-                break;
+                case 1:
+                    node = node.child(0);
+                    break;
 
-            default:
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                default:
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
-                }
-                assert next != null;
-                node = next;
-                break;
+                    assert next != null;
+                    node = next;
+                    break;
             }
         }
 
@@ -214,7 +208,7 @@ public class EngineState {
         return (getFirstOpenAutomaticGoal() == null
                 ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts()
-                        .lookup(sortName);
+                .lookup(sortName);
     }
 
     public Sequent toSequent(String sequent)

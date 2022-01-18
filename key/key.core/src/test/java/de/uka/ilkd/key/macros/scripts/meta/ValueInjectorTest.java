@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Alexander Weigl
@@ -17,24 +17,23 @@ import static org.junit.Assert.assertEquals;
 public class ValueInjectorTest {
     @Test public void testInjectionSimple() throws Exception {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("b", "true");
         args.put("i", "42");
         args.put("s", "blubb");
 
         ValueInjector.injection(null, pp, args);
 
-        Assert.assertEquals(true, pp.b);
+        assertTrue(pp.b);
         Assert.assertEquals(42, pp.i);
         Assert.assertEquals("blubb", pp.s);
 
     }
 
     @Test(expected = ArgumentRequiredException.class) public void testRequired()
-            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException, ArgumentRequiredException,
-            IllegalAccessException {
+            throws Exception {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
 
@@ -50,7 +49,7 @@ public class ValueInjectorTest {
             assertEquals("b", b.getName());
             assertEquals(PP.class.getDeclaredField("b"), b.getField());
             assertEquals(Boolean.TYPE, b.getType());
-            assertEquals(true, b.isRequired());
+            assertTrue(b.isRequired());
         }
 
         {
@@ -58,7 +57,7 @@ public class ValueInjectorTest {
             assertEquals("i", i.getName());
             assertEquals(PP.class.getDeclaredField("i"), i.getField());
             assertEquals(Integer.TYPE, i.getType());
-            assertEquals(true, i.isRequired());
+            assertTrue(i.isRequired());
         }
 
         {
@@ -66,7 +65,7 @@ public class ValueInjectorTest {
             assertEquals("s", i.getName());
             assertEquals(PP.class.getDeclaredField("s"), i.getField());
             assertEquals(String.class, i.getType());
-            assertEquals(false, i.isRequired());
+            assertFalse(i.isRequired());
         }
 
     }
@@ -74,7 +73,7 @@ public class ValueInjectorTest {
     public static class PP {
         @Option("b")
         boolean b;
-        @Option(value = "i", required = true)
+        @Option(value = "i")
         int i;
         @Option(value = "s", required = false)
         String s;
