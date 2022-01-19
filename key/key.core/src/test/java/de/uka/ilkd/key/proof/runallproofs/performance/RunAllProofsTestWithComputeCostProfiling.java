@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * so that statistical data about that method can be recorded (time duration,
  * number of invocations and potentially other stuff).
  */
-@Tag("performance")
+@Tag("performance") @Tag("owntest")
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
     private static ProfilingDirectories directories;
     static File plotScript;

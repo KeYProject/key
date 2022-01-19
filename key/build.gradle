@@ -147,7 +147,7 @@ subprojects {
 
     test {
         useJUnitPlatform {
-            excludeTags "interactive", "performance"
+            excludeTags "owntest", "interactive", "performance"
         }
 
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
