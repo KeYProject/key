@@ -7,8 +7,16 @@ import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.statement.JavaStatement;
 
-public class JmlAssert extends JavaStatement implements ProgramElement {
+/**
+ * A JML assert statement.
+ *
+ * @author Benjamin Takacs
+ */
+public class JmlAssert extends JavaStatement {
 
+    /**
+     * The kind of this statment either ASSERT or ASSUME
+     */
     private final TextualJMLAssertStatement.Kind kind;
 
     /* condition should be an Expression,
@@ -16,16 +24,29 @@ public class JmlAssert extends JavaStatement implements ProgramElement {
        e.g. \forall
        keep this as the parse tree for now
        (blockcontracts seem to handle this similar)
-       TODO: do the visitors work good enought?
+       TODO: do the visitors work good enough?
              compare with what is done for loop/block contracts
+     */
+    /**
+     * The condition of this statement in parse tree form
      */
     private final LabeledParserRuleContext condition;
 
+    /**
+     *
+     * @param kind the kind of this statment
+     * @param condition the condition for this statement
+     */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition) {
         this.kind = kind;
         this.condition = condition;
     }
 
+    /**
+     * copy constructor
+     *
+     * @param proto the orginal JML assert statement to copy
+     */
     public JmlAssert(JmlAssert proto) {
         super(proto);
         this.kind = proto.kind;
@@ -51,12 +72,12 @@ public class JmlAssert extends JavaStatement implements ProgramElement {
     }
 
     @Override
-    public int getChildPositionCode(ProgramElement programElement) {
-        return 0;
+    public int getChildPositionCode(ProgramElement child) {
+        return -1;
     }
 
     @Override
-    public boolean replaceChild(ProgramElement programElement, ProgramElement programElement1) {
+    public boolean replaceChild(ProgramElement p, ProgramElement q) {
         return false;
     }
 

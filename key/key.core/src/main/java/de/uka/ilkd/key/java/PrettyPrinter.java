@@ -3265,8 +3265,7 @@ public class PrettyPrinter {
         markKeywordEnd();
         write(" ");
 
-        //TODO: this will lose whitespace, so e.g. \forall will not printed correctly
-        write(jmlAssert.getCondition().first.getText().substring(kind.length()));
+        write(jmlAssert.getConditionText());
 
         write(";");
 

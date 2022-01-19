@@ -19,10 +19,24 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.Optional;
 
-public class JmlAssertRule implements BuiltInRule {
+/**
+ * A rule for JML assert/assume statements.
+ *
+ * @author Benjamin Takacs
+ */
+public final class JmlAssertRule implements BuiltInRule {
 
-    private static final Name NAME = new Name("JML assert");
+    /**
+     * The instance of this rule
+     */
     public static final JmlAssertRule INSTANCE = new JmlAssertRule();
+    /**
+     * The name of this rule
+     */
+    private static final Name NAME = new Name("JML assert");
+
+    //Only one instance of this class is needed and should be there
+    private JmlAssertRule() { }
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
@@ -53,7 +67,8 @@ public class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+            throws RuleAbortException {
         assert ruleApp instanceof JmlAssertBuiltInRuleApp;
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
@@ -79,14 +94,14 @@ public class JmlAssertRule implements BuiltInRule {
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {
             result = goal.split(2);
-            setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
             setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
         } else if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSUME) {
             result = goal.split(1);
-            setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
         } else {
-            throw new RuleAbortException(String.format("Unknown assertion type %s", jmlAssert.getKind()));
+            throw new RuleAbortException(
+                    String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
+        setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
 
         return result;
     }

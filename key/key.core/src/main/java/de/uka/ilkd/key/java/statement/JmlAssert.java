@@ -5,7 +5,6 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -21,39 +20,45 @@ import java.io.IOException;
 public class JmlAssert extends JavaStatement {
 
     //TODO: move the Kind enum somewhere else?
+    //      or maybe just use a boolean?
+    /**
+     * the kind of the statement, assert or assume
+     */
     private final TextualJMLAssertStatement.Kind kind;
+    /**
+     * the condition in parse tree form
+     */
     private final LabeledParserRuleContext condition;
+    /**
+     * the condition in Term form
+     */
     private Term cond;
 
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition) {
-        this.kind = kind != null ? kind : TextualJMLAssertStatement.Kind.ASSERT;
-        this.condition = condition;
-    }
-
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition, PositionInfo positionInfo) {
+    /**
+     *
+     * @param kind assert or assume
+     * @param condition the condition of this statement
+     * @param positionInfo the position information for this statement
+     */
+    public JmlAssert(TextualJMLAssertStatement.Kind kind,
+                     LabeledParserRuleContext condition,
+                     PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
     }
 
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition, ExtList changeList) {
-        super(changeList);
-        this.kind = getOr(changeList, TextualJMLAssertStatement.Kind.class, kind);
-        this.condition = getOr(changeList, LabeledParserRuleContext.class, condition);
-    }
-
-    public JmlAssert(JmlAssert proto, LabeledParserRuleContext condition) {
-        super(proto.getPositionInfo());
-        kind = proto.kind;
-        this.condition = condition;
-        this.cond = proto.cond;
-    }
-
-    public JmlAssert(JmlAssert x, ExtList changeList) {
-        super(changeList, x.getPositionInfo());
-        this.kind = getOr(changeList, TextualJMLAssertStatement.Kind.class, x.kind);
-        this.condition = getOr(changeList, LabeledParserRuleContext.class, x.condition);
-        this.cond = getOr(changeList, Term.class, x.cond);
+    /**
+     * copy constructor allowing changes
+     *
+     * @param proto the element to copy
+     * @param changeList the changes to be made
+     */
+    public JmlAssert(JmlAssert proto, ExtList changeList) {
+        super(changeList, getOr(changeList, PositionInfo.class, proto.getPositionInfo()));
+        this.kind = getOr(changeList, TextualJMLAssertStatement.Kind.class, proto.kind);
+        this.condition = getOr(changeList, LabeledParserRuleContext.class, proto.condition);
+        this.cond = getOr(changeList, Term.class, proto.cond);
     }
 
     //TODO: move into ExtList?
@@ -66,8 +71,12 @@ public class JmlAssert extends JavaStatement {
         return kind;
     }
 
-    public LabeledParserRuleContext getCondition() {
-        return condition;
+    /**
+     * @return the condition in String form
+     */
+    public String getConditionText() {
+        //TODO: this will lose whitespace, so e.g. \forall will not be printed correctly
+        return condition.first.getText().substring(kind.name().length());
     }
 
     /**
@@ -94,10 +103,7 @@ public class JmlAssert extends JavaStatement {
         if (cond != null) {
             throw new IllegalStateException("condition can only be set once");
         }
-        final var specType = kind == TextualJMLAssertStatement.Kind.ASSERT
-                ? OriginTermLabel.SpecType.ASSERT
-                : OriginTermLabel.SpecType.ASSUME;
-        this.cond = jmlIo.translateTerm(condition, specType);
+        this.cond = jmlIo.translateTerm(condition);
     }
 
     @Override
