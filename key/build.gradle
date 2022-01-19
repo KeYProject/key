@@ -137,14 +137,18 @@ subprojects {
         maxParallelForks = 1 // weigl: test on master
     }
 
-    test {
+    tasks.withType(Test) {
         useJUnitPlatform {
             includeEngines 'junit-vintage'
         }
-        /*useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive',
-                    'org.key_project.util.testcategories.Performance'
-        }*/
+    }
+
+
+
+    test {
+        useJUnitPlatform {
+            excludeTags "interactive", "performance"
+        }
 
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
@@ -157,11 +161,8 @@ subprojects {
 
     task testFast(type: Test) {
         group "verification"
-        useJUnit {
-            // CAUTION! These settings do not affect :key.core since the
-            // detection mechanism is different there.
-            excludeCategories 'org.key_project.util.testcategories.Slow'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        useJUnitPlatform {
+            excludeTags "slow", "performance", "interactive"
         }
 
         testLogging {
