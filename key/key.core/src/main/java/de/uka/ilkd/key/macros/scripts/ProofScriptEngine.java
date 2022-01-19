@@ -8,6 +8,7 @@ import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.antlr.v4.runtime.misc.Interval;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class ProofScriptEngine {
         }
 
         // add the filename (if available) to the statemap.
-        URL url = new URL(ctx.start.getTokenSource().getSourceName());
+        URL url = script.getUrl();
         try {
             stateMap.setBaseFileName(Paths.get(url.toURI()).toFile());
         } catch (URISyntaxException e) {
@@ -184,8 +185,12 @@ public class ProofScriptEngine {
             String key = pc.pname != null ? pc.pname.getText() : "#" + (i++);
             map.put(key, pc.expr);
         }
+        var in = commandContext.start.getTokenSource().getInputStream();
+        var txt = in.getText(Interval.of(commandContext.start.getStartIndex(), commandContext.stop.getStopIndex()));
+        map.put(ScriptLineParser.LITERAL_KEY, txt);
         return map;
     }
+
 
     public EngineState getStateMap() {
         return stateMap;

@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.macros.scripts.meta.Converter;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
-import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -15,7 +17,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.io.StringReader;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Observer;
@@ -26,8 +27,6 @@ import java.util.Optional;
  * @version 1 (28.03.17)
  */
 public class EngineState {
-    private final static DefaultTermParser PARSER = new DefaultTermParser();
-    //private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
     /**
@@ -35,7 +34,9 @@ public class EngineState {
      */
     private Observer observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = ValueInjector.createDefault();
+    private ValueInjector valueInjector = createDefaultValueInjector();
+
+
     private Goal goal;
     private Node lastSetGoalNode;
 
@@ -54,10 +55,70 @@ public class EngineState {
 
     public EngineState(Proof proof) {
         this.proof = proof;
-        valueInjector.addConverter(Term.class, String.class, (String s) -> toTerm(s, null));
-        valueInjector.addConverter(Sequent.class, String.class, this::toSequent);
-        valueInjector.addConverter(Sort.class, String.class, this::toSort);
     }
+
+    private ValueInjector createDefaultValueInjector() {
+        var v = ValueInjector.createDefault();
+        v.addConverter(Term.class, String.class, (String s) -> toTerm(s, null));
+        v.addConverter(Sequent.class, String.class, this::toSequent);
+        v.addConverter(Sort.class, String.class, this::toSort);
+        addContextTranslator(v, String.class);
+        addContextTranslator(v, Term.class);
+        addContextTranslator(v, Integer.class);
+        addContextTranslator(v, Byte.class);
+        addContextTranslator(v, Long.class);
+        addContextTranslator(v, Boolean.class);
+        addContextTranslator(v, Character.class);
+        addContextTranslator(v, Sequent.class);
+        addContextTranslator(v, Integer.TYPE);
+        addContextTranslator(v, Byte.TYPE);
+        addContextTranslator(v, Long.TYPE);
+        addContextTranslator(v, Boolean.TYPE);
+        addContextTranslator(v, Character.TYPE);
+        return v;
+    }
+
+    private <T> void addContextTranslator(ValueInjector v, Class<T> aClass) {
+        var converter = (Converter<T, KeYParser.ProofScriptExpressionContext>)
+                (KeYParser.ProofScriptExpressionContext a) -> convertToString(v, aClass, a);
+        v.addConverter(aClass, KeYParser.ProofScriptExpressionContext.class, converter);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R> R convertToString(ValueInjector inj, Class<?> aClass, KeYParser.ProofScriptExpressionContext ctx)
+            throws Exception {
+        if (ctx.string_literal() != null) {
+            var v = ctx.string_literal().getText();
+            v = v.substring(1, v.length() - 1);
+            return (R) inj.getConverter(aClass, String.class).convert(v);
+        } else if (ctx.term() != null && aClass == Term.class) {
+            return (R) parseExpr(ctx.term());
+        } else if (ctx.seq() != null && aClass == Sequent.class) {
+            return (R) parseSequent(ctx.seq());
+        }
+        var v = ctx.getText();
+        return (R) inj.getConverter(aClass, String.class).convert(v);
+
+    }
+
+    private Sequent parseSequent(KeYParser.SeqContext term) {
+        ExpressionBuilder visitor = new ExpressionBuilder(proof.getServices(), proof.getNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        var t = (Sequent) term.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        warnings.forEach(System.out::println);//waiting for logging
+        return t;
+    }
+
+    private Term parseExpr(KeYParser.TermContext term) {
+        ExpressionBuilder visitor = new ExpressionBuilder(proof.getServices(), proof.getNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        Term t = (Term) term.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        warnings.forEach(System.out::println);//waiting for logging
+        return t;
+    }
+
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
@@ -196,10 +257,9 @@ public class EngineState {
 
     public Term toTerm(String string, Sort sort)
             throws ParserException, ScriptException {
-        StringReader reader = new StringReader(string);
-        Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
+        io.setAbbrevMap(abbrevMap);
+        Term formula = io.parseExpression(string);
         return formula;
     }
 
@@ -213,13 +273,9 @@ public class EngineState {
 
     public Sequent toSequent(String sequent)
             throws ParserException, ScriptException {
-        StringReader reader = new StringReader(sequent);
-        Services services = proof.getServices();
-
-        Sequent seq = PARSER.parseSeq(reader, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(),
-                getAbbreviations());
-        return seq;
+        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
+        io.setAbbrevMap(getAbbreviations());
+        return io.parseSequence(sequent);
     }
 
     public int getMaxAutomaticSteps() {

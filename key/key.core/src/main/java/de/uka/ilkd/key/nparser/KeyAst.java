@@ -12,10 +12,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -143,7 +145,11 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public URL getUrl() {
             try {
-                return new URL(ctx.start.getTokenSource().getSourceName());
+                final var sourceName = ctx.start.getTokenSource().getSourceName();
+                if(sourceName.startsWith("file:") || sourceName.startsWith("http:") || sourceName.startsWith("jar:"))
+                    return new URL(sourceName);
+                else
+                    return new java.io.File(sourceName).toURI().toURL();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 return null;

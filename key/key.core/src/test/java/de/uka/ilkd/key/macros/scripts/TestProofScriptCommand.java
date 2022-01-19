@@ -88,7 +88,8 @@ public class TestProofScriptCommand {
         try {
             pse.execute(env.getUi(), proof);
         } catch(Exception ex) {
-            assertTrue("unexpected exception", props.containsKey("exception"));
+            ex.printStackTrace();
+            assertTrue("unexpected exception: " + ex.getMessage(), props.containsKey("exception"));
             assertEquals(ex.getMessage(), props.get("exception").trim());
             return;
         }

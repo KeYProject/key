@@ -821,7 +821,13 @@ proofScriptCommand
 
 proofScriptParameters: proofScriptParameter+;
 proofScriptParameter :  ((pname=IDENT EQUALS)? expr=proofScriptExpression);
-proofScriptExpression: term;
+proofScriptExpression:
+    boolean_literal
+  | char_literal
+  | number
+  | string_literal
+  | term
+  | seq;
 
 
 // PROOF
