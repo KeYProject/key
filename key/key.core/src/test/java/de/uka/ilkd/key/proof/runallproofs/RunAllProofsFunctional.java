@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  * <p>
  * The test case is controlled by the index file (see {@value #INDEX_FILE}).
  * <p>
- * If the property "{@value #SKIP_FUNCTIONAL_PROPERTY}" is set to true, then
+ * If the property "{@link #SKIP_FUNCTIONAL_PROPERTY}" is set to true, then
  * no functional run-all-proof tests will be run.
  *
  * @author M. Ulbrich
@@ -35,15 +35,23 @@ import java.util.stream.Stream;
 public final class RunAllProofsFunctional extends RunAllProofsTest {
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
+    private static final ProofCollection proofCollection = getProofCollection();
 
-    private static ProofCollection proofCollection;
+    private static ProofCollection getProofCollection() {
+        if (!SKIP_FUNCTIONAL_PROPERTY) {
+            try {
+                return parseIndexFile(INDEX_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assertions.fail();
+            }
+        }
+        return null;
+    }
 
     @TestFactory
-    Stream<DynamicTest> data() throws IOException, RecognitionException {
-        if (SKIP_FUNCTIONAL_PROPERTY) {
-            return Stream.empty();
-        }
-        proofCollection = parseIndexFile(INDEX_FILE);
+    Stream<DynamicTest> data() throws IOException {
+        Assumptions.assumeTrue(proofCollection != null);
         return data(proofCollection);
     }
 
