@@ -27,7 +27,6 @@ public class ProofDifferenceTest {
         assertEquals(4, calculate("f(x)", ""));
     }
 
-    @Test
     public void testPairs(List<String> seq1, List<String> seq2, String exp) {
         List<ProofDifference.Matching> pairs = ProofDifference.findPairs(
                 new ArrayList<>(seq1),
