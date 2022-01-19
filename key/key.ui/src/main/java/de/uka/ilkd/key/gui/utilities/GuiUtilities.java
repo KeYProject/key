@@ -18,13 +18,16 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.*;
 
 public final class GuiUtilities {
 
@@ -44,12 +47,36 @@ public final class GuiUtilities {
         pane.setMinimumSize(new java.awt.Dimension(150,0));
     }
 
+    public static String printTerm(Term term) {
+        final NotationInfo ni = new NotationInfo();
+        LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, null,
+                new TermLabelVisibilityManager());
+        p.setLineWidth(100);
+        p.reset();
+
+        try {
+            p.printTerm(term);
+        } catch (IOException ioe) {
+            return term.toString();
+        }
+        return p.result().toString().trim();
+    }
+
+    public static void renderToClipboard(PosInSequent pos) {
+        var text = printTerm(pos.getPosInOccurrence().subTerm());
+        setClipboardText(text);
+    }
+
     public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
         // Replace nbsp; from html with normal spaces
         String s = view.getHighlightedText(pos).replace('\u00A0', ' ');
         // now CLIPBOARD
+        setClipboardText(s);
+    }
+
+    public static void setClipboardText(String text) {
         java.awt.datatransfer.StringSelection ss =
-            new java.awt.datatransfer.StringSelection(s);
+                new java.awt.datatransfer.StringSelection(text);
         java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
     }

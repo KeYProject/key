@@ -201,6 +201,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         addSeparator();
         addClipboardItem(control);
+        addParseableClipboardItem(control);
 
         if (getPos() != null) {
             PosInOccurrence occ = getPos().getPosInOccurrence();
