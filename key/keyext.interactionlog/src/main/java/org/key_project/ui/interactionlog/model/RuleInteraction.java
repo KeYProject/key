@@ -24,8 +24,6 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * @author weigl
@@ -35,7 +33,7 @@ public final class RuleInteraction extends NodeInteraction {
     private static final long serialVersionUID = -3178292652264875668L;
     private static final int indent = 4;
     private final String topLevelTerm;
-    private final String term;
+    private final String subTerm;
     private String ruleName;
     private OccurenceIdentifier posInOccurrence;
     private HashMap<SchemaVariable, String> arguments = new HashMap<>();
@@ -46,7 +44,8 @@ public final class RuleInteraction extends NodeInteraction {
         this.ruleName = app.rule().displayName();
 
         var posInOccurrence = app.posInOccurrence();
-        this.term = printTerm(posInOccurrence.subTerm());
+        var subTerm = posInOccurrence.subTerm();
+        this.subTerm = subTerm == null ? null : printTerm(subTerm);
         this.topLevelTerm = printTerm(posInOccurrence.topLevel().subTerm());
         this.posInOccurrence = OccurenceIdentifier.get(app.posInOccurrence());
 
@@ -126,8 +125,10 @@ public final class RuleInteraction extends NodeInteraction {
 
     private HashMap<String, String> createInvocationArguments() {
         var allArgs = createInstArguments();
-        allArgs.put("on", topLevelTerm);
-        allArgs.put("formula", term);
+        allArgs.put("formula", topLevelTerm);
+        if (subTerm != null) {
+            allArgs.put("on", subTerm);
+        }
         return allArgs;
     }
 
@@ -171,8 +172,10 @@ public final class RuleInteraction extends NodeInteraction {
         // indent inner lines once again
         var innerIndent = " ".repeat(2 + width);
 
-        out.format(format, "on", indentStringWith(topLevelTerm, innerIndent).trim());
-        out.format(format, "formula", indentStringWith(term, innerIndent).trim());
+        out.format(format, "formula", indentStringWith(topLevelTerm, innerIndent).trim());
+        if (subTerm != null) {
+            out.format(format, "on", indentStringWith(subTerm, innerIndent).trim());
+        }
 
         args.forEach((k, v) ->  {
             out.format(format, k, indentStringWith(v, innerIndent).trim());
