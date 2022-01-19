@@ -13,19 +13,13 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
-import org.antlr.runtime.RecognitionException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+import org.antlr.runtime.RecognitionException;
+import org.junit.jupiter.api.*;
+
+import java.io.IOException;
+import java.util.stream.Stream;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
@@ -37,35 +31,29 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  *
  * @author M. Ulbrich
  */
-@RunWith(Parameterized.class)
-public class RunAllProofsFunctional extends RunAllProofsTest {
-
+@Tag("slow")
+public final class RunAllProofsFunctional extends RunAllProofsTest {
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
-
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
 
     private static ProofCollection proofCollection;
 
-    public RunAllProofsFunctional(RunAllProofsTestUnit unit) {
-        super(unit);
-    }
-
-    @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
+    @TestFactory
+    Stream<DynamicTest> data() throws IOException, RecognitionException {
         if (SKIP_FUNCTIONAL_PROPERTY) {
-            return Collections.emptyList();
+            return Stream.empty();
         }
         proofCollection = parseIndexFile(INDEX_FILE);
         return data(proofCollection);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpStatisticsFile() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
     }
 
-    @AfterClass
+    @AfterAll
     public static void computeSumsAndAverages() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.computeSumsAndAverages();

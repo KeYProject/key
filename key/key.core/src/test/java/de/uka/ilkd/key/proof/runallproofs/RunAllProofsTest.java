@@ -18,13 +18,13 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 import org.antlr.runtime.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -71,32 +71,9 @@ import java.util.List;
  */
 @Tag("slow")
 public abstract class RunAllProofsTest {
-
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
-
    public static final String IGNORE_KEY = "ignore";
 
-   private final RunAllProofsTestUnit unit;
-
-   /**
-    * Constructor.
-    *
-    * @param unit
-    *           {@link RunAllProofsTestUnit} whose test will be executed.
-    */
-   public RunAllProofsTest(RunAllProofsTestUnit unit) {
-      this.unit = unit;
-   }
-
-   /**
-    * Tests each file defined by the instance variables. The tests steps are
-    * described in the constructor of this class.
-    */
-   @Test
-   public void testWithKeYAutoMode() throws Exception {
-      TestResult report = unit.runTest();
-      Assertions.assertTrue(report.success, report.message);
-   }
 
     /**
      * Creates a set of constructor parameters for this class. Uses JUnits
@@ -114,19 +91,22 @@ public abstract class RunAllProofsTest {
      *             file
      */
 
-   public static List<RunAllProofsTestUnit[]> data(ProofCollection proofCollection) throws IOException {
-
+   public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
       /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
-      List<RunAllProofsTestUnit[]> data = new LinkedList<>();
       List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
-      for (RunAllProofsTestUnit unit : units) {
-         data.add(new RunAllProofsTestUnit[] { unit });
-      }
-
-      return data;
+      return units.stream().map(it ->
+              DynamicTest.dynamicTest(it.getTestName(),
+                      () -> {
+                         /*
+                          * Tests each file defined by the instance variables. The tests steps are
+                          * described in the constructor of this class.
+                          */
+                         TestResult report = it.runTest();
+                         Assertions.assertTrue(report.success, report.message);
+                      }));
    }
 
    /**

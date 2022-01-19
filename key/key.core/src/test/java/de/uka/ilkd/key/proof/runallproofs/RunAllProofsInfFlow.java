@@ -19,13 +19,15 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.
@@ -37,24 +39,17 @@ import java.util.Collections;
  *
  * @author M. Ulbrich
  */
-@RunWith(Parameterized.class)
-public class RunAllProofsInfFlow extends RunAllProofsTest {
-
+@Tag("slow")
+public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
     private static ProofCollection proofCollection;
 
-    public RunAllProofsInfFlow(RunAllProofsTestUnit unit) {
-        super(unit);
-    }
-
-    @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
-
+    @TestFactory
+    Stream<DynamicTest> data() throws IOException, RecognitionException {
         if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
-            return Collections.emptyList();
+            return Stream.empty();
         }
-
         proofCollection = parseIndexFile(INDEX_FILE);
         return data(proofCollection);
     }
