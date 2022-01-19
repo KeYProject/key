@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  *
  * @author M. Ulbrich
  */
-@Tag("slow") @Tag("owntest")
+@Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
 public final class RunAllProofsFunctional extends RunAllProofsTest {
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";

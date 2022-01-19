@@ -91,10 +91,11 @@ task testProveRules(type: Test) {
     description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
+    //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
 task testRunAllProofs(type: Test) {
-    description 'Proof/reload all keyfiles tagged for regression testing'
+    description 'Prove/reload all keyfiles tagged for regression testing'
     group "verification"
     filter {
         includeTestsMatching "RunAllProofsInfFlow"

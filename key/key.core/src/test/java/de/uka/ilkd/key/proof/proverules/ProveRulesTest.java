@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Kai Wallisch
  */
-@Tag("slow")
+@Tag("slow") @Tag("owntest")
 public class ProveRulesTest {
     /*
      * File object pointing to directory key/key.core.test

@@ -140,6 +140,7 @@ subprojects {
     tasks.withType(Test) {
         useJUnitPlatform {
             includeEngines 'junit-vintage'
+            includeEngines 'junit-jupiter'
         }
     }
 
