@@ -88,8 +88,8 @@ public final class JmlAssertRule implements BuiltInRule {
                 .map(JmlAssert.class::cast)
                 .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        //TODO: add wellFormed or other conditions?
-        final Term condition = jmlAssert.getCond();
+        //TODO: add other conditions?
+        final Term condition = tb.and(jmlAssert.getCond(), tb.wellFormed(tb.getBaseHeap()));
 
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {
