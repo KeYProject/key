@@ -522,6 +522,16 @@ public abstract class SequentView extends JEditorPane {
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            // quick-and-dirty-fixception:
+            // result.end() is sometimes -1 even though the text is nonempty
+            // this really should not happen
+            if (result.end() < 0) {
+                // Let's write some debug info since we can't reproduce
+                Debug.out("SequentView::getHighlightRange rangeForIndex returned invalid range:");
+                Debug.out("result was " + result + ", character index " + characterIndex + ", point " + p);
+                Debug.out(seqText);
+                return null;
+            }
             result = new Range(result.start() + 1, result.end() + 1);
 
             return result;
