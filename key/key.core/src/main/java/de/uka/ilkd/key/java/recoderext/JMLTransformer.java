@@ -39,7 +39,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 import javax.annotation.Nonnull;
-import java.io.StringReader;
 import java.util.*;
 
 import static java.lang.String.format;
