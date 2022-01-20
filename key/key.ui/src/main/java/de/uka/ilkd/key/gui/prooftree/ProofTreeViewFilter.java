@@ -297,7 +297,7 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         public boolean showSubtree(Node node) {
-            return node.getNodeInfo().getInteractiveRuleApplication();
+            return node.getNodeInfo().getInteractiveRuleApplication() || node.getNodeInfo().getScriptRuleApplication();
         }
 	}
 
