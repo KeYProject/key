@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.ui.BoundsPopupMenuListener;
@@ -349,9 +350,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             Interaction selectedValue = listInteraction.getSelectedValue();
             if (selectedValue != null) {
                 String text = selectedValue.getProofScriptRepresentation();
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection contents = new StringSelection(text);
-                clipboard.setContents(contents, contents);
+                GuiUtilities.setClipboardText(text);
             }
         }
     }

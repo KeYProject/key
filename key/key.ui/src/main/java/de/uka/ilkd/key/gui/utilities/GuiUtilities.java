@@ -19,6 +19,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -30,6 +33,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 
 public final class GuiUtilities {
+    public static final int LINE_WIDTH = 100;
+    public static final int INDENT = 4;
 
     private GuiUtilities() {
         throw new Error("Do not instantiate");
@@ -47,11 +52,11 @@ public final class GuiUtilities {
         pane.setMinimumSize(new java.awt.Dimension(150,0));
     }
 
-    public static String printTerm(Term term) {
+    public static String writeTerm(Term term) {
         final NotationInfo ni = new NotationInfo();
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, null,
                 new TermLabelVisibilityManager());
-        p.setLineWidth(100);
+        p.setLineWidth(LINE_WIDTH);
         p.reset();
 
         try {
@@ -62,8 +67,50 @@ public final class GuiUtilities {
         return p.result().toString().trim();
     }
 
-    public static void renderToClipboard(PosInSequent pos) {
-        var text = printTerm(pos.getPosInOccurrence().subTerm());
+    private static int calculateParameterWidth(Iterable<String> args) {
+        var width = 0;
+        for (var k : args) {
+            width = Math.max(k.length(), width);
+        }
+
+        return width;
+    }
+
+    private static String indentStringWith(String value, String indent) {
+        return value.replaceAll("(?m)^", indent);
+    }
+
+    public static String writeCommand(String name, String firstArg, HashMap<String, String> args) {
+        // indent parameters once
+        StringWriter sout = new StringWriter();
+        PrintWriter out = new PrintWriter(sout);
+
+        out.format("%s %s", name, firstArg);
+
+        var width = calculateParameterWidth(args.keySet()) + INDENT;
+        var format = "%n%" + width + "s='%s'";
+
+        // indent inner lines once again
+        var innerIndent = " ".repeat(2 + width);
+        args.forEach((k, v) ->  {
+            out.format(format, k, indentStringWith(v, innerIndent).trim());
+        });
+
+        out.format(";");
+        return sout.toString();
+    }
+
+    public static void copyTermToClipboard(PosInSequent pos) {
+        var text = writeTerm(pos.getPosInOccurrence().subTerm());
+        setClipboardText(text);
+    }
+
+    public static void copySelectMacroToClipboard(PosInSequent pos) {
+        var where = pos.getPosInOccurrence().isInAntec() ? "antecedent" : "succedent";
+        var args = new HashMap<String, String>(1);
+        var term = writeTerm(pos.getPosInOccurrence().topLevel().subTerm());
+        args.put("formula", term);
+        var text = writeCommand("select", where, args);
         setClipboardText(text);
     }
 

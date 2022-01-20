@@ -32,6 +32,8 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
 
     private static final String COPY_PARSEABLE_TO_CLIPBOARD = "Copy parseable to clipboard";
 
+    private static final String COPY_SELECT_TO_CLIPBOARD = "Copy select macro to clipboard";
+
     /** @see #createNameCreationInfoSection(MenuControl) */
     private static final String NAME_CREATION_INFO = "View name creation info";
 
@@ -119,6 +121,17 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     }
 
     /**
+     * Adds an action to copy a select macro representation of the selected term to the clipboard.
+     *
+     * @param control the action listener for the action.
+     */
+    protected void addSelectMacroClipboardItem(MenuControl control) {
+        JMenuItem item = new JMenuItem(COPY_SELECT_TO_CLIPBOARD);
+        item.addActionListener(control);
+        add(item);
+    }
+
+    /**
      * Adds an action to show the name creation info to the clipboard.
      *
      * @param control the action listener for the action.
@@ -138,7 +151,10 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
         public void actionPerformed(ActionEvent e) {
             if (((JMenuItem) e.getSource()).getText()
                     .startsWith(COPY_PARSEABLE_TO_CLIPBOARD)) {
-                GuiUtilities.renderToClipboard(pos);
+                GuiUtilities.copyTermToClipboard(pos);
+            } else if (((JMenuItem) e.getSource()).getText()
+                    .startsWith(COPY_SELECT_TO_CLIPBOARD)) {
+                GuiUtilities.copySelectMacroToClipboard(pos);
             } else if (((JMenuItem) e.getSource()).getText()
                     .startsWith(COPY_TO_CLIPBOARD)) {
                 GuiUtilities.copyHighlightToClipboard(sequentView, pos);

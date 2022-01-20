@@ -2,6 +2,7 @@ package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.EngineState;
@@ -31,7 +32,7 @@ import java.util.Iterator;
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
     private static final long serialVersionUID = -3178292652264875668L;
-    private static final int indent = 4;
+
     private final String topLevelTerm;
     private final String subTerm;
     private String ruleName;
@@ -145,45 +146,10 @@ public final class RuleInteraction extends NodeInteraction {
         return out.toString();
     }
 
-    private static int calculateParameterWidth(Collection<String> args) {
-        var width = 0;
-        for (var k : args) {
-            width = Math.max(k.length(), width);
-        }
-
-        return width;
-    }
-
-    private static String indentStringWith(String value, String indent) {
-        return value.replaceAll("(?m)^", indent);
-    }
-
     @Override
     public String getProofScriptRepresentation() {
-        // indent parameters once
-        StringWriter sout = new StringWriter();
-        PrintWriter out = new PrintWriter(sout);
-
-        out.format("rule %s", getRuleName());
-
-        var args = createInstArguments();
-        var width = calculateParameterWidth(args.keySet()) + indent;
-        var format = "%n%" + width + "s='%s'";
-
-        // indent inner lines once again
-        var innerIndent = " ".repeat(2 + width);
-
-        out.format(format, "formula", indentStringWith(topLevelTerm, innerIndent).trim());
-        if (subTerm != null) {
-            out.format(format, "on", indentStringWith(subTerm, innerIndent).trim());
-        }
-
-        args.forEach((k, v) ->  {
-            out.format(format, k, indentStringWith(v, innerIndent).trim());
-        });
-
-        out.format(";");
-        return sout.toString();
+        var args = createInvocationArguments();
+        return GuiUtilities.writeCommand("rule", getRuleName(), args);
     }
 
     @Override
