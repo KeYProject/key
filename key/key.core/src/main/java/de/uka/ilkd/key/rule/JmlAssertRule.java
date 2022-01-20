@@ -69,10 +69,11 @@ public final class JmlAssertRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
-        assert ruleApp instanceof JmlAssertBuiltInRuleApp;
+        if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
+            throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
+        }
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
-        assert occurrence != null;
 
         final Term formula = occurrence.subTerm();
         final Term update = UpdateApplication.getUpdate(formula);

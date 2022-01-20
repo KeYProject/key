@@ -4,6 +4,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
+import java.util.Objects;
+
 /**
  * The rule application for {@link JmlAssertRule}
  *
@@ -16,9 +18,11 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * @param occurrence the position at which the rule is applied
      */
     public JmlAssertBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence) {
-        super(rule, occurrence);
-        assert rule instanceof JmlAssertRule;
-        assert occurrence != null;
+        super(rule, Objects.requireNonNull(occurrence, "rule application needs a position"));
+        if (!(rule instanceof JmlAssertRule)) {
+            throw new IllegalArgumentException(String.format(
+                    "can only create an application for JmlAssertRule, not for %s", rule));
+        }
     }
 
     @Override
