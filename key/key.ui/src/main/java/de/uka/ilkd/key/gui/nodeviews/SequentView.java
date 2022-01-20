@@ -920,14 +920,16 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
-	public void setFilter(SequentPrintFilter sequentPrintFilter) {
+	public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
 		this.filter = sequentPrintFilter;
 		Node selectedNode = getMainWindow().getMediator().getSelectedNode();
 		if (selectedNode != null) {
 		    // bugfix #1458 (gitlab). The selected node may be null if no proof.
 		    this.filter.setSequent(selectedNode.sequent());
 		}
-		printSequent();
+        if (forceUpdate) {
+            printSequent();
+        }
 
 		if (getParent() != null) {
 	        getParent().revalidate();

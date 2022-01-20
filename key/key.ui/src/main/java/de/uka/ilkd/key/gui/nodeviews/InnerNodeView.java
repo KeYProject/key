@@ -93,7 +93,6 @@ public final class InnerNodeView extends SequentView {
         tacletInfo.setEditable(false);
 
 //        updateUI();
-        printSequent();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER

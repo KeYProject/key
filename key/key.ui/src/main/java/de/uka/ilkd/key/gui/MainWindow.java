@@ -410,6 +410,8 @@ public final class MainWindow extends JFrame {
      */
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
+        // Not sure if this is needed.
+        // Automode stopped is always fired next and sets it as well (does not cause a duplicate listener).
         result.addKeYSelectionListener(proofListener);
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
@@ -1052,16 +1054,24 @@ public final class MainWindow extends JFrame {
 
         final SequentView newSequentView;
 
+        // if this is set we can skip calls to printSequent, since it is invoked in setSequentView immediately anyways
+        final boolean isPrintRunImmediately = SwingUtilities.isEventDispatchThread();
         if (getMediator().getSelectedProof() == null) {
             newSequentView = emptySequent;
         } else {
             Goal goal = getMediator().getSelectedGoal();
             if (goal != null && !goal.node().isClosed()) {
                 currentGoalView.setPrinter(goal);
-                currentGoalView.printSequent();
+
+                if (!isPrintRunImmediately) {
+                    currentGoalView.printSequent();
+                }
                 newSequentView = currentGoalView;
             } else {
                 newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                if (!isPrintRunImmediately) {
+                    newSequentView.printSequent();
+                }
             }
         }
 
@@ -1069,11 +1079,12 @@ public final class MainWindow extends JFrame {
             @Override
             public void run() {
                 mainFrame.setContent(newSequentView);
+                // always does printSequent if on the event thread
                 sequentViewSearchBar.setSequentView(newSequentView);
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (isPrintRunImmediately) {
             sequentUpdater.run();
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1606,7 +1617,7 @@ public final class MainWindow extends JFrame {
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
-            getMediator().addKeYSelectionListener(proofListener);
+            getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
         /**
