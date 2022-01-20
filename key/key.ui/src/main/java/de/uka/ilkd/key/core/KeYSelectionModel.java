@@ -315,6 +315,14 @@ public class KeYSelectionModel {
         return null;
     }
 
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+        synchronized (listenerList) {
+            if(!listenerList.contains(listener)) {
+                addKeYSelectionListener(listener);
+            }
+        }
+    }
+
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
             Debug.log4jInfo("Adding " + listener.getClass(), "key.threading");

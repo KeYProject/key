@@ -17,8 +17,8 @@ dependencies {
 
     api 'com.miglayout:miglayout-swing:11.0'
 
-    api group: group, name: 'docking-frames-common', version: '1.0'
-    api group: group, name: 'docking-frames-core', version: '1.0'
+    api 'org.dockingframes:docking-frames-common:1.1.3p1'
+    api 'org.dockingframes:docking-frames-core:1.1.3p1'
 
     implementation "org.antlr:antlr4-runtime:4.7.1"
 
