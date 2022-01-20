@@ -260,7 +260,7 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
+            if (node.getNode().getNodeInfo().getInteractiveRuleApplication() || node.getNode().getNodeInfo().getScriptRuleApplication()) {
                 return true;
             }
 
