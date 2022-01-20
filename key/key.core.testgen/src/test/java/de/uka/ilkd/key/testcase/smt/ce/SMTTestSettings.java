@@ -4,6 +4,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.smt.st.SolverType;
 
 import java.io.File;
 import java.util.Collection;
@@ -39,6 +40,11 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
     @Override
     public long getTimeout() {
 	return 300000;
+    }
+
+    @Override
+    public long getTimeout(SolverType type) {
+        return getTimeout();
     }
 
     @Override

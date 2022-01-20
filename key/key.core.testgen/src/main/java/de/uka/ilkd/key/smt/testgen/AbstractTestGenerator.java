@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -31,14 +34,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
@@ -74,14 +71,14 @@ public abstract class AbstractTestGenerator {
       TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
 
-    if (!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
+    if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
        log
        .writeln("Could not find the z3 SMT solver. Aborting.");
        return;
     }
-    if (!SolverType.Z3_CE_SOLVER.isSupportedVersion()) {
+    if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
        log.writeln("Warning: z3 supported versions are: "
-             + Arrays.toString(SolverType.Z3_CE_SOLVER
+             + Arrays.toString(SolverTypes.Z3_CE_SOLVER
                    .getSupportedVersions()));
     }
     if(originalProof.closed() && settings.includePostCondition()){
@@ -164,7 +161,7 @@ public abstract class AbstractTestGenerator {
               .getNewSMTSettings());
     pdSettings.invariantForall = settings.invariantForAll();
     // invoke z3 for counterexamples
-    final SMTSettings smtsettings = new SMTSettings(pdSettings,
+    final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
           piSettings, newSettings, proof);
     launcher = new SolverLauncher(smtsettings);
     launcher.addListener(new SolverLauncherListener() {
@@ -179,8 +176,8 @@ public abstract class AbstractTestGenerator {
        }
     });
     final List<SolverType> solvers = new LinkedList<>();
-    solvers.add(SolverType.Z3_CE_SOLVER);
-    SolverType.Z3_CE_SOLVER.checkForSupport();
+    solvers.add(SolverTypes.Z3_CE_SOLVER);
+    SolverTypes.Z3_CE_SOLVER.checkForSupport();
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -453,6 +450,6 @@ public abstract class AbstractTestGenerator {
     * @return {@code true} solver is available, {@code false} solver is not available.
     */
    public static boolean isSolverAvailable() {
-      return SolverType.Z3_CE_SOLVER.isInstalled(true);
+      return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
    }
 }

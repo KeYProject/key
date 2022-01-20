@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -20,15 +23,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.smt.SMTObjTranslator;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
 
@@ -61,7 +57,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	public void launch(){
 		System.out.println("Launch "+count++);
 		SolverLauncher launcher = prepareLauncher();
-		SolverType solver = SolverType.Z3_CE_SOLVER;
+		SolverType solver = SolverTypes.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(goal);
 		launcher.addListener(this);
 		launcher.launch(problem, services, solver);		
@@ -79,7 +75,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
 		pdSettings.invariantForall = settings.invariantForAll();
 		// invoke z3 for counterexamples
-		final SMTSettings smtsettings = new SMTSettings(pdSettings,
+		final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
 				piSettings, new NewSMTTranslationSettings(), null);
 		return new SolverLauncher(smtsettings);
 	}

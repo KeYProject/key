@@ -8,7 +8,8 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class TestCE extends TestCommons {
 
     @Override
     public SolverType getSolverType() {
-        SolverType type = SolverType.Z3_CE_SOLVER;
+        SolverType type = SolverTypes.Z3_CE_SOLVER;
         // SolverType type = SolverType.Z3_SOLVER;
         String solverPathProperty = System
                 .getProperty(SYSTEM_PROPERTY_SOLVER_PATH);

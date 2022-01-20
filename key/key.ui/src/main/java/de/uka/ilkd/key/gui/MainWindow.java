@@ -52,7 +52,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -1697,7 +1697,7 @@ public final class MainWindow extends JFrame {
                 @Override
                 public void run() {
 
-                    SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+                    DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                             proof.getSettings().getNewSMTSettings(), proof);
                     SolverLauncher launcher = new SolverLauncher(settings);

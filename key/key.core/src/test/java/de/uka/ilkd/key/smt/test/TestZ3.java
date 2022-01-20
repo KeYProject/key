@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.smt.test;
 
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.junit.Assert;
 
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
 
 
 public class TestZ3 extends TestSMTSolver {
@@ -52,7 +53,7 @@ public class TestZ3 extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.Z3_SOLVER;
+       SolverType type = SolverTypes.Z3_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);
