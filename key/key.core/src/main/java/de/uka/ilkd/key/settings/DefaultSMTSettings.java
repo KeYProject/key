@@ -24,7 +24,9 @@ import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
+/**
+ * The default implementation of {@link SMTSettings}.
+ */
 public class DefaultSMTSettings implements SMTSettings {
     private final ProofDependentSMTSettings pdSettings;
     private final ProofIndependentSMTSettings piSettings;
