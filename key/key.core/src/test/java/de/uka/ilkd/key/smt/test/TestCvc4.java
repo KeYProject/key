@@ -14,7 +14,8 @@
 package de.uka.ilkd.key.smt.test;
 
 
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 
 public class TestCvc4 extends TestSMTSolver {
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "cvc4SolverPath";
@@ -45,7 +46,7 @@ public class TestCvc4 extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.CVC4_SOLVER;
+       SolverType type = SolverTypes.CVC4_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);

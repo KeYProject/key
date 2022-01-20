@@ -5,7 +5,9 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 
 
 import javax.swing.*;
@@ -43,8 +45,8 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner locsetBoundField;
     private final JCheckBox solverSupportCheck;
 
-    private ProofIndependentSMTSettings settings;
-    private List<SettingsProvider> children = new ArrayList<>();
+    private transient ProofIndependentSMTSettings settings;
+    private transient List<SettingsProvider> children = new ArrayList<>();
 
 
     public SMTSettingsProvider() {
@@ -62,7 +64,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
-        for (SolverType options : SolverType.ALL_SOLVERS) {
+        for (SolverType options : SolverTypes.getSolverTypes()) {
             getChildren().add(new SolverOptions(options));
         }
     }
@@ -80,9 +82,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     @Override
     public JComponent getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
-        if (window.getMediator().getSelectedProof() == null) {
-            //TODO maybe special handling
-        }
         setSmtSettings(pi.clone());
         return this;
     }
@@ -97,66 +96,63 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createLocSetBoundField() {
         return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.locsetBound = e);
+                e -> settings.setLocsetBound(e));
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.maxConcurrentProcesses = e);
+                e -> settings.setMaxConcurrentProcesses(e));
     }
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.timeout = e * 1000);
+                e -> settings.setTimeout(e * 1000L));
     }
 
     private JSpinner createIntBoundField() {
         return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.intBound = e);
+                e -> settings.setIntBound(e));
     }
 
     private JSpinner createSeqBoundField() {
         return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.seqBound = e);
+                e -> settings.setSeqBound(e));
     }
 
     private JSpinner createObjectBoundField() {
         return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.objectBound = e);
+                e -> settings.setObjectBound(e));
     }
 
     private JComboBox<String> getProgressModeBox() {
         return addComboBox("", BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
-                e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
-                getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
-                getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
+                e -> settings.setModeOfProgressDialog(ProgressMode.values()[progressModeBox.getSelectedIndex()]),
+                getProgressMode(ProgressMode.USER),
+                getProgressMode(ProgressMode.CLOSE));
     }
 
     private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started",
                 BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
                 false,
-                e -> settings.checkForSupport = solverSupportCheck.isSelected());
+                e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:",
                 "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
-                true, e -> {
-                    settings.pathForSMTTranslation = saveToFilePanel.getText();
-                    //TODO settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
-                });
+                true, e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
-    private String getProgressMode(int index) {
+    private String getProgressMode(ProgressMode index) {
         switch (index) {
-            case ProofIndependentSMTSettings.PROGRESS_MODE_USER:
+            case USER:
                 return BUNDLE.getString(PROGRESS_MODE_USER);
-            case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE:
+            case CLOSE:
                 return BUNDLE.getString(PROGRESS_MODE_CLOSE);
-            case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE_FIRST:
+            case CLOSE_FIRST:
                 return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
         }
         return "";
@@ -164,14 +160,14 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     public void setSmtSettings(ProofIndependentSMTSettings settings) {
         this.settings = settings;
-        saveToFilePanel.setText(this.settings.pathForSMTTranslation);
-        solverSupportCheck.setSelected(this.settings.checkForSupport);
-        progressModeBox.setSelectedIndex(this.settings.modeOfProgressDialog);
-        intBoundField.setValue(this.settings.intBound);
-        locsetBoundField.setValue(this.settings.locsetBound);
-        objectBoundField.setValue(this.settings.objectBound);
-        seqBoundField.setValue(this.settings.seqBound);
-        timeoutField.setValue(((float) this.settings.timeout / 1000));
-        maxProcesses.setValue(this.settings.maxConcurrentProcesses);
+        saveToFilePanel.setText(this.settings.getPathForSMTTranslation());
+        solverSupportCheck.setSelected(this.settings.isCheckForSupport());
+        progressModeBox.setSelectedIndex(this.settings.getModeOfProgressDialog().ordinal());
+        intBoundField.setValue(this.settings.getIntBound());
+        locsetBoundField.setValue(this.settings.getLocsetBound());
+        objectBoundField.setValue(this.settings.getObjectBound());
+        seqBoundField.setValue(this.settings.getSeqBound());
+        timeoutField.setValue(((float) this.settings.getTimeout() / 1000));
+        maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
     }
 }

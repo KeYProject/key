@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Assert;
 import org.junit.jupiter.api.Tag;

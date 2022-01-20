@@ -20,10 +20,11 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Use this class for testing SMT: It provides a mechanism to load proofs and
  * taclets. Do not modify this class directly but derive subclasses to implement
  * tests.
+ *
  */
 public abstract class TestCommons {
     protected static File folder = new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");

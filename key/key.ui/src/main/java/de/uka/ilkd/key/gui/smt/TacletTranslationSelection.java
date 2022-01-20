@@ -43,7 +43,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
@@ -68,10 +68,10 @@ public class TacletTranslationSelection {
 
         private TreePanel[][] treePanels = new TreePanel[2][2];
         
-        private final SMTSettings  smtSettings;
+        private final DefaultSMTSettings smtSettings;
        
 
-        public TacletTranslationSelection(SMTSettings smtSettings) {
+        public TacletTranslationSelection(DefaultSMTSettings smtSettings) {
                 this.smtSettings = smtSettings;
                 treePanels[INNER_PANEL][PAINT] = new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
                 treePanels[INNER_PANEL][EDIT] = new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
@@ -204,7 +204,7 @@ abstract class TreePanel extends JPanel {
 
         }
 
-        protected abstract JPanel init(TreeItem node, TreeItem rootNode, JTree t, SMTSettings settings);
+        protected abstract JPanel init(TreeItem node, TreeItem rootNode, JTree t, DefaultSMTSettings settings);
 
         protected void propergateToRoot(TreeItem node, SelectionMode mode) {
                 TreeItem parent =(TreeItem) node.getParent();
@@ -276,7 +276,7 @@ class InnerPanel extends TreePanel {
         }
 
         @Override
-        protected JPanel init(TreeItem node, TreeItem rootNode, JTree t, SMTSettings settings) {
+        protected JPanel init(TreeItem node, TreeItem rootNode, JTree t, DefaultSMTSettings settings) {
 
                 currentNode = node;
                 root = rootNode;
@@ -405,7 +405,7 @@ class LeafPanel extends TreePanel {
         }
 
         @Override
-        protected JPanel init(TreeItem node, TreeItem r, JTree t, SMTSettings smtSettings) {
+        protected JPanel init(TreeItem node, TreeItem r, JTree t, DefaultSMTSettings smtSettings) {
                 
                 int max = smtSettings != null ? smtSettings.getMaxNumberOfGenerics() :0;
                 currentNode = node;

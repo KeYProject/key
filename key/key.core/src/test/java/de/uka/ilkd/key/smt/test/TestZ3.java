@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.smt.test;
 
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.st.SolverType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,7 +54,7 @@ public class TestZ3 extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.Z3_SOLVER;
+       SolverType type = SolverTypes.Z3_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);
