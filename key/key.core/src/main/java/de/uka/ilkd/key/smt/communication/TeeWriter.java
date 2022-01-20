@@ -6,7 +6,7 @@ import java.io.Writer;
 
 
 /**
- * A {@link TeeReader} writes everything it reads to a separated writer.
+ * A {@link TeeReader} writes everything it writes to a separated writer.
  *
  * @author Alexander Weigl
  * @version 1 (10/3/21)
