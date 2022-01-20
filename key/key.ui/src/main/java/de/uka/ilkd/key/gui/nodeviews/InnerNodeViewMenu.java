@@ -37,5 +37,6 @@ public class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
         addExtensionMenu();
         addSeparator();
         addClipboardItem(control);
+        addParseableClipboardItem(control);
     }
 }
