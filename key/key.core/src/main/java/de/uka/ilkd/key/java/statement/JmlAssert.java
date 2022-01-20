@@ -11,6 +11,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.ExtList;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * A JML assert statement.
@@ -104,6 +105,28 @@ public class JmlAssert extends JavaStatement {
             throw new IllegalStateException("condition can only be set once");
         }
         this.cond = jmlIo.translateTerm(condition);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        //super.equals() check classes
+        final JmlAssert jmlAssert = (JmlAssert) o;
+        return kind == jmlAssert.kind &&
+                Objects.equals(condition, jmlAssert.condition) &&
+                Objects.equals(cond, jmlAssert.cond);
+    }
+
+    // hashCode() caches the result of computeHashCode()
+    // so override that instead of hashCode which is final
+    @Override
+    protected int computeHashCode() {
+        return Objects.hash(super.computeHashCode(), kind, condition, cond);
     }
 
     @Override
