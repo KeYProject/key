@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.statement.JmlAssert;
@@ -668,8 +669,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Term newCond = replaceVariablesInTerm(x.getCond());
         //TODO: I think that is ok this way
         stack.peek().add(newCond);
-        //TODO: use .equals() or some variant?
-        if (!newCond.equals(x.getCond())) {
+        if (!Objects.equals(newCond, x.getCond())) {
             changed();
         }
         super.performActionOnJmlAssert(x);
