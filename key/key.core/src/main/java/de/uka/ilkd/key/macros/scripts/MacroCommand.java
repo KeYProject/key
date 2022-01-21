@@ -6,9 +6,7 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -17,6 +15,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static Map<String, ProofMacro> macroMap = loadMacroMap();
@@ -105,6 +106,10 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 pio = extractMatchingPio(sequent, matchRegEx, services);
             }
 
+            if (args.formula != null) {
+                pio = findMatchingFormula(sequent, args.formula);
+            }
+
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), pio, uiControl);
             }
@@ -115,6 +120,31 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
+    }
+
+    private static PosInOccurrence findMatchingFormula(Sequent sequent, Term formula) throws ScriptException {
+        ImmutableList<PosInOccurrence> allApps = ImmutableSLList.nil();
+
+        for (SequentFormula sf : sequent.antecedent()) {
+            if (sf.formula().equalsModRenaming(formula)) {
+                allApps = allApps.append(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+            }
+        }
+
+        for (SequentFormula sf : sequent.succedent()) {
+            if (sf.formula().equalsModRenaming(formula)) {
+                allApps = allApps.append(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
+            }
+        }
+
+        if (allApps.size() > 1) {
+            throw new ScriptException("More than one matching formula");
+        }
+        if (allApps.isEmpty()) {
+            throw new ScriptException("No matching formula");
+        }
+
+        return allApps.head();
     }
 
     /**
@@ -180,6 +210,9 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         /** Run on formula matching the given regex */
         @Option(value = "matches", required = false)
         public String matches = null;
+        /** Run on formula */
+        @Option(value = "formula", required = false)
+        public Term formula = null;
         /** Variable macro parameters */
         @Varargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
