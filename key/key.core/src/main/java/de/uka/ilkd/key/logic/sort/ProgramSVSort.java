@@ -61,18 +61,20 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Special "sorts" used for schema variables matching program constructs
  * (class ProgramSV). Not really sorts in the theoretical meaning of the word.
  */
 public abstract class ProgramSVSort extends AbstractSort {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static final Map<Name, ProgramSVSort> NAME2SORT =
-            new LinkedHashMap<Name, ProgramSVSort>(60);
+    private static final Map<Name, ProgramSVSort> NAME2SORT = new LinkedHashMap<>(60);
 
 
     //----------- Types of Expression Program SVs ----------------------------
@@ -1433,7 +1435,7 @@ protected boolean canStandFor(ProgramElement check, Services services) {
                 elemname = n.toString();
             }
         } else {
-            System.err.println("Please check implicit in ProgramSVSort");
+            LOGGER.warn("Please check implicit in ProgramSVSort");
             return false;
         }
         return elemname.charAt(0) == '<';

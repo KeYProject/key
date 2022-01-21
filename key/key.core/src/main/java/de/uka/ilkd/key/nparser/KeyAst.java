@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
@@ -39,6 +40,11 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
         return ctx.accept(visitor);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
     }
 
     public static class File extends KeyAst<KeYParser.FileContext> {

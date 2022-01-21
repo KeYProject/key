@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Namespace;
@@ -32,12 +28,16 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Feature that computes the cost for using the query expand rule.
  * @author gladisch
  */
 public class QueryExpandCost implements Feature {
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpandCost.class);
 
     /** Constant that represents the boolean value true */
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
@@ -47,7 +47,7 @@ public class QueryExpandCost implements Feature {
     /** If the literals in a query become greater than abs(ConsideredAsBigLiteral), then
      *  this is interpreted as a "loop smell", i.e. the proof construction is in a loop
      *  and produces big literals.*/
-    public static final int ConsideredAsBigLiteral = 7;
+    public static final int CONSIDERED_AS_BIG_LITERAL = 7;
 
     /**
      * The base cost for this rule.
@@ -89,20 +89,14 @@ public class QueryExpandCost implements Feature {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term t = pos.subTerm();
 
-        // System.out.print("G:"+goal.hashCode()+"   ");
         long cost = baseCost;
 
-
-
         if (useExperimentalHeuristics) {
-            // System.out.print("literal sum: "+literalsInArgumentsToCost(t,integerLDT,services));
-
             //If the factor is too small, then higher cost has no effect for some reason.
             int litcost = maxIntliteralInArgumentsTimesTwo(t, integerLDT, services);
-            if (litcost > ConsideredAsBigLiteral * 2) {
+            if (litcost > CONSIDERED_AS_BIG_LITERAL * 2) {
                 return TOP_COST;
             }
-            //cost += litcost;
         }
 
         if (maxRepetitionsOnSameTerm != -1 && maxRepetitionsOnSameTerm < Integer.MAX_VALUE) {
@@ -110,7 +104,7 @@ public class QueryExpandCost implements Feature {
             if(count > maxRepetitionsOnSameTerm) {
                 return TOP_COST;
             } else {
-                cost += count * 2000l;
+                cost += count * 2000L;
             }
         }
 
@@ -119,25 +113,19 @@ public class QueryExpandCost implements Feature {
             if (qtime != null) {
                 cost += qtime * termAgeFactor;
             } else {
-                System.err.println(
+                LOGGER.info(
                         "QueryExpandCost::compute. Time of query should have been set already."
-                        + "The query was:" + t);
+                                + "The query was: {}", t);
             }
         }
-
-        //String tStr = t.toString(); int maxLen = tStr.length()>50?50:tStr.length();
-        //System.out.println("  cost="+cost + "    query:.."+tStr.substring(15, maxLen-1)+"..");
 
         return NumberRuleAppCost.create(cost);
     }
 
     /**
      * @param t the query that is considered for the rule expand query.
-     * @param iLDT
-     * @param serv
      * @return Cost that is computed base on the integer
      *      literals occurring in the numerical arguments of the query t.
-     * @see <code>literalsToCost</code>
      */
     private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
         final Namespace<Sort> sorts = serv.getNamespaces().sorts();
@@ -157,14 +145,11 @@ public class QueryExpandCost implements Feature {
     /** Absolute values of literal occurring in t a used for cost computation.
      *  The cost of literals is sorted the following way:0,1,-1,2,-2,3,-3,...
      * @param t The term is expected to be an argument of the query.
-     * @param iLDT
-     * @param serv
      * @return Sum* of the absolute values of integer literals occurring in t multiplied by two.
               (*) The sum is modified by extrapolating negative numbers from zero by one. The
                   cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
     private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
-        //if(t.op() instanceof Function && iLDT.hasLiteralFunction((Function)t.op())){
         if(t.op() == iLDT.getNumberSymbol()) {
             String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
             int val = Integer.parseInt(strVal);
@@ -195,17 +180,15 @@ public class QueryExpandCost implements Feature {
         int count = 0;
         ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
-            Iterator<RuleApp> appliedRuleAppIter = appliedRuleApps.iterator();
-            while (appliedRuleAppIter.hasNext()) {
-                RuleApp appliedRuleApp = appliedRuleAppIter.next();
+            for (RuleApp appliedRuleApp : appliedRuleApps) {
                 final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
                 if (pio != null) {
                     final Term oldterm = pio.subTerm();
                     final Term curterm = pos.subTerm();
-                    if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) &&
+                    if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE) &&
                             oldterm.equalsModIrrelevantTermLabels(curterm)) {
                         count++;
-                        if(count > maxRepetitionsOnSameTerm) {
+                        if (count > maxRepetitionsOnSameTerm) {
                             break;
                         }
                     }
@@ -229,14 +212,12 @@ public class QueryExpandCost implements Feature {
             NodeInfo ni = node.getNodeInfo();
             if(ni != null && ni.getBranchLabel() != null) {
                 String branchName = ni.getBranchLabel().toLowerCase();
-                if(branchName.indexOf("step case") >= 0
-                        || branchName.indexOf("body preserves") >= 0) {
-                    //System.out.println("Step Case found!");
+                if(branchName.contains("step case")
+                        || branchName.contains("body preserves")) {
                     return true;
-                } else if (branchName.indexOf("base case") >= 0 ||
-                        branchName.indexOf("invariant initially") >= 0 ||
-                        branchName.indexOf("use case") >= 0) {
-                    //System.out.println("Base Case found!");
+                } else if (branchName.contains("base case") ||
+                        branchName.contains("invariant initially") ||
+                        branchName.contains("use case")) {
                     return false;
                 }
             }

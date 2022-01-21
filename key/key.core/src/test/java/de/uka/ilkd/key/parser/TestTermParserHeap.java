@@ -5,8 +5,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import javax.annotation.Nonnull;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.fail;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParserHeap.class);
     private Term h, a, f, next;
 
     @Before
@@ -200,7 +202,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
             @Nonnull Term t = io.parseExpression("(a.f + a.f)@h2");
-            System.out.println(t);
+            LOGGER.info("Out: {}", t);
             fail();
         } catch (Exception e) {
             //assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));

@@ -90,8 +90,6 @@ public class ResolveGenericClassTest extends TestCase {
         s1 = spaces.matcher(s1).replaceAll(" ").trim();
         s2 = spaces.matcher(s2).replaceAll(" ").trim();
         
-//        System.out.println("'"+s1+"'");
-//        System.out.println("'"+s2+"'");
 
         int minlength = Math.min(s1.length(), s2.length());
         for (int i = 0; i < minlength; i++) {

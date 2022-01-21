@@ -13,17 +13,18 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
+import de.uka.ilkd.key.java.ConvertException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.util.Debug;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 
@@ -46,9 +47,10 @@ import de.uka.ilkd.key.util.Debug;
  * 
  */
 public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceNameInfo.class);
+
     // this somewhat doubles name2type in DefaultNameInfo to which we have no access
-    private HashMap<String, ClassType> classtypes = new LinkedHashMap<String, ClassType>(); 
+    private final HashMap<String, ClassType> classtypes = new LinkedHashMap<>();
     
     public KeYCrossReferenceNameInfo(ServiceConfiguration config) {
         super(config);
@@ -80,8 +82,7 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
             } else {
                 d2 = old.toString();
             }
-            Debug.log4jWarn("Datatype " + name + " declared twice: Once in " + d1 + " and once in " + d2+", Keeping one from " + d2,
-        	    	    KeYCrossReferenceNameInfo.class.getName());
+            LOGGER.warn("Datatype {} declared twice: Once in {} and once in {}, Keeping one from {}", name, d1, d2, d2);
             return;
         }
         

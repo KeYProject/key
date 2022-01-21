@@ -20,6 +20,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.key_project.util.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -50,17 +52,19 @@ public class MasterHandlerTest {
      * If this variable is set when running this test class, then
      * those cases with expected result "weak_valid" will raise an
      * exception unless they can be proved using the solver.
-     *
+     * <p>
      * Otherwise a "timeout" or "unknown" is accepted. This can be
      * used to deal with test cases that should verify but do not
      * yet do so.
-     *
+     * <p>
      * (Default false)
      */
     private static final boolean STRICT_TEST =
             Boolean.getBoolean("key.newsmt2.stricttests");
 
     private static final boolean DUMP_SMT = true;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
+
 
     @Parameter(0)
     public String name;
@@ -89,7 +93,7 @@ public class MasterHandlerTest {
 
         List<Object[]> result = new ArrayList<>();
         Files.list(directory).forEach(f -> {
-            Object[] item = { f.getFileName().toString(), f };
+            Object[] item = {f.getFileName().toString(), f};
             result.add(item);
         });
 
@@ -99,16 +103,16 @@ public class MasterHandlerTest {
     @Test
     public void testTranslation() throws Exception {
 
-        if(DUMP_SMT) {
+        if (DUMP_SMT) {
             Path tmpSmt = Files.createTempFile("SMT_key_" + name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
             Files.write(tmpSmt, translation.getBytes());
-            System.err.println("SMT2 for " + name + " saved in: " + tmpSmt);
+            LOGGER.info("SMT2 for {}  saved in: {}", name, tmpSmt);
         }
 
         int i = 1;
-        while(props.containsKey("contains." + i)) {
+        while (props.containsKey("contains." + i)) {
             assertThat("Occurrence check for contains." + i,
                     translation,
                     new ContainsModuloSpaces(props.get("contains." + i).trim()));
@@ -201,7 +205,7 @@ public class MasterHandlerTest {
                 }
             }
 
-            if(!STRICT_TEST) {
+            if (!STRICT_TEST) {
                 Assume.assumeFalse("This is an extended test (will be run only in strict mode)",
                         "extended".equals(props.get("state")));
             }
@@ -209,14 +213,9 @@ public class MasterHandlerTest {
             if (lookFor != null) {
                 fail("Expectation not found");
             }
-        } catch(Throwable t) {
-            System.out.println("Z3 input");
-            System.out.println(translation);
-
-            System.out.println("\n\nZ3 response");
-            for (String s : response) {
-                System.out.println(s);
-            }
+        } catch (Throwable t) {
+            LOGGER.error("Z3 input {}", translation);
+            LOGGER.error("Z3 response: {}", response, t);
             throw t;
         }
     }

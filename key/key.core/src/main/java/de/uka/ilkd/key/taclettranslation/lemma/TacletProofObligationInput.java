@@ -24,13 +24,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFil
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * The Class TacletProofObligationInput is a special purpose proof obligations
@@ -42,8 +41,10 @@ import java.util.Properties;
  * @author mattias ulbrich
  */
 public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
+    public static final String AXIOM_FILE = "axiomFile";
 
-    private String tacletName;
+    private final String tacletName;
     private ProofAggregate proofObligation;
 
     // The following may all possibly be null
@@ -56,7 +57,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * This filter is used to filter out precisely that taclet which has the
      * required name.
      */
-    private TacletFilter filter = new TacletFilter() {
+    private final TacletFilter filter = new TacletFilter() {
         @Override
         public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
             Name name = new Name(tacletName);
@@ -72,18 +73,16 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /**
      * This listener communicates with the PO loader.
      */
-    private LoaderListener listener = new LoaderListener() {
+    private final LoaderListener listener = new LoaderListener() {
 
         @Override
         public void stopped(Throwable exception) {
-            System.err.println("Exception while loading proof obligation for taclet:");
-            exception.printStackTrace();
+            LOGGER.error("Exception while loading proof obligation for taclet:", exception);
         }
 
         @Override
         public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms) {
-            assert p != null;
-            proofObligation = p;
+            proofObligation = Objects.requireNonNull(p);
         }
 
         @Override
@@ -136,7 +135,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
-                String name = "axiomFile" + (i == 0 ? "" : (i + 1));
+                String name = AXIOM_FILE + (i == 0 ? "" : (i + 1));
                 properties.setProperty(name, axiomFiles[i]);
             }
         }
@@ -152,7 +151,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     @Override
     public void readProblem() throws ProofInputException {
-        TacletLoader loader = null;
+        TacletLoader loader;
 
         if (tacletFile == null) {
             // prove a KeY taclet
@@ -180,15 +179,15 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
     }
 
-    private ProofEnvironment createProofEnvironment() throws ProofInputException {
+    private ProofEnvironment createProofEnvironment() {
         return new ProofEnvironment(environmentConfig);
     }
 
 
     private Collection<File> fileCollection(String[] strings) {
-        ArrayList<File> result = new ArrayList<File>();
-        for (int i = 0; i < strings.length; i++) {
-            result.add(new File(baseDir, strings[i]));
+        ArrayList<File> result = new ArrayList<>();
+        for (String string : strings) {
+            result.add(new File(baseDir, string));
         }
         return result;
     }
@@ -212,7 +211,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         String tacletName = properties.getProperty(PROPERTY_NAME);
         // This string is parsed by "proveRules.pl"
         if (java.awt.GraphicsEnvironment.isHeadless()) {
-            System.out.println("Proof obligation for taclet: " + tacletName);
+            LOGGER.info("Proof obligation for taclet: {}", tacletName);
         }
         TacletProofObligationInput proofOblInput =
                 new TacletProofObligationInput(tacletName, initConfig);
@@ -224,15 +223,15 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.baseDir = new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
         this.tacletFile = properties.getProperty("tacletFile");
         this.definitionFile = properties.getProperty("definitionFile");
-        List<String> axioms = new ArrayList<String>();
-        String name = "axiomFile";
+        List<String> axioms = new ArrayList<>();
+        String name = AXIOM_FILE;
         String axFile = properties.getProperty(name);
         while (axFile != null) {
             axioms.add(axFile);
-            name = "axiomFile" + (axioms.size() + 1);
+            name = AXIOM_FILE + (axioms.size() + 1);
             axFile = properties.getProperty(name);
         }
-        this.axiomFiles = axioms.toArray(new String[axioms.size()]);
+        this.axiomFiles = axioms.toArray(new String[0]);
     }
 
     public void setLoadInfo(File tacletFile, File definitionFile,

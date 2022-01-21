@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,12 +24,16 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class decribes a substitution,which store a map(varMap) from quantifiable 
  * variable to a term(instance).
  */
 public class Substitution {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Substitution.class);
+
     private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
@@ -59,7 +64,7 @@ public class Substitution {
         while ( it.hasNext () ) {
             final Term t = getSubstitutedTerm(it.next ()); 
             if ( t.freeVars ().size () != 0 ) {
-            	Debug.out("evil free vars in term: " + t);
+            	LOGGER.debug("evil free vars in term: " + t);
                 return false;
             }
         }

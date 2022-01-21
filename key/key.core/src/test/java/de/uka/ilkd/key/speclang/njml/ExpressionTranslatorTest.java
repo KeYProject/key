@@ -14,12 +14,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -27,6 +29,7 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 public class ExpressionTranslatorTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionTranslatorTest.class);
     @Parameterized.Parameter
     public String expr;
 
@@ -34,7 +37,7 @@ public class ExpressionTranslatorTest {
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
         try (InputStream s = ExpressionTranslatorTest.class.getResourceAsStream("exprs.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+             BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(s)))) {
             String l;
             while ((l = reader.readLine()) != null) {
                 if (l.trim().isEmpty() || l.startsWith("#")) {
@@ -46,14 +49,13 @@ public class ExpressionTranslatorTest {
         return seq;
     }
 
-    private Recoder2KeY r2k;
     private Services services;
 
     @Before
     public void setup() {
         if (services != null) return;
         services = TacletForTests.services();
-        r2k = new Recoder2KeY(services, services.getNamespaces());
+        Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
         r2k.parseSpecialClasses();
     }
 
@@ -70,6 +72,6 @@ public class ExpressionTranslatorTest {
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
                 new HashMap<>(), new HashMap<>());
-        System.out.println(ctx.accept(et));
+        LOGGER.debug("{}", ctx.accept(et));
     }
 }

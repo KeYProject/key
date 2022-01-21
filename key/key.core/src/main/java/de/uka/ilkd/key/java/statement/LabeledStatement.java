@@ -217,7 +217,7 @@ public class LabeledStatement extends JavaStatement
 	if ((name instanceof ProgramElementName) || (name==null)) {
 	    return (ProgramElementName) name;
 	} 
-	Debug.out("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
+	LOGGER.debug("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
 	return null;
     }
 

@@ -11,7 +11,6 @@ import org.junit.*;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.net.URL;
 
 public class ProofExplorationServiceTest {
     ProofExplorationService expService;
@@ -41,7 +40,7 @@ public class ProofExplorationServiceTest {
 //region Addition
 
     /**
-     * Tests that the added term is added correctly and that meta data was added as well
+     * Tests that the added term is added correctly and that metadata was added as well
      */
     @Test
     public void testAdditionAntec() {
@@ -85,7 +84,7 @@ public class ProofExplorationServiceTest {
     }
 
     /**
-     * Test tests that the added term is added correctly and that meta data was added as well
+     * Test tests that the added term is added correctly and that metadata was added as well
      */
     @Test
     public void testAdditionSucc() {
@@ -151,8 +150,6 @@ public class ProofExplorationServiceTest {
         Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
                 newCreatedGoals.tail().head();
 
-        //System.out.println("applicationBranch = " + applicationBranch.sequent());
-        //System.out.println("justificationBranch.sequent() = " + justificationBranch.sequent());
         //check meta data
         Node hideNode = applicationBranch.node().parent();
 
@@ -174,25 +171,34 @@ public class ProofExplorationServiceTest {
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
         Semisequent semiSeqAdded = antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfAdded = antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent parentSemiSeqOfAdded = antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
-        Semisequent semiSeqUntouched = !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfUntouched = !antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent semiSeqUntouched = !antec
+                ? withAddedTerm.sequent().antecedent()
+                : withAddedTerm.sequent().succedent();
+
+        Semisequent parentSemiSeqOfUntouched = !antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
 
-        Assert.assertSame("The size of the added semisequent has changed", semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1);
+        Assert.assertSame("The size of the added semisequent has changed",
+                semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1);
         Assert.assertEquals("Added Term is indeed added", semiSeqAdded.get(0).formula(), added);
         Assert.assertFalse("Justification branch is marked as interactive", justification.isAutomatic());
 
-        Assert.assertSame("The size if untouched semisequents is the same", semiSeqUntouched.size(), parentSemiSeqOfUntouched.size());
-        Assert.assertEquals("The  untouched semisequents are equal", semiSeqUntouched, parentSemiSeqOfUntouched);
+        Assert.assertSame("The size if untouched semisequents is the same",
+                semiSeqUntouched.size(), parentSemiSeqOfUntouched.size());
+        Assert.assertEquals("The  untouched semisequents are equal",
+                semiSeqUntouched, parentSemiSeqOfUntouched);
 
         Node parent = withAddedTerm.node().parent();
 
         Assert.assertEquals("Both nodes have the same parent", parent, justification.node().parent());
-        Assert.assertEquals("The addition was inserted using the cut rule", new Name("cut"), parent.getAppliedRuleApp().rule().name());
-
-
+        Assert.assertEquals("The addition was inserted using the cut rule",
+                new Name("cut"), parent.getAppliedRuleApp().rule().name());
     }
 
     /**

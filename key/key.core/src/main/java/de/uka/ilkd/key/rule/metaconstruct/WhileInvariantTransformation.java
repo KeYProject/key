@@ -39,6 +39,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.util.Debug;
  * logic.
  */
 public class WhileInvariantTransformation extends WhileLoopTransformation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WhileInvariantTransformation.class);
 
     private JavaInfo javaInfo = null;
 
@@ -326,7 +329,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             }
             
             if(breakInnerLabel != breakOuterLabel)
-                Debug.log4jWarn("inner and outer label must be the same in WhileInvariantTransformation.performActionOnEnhancedFor", null);
+                LOGGER.warn("inner and outer label must be the same in " +
+                        "WhileInvariantTransformation.performActionOnEnhancedFor");
             
             Statement body = changeList.get(Statement.class);
             

@@ -60,11 +60,7 @@ public class TestJMLPreTranslator {
     @Test
     public void testEnabledKeysLexer() {
         String contract = "/*-key@ invariant x == 54; */";
-        JmlLexer lex = JmlFacade.createLexer(contract);
-        List<? extends Token> toks = lex.getAllTokens();
-        for (Token tok : toks) {
-            System.out.println(tok);
-        }
+        lex(contract, COMMENT);
     }
 
     @Test

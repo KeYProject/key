@@ -17,7 +17,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
@@ -39,15 +42,13 @@ import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
  * 
  */
 public class ReferenceLister {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceLister.class);
 
     private static DefaultServiceConfiguration sc;
 
     public static void main(String[] args) throws ParserException, IOException {
-
-        System.err
-                .println("Use this program to print unresolved type references.");
-        System.err
-                .println("Call with one argument: The directory to read java files from (recursively).");
+        LOGGER.info("Use this program to print unresolved type references.");
+        LOGGER.info("Call with one argument: The directory to read java files from (recursively).");
 
         sc = new RefSolverServiceConfiguration();
 
@@ -67,8 +68,7 @@ public class ReferenceLister {
                     TypeReference typeRef = (TypeReference) pe;
                     if (si.getType(typeRef) == null
                             && !typeRef.getName().equals("void"))
-                        System.out.println("Unresolvable type: "
-                                + typeRef.toSource());
+                        LOGGER.info("Unresolvable type: {}", typeRef.toSource());
                 }
             }
         }
@@ -77,7 +77,7 @@ public class ReferenceLister {
     private static void handleDir(File dir) throws ParserException, IOException {
         assert dir.isDirectory();
         File[] files = dir.listFiles();
-        for (File file : files) {
+        for (File file : Objects.requireNonNull(files)) {
             if (file.isDirectory())
                 handleDir(file);
             else
@@ -89,7 +89,7 @@ public class ReferenceLister {
         if (!file.getName().toLowerCase().endsWith(".java"))
             return;
 
-        System.err.println("Parsing: " + file);
+        LOGGER.warn("Parsing: {}", file);
 
         ProgramFactory factory = sc.getProgramFactory();
         FileReader fileReader = new FileReader(file);
@@ -106,6 +106,7 @@ public class ReferenceLister {
 }
 
 class RefSolverServiceConfiguration extends CrossReferenceServiceConfiguration {
+    @Override
     protected ProgramFactory makeProgramFactory() {
         return ProofJavaProgramFactory.getInstance();
     }

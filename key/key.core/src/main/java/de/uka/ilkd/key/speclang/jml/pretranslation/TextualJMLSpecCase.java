@@ -107,7 +107,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         ENSURES_FREE,
         AXIOMS,
     }
-    //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 
     private final Behavior behavior;
     private ArrayList<Entry> clauses = new ArrayList<>(16);
@@ -130,12 +129,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
         super(mods);
-        assert behavior != null;
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
         this.behavior = behavior;
-        /*for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            //heaps.put(hName.toString(), new ArrayList<>(32));
-            //accessibles.put(hName.toString() + "AtPre", ImmutableSLList.nil());
-        }*/
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
@@ -210,105 +207,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                 '}';
     }
 
-    /*
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        Iterator<PositionedString> it;
-
-        sb.append(behavior).append("\n");
-
-        for (Triple<PositionedString, PositionedString, PositionedString> t : abbreviations) {
-            sb.append("old: ");
-            sb.append(t.first.toString());
-            sb.append(" ");
-            sb.append(t.second.toString());
-            sb.append(" = ");
-            sb.append(t.third.toString());
-            sb.append("\n");
-        }
-
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = requires.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("requires<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = requiresFree.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("requires_free<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = assignables.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("assignable<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = accessibles.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("accessible<" + h + ">: " + it.next() + "\n");
-            }
-            it = accessibles.get(h.toString() + "AtPre").iterator();
-            while (it.hasNext()) {
-                sb.append("accessible<" + h + "AtPre>: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = ensures.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("ensures<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = ensuresFree.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("ensures_free<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = axioms.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("axioms<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        it = signals.iterator();
-        while (it.hasNext()) {
-            sb.append("signals: ").append(it.next()).append("\n");
-        }
-        it = signalsOnly.iterator();
-        while (it.hasNext()) {
-            sb.append("signals_only: ").append(it.next()).append("\n");
-        }
-        it = diverges.iterator();
-        while (it.hasNext()) {
-            sb.append("diverges: ").append(it.next()).append("\n");
-        }
-        it = depends.iterator();
-        while (it.hasNext()) {
-            sb.append("depends: ").append(it.next()).append("\n");
-        }
-        it = breaks.iterator();
-        while (it.hasNext()) {
-            sb.append("breaks: ").append(it.next()).append("\n");
-        }
-        it = continues.iterator();
-        while (it.hasNext()) {
-            sb.append("continues: ").append(it.next()).append("\n");
-        }
-        it = returns.iterator();
-        while (it.hasNext()) {
-            sb.append("returns: ").append(it.next()).append("\n");
-        }
-        it = infFlowSpecs.iterator();
-        while (it.hasNext()) {
-            sb.append("determines: ").append(it.next()).append("\n");
-        }
-        return sb.toString();
-    }
-    */
 
     //region legacy api
     public void addRequires(LabeledParserRuleContext label) {
@@ -316,7 +214,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
-        //TODO System.out.println("TODO .getAbbreviations");
+        /* weigl: prepare for future use of generated abbreviations from JML specifications*/
         return new Triple[0];
     }
 

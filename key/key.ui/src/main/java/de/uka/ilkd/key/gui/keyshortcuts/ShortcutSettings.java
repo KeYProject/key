@@ -87,7 +87,6 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                 KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
                 txtCaptureShortcut.setText(ks.toString());
 
-                //System.out.println(ks);
                 boolean shortcutComplete =
                         ks.getModifiers() > 0
                                 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED

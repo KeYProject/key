@@ -13,29 +13,28 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.io.*;
-import javax.xml.parsers.*;
-
-
 import de.uka.ilkd.key.util.Debug;
-import org.xml.sax.*;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.ParameterDeclaration;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.*;
+import java.util.*;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for
@@ -51,7 +50,9 @@ import recoder.java.declaration.ParameterDeclaration;
  * @author weigl, 2016-08-17
  */
 public class RIFLTransformer {
-    private List<File> result = new ArrayList<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(RIFLTransformer.class);
+
+    private final List<File> result = new ArrayList<>();
 
     public RIFLTransformer() throws ParserConfigurationException, SAXException {
         JPF.initialize(new CrossReferenceServiceConfiguration());
@@ -59,7 +60,6 @@ public class RIFLTransformer {
     }
 
 
-    //private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
     private static final JavaProgramFactory JPF =
             de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
 
@@ -68,8 +68,8 @@ public class RIFLTransformer {
      */
     public static void main(String[] args) {
         if (args.length < 2 || "--help".equals(args[0])) {
-            System.out.println("This is the RIFL to JML* transformer.");
-            System.out.println("Usage: <RIFL file> <Java sources>");
+            LOGGER.info("This is the RIFL to JML* transformer.");
+            LOGGER.info("Usage: <RIFL file> <Java sources>");
         } else {
             final File riflFilename = new File(args[0]);
             final File javaFilename = new File(args[1]);
@@ -87,23 +87,15 @@ public class RIFLTransformer {
      */
     public static boolean transform(File riflFilename, File javaSource,
                                     File savePath, KeYRecoderExcHandler kexh) {
-        assert riflFilename != null;
-        assert javaSource != null;
-        assert savePath != null;
-        assert kexh != null;
+        if (riflFilename == null || javaSource == null || savePath == null || kexh == null)
+            throw new IllegalArgumentException("A parameter is null");
 
-        RIFLTransformer rt = null;
+        RIFLTransformer rt;
         try {
             rt = new RIFLTransformer();
             rt.doTransform(riflFilename, javaSource, savePath);
             return true;
-        }catch (final ParserConfigurationException e) {
-            kexh.reportException(e);
-        } catch (final SAXException e) {
-            kexh.reportException(e);
-        } catch (final ParserException e) {
-            kexh.reportException(e);
-        } catch (final IOException e) {
+        } catch (final ParserConfigurationException | SAXException | ParserException | IOException e) {
             kexh.reportException(e);
         }
         return false;
@@ -143,33 +135,25 @@ public class RIFLTransformer {
         final Walker walker = files.createWalker(".java");
 
         final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
-        Map<CompilationUnit, File> javaCUs = new HashMap<CompilationUnit, File>();
+        Map<CompilationUnit, File> javaCUs = new HashMap<>();
 
         // parse
         while (walker.step()) {
             final File javaFile = new File(walker.getCurrentName());
             // debug
             if (Debug.ENABLE_DEBUG) {
-                System.out.println("[RIFL] Read file: " + javaFile);
+                LOGGER.info("[RIFL] Read file: {}", javaFile);
             }
 
             final CompilationUnit cu;
-            Reader fr = null;
 
-            try {
-                fr = new BufferedReader(new FileReader(javaFile));
+            try (Reader fr = new BufferedReader(new FileReader(javaFile))) {
                 cu = JPF.parseCompilationUnit(fr);
 
                 //crud relative
                 File relative = relative(root, javaFile);
                 javaCUs.put(cu, relative); // relative path
                 serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
-            } catch (IOException e) {
-                throw e;
-            } catch (ParserException e) {
-                throw e;
-            } finally {
-                if (fr != null) fr.close();
             }
         }
         return javaCUs;
@@ -187,6 +171,8 @@ public class RIFLTransformer {
             throws IOException, SAXException, ParserConfigurationException {
         // TODO: validate input file
         final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         spf.setNamespaceAware(true);
 
         SAXParser saxParser = spf.newSAXParser();
@@ -210,36 +196,38 @@ public class RIFLTransformer {
         Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
         int counter = 0;
         // step 2: inject specifications
-        //TODO rename the public class in the compilation unit and reuse the old java folder, for ensure interdepences to other files
+        //TODO rename the public class in the compilation unit and reuse the old java folder,
+        // for ensure interdepences to other files
         for (CompilationUnit cu : javaCUs.keySet()) {
-            final SpecificationInjector si = new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
+            final SpecificationInjector si = new SpecificationInjector(sc,
+                    JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
 
             ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
             for (MethodDeclaration mdecl : si.getSpecifiedMethodDeclarations()) {
 
-            	
-            	StringBuilder sb = new StringBuilder();
-            	for (ParameterDeclaration p : mdecl.getParameters()) {
-            		sb.append(p.getTypeReference().getName());
-            		sb.append(",");
-            	}
-            	if(sb.length()>0){
-            		sb.deleteCharAt(sb.length() - 1);
-            	}
 
-            	String poname = clazz.getFullName() + "[" +
-            			clazz.getFullName() + "\\\\:\\\\:" +
-            			mdecl.getName() + "(" + sb + ")" + "]"
-            			+ ".Non-interference contract.0";
+                StringBuilder sb = new StringBuilder();
+                for (ParameterDeclaration p : mdecl.getParameters()) {
+                    sb.append(p.getTypeReference().getName());
+                    sb.append(",");
+                }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
 
-            	File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
+                String poname = clazz.getFullName() + "[" +
+                        clazz.getFullName() + "\\\\:\\\\:" +
+                        mdecl.getName() + "(" + sb + ")" + "]"
+                        + ".Non-interference contract.0";
 
-            	writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
-            	result.add(problemFileName);
+                File problemFileName = new File(javaRoot.getParent(),
+                        riflFilename.getName() + "_" + counter++ + ".key");
+
+                writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
+                result.add(problemFileName);
 
             }
-            //result.add(keyProblemFile);
         }
 
 
@@ -254,22 +242,22 @@ public class RIFLTransformer {
 
 
     private void writeProblemFile(File problemFileName, String newJavaFolder, String poname) {
-        String tmp, blueprint = "";
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(getClass().getResourceAsStream("blueprint_rifl.key")));
+        String tmp;
+        StringBuilder blueprint = new StringBuilder();
 
-        try {
+        final var stream = getClass().getResourceAsStream("blueprint_rifl.key");
+        Objects.requireNonNull(stream);
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+             Writer fw = new BufferedWriter(new FileWriter(problemFileName))) {
             while ((tmp = br.readLine()) != null) {
-                blueprint += tmp + "\n";
+                blueprint.append(tmp).append("\n");
             }
 
-            FileWriter fw = new FileWriter(problemFileName);
             fw.write(
-                    blueprint.replaceAll("%%JAVA_SOURCE%%", newJavaFolder)
-                            .replaceAll("%%PO_NAME%%", poname)
-            );
-            br.close();
-            fw.close();
+                    blueprint.toString()
+                            .replace("%%JAVA_SOURCE%%", newJavaFolder)
+                            .replace("%%PO_NAME%%", poname));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -277,13 +265,11 @@ public class RIFLTransformer {
 
     private void ensureTargetDirExists(File target) throws IOException {
         if (target.exists()) {
-            if (target.isDirectory() && target.canWrite()) {
-                return; // nothing to do
-            } else { // bad
+            if (!target.isDirectory() || !target.canWrite()) { // bad
                 throw new IOException("target directory " + target + " not writable");
             }
         } else { // create directory
-            target.mkdir();
+            target.mkdirs();
         }
     }
 
@@ -292,24 +278,15 @@ public class RIFLTransformer {
      */
     private void writeJavaFile(File target, CompilationUnit cu)
             throws IOException {
-        FileWriter writer = null;
-        try {
-            if (Debug.ENABLE_DEBUG) {
-                System.out.println("[RIFL] Trying to write file " + target);
-            }
-
-            writer = new FileWriter(target);
+        try (var writer = new BufferedWriter(new FileWriter(target))) {
+            LOGGER.debug("Trying to write file {}", target);
             final String source = cu.toSource();
 
-            if (Debug.ENABLE_DEBUG) {
-                System.out.println("[RIFL] Write the following contents to file:");
-                System.out.println(source);
-            }
+            LOGGER.debug("[RIFL] Write the following contents to file:");
+            LOGGER.debug(source);
 
             writer.write(source);
             writer.flush();
-        } finally {
-            if (writer != null) writer.close();
         }
     }
 
