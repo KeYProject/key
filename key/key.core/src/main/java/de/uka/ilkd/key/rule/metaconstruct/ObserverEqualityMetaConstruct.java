@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.conditions.SameObserverCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -127,7 +128,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term result = services.getTermBuilder().and(
                 buildConditionMonotonicHeap(termExt.sub(0), termBase.sub(0), services),
                 buildConditionPrecondition(termBase, contract, services),
-                buildConditionSameParams(termExt, termBase, services),
+                buildConditionSameParams(contract, termExt, termBase, services),
                 buildConditionDependency(termExt, termBase, contract, services)
         );
 
@@ -153,7 +154,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term ov = tb.var(varObj);
         Term fv = tb.var(varFld);
 
-        ImmutableList<Term> params = smaller.subs().toImmutableList().take(2);
+        // static methods do not a self var ==> one argument less to ignore (#1672)
+        int paramOffset = contract.hasSelfVar() ? 2 : 1;
+        ImmutableList<Term> params = smaller.subs().toImmutableList().take(paramOffset);
 
         Term mod = contract.getDep(baseHeap, false, smaller.sub(0),
                 smaller.sub(1), params, Collections.emptyMap(), services);
@@ -172,11 +175,14 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build
      *   a1=a1' /\ ... /\ an=an'
      */
-    private Term buildConditionSameParams(Term term1, Term term2, Services services) {
+    private Term buildConditionSameParams(DependencyContract contract, Term term1, Term term2, Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = tb.tt();
 
-        for (int i = 2; i < term1.arity(); i++) {
+        // static methods do not a self var ==> one argument less to ignore (#1672)
+        int paramOffset = contract.hasSelfVar() ? 2 : 1;
+
+        for (int i = paramOffset; i < term1.arity(); i++) {
             result = tb.and(result, tb.equals(term1.sub(i), term2.sub(i)));
         }
 
@@ -192,7 +198,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
                                             DependencyContract contract, Services services) {
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        ImmutableList<Term> params = app.subs().toImmutableList().take(2);
+        // static methods do not a self var ==> one argument less to ignore (#1672)
+        int paramOffset = contract.hasSelfVar() ? 2 : 1;
+        ImmutableList<Term> params = app.subs().toImmutableList().take(paramOffset);
 
         return contract.getPre(baseHeap, app.sub(0), app.sub(1),
                 params, Collections.emptyMap(), services);
