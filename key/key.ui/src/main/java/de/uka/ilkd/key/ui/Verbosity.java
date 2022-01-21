@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.ui;
 
 public interface Verbosity {
-   public static final byte SILENT = 0;
-   public static final byte NORMAL = 1;
-   public static final byte HIGH = 2;
-   public static final byte DEBUG = 4;
+   byte SILENT = 0;
+   byte NORMAL = 1;
+   byte INFO = 2;
+   byte DEBUG = 3;
+   byte TRACE = 4;
 }

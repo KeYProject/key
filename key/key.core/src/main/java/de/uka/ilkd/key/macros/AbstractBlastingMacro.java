@@ -214,9 +214,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.create(10);
             } else if (app.rule().name().toString().equals("pullOut")) {
                 Term t = pio.subTerm();
-
-                // System.out.println(t);
-
                 if (t.op() instanceof Function) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
                         return NumberRuleAppCost.create(1000);
@@ -239,7 +236,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             String name = rule.name().toString();
 
-            // System.out.println(rule.name());
 
             return name.equals("pullOut")
                     // ||name.startsWith("applyEq")

@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.strategy;
 
+import antlr.ASTFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -207,6 +211,7 @@ public final class StrategyProperties extends Properties {
 
 
     private static final Properties DEFAULT_MAP = new Properties();
+    private static final Logger LOGGER = LoggerFactory.getLogger(StrategyProperties.class);
 
     static {
         DEFAULT_MAP.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
@@ -403,10 +408,10 @@ public final class StrategyProperties extends Properties {
         // If you changed something in the settings:Perhaps you need to update
         // the string pool in StrategyProperties.
 
-        System.err.println("The string \"" + in + "\" is not registered in the" +
-                           " string pool of StrategyProperties. Probably you are loading" +
-                           " properties stored with a different KeY version. This setting" +
-                           " is ignored, default value is taken!");
+        LOGGER.error("The string \"{}\" is not registered in the" +
+                " string pool of StrategyProperties. Probably you are loading" +
+                " properties stored with a different KeY version. This setting" +
+                " is ignored, default value is taken!", in);
         return null;
     }
 

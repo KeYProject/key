@@ -15,6 +15,8 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,6 +61,8 @@ import java.util.stream.Collectors;
  * @version 2 (11/15/21)
  */
 public final class IssueDialog extends JDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
+
     /** regex to find web urls in string messages */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
 
@@ -559,7 +563,7 @@ public final class IssueDialog extends JDialog {
                     message == null ? exception.toString() : message, resourceLocation, pos, info);
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
-            Debug.out("Creating a Location failed for " + exception, e);
+            LOGGER.debug("Creating a Location failed for " + exception, e);
         }
         return new PositionedIssueString("Constructing the error message failed!");
     }
@@ -633,7 +637,7 @@ public final class IssueDialog extends JDialog {
                 try (InputStream stream = IOUtil.openStream(issue.fileName)) {
                     return IOUtil.readFrom(stream);
                 } catch (IOException e) {
-                    Debug.out("Unknown IOException!", e);
+                    LOGGER.debug("Unknown IOException!", e);
                     return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
                 }
             });

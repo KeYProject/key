@@ -21,7 +21,10 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This task takes care for a notification when exiting KeY.
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.util.Debug;
  * @author bubel
  */
 public class ExitKeYNotification extends NotificationTask {
+   private static final Logger LOGGER = LoggerFactory.getLogger(ExitKeYNotification.class);
 
    /**
     * overwritten as invokeAndWait is taken called to execute the notification
@@ -64,10 +68,10 @@ public class ExitKeYNotification extends NotificationTask {
             });
          }
          catch (InterruptedException e) {
-            Debug.out("unexpected exception during notification");
+            LOGGER.debug("unexpected exception during notification");
          }
          catch (InvocationTargetException e) {
-            Debug.out("unexpected exception during notification");
+            LOGGER.debug("unexpected exception during notification");
          }
       }
    }

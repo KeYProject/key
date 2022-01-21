@@ -342,8 +342,6 @@ public class CETree {
 						if(value.contains("="))
 							value = value.substring(value.indexOf('=')+1);
 						
-						//System.err.println("Expand: "+value);
-
 						if(value.startsWith("#o")){
 
 							value = value.substring(value.indexOf('=')+1);

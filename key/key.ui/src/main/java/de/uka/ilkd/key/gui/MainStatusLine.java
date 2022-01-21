@@ -69,7 +69,12 @@ class MainStatusLine extends JPanel {
         add(progressBar);
 
         add(Box.createHorizontalGlue());
-        KeYGuiExtensionFacade.getStatusLineComponents().forEach(this::add);
+        JToolBar bar = new JToolBar();
+        bar.setFloatable(false);
+        bar.setRollover(false);
+        bar.setBorderPainted(false);
+        add(bar);
+        KeYGuiExtensionFacade.getStatusLineComponents().forEach(bar::add);
     }
 
     /*

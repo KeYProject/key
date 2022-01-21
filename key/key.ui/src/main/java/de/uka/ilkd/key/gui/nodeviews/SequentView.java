@@ -64,12 +64,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
     private static final long serialVersionUID = 6867808795064180589L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 
@@ -90,6 +94,7 @@ public abstract class SequentView extends JEditorPane {
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
+
 
     private final MainWindow mainWindow;
 
@@ -198,7 +203,7 @@ public abstract class SequentView extends JEditorPane {
             putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
-            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
+            LOGGER.debug("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
         }
     }
 
@@ -288,9 +293,7 @@ public abstract class SequentView extends JEditorPane {
                         .changeHighlight(highlighter, 0, 0);
             }
         } catch (BadLocationException badLocation) {
-            System.err.println("SequentView tried to highlight an area "
-                    + "that does not exist: "+range);
-            badLocation.printStackTrace();
+            LOGGER.warn("SequentView tried to highlight an area that does not exist: {]", range);
         }
     }
 
@@ -320,7 +323,7 @@ public abstract class SequentView extends JEditorPane {
             highlight
                     = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
-            Debug.out("Highlight range out of scope.");
+            LOGGER.debug("Highlight range out of scope.");
             e.printStackTrace();
         }
         return highlight;
@@ -460,7 +463,7 @@ public abstract class SequentView extends JEditorPane {
         try {
             getHighlighter().changeHighlight(highlight, 0, 0);
         } catch (BadLocationException e) {
-            Debug.out("Invalid range for highlight");
+            LOGGER.debug("Invalid range for highlight");
             e.printStackTrace();
         }
     }
@@ -597,7 +600,7 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
@@ -613,7 +616,7 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
@@ -673,7 +676,7 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
@@ -685,7 +688,6 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private void setLastMousePosition(Point p) {
-        // System.out.println("setLast Pos " + p);
         Point old = this.lastMousePosition;
         lastMousePosition=p;
         firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);

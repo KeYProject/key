@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +93,7 @@ class ScriptLineParser {
     }
 
     public Map<String, String> parseCommand() throws IOException, ScriptException {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();
         StringBuilder sb = new StringBuilder();
@@ -219,26 +217,8 @@ class ScriptLineParser {
     }
 
     private void exc(int c) throws ScriptException {
-        throw new ScriptException("Unexpected char '" + (char)c + "' at " + line + ":" + col,
+        throw new ScriptException(String.format("Unexpected char '%s' at %d:%d", (char) c, line, col),
                 fileURL, line, col);
-    }
-
-    // TODO make this a testcase
-    public static void main(String[] args) throws Exception {
-
-        String arg = "macro key1=value1 key2=\"value two\" defval3 \"long defvalue\"; " +
-                "command ; \n\n" +
-                "# some comment\n" +
-                "multiline #comment internal\n command \n with=\"line breaks in \n values\"; \n" +
-                "select formula=\"a;b\"; \n" +
-                "hyphened-command;\n" +
-                "ignored ";
-
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg));
-        Map<String, String> str;
-        while((str = mlp.parseCommand()) != null) {
-            System.err.println(str);
-        }
     }
 
     /**

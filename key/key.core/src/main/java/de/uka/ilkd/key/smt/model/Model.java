@@ -26,6 +26,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.lang.SMTSort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents an SMT model.
@@ -34,6 +36,7 @@ import de.uka.ilkd.key.smt.lang.SMTSort;
  *
  */
 public class Model {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Model.class);
 
     /**
      * marks an empty model
@@ -48,19 +51,19 @@ public class Model {
      * Maps constant values to constant names. (constantValue,
      * constantName1/constantName2/...)
      */
-    private Map<String, String> reversedConstants;
+    private final Map<String, String> reversedConstants;
     /**
      * List of heaps.
      */
-    private List<Heap> heaps;
+    private final List<Heap> heaps;
     /**
      * List of location sets.
      */
-    private List<LocationSet> locsets;
+    private final List<LocationSet> locsets;
     /**
      * List of sequences.
      */
-    private List<Sequence> sequences;
+    private final List<Sequence> sequences;
     /**
      * Type information from the SMT specification.
      */
@@ -71,11 +74,11 @@ public class Model {
      */
     public Model() {
         empty = true;
-        constants = new HashMap<String, String>();
-        heaps = new LinkedList<Heap>();
-        locsets = new LinkedList<LocationSet>();
-        reversedConstants = new HashMap<String, String>();
-        sequences = new LinkedList<Sequence>();
+        constants = new HashMap<>();
+        heaps = new LinkedList<>();
+        locsets = new LinkedList<>();
+        reversedConstants = new HashMap<>();
+        sequences = new LinkedList<>();
     }
 
     /**
@@ -347,8 +350,6 @@ public class Model {
         if (s.getId().equals(SMTObjTranslator.BINT_SORT)) {
             long intBound = types.getSort(SMTObjTranslator.BINT_SORT)
                     .getBound();
-            // long intSize =
-            // types.getSort(SMTObjTranslator.BINT_SORT).getBitSize();
             if (x >= intBound / 2) {
                 x = (int) (x - intBound);
             }
@@ -374,7 +375,6 @@ public class Model {
         if (val == null) {
             return null;
         }
-        // System.out.println("AnyVal: "+val);
         // if val is in hexadecimal transform it to binary first
         if (val.startsWith("#x")) {
             val = val.replace("#", "");
@@ -382,12 +382,11 @@ public class Model {
             int x = Integer.parseInt(val, 16);
 
             long anySize = types.getSort(SMTObjTranslator.ANY_SORT).getBitSize();
-            String binString = Integer.toBinaryString(x);
+            StringBuilder binString = new StringBuilder(Integer.toBinaryString(x));
 
             while (binString.length() < anySize) {
-                binString = "0" + binString;
+                binString.insert(0, "0");
             }
-
             val = "#b" + binString;
         }
         // remove #b prefix of binary string
@@ -442,13 +441,8 @@ public class Model {
                     .getBitSize();
             val = val.substring(val.length() - (int) objSize);
             val = "#o" + Integer.parseInt(val, 2);
-            // if(reversedConstants.containsKey(val)){
-            // val = val + "/" + reversedConstants.get(val);
-            // }
         }
-
         return val;
-
     }
 
     /**
@@ -458,15 +452,12 @@ public class Model {
     public void processArrayValues() {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
-
                 Sort s = o.getSort();
-
                 if (s == null) {
                     continue;
                 }
 
                 String sortname = s.name().toString();
-
                 if (!sortname.endsWith("[]")) {
                     continue;
                 }
@@ -476,7 +467,6 @@ public class Model {
                     val = processAnyValue(val);
                     o.setArrayValue(i, val);
                 }
-
             }
         }
     }
@@ -529,7 +519,7 @@ public class Model {
             if (reversedConstants.containsKey(ls.getName())) {
                 ls.setName(getAliasedName(ls.getName()));
             }
-            List<Location> newLocations = new LinkedList<Location>();
+            List<Location> newLocations = new LinkedList<>();
             for (Location l : ls.getLocations()) {
                 String newObjectID = reversedConstants.containsKey(
                         l.getObjectID()) ? getAliasedName(l.getObjectID())
@@ -560,7 +550,7 @@ public class Model {
      * @return set with all function values
      */
     private Map<String, String> extractFunctionValuesFor(ObjectVal o) {
-        Map<String, String> newFunValues = new HashMap<String, String>();
+        Map<String, String> newFunValues = new HashMap<>();
         for (Entry<String, String> e : o.getFunValues().entrySet()) {
             if (reversedConstants.containsKey(e.getValue())) {
                 newFunValues.put(e.getKey(), getAliasedName(e.getValue()));
@@ -577,7 +567,7 @@ public class Model {
      * @return set with all array values
      */
     private Map<Integer, String> extractArrayValuesFor(ObjectVal o) {
-        Map<Integer, String> newArrayValues = new HashMap<Integer, String>();
+        Map<Integer, String> newArrayValues = new HashMap<>();
         for (int i = 0; i < o.getLength(); i++) {
             if (reversedConstants.containsKey(o.getArrayValue(i))) {
                 newArrayValues.put(i, getAliasedName(o.getArrayValue(i)));
@@ -594,7 +584,7 @@ public class Model {
      * @return set with all field values
      */
     private Map<String, String> extractFieldValuesFor(ObjectVal o) {
-        Map<String, String> newFieldValues = new HashMap<String, String>();
+        Map<String, String> newFieldValues = new HashMap<>();
         for (Entry<String, String> e : o.getFieldvalues().entrySet()) {
             if (reversedConstants.containsKey(e.getValue())) {
                 newFieldValues.put(e.getKey(), getAliasedName(e.getValue()));
@@ -611,10 +601,9 @@ public class Model {
      * @return set of necessary prestate objects
      */
     public Set<ObjectVal> getNecessaryPrestateObjects(String location) {
-        Set<ObjectVal> result = new HashSet<ObjectVal>();
+        Set<ObjectVal> result = new HashSet<>();
 
         String[] l = location.split("\\.");
-        // System.out.println("location: "+location);
         String objName = l[0];
         String nullString = "#o0";
 
@@ -628,7 +617,6 @@ public class Model {
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
             result.add(o);
-            // System.out.println(o.getName()+"."+l[i]);
             String pointed = o.getFieldUsingSimpleName(l[i]);
             if (pointed == null) {
                 break;
@@ -647,7 +635,6 @@ public class Model {
      */
     public ObjectVal findObject(String ref) {
         String[] l = ref.split("\\.");
-        // System.out.println("location: "+location);
         String objName = l[0];
         String nullString = "#o0";
 
@@ -660,7 +647,6 @@ public class Model {
         ObjectVal o = getObject(constants.get(objName), heap);
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
-            // System.out.println(o.getName()+"."+l[i]);
             String pointed = o.getFieldUsingSimpleName(l[i]);
             if (pointed == null) {
                 break;
@@ -677,26 +663,19 @@ public class Model {
      * cleans up maps from unused/unnecessary objects
      */
     public void removeUnnecessaryObjects() {
-
-        // System.out.println("Start cleaning...");
-        Set<String> objConstants = new HashSet<String>();
-
-        for (String c : constants.keySet()) {
-
+        Set<String> objConstants = new HashSet<>();
+        for (var pair : constants.entrySet()) {
+            var c = pair.getKey();
             if (types.getTypeForConstant(c) == null) {
                 continue;
             }
-
-            if (types.getTypeForConstant(c).getId()
-                    .equals(SMTObjTranslator.OBJECT_SORT)) {
-                objConstants.add(constants.get(c));
+            if (types.getTypeForConstant(c).getId().equals(SMTObjTranslator.OBJECT_SORT)) {
+                objConstants.add(pair.getValue());
             }
         }
 
-        // System.out.println("Found: "+objConstants);
-
         for (Heap h : heaps) {
-            Set<ObjectVal> reachable = new HashSet<ObjectVal>();
+            Set<ObjectVal> reachable = new HashSet<>();
             for (String o : objConstants) {
                 reachable.addAll(getReachableObjects(o, h));
             }
@@ -715,8 +694,8 @@ public class Model {
      */
     public Set<ObjectVal> getReachableObjects(String name, Heap heap) {
 
-        Set<ObjectVal> result = new HashSet<ObjectVal>();
-        Stack<ObjectVal> scheduled = new Stack<ObjectVal>();
+        Set<ObjectVal> result = new HashSet<>();
+        Stack<ObjectVal> scheduled = new Stack<>();
 
         ObjectVal init = getObject(name, heap);
 
@@ -761,7 +740,7 @@ public class Model {
      */
     public Set<ObjectVal> pointsTo(String name, Heap heap) {
 
-        Set<ObjectVal> result = new HashSet<ObjectVal>();
+        Set<ObjectVal> result = new HashSet<>();
 
         ObjectVal o = getObject(name, heap);
 
@@ -800,7 +779,6 @@ public class Model {
      * @return the object of the given name found in the heap
      */
     public ObjectVal getObject(String name, Heap heap) {
-        // System.out.println(name+"@"+heap.getName());
         for (ObjectVal o : heap.getObjects()) {
             if (o.getName().startsWith(name)) {
                 return o;
@@ -833,15 +811,14 @@ public class Model {
      * binary/hexadecimal to a human readable from.
      */
     public void processConstantsAndFieldValues() {
-
         // process constants
-        Map<String, String> newConstants = new HashMap<String, String>();
-        for (String c : constants.keySet()) {
-
-            String value = constants.get(c);
+        Map<String, String> newConstants = new HashMap<>();
+        for (var pair : constants.entrySet()) {
+            var c = pair.getKey();
+            var value = constants.get(c);
             SMTSort s = types.getTypeForConstant(c);
             if (s == null) {
-                // System.err.println("No sort for: "+c);
+                LOGGER.warn("No sort for: {}", c);
             } else {
                 newConstants.put(c, processConstantValue(value, s));
             }
@@ -853,16 +830,14 @@ public class Model {
 
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
-                Map<String, String> newFieldValues = new HashMap<String, String>();
+                Map<String, String> newFieldValues = new HashMap<>();
                 for (String f : o.getFieldvalues().keySet()) {
                     String value = o.getFieldvalues().get(f);
                     newFieldValues.put(f, processAnyValue(value));
-
                 }
                 o.setFieldvalues(newFieldValues);
             }
         }
-
         processLocSetNames();
     }
 
@@ -871,35 +846,35 @@ public class Model {
      * @return string representation of the model for debugging purposes
      */
     public String toString() {
-        String result = "Constants";
-        result += "\n-----------\n\n";
+        StringBuilder result = new StringBuilder("Constants");
+        result.append("\n-----------\n\n");
         for (Entry<String, String> e : constants.entrySet()) {
-            result += e.getKey() + " = " + e.getValue();
-            result += "\n";
+            result.append(e.getKey()).append(" = ").append(e.getValue());
+            result.append("\n");
         }
 
-        result += "\n";
-        result += "\nHeaps";
-        result += "\n-----------";
+        result.append("\n");
+        result.append("\nHeaps");
+        result.append("\n-----------");
         for (Heap h : heaps) {
-            result += "\n";
-            result += h.toString();
+            result.append("\n");
+            result.append(h.toString());
         }
-        result += "\n";
-        result += "\nLocation Sets";
-        result += "\n-----------";
+        result.append("\n");
+        result.append("\nLocation Sets");
+        result.append("\n-----------");
         for (LocationSet ls : locsets) {
-            result += "\n";
-            result += ls.toString();
+            result.append("\n");
+            result.append(ls.toString());
         }
-        result += "\n";
-        result += "\nSequences";
-        result += "\n-----------";
+        result.append("\n");
+        result.append("\nSequences");
+        result.append("\n-----------");
         for (Sequence s : sequences) {
-            result += "\n" + s;
+            result.append("\n").append(s);
         }
 
-        return result;
+        return result.toString();
 
     }
 
