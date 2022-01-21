@@ -133,7 +133,9 @@ public final class RuleInteraction extends NodeInteraction {
 
     private HashMap<String, String> createInvocationArguments() {
         var allArgs = createInstArguments();
-        allArgs.put("formula", topLevelTerm);
+        if (topLevelTerm != null) {
+            allArgs.put("formula", topLevelTerm);
+        }
         if (subTerm != null) {
             allArgs.put("on", subTerm);
         }
