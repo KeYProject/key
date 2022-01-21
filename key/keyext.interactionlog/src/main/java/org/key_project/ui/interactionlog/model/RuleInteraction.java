@@ -45,11 +45,17 @@ public final class RuleInteraction extends NodeInteraction {
         this.ruleName = app.rule().displayName();
 
         var posInOccurrence = app.posInOccurrence();
-        var topLevelTerm = posInOccurrence.topLevel().subTerm();
-        var subTerm = posInOccurrence.subTerm();
-        this.subTerm = subTerm == topLevelTerm || subTerm == null ? null : printTerm(subTerm);
-        this.topLevelTerm = printTerm(topLevelTerm);
-        this.posInOccurrence = OccurenceIdentifier.get(app.posInOccurrence());
+        if (posInOccurrence == null) {
+            this.subTerm = null;
+            this.topLevelTerm = null;
+        } else {
+            var topLevelTerm = posInOccurrence.topLevel().subTerm();
+            var subTerm = posInOccurrence.subTerm();
+            this.subTerm = subTerm == topLevelTerm || subTerm == null ? null : printTerm(subTerm);
+            this.topLevelTerm = printTerm(topLevelTerm);
+        }
+
+        this.posInOccurrence = OccurenceIdentifier.get(posInOccurrence);
 
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
