@@ -44,11 +44,17 @@ public final class RuleInteraction extends NodeInteraction {
         this.ruleName = app.rule().displayName();
 
         var posInOccurrence = app.posInOccurrence();
-        var topLevelTerm = posInOccurrence.topLevel().subTerm();
-        var subTerm = posInOccurrence.subTerm();
-        this.subTerm = subTerm == topLevelTerm || subTerm == null ? null : printTerm(subTerm);
-        this.topLevelTerm = printTerm(topLevelTerm);
-        this.posInOccurrence = OccurenceIdentifier.get(app.posInOccurrence());
+        if (posInOccurrence == null) {
+            this.subTerm = null;
+            this.topLevelTerm = null;
+        } else {
+            var topLevelTerm = posInOccurrence.topLevel().subTerm();
+            var subTerm = posInOccurrence.subTerm();
+            this.subTerm = subTerm == topLevelTerm || subTerm == null ? null : printTerm(subTerm);
+            this.topLevelTerm = printTerm(topLevelTerm);
+        }
+
+        this.posInOccurrence = OccurenceIdentifier.get(posInOccurrence);
 
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
@@ -126,7 +132,9 @@ public final class RuleInteraction extends NodeInteraction {
 
     private HashMap<String, String> createInvocationArguments() {
         var allArgs = createInstArguments();
-        allArgs.put("formula", topLevelTerm);
+        if (topLevelTerm != null) {
+            allArgs.put("formula", topLevelTerm);
+        }
         if (subTerm != null) {
             allArgs.put("on", subTerm);
         }
@@ -178,7 +186,7 @@ public final class RuleInteraction extends NodeInteraction {
             out.format(format, "on", indentStringWith(subTerm, innerIndent).trim());
         }
 
-        args.forEach((k, v) ->  {
+        args.forEach((k, v) -> {
             out.format(format, k, indentStringWith(v, innerIndent).trim());
         });
 
