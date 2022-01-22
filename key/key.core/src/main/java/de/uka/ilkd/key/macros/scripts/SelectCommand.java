@@ -6,14 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -32,7 +29,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         if (formula != null) {
             try {
                 state.toTerm(formula, null);
-            } catch(BuildingException e) {
+            } catch(BuildingException | TermCreationException e) {
                 // Ignored
             }
         }
@@ -128,7 +125,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         try {
             var term = state.toTerm(formula, null);
             return contains(node.sequent(), term, selection);
-        } catch(BuildingException e) {
+        } catch(BuildingException | TermCreationException e) {
             return false;
         } catch(ParserException | ScriptException e) {
             // Should not happen, let's print it anyways
