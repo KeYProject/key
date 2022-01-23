@@ -13,20 +13,12 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Expression;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.MethodReference;
@@ -38,12 +30,15 @@ import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
  * has to be created, in KeY this is quite similar to take it out of a list of
  * objects and setting the implicit flag <code> &lt;created&gt; </code> to
  * <code>true</code> as well as setting all fields of the object to their
- * default values. For the complete procedure, the method creates the 
+ * default values. For the complete procedure, the method creates the
  * implicit method <code>&lt;createObject$gt;</code> which on its part calls
  * another implicit method <code>lt;prepare&gt;</code> for setting the fields
  * default values.
@@ -52,107 +47,108 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_OBJECT_CREATE = "<createObject>";
     public static final String NEW_OBJECT_VAR_NAME = "__NEW__";
-    private HashMap<ClassDeclaration, Identifier> class2identifier;
+    private final Map<ClassDeclaration, Identifier> class2identifier;
 
 
     public CreateObjectBuilder
-	(CrossReferenceServiceConfiguration services, 
-	 TransformerCache cache) {	
-	super(services, cache);
-	class2identifier = new LinkedHashMap<ClassDeclaration, Identifier>();
+            (CrossReferenceServiceConfiguration services,
+             TransformerCache cache) {
+        super(services, cache);
+        class2identifier = new LinkedHashMap<>();
     }
 
-   
-    /** 
+
+    /**
      * Creates the body of the static <code>&lt;createObject&gt;</code>
      * method.
      */
     private StatementBlock createBody(ClassDeclaration recoderClass) {
-		
-	ASTList<Statement> result = new ASTArrayList<Statement>(10);
-	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
-	
 
-	result.add(local);
+        ASTList<Statement> result = new ASTArrayList<>(10);
+        LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
 
-	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
-       
+
+        result.add(local);
+
+        final ASTList<Expression> arguments = new ASTArrayList<>(0);
+
         result.add
-            (assign(new VariableReference
-                    (new Identifier(NEW_OBJECT_VAR_NAME)),
-                    new MethodReference(new TypeReference
-                         (class2identifier.get(recoderClass)), 
-                         new ImplicitIdentifier
-                         (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                         arguments)));
+                (assign(new VariableReference
+                                (new Identifier(NEW_OBJECT_VAR_NAME)),
+                        new MethodReference(new TypeReference
+                                (class2identifier.get(recoderClass)),
+                                new ImplicitIdentifier
+                                        (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                                arguments)));
 
-	MethodReference createRef = 
-	    (new MethodReference(new VariableReference
-				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
-				 new ImplicitIdentifier
-				 (CreateBuilder.IMPLICIT_CREATE)));
-	
-	// July 08 - mulbrich: wraps createRef into a method body statement to
-	// avoid unnecessary dynamic dispatch.
-	// Method body statement are not possible for anonymous classes, however.
-	// Use a method call there
-	if(recoderClass.getIdentifier() == null) {
-	    // anonymous
-	    result.add
-        (new MethodReference(new VariableReference
-                             (new Identifier(NEW_OBJECT_VAR_NAME)),
-                             new ImplicitIdentifier
-                             (CreateBuilder.IMPLICIT_CREATE)));
-	} else {
-	    TypeReference tyref;
-	    tyref = makeTyRef(recoderClass); 
-	    result.add(new MethodBodyStatement(tyref, null, createRef));
-	}
-	
-	// TODO why does the method return a value? Is the result ever used??
-	result.add(new Return
-		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
+        MethodReference createRef =
+                (new MethodReference(new VariableReference
+                        (new Identifier(NEW_OBJECT_VAR_NAME)),
+                        new ImplicitIdentifier
+                                (CreateBuilder.IMPLICIT_CREATE)));
 
-	return new StatementBlock(result);
-	
+        // July 08 - mulbrich: wraps createRef into a method body statement to
+        // avoid unnecessary dynamic dispatch.
+        // Method body statement are not possible for anonymous classes, however.
+        // Use a method call there
+        if (recoderClass.getIdentifier() == null) {
+            // anonymous
+            result.add
+                    (new MethodReference(new VariableReference
+                            (new Identifier(NEW_OBJECT_VAR_NAME)),
+                            new ImplicitIdentifier
+                                    (CreateBuilder.IMPLICIT_CREATE)));
+        } else {
+            TypeReference tyref;
+            tyref = makeTyRef(recoderClass);
+            result.add(new MethodBodyStatement(tyref, null, createRef));
+        }
+
+        // TODO why does the method return a value? Is the result ever used??
+        result.add(new Return(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
+
+        return new StatementBlock(result);
+
     }
 
-    /* 
-     * make a type reference. There are special classes which need to be handled 
-     * differently. (<Default> for instance) 
+    /*
+     * make a type reference. There are special classes which need to be handled
+     * differently. (<Default> for instance)
      */
     private TypeReference makeTyRef(ClassDeclaration recoderClass) {
         Identifier id = recoderClass.getIdentifier();
-        if(id instanceof ImplicitIdentifier) 
+        if (id instanceof ImplicitIdentifier)
             return new TypeReference(id);
-        else 
+        else
             return TypeKit.createTypeReference(getProgramFactory(), recoderClass);
     }
-    
+
 
     /**
      * creates the implicit static <code>&lt;createObject&gt;</code>
      * method that takes the object to be created out of the pool
+     *
      * @param type the TypeDeclaration for which the
-     * <code>&lt;prepare&gt;</code> is created
+     *             <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
-	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
-	modifiers.add(new Public());
-	modifiers.add(new Static());	
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
+        modifiers.add(new Public());
+        modifiers.add(new Static());
 
-	MethodDeclaration md =  new MethodDeclaration
-	    (modifiers, 
-	     new TypeReference(class2identifier.get(type)), 
-	     new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), 
-	     new ASTArrayList<ParameterDeclaration>(0), 
-	     null,
-	     createBody(type));
-	md.makeAllParentRolesValid();
-	return md;
-    }    
+        MethodDeclaration md = new MethodDeclaration
+                (modifiers,
+                        new TypeReference(class2identifier.get(type)),
+                        new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE),
+						new ASTArrayList<>(0),
+                        null,
+                        createBody(type));
+        md.makeAllParentRolesValid();
+        return md;
+    }
 
+	@Override
     public ProblemReport analyze() {
         for (final ClassDeclaration cd : classDeclarations()) {
             class2identifier.put(cd, getId(cd));
@@ -163,22 +159,13 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     /**
      * entry method for the constructor normalform builder
-     * @param td the TypeDeclaration 
+     *
+     * @param td the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
-	if (td instanceof ClassDeclaration) {           
-	    attach(createMethod((ClassDeclaration)td), td, 
-	            td.getMembers().size());
-//  	    java.io.StringWriter sw = new java.io.StringWriter();
-//  	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
-//  	    System.out.println(sw.toString());
-//  	    try { sw.close(); } catch (Exception e) {}		
-	}
+        if (td instanceof ClassDeclaration) {
+            attach(createMethod((ClassDeclaration) td), td,
+                    td.getMembers().size());
+        }
     }
-
-
-
-
-
-
 }

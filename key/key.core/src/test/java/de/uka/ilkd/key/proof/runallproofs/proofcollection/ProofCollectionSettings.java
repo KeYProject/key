@@ -16,6 +16,8 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Immutable settings type for proof collections. Specifies settings used during
@@ -40,7 +42,9 @@ public class ProofCollectionSettings implements Serializable {
    private static final String TEMP_DIR = "tempDir";
    private static final String RUN_ONLY_ON = "runOnlyOn";
    private static final String DIRECTORY = "directory";
-   
+   private static final Logger LOGGER = LoggerFactory.getLogger(ProofCollectionSettings.class);
+
+
    /**
     * The time at which the corresponding runallproofs run has been started.
     */
@@ -118,9 +122,7 @@ public class ProofCollectionSettings implements Serializable {
       /*
        * Convert to an unmodifiable map and return.
        */
-      Map<String, String> unmodifiableMap = Collections
-            .unmodifiableMap(mutableMap);
-      return unmodifiableMap;
+      return Collections.unmodifiableMap(mutableMap);
    }
 
    /**
@@ -224,8 +226,7 @@ public class ProofCollectionSettings implements Serializable {
       }
       else {
          for (ForkMode mode : ForkMode.values()) {
-            if (mode.settingName.toLowerCase().equals(
-                  forkModeString.toLowerCase())) {
+            if (mode.settingName.equalsIgnoreCase(forkModeString)) {
                forkMode = mode;
                break;
             }
@@ -240,15 +241,11 @@ public class ProofCollectionSettings implements Serializable {
          /*
           * Unknown value used for fork mode. Printing out warning to the user.
           */
-         System.out
-               .println("Warning: Unknown value used for runAllProofs fork mode: "
-                     + forkModeString);
-         System.out
-               .println("Use either of the following: noFork (default), perGroup, perFile");
-         System.out.println("Using default fork mode: noFork");
-         System.out
-               .println("If you want to inspect source code, look up the following location:");
-         System.out.println(new Throwable().getStackTrace()[0]);
+         LOGGER.warn("Warning: Unknown value used for runAllProofs fork mode:  {}", forkModeString);
+         LOGGER.warn("Use either of the following: noFork (default), perGroup, perFile");
+         LOGGER.warn("Using default fork mode: noFork");
+         LOGGER.warn("If you want to inspect source code, look up the following location:");
+         LOGGER.warn("{}", new Throwable().getStackTrace()[0]);
          forkMode = ForkMode.NOFORK;
       }
 
@@ -269,8 +266,7 @@ public class ProofCollectionSettings implements Serializable {
     * @return <code>null</code> if not set, otherwise the local settings
     */
    public String getLocalKeYSettings() {
-      String lks = get(LOCAL_SETTINGS_KEY);
-      return lks;
+      return get(LOCAL_SETTINGS_KEY);
    }
 
    /**
@@ -328,9 +324,7 @@ public class ProofCollectionSettings implements Serializable {
 
       Set<String> enabledTestCaseNames = new LinkedHashSet<>();
       String[] testCaseList = testCases.split(",");
-      for (String testCaseName : testCaseList) {
-         enabledTestCaseNames.add(testCaseName);
-      }
+      Collections.addAll(enabledTestCaseNames, testCaseList);
       enabledTestCaseNames = Collections.unmodifiableSet(enabledTestCaseNames);
       return enabledTestCaseNames;
    }
@@ -349,10 +343,7 @@ public class ProofCollectionSettings implements Serializable {
          return false;
       }
       else {
-         System.out.println("Warning - unrecognized reload option: "
-               + reloadEnabled);
-         System.out.println("To check Java code for this message, see:");
-         System.out.println(new Throwable().getStackTrace()[0]);
+         LOGGER.warn("Warning - unrecognized reload option: {}", reloadEnabled);
          return true;
       }
    }
@@ -362,8 +353,7 @@ public class ProofCollectionSettings implements Serializable {
     */
    public static Entry<String, String> getSettingsEntry(final String key,
          final String value) {
-      return new Entry<String, String>() {
-
+      return new Entry<>() {
          @Override
          public String getKey() {
             return key;
@@ -377,7 +367,7 @@ public class ProofCollectionSettings implements Serializable {
          @Override
          public String setValue(String value) {
             throw new UnsupportedOperationException(
-                  "Proof collection settings are immutable. Changing settings values is not allowed.");
+                    "Proof collection settings are immutable. Changing settings values is not allowed.");
          }
       };
    }

@@ -1,15 +1,21 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
@@ -23,6 +29,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  * @author Mattias Ulbrich
  */
 public class ModularSMTLib2Translator implements SMTTranslator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
     private String preamble;
 
@@ -94,14 +101,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         // any exceptions?
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
-            sb.append("\n; " + t.toString().replace("\n", "\n;"));
+            sb.append("\n; ").append(t.toString().replace("\n", "\n;"));
             t.printStackTrace();
         }
 
         // TODO Find a concept for exceptions here
         if(!exceptions.isEmpty()) {
-            System.err.println("Exception while translating:");
-            System.err.println(sb);
+            LOGGER.error("Exception while translating: {}", sb);
             throw new RuntimeException(exceptions.get(0));
         }
 
@@ -111,7 +117,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     /*
      * precompute the information on the required sources from the translation.
      */
-    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master, List<Term> sequentAsserts) {
+    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master,
+                                         List<Term> sequentAsserts) {
         TypeManager tm = new TypeManager(services);
         tm.handle(master);
     }

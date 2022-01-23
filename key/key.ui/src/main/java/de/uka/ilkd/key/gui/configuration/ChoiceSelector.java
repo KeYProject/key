@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -41,25 +39,22 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChoiceSelector extends JDialog {
-
-    /**
-     * 
-     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
-    private ChoiceSettings settings;
-    private HashMap<String, String> category2DefaultChoice;
+    private final ChoiceSettings settings;
+    private final HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
     private boolean changed=false;
 
@@ -123,9 +118,10 @@ public class ChoiceSelector extends JDialog {
             choiceList.addListSelectionListener(e -> {
                 ChoiceEntry selectedValue = choiceList.getSelectedValue();
                 if (selectedValue != null) {
-                    setDefaultChoice(selectedValue.getChoice());
+                   setDefaultChoice(selectedValue.getChoice());
+
                 } else {
-                    setDefaultChoice(null);
+                   setDefaultChoice(null);
                 }
             });
 
@@ -154,16 +150,16 @@ public class ChoiceSelector extends JDialog {
         {
             JButton okButton = new JButton("OK");
             okButton.addActionListener(e -> {
-                if (changed) {
+                if(changed){
                     int res = JOptionPane.showOptionDialog
                             (ChoiceSelector.this,
-                                    "Your changes will become effective when " +
+                                    "Your changes will become effective when "+
                                             "the next problem is loaded.\n",
                                             "Taclet Options",
                                             JOptionPane.DEFAULT_OPTION,
                                             JOptionPane.QUESTION_MESSAGE, null,
-                                            new Object[] {"OK", "Cancel"}, "OK");
-                    if (res == 0) {
+                                            new Object[]{"OK", "Cancel"}, "OK");
+                    if (res==0){
                         settings.setDefaultChoices(
                                 category2DefaultChoice);
                     }
@@ -204,7 +200,7 @@ public class ChoiceSelector extends JDialog {
     /** is called to set the selected choice in 
      * <code>category2DefaultChoice</code>*/
     private void setDefaultChoice(String sel) {
-	String category = (String) catList.getSelectedValue();
+	String category = catList.getSelectedValue();
 	if(sel != null){
 	    category2DefaultChoice.put(category,sel);
 	    changed = true;
@@ -216,7 +212,7 @@ public class ChoiceSelector extends JDialog {
      * the left side
      */
     private void setChoiceList() {
-	String selection = (String) catList.getSelectedValue();
+	String selection = catList.getSelectedValue();
 	ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
 	choiceList.setListData(choices);
 	ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
@@ -247,13 +243,9 @@ public class ChoiceSelector extends JDialog {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                     }
                     explanationMap.loadFromXML(is);
-                } catch (InvalidPropertiesFormatException e) {
-                    System.err.println("Cannot load help message in rule view (malformed XML).");
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    System.err.println("Cannot load help messages in rule view.");
-                    e.printStackTrace();
-                } 
+                    LOGGER.warn("Cannot load help message in rule view.", e);
+                }
             }
         }
         String result = explanationMap.getProperty(category);
@@ -318,12 +310,7 @@ public class ChoiceSelector extends JDialog {
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-       return ArrayUtil.search(choices, new IFilter<ChoiceEntry>() {
-         @Override
-         public boolean select(ChoiceEntry element) {
-            return element.getChoice().equals(choice);
-         }
-       });
+       return ArrayUtil.search(choices, element -> element.getChoice().equals(choice));
     }
 
     /**

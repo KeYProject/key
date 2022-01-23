@@ -80,27 +80,9 @@ public class ExternalProcessLauncher implements SMTProcessLauncher {
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
             pipe = new SimplePipe(input, messageDelimiters, output, session, process);
-            //catchLivenessThrowOutput();
         } catch (IOException ex) {
             stop();
             throw ex;
-        }
-    }
-
-    /**
-     * Checks if the given process is alive. If the process terminates, an {@link IllegalStateException} is
-     * thrown with the remaining process output in the exception message.
-     *
-     * Useful to check before communicated with the process.
-     *
-     */
-    public void catchLivenessThrowOutput() {
-        if (!process.isAlive()) {
-            pipe.tryToReadExhaustively();
-            int exit = process.exitValue();
-            process.destroy();
-            throw new IllegalStateException(
-                    "Process directly terminated (exit code " + exit + "). Process report:\n" + pipe.getReadMessages());
         }
     }
 

@@ -1,0 +1,684 @@
+import recoder.*;
+
+// rsh will point to the service configuration of sourcerer
+CrossReferenceServiceConfiguration rsh;
+
+// sel is linked to the active selection in sourcerer
+// you may set this variable to redirect the other views
+ModelElement sel;
+
+// import all recoder packages eagerly
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.bytecode.*;
+import recoder.convenience.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
+import recoder.java.reference.*;
+import recoder.java.expression.*;
+import recoder.java.expression.literal.*;
+import recoder.java.expression.operator.*;
+import recoder.java.statement.*;
+import recoder.kit.*;
+import recoder.kit.pattern.*;
+import recoder.kit.transformation.*;
+import recoder.list.*;
+import recoder.io.*;
+import recoder.service.*;
+import recoder.util.*;
+
+// convenience methods follow; these definitions form a facade to RECODER
+
+// format the model element
+String format(String format, ModelElement x) {
+    return Format.toString(format, x);
+}
+
+// format the model element list
+String format(String format, ModelElementList x) {
+    return Format.toString(format, "", "\n", "", x);
+}
+
+// format the model element and print it
+void printf(String format, ModelElement x) {
+    print(format(format, x));
+}
+
+// format the model element list and print it
+void printf(String format, ModelElementList x) {
+    print(format(format, x));
+}
+
+// sort the model element list by the given format
+ModelElementList sort(String format, ModelElementList x) {
+    ModelElement[] a = x.toModelElementArray();
+    Order ord = new Relations.ModelElementLexicalOrder(format);
+    Sorting.heapSort(a, ord);
+    return new ModelElementArrayList(a);
+}
+
+// format the model element list, sorted by the format
+String sformat(String format, ModelElementList x) {
+    return format(format, sort(format, x));
+}
+
+// format the model element list, sorted by the format, and print it
+void printsf(String format, ModelElementList x) {
+    print(sformat(format, x));
+}
+
+// get the currently defined packages
+PackageList getPackages() {
+    return rsh.getNameInfo().getPackages();
+}
+
+// get an already known package with the given name
+Package getPackage(String name) {
+    return rsh.getNameInfo().getPackage(name);
+}
+
+// get a list of all class types currently known
+ClassTypeList getClassTypes() {
+    return rsh.getNameInfo().getClassTypes();
+}
+
+// get a list of all types currently known
+TypeList getTypes() {
+    return rsh.getNameInfo().getTypes();
+}
+
+// get a type with the given (full) name; may reload a class
+Type getType(String name) {
+    return rsh.getNameInfo().getType(name);
+}
+
+// get a class type with the given (full) name; may reload a class
+ClassType getClassType(String name) {
+    return rsh.getNameInfo().getClassType(name);
+}
+
+// enforce model update
+void updateModel() {
+    rsh.getChangeHistory().updateModel();
+}
+
+// undo all known changes
+void rollback() {
+    rsh.getChangeHistory().rollback();
+}
+
+// erase all changes; no undo of old changes possible
+void commit() {
+    rsh.getChangeHistory().commit();
+}
+
+// create a new compilation unit by parsing
+CompilationUnit parseCompilationUnit(String in) {
+    return rsh.getProgramFactory().parseCompilationUnit(in);
+}
+
+// create a new member declaration by parsing
+MemberDeclaration parseMemberDeclaration(String in) {
+    return rsh.getProgramFactory().parseMemberDeclaration(in);
+}
+
+// create a new type declaration by parsing
+TypeDeclaration parseTypeDeclaration(String in) {
+    return rsh.getProgramFactory().parseTypeDeclaration(in);
+}
+
+StatementList parseStatements(String in) { 
+    return rsh.getProgramFactory().parseStatements(in);
+}
+
+Expression parseExpression(String in) {
+    return rsh.getProgramFactory().parseExpression(in);
+}
+
+TypeReference parseTypeReference(String in) {
+    return rsh.getProgramFactory().parseTypeReference(in);
+}
+
+String getProperty(String p) {
+    return rsh.getProjectSettings().getProperty(p);
+}
+
+String setProperty(String p, String x) {
+    return rsh.getProjectSettings().setProperty(p, x);	
+}
+    
+void setInputPath(String path) {
+    rsh.getProjectSettings().setProperty(PropertyNames.INPUT_PATH, path);
+}
+
+String getInputPath() {
+    return rsh.getProjectSettings().getProperty(PropertyNames.INPUT_PATH);
+}
+
+void setOutputPath(String path) {
+    rsh.getProjectSettings().setProperty(PropertyNames.OUTPUT_PATH, path);
+}
+
+String getOutputPath() {
+    return rsh.getProjectSettings().getProperty(PropertyNames.OUTPUT_PATH);
+}
+
+
+CompilationUnit getCompilationUnit(String classname) {
+    return rsh.getSourceFileRepository().getCompilationUnit(classname);
+}
+
+CompilationUnitList getAllCompilationUnitsFromPath() {
+    return rsh.getSourceFileRepository().getAllCompilationUnitsFromPath();
+}
+
+CompilationUnit getCompilationUnitFromFile(String filename) {
+    return rsh.getSourceFileRepository().getCompilationUnitFromFile(filename);
+}
+
+CompilationUnitList getAllCompilationUnitsFromDirectory(String dirname) {
+    CompilationUnitMutableList result = new CompilationUnitArrayList();
+    FileCollector col = new FileCollector(dirname); 
+    while (col.next(DefaultSourceFileRepository.JAVA_FILENAME_FILTER)) {
+	String filename = col.getFile().getAbsolutePath();
+	CompilationUnit cu = getCompilationUnitFromFile(filename);
+	if (cu != null) {
+	    result.add(cu);
+	}
+    }
+    return result;
+}
+
+
+void getAllCompilationUnitsFromProjectFile(String filename) {
+    File projectFile = new File(filename);
+    if (projectFile.isFile()) {
+	new DefaultProjectFileIO(this, projectFile).load();
+	rsh.getProjectSettings().ensureSystemClassesAreInPath();
+    } else {
+	throw new IOException(filename + " is not a file");
+    }
+}
+
+void save(CompilationUnit cu) {
+    rsh.getSourceFileRepository().print(cu);
+}
+
+void saveAll() {
+    rsh.getSourceFileRepository().printAll(true); 
+    rsh.getSourceFileRepository().cleanUp();
+}
+
+
+CompilationUnitList getCompilationUnits() {
+    return rsh.getSourceFileRepository().getCompilationUnits();	
+}
+   
+boolean isVisibleFor(Member m, ClassType t) {
+    return rsh.getSourceInfo().isVisibleFor(m, t);
+}
+
+boolean isWidening(Type f, Type t) {
+    return rsh.getSourceInfo().isWidening(f, t);
+}
+
+boolean isSubtype(ClassType a, ClassType b) {
+    return rsh.getSourceInfo().isSubtype(a, b);
+}
+
+boolean isSupertype(ClassType a, ClassType b) {
+    return rsh.getSourceInfo().isSupertype(a, b);
+}
+   
+Constructor getConstructor(ConstructorReference r) {
+    return rsh.getSourceInfo().getConstructor(r);
+}
+
+Method getMethod(MethodReference r) {
+    return rsh.getSourceInfo().getMethod(r);
+}
+
+Variable getVariable(VariableReference r) {
+    return rsh.getSourceInfo().getVariable(r);
+}
+
+Field getField(FieldReference r) {
+    return rsh.getSourceInfo().getField(r);
+}
+
+Package getPackage(PackageReference r) {
+    return rsh.getSourceInfo().getPackage(r);
+}
+
+Type getType(TypeReference r) {
+    return rsh.getSourceInfo().getType(r);
+}
+
+Type getType(Expression x) {
+    return rsh.getSourceInfo().getType(x);
+}
+
+StatementList getSucceedingStatements(Statement s) {
+    return rsh.getSourceInfo().getSucceedingStatements(s);	
+}
+
+Type getType(String name, ProgramElement context) {
+    return rsh.getSourceInfo().getType(name, context);
+}
+
+Variable getVariable(String name, ProgramElement context) {
+    return rsh.getSourceInfo().getVariable(name, context);
+}
+
+boolean isNarrowingTo(Expression x, PrimitiveType t) {
+    return rsh.getSourceInfo().isNarrowingTo(x, t);
+	
+}
+
+Reference resolveURQ(UncollatedReferenceQualifier urq) {
+    return rsh.getSourceInfo().resolveURQ(urq);
+	
+}
+   
+MemberReferenceList getReferences(Method m) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(m);
+}
+
+ConstructorReferenceList getReferences(Constructor c) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(c);
+}
+
+VariableReferenceList getReferences(Variable c) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(c);
+}
+
+FieldReferenceList getReferences(Field c) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(c);
+}
+
+TypeReferenceList getReferences(Type c) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(c);
+}
+
+PackageReferenceList getReferences(Package c) {
+    return rsh.getCrossReferenceSourceInfo().getReferences(c);
+}
+       
+boolean isCompileTimeConstant(Expression x) {
+    return rsh.getConstantEvaluator().isCompileTimeConstant(x);
+}
+
+boolean isKeyword(String name) {
+    return Naming.isKeyword(name);
+}
+
+
+// the following atomic transformations allow to change syntax trees manually
+// this mechanism is highly risky, therefore BEWARE: 
+// do NOT touch the rest of sourcerer - this may produce a 
+// model update even if the model is still under construction; RECODER does
+// not react gracefully on corrupt models.
+// for offline transformations, use corresponding Transformation.doXxxx methods
+
+void detach(ProgramElement root) {
+    NonTerminalProgramElement parent = root.getASTParent();
+    int position;
+    if (parent != null) {
+	position = parent.getChildPositionCode(root);
+	parent.replaceChild(root, null);
+    } else {
+	position = 0;
+    }
+    rsh.getChangeHistory().detached(root, position);
+}
+   
+void replace(ProgramElement child, ProgramElement replacement) {
+    Transformation.doReplace(child, replacement);
+    rsh.getChangeHistory().replaced(child, replacement);
+}
+
+void attach(CompilationUnit child) {
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Identifier child, NamedProgramElement parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);	
+}
+
+void attach(Import child, CompilationUnit parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(PackageSpecification child, CompilationUnit parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Statement child, StatementBlock parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(StatementBlock child, MethodDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(StatementBlock child, ClassInitializer parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+
+void attach(Statement child, Case parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Statement child, Default parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(StatementBlock child, Catch parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(StatementBlock child, Finally parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(StatementBlock child, Try parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Statement child, Then parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Statement child, Else parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(StatementBlock child, LoopStatement parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Statement child, LabeledStatement parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(StatementBlock child, SynchronizedBlock parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(TypeDeclaration child, CompilationUnit parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ClassDeclaration child, StatementBlock parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(ClassDeclaration child, New parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(MemberDeclaration child, TypeDeclaration parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(ParameterDeclaration child, MethodDeclaration parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ParameterDeclaration child, Catch parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Modifier child, Declaration parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Throws child, MethodDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Implements child, ClassDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Extends child, ClassDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Extends child, InterfaceDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(FieldSpecification child, FieldDeclaration parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(VariableSpecification child, LocalVariableDeclaration parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(VariableSpecification child, ParameterDeclaration parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attachAsBody(Statement child, LoopStatement parent) {
+    Transformation.doAttachAsBody(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsInitializer(LoopInitializer child, For parent) {
+    Transformation.doAttachAsInitializer(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsGuard(Expression child, LoopStatement parent) {
+    Transformation.doAttachAsGuard(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsUpdate(ExpressionStatement child, For parent, int index) {
+    Transformation.doAttachAsUpdate(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsCondition(Expression child, Assert parent) {
+    Transformation.doAttachAsCondition(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsMessage(Expression child, Assert parent) {
+    Transformation.doAttachAsMessage(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Then child, If parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Else child, If parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Catch child, Try parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Finally child, Try parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Case child, Switch parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Default child, Switch parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(ReferencePrefix child, ArrayLengthReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsPrefix(ReferencePrefix child, ArrayReference parent) {
+    Transformation.doAttachAsPrefix(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsArgument(Expression child, ArrayReference parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ReferencePrefix child, FieldReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsPrefix(TypeReference child, MetaClassReference parent) {
+    Transformation.doAttachAsPrefix(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+   
+void attachAsPrefix(ReferencePrefix child, MethodReference parent) {
+    Transformation.doAttachAsPrefix(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsArgument(Expression child, MethodReference parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(PackageReference child, PackageReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ReferencePrefix child, SuperReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(TypeReference child, ThisReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+        
+void attach(ReferencePrefix child, TypeReference parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(ReferencePrefix child, UncollatedReferenceQualifier parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ArrayInitializer child, NewArray parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(ArrayInitializer child, ArrayInitializer parent, int index) {
+    Transformation.doAttach(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Expression child, VariableSpecification parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Expression child, ExpressionJumpStatement parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attach(Expression child, If parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attach(Expression child, Switch parent) {
+    Transformation.doAttach(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsLabel(Expression child, Case parent) {
+    Transformation.doAttachAsLabel(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsPrefix(ReferencePrefix child, New parent) {
+    Transformation.doAttachAsPrefix(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attachAsArgument(Expression child, Operator parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsArgument(Expression child, SpecialConstructorReference parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attachAsArgument(TypeReference child, TypeOperator parent) {
+    Transformation.doAttachAsArgument(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+    
+void attachAsArgument(Expression child, TypeCast parent) {
+    Transformation.doAttachAsArgument(child, parent);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsArgument(Expression child, New parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}
+
+void attachAsArgument(Expression child, NewArray parent, int index) {
+    Transformation.doAttachAsArgument(child, parent, index);
+    rsh.getChangeHistory().attached(child);
+}

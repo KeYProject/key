@@ -48,6 +48,8 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -56,8 +58,9 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
  * carry something of logical value.
  */
 public class NodeInfo {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
+    private static Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;
@@ -334,14 +337,13 @@ public class NodeInfo {
                 Object val = tacletApp.instantiations().lookupValue(new Name(arg));
                 if (val == null) {
                     // chop off the leading '#'
-                    String arg2 = arg.substring(1, arg.length());
+                    String arg2 = arg.substring(1);
                     val = tacletApp.instantiations().lookupValue(new Name(arg2));
                 }
                 String res;
                 if (val == null) {
-                    System.err.println("No instantiation for " + arg
-                            + ". Probably branch label not up to date in "
-                            + tacletApp.rule().name());
+                    LOGGER.warn("No instantiation for {}. Probably branch label not up to date in {}"
+                            , arg,  tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {

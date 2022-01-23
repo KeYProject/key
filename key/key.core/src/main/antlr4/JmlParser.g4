@@ -7,7 +7,7 @@ options { tokenVocab=JmlLexer; }
 }
 
 @members {
-  private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+  private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
@@ -265,12 +265,11 @@ primaryexpr
   | false_
   | null_
   | jmlprimary
-  | this_
   | new_expr
   | array_initializer
   ;
 this_: THIS;
-ident: IDENT | JML_IDENT | SPECIAL_IDENT;
+ident: IDENT | JML_IDENT | SPECIAL_IDENT | THIS | SUPER;
 inv:INV;
 true_:TRUE;
 false_:FALSE;

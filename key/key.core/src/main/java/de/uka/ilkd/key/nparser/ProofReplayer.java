@@ -9,9 +9,7 @@ import org.antlr.v4.runtime.Token;
 
 import javax.annotation.Nonnull;
 import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -35,6 +33,8 @@ public class ProofReplayer {
         }
     }
 
+    private ProofReplayer() {
+    }
 
     /**
      * Replays the proof represented by the expression given in the {@link CharStream} after the position of the
@@ -69,7 +69,7 @@ public class ProofReplayer {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); //currently open proof elements
-        Stack<Integer> posStack = new Stack<>(); // stack of opened commands position
+        Deque<Integer> posStack = new ArrayDeque<>(); // stack of opened commands position
         while (true) {
             int type = stream.LA(1); //current token type
             switch (type) {
@@ -97,7 +97,6 @@ public class ProofReplayer {
                     }
 
                     prl.beginExpr(cur, arg);
-                    //System.out.format("Emit: %s %s%n", cur, arg);
                     stack.push(cur);
                     posStack.push(pos);
                     break;

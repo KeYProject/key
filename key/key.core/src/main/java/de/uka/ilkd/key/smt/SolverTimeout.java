@@ -29,10 +29,6 @@ class SolverTimeout extends TimerTask {
 		this.session = session;
 	}
 
-	public SolverTimeout(SMTSolver solver) {
-		this(solver, null);
-	}
-
 	@Override
 	public void run() {
 		if (session != null) {

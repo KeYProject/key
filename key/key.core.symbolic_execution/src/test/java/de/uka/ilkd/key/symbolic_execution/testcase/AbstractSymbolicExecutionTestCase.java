@@ -36,6 +36,8 @@ import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -140,6 +142,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * The directory which contains the KeY repository.
     */
    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
 
    static {
       Assert.assertNotNull("Could not find test case directory", testCaseDirectory);
@@ -210,10 +213,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
          String path = tempNewOracleDirectory.toString();
          int length = Math.max(path.length(), HEADER_LINE.length());
          String borderLines = StringUtil.repeat("#", PREFIX.length() + length + SUFFIX.length());
-         System.out.println(borderLines);
-         System.out.println(PREFIX + HEADER_LINE + StringUtil.repeat(" ", length - HEADER_LINE.length()) + SUFFIX);
-         System.out.println(PREFIX + path + StringUtil.repeat(" ", length - path.length()) + SUFFIX);
-         System.out.println(borderLines);
+         LOGGER.info(borderLines);
+         LOGGER.info(PREFIX + HEADER_LINE + StringUtil.repeat(" ", length - HEADER_LINE.length()) + SUFFIX);
+         LOGGER.info(PREFIX + path + StringUtil.repeat(" ", length - path.length()) + SUFFIX);
+         LOGGER.info(borderLines);
       }
    }
 
@@ -344,7 +347,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * @param expected The expected {@link IExecutionNode}.
     * @param current The current {@link IExecutionNode}.
     * @param compareParent Compare also the parent node?
-    * @param compareChildren Compare direct children?
     * @param compareVariables Compare variables?
     * @param compareCallStack Compare call stack?
     * @param compareReturnValues Compare return values?
@@ -2052,10 +2054,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
     */
    public static HashMap<String, String> setDefaultTacletOptions() {
       HashMap<String, String> original = HelperClassForTests.setDefaultTacletOptions();
-      // set non modular reasoning
-      //System.out.println(ProofSettings.DEFAULT_SETTINGS);
       ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-      //System.out.println(choiceSettings);
       ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
       cs = cs.add(new Choice("noRestriction", "methodExpansion"));
       choiceSettings.updateWith(cs);

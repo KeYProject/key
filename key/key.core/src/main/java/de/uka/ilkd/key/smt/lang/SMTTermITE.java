@@ -15,6 +15,7 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class SMTTermITE extends SMTTerm {
@@ -36,30 +37,20 @@ public class SMTTermITE extends SMTTerm {
 		this.condition = condition;
 
 		if(condition.sort() != SMTSort.BOOL){
-			throw new RuntimeException("ite condition must be bool: "+ condition);
-		}	
+			throw new IllegalArgumentException("ite condition must be of type bool, but got: "+ condition);
+		}
 		this.trueCase = trueCase;
-		this.falseCase = falseCase;	
-//		if(!trueCase.sort().equals(falseCase.sort())){
-//
-//			String msg = "true case and false case must have same sorts";
-//			msg+= "\ntrue case: "+trueCase.toString();
-//			msg+= "\nSort: "+trueCase.sort();
-//			msg+= "\nfalse case: "+falseCase.toString();		
-//			msg+= "\nSort: "+falseCase.sort();
-//			System.err.println("\nWarning:\n"+msg);
-//			//throw new RuntimeException(msg);
-//		}		
+		this.falseCase = falseCase;
 	}
 
 	@Override
-	public boolean occurs(SMTTermVariable a) {		
-		return condition.occurs(a) || trueCase.occurs(a) || falseCase.occurs(a);		
+	public boolean occurs(SMTTermVariable a) {
+		return condition.occurs(a) || trueCase.occurs(a) || falseCase.occurs(a);
 	}
 
 	@Override
 	public boolean occurs(String id) {
-		return condition.occurs(id) || trueCase.occurs(id) || falseCase.occurs(id);	
+		return condition.occurs(id) || trueCase.occurs(id) || falseCase.occurs(id);
 	}
 
 	@Override
@@ -88,33 +79,22 @@ public class SMTTermITE extends SMTTerm {
 	}
 
 	@Override
-	public SMTTerm copy() {		
+	public SMTTerm copy() {
 		return new SMTTermITE(condition.copy(), trueCase.copy(), falseCase.copy());
 	}
 
+	@Override
 	public String toString(int nestPos) {
-
-		StringBuffer tab =  new StringBuffer();
-		for(int i = 0; i< nestPos; i++) {
-			tab = tab.append(" ");
-		}
-
-		StringBuffer buff = new StringBuffer();
-		buff.append(tab);
-
-		buff.append("("+ITE_STRING);
-		buff.append("\n");
-		buff.append(condition.toString(nestPos+1));
-		buff.append("\n");
-		buff.append(trueCase.toString(nestPos+1));
-		buff.append("\n");
-		buff.append(falseCase.toString(nestPos+1));		
-		buff.append("\n" + tab + ")");
-		return buff.toString();
-
-
-
-
+		String tab = " ".repeat(Math.max(0, nestPos));
+		return tab +
+				"(" + ITE_STRING +
+				"\n" +
+				condition.toString(nestPos + 1) +
+				"\n" +
+				trueCase.toString(nestPos + 1) +
+				"\n" +
+				falseCase.toString(nestPos + 1) +
+				"\n" + tab + ")";
 	}
 
 	@Override
@@ -123,18 +103,16 @@ public class SMTTermITE extends SMTTerm {
 	}
 
 	@Override
-	public boolean equals(Object that){
-		if(this == that){
-			return true;
-		}
-		if(that instanceof SMTTermITE){
-			SMTTermITE thatIte = (SMTTermITE) that;
-			return thatIte.condition.equals(condition) 
-					&& thatIte.trueCase.equals(trueCase) 
-					&& thatIte.falseCase.equals(falseCase);			
-		}	
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof SMTTermITE)) return false;
+		SMTTermITE that = (SMTTermITE) o;
+		return condition.equals(that.condition) && trueCase.equals(that.trueCase) && falseCase.equals(that.falseCase);
+	}
 
-		return false;
+	@Override
+	public int hashCode() {
+		return Objects.hash(condition, trueCase, falseCase);
 	}
 
 	/**
@@ -178,17 +156,14 @@ public class SMTTermITE extends SMTTerm {
 	public void setFalseCase(SMTTerm falseCase) {
 		this.falseCase = falseCase;
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public List<SMTTermVariable> getQuantVars() {
-		List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+		List<SMTTermVariable> vars = new LinkedList<>();
 		vars.addAll(condition.getQuantVars());
 		vars.addAll(trueCase.getQuantVars());
 		vars.addAll(falseCase.getQuantVars());
 		return vars;
 	}
-	
-	
-
 }

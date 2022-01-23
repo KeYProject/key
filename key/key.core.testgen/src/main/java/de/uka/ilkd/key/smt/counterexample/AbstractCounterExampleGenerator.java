@@ -9,6 +9,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementations of this class are used find a counter example for a given
@@ -35,6 +38,8 @@ import de.uka.ilkd.key.util.Debug;
  * by {@link #createSolverListener(DefaultSMTSettings)}.
  */
 public abstract class AbstractCounterExampleGenerator {
+   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCounterExampleGenerator.class);
+
    /**
     * Checks if the required SMT solver is available.
     * @return {@code true} solver is available, {@code false} solver is not available.
@@ -68,7 +73,7 @@ public abstract class AbstractCounterExampleGenerator {
               info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
-          Debug.out("Semantics blasting interrupted");
+          LOGGER.debug("Semantics blasting interrupted");
       } finally {
           semanticsBlastingCompleted(ui);
           ptl.taskFinished(info);

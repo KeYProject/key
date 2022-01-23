@@ -3,14 +3,15 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.antlr.v4.runtime.CharStreams;
-import javax.annotation.Nonnull;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,14 +27,17 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 public class ExprTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExprTest.class);
+
     @Parameterized.Parameter
     public String expr;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
-        try (InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+        InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
+        Assume.assumeNotNull(s);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
             while ((l = reader.readLine()) != null) {
                 if (l.trim().isEmpty() || l.startsWith("#")) {
@@ -49,46 +53,13 @@ public class ExprTest {
     public void parseAndVisit() throws IOException {
         KeyIO io = getIo();
         @Nonnull Term actual = io.parseExpression(expr);
-        if (actual == null) {
-            ParseAllKeyFilesTest.debugLexer(ParsingFacade.createLexer(CharStreams.fromString(expr)));
-        }
         Assert.assertNotNull(actual);
-        System.out.println(actual);
+        LOGGER.info("Actual Term: {}", actual);
     }
 
     private KeyIO getIo() throws IOException {
         Services services = new Services(new JavaProfile());
-        /*NamespaceSet nss = services.getNamespaces();
-        NamespaceBuilder nssb = new NamespaceBuilder(nss);
-        nssb.addSort("numbers").addSort("int");
-        nssb.addSort("java.lang.Object").addSort("java.lang.Serializable").addSort("java.lang.Cloneable");
-        for (int i = 0; i < 9; i++) {
-            nssb.addFunction("numbers "+i+"(numbers)");
-        }
-        nssb.addProgramVariable("Heap", "heap");
-        nssb.addFunction("Field arr(int)");
-        nssb.addFunction("numbers #()")
-                .addFunction("int Z(numbers)")
-                .addFunction("numbers neglit(numbers)")
-                .addFunction("int add(int, int)")
-                .addFunction("int neg(int)")
-                .addFunction("int sub(int, int)")
-                .addFunction("int mul(int, int)")
-                .addFunction("int div(int, int)")
-                .addFunction("int mod(int, int)")
-                .addFunction("int pow(int, int)");
-        nssb.addPredicate("leq(int, int)")
-                .addPredicate("lt(int, int)")
-                .addPredicate("geq(int, int)")
-                .addPredicate("gt(int, int)");
-        ;
 
-        nssb.addVariable("aa", "int")
-                .addVariable("bb", "int")
-                .addVariable("cc", "int");
-         */
-
-        //services.getTypeConverter().init();
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assume.assumeNotNull(url);
@@ -104,14 +75,4 @@ public class ExprTest {
                 .addProgramVariable("int", "x");
         return io;
     }
-
-
-/*    public static class Abc extends AbstractTestTermParser {
-        @Test
-        public void ttttt() throws ParserException {
-            DefaultTermParser dtp = new DefaultTermParser();
-            var term = dtp.parse(new StringReader("\\<{ byte a; }\\> (lt(a,150))"), null, services, nss, null);
-            System.out.println(term);
-        }
-    }*/
 }

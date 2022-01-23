@@ -27,6 +27,9 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Saves intermediate proof artifacts during strategy execution.
@@ -39,6 +42,7 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author bruns
  */
 public class AutoSaver implements ProverTaskListener {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProverTaskListener.class);
 
     private final static File TMP_DIR = IOUtil.getTempDirectory();
     private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
@@ -150,9 +154,9 @@ public class AutoSaver implements ProverTaskListener {
             public void run() {
                 try {
                     new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                    Debug.out("File saved: "+filename);
+                    LOGGER.debug("File saved: "+filename);
                 } catch (IOException e) {
-                    Debug.out("Autosaving file "+filename+" failed.",e);
+                    LOGGER.debug("Autosaving file "+filename+" failed.",e);
                 } catch (Exception x) {
                     // really should not happen, but catching prevents worse
                     x.printStackTrace();

@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -186,6 +188,8 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_LABELS =
             new IconFontProvider(FontAwesomeSolid.ROUTE);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
+
     private static Image keyHole = getImage("images/ekey-mono.gif");
     private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
     private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
@@ -232,16 +236,16 @@ public final class IconFactory {
     private static ImageIcon createImageIcon(Class<?> cl, String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = cl.getResource(filename);
-        Debug.out("Load Resource:" + filename + " of class " + cl);
+        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (iconURL == null && cl.getSuperclass() != null) {
             return createImageIcon(cl.getSuperclass(),
                     filename);
         } else if (iconURL == null && cl.getSuperclass() == null) {
             // error message Resource not found
-            System.out.println("No image resource " + filename + " found");
+            LOGGER.warn("No image resource " + filename + " found");
             return null;
         } else {
-            Debug.out("Done.");
+            LOGGER.trace("Done.");
             return new ImageIcon(iconURL);
         }
     }

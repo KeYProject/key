@@ -45,7 +45,8 @@ public final class GuiUtilities {
     }
 
     public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
-        String s = view.getHighlightedText(pos);
+        // Replace nbsp; from html with normal spaces
+        String s = view.getHighlightedText(pos).replace('\u00A0', ' ');
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss =
             new java.awt.datatransfer.StringSelection(s);

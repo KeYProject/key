@@ -9,26 +9,38 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import javax.annotation.Nonnull;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import javax.annotation.Nonnull;
 import java.io.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.regex.Pattern;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
+ * This class provides regression tests for KeY Taclets.
+ *
+ * <p>
+ * This class uses a default project to boostrap a {@link de.uka.ilkd.key.control.KeYEnvironment} and print all
+ * registered taclets. For the string representation of taclets, the {@link Taclet#toString()} method is used.
+ * So do not expect anything fancy. Later, the actual printout of each taclet is compared to the latest version defined
+ * in {@code taclets.old.txt}.
+ * </p>
+ *
+ * <h2>How to update {@code taclet.old.txt} efficiently.</h2>
+ * <p>
+ * You can generate a new oracle easily by invoking the disabled test-method {@link #createNewOracle()}.
+ * This method generates the {@code taclet.new.txt} file. Then, you should use a diff-tool to compare the changes
+ * or directly overwrite {@code taclets.old.txt} with the new representations.
+ *
  * @author Alexander Weigl
  * @version 1 (5/5/20)
  */
 @RunWith(Parameterized.class)
 public class TestTacletEquality {
+
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> createCases() throws IOException {
         InputStream is = TestTacletEquality.class.getResourceAsStream("taclets.old.txt");
@@ -77,9 +89,31 @@ public class TestTacletEquality {
                     true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
+            //uncomment the line, if you want to generate a new oracle file
+            //createNewOracle();
         }
     }
 
+    public void createNewOracle() {
+        var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
+        var taclets = new ArrayList<>(initConfig.activatedTaclets());
+        //sort by name
+        taclets.sort(Comparator.comparing(it -> it.name().toString()));
+
+        try (var out = new PrintWriter(Files.newBufferedWriter(path))) {
+            out.write("# This files contains representation of taclets, which are accepted and revised.\n");
+            out.format("# Date: %s\n\n", new Date());
+            for (Taclet taclet : taclets) {
+                out.format("== %s (%s) =========================================\n",
+                        taclet.name(), taclet.displayName());
+                out.println(taclet);
+                out.format("-----------------------------------------------------\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Exception for opening " + path);
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testEquality() {
@@ -90,7 +124,6 @@ public class TestTacletEquality {
 
 
     private void assertEquals(String expected, String actual) {
-        Pattern normalizeWs = Pattern.compile("\\s+", Pattern.MULTILINE);
         Assert.assertEquals(
                 normalise(expected).trim(),
                 normalise(actual).trim()

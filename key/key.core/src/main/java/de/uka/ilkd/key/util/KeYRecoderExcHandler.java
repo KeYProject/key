@@ -56,7 +56,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
 
     // Implementation of recoder.service.ErrorHandler
-    protected int getErrorCount() {
+    public int getErrorCount() {
          return exceptions.size();
     }
 

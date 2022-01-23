@@ -24,7 +24,7 @@ baseDirectory = ../
  * Defines a statistics file.
  * Path is relative to base directory.
  */
-statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics_infflow.csv
+statisticsFile = ../../key.core/build/reports/runallproofs/runStatistics_infflow.csv
 
 /*
  * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
@@ -44,7 +44,7 @@ reloadEnabled = false
  * Temporary directory, which is used for inter process communication when using forked mode.
  * The given path is relative to baseDirectory.
  */
-tempDir = ../../key.core.test/runallproofs_infflow_tmp
+tempDir = ../../key.core/build/runallproofs_infflow_tmp
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses are terminated as

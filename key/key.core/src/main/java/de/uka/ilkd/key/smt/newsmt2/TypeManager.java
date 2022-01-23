@@ -40,7 +40,8 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
-                master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
+                master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child),
+                        SExprs.sortExpr(s))));
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild)) && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
@@ -55,7 +56,8 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                    master.addAxiom(new SExpr("assert", new SExpr("subtype",
+                            SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
                 }
             }
         }
@@ -84,37 +86,6 @@ class TypeManager {
         }
         return res;
     }
-
-//    // This is now done on the fly. No longer needed. Keep it for a while
-//    // in case it is required once again.
-//    private void collectSorts(List<Term> sequentAsserts, MasterHandler master) {
-//        if (!sequentAsserts.isEmpty()) {
-//            master.addSort(Sort.ANY);
-//            for (Term t : sequentAsserts) {
-//                addAllSorts(t, master);
-//            }
-//        }
-//
-//    }
-
-//    /**
-//     * Adds all sorts contained in the given problem to the master handler.
-//     * @param problem the given problem
-//     * @param master the master handler of the problem
-//     */
-//    // TODO: Ideally this method can be removed if all sorts are detected on-the-fly.
-//    // Once there no more "XXX" printlns, remove this method (and its calling loop)
-//    // Leave it here for nowin cases it is needed again.
-//    private void addAllSorts(Term problem, MasterHandler master) {
-//        Sort s = problem.sort();
-//        if(!master.getSorts().contains(s)) {
-//            System.err.println("XXX smt2 translation: Missing sort " + s);
-//            master.addSort(s);
-//        }
-//        for (Term t : problem.subs()) {
-//            addAllSorts(t, master);
-//        }
-//    }
 
     /**
      * make the constant declarations for the type constants. Each entry is of
