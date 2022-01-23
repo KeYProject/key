@@ -135,30 +135,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
     public static final IconProvider EXPORT_MU_SCRIPT_CLIPBOARD =
             new IconFontProvider(FontAwesomeRegular.COPY);
-    public static final IconProvider INTERLOG_LOAD =
-            new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
-    public static final IconProvider INTERLOG_SAVE =
-            new IconFontProvider(FontAwesomeRegular.SAVE);
-    public static final IconProvider INTERLOG_ADD_USER_NOTE =
-            new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
-    public static final IconProvider INTERLOG_TOGGLE_FAV =
-            new IconFontProvider(FontAwesomeSolid.HEART);
     public static final IconProvider JUMP_INTO_TREE =
             new IconFontProvider(FontAwesomeSolid.MAP_MARKED);
-    public static final IconProvider INTERLOG_TRY_APPLY =
-            new IconFontProvider(FontAwesomeSolid.REDO);
-    public static final IconProvider INTERLOG_EXPORT_KPS =
-            new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
-    public static final IconProvider INTERLOG_EXPORT_MARKDOWN =
-            new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
-    public static final IconProvider INTERLOW_EXTENDED_ACTIONS =
-            new IconFontProvider(FontAwesomeSolid.WRENCH);
-    public static final IconProvider INTERLOG_RESUME =
-            new IconFontProvider(FontAwesomeSolid.PAUSE_CIRCLE);
-    public static final IconProvider INTERLOG_PAUSE =
-            new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE);
-    public static final IconProvider INTERLOG_ICON =
-            new IconFontProvider(FontAwesomeSolid.BOOK);
 
     public static final IconProvider HEATMAP_DEACTIVATE =
             new IconFontProvider(FontAwesomeSolid.SHOE_PRINTS);
