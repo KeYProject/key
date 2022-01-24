@@ -22,6 +22,26 @@ import java.util.Optional;
 /**
  * A rule for JML assert/assume statements.
  *
+ * This implements the rules as:
+ *
+ * <p>
+ * {@code
+ *    \DELTA => update(cond -> <.. ...>), \GAMMA
+ * --------------------------------------------------------
+ *    \DELTA => update(<.. //@assume cond; ...>), \GAMMA
+ * }
+ * </p>
+ *
+ * and
+ *
+ * <p>
+ * {@code
+ *    \DELTA => update(cond), \GAMMA   \DELTA => update(cond -> <.. ...>), \GAMMA
+ * ---------------------------------------------------------------------------------
+ *             \DELTA => update(<.. //@assert cond; ...>), \GAMMA
+ * }
+ * </p>
+ *
  * @author Benjamin Takacs
  */
 public final class JmlAssertRule implements BuiltInRule {
@@ -89,8 +109,7 @@ public final class JmlAssertRule implements BuiltInRule {
                 .map(JmlAssert.class::cast)
                 .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        //TODO: add other conditions?
-        final Term condition = tb.and(jmlAssert.getCond(), tb.wellFormed(tb.getBaseHeap()));
+        final Term condition = jmlAssert.getCond();
 
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {
