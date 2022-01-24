@@ -126,12 +126,12 @@ public class SimpleSettingsPanel extends JPanel {
         return field;
     }
 
-    protected JSpinner createNumberTextField(int min, int max, int step, final @Nullable Validator<Integer> validator) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
+    protected <T extends Number> JSpinner createNumberTextField(T min, T max, T step, final @Nullable Validator<T> validator) {
+        SpinnerModel spinnerModel = new SpinnerNumberModel(min, (Comparable<?>) min, (Comparable<?>) max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
-    protected <T> JSpinner createNumberTextField(SpinnerModel model, final @Nullable Validator<T> validator) {
+    protected <T extends Number> JSpinner createNumberTextField(SpinnerModel model, final @Nullable Validator<T> validator) {
         JSpinner field = new JSpinner(model);
         field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
         return field;
@@ -173,6 +173,7 @@ public class SimpleSettingsPanel extends JPanel {
                 }
                 demarkComponentAsErrornous(model);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 markComponentAsErrornous(model, ex.getMessage());
             }
         }

@@ -90,7 +90,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
         @Override
         public JComponent visit(IntegerProperty iprop, Void unit) {
-            return addNumberField(iprop.getLabel(),
+            return addIntNumberField(iprop.getLabel(),
                     iprop.getMinimum(), iprop.getMaximum(), 1,
                     iprop.getDescription(),
                     emptyValidator());

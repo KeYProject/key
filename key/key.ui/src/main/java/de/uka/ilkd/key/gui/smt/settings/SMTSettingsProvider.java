@@ -95,34 +95,34 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+        return addLongNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.setLocsetBound(e));
     }
 
     private JSpinner createMaxProcesses() {
-        return addNumberField("Concurrent processes:",
+        return addIntNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_MAX_PROCESSES),
                 e -> settings.setMaxConcurrentProcesses(e));
     }
 
     private JSpinner createTimeoutField() {
-        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
+        return addLongNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
                 e -> settings.setTimeout(e * 1000L));
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+        return addLongNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.setIntBound(e));
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+        return addLongNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.setSeqBound(e));
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+        return addLongNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.setObjectBound(e));
     }
 
@@ -167,7 +167,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField.setValue(this.settings.getLocsetBound());
         objectBoundField.setValue(this.settings.getObjectBound());
         seqBoundField.setValue(this.settings.getSeqBound());
-        timeoutField.setValue(((float) this.settings.getTimeout() / 1000));
+        timeoutField.setValue(this.settings.getTimeout() / 1000L);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
     }
 }

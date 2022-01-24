@@ -55,7 +55,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         String info = "Maximum size (line count) of the tooltips of applicable rules\n"
                 + "<br> with schema variable instantiations displayed.\n"
                 + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
-        txtMaxTooltipLines = addNumberField("Maximum line number for tooltips",
+        txtMaxTooltipLines = addIntNumberField("Maximum line number for tooltips",
                 1, 100, 5, info, emptyValidator());
 
 
@@ -81,7 +81,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
         spAutoSaveProof =
-                addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+                addIntNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
         chkEnsureSourceConsistency =
                 addCheckBox("Ensure source consistency", "", true, emptyValidator());
