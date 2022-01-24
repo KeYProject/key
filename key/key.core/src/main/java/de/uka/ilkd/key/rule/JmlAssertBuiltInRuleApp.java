@@ -18,7 +18,17 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * @param occurrence the position at which the rule is applied
      */
     public JmlAssertBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence) {
-        super(rule, Objects.requireNonNull(occurrence, "rule application needs a position"));
+        this(rule, occurrence, null);
+    }
+
+    /**
+     * @param rule the rule being applied
+     * @param pio the position at which the rule is applied
+     * @param ifInsts information flow related information
+     */
+    public JmlAssertBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+                                   ImmutableList<PosInOccurrence> ifInsts) {
+        super(rule, Objects.requireNonNull(pio, "rule application needs a position"), ifInsts);
         if (!(rule instanceof JmlAssertRule)) {
             throw new IllegalArgumentException(String.format(
                     "can only create an application for JmlAssertRule, not for %s", rule));
@@ -32,11 +42,9 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        //XXX: no idea what I'm doing here, just copied code from elsewhere
-        //     what should this methode even do, there is no javadoc
-
-        // seems like all subclasses of  AbstractBuiltInRuleApp  do it like that
-        // maybe move it there?
+        //XXX: This is overridden in all subclasses to allow making ifInsts final
+        //     when all usages of setIfInsts are corrected to use the result.
+        //     Then a new instance has to be returned here.
         setMutable(ifInsts);
         return this;
     }
