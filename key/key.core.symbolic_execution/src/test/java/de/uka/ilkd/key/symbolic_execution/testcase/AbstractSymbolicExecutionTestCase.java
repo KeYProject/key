@@ -85,12 +85,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
-import junit.framework.TestCase;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Provides the basic functionality of {@link TestCase}s which tests
+ * Provides the basic functionality of TestCases which tests
  * the symbolic execution features.
  * @author Martin Hentschel
  */
@@ -698,10 +697,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
    protected static void assertReturnValue(IExecutionMethodReturnValue expected, IExecutionMethodReturnValue current) throws ProofInputException {
       assertNotNull(expected);
       assertNotNull(current);
-      assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
-      assertTrue(expected.getReturnValueString() + " does not match " + current.getReturnValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(), current.getReturnValueString()));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()), expected.getName() + " does not match " + current.getName());
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(), current.getReturnValueString()), expected.getReturnValueString() + " does not match " + current.getReturnValueString());
       assertEquals(expected.hasCondition(), current.hasCondition());
-      assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()), expected.getConditionString() + " does not match " + current.getConditionString());
    }
 
    /**
@@ -729,7 +728,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
     */
    protected static void assertConstraints(IExecutionConstraint[] expected,
                                            IExecutionConstraint[] current) throws ProofInputException {
-      TestCase.assertEquals(expected.length, current.length);
+      assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionConstraint> availableCurrentVariables = new LinkedList<IExecutionConstraint>();
       CollectionUtil.addAll(availableCurrentVariables, current);
@@ -747,11 +746,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
                }
             }
          });
-         TestCase.assertNotNull(currentVariable);
+         assertNotNull(currentVariable);
          // Compare variables
          assertConstraint(expectedVariable, currentVariable);
       }
-      TestCase.assertTrue(availableCurrentVariables.isEmpty());
+      assertTrue(availableCurrentVariables.isEmpty());
    }
 
    /**
@@ -823,7 +822,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                                          boolean compareParent,
                                          boolean compareChildren,
                                          boolean compareConstraints) throws ProofInputException {
-      TestCase.assertEquals(expected.length, current.length);
+      assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
       CollectionUtil.addAll(availableCurrentVariables, current);
@@ -841,11 +840,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
                }
             }
          });
-         TestCase.assertNotNull(currentVariable);
+         assertNotNull(currentVariable);
          // Compare variables
          assertVariable(expectedVariable, currentVariable, compareParent, compareChildren, compareConstraints);
       }
-      TestCase.assertTrue(availableCurrentVariables.isEmpty());
+      assertTrue(availableCurrentVariables.isEmpty());
    }
 
    /**
@@ -898,7 +897,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                                       boolean compareParent,
                                       boolean compareChildren,
                                       boolean compareConstraints) throws ProofInputException {
-      TestCase.assertEquals(expected.length, current.length);
+      assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
       CollectionUtil.addAll(availableCurrentVariables, current);
@@ -917,11 +916,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
                }
             }
          });
-         TestCase.assertNotNull(currentVariable);
+         assertNotNull(currentVariable);
          // Compare variables
          assertValue(expectedVariable, currentVariable, compareParent, compareChildren, compareConstraints);
       }
-      TestCase.assertTrue(availableCurrentVariables.isEmpty());
+      assertTrue(availableCurrentVariables.isEmpty());
    }
 
    /**
@@ -941,12 +940,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
       if (expected != null) {
          assertNotNull(current);
          // Compare variable
-         assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()), expected.getName() + " does not match " + current.getName());
          assertEquals(expected.getTypeString(), current.getTypeString());
-         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()), expected.getValueString() + " does not match " + current.getValueString());
          assertEquals(expected.isValueAnObject(), current.isValueAnObject());
          assertEquals(expected.isValueUnknown(), current.isValueUnknown());
-         assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()), expected.getConditionString() + " does not match " + current.getConditionString());
          // Compare parent
          if (compareParent) {
             assertVariable(expected.getVariable(), current.getVariable(), false, false, compareConstraints);
@@ -1771,7 +1770,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertNotNull(oraclePathInBaseDirFile);
          File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
          if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+            assertTrue(oracleFile.exists(), "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
          }
          // Make sure that the correct taclet options are defined.
          setOneStepSimplificationEnabled(null, true);
@@ -1863,7 +1862,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertNotNull(oraclePathInBaseDirFile);
          File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
          if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+            assertTrue(oracleFile.exists(), "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
@@ -1947,7 +1946,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertNotNull(oraclePathInBaseDirFile);
          File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
          if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+            assertTrue(oracleFile.exists(), "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
@@ -1985,7 +1984,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
          for (Integer value : executedSetNodesPerGoal.values()) {
             assertNotNull(value);
-            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+            assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes, value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes);
          }
       } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
       // Create new oracle file if required in a temporary directory

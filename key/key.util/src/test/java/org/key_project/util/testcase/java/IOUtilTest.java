@@ -402,7 +402,7 @@ public class IOUtilTest {
     @Test
     public void testGetHomeDirectory() {
         File home = IOUtil.getHomeDirectory();
-        Assert.assertNotNull(home);
+        assertNotNull(home);
         assertEquals(System.getProperty("user.home"), home.toString());
     }
 
@@ -427,11 +427,11 @@ public class IOUtilTest {
         File tempDir = null;
         try {
             tempDir = IOUtil.createTempDirectory("IOUtilTest", "testCreateTempDirectory");
-            Assert.assertNotNull(tempDir);
-            Assert.assertTrue(tempDir.exists());
-            Assert.assertTrue(tempDir.isDirectory());
-            Assert.assertTrue(tempDir.getName().startsWith("IOUtilTest"));
-            Assert.assertTrue(tempDir.getName().endsWith("testCreateTempDirectory"));
+            assertNotNull(tempDir);
+            assertTrue(tempDir.exists());
+            assertTrue(tempDir.isDirectory());
+            assertTrue(tempDir.getName().startsWith("IOUtilTest"));
+            assertTrue(tempDir.getName().endsWith("testCreateTempDirectory"));
         } finally {
             IOUtil.delete(tempDir);
         }
@@ -460,10 +460,10 @@ public class IOUtilTest {
                 new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
         // Test invalid column index
         LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes()));
-        Assert.assertNotNull(infos);
+        assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
-        Assert.assertNotNull(info);
+        assertNotNull(info);
         assertEquals(-1, info.normalizeColumn(-1, 3));
         assertEquals(-2, info.normalizeColumn(-2, 3));
         // Test tabs only
@@ -483,10 +483,10 @@ public class IOUtilTest {
     protected void doTestLineInformationNormalizeColumn(String text, int tabWidth, int[] expectedIndices) throws IOException {
         // Compute line information
         LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream(text.getBytes()));
-        Assert.assertNotNull(infos);
+        assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
-        Assert.assertNotNull(info);
+        assertNotNull(info);
         // Test column normalization
         for (int i = 0; i < expectedIndices.length; i++) {
             int normalColumn = info.normalizeColumn(i, tabWidth);
@@ -501,7 +501,7 @@ public class IOUtilTest {
    public void testComputeLineInformation_File() throws IOException {
       // Get test file
       File textFile = new File(HelperClassForUtilityTests.RESOURCE_DIRECTORY + File.separator + "lineIndicesTest" + File.separator + "Text.txt");
-        Assert.assertTrue(textFile.isFile(), "File '" + textFile + "' does not exist.");
+        assertTrue(textFile.isFile(), "File '" + textFile + "' does not exist.");
         // Test null
         assertLineInformation((File) null);
         // Test unix file
@@ -530,9 +530,9 @@ public class IOUtilTest {
      * @throws IOException Occurred Exception
      */
     protected File convertTextFile(File source, String newFileName, String lineBreak) throws IOException {
-        Assert.assertNotNull(source);
-        Assert.assertTrue(source.exists());
-        Assert.assertNotNull(newFileName);
+        assertNotNull(source);
+        assertTrue(source.exists());
+        assertNotNull(newFileName);
         // Create new file content
       try (CharArrayWriter writer = new CharArrayWriter();
            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(source)))) {
@@ -560,10 +560,10 @@ public class IOUtilTest {
      */
     protected void assertLineInformation(File file, int... expectedIndices) throws IOException {
         LineInformation[] result = IOUtil.computeLineInformation(file);
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         assertEquals(expectedIndices.length, result.length);
         for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertNotNull(result[i]);
+            assertNotNull(result[i]);
             assertEquals(expectedIndices[i], result[i].getOffset());
         }
     }
@@ -665,14 +665,14 @@ public class IOUtilTest {
      */
     protected void assertLineInformation(String text, LineInformation... expectedInfos) throws IOException {
         LineInformation[] result = IOUtil.computeLineInformation(text != null ? new ByteArrayInputStream(text.getBytes()) : null);
-        Assert.assertNotNull(result, text);
+        assertNotNull(result, text);
         assertEquals(expectedInfos.length, result.length, text);
         for (int i = 0; i < expectedInfos.length; i++) {
-            Assert.assertNotNull(expectedInfos[i]);
-            Assert.assertNotNull(result[i]);
+            assertNotNull(expectedInfos[i]);
+            assertNotNull(result[i]);
             assertEquals(expectedInfos[i].getOffset(), result[i].getOffset(), text + " at " + i);
-            Assert.assertNotNull(expectedInfos[i].getTabIndices());
-            Assert.assertNotNull(result[i].getTabIndices());
+            assertNotNull(expectedInfos[i].getTabIndices());
+            assertNotNull(result[i].getTabIndices());
             assertEquals(expectedInfos[i].getTabIndices().length, result[i].getTabIndices().length);
             for (int j = 0; j < expectedInfos[i].getTabIndices().length; j++) {
                 assertEquals(expectedInfos[i].getTabIndices()[j], result[i].getTabIndices()[j]);
@@ -796,7 +796,7 @@ public class IOUtilTest {
       try {
          // Test not existing file
          IOUtil.delete(tempFile);
-            Assert.assertFalse(tempFile.exists());
+            assertFalse(tempFile.exists());
             assertNull(IOUtil.readFrom(tempFile));
             // Test existing file
             IOUtil.writeTo(new FileOutputStream(tempFile), "Hello World!");
@@ -823,7 +823,7 @@ public class IOUtilTest {
       }
       catch (IOException e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -844,13 +844,13 @@ public class IOUtilTest {
        IOUtil.delete(null); // No exception expected
        // Test existing file
        File tmpFile = File.createTempFile("IOUtilTest", "deleteMe");
-        Assert.assertTrue(tmpFile.exists());
+        assertTrue(tmpFile.exists());
         IOUtil.delete(tmpFile);
-        Assert.assertFalse(tmpFile.exists());
+        assertFalse(tmpFile.exists());
         // Test empty directory
         HelperClassForUtilityTests.createFolder(tmpFile);
         IOUtil.delete(tmpFile);
-        Assert.assertFalse(tmpFile.exists());
+        assertFalse(tmpFile.exists());
         // Test directory with content
         HelperClassForUtilityTests.createFolder(tmpFile);
         File subDir = HelperClassForUtilityTests.createFolder(new File(tmpFile, "subDir"));
@@ -860,13 +860,13 @@ public class IOUtilTest {
         File subSubSubDir2 = HelperClassForUtilityTests.createFolder(new File(subSubDir2, "subDir"));
         File subSubSubDir2File = HelperClassForUtilityTests.createFile(new File(subSubSubDir2, "subFile.txt"), "test");
         IOUtil.delete(tmpFile);
-        Assert.assertFalse(tmpFile.exists());
-        Assert.assertFalse(subDir.exists());
-        Assert.assertFalse(subFile.exists());
-        Assert.assertFalse(subDir2.exists());
-        Assert.assertFalse(subSubDir2.exists());
-        Assert.assertFalse(subSubSubDir2.exists());
-        Assert.assertFalse(subSubSubDir2File.exists());
+        assertFalse(tmpFile.exists());
+        assertFalse(subDir.exists());
+        assertFalse(subFile.exists());
+        assertFalse(subDir2.exists());
+        assertFalse(subSubDir2.exists());
+        assertFalse(subSubSubDir2.exists());
+        assertFalse(subSubSubDir2File.exists());
     }
 
     /**
@@ -875,8 +875,8 @@ public class IOUtilTest {
     @Test
     public void testCopy() throws IOException {
         doTestCopy(null);
-        Assert.assertFalse(IOUtil.copy((InputStream) null, null));
-        Assert.assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+        assertFalse(IOUtil.copy((InputStream) null, null));
+        assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
         doTestCopy("One Line");
         doTestCopy("First Line\n\rSecond Line");
         doTestCopy("One Line\r");
@@ -897,14 +897,14 @@ public class IOUtilTest {
             byte[] inBytes = text.getBytes();
             ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Assert.assertTrue(IOUtil.copy(in, out));
+            assertTrue(IOUtil.copy(in, out));
             byte[] outBytes = out.toByteArray();
             assertEquals(inBytes.length, outBytes.length);
             for (int i = 0; i < inBytes.length; i++) {
                 assertEquals(inBytes[i], outBytes[i]);
             }
         } else {
-            Assert.assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
+            assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
         }
     }
 
@@ -914,7 +914,7 @@ public class IOUtilTest {
     @Test
     public void testGetClassLocation() {
         assertNull(IOUtil.getClassLocation(null));
-        Assert.assertNotNull(IOUtil.getClassLocation(getClass()));
+        assertNotNull(IOUtil.getClassLocation(getClass()));
     }
 
     /**
@@ -923,7 +923,7 @@ public class IOUtilTest {
     @Test
     public void testGetProjectRoot() {
         assertNull(IOUtil.getProjectRoot(null));
-        Assert.assertNotNull(IOUtil.getProjectRoot(getClass()));
+        assertNotNull(IOUtil.getProjectRoot(getClass()));
     }
 
     /**
@@ -938,17 +938,17 @@ public class IOUtilTest {
         // Test web URL
         URL url = new URL("https://www.google.de");
         URI uri = IOUtil.toURI(url);
-        Assert.assertNotNull(uri);
+        assertNotNull(uri);
         assertEquals(url.toString(), uri.toString());
         // Test web URL mit query
         url = new URL("https://www.google.de/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=test");
         uri = IOUtil.toURI(url);
-        Assert.assertNotNull(uri);
+        assertNotNull(uri);
         assertEquals(url.toString(), uri.toString());
         // Test file URL
         url = new URL("file:/D:/Forschung/Tools/eclipse 4.4 SR1 (64bit)/../../GIT/R/KeY4Eclipse/src/plugins/org.key_project.ui/");
         uri = IOUtil.toURI(url);
-        Assert.assertNotNull(uri);
+        assertNotNull(uri);
         assertEquals("file:/D:/Forschung/Tools/eclipse%204.4%20SR1%20(64bit)/../../GIT/R/KeY4Eclipse/src/plugins/org.key_project.ui/", uri.toString());
     }
 

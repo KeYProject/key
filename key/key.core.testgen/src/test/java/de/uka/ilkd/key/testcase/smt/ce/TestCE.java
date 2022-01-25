@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -20,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import static org.junit.Assert.assertTrue;
 
 public class TestCE extends TestCommons {
     public static final File testFile = new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");

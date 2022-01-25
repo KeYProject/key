@@ -81,7 +81,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[size - 1 - nr]);
+                assertSame(it.next(), str[size - 1 - nr]);
                 nr++;
             }
             // list has right length
@@ -119,7 +119,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[nr]);
+                assertSame(it.next(), str[nr]);
                 nr++;
             }
             // list has right length
@@ -147,8 +147,8 @@ public class TestSLListOfString {
         }
         // test cascading tail
         for (int i = 0; i < str.length; i++) {
-            Assert.assertSame(newList[i + 1].tail(), newList[i]);
-            Assert.assertSame(newList[i + 1].head(), str[i]);
+            assertSame(newList[i + 1].tail(), newList[i]);
+            assertSame(newList[i + 1].head(), str[i]);
         }
     }
 
@@ -195,7 +195,7 @@ public class TestSLListOfString {
         newList = newList.removeFirst(str[0]);
 
 
-        assertTrue(newList.head() != str[0] && newList.size() == oldSize - 1, "Only first occurrence should have been removed");
+        assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1, "Only first occurrence should have been removed");
 
         newList = newList.removeFirst(str[0]);
 		assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");

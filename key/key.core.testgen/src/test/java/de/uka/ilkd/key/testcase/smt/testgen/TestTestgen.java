@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class TestTestgen extends TestCommons {
     public static final File testFile = new File(
@@ -25,7 +27,12 @@ public class TestTestgen extends TestCommons {
     private static boolean installChecked = false;
 
     @BeforeEach
-    public void toolNotInstalled() {
+    public void setup(){
+        assumeFalse(toolNotInstalled());
+    }
+
+    @Override
+    public boolean toolNotInstalled() {
         if (!installChecked) {
             isInstalled = getSolverType().isInstalled(true);
             installChecked = true;
@@ -41,7 +48,7 @@ public class TestTestgen extends TestCommons {
                 }
             }
         }
-        Assume.assumeTrue(isInstalled);
+        return isInstalled;
     }
 
     public SolverType getSolverType() {
