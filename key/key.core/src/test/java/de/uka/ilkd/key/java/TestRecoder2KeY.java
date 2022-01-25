@@ -37,7 +37,7 @@ import java.io.Reader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class TestRecoder2KeY extends TestCase {
+public class TestRecoder2KeY {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestRecoder2KeY.class);
 
 

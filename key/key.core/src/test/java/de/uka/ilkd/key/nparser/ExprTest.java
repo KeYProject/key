@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,7 @@ public class ExprTest {
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
         InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
-        Assume.assumeNotNull(s);
+        Assumptions.assumeTrue(null != s);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
             while ((l = reader.readLine()) != null) {

@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -255,11 +254,10 @@ public class TestLegacyTacletMatch {
         de.uka.ilkd.key.java.StatementBlock sb
                 = (de.uka.ilkd.key.java.StatementBlock) jb.program();
 
-        JavaBlock javaBlock = JavaBlock.createJavaBlock
-                (new de.uka.ilkd.key.java.StatementBlock
-                        (new ImmutableArray<>
-                                (new de.uka.ilkd.key.java.Statement[]{
-                                        (de.uka.ilkd.key.java.Statement) sb.getChildAt(2),
+        JavaBlock javaBlock = JavaBlock.createJavaBlock(
+                new de.uka.ilkd.key.java.StatementBlock(
+                        new ImmutableArray<>(
+                                (de.uka.ilkd.key.java.Statement) sb.getChildAt(2),
                                 (de.uka.ilkd.key.java.Statement) sb.getChildAt(3))));
 
 

@@ -31,12 +31,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * tests the symbolic execution of the program meta constructs
  */
 public class TestProgramMetaConstructs {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProgramMetaConstructs.class);
+
     @Test
     public void testDoBreak() {
         LabeledStatement labeledBlock = (LabeledStatement) ((StatementBlock) TacletForTests
