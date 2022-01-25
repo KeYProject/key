@@ -13,12 +13,11 @@
 
 package de.uka.ilkd.key.smt.test;
 
-import org.junit.Assert;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uka.ilkd.key.smt.st.SolverTypes;
-import de.uka.ilkd.key.smt.st.SolverType;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

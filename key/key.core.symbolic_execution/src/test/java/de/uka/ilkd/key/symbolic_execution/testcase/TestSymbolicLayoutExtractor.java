@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -1001,7 +1001,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       while (expectedIter.hasNext() && currentIter.hasNext()) {
          String nextExpected = expectedIter.next();
          String nextCurrent = currentIter.next();
-         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", StringUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent), "\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"");
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -1038,7 +1038,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
-         assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()), "\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"");
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertEquals(expected.getConditionString(), current.getConditionString());
       }

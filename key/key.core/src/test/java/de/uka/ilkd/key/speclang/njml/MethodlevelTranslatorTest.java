@@ -1,13 +1,15 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.Assert;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @author Alexander Weigl
@@ -21,7 +23,7 @@ public class MethodlevelTranslatorTest {
     }
 
     public void parseAndInterpret(String expr) {
-        Assert.assertNotEquals("", expr);
+        assertNotEquals("", expr);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         try {
@@ -31,7 +33,7 @@ public class MethodlevelTranslatorTest {
         } catch (Exception e) {
             debugLexer(expr);
         }
-        Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 
     private void debugLexer(String expr) {

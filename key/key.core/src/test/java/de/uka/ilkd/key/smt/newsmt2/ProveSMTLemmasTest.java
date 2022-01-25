@@ -6,7 +6,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +16,10 @@ import org.key_project.util.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,8 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import static org.junit.Assert.fail;
 
 /**
  * This test case makes sure that all KeY formulas which are translated
@@ -42,7 +44,7 @@ public class ProveSMTLemmasTest {
         HEADER = Streams.toString(ProveSMTLemmasTest.class.getResourceAsStream("smt-lemma-header.key"));
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         HEADER = null;
     }
@@ -73,7 +75,7 @@ public class ProveSMTLemmasTest {
                 File saveFile = new File(file.getAbsoluteFile() + ".proof");
                 ProofSaver saver = new ProofSaver(loadedProof, saveFile);
                 saver.save();
-                fail("Proof does not close. See " + file + " and " + saveFile);
+                Assertions.fail("Proof does not close. See " + file + " and " + saveFile);
             } else {
                 if (proofFile == null) {
                     // delete temp files
@@ -86,7 +88,7 @@ public class ProveSMTLemmasTest {
                     if (!actual.equalsModRenaming(parsedLemma)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);
-                        fail("The proven lemma is different from the stored one.");
+                        Assertions.fail("The proven lemma is different from the stored one.");
                     }
                 }
 

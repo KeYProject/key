@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
@@ -25,12 +20,16 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * This {@link TestCase} tests the parallel usage of {@link de.uka.ilkd.key.nparser.KeYParser}
+ * This TestCase tests the parallel usage of {@link de.uka.ilkd.key.nparser.KeYParser}
  * and {@link SchemaJavaParser}.
  * @author Martin Hentschel
  */
-public class TestParallelParsing extends TestCase {
+public class TestParallelParsing  {
    /**
     * Loads both proof files contained in {@code "examples/_testcase/parser/MultipleRecursion"}
     * in parallel using {@code 4} {@link Thread}s in total.

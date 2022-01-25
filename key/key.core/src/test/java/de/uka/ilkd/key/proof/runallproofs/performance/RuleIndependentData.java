@@ -107,7 +107,8 @@ public class RuleIndependentData {
      */
     public static void updateData(long applyStrategyDuration,
             DataRecordingStrategy dataRecordingStrategy) {
-        RuleIndependentData t = new RuleIndependentData(dataRecordingStrategy.dataRecordingTestFile.directories);
+        RuleIndependentData t = new RuleIndependentData(
+                dataRecordingStrategy.dataRecordingTestFile.getProfileDirectories());
 
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);

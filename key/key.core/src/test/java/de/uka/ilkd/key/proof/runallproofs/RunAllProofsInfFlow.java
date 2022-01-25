@@ -17,16 +17,9 @@ package de.uka.ilkd.key.proof.runallproofs;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.TestFactory;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 /**
@@ -54,13 +47,13 @@ public final class RunAllProofsInfFlow extends RunAllProofsTest {
         return data(proofCollection);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpStatisticsFile() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
     }
 
-    @AfterClass
+    @AfterAll
     public static void computeSumsAndAverages() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.computeSumsAndAverages();

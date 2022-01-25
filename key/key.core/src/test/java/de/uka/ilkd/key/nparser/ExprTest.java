@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -27,32 +28,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ExprTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprTest.class);
 
-    public static Collection<Object[]> getFiles() throws IOException {
-        List<Object[]> seq = new LinkedList<>();
-        InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
-        Assumptions.assumeTrue(null != s);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
-            String l;
-            while ((l = reader.readLine()) != null) {
-                if (l.trim().isEmpty() || l.startsWith("#")) {
-                    continue;
-                }
-                seq.add(new Object[]{l});
-            }
-        }
-        return seq;
-    }
-
     @ParameterizedTest
-    @CsvFileSource(resources = "exprs.txt",delimiter = '^')
+    @CsvFileSource(resources = "exprs.txt", delimiter = '^')
     public void parseAndVisit(String expr) throws IOException {
+        Assumptions.assumeFalse(expr.startsWith("#"));
         KeyIO io = getIo();
-        Term actual = io.parseExpression(expr);
-        if (actual == null) {
+        try {
+            Term actual = io.parseExpression(expr);
+            assertNotNull(actual);
+            LOGGER.info("Term: {}", actual);
+        } catch (BuildingException e) {
             DebugKeyLexer.debug(expr);
         }
-        assertNotNull(actual);
-        System.out.println(actual);
     }
 
     private KeyIO getIo() throws IOException {

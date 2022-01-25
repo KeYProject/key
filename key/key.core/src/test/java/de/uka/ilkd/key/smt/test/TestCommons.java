@@ -20,11 +20,14 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SMTTestSettings;
+import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
-import org.junit.Assume;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
 import java.io.File;
@@ -32,8 +35,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Use this class for testing SMT: It provides a mechanism to load proofs and
@@ -73,7 +75,7 @@ public abstract class TestCommons {
     public abstract boolean toolNotInstalled();
 
     protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
-        Assume.assumeFalse(toolNotInstalled());
+        Assumptions.assumeFalse(toolNotInstalled());
         SMTSolverResult result = checkFile(filepath);
         // unknown is always allowed. But wrong answers are not allowed
         return correctResult(isValid, result);
@@ -102,8 +104,8 @@ public abstract class TestCommons {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
-            Assert.assertNotNull(proof);
-            Assert.assertEquals(1, proof.openGoals().size());
+            assertNotNull(proof);
+            assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
             return checkGoal(g);
         } finally {

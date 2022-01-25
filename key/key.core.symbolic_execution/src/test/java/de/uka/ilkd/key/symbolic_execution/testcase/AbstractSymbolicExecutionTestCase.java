@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -88,7 +87,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 import junit.framework.TestCase;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -145,7 +144,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
 
    static {
-      Assert.assertNotNull("Could not find test case directory", testCaseDirectory);
+      assertNotNull(testCaseDirectory, "Could not find test case directory");
    }
 
    /**
@@ -302,7 +301,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             afterFirst = true;
          }
       }
-      assertNotNull("Direct or indirect Child " + childToSearch + " is not contained in " + toSearchIn + ".", toSearchIn);
+      assertNotNull(toSearchIn, "Direct or indirect Child " + childToSearch + " is not contained in " + toSearchIn + ".");
       return toSearchIn;
    }
 
@@ -337,7 +336,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          }
          i++;
       }
-      assertNotNull("Child " + directChildToSearch + " is not contained in " + parentToSearchIn + ".", result);
+      assertNotNull(result, "Child " + directChildToSearch + " is not contained in " + parentToSearchIn + ".");
       return result;
    }
 
@@ -363,7 +362,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
-      assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()),
+              "Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".");
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       if (!StringUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition())) {
          assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
@@ -383,57 +383,57 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertCallStateVariables((IExecutionBaseMethodReturn<?>) expected, (IExecutionBaseMethodReturn<?>) current, compareVariables, compareConstraints);
       }
       if (expected instanceof IExecutionBranchCondition) {
-         assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
-         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
+         assertTrue(current instanceof IExecutionBranchCondition, "Expected IExecutionBranchCondition but is " + current.getClass() + ".");
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()), "Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".");
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
-         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()), "Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionStart) {
-         assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
+         assertTrue(current instanceof IExecutionStart, "Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".");
          assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionTermination) {
-         assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
+         assertTrue(current instanceof IExecutionTermination, "Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".");
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
          assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionBranchStatement) {
-         assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
+         assertTrue(current instanceof IExecutionBranchStatement, "Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopCondition) {
-         assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
+         assertTrue(current instanceof IExecutionLoopCondition, "Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopStatement) {
-         assertTrue("Expected IExecutionLoopStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopStatement);
+         assertTrue(current instanceof IExecutionLoopStatement, "Expected IExecutionLoopStatement but is " + (current != null ? current.getClass() : null) + ".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionMethodCall) {
-         assertTrue("Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodCall);
+         assertTrue(current instanceof IExecutionMethodCall, "Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
          assertMethodReturns((IExecutionMethodCall)expected, (IExecutionMethodCall)current);
       }
       else if (expected instanceof IExecutionMethodReturn) {
-         assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
-         assertTrue(((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()));
+         assertTrue(current instanceof IExecutionMethodReturn, "Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".");
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()), ((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature());
          if (compareReturnValues) {
-            assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
-            assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
+            assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()), ((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue());
+            assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()), ((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue());
             assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          }
-         assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()), ((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
          if (compareReturnValues) {
@@ -441,19 +441,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
          }
       }
       else if (expected instanceof IExecutionExceptionalMethodReturn) {
-         assertTrue("Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionExceptionalMethodReturn);
-         assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
-         assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertTrue(current instanceof IExecutionExceptionalMethodReturn, "Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".");
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()), ((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature());
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()), ((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionStatement) {
-         assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
+         assertTrue(current instanceof IExecutionStatement, "Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".");
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionOperationContract) {
-         assertTrue("Expected IExecutionOperationContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionOperationContract);
+         assertTrue(current instanceof IExecutionOperationContract, "Expected IExecutionOperationContract but is " + (current != null ? current.getClass() : null) + ".");
          assertEquals(((IExecutionOperationContract)expected).isPreconditionComplied(), ((IExecutionOperationContract)current).isPreconditionComplied());
          assertEquals(((IExecutionOperationContract)expected).hasNotNullCheck(), ((IExecutionOperationContract)current).hasNotNullCheck());
          assertEquals(((IExecutionOperationContract)expected).isNotNullCheckComplied(), ((IExecutionOperationContract)current).isNotNullCheckComplied());
@@ -465,19 +465,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopInvariant) {
-         assertTrue("Expected IExecutionLoopInvariant but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopInvariant);
+         assertTrue(current instanceof IExecutionLoopInvariant, "Expected IExecutionLoopInvariant but is " + (current != null ? current.getClass() : null) + ".");
          assertEquals(((IExecutionLoopInvariant)expected).isInitiallyValid(), ((IExecutionLoopInvariant)current).isInitiallyValid());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionAuxiliaryContract) {
-         assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionAuxiliaryContract);
+         assertTrue(current instanceof IExecutionAuxiliaryContract, "Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".");
          assertEquals(((IExecutionAuxiliaryContract)expected).isPreconditionComplied(), ((IExecutionAuxiliaryContract)current).isPreconditionComplied());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionJoin) {
-         assertTrue("Expected IExecutionJoin but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionJoin);
+         assertTrue(current instanceof IExecutionJoin, "Expected IExecutionJoin but is " + (current != null ? current.getClass() : null) + ".");
          assertEquals(((IExecutionJoin)expected).isWeakeningVerified(), ((IExecutionJoin)current).isWeakeningVerified());
          assertVariables(expected, current, compareVariables, compareConstraints);
          assertConstraints(expected, current, compareConstraints);
@@ -490,14 +490,15 @@ public abstract class AbstractSymbolicExecutionTestCase {
          IExecutionNode<?>[] expectedStack = expected.getCallStack();
          IExecutionNode<?>[] currentStack = current.getCallStack();
          if (expectedStack != null) {
-            assertNotNull("Call stack of \"" + current + "\" should not be null.", currentStack);
-            assertEquals("Node: " + expected, expectedStack.length, currentStack.length);
+            assertNotNull(currentStack, "Call stack of \"" + current + "\" should not be null.");
+            assertEquals(expectedStack.length, currentStack.length, "Node: " + expected);
             for (int i = 0; i < expectedStack.length; i++) {
                assertExecutionNode(expectedStack[i], currentStack[i], false, false, false, false, false);
             }
          }
          else{
-            assertTrue("Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack) + "\" but should be null or empty.", currentStack == null || currentStack.length == 0);
+            assertTrue(currentStack == null || currentStack.length == 0,
+                    "Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack) + "\" but should be null or empty.");
          }
       }
       // Optionally compare parent
@@ -516,8 +517,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionLink> expectedEntries = expected.getOutgoingLinks();
       ImmutableList<IExecutionLink> currentEntries = current.getOutgoingLinks();
       if (expectedEntries != null) {
-         assertNotNull("Outgoing links of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Outgoing links: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Outgoing links of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Outgoing links: " + expected);
          Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionLink> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -530,7 +531,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Outgoing links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(),
+                 "Outgoing links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 
@@ -544,8 +546,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionLink> expectedEntries = expected.getIncomingLinks();
       ImmutableList<IExecutionLink> currentEntries = current.getIncomingLinks();
       if (expectedEntries != null) {
-         assertNotNull("Incoming links of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Incoming links: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Incoming links of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Incoming links: " + expected);
          Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionLink> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -558,7 +560,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Incoming links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(),
+                 "Incoming links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 
@@ -572,8 +575,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionBlockStartNode<?>> expectedEntries = expected.getCompletedBlocks();
       ImmutableList<IExecutionBlockStartNode<?>> currentEntries = current.getCompletedBlocks();
       if (expectedEntries != null) {
-         assertNotNull("Completed blocks of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Completed blocks of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
          Iterator<IExecutionBlockStartNode<?>> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionBlockStartNode<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -590,7 +593,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Completed block entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(),
+                 "Completed block entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 
@@ -604,8 +608,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionNode<?>> expectedEntries = expected.getBlockCompletions();
       ImmutableList<IExecutionNode<?>> currentEntries = current.getBlockCompletions();
       if (expectedEntries != null) {
-         assertNotNull("Block completions of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Block completions of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
          Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -615,7 +619,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Block completion entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(), "Block completion entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 
@@ -629,8 +633,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionBaseMethodReturn<?>> expectedEntries = expected.getMethodReturns();
       ImmutableList<IExecutionBaseMethodReturn<?>> currentEntries = current.getMethodReturns();
       if (expectedEntries != null) {
-         assertNotNull("Method return of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Method return of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
          Iterator<IExecutionBaseMethodReturn<?>> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionBaseMethodReturn<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -640,7 +644,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Method return entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(),
+                 "Method return entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 
@@ -654,8 +659,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
       ImmutableList<IExecutionTermination> expectedEntries = expected.getTerminations();
       ImmutableList<IExecutionTermination> currentEntries = current.getTerminations();
       if (expectedEntries != null) {
-         assertNotNull("Termination of \"" + current + "\" should not be null.", currentEntries);
-         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         assertNotNull(currentEntries, "Termination of \"" + current + "\" should not be null.");
+         assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
          Iterator<IExecutionTermination> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionTermination> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
@@ -665,7 +670,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertFalse(currentIter.hasNext());
       }
       else{
-         assertTrue("Termination entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+         assertTrue(currentEntries == null || currentEntries.isEmpty(), "Termination entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
       }
    }
 

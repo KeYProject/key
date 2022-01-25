@@ -18,7 +18,6 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.*;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
@@ -35,7 +34,7 @@ import java.nio.charset.Charset;
  * Tests {@link SymbolicLayoutWriter} and {@link SymbolicLayoutReader}
  * @author Martin Hentschel
  */
-public class TestSymbolicLayoutWriterAndReader extends TestCase {
+public class TestSymbolicLayoutWriterAndReader  {
    /**
     * Tests the writing and reading of an {@link ISymbolicLayout}.
     */
