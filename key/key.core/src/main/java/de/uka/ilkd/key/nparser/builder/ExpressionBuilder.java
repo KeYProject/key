@@ -29,6 +29,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -45,6 +48,8 @@ import java.util.stream.Collectors;
  * @author weigl
  */
 public class ExpressionBuilder extends DefaultBuilder {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
+
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
 
     /**
@@ -539,8 +544,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         String cleanJava = trimJavaBlock(s);
         sjb.opName = operatorOfJavaBlock(s);
 
-        Debug.out("Modal operator name passed to getJavaBlock: ", sjb.opName);
-        Debug.out("Java block passed to getJavaBlock: ", s);
+        LOGGER.debug("Modal operator name passed to getJavaBlock: ", sjb.opName);
+        LOGGER.debug("Java block passed to getJavaBlock: ", s);
 
         try {
             try {
@@ -1407,8 +1412,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Operator finalOp = op;
         if (op instanceof ParsableVariable) {
             if (args != null) {
-                System.out.println(ctx.getText());
-                semanticError(ctx, "You used the variable `" + op + "` like a predicate or function.");
+                semanticError(ctx, "You used the variable `%s` like a predicate or function.", op);
             }
             if (boundVars != null)
                 addWarning(ctx, "Bounded variable are ignored on a variable");

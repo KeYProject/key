@@ -32,6 +32,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -42,6 +45,7 @@ import java.util.*;
  * services.
  */
 public final class JavaInfo {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JavaInfo.class);
 
 
     protected Services services;
@@ -910,7 +914,7 @@ public final class JavaInfo {
         if (asIn instanceof ClassDeclaration) {
             cd = (ClassDeclaration) asIn;
         } else {
-            Debug.out("Reading Java Block from an InterfaceDeclaration:"
+            LOGGER.debug("Reading Java Block from an InterfaceDeclaration:"
                     + " Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();

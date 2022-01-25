@@ -40,4 +40,9 @@ public interface Pipe {
      * automatically close.
      */
     void close();
+
+    /**
+     * Sends end-of-file to the underlying SMT solver. Note, this closes the stream.
+     */
+    void sendEOF();
 }

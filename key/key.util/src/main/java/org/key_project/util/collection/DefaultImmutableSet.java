@@ -81,9 +81,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 //            StackTraceElement[] st = new Throwable().getStackTrace();
 //            String complain = "TOO LARGE: " + st[2];
 //            if(previousComplains.add(complain)) {
-//                System.err.println(complain);
+//                LOGGER.error(complain);
 ////                for (int i = 2; i < 6; i++) {
-////                    System.err.println(st[i]);
+////                    LOGGER.error(st[i]);
 ////                }
 //            }
 //        }

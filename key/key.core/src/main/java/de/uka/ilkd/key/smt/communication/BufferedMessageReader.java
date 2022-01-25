@@ -13,8 +13,11 @@
 
 package de.uka.ilkd.key.smt.communication;
 
+import org.key_project.util.java.IOUtil;
+
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 
 /**
  * Wraps BufferedReader in order to provide different message delimiters.
@@ -130,13 +133,12 @@ class BufferedMessageReader {
      * @throws IOException if reading fails
      */
     public String drain() throws IOException {
-        char[] buf = new char[1024];
-        StringBuilder result = new StringBuilder();
-        int len = reader.read(buf);
-        while (len >= 0) {
-            result.append(buf, 0, len);
-            len = reader.read(buf);
-        }
-        return result.toString();
+        StringWriter sw = new StringWriter();
+        IOUtil.copy(reader, sw);
+        return sw.toString();
+    }
+
+    public Reader getReader() {
+        return reader;
     }
 }

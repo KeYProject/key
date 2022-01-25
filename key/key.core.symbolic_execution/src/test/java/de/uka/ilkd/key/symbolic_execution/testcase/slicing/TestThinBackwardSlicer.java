@@ -28,6 +28,8 @@ import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 
@@ -41,6 +43,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Flag to print found slices in the console.
     */
    public static final boolean PRINT_SLICE = false;
+   private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
 
    /** 
     * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
@@ -579,16 +582,16 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertNotNull(eqSelector);
          ImmutableList<ISymbolicEquivalenceClass> sec = eqSelector.selectEquivalenceClass(environment, proof, seed);
          if (PRINT_SLICE) {
-            System.out.println("Equivalence Class: " + sec);
+            LOGGER.info("Equivalence Class: {}", sec);
          }
          // Perform slicing
          ThinBackwardSlicer slicer = new ThinBackwardSlicer();
          ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
          // Print slice if requested
          if (PRINT_SLICE) {
-            System.out.println("Found Slices: " + slices.size());
+            LOGGER.info("Found Slices: {}", slices.size());
             for (Node slice : slices) {
-               System.out.println(slice.serialNr());
+               LOGGER.info("SerialNr {}", slice.serialNr());
             }
          }
          if (fullSlize) {
@@ -626,7 +629,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Implementations are used to select an {@link ISymbolicEquivalenceClass}.
     * @author Martin Hentschel
     */
-   protected static interface IEquivalenceClassSelector {
+   protected interface IEquivalenceClassSelector {
       /**
        * Selects the {@link ISymbolicEquivalenceClass}.
        * @param environment The current {@link KeYEnvironment}.
@@ -634,9 +637,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
        * @param seed The current seed.
        * @return The {@link ISymbolicEquivalenceClass}es or {@code null} to select.
        */
-      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, 
-                                                                             Proof proof, 
-                                                                             Pair<Node, ReferencePrefix> seed) throws Exception;
+      ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment,
+                                                                      Proof proof,
+                                                                      Pair<Node, ReferencePrefix> seed) throws Exception;
    }
    
    /**
@@ -720,7 +723,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          VariableDeclaration variableDeclaration = (VariableDeclaration) activeStatemt;
          SourceElement seedLocation = variableDeclaration.getChildAt(1);
          assertTrue(seedLocation instanceof VariableSpecification);
-         return new Pair<Node, ReferencePrefix>(seedNode, (ReferencePrefix) ((VariableSpecification) seedLocation).getInitializer());
+         return new Pair<>(seedNode, (ReferencePrefix) ((VariableSpecification) seedLocation).getInitializer());
       }
    }
    
@@ -755,7 +758,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertTrue(activeStatemt instanceof CopyAssignment);
          CopyAssignment assignment = (CopyAssignment) activeStatemt;
          SourceElement seedLocation = assignment.getChildAt(1);
-         return new Pair<Node, ReferencePrefix>(seedNode, (ReferencePrefix) seedLocation);
+         return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
       }
    }
    
@@ -790,7 +793,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertTrue(activeStatemt instanceof CopyAssignment);
          CopyAssignment assignment = (CopyAssignment) activeStatemt;
          SourceElement seedLocation = assignment.getChildAt(0);
-         return new Pair<Node, ReferencePrefix>(seedNode, (ReferencePrefix) seedLocation);
+         return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
       }
    }
    
@@ -825,7 +828,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertTrue(activeStatemt instanceof Return);
          Return returnStatement = (Return) activeStatemt;
          SourceElement seedLocation = returnStatement.getExpression();
-         return new Pair<Node, ReferencePrefix>(seedNode, (ReferencePrefix) seedLocation);
+         return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
       }
    }
    
@@ -833,8 +836,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Implementations of this interface are used to find the seed.
     * @author Martin Hentschel
     */
-   protected static interface ISeedLocationSelector {
-      public Pair<Node, ReferencePrefix> findSeed(Proof proof);
+   protected interface ISeedLocationSelector {
+      Pair<Node, ReferencePrefix> findSeed(Proof proof);
    }
 
    /**

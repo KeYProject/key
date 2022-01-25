@@ -39,11 +39,15 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShowProofStatistics extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
     /**
      *
@@ -231,7 +235,7 @@ public class ShowProofStatistics extends MainWindowAction {
                                                  Boolean.TRUE);
                 statisticsPane.setFont(myFont);
             } else {
-                Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
+                LOGGER.debug("KEY_FONT_PROOF_TREE not available. Use standard font.");
             }
 
             JPanel buttonPane = new JPanel();

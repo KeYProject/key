@@ -14,57 +14,55 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map.Entry;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 
 class SortWrapper {
-    private Sort sort;
-    private StringBuffer name;
-    private StringBuffer predicateName;
-    private LinkedList<SortWrapper> parentSorts = new LinkedList<SortWrapper>();
+    private final Sort sort;
+    private final StringBuilder name;
+    private final StringBuilder predicateName;
+    private final List<SortWrapper> parentSorts = new LinkedList<>();
 
     public boolean extendsTrans(SortWrapper sw) {
-	return sw.getSort() != getSort()
-	        && getSort().extendsTrans(sw.getSort());
+        return sw.getSort() != getSort()
+                && getSort().extendsTrans(sw.getSort());
     }
 
     public Sort getSort() {
-	return sort;
+        return sort;
     }
 
-    public StringBuffer getName() {
-	return name;
+    public StringBuilder getName() {
+        return name;
     }
 
-    public StringBuffer getPredicateName() {
-	return predicateName;
+    public StringBuilder getPredicateName() {
+        return predicateName;
     }
 
-    public SortWrapper(Sort sort, StringBuffer name, StringBuffer predicateName) {
-	super();
-	this.sort = sort;
-	this.name = name;
-	this.predicateName = predicateName;
+    public SortWrapper(Sort sort, StringBuilder name, StringBuilder predicateName) {
+        super();
+        this.sort = sort;
+        this.name = name;
+        this.predicateName = predicateName;
     }
 
-    public LinkedList<SortWrapper> getParents() {
-	return parentSorts;
+    public List<SortWrapper> getParents() {
+        return parentSorts;
     }
 
     void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy, boolean explicitHierarchy,
-	      Services services) {
-	for (SortWrapper sw : sorts) {
-	    if (this.extendsTrans(sw)) {
-		addParent(sw,explicitNullHierarchy,explicitHierarchy,services);
-	    }
-	}
+                            Services services) {
+        for (SortWrapper sw : sorts) {
+            if (this.extendsTrans(sw)) {
+                addParent(sw, explicitNullHierarchy, explicitHierarchy, services);
+            }
+        }
     }
 
     /**
@@ -73,32 +71,27 @@ class SortWrapper {
      * <code>this.getSort()</code> and the considered sort.
      */
     private void removeGrandParents(SortWrapper parent) {
-	Iterator<SortWrapper> it = parentSorts.iterator();
-	while (it.hasNext()) {
-	    SortWrapper sw = it.next();
-	    if (parent.extendsTrans(sw)) {
-		it.remove();
-	    }
-	}
+        parentSorts.removeIf(parent::extendsTrans);
     }
 
-   private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {
-	Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
-	if((explicitNullHierarchy && this.getSort() == nullOp.sort())|| explicitHierarchy){
-	    parentSorts.add(parent);
-	    return true;
-	}
-	
-	for (SortWrapper sw : parentSorts) {
-	    // only add the sort as parent, if it is a direct super sort.
-	    if (sw.extendsTrans(parent)) {
-		return false;
-	    }
-	}
-	parentSorts.add(parent);
-	
-	    removeGrandParents(parent);
-	return true;
+    private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy,
+                              boolean explicitHierarchy, Services services) {
+        Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+        if ((explicitNullHierarchy && this.getSort() == nullOp.sort()) || explicitHierarchy) {
+            parentSorts.add(parent);
+            return true;
+        }
+
+        for (SortWrapper sw : parentSorts) {
+            // only add the sort as parent, if it is a direct super sort.
+            if (sw.extendsTrans(parent)) {
+                return false;
+            }
+        }
+        parentSorts.add(parent);
+
+        removeGrandParents(parent);
+        return true;
 
     }
 
@@ -106,37 +99,35 @@ class SortWrapper {
 
 /**
  * The SortHierarchy works as a wrapper class for sorts.
- * 
+ *
  * @author Simon Greiner
- * 
  */
 public class SortHierarchy {
 
-    private LinkedList<SortWrapper> sorts = new LinkedList<SortWrapper>();
+    private final LinkedList<SortWrapper> sorts = new LinkedList<>();
 
     /**
      * Create a Sort Hierarchy.
-     * 
-     * @param sortnames
-     *            a HashMap of sorts mapped to the Strings which is displayed in
-     *            Formulas
+     *
+     * @param sortnames a HashMap of sorts mapped to the Strings which is displayed in
+     *                  Formulas
      */
-    protected SortHierarchy(HashMap<Sort, StringBuffer> sortnames,
-	    HashMap<Sort, StringBuffer> prednames, boolean explicitNullHierarchy, boolean explicitHierarchy,
-	    Services services) {
-	for (Entry<Sort, StringBuffer> entry : sortnames.entrySet()) {
-	    sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
-		    prednames.get(entry.getKey())));
-	}
+    protected SortHierarchy(Map<Sort, StringBuilder> sortnames,
+                            Map<Sort, StringBuilder> prednames,
+                            boolean explicitNullHierarchy, boolean explicitHierarchy,
+                            Services services) {
+        for (Entry<Sort, StringBuilder> entry : sortnames.entrySet()) {
+            sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
+                    prednames.get(entry.getKey())));
+        }
 
-	for (SortWrapper sw : sorts) {
-	    sw.computeParentSorts(sorts,explicitNullHierarchy,explicitHierarchy,services);
-	}
+        for (SortWrapper sw : sorts) {
+            sw.computeParentSorts(sorts, explicitNullHierarchy, explicitHierarchy, services);
+        }
 
     }
 
-    public LinkedList<SortWrapper> getSorts() {
-	return sorts;
+    public List<SortWrapper> getSorts() {
+        return sorts;
     }
-
 }

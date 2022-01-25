@@ -13,24 +13,21 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Timer;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+import de.uka.ilkd.key.smt.st.SolverType;
+
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>
  * There are two cases how the solvers can be started:<br>
  * <br>
  * 1. Case: Starting the solvers synchronously<br>
- *<br>
+ * <br>
  * First Step: Create the SMT problem:<br>
  * <code>SMTProblem problem = new SMTProblem(g); // g can be either a goal or term</code>
  * <br>
@@ -47,20 +44,20 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  * <code>return problem.getFinalResult();</code><br>
  * <br>
  * In case that you want to access the result of each solver:<br>
- * 
+ *
  * <pre>
  * for (SMTSolver solver : problem.getSolvers()) {
  *     solver.getFinalResult();
  * }
- *</pre>
- * 
+ * </pre>
+ *
  * <br>
- * 
+ * <p>
  * 2. Case: Starting the solvers asynchronously:<br>
  * <br>
- * 
+ *
  * <pre>
- * Thread thread = new Thread(new Runnable() {        
+ * Thread thread = new Thread(new Runnable() {
  * public void run() {
  *   SMTProblem final problem = new SMTProblem(...);
  *   SolverLauncher launcher = new SolverLauncher(new SMTSettings(...));
@@ -72,21 +69,21 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  *          	for(SMTSolver solver : problemSolvers){
  *          		solver.getException();
  *          		...
- *          	}
+ *            }
  *          }
  *          public void launcherStarted(Collection<SMTProblem> problems,
  *                                      Collection<SolverType> solverTypes,
  *                                      SolverLauncher launcher);
- *     		 });
+ *             });
  *   launcher.launch(problem,services,SolverType.Z3_SOLVER,SolverType.YICES_SOLVER);
- * 	      
- * 	        }
- * 	    });
+ *
+ *            }
+ *        });
  *    thread.start();
- *</pre>
- * 
+ * </pre>
+ *
  * <br>
- *NOTE: In case that you add at least one listener to a launcher no exception
+ * NOTE: In case that you add at least one listener to a launcher no exception
  * is thrown when a solver produces an error. The exceptions of the solvers are
  * stored within the solver object and can be accessed by
  * <code>solver.getException</code>.
@@ -95,16 +92,15 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 public class SolverLauncher implements SolverListener {
 
     /* ############### Public Interface #################### */
+
     /**
      * Create for every solver execution a new object. Don't reuse the solver
      * launcher object.
-     * 
-     * @param settings
-     *            settings for the execution of the SMT Solvers.
+     *
+     * @param settings settings for the execution of the SMT Solvers.
      */
     public SolverLauncher(SMTSettings settings) {
-	this.settings = settings;
-
+        this.settings = settings;
     }
 
     /**
@@ -113,13 +109,13 @@ public class SolverLauncher implements SolverListener {
      * solver launcher, no exception is thrown when a solver produces an error.
      * The error can be read when the method <code>launcherStopped</code> of the
      * listener is called.
-     * */
+     */
     public void addListener(SolverLauncherListener listener) {
-	listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeListener(SolverLauncherListener listener) {
-	listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     /**
@@ -127,47 +123,39 @@ public class SolverLauncher implements SolverListener {
      * Note: Calling this methods does not create an extra thread, i.e. the
      * calling thread is blocked until the method returns. (Synchronous method
      * call).
-     * 
-     * @param problem
-     *            The problem that should be translated and passed to the
-     *            solvers
-     * @param services
-     *            The services object of the current proof.
-     * @param solverTypes
-     *            A list of solver types that should be used for the problem.
-     * 
+     *
+     * @param problem     The problem that should be translated and passed to the
+     *                    solvers
+     * @param services    The services object of the current proof.
+     * @param solverTypes A list of solver types that should be used for the problem.
      */
-    public void launch(SMTProblem problem, Services services,
-	    SolverType... solverTypes) {
-	checkLaunchCall();
-	launchIntern(problem, services, solverTypes);
+    public void launch(SMTProblem problem, Services services, SolverType... solverTypes) {
+        checkLaunchCall();
+        launchIntern(problem, services, solverTypes);
     }
 
     /**
      * Launches several solvers for the problems that are handed over. Note:
      * Calling this methods does not create an extra thread, i.e. the calling
      * thread is blocked until the method returns. (Synchronous method call).
-     * 
-     * @param problems
-     *            The problems that should be translated and passed to the
-     *            solvers
-     * @param services
-     *            The services object of the current proof.
-     * @param solverTypes
-     *            A list of solver types that should be used for the problem.
+     *
+     * @param problems    The problems that should be translated and passed to the
+     *                    solvers
+     * @param services    The services object of the current proof.
+     * @param solverTypes A list of solver types that should be used for the problem.
      */
     public void launch(Collection<SolverType> solverTypes,
-	    Collection<SMTProblem> problems, Services services) {
-	checkLaunchCall();
-	launchIntern(solverTypes, problems, services);
+                       Collection<SMTProblem> problems, Services services) {
+        checkLaunchCall();
+        launchIntern(solverTypes, problems, services);
     }
 
     /**
      * Stops the execution of the launcher.
      */
     public void stop() {
-	stopSemaphore.tryAcquire();
-	session.interruptAll(ReasonOfInterruption.User);
+        stopSemaphore.tryAcquire();
+        session.interruptAll(ReasonOfInterruption.User);
     }
 
     /* ################ Implementation ############################ */
@@ -176,7 +164,7 @@ public class SolverLauncher implements SolverListener {
      * Period of a timer task. Sometimes it happens that a timer event got lost.
      * Therefore the timer tasks are called periodly until it is canceld
      */
-    private final static int PERIOD = 50;
+	private static final int PERIOD = 50;
 
     /**
      * Used for synchronisation. This lock is used in the same way as the
@@ -190,114 +178,110 @@ public class SolverLauncher implements SolverListener {
      * the <code>wait</code>-condition in order to wake up the launcher.
      */
     private final Condition wait = lock.newCondition();
-    /** The timer that is responsible for the timeouts. */
+    /**
+     * The timer that is responsible for the timeouts.
+     */
     private final Timer timer = new Timer(true);
     /**
      * A sesion encapsulates some attributes that should be accessed only by
      * specified methods (in oder to maintain thread safety)
      */
     private final Session session = new Session();
-    /** The SMT settings that should be used */
+
+    /**
+     * The SMT settings that should be used
+     */
     private final SMTSettings settings;
+
     /**
      * This semaphore is used for stopping the launcher. If the permit is
      * acquired the launcher stops.
      */
     private final Semaphore stopSemaphore = new Semaphore(1, true);
 
-    private LinkedList<SolverLauncherListener> listeners = new LinkedList<SolverLauncherListener>();
+    private final LinkedList<SolverLauncherListener> listeners = new LinkedList<>();
 
-    /** Every launcher object should be used only once. */
+    /**
+     * Every launcher object should be used only once.
+     */
     private boolean launcherHasBeenUsed = false;
 
     /**
      * Creates the concrete solver objects and distributes them to the SMT
      * problems.
      */
-    private Collection<SMTProblem> prepareSolvers(
-	    Collection<SolverType> factories, Collection<SMTProblem> problems,
-	    Services services) {
-	for (SMTProblem problem : problems) {
-	    for (SolverType factory : factories) {
-		if (factory.isInstalled(false)) {
-		    SMTSolver solver = factory.createSolver(problem, this,
-			    services);
-		    problem.addSolver(solver);
-		
-		}
-	    }
-	}
-	return problems;
+    private void prepareSolvers(Collection<SolverType> factories,
+                                Collection<SMTProblem> problems, Services services) {
+        for (SMTProblem problem : problems) {
+            for (SolverType factory : factories) {
+                if (factory.isInstalled(false)) {
+                    SMTSolver solver = factory.createSolver(problem, this, services);
+                    solver.setTimeout(settings.getTimeout(factory));
+                    problem.addSolver(solver);
+                }
+            }
+        }
     }
 
     private void launchIntern(SMTProblem problem, Services services,
-	    SolverType[] solverTypes)  {
-
-	LinkedList<SolverType> types = new LinkedList<SolverType>();
-	Collections.addAll(types, solverTypes);
-	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
-	problems.add(problem);
-	launchIntern(types, problems, services);
+                              SolverType[] solverTypes) {
+        LinkedList<SolverType> types = new LinkedList<>();
+        Collections.addAll(types, solverTypes);
+        LinkedList<SMTProblem> problems = new LinkedList<>();
+        problems.add(problem);
+        launchIntern(types, problems, services);
     }
 
     private void launchIntern(Collection<SolverType> factories,
-	    Collection<SMTProblem> problems, Services services)
-	    {
-
-	// consider only installed solvers.
-	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
-	for (SolverType type : factories) {
-	    if (type.isInstalled(false)) {
-	    	installedSolvers.add(type);
-	    	if(settings.checkForSupport()){
-	    		type.checkForSupport();
-	    	}
-	    }
-	}
-	problems = prepareSolvers(installedSolvers, problems, services);
-
-	launchIntern(problems, installedSolvers);
+                              Collection<SMTProblem> problems, Services services) {
+        // consider only installed solvers.
+        LinkedList<SolverType> installedSolvers = new LinkedList<>();
+        for (SolverType type : factories) {
+            if (type.isInstalled(false)) {
+                installedSolvers.add(type);
+                if (settings.checkForSupport()) {
+                    type.checkForSupport();
+                }
+            }
+        }
+        prepareSolvers(installedSolvers, problems, services);
+        launchIntern(problems, installedSolvers);
     }
 
     private void checkLaunchCall() {
-	if (launcherHasBeenUsed) {
-	    throw new RuntimeException(
-		    "Every launcher object can be used only once.");
-	}
-	launcherHasBeenUsed = true;
+        if (launcherHasBeenUsed) {
+            throw new IllegalStateException("Every launcher object can be used only once.");
+        }
+        launcherHasBeenUsed = true;
     }
 
     private void launchIntern(Collection<SMTProblem> problems,
-	    Collection<SolverType> factories)  {
+                              Collection<SolverType> factories) {
 
-	LinkedList<SMTSolver> solvers = new LinkedList<SMTSolver>();
-	for (SMTProblem problem : problems) {
-	    solvers.addAll(problem.getSolvers());
-	}
-	launchSolvers(solvers, problems, factories);
+        LinkedList<SMTSolver> solvers = new LinkedList<>();
+        for (SMTProblem problem : problems) {
+            solvers.addAll(problem.getSolvers());
+        }
+        launchSolvers(solvers, problems, factories);
     }
 
     /**
      * Takes the next solvers from the queue and starts them. It depends on the
      * settings how many solvers can be executed concurrently.
      */
-    private void fillRunningList(LinkedList<SMTSolver> solvers) {
-	int i = 0;
-	while (startNextSolvers(solvers) && !isInterrupted()) {
-	    SMTSolver solver = solvers.poll();
+    private void fillRunningList(Queue<SMTSolver> solvers) {
+        while (startNextSolvers(solvers) && !isInterrupted()) {
+            SMTSolver solver = solvers.poll();
+            Objects.requireNonNull(solver);
 
-	    SolverTimeout solverTimeout = new SolverTimeout(solver,
-		    session, settings.getTimeout() + i * 50);
+            SolverTimeout solverTimeout = new SolverTimeout(solver, session);
+            timer.schedule(solverTimeout, solver.getTimeout(), PERIOD);
+            session.addCurrentlyRunning(solver);
 
-	 
-	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
-	    session.addCurrentlyRunning(solver);
-	    // This cast is okay since there is only the class
-	    // SMTSolverImplementation that implements SMTSolver.
-	    solver.start(solverTimeout, settings);
-	    i++;
-
-	}
+            // This cast is okay since there is only the class
+            // SMTSolverImplementation that implements SMTSolver.
+            solver.start(solverTimeout, settings);
+        }
     }
 
     /**
@@ -305,86 +289,84 @@ public class SolverLauncher implements SolverListener {
      * stopped.
      */
     private boolean isInterrupted() {
-	return stopSemaphore.availablePermits() == 0;
+        return stopSemaphore.availablePermits() == 0;
     }
 
     /**
      * Checks whether it is possible to start another solver.
      */
-    private boolean startNextSolvers(LinkedList<SMTSolver> solvers) {
-	return !solvers.isEmpty()
-	        && session.getCurrentlyRunningCount() < settings
-	                .getMaxConcurrentProcesses();
+    private boolean startNextSolvers(Queue<SMTSolver> solvers) {
+        return !solvers.isEmpty()
+                && session.getCurrentlyRunningCount() < settings
+                .getMaxConcurrentProcesses();
     }
 
-    private void launchSolvers(LinkedList<SMTSolver> solvers,
-	    Collection<SMTProblem> problems, Collection<SolverType> solverTypes)
-    {
-    //Show progress dialog
-	notifyListenersOfStart(problems, solverTypes);
+    private void launchSolvers(Queue<SMTSolver> solvers,
+                               Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+        //Show progress dialog
+        notifyListenersOfStart(problems, solverTypes);
 
-	// Launch all solvers until the queue is empty or the launcher is
-	// interrupted.
-	launchLoop(solvers);
+        // Launch all solvers until the queue is empty or the launcher is
+        // interrupted.
+        launchLoop(solvers);
 
-	// at this point either there are no solvers left to start or
-	// the whole launching process was interrupted.
-	waitForRunningSolvers();
+        // at this point either there are no solvers left to start or
+        // the whole launching process was interrupted.
+        waitForRunningSolvers();
 
-	cleanUp(solvers);
+        cleanUp(solvers);
 
-	notifyListenersOfStop();
+        notifyListenersOfStop();
 
     }
 
-    private void notifyListenersOfStart(Collection<SMTProblem> problems,
-	    Collection<SolverType> solverTypes) {
-	for (SolverLauncherListener listener : listeners) {
-	    listener.launcherStarted(problems, solverTypes, this);
-	}
+    private void notifyListenersOfStart(Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+        for (SolverLauncherListener listener : listeners) {
+            listener.launcherStarted(problems, solverTypes, this);
+        }
     }
 
     /**
      * Core of the launcher. Start all solvers until the queue is empty or the
      * launcher is interrupted.
      */
-    private void launchLoop(LinkedList<SMTSolver> solvers) {
-	// as long as there are jobs to do, start solvers
-	while (!solvers.isEmpty() && !isInterrupted()) {
-	    lock.lock();
-	    try {
-		// start solvers as many as possible
-		fillRunningList(solvers);
-		if (!startNextSolvers(solvers) && !isInterrupted()) {
-		    try {
-			// if there is nothing to do, wait for the next solver
-			// finishing its task.
-			wait.await();
+    private void launchLoop(Queue<SMTSolver> solvers) {
+        // as long as there are jobs to do, start solvers
+        while (!solvers.isEmpty() && !isInterrupted()) {
+            lock.lock();
+            try {
+                // start solvers as many as possible
+                fillRunningList(solvers);
+                if (!startNextSolvers(solvers) && !isInterrupted()) {
+                    try {
+                        // if there is nothing to do, wait for the next solver
+                        // finishing its task.
+                        wait.await();
 
-		    } catch (InterruptedException e) {
-			launcherInterrupted(e);
-		    }
-		}
-	    } finally {
-		lock.unlock();
-	    }
-	}
+                    } catch (InterruptedException e) {
+                        launcherInterrupted(e);
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
     /**
      * The launcher should not be stopped until every solver has stopped.
      */
     private void waitForRunningSolvers() {
-	while (session.getCurrentlyRunningCount() > 0) {
-	    lock.lock();
-	    try {
-		wait.await();
-	    } catch (InterruptedException e) {
-		launcherInterrupted(e);
-	    } finally {
-		lock.unlock();
-	    }
-	}
+        while (session.getCurrentlyRunningCount() > 0) {
+            lock.lock();
+            try {
+                wait.await();
+            } catch (InterruptedException e) {
+                launcherInterrupted(e);
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
     /**
@@ -392,31 +374,30 @@ public class SolverLauncher implements SolverListener {
      * interruption must be set.
      */
     private void cleanUp(Collection<SMTSolver> solvers) {
-	if (isInterrupted()) {
-	    for (SMTSolver solver : solvers) {
-		solver.interrupt(ReasonOfInterruption.User);
-	    }
-	}
+        if (isInterrupted()) {
+            for (SMTSolver solver : solvers) {
+                solver.interrupt(ReasonOfInterruption.User);
+            }
+        }
     }
 
-    private void notifyListenersOfStop()  {
-	Collection<SMTSolver> problemSolvers = session.getProblemSolvers();
-	Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
-	//finishedSolvers.addAll(problemSolvers);
-	
-	for(SMTSolver solver : problemSolvers){
-		if(!finishedSolvers.contains(solver)){
-			finishedSolvers.add(solver);
-		}
-	}
-	
-	for (SolverLauncherListener listener : listeners) {
-	    listener.launcherStopped(this, finishedSolvers);
-	}
+    private void notifyListenersOfStop() {
+        Collection<SMTSolver> problemSolvers = session.getProblemSolvers();
+        Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
 
-	if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
-	    throw new SolverException(problemSolvers);
-	}
+        for (SMTSolver solver : problemSolvers) {
+            if (!finishedSolvers.contains(solver)) {
+                finishedSolvers.add(solver);
+            }
+        }
+
+        for (SolverLauncherListener listener : listeners) {
+            listener.launcherStopped(this, finishedSolvers);
+        }
+
+        if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
+            throw new SolverException(problemSolvers);
+        }
     }
 
     /**
@@ -425,13 +406,13 @@ public class SolverLauncher implements SolverListener {
      * wake up the launcher.
      */
     private void notifySolverHasFinished(SMTSolver solver) {
-	lock.lock();
-	try {		
-		session.removeCurrentlyRunning(solver);
-		wait.signal();
-	} finally {
-		lock.unlock();
-	}
+        lock.lock();
+        try {
+            session.removeCurrentlyRunning(solver);
+            wait.signal();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -439,7 +420,7 @@ public class SolverLauncher implements SolverListener {
      * solvers) just forward it
      */
     private void launcherInterrupted(Exception e) {
-	throw new RuntimeException(e);
+        throw new RuntimeException(e);
     }
 
     @Override
@@ -448,20 +429,20 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
-    session.addFinishedSolver(solver);
-	notifySolverHasFinished(solver);
+        session.addFinishedSolver(solver);
+        notifySolverHasFinished(solver);
     }
 
     @Override
     public void processInterrupted(SMTSolver solver, SMTProblem problem,
-	    Throwable e) {
-	session.addProblemSolver(solver);
-	notifySolverHasFinished(solver);
+                                   Throwable e) {
+        session.addProblemSolver(solver);
+        notifySolverHasFinished(solver);
     }
 
     @Override
     public void processTimeout(SMTSolver solver, SMTProblem problem) {
-	notifySolverHasFinished(solver);
+        notifySolverHasFinished(solver);
     }
 
     @Override
@@ -476,115 +457,113 @@ public class SolverLauncher implements SolverListener {
  */
 class Session {
 
-    /** Locks the queue of the currently running solvers */
-    private ReentrantLock lock = new ReentrantLock();
-    /** Locks the collection of the problem solvers. */
-    private ReentrantLock problemSolverLock = new ReentrantLock();
-    private ReentrantLock finishedSolverLock = new ReentrantLock();
-    private Collection<SMTSolver> finishedSolvers = new LinkedList<SMTSolver>();
-    private Collection<SMTSolver> problemSolvers = new LinkedList<SMTSolver>();
-    private LinkedList<SMTSolver> currentlyRunning = new LinkedList<SMTSolver>();
+    /**
+     * Locks the queue of the currently running solvers
+     */
+    private final ReentrantLock lock = new ReentrantLock();
+    /**
+     * Locks the collection of the problem solvers.
+     */
+    private final ReentrantLock problemSolverLock = new ReentrantLock();
+    private final ReentrantLock finishedSolverLock = new ReentrantLock();
+    private final Collection<SMTSolver> finishedSolvers = new LinkedList<>();
+    private final Collection<SMTSolver> problemSolvers = new LinkedList<>();
+    private final LinkedList<SMTSolver> currentlyRunning = new LinkedList<>();
 
-    /** Adds a solver to the list of currently running solvers. Thread safe */
+    /**
+     * Adds a solver to the list of currently running solvers. Thread safe
+     */
     public void addCurrentlyRunning(SMTSolver solver) {
-	try {
-	    lock.lock();
-	    currentlyRunning.add(solver);
-	} finally {
-	    lock.unlock();
-	}
+        try {
+            lock.lock();
+            currentlyRunning.add(solver);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeCurrentlyRunning(SMTSolver solver) {
-	try {
-	    lock.lock();
-	    int i = currentlyRunning.indexOf(solver);
-	    if (i >= 0) {
-		currentlyRunning.remove(i);
-	    }
-	} finally {
-	    lock.unlock();
-	}
+        try {
+            lock.lock();
+            int i = currentlyRunning.indexOf(solver);
+            if (i >= 0) {
+                currentlyRunning.remove(i);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getCurrentlyRunningCount() {
-	try {
-	    lock.lock();
-	    int count = currentlyRunning.size();
-	    return count;
-	} finally { // finally trumps return
-	    lock.unlock();
-	}
+        try {
+            lock.lock();
+            return currentlyRunning.size();
+        } finally { // finally trumps return
+            lock.unlock();
+        }
     }
 
     public void interruptSolver(SMTSolver solver, ReasonOfInterruption reason) {
-	try {
-	    lock.lock();
-	    Iterator<SMTSolver> it = currentlyRunning.iterator();
-	    while (it.hasNext()) {
-		SMTSolver next = it.next();
-		if (next.equals(solver)) {
-		    next.interrupt(reason);
-		    it.remove();
-		    break;
-		}
-	    }
-	} finally {
-	    lock.unlock();
-	}
+        try {
+            lock.lock();
+            Iterator<SMTSolver> it = currentlyRunning.iterator();
+            while (it.hasNext()) {
+                SMTSolver next = it.next();
+                if (next.equals(solver)) {
+                    next.interrupt(reason);
+                    it.remove();
+                    break;
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void interruptAll(ReasonOfInterruption reason) {
-	try {
-	    lock.lock();
-	    for (SMTSolver solver : currentlyRunning) {
-		solver.interrupt(reason);
-	    }
-	} finally {
-	    lock.unlock();
-	}
+        try {
+            lock.lock();
+            for (SMTSolver solver : currentlyRunning) {
+                solver.interrupt(reason);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void addProblemSolver(SMTSolver solver) {
-	try {
-	    problemSolverLock.lock();
-	    problemSolvers.add(solver);
-	} finally {
-	    problemSolverLock.unlock();
-	}
+        try {
+            problemSolverLock.lock();
+            problemSolvers.add(solver);
+        } finally {
+            problemSolverLock.unlock();
+        }
     }
-    
+
     public void addFinishedSolver(SMTSolver solver) {
-    	try {
-    		finishedSolverLock.lock();
-    		finishedSolvers.add(solver);
-    	} finally {
-    		finishedSolverLock.unlock();
-    	}
+        try {
+            finishedSolverLock.lock();
+            finishedSolvers.add(solver);
+        } finally {
+            finishedSolverLock.unlock();
+        }
     }
 
     public Collection<SMTSolver> getProblemSolvers() {
-	try {
-	    problemSolverLock.lock();
-	    Collection<SMTSolver> copy = new LinkedList<SMTSolver>(
-		    problemSolvers);
-	    return copy; // finally trumps return
-	} finally {
-	    problemSolverLock.unlock();
-	}
-
+        try {
+            problemSolverLock.lock();
+            return new LinkedList<>(problemSolvers); // finally trumps return
+        } finally {
+            problemSolverLock.unlock();
+        }
     }
-    
+
     public Collection<SMTSolver> getFinishedSolvers() {
-    	try {
-    		finishedSolverLock.lock();
-    		Collection<SMTSolver> copy = new LinkedList<SMTSolver>(
-    				finishedSolvers);
-    		return copy; // finally trumps return
-    	} finally {
-    		finishedSolverLock.unlock();
-    	}
-
+        try {
+            finishedSolverLock.lock();
+            return new LinkedList<>(finishedSolvers); // finally trumps return
+        } finally {
+            finishedSolverLock.unlock();
+        }
     }
-
 }

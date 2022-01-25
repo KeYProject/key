@@ -3,6 +3,9 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
@@ -26,7 +29,12 @@ import java.util.*;
  * @author Alexander Weigl
  * @version 1 (19.08.19)
  */
-public abstract class ParsingFacade {
+public final class ParsingFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
+
+    private ParsingFacade() {
+    }
+
     /**
      * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
      * <b>The use of this method is discourage and should be avoided in all high level scenarios.</b>
@@ -35,7 +43,8 @@ public abstract class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    public static <T extends ParserRuleContext> @Nonnull T getParseRuleContext(@Nonnull KeyAst<T> ast) {
+    @Nonnull
+    public static <T extends ParserRuleContext> T getParseRuleContext(@Nonnull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -64,7 +73,6 @@ public abstract class ParsingFacade {
      * Extracts the choice information from the given the parsed files {@code ctxs}.
      *
      * @param ctxs non-null list
-     * @return
      */
     public static @Nonnull
     ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
@@ -90,7 +98,7 @@ public abstract class ParsingFacade {
     }
 
     public static KeyAst.File parseFile(URL url) throws IOException {
-        //long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
              ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(
@@ -102,8 +110,8 @@ public abstract class ParsingFacade {
                     -1);
             return parseFile(stream);
         } finally {
-            //long stop = System.currentTimeMillis();
-            //System.err.printf("PARSING %s took %d ms\n", url, stop - start);
+            long stop = System.currentTimeMillis();
+            LOGGER.debug("PARSING {} took {} ms", url, stop - start);
         }
     }
 
@@ -155,10 +163,9 @@ public abstract class ParsingFacade {
      * <p>
      * <b>Use is discourage.</b>
      *
-     * @param stream
-     * @return
      * @deprecated
      */
+    @Deprecated
     public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
         KeYParser p = createParser(stream);
         return p.id_declaration();

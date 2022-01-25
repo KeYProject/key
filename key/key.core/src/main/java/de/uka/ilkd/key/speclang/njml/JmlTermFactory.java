@@ -42,6 +42,9 @@ import de.uka.ilkd.key.util.Triple;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +57,8 @@ import static java.text.MessageFormat.format;
  * Old legacy factory methods for constructing KeY terms for JML constructs.
  */
 public final class JmlTermFactory {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JmlTermFactory.class);
+
     public Services services;
     public final TermBuilder tb;
     public final SLExceptionFactory exc;
@@ -936,7 +941,7 @@ public final class JmlTermFactory {
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
-                        Debug.out("Can't create a locset from local variable " + t + ".\n" +
+                        LOGGER.debug("Can't create a locset from local variable " + t + ".\n" +
                                 "In this version of KeY, you do not need to put them in assignable clauses.");
                     } else {
                         throw exc.createException0("Can't create a locset from " + t + ".");

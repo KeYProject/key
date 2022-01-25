@@ -1,19 +1,18 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +28,9 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 public class ClasslevelTranslatorTest {
-    @Parameterized.Parameter(value = 0)
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClasslevelTranslatorTest.class);
+
+    @Parameterized.Parameter()
     public String expr = "";
 
     @Parameterized.Parameters()
@@ -50,7 +51,7 @@ public class ClasslevelTranslatorTest {
                 content.append(l).append('\n');
             }
             final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
-            System.out.println("cases: " + split.length);
+            LOGGER.debug("cases: {}", split.length);
             for (String value : split) {
                 value = value.trim();
                 if (!value.isEmpty())
@@ -60,19 +61,12 @@ public class ClasslevelTranslatorTest {
         return seq;
     }
 
-    private Recoder2KeY r2k;
-    private Services services;
 
     @Before
-    public void setup() {
-        if (services != null) return;
-        //services = TacletForTests.services();
-        //r2k = new Recoder2KeY(services, services.getNamespaces());
-        //r2k.parseSpecialClasses();
-    }
+    public void setup() {}
 
     @Test
-    public void parseAndInterpret() throws SLTranslationException {
+    public void parseAndInterpret() {
         Assert.assertNotEquals("", expr);
         KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
@@ -86,11 +80,6 @@ public class ClasslevelTranslatorTest {
             debugLexer();
         }
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
-        //Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
-        //        new HashMap<>(), new HashMap<>());
-        //JmlSpecFactory factory = new JmlSpecFactory(services);
-        //ContractTranslator ct = new ContractTranslator("", new Position(0,0), factory, kjt);
-        //System.out.println(ctx.accept(ct));
     }
 
     private void debugLexer() {

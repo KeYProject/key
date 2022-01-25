@@ -40,9 +40,9 @@ public class SettingsConverter {
 
     public static String encode(String str) {
         int i = str.indexOf(PREFIX);
-        if(i==0) {
+        if (i == 0) {
             str = str.substring(PREFIX.length());
-        }else{
+        } else {
             throw new RuntimeException(String.format(
                     "Given string '%s' has not the right prefix ('%s').", str, PREFIX));
         }
@@ -153,5 +153,19 @@ public class SettingsConverter {
     }
 
     private SettingsConverter() {
+    }
+
+    public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue, T[] values) {
+        int ord = read(props, key, defaultValue.ordinal());
+        for (T value : values) {
+            if (ord == value.ordinal()) {
+                return value;
+            }
+        }
+        return defaultValue;
+    }
+
+    public static <T extends Enum<?>> void store(Properties props, String key, T value) {
+        store(props, key, value.ordinal());
     }
 }

@@ -36,7 +36,6 @@ public class WebstartMain {
             }
 
             File tempDir = createTempDirectory();
-            System.out.println(tempDir);
 
             ZipInputStream zis = new ZipInputStream(examplesURL.openStream());
 

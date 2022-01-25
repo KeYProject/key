@@ -38,8 +38,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LemmataHandler implements TacletFilter {
+        private static final Logger LOGGER = LoggerFactory.getLogger(LemmataHandler.class);
+
         private final LemmataAutoModeOptions options;
         private final Profile profile;
 
@@ -49,21 +53,15 @@ public class LemmataHandler implements TacletFilter {
         }
 
         public void println(String s) {
-                if (options.getPrintStream() != null) {
-                        options.getPrintStream().println(s);
-                }
+                LOGGER.info(s);
         }
 
         public void print(String s) {
-                if (options.getPrintStream() != null) {
-                        options.getPrintStream().print(s);
-                }
+                LOGGER.info(s);
         }
 
         public void printException(Throwable t) {
-                if (options.getPrintStream() != null) {
-                        t.printStackTrace(options.getPrintStream());
-                }
+                LOGGER.error("", t);
         }
 
         public void start() throws IOException, ProofInputException {
@@ -100,10 +98,8 @@ public class LemmataHandler implements TacletFilter {
                                         return;
                                 }
                                 println("Proofs have been created for");
-                                if (options.getPrintStream() != null) {
-                                        for (Proof p : pa.getProofs()) {
-                                                println(p.name().toString());
-                                        }
+                                for (Proof p : pa.getProofs()) {
+                                        LOGGER.info(p.name().toString());
                                 }
                                 startProofs(pa);
 

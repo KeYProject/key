@@ -5,14 +5,11 @@ import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -37,10 +34,13 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object>
-        implements InterruptListener {
+public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
     private final String script;
@@ -54,12 +54,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-            publish(arg);
-        }
-    };
+    private final Observer observer = (o, arg) -> publish(arg);
 
     public ProofScriptWorker(KeYMediator mediator, File file)
             throws IOException {
@@ -105,8 +100,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
-            Debug.out("Proof macro has been interrupted:");
-            Debug.out(ex);
+            LOGGER.debug("Proof macro has been interrupted:", ex);
         }
         return null;
     }
@@ -129,12 +123,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                interruptionPerformed();
-            }
-        });
+        cancelButton.addActionListener(e -> interruptionPerformed());
         JPanel panel = new JPanel(new FlowLayout());
         panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
@@ -187,8 +176,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         try {
             get();
         } catch (CancellationException ex) {
-            System.err.println("Scripting was cancelled.");
-            Debug.printStackTrace(ex);
+            LOGGER.info("Scripting was cancelled.", ex);
         } catch (Throwable ex) {
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
@@ -206,7 +194,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
                 mediator.getSelectionModel().setSelectedGoal(
                         engine.getStateMap().getFirstOpenAutomaticGoal());
             }
-        } catch (ScriptException e) { }
+        } catch (ScriptException e) {
+            LOGGER.warn("", e);
+        }
 
         mediator.setInteractive(true);
     }

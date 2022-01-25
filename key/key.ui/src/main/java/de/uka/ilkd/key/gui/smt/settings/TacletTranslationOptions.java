@@ -78,7 +78,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
         ProofDependentSMTSettings pdSettings = SettingsManager.getSmtPdSettings(window).clone();
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
         maxNumberOfGenerics.setValue(pdSettings.maxGenericSorts);
-        fileChooserPanel.setText(piSettings.pathForTacletTranslation);
+        fileChooserPanel.setText(piSettings.getPathForTacletTranslation());
         //fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
         return this;
     }
@@ -89,8 +89,8 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
         ProofIndependentSMTSettings currentPi = SettingsManager.getSmtPiSettings();
 
         currentPd.maxGenericSorts = (Integer) maxNumberOfGenerics.getValue();
-        currentPi.pathForTacletTranslation = fileChooserPanel.getText();
-        currentPi.storeTacletTranslationToFile = !fileChooserPanel.getText().trim().isEmpty();
+        currentPi.setPathForTacletTranslation(fileChooserPanel.getText());
+        currentPi.setStoreTacletTranslationToFile(!fileChooserPanel.getText().trim().isEmpty());
 
         currentPd.fireSettingsChanged();
         currentPi.fireSettingsChanged();

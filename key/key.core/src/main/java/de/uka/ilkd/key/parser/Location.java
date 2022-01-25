@@ -13,9 +13,12 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +37,8 @@ import java.net.URL;
  */
 
 public final class Location {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Location.class);
+
     /**
      * The location of the resource of the Location. May be null!
      */
@@ -83,7 +88,7 @@ public final class Location {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
         } catch (MalformedURLException e) {
-            Debug.out("Location could not be created from String: " + re.input.getSourceName(), e);
+            LOGGER.debug("Location could not be created from String: " + re.input.getSourceName(), e);
             return null;
         }
     }

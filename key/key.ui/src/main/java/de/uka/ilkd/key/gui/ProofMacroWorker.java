@@ -21,10 +21,13 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ import java.util.List;
  * mediator to receive Stop-Button events
  */
 public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> implements InterruptListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofMacroWorker.class);
 
     /**
      * This flag decides whether after a macro an open is selected or not.
@@ -102,8 +106,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
-            Debug.out("Proof macro has been interrupted:");
-            Debug.out(exception);
+            LOGGER.debug("Proof macro has been interrupted:",exception);
             info = new ProofMacroFinishedInfo(macro, selectedProof, true);
             this.exception = exception;
         } catch (final Exception exception) {
