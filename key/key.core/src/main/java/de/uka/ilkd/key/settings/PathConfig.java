@@ -15,6 +15,7 @@ package de.uka.ilkd.key.settings;
 
 import java.io.File;
 
+import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import org.key_project.util.java.IOUtil;
 
 /**
@@ -56,6 +57,8 @@ public class PathConfig {
     
     public static String proofIndependentSettings;
 
+    public static String smtSolverPropertiesDirectory;
+
     /**
      * Initializes the instance variables with the default settings.
      */
@@ -79,6 +82,8 @@ public class PathConfig {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+        PathConfig.smtSolverPropertiesDirectory = getKeyConfigDir() + File.separator
+                + "smtSolverProperties" + File.separator;
     }
 
     /**
@@ -95,5 +100,14 @@ public class PathConfig {
      */
     public static String getProofIndependentSettings() {
         return proofIndependentSettings;
+    }
+
+    /**
+     * Returns the path to the directory used for storing SMT solver properties.
+     * See {@link ProofIndependentSMTSettings} and {@link SolverPropertiesLoader} for usage.
+     * @return The path to the directory.
+     */
+    public static String getSmtSolverPropertiesDirectory() {
+        return smtSolverPropertiesDirectory;
     }
 }

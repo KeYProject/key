@@ -162,11 +162,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private void setSmtSettings(ProofIndependentSMTSettings clone) {
-        final var solverData = clone.getSolverData(solverType);
-        if (solverData != null) {
-            solverCommand.setText(solverData.getSolverCommand());
-            solverParameters.setText(solverData.getSolverParameters());
-            solverTimeout.setValue((Long) solverData.getTimeout()/1000L);
+        if (clone.containsSolver(solverType)) {
+            solverCommand.setText(clone.getCommand(solverType));
+            solverParameters.setText(clone.getParameters(solverType));
+            solverTimeout.setValue((Long) clone.getSolverTimeout(solverType)/1000L);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
@@ -184,18 +183,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     @Override
     public void applySettings(MainWindow window) {
         var settings = SettingsManager.getSmtPiSettings();
-        final var solverData = settings.getSolverData(solverType);
-        if (solverData != null) {
+        if (settings.containsSolver(solverType)) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
             long timeout = ((Long) solverTimeout.getValue())*1000L;
 
-            solverData.setTimeout(timeout);
-            solverData.setSolverCommand(command);
-            solverData.setSolverParameters(params);
-
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);
+            solverType.setSolverTimeout(timeout);
             // This is not necessary as it just calls solverData.setSolver... again
             // SettingsManager.getSmtPiSettings().setCommand(solverType, command);
             // SettingsManager.getSmtPiSettings().setParameters(solverType, params);

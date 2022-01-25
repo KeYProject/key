@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
-import javax.annotation.Nullable;
+import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 
@@ -173,7 +173,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     }
 
 
-    private final Map<SolverType, SolverData> dataOfSolvers = new LinkedHashMap<>();
+    private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
     private boolean storeSMTTranslationToFile = false;
     private boolean storeTacletTranslationToFile = false;
@@ -235,9 +235,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         this.objectBound = data.objectBound;
 
 
-        for (Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()) {
-            dataOfSolvers.put(entry.getKey(), entry.getValue().clone());
-        }
+        solverTypes.addAll(data.solverTypes);
 
         solverUnions = new LinkedList<>();
         for (SolverTypeCollection solverUnion : data.solverUnions) {
@@ -255,12 +253,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         return DEFAULT_DATA.clone();
     }
 
-    public Collection<SolverType> getSupportedSolvers() {
-        return dataOfSolvers.keySet();
-    }
-
+    /**
+     * Creates a new ProofIndependentSettings object with the default solvers created by
+     * {@link SolverTypes#getSolverTypes()}.
+     */
     private ProofIndependentSMTSettings() {
-        for (SolverType type : SolverTypes.getSolverTypes()) {
+        /*for (SolverType type : SolverTypes.getSolverTypes()) {
             dataOfSolvers.put(type, new SolverData(type));
         }
 
@@ -276,41 +274,50 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         // single solvers with legacy translation
         for (SolverType type: legacyTypes) {
             legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
+        }*/
+
+        // Load solver props from standard directory, see PathConfig
+        Collection<SolverType> legacyTypes = SolverTypes.getLegacySolvers();
+        Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
+        solverTypes.addAll(nonLegacyTypes);
+        nonLegacyTypes.removeAll(legacyTypes);
+        for (SolverType type: nonLegacyTypes) {
+            solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 
+        // single solvers with legacy translation
+        for (SolverType type: legacyTypes) {
+            legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
+        }
     }
 
+    public boolean containsSolver(SolverType type) {
+        return solverTypes.contains(type);
+    }
 
     public String getCommand(SolverType type) {
-        return dataOfSolvers.get(type).getSolverCommand();
+        return type.getSolverCommand();
+    }
+
+    public long getSolverTimeout(SolverType type) {
+        return type.getSolverTimeout();
     }
 
     public String getParameters(SolverType type) {
-        return dataOfSolvers.get(type).getSolverParameters();
+        return type.getSolverParameters();
     }
 
     public void setCommand(SolverType type, String command) {
-        dataOfSolvers.get(type).setSolverCommand(command);
+        type.setSolverCommand(command);
     }
 
     public void setParameters(SolverType type, String parameters) {
-        dataOfSolvers.get(type).setSolverParameters(parameters);
+        type.setSolverParameters(parameters);
     }
-
-    public Collection<SolverData> getDataOfSolvers() {
-        return dataOfSolvers.values();
-    }
-
-    public @Nullable
-    SolverData getSolverData(SolverType type) {
-        return dataOfSolvers.get(type);
-    }
-
 
     public ProofIndependentSMTSettings clone() {
         return new ProofIndependentSMTSettings(this);
     }
-
 
     public void readSettings(Properties props) {
         timeout = SettingsConverter.read(props, KEY_TIMEOUT, timeout);
@@ -326,12 +333,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         seqBound = SettingsConverter.read(props, FIELD_BOUND, seqBound);
         locsetBound = SettingsConverter.read(props, LOCSET_BOUND, locsetBound);
         objectBound = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
-
-        for (SolverData solverData : dataOfSolvers.values()) {
-            solverData.readSettings(props);
-        }
     }
-
 
     public void writeSettings(Properties props) {
         SettingsConverter.store(props, KEY_TIMEOUT, timeout);
@@ -347,10 +349,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         SettingsConverter.store(props, OBJECT_BOUND, objectBound);
         SettingsConverter.store(props, FIELD_BOUND, seqBound);
         SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
-
-        for (SolverData solverData : dataOfSolvers.values()) {
-            solverData.writeSettings(props);
-        }
     }
 
     public void setActiveSolverUnion(SolverTypeCollection solverUnion) {
@@ -404,8 +402,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     @Override
     public void addSettingsListener(SettingsListener l) {
         listeners.add(l);
-
-
     }
 
     @Override
@@ -413,81 +409,4 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         listeners.remove(l);
     }
 
-    public static class SolverData {
-        private String solverParameters = "";
-        private String solverCommand = "";
-        private long timeout = -1;
-        private final SolverType type;
-
-        public SolverData(SolverType type) {
-            this(type, type.getDefaultSolverCommand(), type.getDefaultSolverParameters());
-        }
-
-        private SolverData(SolverType type, String command, String parameters) {
-            this(type, command, parameters, -1);
-        }
-
-        public SolverData(SolverType type, String command, String parameters, long timeout) {
-            this.type = type;
-            setSolverCommand(command);
-            setSolverParameters(parameters);
-            setTimeout(timeout);
-        }
-
-        private void readSettings(Properties props) {
-            setSolverParameters(SettingsConverter.read(props,
-                    SOLVER_PARAMETERS + getType().getName(), getSolverParameters()));
-            setTimeout(SettingsConverter.read(props, PROP_TIMEOUT + getType().getName(), getTimeout()));
-            setSolverCommand(SettingsConverter.read(props,
-                    SOLVER_COMMAND + getType().getName(), getSolverCommand()));
-            getType().setSolverParameters(getSolverParameters());
-            getType().setSolverCommand(getSolverCommand());
-
-        }
-
-        private void writeSettings(Properties props) {
-            SettingsConverter.store(props, SOLVER_PARAMETERS + getType().getName(), getSolverParameters());
-            SettingsConverter.store(props, SOLVER_COMMAND + getType().getName(), getSolverCommand());
-            SettingsConverter.store(props, PROP_TIMEOUT + getType().getName(), getTimeout());
-            getType().setSolverParameters(getSolverParameters());
-            getType().setSolverCommand(getSolverCommand());
-        }
-
-
-        public SolverData clone() {
-            return new SolverData(getType(), getSolverCommand(), getSolverParameters(), getTimeout());
-        }
-
-        public String toString() {
-            return getType().getName();
-        }
-
-        public String getSolverParameters() {
-            return solverParameters;
-        }
-
-        public void setSolverParameters(String solverParameters) {
-            this.solverParameters = solverParameters;
-        }
-
-        public String getSolverCommand() {
-            return solverCommand;
-        }
-
-        public void setSolverCommand(String solverCommand) {
-            this.solverCommand = solverCommand;
-        }
-
-        public SolverType getType() {
-            return type;
-        }
-
-        public long getTimeout() {
-            return timeout;
-        }
-
-        public void setTimeout(long timeout) {
-            this.timeout = timeout;
-        }
-    }
 }

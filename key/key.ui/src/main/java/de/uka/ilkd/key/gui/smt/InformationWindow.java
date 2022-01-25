@@ -21,6 +21,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
+import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.key_project.util.java.StringUtil;
 

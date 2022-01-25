@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementations of this class are used find a counter example for a given
- * {@link Sequent} using the SMT solver {@link SolverTypes#Z3_CE_SOLVER}.
+ * {@link Sequent} using the SMT solver {@link SolverPropertiesHandler#Z3_CE_SOLVER}.
  * <p>
  * <b>This class provides the full logic independent from the a user interface.</b>
  * Subclasses are used to realize the user interface specific functionality.

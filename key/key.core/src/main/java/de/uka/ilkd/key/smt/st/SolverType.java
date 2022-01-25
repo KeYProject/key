@@ -15,8 +15,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
 import de.uka.ilkd.key.smt.communication.SMTProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 
@@ -78,6 +77,15 @@ public interface SolverType {
     void setSolverCommand(String s);
 
     String getDefaultSolverCommand();
+
+    /**
+     * the solver timeout, e.g. 2000L milliseconds
+     */
+    long getSolverTimeout();
+
+    void setSolverTimeout(long timeout);
+
+    long getDefaultSolverTimeout();
 
 
     /**
@@ -144,7 +152,8 @@ public interface SolverType {
      *              solvers this can be null)
      * @return the newly created socket
      */
-    @Nonnull AbstractSolverSocket getSocket(ModelExtractor query);
+    @Nonnull
+    SolverCommunicationSocket getSocket(ModelExtractor query);
 
     @Nonnull
     SMTProcessLauncher getLauncher(SolverCommunication communication);

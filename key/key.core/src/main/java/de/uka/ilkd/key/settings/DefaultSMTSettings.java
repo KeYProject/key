@@ -109,9 +109,8 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public long getTimeout(SolverType type) {
-        ProofIndependentSMTSettings.SolverData data = piSettings.getSolverData(type);
-        if (data != null && data.getTimeout() >= 1) {
-            return data.getTimeout();
+        if (piSettings.getSolverTimeout(type) >= 1) {
+            return piSettings.getSolverTimeout(type);
         }
         return getTimeout();
     }

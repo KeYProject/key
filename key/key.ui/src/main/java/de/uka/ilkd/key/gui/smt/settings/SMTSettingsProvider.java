@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
+import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
@@ -67,7 +68,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
         Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
         if (!Main.isExperimentalMode()) {
-            solverTypes.removeAll(SolverTypes.getLegacy());
+            solverTypes.removeAll(SolverTypes.getLegacySolvers());
         } else {
             getChildren().add(new TranslationOptions());
         }
