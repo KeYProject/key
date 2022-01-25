@@ -1196,11 +1196,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression argument = accept(ctx.expression());
         LDT ldt = services.getTypeConverter().getLDTFor(argument.getTerm().sort());
         if (ldt == null) {
-            throw new RuntimeException("What is the right edception?");
+            raiseError(ctx, "LDT for %s cannot be found.", argument.getTerm().sort());
         }
         String opName = ctx.getStart().getText();
         assert opName.startsWith("\\fp_");
         Function op = ldt.getFunctionFor(opName.substring(4), services);
+        if (op == null) {
+            raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
+        }
 
         return new SLExpression(tb.func(op, argument.getTerm()));
     }
