@@ -9,7 +9,8 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.File;
 
 public class ContractLoadingTests {
@@ -20,8 +21,9 @@ public class ContractLoadingTests {
         final File javaFile = new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Services services = file.getServices();
+        Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
         for (Contract proofContract : file.getProofContracts()) {
-            System.out.println(proofContract.getPlainText(services));
+            LOGGER.info(proofContract.getPlainText(services));
         }
     }
 

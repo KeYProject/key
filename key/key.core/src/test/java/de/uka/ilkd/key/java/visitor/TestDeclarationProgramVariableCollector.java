@@ -24,23 +24,28 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestDeclarationProgramVariableCollector {
+public class TestDeclarationProgramVariableCollector {private static final Logger LOGGER = LoggerFactory.getLogger(TestDeclarationProgramVariableCollector.class);
 
-    // some non sense java blocks with lots of statements and expressions
+    // some nonsense java blocks with lots of statements and expressions
     private static final String[] jblocks=new String[]{
-	"{ int j1 = 0; int j2, j3, j4 = 0;}",
-	"{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
-	"{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }"
+            "{ int j1 = 0; int j2, j3, j4 = 0;}",
+            "{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
+            "{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }"
     };
 
     // names of variables expected to be collected in jblocks
     private static final String[][] expectedVars = new String[][]{
-	{"j1", "j2", "j3", "j4"},
-	{"j1", "j5"},
-	{"j0"}
+            {"j1", "j2", "j3", "j4"},
+            {"j1", "j5"},
+            {"j0"}
     };
 
 
@@ -48,7 +53,7 @@ public class TestDeclarationProgramVariableCollector {
 
     private static int testCases = 0;
     private static int down = 0;
-    
+
     public TestDeclarationProgramVariableCollector() {
         testCases++;
     }
@@ -58,40 +63,40 @@ public class TestDeclarationProgramVariableCollector {
     public void setUp() {
         if (down != 0) return;
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
-	for (int i = 0; i < jblocks.length; i++) {
-	    test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
-	}
+        for (int i = 0; i < jblocks.length; i++) {
+            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
+        }
     }
 
     @AfterEach
     public void tearDown() {
         down++;
         if (down < testCases) return;
-        test_block = null;    
+        test_block = null;
     }
-    
+
     private HashSet<String> toNames(Set<? extends Named> programVariables) {
-	HashSet<String> result = new HashSet<>();
+        HashSet<String> result = new HashSet<>();
         for (Named programVariable : programVariables) {
             String name = "" + programVariable.name();
             if (result.contains(name)) {
-                System.out.println("Warning: Program variables have same name." +
+                LOGGER.warn("Warning: Program variables have same name." +
                         " Probably unsane test case");
             }
             result.add(name);
         }
-	return result;
+        return result;
     }
-    
+
 
     @Test
     public void testVisitor() {
-	DeclarationProgramVariableCollector dpvc;
-	for (int i = 0; i < jblocks.length; i++) {
-	    dpvc = new DeclarationProgramVariableCollector(test_block[i].program(), 
-                                                           TacletForTests.services());
-	    dpvc.start();
-	    HashSet<String> names = toNames(dpvc.result());
+        DeclarationProgramVariableCollector dpvc;
+        for (int i = 0; i < jblocks.length; i++) {
+            dpvc = new DeclarationProgramVariableCollector(test_block[i].program(),
+                    TacletForTests.services());
+            dpvc.start();
+            HashSet<String> names = toNames(dpvc.result());
 
 
 	    assertTrue(dpvc.result().size() <= expectedVars[i].length, "" +
@@ -99,11 +104,11 @@ public class TestDeclarationProgramVariableCollector {
                         dpvc.result() + " in " + jblocks[i]);
 
 
-	    for (int j = 0; j < expectedVars[i].length; j++) {
+            for (int j = 0; j < expectedVars[i].length; j++) {
 		assertTrue(names.contains(expectedVars[i][j]),
                 "Missing variable: " + expectedVars[i][j] + " of " + jblocks[i]);
-	    }	    
-	}
+            }
+        }
     }
 
 }

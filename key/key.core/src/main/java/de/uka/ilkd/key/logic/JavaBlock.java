@@ -20,9 +20,12 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaBlock {
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
+
     /**
      * Attention using the JavaBlock below means no program not the empty program.
      * It is used as a realization of the sentinel design pattern to mark terms with operators
@@ -32,8 +35,8 @@ public class JavaBlock {
      * empty statement block.  
      * 
      */
-    public static final JavaBlock EMPTY_JAVABLOCK
-    	= new JavaBlock(new StatementBlock());
+    public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
+
     private final JavaProgramElement prg;
 
 
@@ -135,8 +138,7 @@ public class JavaBlock {
 	    pp.setIndentationLevel(0);
 	    prg.prettyPrint(pp);
 	} catch (IOException e) {
-	    System.err.println("toString of JavaBlock failed due to :"+e);
-	    e.printStackTrace();
+	    LOGGER.warn("toString of JavaBlock failed",e);
 	}
 	return sw.toString();
     }

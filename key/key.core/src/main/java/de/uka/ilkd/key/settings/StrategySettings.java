@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.Properties;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
@@ -25,18 +21,23 @@ import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.EventObject;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Properties;
 
 
 public class StrategySettings implements Settings, Cloneable {
+    public static final Logger LOGGER = LoggerFactory.getLogger(StrategySettings.class);
 
     private static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
     private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
     private static final String TIMEOUT_KEY = "[Strategy]Timeout";
     
-    private final LinkedList<SettingsListener> listenerList = 
-        new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
     
     private Name activeStrategy;
 
@@ -117,10 +118,10 @@ public class StrategySettings implements Settings, Cloneable {
             try {
                 numSteps = Integer.parseInt(numString);
             } catch(NumberFormatException e) { 
-                Debug.out("StrategySettings: failure while converting the string "+
+                LOGGER.debug("StrategySettings: failure while converting the string "+
                           "with the allowed steps of heuristics applications to int."+
                           "Use default value 1000 instead."+
-                          "\nThe String that has been tried to convert was", numString);
+                          "\nThe String that has been tried to convert was {}", numString);
             }
         }
         
@@ -128,9 +129,9 @@ public class StrategySettings implements Settings, Cloneable {
             try {
                 localTimeout = Long.parseLong(timeoutString);
             } catch(NumberFormatException e) { 
-                Debug.out("StrategySettings: failure while converting the string "+
+                LOGGER.debug("StrategySettings: failure while converting the string "+
                           "with rule application timeout. "+                        
-                          "\nThe String that has been tried to convert was", timeoutString);
+                          "\nThe String that has been tried to convert was {}", timeoutString);
             }
         }
         
@@ -154,7 +155,9 @@ public class StrategySettings implements Settings, Cloneable {
      */
     public void writeSettings(Properties props) {
 	if (getStrategy()==null) {
-	    setStrategy(JavaCardDLStrategyFactory.NAME); // It would be bedder to return the name of the default factory defined by the profile used by the proof in which this strategysettings is used or just not to save the strategy because it is not defined.
+        // It would be bedder to return the name of the default factory defined by the profile used by the proof
+        // in which this strategysettings is used or just not to save the strategy because it is not defined.
+	    setStrategy(JavaCardDLStrategyFactory.NAME);
 	}
 	if (maxSteps<0) {
 	    setMaxSteps(10000);
@@ -240,12 +243,7 @@ public class StrategySettings implements Settings, Cloneable {
      * @return The {@link StopCondition} to use in an {@link ApplyStrategy} instance.
      */
     public StopCondition getApplyStrategyStopCondition() {
-        if (customApplyStrategyStopCondition != null) {
-            return customApplyStrategyStopCondition;
-        }
-        else {
-            return new AppliedRuleStopCondition();
-        }
+        return Objects.requireNonNullElseGet(customApplyStrategyStopCondition, AppliedRuleStopCondition::new);
     }
 
     /**
@@ -284,7 +282,8 @@ public class StrategySettings implements Settings, Cloneable {
      * {@link ApplyStrategy} instance to select the next {@link Goal} to
      * apply a rule on. If no one is defined the default one of the
      * {@link ApplyStrategy}, which is defined by the user interface, is used.
-     * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the default one of the {@link ApplyStrategy}.
+     * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null}
+     *                          to use the default one of the {@link ApplyStrategy}.
      */
     public void setCustomApplyStrategyGoalChooser(GoalChooser customGoalChooser) {
         this.customApplyStrategyGoalChooser = customGoalChooser;

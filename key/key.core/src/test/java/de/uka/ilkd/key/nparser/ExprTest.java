@@ -6,7 +6,10 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1 (17.10.19)
  */
 public class ExprTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExprTest.class);
+
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
-        try (InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+        InputStream s = ExprTest.class.getResourceAsStream("exprs.txt");
+        Assume.assumeNotNull(s);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
             while ((l = reader.readLine()) != null) {
                 if (l.trim().isEmpty() || l.startsWith("#")) {

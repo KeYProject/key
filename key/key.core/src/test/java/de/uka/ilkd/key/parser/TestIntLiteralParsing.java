@@ -9,6 +9,8 @@ import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -136,6 +138,9 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "0b10000_0000000000_0000000000_0000000000_0000000000_0000000000_0000000000L", // 2^64
             "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestIntLiteralParsing.class);
+
 
     private final JmlIO jio;
     private static KeYJavaType containerType;

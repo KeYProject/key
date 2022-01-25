@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -32,6 +34,7 @@ import javax.annotation.Nullable;
 public class Namespace<E extends Named> implements java.io.Serializable {
 
     private static final long serialVersionUID = 7510655524858729144L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
     /**
      * The fall-back namespace for symbols not present in this Namespace.
@@ -83,18 +86,15 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     public void add(E sym) {
 
-        //debug
-        //if(sym instanceof Function && ((Function) sym).name().toString().equals("Test::$x")) throw new RuntimeException();
-
         if(sealed) {
-            System.err.println("SEALED");
+            LOGGER.warn("Namespace is SEALED");
             throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
         }
 
-        /* TODO ... Investigate in a future version
+        /* TODO ulbrich: Investigate in a future version
         Named old = lookup(sym.name());
         if(old != null && old != sym) {
-            System.err.println("Clash! Name already used: " + sym.name().toString());
+            LOGGER.warn("Clash! Name already used: " + sym.name().toString());
         }
         */
 
@@ -102,7 +102,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             symbols = Collections.singletonMap(sym.name(), sym);
         } else {
             if (symbols.size() == 1) {
-                symbols = new LinkedHashMap<Name, E>(symbols);
+                symbols = new LinkedHashMap<>(symbols);
             }
             symbols.put(sym.name(), sym);
         }
@@ -171,7 +171,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> extended(Iterable<? extends E> ext) {
-        Namespace<E> result = new Namespace<E>(this);
+        Namespace<E> result = new Namespace<>(this);
         result.add(ext);
         return result;
     }
@@ -238,7 +238,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> copy() {
-        Namespace<E> copy = new Namespace<E>(parent);
+        Namespace<E> copy = new Namespace<>(parent);
         if(symbols != null)
             copy.add(symbols.values());
 
@@ -277,7 +277,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public Namespace<E> compress() {
         // TODO the order may be changed! This seems rather inefficient ...
-        Namespace<E> result = new Namespace<E>();
+        Namespace<E> result = new Namespace<>();
         result.add(allElements());
         return result;
     }

@@ -29,6 +29,8 @@ import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,6 +43,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Flag to print found slices in the console.
     */
    public static final boolean PRINT_SLICE = false;
+   private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
 
    /** 
     * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
@@ -580,16 +583,16 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          Assertions.assertNotNull(eqSelector);
          ImmutableList<ISymbolicEquivalenceClass> sec = eqSelector.selectEquivalenceClass(environment, proof, seed);
          if (PRINT_SLICE) {
-            System.out.println("Equivalence Class: " + sec);
+            LOGGER.info("Equivalence Class: {}", sec);
          }
          // Perform slicing
          ThinBackwardSlicer slicer = new ThinBackwardSlicer();
          ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
          // Print slice if requested
          if (PRINT_SLICE) {
-            System.out.println("Found Slices: " + slices.size());
+            LOGGER.info("Found Slices: {}", slices.size());
             for (Node slice : slices) {
-               System.out.println(slice.serialNr());
+               LOGGER.info("SerialNr {}", slice.serialNr());
             }
          }
          if (fullSlize) {

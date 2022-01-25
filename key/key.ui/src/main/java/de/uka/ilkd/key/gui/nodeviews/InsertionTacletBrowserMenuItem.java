@@ -45,12 +45,16 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class InsertionTacletBrowserMenuItem extends JMenu
  implements TacletMenuItem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
 
     /**
      * 
@@ -219,7 +223,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
                 try {
                     super.setUI(ui);
                 } catch(NullPointerException e) {
-                    Debug.out("Exception thrown by class Main at setUI");
+                    LOGGER.debug("Exception thrown by class Main at setUI");
                 }
             }
         }; // work around bug in

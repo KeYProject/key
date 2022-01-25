@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
@@ -46,6 +49,7 @@ import de.uka.ilkd.key.util.Debug;
  * @version 2006-11-21
  */
 public class EnumClassBuilder extends RecoderModelTransformer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnumClassBuilder.class);
 
     /**
      * create a new instance that uses the given service configuration and works
@@ -67,15 +71,13 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     /**
      * a mapping of enums to the newly created class declarations.
      */
-    Map<EnumDeclaration, EnumClassDeclaration> substitutes =
-            new LinkedHashMap<EnumDeclaration, EnumClassDeclaration>();
+    Map<EnumDeclaration, EnumClassDeclaration> substitutes = new LinkedHashMap<>();
     
     /**
      * a mapping of constant references in switch-statements and their
      * substitutes.
      */
-    Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = 
-            new LinkedHashMap<FieldReference, UncollatedReferenceQualifier>(); 
+    Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = new LinkedHashMap<>();
 
     /**
      * find all enum declarations and make their substitutes.
@@ -99,7 +101,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
                     substitutes.put(ed, ecd);
                     if (Debug.ENABLE_DEBUG) {
                         for (MemberDeclaration m : ecd.getMembers()) {
-                            Debug.out("Member of "
+                            LOGGER.debug("Member of "
                                     + ecd.getIdentifier().getText() + ": "
                                     + m.toSource());
                         }
@@ -157,6 +159,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * 
      * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#transform()
      */
+    @Override
     public void transform() {
         
         super.transform();
@@ -164,7 +167,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
         for (EnumDeclaration ed : substitutes.keySet()) {
             EnumClassDeclaration ecd = substitutes.get(ed);
             if (ecd == null) {
-                Debug.out("There is no enum->class substitute for "
+                LOGGER.debug("There is no enum->class substitute for "
                         + ed.getFullName());
             } else {
                 replace(ed, ecd);
@@ -178,17 +181,6 @@ public class EnumClassBuilder extends RecoderModelTransformer {
         }
         
         getChangeHistory().updateModel();
-
-//
-//        // Debug output
-//        for (CompilationUnit cu : getUnits()) {
-//            for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
-//                System.out.println("Defined in " + cu.getName() + ": " + 
-//                        cu.getTypeDeclarationAt(i) + " - " + 
-//                        cu.getTypeDeclarationAt(i).getClass());
-//            }
-//        }
-        
         cache.invalidateClasses();
     }
     

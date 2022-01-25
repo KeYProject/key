@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
 import recoder.convenience.TreeWalker;
 import recoder.java.Comment;
@@ -38,6 +40,8 @@ import java.util.function.Predicate;
  * @version 1 (9/12/21)
  */
 public class ProofJavaProgramFactoryTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofJavaProgramFactoryTest.class);
+
     final Services services = HelperClassForTests.createServices();
     final Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
 
@@ -48,7 +52,7 @@ public class ProofJavaProgramFactoryTest {
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> om = findMethod(cu, "AssertsFalse", "m");
-        System.out.println(cu);
+        LOGGER.debug("{}",cu);
         Assertions.assertTrue(om.isPresent(), "Could not find method AssertsFalse#m()");
         MethodDeclaration m = (MethodDeclaration) om.get();
         assertContainsComment(m, it -> it.startsWith("/*@ normal_behavior"));
@@ -66,7 +70,7 @@ public class ProofJavaProgramFactoryTest {
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
-        System.out.println(cu);
+        LOGGER.debug("{}", cu);
         Assertions.assertTrue(ofib.isPresent(), "Could not find method Steinhoefel1#fib()");
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
@@ -108,7 +112,7 @@ public class ProofJavaProgramFactoryTest {
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> ofib = findMethod(cu, "SetInMethodBody", "foo");
-        System.out.println(cu);
+        LOGGER.debug("{}", cu);
         Assertions.assertTrue(ofib.isPresent(), "Could not find method SetInMethodBody#foo()");
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
@@ -141,38 +145,8 @@ public class ProofJavaProgramFactoryTest {
         //Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
 
         String out = getActualResult(cu);
-        System.out.println(out);
+        LOGGER.debug("{}", out);
         Assertions.assertEquals(expected, out, "Difference in attached comments");
-        /*
-        Assert.assertTrue("Could not find method Steinhoefel1#fib()", ofib.isPresent());
-        MethodDeclaration m = (MethodDeclaration) ofib.get();
-        assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
-
-        LocalVariableDeclaration ghost1 = (LocalVariableDeclaration) m.getBody().getStatementAt(2);
-        Assert.assertTrue(ghost1.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k0_old", ghost1.getVariables().get(0).getName());
-
-        LocalVariableDeclaration ghost2 = (LocalVariableDeclaration) m.getBody().getStatementAt(3);
-        Assert.assertTrue(ghost2.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k1_old", ghost2.getVariables().get(0).getName());
-
-        For forLoop = (For) m.getBody().getStatementAt(4); //retrieve the for loop
-        assertContainsComment(forLoop, it -> it.equals("//@ ghost int k0_old = k0;"));
-        assertContainsComment(forLoop, it -> it.equals("//@ ghost int k1_old = k1;"));
-        assertContainsComment(forLoop, it -> it.startsWith("/*@ loop_invariant"));
-
-        LocalVariableDeclaration ghost3 = (LocalVariableDeclaration) m.getBody().getStatementAt(2);
-        Assert.assertTrue(ghost3.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k0_old", ghost3.getVariables().get(0).getName());
-
-        LocalVariableDeclaration ghost4 = (LocalVariableDeclaration) m.getBody().getStatementAt(3);
-        Assert.assertTrue(ghost4.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k1_old", ghost4.getVariables().get(0).getName());
-
-        EmptyStatement lastStatementInForLoop = (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
-        assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k0_old = k0;"));
-        assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k1_old = k1;"));
-        */
     }
 
 
@@ -185,7 +159,7 @@ public class ProofJavaProgramFactoryTest {
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
-        System.out.println(out);
+        LOGGER.debug("{}", out);
         Assertions.assertEquals(expected, out, "Difference in attached comments");
     }
 
@@ -227,8 +201,6 @@ public class ProofJavaProgramFactoryTest {
                 .filter(it -> needle.test(it.getText()))
                 .findFirst();
 
-        //Debug
-        //haystack.forEach(it -> System.out.println(it.getText()));
         Assertions.assertTrue(search.isPresent(), "Could not find comment satisfying the given predicate.");
     }
 

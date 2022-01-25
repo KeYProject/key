@@ -20,16 +20,21 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTermParser extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
+
     private Sort elem, list;
     private Function head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
@@ -245,13 +250,14 @@ public class TestTermParser extends AbstractTestTermParser {
         //	String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
         String s = "\\<{ int x = 1; {int s = 2;} }\\> x=x";
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
     public void test11() throws Exception {
         String s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
-        System.out.println(s);
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
 
@@ -260,6 +266,7 @@ public class TestTermParser extends AbstractTestTermParser {
     public void test12() throws Exception {
         String s = "\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
@@ -289,6 +296,7 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t = parseTerm(s);
         s = "\\<{int[] i;}\\>\\<{}\\>true";
         t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
@@ -356,8 +364,8 @@ public class TestTermParser extends AbstractTestTermParser {
     private void assertTermEquals(String actual, String expected) throws Exception {
         Term t = parseTerm(actual);
         Term u = parseTerm(expected);
-        System.out.println(t);
-        System.out.println(u);
+        LOGGER.debug("Actual: {}", t);
+        LOGGER.debug("Expected: {}", u);
         assertEquals(u.toString(), t.toString());
     }
 
@@ -477,7 +485,7 @@ public class TestTermParser extends AbstractTestTermParser {
         try {
             parseTerm(s);
             parsed = true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         assertFalse(parsed, "Program variables should not have arguments");
     }

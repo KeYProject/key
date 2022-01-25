@@ -27,9 +27,13 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModelGenerator implements SolverLauncherListener{
-   private final Services services;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelGenerator.class);
+
+	private final Services services;
 
 	private Goal goal;
 	
@@ -55,7 +59,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * Try finding a model for the term with z3.
 	 */
 	public void launch(){
-		System.out.println("Launch "+count++);
+		LOGGER.debug("Launch {}", count++);
 		SolverLauncher launcher = prepareLauncher();
 		SolverType solver = SolverTypes.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(goal);
@@ -118,8 +122,6 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * @return true if the term has been changed
 	 */
 	private boolean addModelToTerm(Model m){
-		//System.out.println("Model to term");
-
 		TermBuilder tb = services.getTermBuilder();
 		Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
 		Term tmodel=tb.tt();
@@ -128,13 +130,10 @@ public class ModelGenerator implements SolverLauncherListener{
 			SMTSort sort = m.getTypes().getTypeForConstant(c);
 
 			if(sort!=null && sort.getId().equals(SMTObjTranslator.BINT_SORT)){
-				//System.out.println("const: "+c);
 				String val = m.getConstants().get(c);
-				//System.out.println(val);
 				int value = Integer.parseInt(val);
 				ProgramVariable v = (ProgramVariable)variables.lookup(c);				
 				Term termConst = tb.var(v);
-				//Term termConst =  tb.func(f);
 				Term termVal = tb.zTerm(value);
 				Term termEquals = tb.equals(termConst, termVal);
 				tmodel = tb.and(tmodel,termEquals);
@@ -143,7 +142,6 @@ public class ModelGenerator implements SolverLauncherListener{
 
 
 		if(!tmodel.equals(tb.tt())){
-			//System.out.println(tmodel);
 			Term notTerm = tb.not(tmodel);
 			SequentFormula sf = new SequentFormula(notTerm);			
 			goal.addFormula(sf, true, true);		
@@ -154,20 +152,15 @@ public class ModelGenerator implements SolverLauncherListener{
 	}
 
 	private void finish(){
-		System.out.println("\n\nFinished: found "+models.size()+"\n");
+		LOGGER.info("Finished: found {}", models.size());
 		for(Model m :  models){
-			System.out.println(m.toString());
+			LOGGER.info("\t{}", m.toString());
 		}
 	}
 
 	@Override
 	public void launcherStarted(Collection<SMTProblem> problems,
 			Collection<SolverType> solverTypes, SolverLauncher launcher) {
-//		System.out.println("\nStarted: "+count);
-//		for(SMTProblem p : problems){
-//			System.out.println(p.getTerm());
-//		}
-
 	}
 
 	public Term sequentToTerm(Sequent s) {

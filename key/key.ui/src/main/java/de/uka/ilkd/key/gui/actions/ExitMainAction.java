@@ -26,9 +26,13 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExitMainAction extends MainWindowAction {
-   /**
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExitMainAction.class);
+
+    /**
     * If it is {@code true} the whole application is exited via
     * {@link System#exit(int)}. If it is {@code false} the main window is
     * only closed and the application will be still alive.
@@ -95,7 +99,7 @@ public class ExitMainAction extends MainWindowAction {
         mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
         getMediator().fireShutDown(new EventObject(this));
 
-        System.out.println("Have a nice day.");
+        LOGGER.info("Have a nice day.");
         saveSettings();
         if (exitSystem) {
            //weigl: change to 0, so no error is shown in gradle run

@@ -16,6 +16,9 @@
  */
 package de.uka.ilkd.key.smt.lang;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +30,8 @@ import java.util.List;
  * 
  */
 public class SMTTermBinOp extends SMTTerm {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SMTTermBinOp.class);
+
 	private static HashMap<Op,String> bvSymbols;
 	private static HashMap<Op,String> intSymbols;
 	public enum OpProperty{
@@ -355,7 +360,7 @@ public class SMTTermBinOp extends SMTTerm {
 	}
 
 	public String toString(int nestPos) {
-		System.err.println("Warning: somehow a binop was created."+this.getOperator());
+		LOGGER.warn("Warning: somehow a binop was created. {}", this.getOperator());
 		StringBuffer tab =  new StringBuffer("");
 		for(int i = 0; i< nestPos; i++) {
 			tab = tab.append(" ");

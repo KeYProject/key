@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 @members{
    private int parenthesisLevel = 0;
-   private void incrParen() { parenthesisLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrParen() { parenthesisLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrParen() { parenthesisLevel++;}
+   private void decrParen() { parenthesisLevel--;}
 
    private int bracesLevel = 0;
-   private void incrBrace() { bracesLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrBrace() { bracesLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrBrace() { bracesLevel++;}
+   private void decrBrace() { bracesLevel--;}
 
    private int bracketLevel = 0;
    private void incrBracket() { bracketLevel++;}

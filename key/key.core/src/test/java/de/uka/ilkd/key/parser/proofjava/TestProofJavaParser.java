@@ -16,6 +16,14 @@ package de.uka.ilkd.key.parser.proofjava;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.ParserException;
+import recoder.ServiceConfiguration;
+import recoder.java.Expression;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import recoder.ParserException;
@@ -32,12 +40,11 @@ import recoder.java.Expression;
  */
 
 public class TestProofJavaParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProofJavaParser.class);
 
-    static boolean debug = false;
+    private static ServiceConfiguration sc;
 
-    static ServiceConfiguration sc;
-
-    static ProofJavaProgramFactory factory;
+    private static ProofJavaProgramFactory factory;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -55,14 +62,14 @@ public class TestProofJavaParser {
     private void testExpr(String expr) {
         try {
             Expression e = factory.parseExpression(expr);
-            System.out.println(expr + " <-> " + e.toSource());
+            LOGGER.debug(expr + " <-> " + e.toSource());
         } catch (ParserException ex) {
             throw new RuntimeException("Error with: " + expr, ex);
         }
     }
 
     @Test
-    public void testExpressions() throws ParserException {
+    public void testExpressions() {
         testExpr("<a>+2");
         testExpr("a >> <a>");
         testExpr("a<<b>-2");

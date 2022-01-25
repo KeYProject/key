@@ -6,14 +6,17 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +41,7 @@ import java.util.TimerTask;
  * @author Wolfram Pfeifer: syntax highlighting
  */
 public class EditSourceFileAction extends KeyAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditSourceFileAction.class);
     /**
      * tooltip of save buttons and textarea if the file is not writeable
      * (e.g. inside a zip archive)
@@ -199,7 +203,7 @@ public class EditSourceFileAction extends KeyAction {
             try {
                 sourceFile = Paths.get(sourceURL.toURI()).toFile();
             } catch (URISyntaxException e) {
-                Debug.out(e);
+                LOGGER.debug("Exception", e);
             }
         }
         return sourceFile;

@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +26,8 @@ import java.util.stream.Stream;
  * @version 1 (5/15/20)
  */
 public class ClasslevelTranslatorTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClasslevelTranslatorTest.class);
+
     @TestFactory
     Stream<DynamicTest> getFiles() throws IOException {
         InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("classlevel.txt");
@@ -43,6 +47,7 @@ public class ClasslevelTranslatorTest {
                 content.append(l).append('\n');
             }
             final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
+            LOGGER.debug("cases: {}", split.length);
             for (String value : split) {
                 value = value.trim();
                 if (!value.isEmpty())

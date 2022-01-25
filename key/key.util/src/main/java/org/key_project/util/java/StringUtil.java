@@ -135,20 +135,12 @@ public final class StringUtil {
 
    /**
     * Creates a line which consists of the given text.
-    * @param text The text to repeate.
+    * @param text The text to repeat.
     * @param repetitions The number of repetitions.
     * @return The created line.
     */
    public static String repeat(String text, int repetitions) {
-      //fast paths
-      if(repetitions==0) return "";
-      if(repetitions==1) return text;
-
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < repetitions; i++) {
-         sb.append(text);
-      }
-      return sb.toString();
+      return text.repeat(repetitions);
    }
 
    /**

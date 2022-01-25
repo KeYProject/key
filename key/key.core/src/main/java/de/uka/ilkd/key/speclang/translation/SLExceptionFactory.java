@@ -18,6 +18,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.runtime.*;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
+
 import javax.annotation.Nonnull;
 
 import java.util.LinkedList;
@@ -33,6 +37,8 @@ import static java.text.MessageFormat.format;
  * the class can be constructed from antlr3.
  */
 public class SLExceptionFactory {
+    public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
+
     private String fileName;
     private final int offsetLine, offsetColumn, offsetIndex;
     private int line;
@@ -139,12 +145,12 @@ public class SLExceptionFactory {
     }
 
     public void addWarning(String msg) {
-        Debug.out("JML translator warning: " + msg);
+        LOGGER.debug("JML translator warning: " + msg);
         warnings.add(new PositionedString(msg, ""));
     }
 
     public void addWarning(String msg, org.antlr.v4.runtime.Token t) {
-        Debug.out("JML translator warning: " + msg);
+        LOGGER.debug("JML translator warning: " + msg);
         warnings.add(createPositionedString(msg, t));
     }
 

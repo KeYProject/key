@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link TruthValueTracingUtil}.
@@ -24,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
+   private static final Logger LOGGER = LoggerFactory.getLogger(TestTruthValueEvaluationUtil.class);
+
    /**
     * Tests example: /set/truthValueWeakeningTest
     */
@@ -1092,8 +1096,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             TruthValueTracingResult result = TruthValueTracingUtil.evaluate(nodeToEvaluate, FormulaTermLabel.NAME, false, false);
             currentResults.add(result);
             if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-               System.out.println("\nFound Result:");
-               System.out.println(result);
+               LOGGER.info("Found Result: {}", result);
             }
          }
       }

@@ -15,8 +15,11 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import de.uka.ilkd.key.nparser.DebugKeyLexer;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -24,6 +27,8 @@ import de.uka.ilkd.key.util.Debug;
  * @author Wolfram Pfeifer
  */
 public final class DiskFileRepo extends AbstractFileRepo {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiskFileRepo.class);
+
     /**
      * The temporary directory used as a cache.
      */
@@ -96,7 +101,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            Debug.out("This type of URL is not supported by the FileRepo!" +
+            LOGGER.debug("This type of URL is not supported by the FileRepo!" +
                 " Resource will not be copied to FileRepo!");
             return url.openStream();    // fallback without a copy
         }

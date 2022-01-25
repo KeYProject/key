@@ -19,24 +19,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 
 /**
- * This class tests, if design principles have been hurt. Therefore it
+ * This class tests, if design principles have been hurt. Therefore, it
  * makes use of reflection.
  */
 public class DesignTests {
 
     private static final File binaryPath;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DesignTests.class);
 
     static {
         File projectRoot = IOUtil.getClassLocation(Term.class);
@@ -79,7 +82,7 @@ public class DesignTests {
      * @return array of found class files
      */
     private static Class<?>[] getClasses(File directory) {
-        System.out.print(".");
+        LOGGER.info(".");
         File[] classFiles = directory.listFiles(FILTER);
 
         Class<?>[] classes = new Class
@@ -93,11 +96,9 @@ public class DesignTests {
             try {
                 classes[i] = Term.class.getClassLoader().loadClass(className);
             } catch (ClassNotFoundException cnfe) {
-                System.err.println("That's weiry. Cannot find class " +
-                        className + "\n" + cnfe);
+                LOGGER.error("That's weird. Cannot find class {}", className, cnfe);
             } catch (NoClassDefFoundError ncdfe) {
-                System.err.println(className + " skipped. " +
-                        "Please check your classpath.");
+                LOGGER.error("{} skipped. Please check your classpath.", className, ncdfe);
             }
         }
 
@@ -142,7 +143,7 @@ public class DesignTests {
     }
 
     /**
-     * prints an enumeration of of those classes that hurt a design principle
+     * prints an enumeration of those classes that hurt a design principle
      */
     private String printBadClasses(LinkedList<Class<?>> badClasses) {
         StringBuilder sb = new StringBuilder();
@@ -157,7 +158,7 @@ public class DesignTests {
     }
 
     /**
-     * subclass of Term must be private or package private
+     * does not test if GUI is used within methods
      */
     @Disabled("weigl: stupid test")
     @Test
@@ -205,19 +206,21 @@ public class DesignTests {
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) { //|| pkgname.contains("key.gui")) { as long as the mediator and settings are in the GUI
-                        System.out.println("Illegal GUI reference at field " + f.getName() + " declared in class " + allClass.getName());
+                        LOGGER.error("Illegal GUI reference at field {} declared in class {}",
+                                f.getName(), allClass.getName());
                         badClasses.add(allClass);
                     }
                 }
 
                 for (Method m : allClass.getDeclaredMethods()) {
                     if (java.awt.Component.class.isAssignableFrom(m.getReturnType())) {
-                        System.out.println("Illegal GUI reference as return type of " + m.getName() + " declared in class " + allClass.getName());
-                        badClasses.add(allClass);
+                        LOGGER.error("Illegal GUI reference as return type of {} declared in class {}",
+                                m.getName(), allClass.getName());
                     }
                     for (Class<?> t : m.getParameterTypes())
                         if (java.awt.Component.class.isAssignableFrom(t)) {
-                            System.out.println("Illegal GUI reference as parameter type of " + m.getName() + " declared in class " + allClass.getName());
+                            LOGGER.error("Illegal GUI reference as parameter type of {} declared in class {}",
+                                    m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
                 }
@@ -237,7 +240,7 @@ public class DesignTests {
         } catch (NoSuchMethodException e) {
             return false; // class does not override equals()
         } catch (SecurityException e) {
-            System.err.println("hashCode test skipped for type " + cl);
+            LOGGER.error("hashCode test skipped for type {}", cl, e);
         }
         return true;
     }
@@ -249,14 +252,14 @@ public class DesignTests {
             // class does not override hashCode
             return false;
         } catch (SecurityException e) {
-            System.err.println("hashCode test skipped for type " + cl);
+            LOGGER.error("hashCode test skipped for type {}", cl, e);
         }
         return true;
     }
 
     /**
-     * Tests that if <code>equals()</code> is overriden,
-     * <code>hashCode()</code> is also overriden.
+     * Tests that if <code>equals()</code> is overridden,
+     * <code>hashCode()</code> is also overridden.
      */
     @Test
     public void testHashCodeImplemented() {
@@ -277,10 +280,9 @@ public class DesignTests {
 
     public void runTests() {
         Method[] meth = getClass().getMethods();
-        System.out.println("[Design Conformance Tests]");
-        System.out.println("[Collecting classes. Please wait...]");
+        LOGGER.info("[Collecting classes. Please wait...]");
         allClasses = getAllClasses(binaryPath);
-        System.out.println("\n[Testing " + allClasses.length + " classes.]");
+        LOGGER.info("[Testing " + allClasses.length + " classes.]");
         int failures = 0;
         int testcases = 0;
         for (Method method : meth) {
@@ -289,23 +291,16 @@ public class DesignTests {
                     testcases++;
                     message = ".";
                     method.invoke(this, (Object[]) null);
-                    System.out.print(message);
+                    LOGGER.info(message);
                 } catch (Exception e) {
-                    System.err.println("Test failed: " + method);
-                    e.printStackTrace();
+                    LOGGER.error("Test failed: {}", method, e);
                     failures++;
                 }
             }
         }
-        System.out.println("\n[Design tests finished. (" + (testcases - failures) +
-                "/" + testcases + ") tests passed.]");
+        LOGGER.info("[Design tests finished. (" + (testcases - failures) + "/" + testcases + ") tests passed.]");
         if (failures > 0) {
             System.exit(1);
         }
-    }
-
-    public static void main(String[] args) {
-        DesignTests tests = new DesignTests();
-        tests.runTests();
     }
 }

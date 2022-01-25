@@ -22,7 +22,6 @@ import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;
-import recoder.java.Comment;
 import recoder.java.Expression;
 import recoder.java.Identifier;
 import recoder.java.SingleLineComment;
@@ -47,11 +46,10 @@ import recoder.list.generic.ASTList;
 import recoder.service.SourceInfo;
 
 class ResolveTypeDeclaration extends GenericResolutionTransformation {
+    private final TypeDeclaration declaration;
 
-    private TypeDeclaration declaration;
-
-    private List<MethodDeclaration> methodsToAdd = new ArrayList<MethodDeclaration>();
-    private List<List<Type>> signaturesToAdd = new ArrayList<List<Type>>();
+    private final List<MethodDeclaration> methodsToAdd = new ArrayList<>();
+    private final List<List<Type>> signaturesToAdd = new ArrayList<>();
 
     public ResolveTypeDeclaration(ClassDeclaration declaration, CrossReferenceServiceConfiguration sc) {
         super(sc);
@@ -81,9 +79,6 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     }
 
     void analyseMethods() {
-//        ClassType classType = (ClassType) getSourceInfo().getType(declaration);
-//        System.err.println("===\nMethods for " + classType + " (" + declaration + ") " + System.identityHashCode(declaration));
-
         for (Method method : declaration.getMethods()) {
             List<Type> signature = method.getSignature();
             List<Method> superMethods = getOverriddenMethods(method);
@@ -119,8 +114,6 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * check if this new method has already been added to the class or has been
      * present in the first place!
      * 
-     * @param name
-     * @param signature
      * @return a boolean true if the method with the given name and signature existed already
      */
     private boolean methodAlreadyPresent(String name, List<Type> signature) {
@@ -189,9 +182,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         Type returnType = targetType(origMethod.getReturnType());
         String name = origMethod.getName();
         ASTList<DeclarationSpecifier> prefix = getDeclarationSpecifiers(origMethod);
-        List<ClassType> exceptions = new ArrayList<ClassType>(origMethod.getExceptions());
-        Throws _throws = createThrows(exceptions);
-        TypeReference returnTypeRef = null;
+        List<ClassType> exceptions = new ArrayList<>(origMethod.getExceptions());
+        Throws aThrows = createThrows(exceptions);
+        TypeReference returnTypeRef;
         if (returnType != null)
             returnTypeRef = TypeKit.createTypeReference(programFactory, returnType);
         else
@@ -200,7 +193,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         //
         // make the paramters: the ones of the super class
-        ASTList<ParameterDeclaration> parameters = new ASTArrayList<ParameterDeclaration>();
+        ASTList<ParameterDeclaration> parameters = new ASTArrayList<>();
         int counter = 1;
         for (Type type : superSig) {
             TypeReference typeRef = TypeKit.createTypeReference(programFactory, type);
@@ -211,12 +204,13 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         //
         // actually create the declaration
-        MethodDeclaration methodDecl = programFactory.createMethodDeclaration(prefix, returnTypeRef, methodName, parameters, _throws);
+        MethodDeclaration methodDecl = programFactory.createMethodDeclaration(
+                prefix, returnTypeRef, methodName, parameters, aThrows);
 
         //
         // the method arguments
         counter = 1;
-        ASTList<Expression> args = new ASTArrayList<Expression>(localSign.size());
+        ASTList<Expression> args = new ASTArrayList<>(localSign.size());
         for (Type type : localSign) {
             Identifier id = programFactory.createIdentifier("arg" + counter);
             VariableReference varRef = programFactory.createVariableReference(id);
@@ -228,11 +222,11 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         //
         // create the methodCall
-        MethodReference methodCall = programFactory.createMethodReference(programFactory.createThisReference(), methodName.deepClone(),
-                args);
+        MethodReference methodCall = programFactory.createMethodReference(
+                programFactory.createThisReference(), methodName.deepClone(), args);
 
         // if there is a return type, make a return
-        ASTList<Statement> stm = new ASTArrayList<Statement>(1);
+        ASTList<Statement> stm = new ASTArrayList<>(1);
         if (returnType != null)
             stm.add(programFactory.createReturn(methodCall));
         else
@@ -243,9 +237,11 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         //
         // add a comment
-        methodDecl.setComments(new ASTArrayList<Comment>());
-        SingleLineComment slc = getProgramFactory().createSingleLineComment("//--- This method has been created due to generics removal");
-        // sould be done elsewhere methodDecl.getFirstElement().setRelativePosition(new SourceElement.Position(1, 0));
+        methodDecl.setComments(new ASTArrayList<>());
+        SingleLineComment slc = getProgramFactory().createSingleLineComment(
+                "//--- This method has been created due to generics removal");
+
+        // sould be done elsewhere methodDecl.getFirstElement().setRelativePosition(new SourceElement.Position(1, 0))
         slc.setPrefixed(true);
         methodDecl.getComments().add(slc);
         methodDecl.makeAllParentRolesValid();
@@ -258,7 +254,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     }
 
     private ASTList<DeclarationSpecifier> getDeclarationSpecifiers(Method origMethod) {
-        ASTList<DeclarationSpecifier> ret = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ret = new ASTArrayList<>();
         ProgramFactory programFactory = getProgramFactory();
         if (origMethod.isFinal())
             ret.add(programFactory.createFinal());
@@ -291,7 +287,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         if (exceptions == null || exceptions.isEmpty())
             return null;
 
-        ASTList<TypeReference> tr = new ASTArrayList<TypeReference>(exceptions.size());
+        ASTList<TypeReference> tr = new ASTArrayList<>(exceptions.size());
 
         for (ClassType exc : exceptions) {
             tr.add(TypeKit.createTypeReference(getProgramFactory(), exc));
@@ -302,7 +298,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
     private List<Type> getUngenericSignature(List<Type> signature) {
 
-        List<Type> newSignature = new ArrayList<Type>(signature.size());
+        List<Type> newSignature = new ArrayList<>(signature.size());
 
         for (Type type : signature) {
             newSignature.add(targetType(type));
@@ -318,7 +314,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         List<Type> signature = method.getSignature();
         String name = method.getName();
 
-        List<Method> superMethods = new LinkedList<Method>();
+        List<Method> superMethods = new LinkedList<>();
 
         for (ClassType superType : sourceInfo.getSupertypes(classType)) {
             List<Method> matchingMethods = sourceInfo.getMethods(superType, name, signature, null, classType);

@@ -32,7 +32,10 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays a JOptionPane informing about a closed proof
@@ -40,7 +43,7 @@ import de.uka.ilkd.key.util.Debug;
  * @author bubel
  */
 public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofClosedJTextPaneDisplay.class);
 
     public ProofClosedJTextPaneDisplay(Frame parentComponent) {
         super(parentComponent);
@@ -79,7 +82,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
                 contentPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
                 contentPane.setFont(myFont);
             } else {
-                Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
+                LOGGER.debug("KEY_FONT_PROOF_TREE not available. Use standard font.");
             }
 
             JOptionPane.showMessageDialog(parentComponent, scrollPane,

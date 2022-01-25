@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  *
  * <p>
  * The files to test are listed in: <br />
- * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt
+ * $KEY_HOME/key.core/src/test/resources/testcase/runallproofs/automaticJAVADL.txt
  * </p>
  *
  * <p>

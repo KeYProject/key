@@ -163,7 +163,6 @@ public class DeclarationBuilder extends DefaultBuilder {
         return createdSorts;
     }
 
-
     @Override
     public Object visitOption_decls(KeYParser.Option_declsContext ctx) {
         return mapOf(ctx.choice());

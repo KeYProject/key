@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
@@ -21,6 +23,8 @@ import java.util.HashMap;
  * @version 1 (5/14/20)
  */
 public class ExpressionTranslatorTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionTranslatorTest.class);
+
     private Services services;
 
     @BeforeEach
@@ -45,6 +49,6 @@ public class ExpressionTranslatorTest {
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
                 new HashMap<>(), new HashMap<>());
-        System.out.println(ctx.accept(et));
+        LOGGER.debug("{}", ctx.accept(et));
     }
 }

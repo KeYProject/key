@@ -8,8 +8,10 @@ import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 import de.uka.ilkd.key.testcase.smt.ce.TestCommons;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,37 +20,32 @@ public class TestTestgen extends TestCommons {
     public static final File testFile = new File(
             HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/tg");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTestgen.class);
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
 
-    public boolean toolNotInstalled() {
+    @BeforeEach
+    public void toolNotInstalled() {
         if (!installChecked) {
             isInstalled = getSolverType().isInstalled(true);
             installChecked = true;
             if (!isInstalled) {
-                System.out.println("Warning: " + getSolverType().getName()
-                        + " is not installed, tests skipped.");
-                System.out.println("Maybe use JVM system property \""
-                        + SYSTEM_PROPERTY_SOLVER_PATH
-                        + "\" to define the path to the Z3 command.");
+                LOGGER.warn("Warning: {} is not installed, tests skipped.", getSolverType().getName());
+                LOGGER.warn("Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                        SYSTEM_PROPERTY_SOLVER_PATH);
             }
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
-                    System.out
-                            .println("Warning: "
-                                    + "The version of the solver "
-                                    + getSolverType().getName()
-                                    + " used for the following tests may not be supported.");
+                    LOGGER.warn("Warning: The version of the solver {} " +
+                            "used for the following tests may not be supported.", getSolverType().getName());
                 }
             }
         }
-        return !isInstalled;
+        Assume.assumeTrue(isInstalled);
     }
 
-    @Override
     public SolverType getSolverType() {
         SolverType type = SolverTypes.Z3_CE_SOLVER;
-        // SolverType type = SolverType.Z3_SOLVER;
         String solverPathProperty = System
                 .getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {

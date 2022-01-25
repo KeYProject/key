@@ -17,16 +17,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * tests non-destructive list implementation with String
  */
-
 public class TestSLListOfString {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
     String[] str = new String[]{"Dies", "ist", "ein", "Test"};
 
@@ -78,7 +81,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                assertSame(it.next(), str[size - 1 - nr]);
+                Assert.assertSame(it.next(), str[size - 1 - nr]);
                 nr++;
             }
             // list has right length
@@ -116,7 +119,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                assertSame(it.next(), str[nr]);
+                Assert.assertSame(it.next(), str[nr]);
                 nr++;
             }
             // list has right length
@@ -144,8 +147,8 @@ public class TestSLListOfString {
         }
         // test cascading tail
         for (int i = 0; i < str.length; i++) {
-            assertSame(newList[i + 1].tail(), newList[i]);
-            assertSame(newList[i + 1].head(), str[i]);
+            Assert.assertSame(newList[i + 1].tail(), newList[i]);
+            Assert.assertSame(newList[i + 1].head(), str[i]);
         }
     }
 
@@ -225,30 +228,27 @@ public class TestSLListOfString {
 
 
     public static void performanceTest(int n) {
-        System.out.println("Performance Test for " + n + " elements");
+        LOGGER.info("Performance Test for " + n + " elements");
         ImmutableList<String> newList = ImmutableSLList.nil();
-        System.out.println("Create list with prepend.");
+        LOGGER.info("Create list with prepend.");
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             newList = newList.prepend("" + i);
         }
         long end = System.currentTimeMillis();
-        System.out.println("Time:" + (end - start) + " ms");
+        LOGGER.info("Time:" + (end - start) + " ms");
 
-        System.out.print("append:");
         start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             newList = newList.append("" + i);
         }
         end = System.currentTimeMillis();
-        System.out.println((end - start) + " ms");
+        LOGGER.info("append: {} ms ", end - start);
 
-        System.out.print("contains:");
         start = System.currentTimeMillis();
         newList.contains("" + n);
         end = System.currentTimeMillis();
-        System.out.println((end - start) + " ms");
-
+        LOGGER.info("contains: {} ms", end - start);
     }
 
 

@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.smt.test;
 
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.smt.st.SolverType;
 import org.junit.jupiter.api.Test;
@@ -24,6 +27,8 @@ public class TestZ3 extends TestSMTSolver {
 
 
     public static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestZ3.class);
+
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -35,13 +40,15 @@ public class TestZ3 extends TestSMTSolver {
     		isInstalled = getSolverType().isInstalled(true);
     		installChecked = true;
     		if(!isInstalled) {
-    			System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-            System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the Z3 command.");
+                LOGGER.warn("Warning: {} is not installed, tests skipped.", getSolverType().getName());
+                LOGGER.warn("Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                        SYSTEM_PROPERTY_SOLVER_PATH);
     		}	  
     		
     		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
     			if(!getSolverType().checkForSupport()){
-    				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
+                    LOGGER.warn("Warning: " + "The version of the solver {} used for the " +
+                            "following tests may not be supported.", getSolverType().getName());
     			}    			
     		}
     	}

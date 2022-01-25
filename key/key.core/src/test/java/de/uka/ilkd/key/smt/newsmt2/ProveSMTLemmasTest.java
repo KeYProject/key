@@ -3,9 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import org.junit.AfterClass;
@@ -14,6 +12,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.key_project.util.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -34,6 +34,7 @@ import static org.junit.Assert.fail;
  */
 @Tag("slow")
 public class ProveSMTLemmasTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProveSMTLemmasTest.class);
     private static String HEADER;
 
     @BeforeAll
@@ -62,7 +63,7 @@ public class ProveSMTLemmasTest {
 
         File file = path.toFile();
 
-        System.err.println("Now processing file " + file);
+        LOGGER.info("Now processing file {}", file);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
         try {
@@ -79,13 +80,12 @@ public class ProveSMTLemmasTest {
                     file.delete();
                 } else {
                     // and check if proofs are actually for the right theorem!
-                    DefaultTermParser tp = new DefaultTermParser();
-                    Term parsedLemma = tp.parse(new StringReader(lemmaString), Sort.FORMULA,
-                            loadedProof.getServices(), loadedProof.getNamespaces(), new AbbrevMap());
+                    KeyIO io = new KeyIO(loadedProof.getServices());
+                    Term parsedLemma = io.parseExpression(lemmaString);
                     Term actual = loadedProof.root().sequent().succedent().get(0).formula();
                     if (!actual.equalsModRenaming(parsedLemma)) {
-                        System.out.println("Stored : " + parsedLemma);
-                        System.out.println("Proven : " + actual);
+                        LOGGER.info("Stored : {}", parsedLemma);
+                        LOGGER.warn("Proven : {}", actual);
                         fail("The proven lemma is different from the stored one.");
                     }
                 }
@@ -111,7 +111,7 @@ public class ProveSMTLemmasTest {
 
         for (String name : props.stringPropertyNames()) {
             if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-                String[] params = { name, props.getProperty(name) };
+                String[] params = {name, props.getProperty(name)};
                 result.add(params);
             }
         }

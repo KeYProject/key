@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParserHeap.class);
     private Term h, a, f, next;
 
     @BeforeEach
@@ -196,7 +199,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
             @Nonnull Term t = io.parseExpression("(a.f + a.f)@h2");
-            System.out.println(t);
+            LOGGER.info("Out: {}", t);
             fail();
         } catch (Exception e) {
             //assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));

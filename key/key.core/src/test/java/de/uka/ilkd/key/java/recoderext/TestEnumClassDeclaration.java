@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import recoder.DefaultServiceConfiguration;
@@ -22,6 +24,7 @@ import recoder.ServiceConfiguration;
 import recoder.java.declaration.EnumDeclaration;
 
 public class TestEnumClassDeclaration {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEnumClassDeclaration.class);
 
     ProgramFactory factory;
 
@@ -33,47 +36,33 @@ public class TestEnumClassDeclaration {
         factory.initialize(sc);
     }
 
-    private static final String[] enums =
-            {
+    private static final String[] enums = {
             // Simple
-                    "enum A { a1, a2, a3 }",
-                    // Two
-                    "enum B implements C { b1(13), b2(42); B(int i){} void m() {} int j; }",
-                    // 2 Constructors
-                    "enum C { c1, c2(23); C(int i) { this(); } C() { j = 0; } int j; }"
-                    };
+            "enum A { a1, a2, a3 }",
+            // Two
+            "enum B implements C { b1(13), b2(42); B(int i){} void m() {} int j; }",
+            // 2 Constructors
+            "enum C { c1, c2(23); C(int i) { this(); } C() { j = 0; } int j; }"
+    };
 
     @Test
     public void testSimple() throws ParserException {
-        EnumDeclaration ed =
-                (EnumDeclaration) factory.parseCompilationUnit(enums[0]).getTypeDeclarationAt(
-                        0);
-
+        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[0]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
-
-        System.out.println(ec.toSource());
-
+        LOGGER.debug(ec.toSource());
     }
 
     @Test
     public void testTwo() throws ParserException {
-        EnumDeclaration ed =
-                (EnumDeclaration) factory.parseCompilationUnit(enums[1]).getTypeDeclarationAt(
-                        0);
-
+        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[1]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
-
-        System.out.println(ec.toSource());
+        LOGGER.debug(ec.toSource());
     }
-    
+
     @Test
     public void test2Constr() throws ParserException {
-        EnumDeclaration ed =
-                (EnumDeclaration) factory.parseCompilationUnit(enums[2]).getTypeDeclarationAt(
-                        0);
-
+        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[2]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
-
-        System.out.println(ec.toSource());
+        LOGGER.debug(ec.toSource());
     }
 }

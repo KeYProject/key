@@ -24,6 +24,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.jupiter.api.Tag;
 
 import java.io.File;
@@ -38,145 +39,140 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Use this class for testing SMT: It provides a mechanism to load proofs and
  * taclets. Do not modify this class directly but derive subclasses to implement
  * tests.
- * 
  */
 @Tag("slow")
 public abstract class TestCommons {
-	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
-	        + File.separator + "smt" + File.separator + "tacletTranslation"
-	        + File.separator;
-	/** The set of taclets */
-	private final Collection<Taclet> taclets = new LinkedList<>();
-	InitConfig initConfig = null;
-	static protected ProblemInitializer initializer = null;
-	static protected Profile profile = init();
+    protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
+            + File.separator + "smt" + File.separator + "tacletTranslation"
+            + File.separator;
+    /**
+     * The set of taclets
+     */
+    private final Collection<Taclet> taclets = new LinkedList<>();
+    InitConfig initConfig = null;
+    static protected ProblemInitializer initializer = null;
+    static protected Profile profile = init();
 
-	static Profile init() {
+    static Profile init() {
 		return new JavaProfile();
-	}
-
-	private TermServices services;
-
-	protected TermServices getServices() {
-		return services;
-	}
-
-	/**
-	 * returns the solver that should be tested.
-	 * 
-	 * @return the solver to be tested.
-	 */
-	public abstract SolverType getSolverType();
-
-	public abstract boolean toolNotInstalled();
-
-	protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
-		if (toolNotInstalled()) {
-			return true;
-		}
-		SMTSolverResult result = checkFile(filepath);
-		// System.gc();
-		// unknown is always allowed. But wrong answers are not allowed
-		return correctResult(isValid, result);
-	}
-	
-	protected boolean correctResult(Goal g, boolean isValid){
-		return correctResult(isValid, checkGoal(g));
-	}
-
-	private boolean correctResult(boolean isValid, SMTSolverResult result) {
-		//System.out.println(Boolean.toString(isValid)+" "+result);
-	    if (isValid && result != null) {
-			return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
-		} else {
-			return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
-		}
     }
 
-	/**
-	 * check a problem file
-	 * 
-	 * @param filepath
-	 *            the path to the file
-	 * @return the resulttype of the external solver
-	 * @throws ProblemLoaderException 
-	 */
+    private TermServices services;
+
+    protected TermServices getServices() {
+        return services;
+    }
+
+    /**
+     * returns the solver that should be tested.
+     *
+     * @return the solver to be tested.
+     */
+    public abstract SolverType getSolverType();
+
+    public abstract boolean toolNotInstalled();
+
+    protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
+        Assume.assumeFalse(toolNotInstalled());
+        SMTSolverResult result = checkFile(filepath);
+        // unknown is always allowed. But wrong answers are not allowed
+        return correctResult(isValid, result);
+    }
+
+    protected boolean correctResult(Goal g, boolean isValid) {
+        return correctResult(isValid, checkGoal(g));
+    }
+
+    private boolean correctResult(boolean isValid, SMTSolverResult result) {
+        if (isValid && result != null) {
+            return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
+        } else {
+            return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
+        }
+    }
+
+    /**
+     * check a problem file
+     *
+     * @param filepath the path to the file
+     * @return the resulttype of the external solver
+     * @throws ProblemLoaderException
+     */
 	protected SMTSolverResult checkFile(String filepath) throws ProblemLoaderException {
-	   KeYEnvironment<?> p = loadProof(filepath);
-	   try {
-	      Proof proof = p.getLoadedProof();
-	      Assert.assertNotNull(proof);
-		  Assert.assertEquals(1, proof.openGoals().size());
-	      Goal g = proof.openGoals().iterator().next();
-	      return checkGoal(g);
-	   }
-	   finally {
-	      p.dispose();
-	   }
-	}
-
-	private SMTSolverResult checkGoal(Goal g) {
-	    SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
-		SMTProblem problem = new SMTProblem(g);
-		launcher.launch(problem, g.proof().getServices(), getSolverType());
-		return problem.getFinalResult();
-    }
-	
-	
-
-	protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-	   return KeYEnvironment.load(new File(filepath), null, null, null);
+        KeYEnvironment<?> p = loadProof(filepath);
+        try {
+            Proof proof = p.getLoadedProof();
+            Assert.assertNotNull(proof);
+            Assert.assertEquals(1, proof.openGoals().size());
+            Goal g = proof.openGoals().iterator().next();
+            return checkGoal(g);
+        } finally {
+            p.dispose();
+        }
     }
 
-	/**
-	 * Returns a set of taclets that can be used for tests. REMARK: First you
-	 * have to call <code>parse</code> to instantiate the set of taclets.
-	 * 
-	 * @return set of taclets.
-	 */
-	protected Collection<Taclet> getTaclets() {
-		if (taclets.isEmpty()) {
-			if (initConfig == null) {
-				parse();
-			}
-			for (Taclet t : initConfig.getTaclets()) {
-				taclets.add(t);
-			}
-		}
-		return taclets;
-	}
-	
-	protected HashSet<String> getTacletNames() {
-		Collection<Taclet> set = getTaclets();
+    private SMTSolverResult checkGoal(Goal g) {
+        SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
+        SMTProblem problem = new SMTProblem(g);
+        launcher.launch(problem, g.proof().getServices(), getSolverType());
+        return problem.getFinalResult();
+    }
+
+
+    protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
+        return KeYEnvironment.load(new File(filepath), null, null, null);
+    }
+
+    /**
+     * Returns a set of taclets that can be used for tests. REMARK: First you
+     * have to call <code>parse</code> to instantiate the set of taclets.
+     *
+     * @return set of taclets.
+     */
+    protected Collection<Taclet> getTaclets() {
+        if (taclets.isEmpty()) {
+            if (initConfig == null) {
+                parse();
+            }
+            for (Taclet t : initConfig.getTaclets()) {
+                taclets.add(t);
+            }
+        }
+        return taclets;
+    }
+
+    protected HashSet<String> getTacletNames() {
+        Collection<Taclet> set = getTaclets();
 		HashSet<String> names = new HashSet<>();
-		for (Taclet taclet : set) {
-			names.add(taclet.name().toString());
-		}
-		return names;
-	}
+        for (Taclet taclet : set) {
+            names.add(taclet.name().toString());
+        }
+        return names;
+    }
 
-	/**
-	 * Use this method if you only need taclets for testing.
-	 */
-	protected ProofAggregate parse() {
-		return parse(new File(folder + "dummyFile.key"));
-	}
+    /**
+     * Use this method if you only need taclets for testing.
+     */
+    protected ProofAggregate parse() {
+        return parse(new File(folder + "dummyFile.key"));
+    }
 
-	/**
-	 * Calls
-	 * <code>parse(File file, Profile profile) with the standard profile for testing.
-	 */
-	protected ProofAggregate parse(File file) {
-		return parse(file, profile);
-	}
+    /**
+     * Calls
+     * <code>parse(File file, Profile profile) with the standard profile for testing.
+     */
+    protected ProofAggregate parse(File file) {
+        return parse(file, profile);
+    }
 
-	/**
-	 * Parses a problem file and returns the corresponding ProofAggregate.
-	 * 
+    /**
+     * Parses a problem file and returns the corresponding ProofAggregate.
+     *
 	 * @param file
 	 *            problem file.
 	 * @param pro determines the profile that should be used.
-	 * @return ProofAggregate of the problem file.
+     * @return ProofAggregate of the problem file.
+     * @profile determines the profile that should be used.
 	 */
 	protected ProofAggregate parse(File file, Profile pro) {
 		assertTrue(file.exists());
@@ -194,8 +190,8 @@ public abstract class TestCommons {
 		} catch (Exception e) {
 			fail("Error while loading problem file " + file + ":\n\n"
 					+ e.getMessage());
-		}
-		return result;
-	}
+        }
+        return result;
+    }
 }
 

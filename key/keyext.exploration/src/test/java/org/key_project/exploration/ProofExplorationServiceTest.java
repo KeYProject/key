@@ -88,7 +88,7 @@ public class ProofExplorationServiceTest {
     }
 
     /**
-     * Test tests that the added term is added correctly and that meta data was added as well
+     * Test tests that the added term is added correctly and that metadata was added as well
      */
     @Test
     public void testAdditionSucc() {
@@ -154,8 +154,6 @@ public class ProofExplorationServiceTest {
         Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
                 newCreatedGoals.tail().head();
 
-        //System.out.println("applicationBranch = " + applicationBranch.sequent());
-        //System.out.println("justificationBranch.sequent() = " + justificationBranch.sequent());
         //check meta data
         Node hideNode = applicationBranch.node().parent();
 
@@ -177,10 +175,17 @@ public class ProofExplorationServiceTest {
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
         Semisequent semiSeqAdded = antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfAdded = antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent parentSemiSeqOfAdded = antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
-        Semisequent semiSeqUntouched = !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfUntouched = !antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent semiSeqUntouched = !antec
+                ? withAddedTerm.sequent().antecedent()
+                : withAddedTerm.sequent().succedent();
+
+        Semisequent parentSemiSeqOfUntouched = !antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
 
         assertSame(semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1,

@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.bytecode.ByteCodeParser;
@@ -56,15 +58,15 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * 
  */
 public class ClassFileDeclarationManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassFileDeclarationManager.class);
 
-    private List<CompilationUnit> compUnits = new ArrayList<CompilationUnit>();
+    private List<CompilationUnit> compUnits = new ArrayList<>();
 
-    private List<ClassFileDeclarationBuilder> builderList = new ArrayList<ClassFileDeclarationBuilder>();
+    private List<ClassFileDeclarationBuilder> builderList = new ArrayList<>();
 
     private ProgramFactory programFactory;
 
-    private Map<String, ClassFileDeclarationBuilder> classBuilders = 
-        new LinkedHashMap<String, ClassFileDeclarationBuilder>();
+    private Map<String, ClassFileDeclarationBuilder> classBuilders = new LinkedHashMap<>();
     
     /**
      * create a new ClassFileDeclarationManager
@@ -176,7 +178,7 @@ public class ClassFileDeclarationManager {
         while(walker.step()) {
             try {
                 DataLocation currentDataLocation = walker.getCurrentDataLocation();
-                System.out.println("Now reading: " + currentDataLocation);
+                LOGGER.info("Now reading: {}", currentDataLocation);
                 InputStream is = walker.openCurrent();
                 ClassFile cf;
                 try { 
@@ -204,14 +206,14 @@ public class ClassFileDeclarationManager {
         sc.getChangeHistory().updateModel();
         for (CompilationUnit cu : manager.getCompilationUnits()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
-            System.out.println("Generating " + name);
+            LOGGER.info("Generating {}",name);
             FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
             fw.write(cu.toSource());
             fw.close();
         }
         for (CompilationUnit cu : sourceInfo.getCreatedStubClasses()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
-            System.out.println("Generating empty stub " + name);
+            LOGGER.info("Generating empty stub {}",  name);
             FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
             fw.write(cu.toSource());
             fw.close();
