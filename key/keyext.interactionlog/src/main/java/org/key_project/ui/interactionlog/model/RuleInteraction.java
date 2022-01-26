@@ -20,11 +20,10 @@ import org.key_project.util.collection.ImmutableMapEntry;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author weigl
@@ -127,7 +126,13 @@ public final class RuleInteraction extends NodeInteraction {
 
     private HashMap<String, String> createInstArguments() {
         var allArgs = new HashMap<String, String>();
-        arguments.forEach((k, v) -> allArgs.put("inst_" + k.name().toString(), v));
+        var filter = getFilterFor(ruleName);
+        arguments.forEach((k, v) -> {
+            var name = k.name().toString();
+            if (filter.filter(name)) {
+                allArgs.put("inst_" + name, v);
+            }
+        });
         return allArgs;
     }
 
@@ -173,5 +178,57 @@ public final class RuleInteraction extends NodeInteraction {
         } catch (Exception e) {
             throw new IllegalStateException("Rule application", e);
         }
+    }
+
+    private static final HashMap<String, ArgumentFilter> FILTERS;
+
+    private static ArgumentFilter getFilterFor(String rule) {
+        var filter = FILTERS.get(rule);
+        return filter == null ? new NoArgumentFilter() : filter;
+    }
+
+    private interface ArgumentFilter {
+        boolean filter(String parameter);
+    }
+
+    private static class ExcludeArgumentFilter implements ArgumentFilter {
+        private final Set<String> filter;
+
+        ExcludeArgumentFilter(Set<String> filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public boolean filter(String parameter) {
+            return !filter.contains(parameter);
+        }
+    }
+
+    private static class NoArgumentFilter implements ArgumentFilter {
+        NoArgumentFilter() {}
+
+        @Override
+        public boolean filter(String parameter) {
+            return true;
+        }
+    }
+
+    static {
+        FILTERS = new HashMap<>();
+
+        var BC = new ExcludeArgumentFilter(Set.of("b", "c"));
+        FILTERS.put("impLeft", BC);
+        FILTERS.put("impRight", BC);
+        FILTERS.put("andLeft", BC);
+        FILTERS.put("andRight", BC);
+
+        var BU = new ExcludeArgumentFilter(Set.of("b", "u"));
+        FILTERS.put("allLeft", BU);
+        FILTERS.put("allLeftHide", BU);
+
+        var BUSK = new ExcludeArgumentFilter(Set.of("b", "u", "sk"));
+        FILTERS.put("allRight", BUSK);
+        FILTERS.put("allRightHide", BUSK);
+        FILTERS.put("exLeft", BUSK);
     }
 }
