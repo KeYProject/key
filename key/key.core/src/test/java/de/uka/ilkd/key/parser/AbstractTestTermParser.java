@@ -99,7 +99,8 @@ public class AbstractTestTermParser {
     }
 
     protected static void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
-        assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""),
+                message);
     }
 
     protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
