@@ -29,6 +29,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
@@ -43,6 +44,8 @@ import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
@@ -851,34 +854,38 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (!node.getNode().leaf() || node instanceof GUIBranchNode) return;
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
-                String toolTipText;
+                var tooltip = new TooltipContent();
                 final String notes = leaf.getNodeInfo().getNotes();
 
                 if (goal == null || leaf.isClosed()) {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_GREEN_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
-                    toolTipText = "A closed goal";
+                    tooltip.title = "A closed goal";
                 } else if (goal.isLinked()) {
                     style.set(KEY_COLOR_FOREGROUND, PINK_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleLinked(20, 20));
                     ProofTreeView.this.setToolTipText("Linked Goal");
-                    toolTipText = "Linked goal - no automatic rule application";
+                    tooltip.title = "Linked goal - no automatic rule application";
                 } else if (!goal.isAutomatic()) {
                     style.set(KEY_COLOR_FOREGROUND, ORANGE_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleInteractive(20, 20));
                     ProofTreeView.this.setToolTipText("Disabled Goal");
-                    toolTipText = "Interactive goal - no automatic rule application";
+                    tooltip.title = "Interactive goal - no automatic rule application";
                 } else {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_RED_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHole(20, 20));
                     ProofTreeView.this.setToolTipText("Open Goal");
-                    toolTipText = "An open goal";
+                    tooltip.title = "An open goal";
                 }
                 if (notes != null) {
-                    toolTipText += ".\nNotes: " + notes;
+                    tooltip.notes = notes;
                 }
-                style.set(KEY_TOOLTIP, toolTipText);
+                var oldTooltip = style.get(KEY_TOOLTIP);
+                if (!oldTooltip.isEmpty()) {
+                    tooltip.additionalInfo = oldTooltip;
+                }
+                style.set(KEY_TOOLTIP, tooltip.render());
             } catch (ClassCastException ignored) {
             }
         }
@@ -887,11 +894,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Node node = treeNode.getNode();
             if (node.leaf() || treeNode instanceof GUIBranchNode) return;
             style.set(KEY_COLOR_FOREGROUND, Color.black);
-            String tooltipText = "An inner node of the proof";
+            var tooltip = new TooltipContent();
+            tooltip.title = "An inner node of the proof";
             final String notes = node.getNodeInfo().getNotes();
 
             if (notes != null) {
-                tooltipText += ".\nNotes: " + notes;
+                tooltip.notes = notes;
             }
 
             Icon defaultIcon;
@@ -909,16 +917,41 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             boolean isBranch = false;
             final Node child = treeNode.findChild(node);
-            if (child != null && child.getNodeInfo().getBranchLabel() != null) {
+            if (child != null && child != node && child.getNodeInfo().getBranchLabel() != null) {
                 isBranch = true;
                 style.set(KEY_TEXT, style.get(KEY_TEXT) + ": " + child.getNodeInfo().getBranchLabel());
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();
-                tooltipText = "A branch node with all children hidden";
+                tooltip.title = "A branch node with all children hidden";
             }
+
             style.set(KEY_ICON, defaultIcon);
-            style.set(KEY_TOOLTIP, tooltipText);
+            var oldTooltip = style.get(KEY_TOOLTIP);
+            if (!oldTooltip.isEmpty()) {
+                tooltip.additionalInfo = oldTooltip;
+            }
+
+            var text = style.get(KEY_TEXT);
+            // Elide text and move it to additional info
+            // This does not influence the search since it uses the toString repr
+            if (tooltip.additionalInfo.isEmpty() && text.length() > 60 && treeNode instanceof GUIProofTreeNode) {
+                style.set(KEY_TEXT, text.substring(0, 60) + "...");
+                // This should only happen if node.name() uses the active statement
+                // Pretty print it to make it readable
+                var active = node.getNodeInfo().getActiveStatement();
+                String info = null;
+                if (active != null) {
+                    var writer = new StringWriter();
+                    var printer = new PrettyPrinter(writer);
+                    try {
+                        active.prettyPrint(printer);
+                        info = writer.toString().trim();
+                    } catch (IOException ignored) {}
+                }
+                tooltip.additionalInfo = info == null ? node.name() : info;
+            }
+            style.set(KEY_TOOLTIP, tooltip.render());
         }
 
         private void checkNotes(Style style, GUIAbstractTreeNode treeNode) {
@@ -940,6 +973,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 style.set(KEY_COLOR_FOREGROUND, GRAY_COLOR.get());
                 style.set(KEY_ICON, IconFactory.oneStepSimplifier(16));
                 style.set(KEY_TEXT, node.toString());
+                var text = ((GUIOneStepChildTreeNode) node).appliedOn();
+                style.set(KEY_TOOLTIP, text);
             }
         }
 
@@ -963,6 +998,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.set(KEY_FONT_ITALIC, false);
             style.set(KEY_TOOLTIP, "");
             style.set(KEY_ICON, null);
+            style.set(KEY_TEXT, getText());
 
             stylers.forEach(it -> it.style(style, (GUIAbstractTreeNode) value));
 
@@ -981,8 +1017,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
                             (style.getBoolean(KEY_FONT_ITALIC) ? Font.ITALIC : Font.PLAIN);
 
             setFont(getFont().deriveFont(fontStyle));
-            setToolTipText(style.get(KEY_TOOLTIP));
+            var tooltip = style.get(KEY_TOOLTIP);
+            if (!tooltip.isEmpty()) {
+                setToolTipText("<html>" + tooltip + "</html>");
+            }
             setIcon(style.get(KEY_ICON));
+            setText(style.get(KEY_TEXT));
 
             return this;
         }

@@ -17,6 +17,7 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
@@ -53,10 +54,12 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     }
     
     @Override public String toString() {
-    	//For prettyprinting
-    	Services services = parent.getNode().proof().getServices();
-    	String prettySubTerm =  LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
-        return app.rule().name() + " ON " +prettySubTerm;
+        return app.rule().name().toString();
+    }
+
+    public String appliedOn() {
+        Services services = parent.getNode().proof().getServices();
+        return LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
     }
 
     @Override public void flushCache() {
