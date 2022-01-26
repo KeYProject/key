@@ -1081,10 +1081,11 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             return new Variables(selfVar(method, method.getContainerType(), false), breakFlags,
                     continueFlags, returnFlag,
-                    resultVar(services.getVariableNamer().getTemporaryNameProposal("result")
-                            .toString(), method, false),
-                    excVar(services.getVariableNamer().getTemporaryNameProposal("exc").toString(),
-                            method, false),
+                    // We don't need to (and shouldn't) make the variable names unique here.
+                    // That is done in AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
+                    // when the contract is applied.
+                    resultVar(method, false),
+                    excVar(method, false),
                     createRemembranceHeaps(), createRemembranceLocalVariables(),
                     createOuterRemembranceHeaps(), createOuterRemembranceLocalVariables(),
                     services);
