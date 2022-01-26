@@ -36,14 +36,23 @@ import java.util.stream.Stream;
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection;
+    private static ProofCollection proofCollection = getProofCollection();
+
+    private static ProofCollection getProofCollection() {
+        if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
+            try {
+                return parseIndexFile(INDEX_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assertions.fail();
+            }
+        }
+        return null;
+    }
 
     @TestFactory
-    Stream<DynamicTest> data() throws IOException, RecognitionException {
-        if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
-            return Stream.empty();
-        }
-        proofCollection = parseIndexFile(INDEX_FILE);
+    Stream<DynamicTest> data() throws IOException {
+        Assumptions.assumeTrue(proofCollection != null);
         return data(proofCollection);
     }
 
