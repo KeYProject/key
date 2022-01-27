@@ -76,7 +76,21 @@ procedure is sound. In this case, the generated "is weakening" goals should
 only be closable if the concrete join instance is correct.
 </entry>
 
-<entry key="initialisation">
+<entry key="floatRules">
+Rules for how to deal with floating point numbers.
+
+All KeY rules concerning floating point numbers, as well as their translation to SMT-LIB, only make sense for
+strictfp floats.
+
+* assumeStrictfp: treat all floats as if they came from a strictfp class. This is convenient, but not always sound,
+as the compiler might make optimizations which break some assumptions which the KeY rules and SMT-LIB translation
+depend on.
+
+* strictfpOnly: floats are only usable if they come from a strictfp class, and essentially remain uninterpreted
+functions otherwise.
+</entry>
+
+    <entry key="initialisation">
 Specifies whether static (class loading) initialization should be
 taken in consideration.
 
