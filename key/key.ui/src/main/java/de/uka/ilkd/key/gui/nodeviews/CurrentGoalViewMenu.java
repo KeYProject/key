@@ -52,7 +52,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -555,7 +555,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 assert goal != null;
 
                 Thread thread = new Thread(() -> {
-                    SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+                    DefaultSMTSettings settings = new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                             goal.proof().getSettings().getNewSMTSettings(),
                             goal.proof());

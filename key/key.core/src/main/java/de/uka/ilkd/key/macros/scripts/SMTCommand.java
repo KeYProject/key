@@ -5,9 +5,11 @@ import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ public class SMTCommand
     private static Map<String, SolverType> computeSolverMap() {
         Map<String, SolverType> result = new HashMap<String, SolverType>();
 
-        for (SolverType type : SolverType.ALL_SOLVERS) {
+        for (SolverType type : SolverTypes.getSolverTypes()) {
             result.put(type.getName(), type);
         }
 
@@ -52,7 +54,7 @@ public class SMTCommand
         }
         
         for (Goal goal : goals) {
-            SMTSettings settings = new SMTSettings(
+            DefaultSMTSettings settings = new DefaultSMTSettings(
                     goal.proof().getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     goal.proof().getSettings().getNewSMTSettings(),

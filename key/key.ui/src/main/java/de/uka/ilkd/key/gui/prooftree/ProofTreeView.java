@@ -31,9 +31,12 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -52,6 +55,7 @@ import java.util.*;
 import static de.uka.ilkd.key.gui.prooftree.Style.*;
 
 public class ProofTreeView extends JPanel implements TabPanel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
     public static final ColorSettings.ColorProperty GRAY_COLOR =
             ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
@@ -101,7 +105,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private KeYMediator mediator;
 
-    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
+    private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
 
     /**
      * the proof this view shows
@@ -294,8 +298,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             delegateView.setFont(myFont);
         } else {
-            Debug.out("KEY-PROOF_TREE_FONT not available, " +
-                    "use standard font.");
+            LOGGER.debug("KEY-PROOF_TREE_FONT not available, use standard font.");
             delegateView.setRowHeight(rowHeight);
         }
     }
@@ -682,7 +685,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("ProofTreeView: initialize with new proof");
+            LOGGER.debug("ProofTreeView: initialize with new proof");
             lastGoalNode = null;
             setProof(e.getSource().getSelectedProof());
             delegateView.validate();
@@ -696,7 +699,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             modifiedSubtrees = ImmutableSLList.<Node>nil();
             modifiedSubtreesCache = new LinkedHashSet<Node>();
             if (delegateModel == null) {
-                Debug.out("delegateModel is null");
+                LOGGER.debug("delegateModel is null");
                 return;
             }
             if (delegateModel.isAttentive()) {

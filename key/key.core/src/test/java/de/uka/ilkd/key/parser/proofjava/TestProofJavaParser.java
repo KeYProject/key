@@ -13,13 +13,15 @@
 
 package de.uka.ilkd.key.parser.proofjava;
 
-import junit.framework.TestCase;
-import recoder.ParserException;
-import recoder.ServiceConfiguration;
-import recoder.java.Expression;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import junit.framework.TestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.ParserException;
+import recoder.ServiceConfiguration;
+import recoder.java.Expression;
 
 /**
  * 
@@ -31,12 +33,11 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  */
 
 public class TestProofJavaParser extends TestCase {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProofJavaParser.class);
 
-    static boolean debug = false;
+    private static ServiceConfiguration sc;
 
-    static ServiceConfiguration sc;
-
-    static ProofJavaProgramFactory factory;
+    private static ProofJavaProgramFactory factory;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -46,22 +47,20 @@ public class TestProofJavaParser extends TestCase {
     }
 
     public void testGenericWithWithoutSpaces() throws ParserException {
-        factory
-                .parseCompilationUnit("class A < B > { B m() { return new B(); }}");
-        factory
-                .parseCompilationUnit("class A <B> { B m() { return new B(); }}");
+        factory.parseCompilationUnit("class A < B > { B m() { return new B(); }}");
+        factory.parseCompilationUnit("class A <B> { B m() { return new B(); }}");
     }
 
-    private void testExpr(String expr) throws ParserException {
+    private void testExpr(String expr) {
         try {
             Expression e = factory.parseExpression(expr);
-            System.out.println(expr + " <-> " + e.toSource());
+            LOGGER.debug(expr + " <-> " + e.toSource());
         } catch (ParserException ex) {
             throw new RuntimeException("Error with: " + expr, ex);
         }
     }
 
-    public void testExpressions() throws ParserException {
+    public void testExpressions() {
         testExpr("<a>+2");
         testExpr("a >> <a>");
         testExpr("a<<b>-2");

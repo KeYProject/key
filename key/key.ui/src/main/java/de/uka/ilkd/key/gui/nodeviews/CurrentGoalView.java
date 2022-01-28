@@ -42,6 +42,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -72,6 +74,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             ColorSettings.define("[currentGoal]dndHighlight", "",
                     new Color(0, 150, 130, 104));
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
+
 
     // the mediator
     private final KeYMediator mediator;
@@ -80,7 +84,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private final CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private DragSource dragSource = null;
+    private DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
@@ -158,7 +162,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         // add listener to KeY GUI events
         getMediator().addGUIListener(guiListener);
 
-        updateHighlights = new LinkedList<Object>();
+        updateHighlights = new LinkedList<>();
 
     }
 
@@ -221,12 +225,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         if (SwingUtilities.isEventDispatchThread()) {
             printSequentImmediately();
         } else {
-            Runnable sequentUpdater = new Runnable() {
-                @Override
-                public void run() {
-                    printSequentImmediately();
-                }
-            };
+            Runnable sequentUpdater = this::printSequentImmediately;
             SwingUtilities.invokeLater(sequentUpdater);
         }
     }
@@ -255,8 +254,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                             getLogicPrinter().toString(),
                             getMainWindow().getMediator().getSelectedNode()));
                 } catch (Error e) {
-                    System.err.println("Error occurred while printing Sequent!");
-                    e.printStackTrace();
+                    LOGGER.error("Error occurred while printing Sequent!",e);
                     errorocc = true;
                 }
             } while (errorocc);

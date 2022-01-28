@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.gui.colors;
 
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -25,6 +28,7 @@ import java.util.stream.Stream;
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
     public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
     private ColorSettings(Properties settings) {
@@ -69,7 +73,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
      * @see #SETTINGS_FILE
      */
     public void save() {
-        System.out.println("[ColorSettings] Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's Colors");
             writer.flush();

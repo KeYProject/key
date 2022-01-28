@@ -1,25 +1,30 @@
 package de.uka.ilkd.key.ui;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.KeYTypeUtil;
+import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.init.*;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.KeYTypeUtil;
-
-public class ConsoleProofObligationSelector implements ProofObligationSelector{
+public class ConsoleProofObligationSelector implements ProofObligationSelector {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
 
     public static final String TAB = "   ";
 
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
     protected InitConfig initConfig;
     protected ConsoleUserInterfaceControl ui;
 
@@ -35,7 +40,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
     private void initializeContractsArray() {
         ImmutableSet<Contract> contracts = initConfig.getServices().getSpecificationRepository().getAllContracts();
-        this.contracts = new ArrayList<Contract>();
+        this.contracts = new ArrayList<>();
         //int i = 0;
 
         for (Contract c : contracts) {
@@ -50,21 +55,21 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
 
     protected void printAvailableProofObligations() {
-        System.out.println("Available Contracts: ");
+        LOGGER.info("Available Contracts: ");
         for (int i = 0; i < contracts.size(); i++) {
             printContract(i);
         }
     }
 
     private void printContract(int i) {
-        System.out.println("Contract " + i + ":");
-        System.out.println(TAB + "Method: " + contracts.get(i).getTarget().name());
-        System.out.println(TAB + "PO:" + contracts.get(i).getDisplayName());
+        LOGGER.info("Contract " + i + ":");
+        LOGGER.info(TAB + "Method: " + contracts.get(i).getTarget().name());
+        LOGGER.info(TAB + "PO:" + contracts.get(i).getDisplayName());
     }
 
     protected ProofOblInput createPOForSelectedContract() {
         final Contract contract = selectContract();
-        System.out.println("Contract: " + contract);
+        LOGGER.info("Contract: " + contract);
         return contract == null
                 ? null
                 : contract.createProofObl(initConfig, contract);
@@ -75,7 +80,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
         Proof proof = findPreferablyClosedProof(po);
 
-        //System.out.println("Proof: "+proof);
+        //LOGGER.info("Proof: "+proof);
         if (proof == null) {
             ProblemInitializer pi =
                     new ProblemInitializer(ui, initConfig.getServices(), ui);
@@ -98,7 +103,6 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
-
         ImmutableSet<Proof> proofs = initConfig.getServices().getSpecificationRepository().getProofs(po);
 
         //no proofs?
@@ -119,7 +123,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
     public boolean selectProofObligation() {
         ProofOblInput po = createPOForSelectedContract();
-        //System.out.println("PO: "+po.getPO().getProofs().length);
+        //LOGGER.info("PO: "+po.getPO().getProofs().length);
         findOrStartProof(po);
         return true;
     }
@@ -128,7 +132,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
     private Contract selectContract() {
         printAvailableProofObligations();
 
-        System.out.println("Choose PO, enter number between 0 and " + (contracts.size() - 1));
+        LOGGER.info("Choose PO, enter number between 0 and " + (contracts.size() - 1));
         int cNr = readContractNumber();
         return contracts.get(cNr);
 
@@ -145,12 +149,11 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
                     return i;
                 }
                 i = -1;
-                System.out.println("Contract number out of range!");
-
+                LOGGER.error("Contract number out of range!");
             } catch (NumberFormatException e) {
-                System.out.println("NumberFormatException!");
+                LOGGER.info("NumberFormatException!", e);
             } catch (IOException e) {
-                System.out.println("IOException!");
+                LOGGER.error("IOException!", e);
             }
         }
         return -1;
@@ -158,8 +161,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
     private int readInt() throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int result = Integer.parseInt(br.readLine());
-        return result;
+        return Integer.parseInt(br.readLine());
     }
 
 

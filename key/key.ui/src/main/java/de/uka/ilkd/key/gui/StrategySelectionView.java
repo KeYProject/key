@@ -31,6 +31,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.java.ObjectUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -68,10 +70,13 @@ import java.util.Map.Entry;
  * @author Martin Hentschel
  */
 public final class StrategySelectionView extends JPanel implements TabPanel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StrategySelectionView.class);
+
     /**
      * Generated UID.
      */
     private static final long serialVersionUID = -267867794853527874L;
+
     /**
      * The always used {@link StrategyFactory}.
      */
@@ -87,22 +92,25 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * The name of {@link #FACTORY}.
      */
-    private static final String JAVACARDDL_STRATEGY_NAME = FACTORY.name()
-            .toString();
+    private static final String JAVACARDDL_STRATEGY_NAME = FACTORY.name().toString();
+
     /**
      * The {@link KeYMediator} which provides the active proof.
      */
     private KeYMediator mediator;
+
     /**
      * Allows access to shown UI controls generated according to
      * {@link #DEFINITION}.
      */
     private StrategySelectionComponents components;
+
     /**
      * Stores whether a chosen predef setting has been changed;
      * in this case, the default button should be activated again.
      */
     private boolean predefChanged = true;
+
     /**
      * Observe changes on {@link #mediator}.
      */
@@ -596,9 +604,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     return s.create(proof, properties);
                 }
             }
-            System.err.println("Selected Strategy '" + strategyName
-                    + "' not found falling back to "
-                    + mediator.getProfile().getDefaultStrategyFactory().name());
+            LOGGER.info("Selected Strategy '{}' not found falling back to {}",
+                    strategyName, mediator.getProfile().getDefaultStrategyFactory().name());
         }
         return mediator != null ? mediator.getProfile()
                 .getDefaultStrategyFactory().create(proof, properties) : proof

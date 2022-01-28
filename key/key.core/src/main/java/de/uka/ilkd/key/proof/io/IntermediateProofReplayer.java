@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof.io;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -90,7 +91,7 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -101,6 +102,9 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This class is responsible for generating a KeY proof from an intermediate
@@ -123,6 +127,8 @@ public class IntermediateProofReplayer {
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntermediateProofReplayer.class);
+
 
     /** The problem loader, for reporting errors */
     private final AbstractProblemLoader loader;
@@ -599,7 +605,7 @@ public class IntermediateProofReplayer {
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
-                SMTSettings settings = new SMTSettings(
+                DefaultSMTSettings settings = new DefaultSMTSettings(
                     proof.getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     proof.getSettings().getNewSMTSettings(),
@@ -898,8 +904,7 @@ public class IntermediateProofReplayer {
             if (sv == null) {
                 // throw new IllegalStateException(
                 // varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
-                System.err.println(varname + " from " + app.rule().name()
-                        + " is not in uninsts");
+                LOGGER.error("{} from {} is not in uninsts", varname, app.rule().name());
                 continue;
             }
             final String value = s.substring(eq + 1, s.length());

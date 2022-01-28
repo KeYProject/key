@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -59,6 +60,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
@@ -91,6 +94,7 @@ import static java.lang.String.format;
  * @since Jul-07
  */
 public class Recoder2KeYConverter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Recoder2KeYConverter.class);
 
     // -------- public part
 
@@ -271,7 +275,7 @@ public class Recoder2KeYConverter {
                 try {
                     m = getClass().getMethod("convert", context);
                 } catch (NoSuchMethodException nsme) {
-                    Debug.out("convert method not found for: " + context[0]);
+                    LOGGER.debug("convert method not found for: " + context[0]);
                     context[0] = contextClass = context[0].getSuperclass();
                 }
             }
@@ -292,14 +296,14 @@ public class Recoder2KeYConverter {
         try {
             result = m.invoke(this, pe);
         } catch (IllegalAccessException iae) {
-            Debug.out("recoder2key: cannot access method ", iae);
+            LOGGER.debug("recoder2key: cannot access method ", iae);
             throw new ConvertException("recoder2key: cannot access method", iae);
         } catch (IllegalArgumentException iarg) {
-            Debug.out("recoder2key: wrong method arguments ", iarg);
+            LOGGER.debug("recoder2key: wrong method arguments ", iarg);
             throw new ConvertException("recoder2key: wrong method arguments",
                     iarg);
         } catch (InvocationTargetException ite) {
-            Debug.out("recoder2key: called method " + m + " threw exception ", ite
+            LOGGER.debug("recoder2key: called method " + m + " threw exception ", ite
                     .getTargetException());
             if (ite.getTargetException() instanceof ConvertException) {
                 throw (ConvertException) ite.getTargetException();
@@ -548,7 +552,7 @@ public class Recoder2KeYConverter {
             if (sb.charAt(sb.length()-1)==',') sb.deleteCharAt(sb.length()-1);
             sb.append(')');
             final String constructorName = sb.toString();
-            Debug.out("recoder2key: invocation of constructor "+constructorName +" failed.", e);
+            LOGGER.debug("recoder2key: invocation of constructor "+constructorName +" failed.", e);
             Recoder2KeY.reportError("Invocation of the constructor "+constructorName +" failed", e);
             throw new Error("unreachable"); // this line is not reachable
             // because reportError fails under
@@ -570,16 +574,16 @@ public class Recoder2KeYConverter {
         try {
             return Class.forName(className); // Classes are always in this component; ClassLoaderUtil#getClassforName(String) does not need to be used.
         } catch (ClassNotFoundException cnfe) {
-            Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
+            LOGGER.debug("There is an AST class " +className + " missing at KeY.", cnfe);
             throw new ConvertException("Recoder2KeYConverter could not find a conversion from RecodeR "+recoderClass.getClass()+".\n"
                     +"Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
                     +"\nAt least there is no class named "+className+"."
                     ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
-            Debug.out("recoder2key: Failed initializing class.", initErr);
+            LOGGER.debug("recoder2key: Failed initializing class.", initErr);
             throw new ConvertException("Failed initializing class.", initErr);
         } catch (LinkageError le) {
-            Debug.out("recoder2key: Linking class failed.", le);
+            LOGGER.debug("recoder2key: Linking class failed.", le);
             throw new ConvertException("Linking class failes", le);
         }
     }
@@ -626,9 +630,9 @@ public class Recoder2KeYConverter {
                 constructorCache.put(recoderClass, result);
             }
         } catch (NoSuchMethodException nsme) {
-            Debug.out("recoder2key: constructor not found. ", nsme);
+            LOGGER.debug("recoder2key: constructor not found. ", nsme);
         } catch (SecurityException se) {
-            Debug.out("recoder2key: access denied. ", se);
+            LOGGER.debug("recoder2key: access denied. ", se);
         }
         return result;
     }
@@ -646,7 +650,7 @@ public class Recoder2KeYConverter {
         if (r != null) {
             getMapping().put(r, k);
         } else {
-            Debug.out("Tried to store element for null-key - ignored");
+            LOGGER.debug("Tried to store element for null-key - ignored");
         }
     }
 

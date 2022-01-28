@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -76,6 +78,8 @@ import de.uka.ilkd.key.util.SpecDataLocation;
 
 public class KeYCrossReferenceSourceInfo
     extends DefaultCrossReferenceSourceInfo {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
     private HashMap<String, recoder.java.declaration.VariableSpecification>  names2vars = null;
 
@@ -605,7 +609,7 @@ public class KeYCrossReferenceSourceInfo
             changeHistory.updateModel();
 
             stubClasses.put(typeString, cu);
-            Debug.out("Dynamically created class: ", typeString);
+            LOGGER.debug("Dynamically created class: ", typeString);
 
             register(cu);
 

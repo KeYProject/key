@@ -1,68 +1,68 @@
 package de.uka.ilkd.key.testgen.oracle;
 
-import java.util.List;
-
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
+import java.util.List;
+
 public class OracleMethod {
 
-	private String methodName;
+    private final String methodName;
 
-	private List<OracleVariable> args;
+    private final List<OracleVariable> args;
 
-	private String body;
-	
-	private Sort returnType;
+    private final String body;
 
-	public OracleMethod(String methodName, List<OracleVariable> args,
-			String body) {
-		super();
-		this.methodName = methodName;
-		this.args = args;
-		this.body = body;
-	}
-	
-	public OracleMethod(String methodName, List<OracleVariable> args,
-			String body, Sort sort) {
-		super();
-		this.methodName = methodName;
-		this.args = args;
-		this.body = body;
-		this.returnType = sort;
-	}
+    private Sort returnType;
 
-	public String getMethodName() {
-		return methodName;
-	}
+    public OracleMethod(String methodName, List<OracleVariable> args,
+                        String body) {
+        super();
+        this.methodName = methodName;
+        this.args = args;
+        this.body = body;
+    }
 
-	public List<OracleVariable> getArgs() {
-		return args;
-	}
+    public OracleMethod(String methodName, List<OracleVariable> args,
+                        String body, Sort sort) {
+        super();
+        this.methodName = methodName;
+        this.args = args;
+        this.body = body;
+        this.returnType = sort;
+    }
 
-	public String getBody() {
-		return body;
-	}	
+    public String getMethodName() {
+        return methodName;
+    }
 
-	public String toString() {
-		//System.out.println("printing");
-		String tab = TestCaseGenerator.TAB;
-		String argString = "";
+    public List<OracleVariable> getArgs() {
+        return args;
+    }
 
-		for(OracleVariable var : args){
-			argString += var.getSort().name()+" "+var.getName()+",";
-		}	
-		if(!args.isEmpty()){
-			argString = argString.substring(0, argString.length()-1);		
-		}
+    public String getBody() {
+        return body;
+    }
 
-		String retType = "boolean";
-		if(returnType!=null){
-			retType = returnType.name().toString();
-		}
-		return tab + "public "+retType+" "+methodName+ "("+argString+"){\n"
-				+tab+ tab+body+"\n"
-						+ tab+"}";
+    @Override
+    public String toString() {
+        String tab = TestCaseGenerator.TAB;
+        StringBuilder argString = new StringBuilder();
 
-	}
+        for (OracleVariable var : args) {
+            argString.append(var.getSort().name()).append(" ").append(var.getName()).append(",");
+        }
+        if (!args.isEmpty()) {
+            argString = new StringBuilder(argString.substring(0, argString.length() - 1));
+        }
+
+        String retType = "boolean";
+        if (returnType != null) {
+            retType = returnType.name().toString();
+        }
+        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n"
+                + tab + tab + body + "\n"
+                + tab + "}";
+
+    }
 }

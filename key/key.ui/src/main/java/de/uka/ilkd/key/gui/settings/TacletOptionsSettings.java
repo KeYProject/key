@@ -10,6 +10,8 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import javax.annotation.Nonnull;
 import org.key_project.util.java.ObjectUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +26,11 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TacletOptionsSettings.class);
+
     private static final long serialVersionUID = 1455572432081960150L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
@@ -67,11 +73,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                     }
                     explanationMap.loadFromXML(is);
                 } catch (InvalidPropertiesFormatException e) {
-                    System.err.println("Cannot load help message in rule view (malformed XML).");
-                    e.printStackTrace();
+                    LOGGER.error("Cannot load help message in rule view (malformed XML).",e);
                 } catch (IOException e) {
-                    System.err.println("Cannot load help messages in rule view.");
-                    e.printStackTrace();
+                    LOGGER.error("Cannot load help messages in rule view.",e);
                 }
             }
         }
@@ -201,16 +205,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             btn.addActionListener(new ChoiceSettingsSetter(cat, c.choice));
         }
         addExplanation(explanation);
-        /*choiceList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                Object selectedValue = choiceList.getSelectedValue();
-                if (selectedValue instanceof ChoiceEntry) {
-                    setDefaultChoice(((ChoiceEntry) selectedValue).getChoice());
-                } else {
-                    setDefaultChoice(null);
-                }
-            }
-        });*/
     }
 
     protected void addExplanation(String explanation) {
@@ -235,7 +229,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         title.setContentAreaFilled(false);
         title.setBorderPainted(false);
         north.add(title, BorderLayout.WEST);
-        //north.add(new JSeparator(), BorderLayout.CENTER);
         p.add(north, BorderLayout.NORTH);
         p.add(child);
         child.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -440,25 +433,25 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         public String toString() {
             if (unsound && incomplete) {
                 if (information != null) {
-                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", " + information + ")";
+                    return format("%s (%s and %s, %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT, information);
                 } else {
-                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+                    return format("%s (%s and %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT);
                 }
             } else if (unsound) {
                 if (information != null) {
-                    return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+                    return format("%s (%s, %s)", choice, UNSOUND_TEXT, information);
                 } else {
-                    return choice + " (" + UNSOUND_TEXT + ")";
+                    return format("%s (%s)", choice, UNSOUND_TEXT);
                 }
             } else if (incomplete) {
                 if (information != null) {
-                    return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
+                    return format("%s (%s, %s)", choice, INCOMPLETE_TEXT, information);
                 } else {
-                    return choice + " (" + INCOMPLETE_TEXT + ")";
+                    return format("%s (%s)", choice, INCOMPLETE_TEXT);
                 }
             } else {
                 if (information != null) {
-                    return choice + " (" + information + ")";
+                    return format("%s (%s)", choice, information);
                 } else {
                     return choice;
                 }

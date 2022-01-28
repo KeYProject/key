@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.smt.st.SolverType;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;

@@ -34,7 +34,6 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.*;
-import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -48,6 +47,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 
@@ -56,7 +57,7 @@ import java.util.*;
 
 
 public final class ProblemInitializer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
     private static InitConfig baseConfig;
     private final Services services;
@@ -82,6 +83,10 @@ public final class ProblemInitializer {
     //-------------------------------------------------------------------------
 
     public ProblemInitializer(Profile profile) {
+        if (profile == null) {
+            throw new IllegalArgumentException("Given profile is null");
+        }
+
         this.progMon = null;
         this.listener = null;
         this.services = new Services(Objects.requireNonNull(profile));
@@ -239,12 +244,12 @@ public final class ProblemInitializer {
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig)
-                throws ProofInputException {
+            throws ProofInputException {
         //this method must only be called once per init config
         assert !initConfig.getServices()
-                          .getJavaInfo()
-                          .rec2key()
-                          .parsedSpecial();
+                .getJavaInfo()
+                .rec2key()
+                .parsedSpecial();
         assert initConfig.getServices().getJavaModel() == null;
 
         //read Java source and classpath settings
@@ -253,7 +258,7 @@ public final class ProblemInitializer {
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath;
         try {
-         bootClassPath = envInput.readBootClassPath();
+            bootClassPath = envInput.readBootClassPath();
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         }
@@ -277,31 +282,31 @@ public final class ProblemInitializer {
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-                                           initConfig.namespaces());
+                initConfig.namespaces());
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
-        if(javaPath != null) {
+        if (javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings
-                =  initConfig.getServices()
-                             .getJavaInfo()
-                             .getKeYProgModelInfo()
-                             .getServConf()
-                             .getProjectSettings();
+                    = initConfig.getServices()
+                    .getJavaInfo()
+                    .getKeYProgModelInfo()
+                    .getServConf()
+                    .getProjectSettings();
             final PathList searchPathList = settings.getSearchPathList();
-            if(searchPathList.find(javaPath) == null) {
+            if (searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-        Collection<String> var = getClasses(javaPath);
-            if(envInput.isIgnoreOtherJavaFiles()) {
+            Collection<String> var = getClasses(javaPath);
+            if (envInput.isIgnoreOtherJavaFiles()) {
                 String file = envInput.getJavaFile();
                 if (var.contains(file)) {
                     var = Collections.singletonList(file);
                 }
             }
             //support for single file loading
-        final String[] cus = var.toArray(new String[var.size()]);
+            final String[] cus = var.toArray(new String[0]);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
@@ -313,10 +318,10 @@ public final class ProblemInitializer {
         }
         File initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
-                                                                        classPath,
-                                                                        bootClassPath,
-                                                                        includes,
-                                                                        initialFile));
+                classPath,
+                bootClassPath,
+                includes,
+                initialFile));
     }
 
     /**
@@ -347,8 +352,8 @@ public final class ProblemInitializer {
         initConfig.getServices().getNamespaces().setFunctions(newFuncNS);
     }
 
-    public final void readEnvInput(EnvInput envInput,
-                                   InitConfig initConfig)
+    public void readEnvInput(EnvInput envInput,
+                             InitConfig initConfig)
             throws ProofInputException {
         if (alreadyParsed.add(envInput)) {
             // read includes
@@ -407,26 +412,20 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
-        Iterator<SequentFormula> it = proof.root().sequent().iterator();
-        while (it.hasNext()) {
-            SequentFormula cf = it.next();
+        for (SequentFormula cf : proof.root().sequent()) {
             populateNamespaces(cf.formula(), namespaces, rootGoal);
         }
     }
 
     // what is the purpose of this method?
-    private InitConfig determineEnvironment(ProofOblInput po,
-                                            InitConfig initConfig)
-            throws ProofInputException {
+    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) throws ProofInputException {
         //TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);
-
         return initConfig;
     }
 
     private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
             throws ProofInputException {
-        //ProofAggregate pl = problem.getPO();
         if (pl == null) {
             throw new ProofInputException("No proof");
         }
@@ -451,7 +450,8 @@ public final class ProblemInitializer {
                 setProgress(10 + i * proofs.length);
             }
 
-            proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
+            //TODO: refactor Proof.setNamespaces() so this becomes unnecessary
+            proofs[i].setNamespaces(proofs[i].getNamespaces());
             populateNamespaces(proofs[i]);
         }
     }
@@ -488,19 +488,20 @@ public final class ProblemInitializer {
                 baseConfig = currentBaseConfig;
             }
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            if(Debug.ENABLE_DEBUG) print(ic);
+            if (Debug.ENABLE_DEBUG) print(ic);
             return ic;
         }
     }
 
     private void print(Proof firstProof) {
-        File taclets1 = null;
+        File taclets1;
         try {
             taclets1 = File.createTempFile("proof", ".txt");
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
-        System.out.println("Taclets under: " + taclets1);
+        LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
@@ -509,55 +510,34 @@ public final class ProblemInitializer {
     }
 
     private void print(InitConfig ic) {
-        File taclets1 = null;
+        File taclets1;
         try {
             taclets1 = File.createTempFile("taclets", ".txt");
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
-        System.out.println("Taclets under: " + taclets1);
+        LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
-            out.format("Date: %s\n", new Date());
+            out.format("Date: %s%n", new Date());
 
-            out.format("Choices: \n");
-            ic.getActivatedChoices().forEach(i -> out.format("\t%s\n", i));
+            out.format("Choices: %n");
+            ic.getActivatedChoices().forEach(i -> out.format("\t%s%n", i));
 
-            out.format("Activated Taclets: \n");
+            out.format("Activated Taclets: %n");
             final List<Taclet> taclets = new ArrayList<>();
             for (Taclet t : ic.activatedTaclets()) taclets.add(t);
-            taclets.sort(Comparator.comparing((a) -> a.name().toString()));
+            taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
-                out.format("== %s (%s) =========================================\n",
+                out.format("== %s (%s) =========================================%n",
                         taclet.name(), taclet.displayName());
-                out.println(taclet.toString());
-                out.format("-----------------------------------------------------\n");
+                out.println(taclet);
+                out.format("-----------------------------------------------------%n");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    /*
-    private List<KeYFile> explore(KeYFile file) throws ProofInputException {
-        Queue<KeYFile> queue = new LinkedList<>();
-        queue.add(file);
-        Set<KeYFile> reached = new HashSet<>();
-        List<KeYFile> found = new LinkedList<>();
-        while (!queue.isEmpty()) {
-            var f = queue.poll();
-            reached.add(f);
-            var includes = file.readIncludes();
-            for (RuleSource u : includes.getRuleSets()) {
-                KeYFile nf = new KeYFile(u.toString(), u, progMon,file.getProfile());
-                if (!reached.contains(nf)) {
-                    queue.offer(nf);
-                }
-            }
-            found.add(f);
-        }
-        return found;
-    }
-    */
 
     //-------------------------------------------------------------------------
     //public interface
@@ -616,11 +596,10 @@ public final class ProblemInitializer {
 
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
-        assert initConfig != null;
         progressStarted(this);
         try {
             //determine environment
-            initConfig = determineEnvironment(po, initConfig);
+            initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
 
             //read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
@@ -629,7 +608,7 @@ public final class ProblemInitializer {
             //final work
             setUpProofHelper(po, pa);
 
-            if(Debug.ENABLE_DEBUG) print(pa.getFirstProof());
+            if (Debug.ENABLE_DEBUG) print(pa.getFirstProof());
 
             //done
             proofCreated(pa);
@@ -680,19 +659,19 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
-    public static interface ProblemInitializerListener {
-        public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
+    public interface ProblemInitializerListener {
+        void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
-        public void progressStarted(Object sender);
+        void progressStarted(Object sender);
 
-        public void progressStopped(Object sender);
+        void progressStopped(Object sender);
 
-        public void reportStatus(Object sender, String status, int progress);
+        void reportStatus(Object sender, String status, int progress);
 
-        public void reportStatus(Object sender, String status);
+        void reportStatus(Object sender, String status);
 
-        public void resetStatus(Object sender);
+        void resetStatus(Object sender);
 
-        public void reportException(Object sender, ProofOblInput input, Exception e);
+        void reportException(Object sender, ProofOblInput input, Exception e);
     }
 }

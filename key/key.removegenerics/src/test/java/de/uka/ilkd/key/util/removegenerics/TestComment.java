@@ -29,7 +29,6 @@ import recoder.kit.TypeKit;
  */
 
 public class TestComment {
-    
     protected static CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
     public static CompilationUnit registerCU(String compilationUnit) throws ParserException {
@@ -42,17 +41,13 @@ public class TestComment {
     public static void testComments() throws ParserException {
         CompilationUnit cu = registerCU("class A {\n\n\n" +
                         "// some comment\r\nA a; } class B {}");
-        System.out.println(cu.toSource());
         FieldDeclaration fd = (FieldDeclaration) cu.getDeclarations().get(0).getMembers().get(0);
         TypeReference oldType = fd.getTypeReference();
         TypeReference newType = TypeKit.createTypeReference(sc.getProgramFactory(), "B");
         fd.replaceChild(oldType, newType);
-        System.out.println(cu.toSource());
-        
     }
     
     public static void main(String[] args) throws ParserException {
         testComments();
     }
-    
 }

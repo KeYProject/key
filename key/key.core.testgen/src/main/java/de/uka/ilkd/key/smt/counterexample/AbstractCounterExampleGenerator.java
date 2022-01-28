@@ -9,21 +9,23 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementations of this class are used find a counter example for a given
- * {@link Sequent} using the SMT solver {@link SolverType#Z3_CE_SOLVER}.
+ * {@link Sequent} using the SMT solver {@link SolverTypes#Z3_CE_SOLVER}.
  * <p>
  * <b>This class provides the full logic independent from the a user interface.</b>
  * Subclasses are used to realize the user interface specific functionality.
@@ -33,15 +35,17 @@ import de.uka.ilkd.key.util.Debug;
  * Next the macro {@link SemanticsBlastingMacro} is performed on the new {@link Proof}
  * and when done the SMT solver is started. The progress of the SMT solver and
  * the final result can be observed by a {@link SolverLauncherListener} instantiated.
- * by {@link #createSolverListener(SMTSettings)}.
+ * by {@link #createSolverListener(DefaultSMTSettings)}.
  */
 public abstract class AbstractCounterExampleGenerator {
+   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCounterExampleGenerator.class);
+
    /**
     * Checks if the required SMT solver is available.
     * @return {@code true} solver is available, {@code false} solver is not available.
     */
    public static boolean isSolverAvailable() {
-      return SolverType.Z3_CE_SOLVER.isInstalled(true);
+      return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
    }
    
    /**
@@ -55,7 +59,7 @@ public abstract class AbstractCounterExampleGenerator {
                                     Proof oldProof, 
                                     Sequent oldSequent) throws ProofInputException {
       if (!isSolverAvailable()) {
-         throw new IllegalStateException("Can't find SMT solver " + SolverType.Z3_CE_SOLVER.getName());
+         throw new IllegalStateException("Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
       }
       
       final Proof proof = createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
@@ -69,21 +73,21 @@ public abstract class AbstractCounterExampleGenerator {
               info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
-          Debug.out("Semantics blasting interrupted");
+          LOGGER.debug("Semantics blasting interrupted");
       } finally {
           semanticsBlastingCompleted(ui);
           ptl.taskFinished(info);
       }
 
       //invoke z3 for counterexamples
-      SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+      DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
               ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
               proof.getSettings().getNewSMTSettings(), proof);
       SolverLauncher launcher = new SolverLauncher(settings);
       launcher.addListener(createSolverListener(settings, proof));
 
       List<SolverType> solvers = new LinkedList<SolverType>();
-      solvers.add(SolverType.Z3_CE_SOLVER);
+      solvers.add(SolverTypes.Z3_CE_SOLVER);
 
       launcher.launch(solvers,
               SMTProblem.createSMTProblems(proof),
@@ -127,9 +131,9 @@ public abstract class AbstractCounterExampleGenerator {
    /**
     * Creates the {@link SolverLauncherListener} which handles the results
     * of the launched SMT solver.
-    * @param settings The {@link SMTSettings}.
+    * @param settings The {@link DefaultSMTSettings}.
     * @param proof The {@link Proof} on which the SMT solver will be performed.
     * @return The {@link SolverLauncherListener} to use.
     */
-   protected abstract SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof);
+   protected abstract SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof);
 }

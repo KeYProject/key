@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,13 +10,14 @@ import java.util.Properties;
 
 /**
  * An instance of this class loads several XML files, whose contents are
- * displayed in {@link InfoView}.
+ * displayed in {@link de.uka.ilkd.key.gui.InfoView}.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class XMLResources {
 
     private static final String RULE_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLResources.class);
     protected final Properties ruleExplanations;
 
     private static final String LABEL_RESOURCE = "/de/uka/ilkd/key/gui/help/termLabelExplanations.xml";
@@ -43,15 +47,13 @@ public class XMLResources {
     private static Properties getResource(String xmlFile) {
         Properties ret = new Properties();
 
-        InputStream is = XMLResources.class.getResourceAsStream(xmlFile);
-        try {
+        try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile);) {
             if (is == null) {
                 throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
             }
             ret.loadFromXML(is);
         } catch (IOException e) {
-            System.err.println("Cannot not load help messages in info view");
-            e.printStackTrace();
+            LOGGER.error("Cannot not load help messages in info view", e);
         }
 
         return ret;

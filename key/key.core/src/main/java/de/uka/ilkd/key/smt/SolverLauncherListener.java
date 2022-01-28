@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.smt.st.SolverType;
+
 import java.util.Collection;
 
 /**
@@ -24,5 +26,5 @@ public interface SolverLauncherListener {
 	    Collection<SMTSolver> finishedSolvers);
 
     public void launcherStarted(Collection<SMTProblem> problems,
-	    Collection<SolverType> solverTypes, SolverLauncher launcher);
+                                Collection<SolverType> solverTypes, SolverLauncher launcher);
 }

@@ -6,7 +6,10 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Proof-dependent settings for {@link TermLabel}s.
@@ -14,6 +17,7 @@ import de.uka.ilkd.key.util.Debug;
  * @author lanzinger
  */
 public class TermLabelSettings implements Settings, Cloneable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
     /**
      * Property key for {@link #getUseOriginLabels()}
@@ -39,7 +43,7 @@ public class TermLabelSettings implements Settings, Cloneable {
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
-            Debug.out(
+            LOGGER.debug(
                     "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\".\n" +
                     "Using the default value: true." +
                     "\nThe string read was: ", str);

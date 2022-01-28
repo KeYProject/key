@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.sourceview;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -22,11 +23,12 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -64,6 +66,7 @@ import java.util.*;
  * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
     private static final long serialVersionUID = -94424677425561025L;
 
@@ -451,7 +454,7 @@ public final class SourceView extends JComponent {
         try {
             text = doc.getText(0, doc.getLength());
         } catch (BadLocationException e) {
-            Debug.out(e);
+            LOGGER.debug("Caught exception!", e);
         }
 
         // find line end
@@ -603,7 +606,7 @@ public final class SourceView extends JComponent {
             try {
                 addFiles();
             } catch (IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -889,7 +892,7 @@ public final class SourceView extends JComponent {
                 }
             } catch (IOException e) {
                 source = "[SOURCE COULD NOT BE LOADED]";
-                Debug.out("Unknown IOException!", e);
+                LOGGER.debug("Unknown IOException!", e);
             }
 
             initLineInfo();
@@ -926,7 +929,7 @@ public final class SourceView extends JComponent {
                 InputStream inStream = new ByteArrayInputStream(source.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
-                Debug.out("Error while computing line information from " + absoluteFileName, e);
+                LOGGER.debug("Error while computing line information from " + absoluteFileName, e);
             }
         }
 
@@ -1031,7 +1034,7 @@ public final class SourceView extends JComponent {
                         CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
                         Integer.MAX_VALUE - 1);
             } catch (BadLocationException | IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1118,7 +1121,7 @@ public final class SourceView extends JComponent {
                     }
                 }
             } catch (BadLocationException | IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1132,7 +1135,7 @@ public final class SourceView extends JComponent {
                 int line = posToLine(textPane.viewToModel(p));
                 changeHighlight(highlight, line);
             } catch (BadLocationException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1228,10 +1231,7 @@ public final class SourceView extends JComponent {
             if (level != other.level) {
                 return false;
             }
-            if (line != other.line) {
-                return false;
-            }
-            return true;
+            return line == other.line;
         }
 
         @Override
