@@ -65,6 +65,7 @@ public class TermImpl implements Term {
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
+    private final boolean hasModality;
 
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
@@ -106,6 +107,7 @@ public class TermImpl implements Term {
         assert subs != null;
         this.op = op;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
+        this.hasModality = op instanceof Modality || subs.stream().anyMatch(Term::hasModality);
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null
                 ? JavaBlock.EMPTY_JAVABLOCK
@@ -159,6 +161,11 @@ public class TermImpl implements Term {
     @Override
     public Operator op() {
         return op;
+    }
+
+    @Override
+    public boolean hasModality() {
+        return hasModality;
     }
 
 

@@ -83,37 +83,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     /*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if(term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if(hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
      * Checks if a rule is marked as not suited for interaction.
      */
     private static boolean isNonHumanInteractionTagged(Rule rule) {
@@ -169,7 +138,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if(hasModality(goal.node())) {
+            if(goal.node().sequent().hasModality()) {
                 return delegate.computeCost(app, pio, goal);
             }
 
