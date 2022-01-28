@@ -62,6 +62,11 @@ public interface Term extends SVSubstitute, Sorted {
     public Operator op();
 
     /**
+     * Returns true if this term or any recursive sub has a modality op.
+     */
+    public boolean hasModality();
+
+    /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f")
      * casted to the passed type.
      */

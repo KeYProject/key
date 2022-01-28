@@ -32,10 +32,13 @@ public class Semisequent implements Iterable<SequentFormula> {
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
     /** list with the {@link SequentFormula}s of the Semisequent */
     private final ImmutableList<SequentFormula> seqList;
+    /** true if any formula in seqList contains modality */
+    private final boolean hasModality;
 
     /** used by inner class Empty*/
     private Semisequent() {
         seqList = ImmutableSLList.<SequentFormula>nil();
+        hasModality = false;
     }
 
 
@@ -48,6 +51,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
+        this.hasModality = seqList.stream().anyMatch(s -> s.formula().hasModality());
     }
 
 
@@ -56,6 +60,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     public Semisequent(SequentFormula seqFormula) {
         assert seqFormula != null;
         this.seqList = ImmutableSLList.<SequentFormula>nil().append(seqFormula);
+        this.hasModality = seqFormula.formula().hasModality();
     }
 
 
@@ -465,6 +470,13 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.toString();
     }
 
+    /**
+     * Checks for a modality in any semisequent formula
+     * @return true if any formula contains a modality
+     */
+    public boolean hasModality() {
+        return hasModality;
+    }
 
 
     // inner class used to represent an empty semisequent

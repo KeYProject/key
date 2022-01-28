@@ -540,4 +540,12 @@ public class Sequent implements Iterable<SequentFormula> {
     public ImmutableList<SequentFormula> asList() {
         return antecedent.asList().append(succedent.asList());
     }
+
+    /**
+     * Checks for a modality somewhere in the sequent
+     * @return true if the succedent or antecedent formulas contain a modality
+     */
+    public boolean hasModality() {
+        return succedent.hasModality() || antecedent.hasModality();
+    }
 }
