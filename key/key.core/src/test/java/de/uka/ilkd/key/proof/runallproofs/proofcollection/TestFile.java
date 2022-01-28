@@ -5,6 +5,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
@@ -263,7 +264,8 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-   private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile) throws ProblemLoaderException, ProofInputException {
+   private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
+           throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
     }

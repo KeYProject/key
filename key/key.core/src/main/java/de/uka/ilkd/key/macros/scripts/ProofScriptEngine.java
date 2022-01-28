@@ -37,7 +37,7 @@ import java.util.*;
 public class ProofScriptEngine {
     private static final String SYSTEM_COMMAND_PREFIX = "@";
     private static final int MAX_CHARS_PER_COMMAND = 80;
-    private static final Map<String, ProofScriptCommand<?>> COMMANDS = loadCommands();
+    private static final Map<String, ProofScriptCommand<? extends Object>> COMMANDS = loadCommands();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
 
 
@@ -132,7 +132,7 @@ public class ProofScriptEngine {
             }
 
             try {
-                ProofScriptCommand<Object> command = COMMANDS.get(name);
+                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name + " at "
                             + BuilderHelpers.getPosition(commandContext));
