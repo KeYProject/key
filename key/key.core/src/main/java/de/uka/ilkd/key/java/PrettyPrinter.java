@@ -3259,8 +3259,7 @@ public class PrettyPrinter {
         markStart(0, jmlAssert);
 
         markKeywordStart();
-        //TODO: is that ok or should something else be used?
-        write("//@");
+        write("@");
         write(kind);
         markKeywordEnd();
         write(" ");

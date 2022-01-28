@@ -29,7 +29,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * the condition in parse tree form
      */
-    private final LabeledParserRuleContext condition;
+    private LabeledParserRuleContext condition;
     /**
      * the condition in Term form
      */
@@ -60,6 +60,9 @@ public class JmlAssert extends JavaStatement {
         this.kind = getOr(changeList, TextualJMLAssertStatement.Kind.class, proto.kind);
         this.condition = getOr(changeList, LabeledParserRuleContext.class, proto.condition);
         this.cond = getOr(changeList, Term.class, proto.cond);
+        if ((cond == null) == (condition == null)) {
+            throw new IllegalArgumentException("exactly one of cond and condition has to be null");
+        }
     }
 
     //TODO: move into ExtList?
@@ -76,6 +79,9 @@ public class JmlAssert extends JavaStatement {
      * @return the condition in String form
      */
     public String getConditionText() {
+        if (cond != null) {
+            return cond.toString();
+        }
         //TODO: this will lose whitespace, so e.g. \forall will not be printed correctly
         return condition.first.getText().substring(kind.name().length());
     }
@@ -105,6 +111,7 @@ public class JmlAssert extends JavaStatement {
             throw new IllegalStateException("condition can only be set once");
         }
         this.cond = jmlIo.translateTerm(condition);
+        condition = null;
     }
 
     @Override
