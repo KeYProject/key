@@ -154,6 +154,12 @@ subprojects {
 
 
     test {
+        // Before we switched to JUnit 5, we used JUnit 4 with a customized discovery of test class.
+        // This discovery called AutoSuite and searched in the compiled classes. AutoSuite was
+        // necessary due to bugs caused in some execution order.
+        // AutoSuites made the test order deterministic. A last known commit to find AutoSuite (for the case),
+        // is 980294d04008f6b3798986bce218bac2753b4783.
+
         useJUnitPlatform {
             excludeTags "owntest", "interactive", "performance"
         }
