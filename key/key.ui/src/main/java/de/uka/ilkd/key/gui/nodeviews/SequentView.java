@@ -530,9 +530,10 @@ public abstract class SequentView extends JEditorPane {
             // this really should not happen
             if (result.end() < 0) {
                 // Let's write some debug info since we can't reproduce
-                Debug.out("SequentView::getHighlightRange rangeForIndex returned invalid range:");
-                Debug.out("result was " + result + ", character index " + characterIndex + ", point " + p);
-                Debug.out(seqText);
+                LOGGER.debug("SequentView::getHighlightRange rangeForIndex returned invalid range. " +
+                                "Result was {}, character index {}, point {}.",
+                        result, characterIndex, p);
+                LOGGER.debug("Sequence text: {}", seqText);
                 return null;
             }
             result = new Range(result.start() + 1, result.end() + 1);
