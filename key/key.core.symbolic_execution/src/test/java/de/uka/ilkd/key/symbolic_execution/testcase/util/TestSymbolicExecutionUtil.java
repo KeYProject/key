@@ -31,7 +31,8 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -130,7 +131,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             //weigl: disable, no clue why the choice settings should be initialised
             // assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
             // Store default choice settings
-            HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            Map<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             //weigl: disable, no clue why the choice settings should be initialised
             //assertFalse(defaultSettings.isEmpty());
             // Test initial value
@@ -141,7 +142,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
             assertEquals(newValue, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
             // Make sure that all other settings are unchanged.
-            HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            Map<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
             assertEquals(defaultSettings, changedSettings);
         } finally {

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
 import java.util.LinkedList;
@@ -63,26 +64,15 @@ public class ProofSettings {
     /**
      * the default listener to settings
      */
-    private final SettingsListener listener = e -> saveSettings();
+    private final PropertyChangeListener listener = e -> saveSettings();
 
-    // NOTE: This was commented out in commit
-    // 4932e4d1210356455c04a1e9fb7f2fa1f21b3e9d, 2012/11/08, in the process of
-    // separating proof independent from proof dependent settings.
-    // Is not in ProofIndependentSettings. I don't know why these code
-    // corpses have been left here as comments, therefore I don't removed them.
-    // (DS, 2017-05-11)
-
-    // private final static int strategySettings = 0;
-    // private final static int GENERAL_SETTINGS = 1;
-    // private final static int choiceSettings = 2;
-    // private final static int smtSettings = 3;
-    // private final static int VIEW_SETTINGS = 4;
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings = ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
-    private Properties lastLoadedProperties = null;
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
+
+    private Properties lastLoadedProperties = null;
 
     /**
      * create a proof settings object. When you add a new settings object,
@@ -115,7 +105,7 @@ public class ProofSettings {
 
     public void addSettings(Settings settings) {
         this.settings.add(settings);
-        settings.addSettingsListener(listener);
+        settings.addPropertyChangeListener(listener);
         if (lastLoadedProperties != null) {
             settings.readSettings(lastLoadedProperties);
         }

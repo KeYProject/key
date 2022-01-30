@@ -694,7 +694,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // abort if JML is disabled
         // if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                .useJML()) {
+                .isUseJML()) {
             return;
         }
 

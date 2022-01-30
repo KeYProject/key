@@ -13,16 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runners.MethodSorters;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -30,16 +20,21 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runners.MethodSorters;
 import org.key_project.util.testcategories.Slow;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -998,7 +993,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     */
    @Test public void testSymbolicExecutionCompletionsTest() throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          String javaPathInBaseDir = "/set/symbolicExecutionCompletionsTest/test/SymbolicExecutionCompletionsTest.java";

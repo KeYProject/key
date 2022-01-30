@@ -221,7 +221,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         lemmaCheckbox.setSelected(false);
                         ProofIndependentSettings.DEFAULT_INSTANCE
                             .getLemmaGeneratorSettings()
-                            .showDialogUsingAxioms(showDialogUsingAxioms && infoDialog
+                            .setShowDialogUsingAxioms(showDialogUsingAxioms && infoDialog
                                 .showThisDialogNextTime());
                     }
                 } else {
@@ -332,7 +332,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE
                         .getLemmaGeneratorSettings()
-                        .showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                        .setShowDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                     if (firstTimeAddingAxioms) {
                         return;
                     }

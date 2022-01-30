@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -42,7 +43,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
     * stop conditions works correctly in combination with the goal chooser.
     */
    public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       // Define test settings

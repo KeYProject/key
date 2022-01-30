@@ -6,11 +6,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 
 public class HeatmapToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
@@ -34,8 +34,8 @@ public class HeatmapToggleAction extends MainWindowAction {
 
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         setSelected(vs.isShowHeatmap());
-        final SettingsListener setListener = e -> setSelected(vs.isShowHeatmap());
-        vs.addSettingsListener(setListener);
+        final PropertyChangeListener setListener = e -> setSelected(vs.isShowHeatmap());
+        vs.addPropertyChangeListener(setListener);
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override

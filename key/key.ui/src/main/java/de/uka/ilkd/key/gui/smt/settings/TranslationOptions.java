@@ -94,12 +94,12 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             setEnabled(false);
         } else {
             setEnabled(true);
-            useExplicitTypeHierachy.setSelected(settings.useExplicitTypeHierarchy);
-            useNullInstantiation.setSelected(settings.useNullInstantiation);
-            useBuiltInUniqueness.setSelected(settings.useBuiltInUniqueness);
-            useConstantsForIntegers.setSelected(settings.useConstantsForIntegers);
-            minField.setValue(settings.minInteger);
-            maxField.setValue(settings.maxInteger);
+            useExplicitTypeHierachy.setSelected(settings.isUseExplicitTypeHierarchy());
+            useNullInstantiation.setSelected(settings.isUseNullInstantiation());
+            useBuiltInUniqueness.setSelected(settings.isUseBuiltInUniqueness());
+            useConstantsForIntegers.setSelected(settings.isUseConstantsForIntegers());
+            minField.setValue(settings.getMinInteger());
+            maxField.setValue(settings.getMaxInteger());
         }
     }
 
@@ -108,33 +108,33 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
         return addCheckBox("Use an explicit type hierarchy.",
                 infoUseExplicitTypeHierarchy,
                 false,
-                e -> settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected());
+                e -> settings.setUseExplicitTypeHierarchy(useExplicitTypeHierachy.isSelected()));
     }
 
     protected JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
                 infoUseNullInstantiation, false,
-                e -> settings.useNullInstantiation = useNullInstantiation.isSelected());
+                e -> settings.setUseNullInstantiation(useNullInstantiation.isSelected()));
     }
 
     protected JCheckBox createBuiltInUniqueness() {
         return addCheckBox("Use built-in mechanism for uniqueness if possible.",
                 infoUseBuiltInUniqueness, false,
-                e -> settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected());
+                e -> settings.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected()));
     }
 
     protected JCheckBox createUIMultiplication() {
         return addCheckBox("Use uninterpreted multiplication if necessary.",
                 infoUseUIMultiplication,
                 false,
-                e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
+                e -> settings.setUseUIMultiplication(useUIMultiplication.isSelected()));
     }
 
     protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
             long result = Integer.MAX_VALUE;
             if (settings != null) {
-                result = settings.maxInteger;
+                result = settings.getMaxInteger();
             }
             try {
                 result = (long) maxField.getValue();
@@ -142,7 +142,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             } catch (Throwable ex) {
                 maxField.setForeground(Color.RED);
             }
-            settings.maxInteger = result;
+            settings.setMaxInteger(result);
         });
         max.setValue(Integer.MAX_VALUE);
         return max;
@@ -150,14 +150,14 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMinField() {
         return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, null,
-                val -> settings.minInteger = val);
+                val -> settings.setMinInteger(val));
     }
 
     protected JCheckBox createConstantsForIntegers() {
         return addCheckBox("Active", infoUseConstantsForIntegers,
                 false,
                 e -> {
-                    settings.useConstantsForIntegers = useConstantsForIntegers.isSelected();
+                    settings.setUseConstantsForIntegers(useConstantsForIntegers.isSelected());
                     maxField.setEnabled(useConstantsForIntegers.isSelected());
                     minField.setEnabled(useConstantsForIntegers.isSelected());
                 });
@@ -178,6 +178,5 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     public void applySettings(MainWindow window) {
         ProofDependentSMTSettings current = SettingsManager.getSmtPdSettings(window);
         current.copy(settings);//transfer settings
-        current.fireSettingsChanged();
     }
 }

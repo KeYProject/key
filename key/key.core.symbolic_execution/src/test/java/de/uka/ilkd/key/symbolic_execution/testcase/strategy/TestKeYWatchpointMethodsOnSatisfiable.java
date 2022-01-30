@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,7 +37,7 @@ import org.junit.Test;
 public class TestKeYWatchpointMethodsOnSatisfiable extends AbstractSymbolicExecutionTestCase {
    @Test public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env=null;
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
          // Define test settings

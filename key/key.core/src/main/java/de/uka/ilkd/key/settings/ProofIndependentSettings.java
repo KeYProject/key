@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,7 +53,7 @@ public class ProofIndependentSettings {
 
     private final List<Settings> settings = new LinkedList<>();
 
-    private SettingsListener settingsListener = e -> saveSettings();
+    private final PropertyChangeListener settingsListener = e -> saveSettings();
     private Properties lastReadedProperties;
 
     private ProofIndependentSettings(String filename) {
@@ -67,7 +68,7 @@ public class ProofIndependentSettings {
     public void addSettings(Settings settings) {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
-            settings.addSettingsListener(settingsListener);
+            settings.addPropertyChangeListener(settingsListener);
             if (lastReadedProperties != null) {
                 settings.readSettings(lastReadedProperties);
             }

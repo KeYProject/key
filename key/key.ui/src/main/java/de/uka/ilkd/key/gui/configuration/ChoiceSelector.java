@@ -20,10 +20,7 @@ import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -54,8 +51,8 @@ public class ChoiceSelector extends JDialog {
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
-    private final HashMap<String, String> category2DefaultChoice;
-    private HashMap<String, Set<String>> category2Choices;
+    private final Map<String, String> category2DefaultChoice;
+    private Map<String, Set<String>> category2Choices;
     private boolean changed=false;
 
 

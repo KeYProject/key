@@ -53,7 +53,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -70,6 +69,8 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -456,7 +457,7 @@ public final class MainWindow extends JFrame {
         // minimize interaction
         final boolean stupidMode =
                 ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getGeneralSettings().tacletFilter();
+                        .getGeneralSettings().getTacletFilter();
         userInterface.getProofControl().setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -992,7 +993,7 @@ public final class MainWindow extends JFrame {
                 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton
-                = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
+                = new JRadioButtonMenuItem("Source File Comments Are JML", gs.isUseJML());
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
@@ -1005,7 +1006,7 @@ public final class MainWindow extends JFrame {
         });
 
         JRadioButtonMenuItem noneButton
-                = new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
+                = new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.isUseJML());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
@@ -1563,8 +1564,7 @@ public final class MainWindow extends JFrame {
 
     }
 
-    class MainProofListener implements AutoModeListener, KeYSelectionListener,
-            SettingsListener {
+    class MainProofListener implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
         Proof proof = null;
 
@@ -1587,11 +1587,11 @@ public final class MainWindow extends JFrame {
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
-                proof.getSettings().getStrategySettings().removeSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
             proof = e.getSource().getSelectedProof();
             if (proof != null) {
-                proof.getSettings().getStrategySettings().addSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
 
             disableCurrentGoalView = false;
@@ -1624,12 +1624,9 @@ public final class MainWindow extends JFrame {
             getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
-        /**
-         * invoked when the strategy of a proof has been changed
-         */
         @Override
-        public synchronized void settingsChanged(EventObject e) {
-            if (proof.getSettings().getStrategySettings() == e.getSource()) {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (proof.getSettings().getStrategySettings() == evt.getSource()) {
                 // updateAutoModeConfigButton();
             }
         }

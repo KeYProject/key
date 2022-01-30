@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -133,10 +132,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public void set(String v) {
-            if (!Objects.equals(value(), v)) {
+            final var old = value();
+            if (!Objects.equals(old, v)) {
                 currentValue = fromHex(v);
                 properties.setProperty(getKey(), v);
-                fireSettingsChange();
+                firePropertyChange(getKey(), old, currentValue);
             }
         }
 
@@ -148,9 +148,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
         @Override
         public void set(Color value) {
             if (currentValue != value) {
+                var old = currentValue;
                 currentValue = value;
                 properties.setProperty(getKey(), toHex(value));
-                fireSettingsChange();
+                firePropertyChange(getKey(), old, value);
             }
         }
 

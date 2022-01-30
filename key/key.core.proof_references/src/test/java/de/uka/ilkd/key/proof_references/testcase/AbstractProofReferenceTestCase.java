@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.proof_references.testcase;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -78,7 +78,8 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
                                           boolean useContracts,
                                           IProofReferencesAnalyst analyst,
                                           ExpectedProofReferences... expectedReferences) throws Exception {
-      doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts, analyst, null, expectedReferences);
+      doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts, analyst,
+              null, expectedReferences);
    }
 
    /**
@@ -261,12 +262,12 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       /**
        * The expected kind.
        */
-      private String kind;
+      private final String kind;
 
       /**
        * The expected target.
        */
-      private String target;
+      private final String target;
 
       /**
        * Constructor.
@@ -314,7 +315,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       assertNotNull(tester);
       KeYEnvironment<?> environment = null;
       Proof proof = null;
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
@@ -388,7 +389,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       assertNotNull(tester);
       KeYEnvironment<?> environment = null;
       Proof proof = null;
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
@@ -464,13 +465,13 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * Executes some proof steps with on given {@link Proof}.
     * @author Martin Hentschel
     */
-   protected static interface IProofTester {
+   protected interface IProofTester {
       /**
        * Execute the test.
        * @param environment The {@link KeYEnvironment} to test.
        * @param proof The {@link Proof} to test.
        * @throws Exception Occurred Exception.
        */
-      public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
+      void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
    }
 }

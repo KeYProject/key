@@ -13,13 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -30,12 +23,16 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import static org.junit.Assert.*;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.Map;
 
 public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSymbolicExecutionTestCase {
    @Test public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {

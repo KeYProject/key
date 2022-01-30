@@ -13,19 +13,18 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.util.EventObject;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
-    
+
     public static final String TOOL_TIP = "If ticked, class names are written without package prefixes.";
 
     private static final long serialVersionUID = 3184733794964047845L;
@@ -35,25 +34,21 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
      * <p>
      * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-       @Override
-       public void settingsChanged(EventObject e) {
-          handleViewSettingsChanged(e);
-       }
-    };
-    
+    private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
+
     public HidePackagePrefixToggleAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName(NAME);
-	setTooltip(TOOL_TIP);
-   ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener); // Attention: The listener is never removed, because there is only one MainWindow!
-	updateSelectedState();
+        super(mainWindow);
+        setName(NAME);
+        setTooltip(TOOL_TIP);
+        // Attention: The listener is never removed, because there is only one MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
+        updateSelectedState();
     }
-    
-    protected void updateSelectedState() {
-       final boolean hidePackage = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
-       NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
-       setSelected(hidePackage);
+
+    private void updateSelectedState() {
+        final boolean hidePackage = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
+        NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
+        setSelected(hidePackage);
     }
 
     @Override
@@ -63,14 +58,14 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
         updateMainWindow();
     }
-    
-    protected void updateMainWindow() {
-       mainWindow.makePrettyView();
+
+    private void updateMainWindow() {
+        mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
-       updateSelectedState();
-       updateMainWindow();
+    private void handleViewSettingsChanged(EventObject e) {
+        updateSelectedState();
+        updateMainWindow();
     }
 
 }

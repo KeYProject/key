@@ -64,8 +64,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings),
      * which is used if no other choice is specified in the problemfile
      */
-    private HashMap<String,String> category2DefaultChoice =
-        new LinkedHashMap<String,String>();
+    private Map<String,String> category2DefaultChoice;
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when
@@ -81,8 +80,7 @@ public class InitConfig {
      * ({@link Choice}s) allow to use different ruleset modelling or skipping
      * certain features (e.g. nullpointer checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices
-    	= DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -160,8 +158,7 @@ public class InitConfig {
         if(changed) {
             //FIXME weigl: I do not understand why the default choices are back progragated!
             // For me this is a design flaw.
-            @SuppressWarnings("unchecked")
-            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
+            Map<String, String> clone = new HashMap<>(category2DefaultChoice);
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -195,8 +192,7 @@ public class InitConfig {
         category2DefaultChoice =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
+        HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
         }
@@ -208,7 +204,8 @@ public class InitConfig {
                 category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
         }
-        this.activatedChoices = activatedChoices.union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
+        this.activatedChoices = activatedChoices.union(
+                DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
@@ -441,7 +438,7 @@ public class InitConfig {
            ic.setSettings(new ProofSettings(settings));
         }
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = new HashMap<>(category2DefaultChoice);
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;

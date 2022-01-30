@@ -16,7 +16,6 @@ package de.uka.ilkd.key.speclang;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -88,7 +87,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     public static String getLanguage() {
         GeneralSettings gs =
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        if(gs.useJML()) {
+        if(gs.isUseJML()) {
             return "JML";
         } else {
             return "no";
@@ -382,7 +381,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-        if (gs.useJML()) {
+        if (gs.isUseJML()) {
             return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         } else {
             return null;

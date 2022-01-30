@@ -83,11 +83,16 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // default mappings
         defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyStroke.getKeyStroke("F1"));
         defineDefault(OpenExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
-        defineDefault(EditMostRecentFileAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
-        defineDefault(PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyStrokeManager.MULTI_KEY_MASK));
-        defineDefault(UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyStrokeManager.MULTI_KEY_MASK));
-        defineDefault(IncreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.MULTI_KEY_MASK));
-        defineDefault(DecreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(EditMostRecentFileAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(PrettyPrintToggleAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(UnicodeToggleAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(IncreaseFontSizeAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(DecreaseFontSizeAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.MULTI_KEY_MASK));
 
         defineDefault(PruneProofAction.class,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -131,10 +136,10 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     void setKeyStroke(String key, KeyStroke stroke, boolean override) {
-        boolean exists = properties.contains(key);
-        if (override || !exists) {
+        var old = getKeyStroke(key, null);
+        if (override || (old == null)) {
             properties.setProperty(key, stroke != null ? stroke.toString() : "");
-            fireSettingsChange();
+            firePropertyChange(key, old, stroke);
         }
     }
 
@@ -142,13 +147,13 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.getProperty(key));
             if (ks != null) return ks;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return defaultValue;
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's KeyStrokes");

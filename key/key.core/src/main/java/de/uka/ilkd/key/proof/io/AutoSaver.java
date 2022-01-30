@@ -13,28 +13,23 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.EventObject;
-
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
+
+import java.beans.PropertyChangeListener;
+import java.io.File;
 
 /**
  * Saves intermediate proof artifacts during strategy execution.
  * An {@link AutoSaver} instance saves periodically and the final proof state if it is closed.
- * The default save interval can be set using the static {@link #init(int, boolean)} method.
+ * The default save interval can be set using the static {@code init(int, boolean)} method.
  * Before the saver is registered as a listener, <b>a proof must be set</b> with <code>setProof()</code>.
  * AutoSaver writes .key files to a temporary location (i.e., "/tmp" on most Linux machines).
  * These are possibly overwritten on each strategy run.
@@ -42,31 +37,27 @@ import recoder.service.KeYCrossReferenceSourceInfo;
  * @author bruns
  */
 public class AutoSaver implements ProverTaskListener {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ProverTaskListener.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
-    private final static File TMP_DIR = IOUtil.getTempDirectory();
-    private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
-    
+    private static final File TMP_DIR = IOUtil.getTempDirectory();
+    private static final String PREFIX = TMP_DIR+File.separator+".autosave.";
+
     private Proof proof;
     private final int interval;
     private final boolean saveClosed;
 
     private static int defaultSaveInterval = 0;
     private static boolean defaultSaveClosedProof = false;
-    
-    private static AutoSaver DEFAULT_INSTANCE = null;
-    
-    public final static SettingsListener settingsListener =
-                    new SettingsListener(){
 
-                        @Override
-                        public void settingsChanged(EventObject e) {
-                            assert e.getSource() instanceof GeneralSettings;
-                            GeneralSettings settings = (GeneralSettings) e.getSource();
-                            setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod()>0);
-                        }
-    };
-    
+    private static AutoSaver DEFAULT_INSTANCE = null;
+
+    public static final PropertyChangeListener settingsListener =
+            e -> {
+                assert e.getSource() instanceof GeneralSettings;
+                GeneralSettings settings = (GeneralSettings) e.getSource();
+                setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod()>0);
+            };
+
     /**
      * Set default values.
      * @param saveInterval the interval (= number of proof steps) to periodically save
@@ -78,9 +69,9 @@ public class AutoSaver implements ProverTaskListener {
        if (defaultSaveInterval > 0)
            DEFAULT_INSTANCE = new AutoSaver();
     }
-    
+
     /**
-     * Create a new instance using default values, 
+     * Create a new instance using default values,
      * or null if auto save is disabled by default.
      * The default values can be set through <code>AutoSaver.setDefaultValues()</code>
      */
@@ -91,7 +82,7 @@ public class AutoSaver implements ProverTaskListener {
     private AutoSaver () {
        this(defaultSaveInterval, defaultSaveClosedProof);
     }
-    
+
     /**
      * Create a custom instance.
      * @param saveInterval
@@ -148,22 +139,16 @@ public class AutoSaver implements ProverTaskListener {
     }
 
     private void save(final String filename, final Proof proof) {
-        final Runnable r = new Runnable() {
-
-            // there may be concurrent changes to the proof... whatever
-            public void run() {
-                try {
-                    new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                    LOGGER.debug("File saved: "+filename);
-                } catch (IOException e) {
-                    LOGGER.debug("Autosaving file "+filename+" failed.",e);
-                } catch (Exception x) {
-                    // really should not happen, but catching prevents worse
-                    x.printStackTrace();
-                }
+        // there may be concurrent changes to the proof... whatever
+        final Runnable r = () -> {
+            try {
+                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+                LOGGER.debug("File saved: {}", filename);
+            } catch (Exception e) {
+                LOGGER.debug("Autosaving file "+filename+" failed.",e);
             }
         };
-        (new Thread(null,r,"ProofAutosaver")).start(); 
+        (new Thread(null,r,"ProofAutosaver")).start();
     }
 
 }

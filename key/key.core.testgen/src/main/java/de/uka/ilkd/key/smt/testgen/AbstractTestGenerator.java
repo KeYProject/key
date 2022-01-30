@@ -38,7 +38,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.slf4j.Logger;
@@ -162,7 +161,7 @@ public abstract class AbstractTestGenerator {
     final NewSMTTranslationSettings newSettings =
             new NewSMTTranslationSettings(proof.getSettings()
               .getNewSMTSettings());
-    pdSettings.invariantForall = settings.invariantForAll();
+    pdSettings.setInvariantForall(settings.invariantForAll());
     // invoke z3 for counterexamples
     final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
           piSettings, newSettings, proof);

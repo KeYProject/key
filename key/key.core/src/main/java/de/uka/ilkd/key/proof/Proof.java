@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -23,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -52,8 +54,6 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -94,14 +94,14 @@ public class Proof implements Named {
     private List<ProofTreeListener> listenerList = new LinkedList<ProofTreeListener>();
 
     /** list with the open goals of the proof */
-    private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> openGoals = ImmutableSLList.nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches
      * possible. If the list needs too much memory, pruning can be disabled via the
      * command line option "--no-pruning-closed". In this case the list will not be filled.
      */
-    private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
 
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
@@ -118,7 +118,7 @@ public class Proof implements Named {
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
 
-    private ProofIndependentSettings pis;
+    private final ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
      * Strings containing the user names.
@@ -135,7 +135,7 @@ public class Proof implements Named {
 
     private Strategy activeStrategy;
 
-    private SettingsListener settingsListener;
+    private PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has
@@ -175,16 +175,11 @@ public class Proof implements Named {
         services.setProof(this);
         this.proofFile = services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
 
-        settingsListener = new SettingsListener () {
-            @Override
-            public void settingsChanged ( EventObject config ) {
-                updateStrategyOnGoals();
-            }
-        };
+        settingsListener = config -> updateStrategyOnGoals();
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -295,7 +290,7 @@ public class Proof implements Named {
             localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
         }
         // remove setting listener from settings
-        initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings().removePropertyChangeListener(settingsListener);
         // set every reference (except the name) to null
         root = null;
         env = null;
@@ -419,10 +414,8 @@ public class Proof implements Named {
 
     private void updateStrategyOnGoals() {
         Strategy ourStrategy = getActiveStrategy();
-
-        final Iterator<Goal> it = openGoals ().iterator ();
-        while (it.hasNext()) {
-            it.next().setGoalStrategy(ourStrategy);
+        for (Goal goal : openGoals()) {
+            goal.setGoalStrategy(ourStrategy);
         }
     }
 
@@ -430,9 +423,8 @@ public class Proof implements Named {
     public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
-        final Iterator<Goal> it = openGoals ().iterator ();
-        while (it.hasNext()) {
-            it.next().clearAndDetachRuleAppIndex ();
+        for (Goal goal : openGoals()) {
+            goal.clearAndDetachRuleAppIndex();
         }
     }
 
@@ -512,7 +504,7 @@ public class Proof implements Named {
      * @author mulbrich
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
         for(Goal g : goals) {
             if(g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
@@ -568,7 +560,7 @@ public class Proof implements Named {
         if (b) {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
-            fireProofGoalsAdded(ImmutableSLList.<Goal>nil());
+            fireProofGoalsAdded(ImmutableSLList.nil());
         }
     }
 
@@ -1124,7 +1116,7 @@ public class Proof implements Named {
      */
 
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
-        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> result = ImmutableSLList.nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : openGoals) {
             //if list contains node, remove it to make the list faster later
@@ -1141,7 +1133,7 @@ public class Proof implements Named {
      * @return the closed goals in the subtree
      */
     public ImmutableList<Goal> getClosedSubtreeGoals(Node node) {
-        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> result = ImmutableSLList.nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : closedGoals) {
             //if list contains node, remove it to make the list faster later
@@ -1223,7 +1215,7 @@ public class Proof implements Named {
         StringBuffer result = new StringBuffer();
         result.append("Proof -- ");
         if (!"".equals(name.toString())) {
-            result.append(name.toString());
+            result.append(name);
         } else {
             result.append("unnamed");
         }

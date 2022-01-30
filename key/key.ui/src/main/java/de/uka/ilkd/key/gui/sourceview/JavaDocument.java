@@ -265,7 +265,7 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     public JavaDocument () {
         updateStyles();
-        ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
+        ColorSettings.getInstance().addPropertyChangeListener(e -> updateStyles());
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 

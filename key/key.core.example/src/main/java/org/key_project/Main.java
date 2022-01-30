@@ -50,8 +50,8 @@ public class Main {
          }
          // Set Taclet options
          ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-         HashMap<String, String> newSettings = new HashMap<>(oldSettings);
+         var oldSettings = choiceSettings.getDefaultChoices();
+         var newSettings = new HashMap<>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
          choiceSettings.setDefaultChoices(newSettings);
          // Load source code

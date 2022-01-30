@@ -14,20 +14,12 @@
 package de.uka.ilkd.key.settings;
 
 
-import java.util.Collections;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
 
-public class NewSMTTranslationSettings implements Settings, Cloneable {
-
+public class NewSMTTranslationSettings extends AbstractSettings {
     private static final String PREFIX = "[NewSMT]";
     private final Map<String, String> map = new HashMap<>();
-    private final List<SettingsListener> listeners = new LinkedList<>();
 
     public NewSMTTranslationSettings() {
         // nothing to be done
@@ -46,11 +38,12 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
             String key = k.toString();
-            if(key.startsWith(PREFIX)) {
+            if (key.startsWith(PREFIX)) {
                 map.put(key.substring(PREFIX.length()), props.getProperty(key));
             }
         }
     }
+
     @Override
     public void writeSettings(Properties props) {
         for (Entry<String, String> en : map.entrySet()) {
@@ -67,21 +60,10 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
     }
 
     public String put(String key, String value) {
+        var old = map.get(key);
         String result = map.put(key, value);
-        for (SettingsListener listener : listeners) {
-            listener.settingsChanged(new EventObject(this));
-        }
+        firePropertyChange(key, old, value);
         return result;
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
     }
 
     public void copy(NewSMTTranslationSettings newTranslationSettings) {

@@ -1848,7 +1848,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                                                                                  boolean usePrettyPrinting,
                                                                                  boolean variablesAreOnlyComputedFromUpdates,
                                                                                  boolean simplifyConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that parameter are valid.
@@ -1934,7 +1934,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                                                                                  boolean variablesAreOnlyComputedFromUpdates,
                                                                                  boolean truthValueEvaluationEnabled,
                                                                                  boolean simplifyConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      HashMap<String, String> originalTacletOptions = null;
+      Map<String, String> originalTacletOptions = null;
       try {
          // Make sure that parameter are valid.
          assertNotNull(javaPathInBaseDir);
@@ -2002,11 +2002,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
+   public static Map<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+                 createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName,
+                         false, false, false,
+                         false, false, false,
+                         false, false, false,
+                         false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
@@ -2022,12 +2027,17 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
+   public static Map<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String containerTypeName,
-                                                                 String methodFullName) throws ProblemLoaderException, ProofInputException {
+                                                                 String methodFullName)
+           throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+                 createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName,
+                         null, false, false, false,
+                         false, false, false, false,
+                         false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
@@ -2042,7 +2052,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+   public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
                                                                           String containerTypeName,
                                                                           final String targetName) throws ProblemLoaderException, ProofInputException {
       return HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName, targetName);
@@ -2052,8 +2062,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * Ensures that the default taclet options are defined.
     * @return The original settings which are overwritten.
     */
-   public static HashMap<String, String> setDefaultTacletOptions() {
-      HashMap<String, String> original = HelperClassForTests.setDefaultTacletOptions();
+   public static Map<String, String> setDefaultTacletOptions() {
+      Map<String, String> original = HelperClassForTests.setDefaultTacletOptions();
       ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
       ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
       cs = cs.add(new Choice("noRestriction", "methodExpansion"));
@@ -2065,7 +2075,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * Restores the given taclet options.
     * @param options The taclet options to restore.
     */
-   public static void restoreTacletOptions(HashMap<String, String> options) {
+   public static void restoreTacletOptions(Map<String, String> options) {
       HelperClassForTests.restoreTacletOptions(options);
    }
 
