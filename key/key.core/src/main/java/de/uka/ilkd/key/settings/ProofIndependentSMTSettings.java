@@ -258,25 +258,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
      * {@link SolverTypes#getSolverTypes()}.
      */
     private ProofIndependentSMTSettings() {
-        /*for (SolverType type : SolverTypes.getSolverTypes()) {
-            dataOfSolvers.put(type, new SolverData(type));
-        }
-
-        Collection<SolverType> legacyTypes = SolverTypes.getLegacy();
-        Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
-        nonLegacyTypes.removeAll(legacyTypes);
-
-        // single solvers with new translation
-        for (SolverType type: nonLegacyTypes) {
-            solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
-        }
-
-        // single solvers with legacy translation
-        for (SolverType type: legacyTypes) {
-            legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
-        }*/
-
-        // Load solver props from standard directory, see PathConfig
+        // load solver props from standard directory, see PathConfig
         Collection<SolverType> legacyTypes = SolverTypes.getLegacySolvers();
         Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
         solverTypes.addAll(nonLegacyTypes);
@@ -333,6 +315,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         seqBound = SettingsConverter.read(props, FIELD_BOUND, seqBound);
         locsetBound = SettingsConverter.read(props, LOCSET_BOUND, locsetBound);
         objectBound = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
+
+        for (SolverType type : solverTypes) {
+            type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(), type.getDefaultSolverTimeout()));
+            type.setSolverParameters(SettingsConverter.read(props, SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
+            type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(), type.getDefaultSolverCommand()));
+        }
     }
 
     public void writeSettings(Properties props) {
@@ -349,6 +337,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         SettingsConverter.store(props, OBJECT_BOUND, objectBound);
         SettingsConverter.store(props, FIELD_BOUND, seqBound);
         SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
+
+        for (SolverType type : solverTypes) {
+            SettingsConverter.store(props, PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
+            SettingsConverter.store(props, SOLVER_PARAMETERS + type.getName(), type.getSolverParameters());
+            SettingsConverter.store(props, SOLVER_COMMAND + type.getName(), type.getSolverCommand());
+        }
     }
 
     public void setActiveSolverUnion(SolverTypeCollection solverUnion) {

@@ -5,7 +5,9 @@ import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Provides static SolverType objects to be reused and saves the properties to .props files.
@@ -48,7 +50,6 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	@Override
 	public Collection<SolverType> getSolvers() {
 		if (SOLVERS.isEmpty()) {
-			createHardcodedSolversProperties();
 			for (Properties solverProp : loadSolvers()) {
 				SolverType createdType = makeSolver(solverProp);
 				SOLVERS.add(createdType);
@@ -98,31 +99,6 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		buildingBlocks = ModifiableSolverType.MethodBuildingBlocks.valueOf(buildingBlock);
 		return new ModifiableSolverType(name, info, params, command, version, timeout,
 				delimiters, supportsIfThenElse, buildingBlocks, handler);
-	}
-
-	/**
-	 * Create the hardcoded solvers in {@link HardcodedSolver}.
-	 * @return a map of unique solver names and the corresponding Properties objects describing the SolverTypes.
-	 */
-	private static Collection<Properties> createHardcodedSolversProperties() {
-		Collection<Properties> propsList = new ArrayList<>(HardcodedSolver.values().length);
-		for (HardcodedSolver hardcodedSolver : HardcodedSolver.values()) {
-			Properties props = new Properties();
-			SettingsConverter.store(props, NAME, hardcodedSolver.name);
-			SettingsConverter.store(props, COMMAND, hardcodedSolver.command);
-			SettingsConverter.store(props, PARAMS, hardcodedSolver.params);
-			SettingsConverter.store(props, VERSION, hardcodedSolver.version);
-			SettingsConverter.store(props, INFO, hardcodedSolver.info);
-			SettingsConverter.store(props, TIMEOUT, hardcodedSolver.timeout);
-			SettingsConverter.store(props, ITE, hardcodedSolver.supportsIfThenElse);
-			if (hardcodedSolver.isLegacy()) {
-				SettingsConverter.store(props, LEGACY, "true");
-			}
-			// TODO delimiters
-			propsList.add(props);
-			saveSolverProps(hardcodedSolver.name, props);
-		}
-		return propsList;
 	}
 
 	/**
@@ -187,20 +163,15 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	 * {@link PathConfig#getSmtSolverPropertiesDirectory()} into Properties objects and returns them.
 	 */
 	private static Collection<Properties> loadSolvers() {
-		File solverDir = new File(PathConfig.getSmtSolverPropertiesDirectory());
+		InputStream stream = SolverPropertiesLoader.class.getResourceAsStream("defaultSolvers.txt");
 		Collection<Properties> props = new ArrayList<>();
-		if (!solverDir.isDirectory()) {
-			return new ArrayList<>(0);
-		}
-		for (File child : solverDir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".props") && dir == solverDir;
-			}
-		})) {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		List<String> propsNames = reader.lines().collect(Collectors.toList());
+		for (String fileName : propsNames) {
 			Properties solverProp = new Properties();
+			InputStream propsFile = SolverPropertiesLoader.class.getResourceAsStream(fileName);
 			try {
-				solverProp.load(new FileInputStream(child));
+				solverProp.load(propsFile);
 				props.add(solverProp);
 			} catch (IOException e) {
 				continue;
@@ -208,23 +179,5 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		}
 		return props;
 	}
-
-	/**
-	 * Saves a Properties object for a solver name to a .props file in the
-	 * {@link PathConfig#getSmtSolverPropertiesDirectory()} directory.
-	 */
-	private static void saveSolverProps(String solverName, Properties solverProps) {
-		File solverDir = new File(PathConfig.getSmtSolverPropertiesDirectory());
-		if (!solverDir.mkdir() && !solverDir.isDirectory()) {
-			return;
-		}
-		File solverProp = new File(solverDir, solverName + ".props");
-		try (FileOutputStream out = new FileOutputStream(solverProp)) {
-			solverProps.store(out, "Saved SMT solver info for: " + solverName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 
 }
