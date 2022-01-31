@@ -121,23 +121,31 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * @param dtm    a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */
-    private void findExplorationChildren(@Nonnull Node n,
+    private void findExplorationChildren(@Nonnull Node node,
                                          final @Nonnull ArrayList<Node> foundNodes,
                                          @Nonnull DefaultTreeModel dtm,
                                          @Nonnull MyTreeNode parent) {
+        Set<Node> reached = new HashSet<>(512000);
+        ArrayDeque<Node> nodes = new ArrayDeque<>(8);
+        nodes.add(node);
 
-        ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
-        if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
-            // exporation found
-            MyTreeNode newNode = new MyTreeNode(n);
-            dtm.insertNodeInto(newNode, parent, 0);
-            parent = newNode;
-            foundNodes.add(n);
-        }
+        //depth-first traversal
+        while(!nodes.isEmpty()) {
+            Node n = nodes.pollLast();
 
-        if (!n.leaf()) { // has children, then explore them
+            ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
+            if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
+                // exploration found
+                MyTreeNode newNode = new MyTreeNode(n);
+                dtm.insertNodeInto(newNode, parent, 0);
+                parent = newNode;
+                foundNodes.add(n);
+            }
+
+            reached.add(n);
             for (Node child : n) {
-                foundNodes.addAll(collectAllExplorationSteps(child, dtm, parent));
+                if(!reached.contains(child))
+                    nodes.push(child);
             }
         }
     }
