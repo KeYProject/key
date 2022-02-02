@@ -252,9 +252,8 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        var node = goal.node();
         goal.apply(app);
-        emitInteractiveRuleApplication(node, app);
+        emitInteractiveRuleApplication(goal, app);
     }
 
 
@@ -285,8 +284,10 @@ public abstract class AbstractProofControl implements ProofControl {
         interactionListeners.forEach((l) -> l.runPrune(node));
     }
 
-    protected void emitInteractiveRuleApplication(Node node, RuleApp app) {
-        interactionListeners.forEach((l) -> l.runRule(node, app));
+    protected void emitInteractiveRuleApplication(Goal goal, RuleApp app) {
+        interactionListeners.forEach((l) -> {
+            l.runRule(goal, app);
+        });
     }
 
     /**

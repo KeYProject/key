@@ -3,6 +3,7 @@ package de.uka.ilkd.key.control;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
@@ -24,12 +25,13 @@ public interface InteractionListener {
 
     void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info);
 
-    void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule,
+    void runBuiltInRule(Goal goal, IBuiltInRuleApp app, BuiltInRule rule,
                         PosInOccurrence pos, boolean forced);
 
     void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info);
 
-    void runRule(Node goal, RuleApp app);
+    void runRule(Goal goal, RuleApp app);
+
 
     public enum SettingType {
         SMT, CHOICE, STRATEGY

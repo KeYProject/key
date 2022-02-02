@@ -13,45 +13,41 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
-
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.logic.Term;
 
 public class AbbrevMap {
 
     /**
      * HashMaps used to store the mappings from Term to String, String to Term
-     * and Term to Enabled.
-     */
-    private HashMap<AbbrevWrapper, String> termstring;
-    private HashMap<String, AbbrevWrapper> stringterm;
-
-    /**
-     * Enabled is set true if a abbreviation should be used
+     * and Term to Enabled. Enabled is set true if a abbreviation should be used
      * when printing the term.
      */
-    private HashMap<AbbrevWrapper, Boolean> termenabled;
+    protected HashMap<AbbrevWrapper, String> termstring;
+    protected HashMap<String, AbbrevWrapper> stringterm;
+    protected HashMap<AbbrevWrapper, Boolean> termenabled;
 
     /**
      * Creates a AbbrevMap.
      */
     public AbbrevMap() {
-        termstring = new LinkedHashMap<>();
-        stringterm = new LinkedHashMap<>();
-        termenabled = new LinkedHashMap<>();
+        termstring = new LinkedHashMap<AbbrevWrapper, String>();
+        stringterm = new LinkedHashMap<String, AbbrevWrapper>();
+        termenabled = new LinkedHashMap<AbbrevWrapper, Boolean>();
     }
 
     /**
      * Associates a Term and its abbreviation in this map.
      *
-     * @param t            a term
-     * @param abbreviation the abbreviation for of this term
-     * @param enabled      true if the abbreviation should be used (e.g. when printing
-     *                     the term), false otherwise.
+     * @param t
+     *            a term
+     * @param abbreviation
+     *            the abbreviation for of this term
+     * @param enabled
+     *            true if the abbreviation should be used (e.g. when printing
+     *            the term), false otherwise.
      */
     public void put(Term t, String abbreviation, boolean enabled)
             throws AbbrevException {
@@ -75,7 +71,8 @@ public class AbbrevMap {
      * Changes the abbreviation of t to abbreviation. If the AbbrevMap doesn't
      * contain t nothing happens.
      *
-     * @throws AbbrevException if the abbreviation is already in use.
+     * @throws AbbrevException
+     *             if the abbreviation is already in use.
      */
     public void changeAbbrev(Term t, String abbreviation)
             throws AbbrevException {
@@ -98,7 +95,8 @@ public class AbbrevMap {
      * Changes the abbreviation <code>abbreviation</code> to <code>t</code>. If
      * the AbbrevMap doesn't contain <code>abbreviation</code> nothing happens.
      *
-     * @throws AbbrevException If an abbreviation for t already exists.
+     * @throws AbbrevException
+     *             If an abbreviation for t already exists.
      */
     public void changeAbbrev(String abbreviation, Term t, boolean enabled)
             throws AbbrevException {
@@ -161,23 +159,14 @@ public class AbbrevMap {
     /**
      * Sets the mapping of the term t to its abbreviation enabled or disabled
      *
-     * @param t       a Term
-     * @param enabled true if the abbreviation of t may be used.
+     * @param t
+     *            a Term
+     * @param enabled
+     *            true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
         termenabled.put(new AbbrevWrapper(t),
                 enabled ? Boolean.TRUE : Boolean.FALSE);
-    }
-
-    /**
-     * Exports the current abbreviation map as a sequence of pairs of the term and its abbreviation.
-     * Note, this will allocate a new data structure each time.
-     */
-    public Collection<Pair<Term, String>> export() {
-        return termstring.entrySet().stream()
-                .map(e -> new Pair<>(e.getKey().t, e.getValue()))
-                .collect(Collectors.toList());
-
     }
 
     public static class AbbrevWrapper {

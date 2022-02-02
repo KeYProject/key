@@ -64,7 +64,7 @@ public class KeYSelectionModel {
      *
      * @see KeYMediator#setProof(Proof)
      */
-    public void setSelectedProof(Proof p) {
+    void setSelectedProof(Proof p) {
         goalIsValid = false;
         proof = p;
         if (proof != null) {
