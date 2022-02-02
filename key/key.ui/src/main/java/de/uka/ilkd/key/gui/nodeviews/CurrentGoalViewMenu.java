@@ -576,7 +576,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 // No functionality is allowed in this method body!
                 mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
                         birmi.connectedTo(), getPos().getPosInOccurrence(),
-                        birmi.forcedApplication());
+                        birmi.forcedApplication(), true);
 
             } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
                 mediator.getUI().getProofControl().startFocussedAutoMode(
