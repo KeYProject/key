@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
@@ -23,6 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A view that summaries the exploration steps inside a proof.
@@ -48,11 +50,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     };
 
     private transient Proof currentProof;
+    private boolean enabled;
 
 
-    public ExplorationStepsList(MainWindow window) throws HeadlessException {
+    public ExplorationStepsList(MainWindow window, ExplorationModeModel model) throws HeadlessException {
         this.mediator = window.getMediator();
         initialize();
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> setEnabled(model.isExplorationModeSelected()));
+        setEnabled(model.isExplorationModeSelected());
     }
 
     /**
@@ -71,11 +76,19 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
+    public void setEnabled(boolean enabled) {
+        var old = this.enabled;
+        this.enabled = enabled;
+        if (old != enabled) {
+            createModel(currentProof);
+        }
+    }
+
     public Proof getProof() {return currentProof;}
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
-        if (model != null && !model.isDisposed()) {
+        if (enabled && model != null && !model.isDisposed()) {
             Node root = model.root();
             //build the treemodel
             MyTreeNode rootNode = new MyTreeNode(root);

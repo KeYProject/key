@@ -121,13 +121,13 @@ public class ExplorationExtension implements KeYGuiExtension,
     @Nonnull
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
+        if (leftPanel == null) leftPanel = new ExplorationStepsList(window, model);
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
+        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance(), model);
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
 
