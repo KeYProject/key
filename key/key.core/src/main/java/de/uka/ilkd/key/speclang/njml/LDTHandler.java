@@ -55,7 +55,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
 
     private SLExpression buildUnary(JMLOperator op, SLExpression left) {
         KeYJavaType type = left.getType();
-        Map<JMLOperator, Operator> opMap = getOperatorMap(type);
+        Map<JMLOperator, Operator> opMap = getOperatorMap(type.getJavaType());
         if (opMap == null) {
             // we are not responsible for the type
             return null;
