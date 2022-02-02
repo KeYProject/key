@@ -48,6 +48,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     };
 
     private transient Proof currentProof;
+    private boolean enabled;
 
 
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
@@ -71,11 +72,19 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
+    public void setEnabled(boolean enabled) {
+        var old = this.enabled;
+        this.enabled = enabled;
+        if (old != enabled) {
+            createModel(currentProof);
+        }
+    }
+
     public Proof getProof() {return currentProof;}
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
-        if (model != null && !model.isDisposed()) {
+        if (enabled && model != null && !model.isDisposed()) {
             Node root = model.root();
             //build the treemodel
             MyTreeNode rootNode = new MyTreeNode(root);

@@ -118,16 +118,26 @@ public class ExplorationExtension implements KeYGuiExtension,
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
+    private void initLeftPanel(@Nonnull MainWindow window) {
+        if (leftPanel != null) {
+            return;
+        }
+
+        leftPanel = new ExplorationStepsList(window);
+        leftPanel.setEnabled(model.isExplorationModeSelected());
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
+    }
+
     @Nonnull
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
+        initLeftPanel(window);
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
+        initLeftPanel(MainWindow.getInstance());
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
 
