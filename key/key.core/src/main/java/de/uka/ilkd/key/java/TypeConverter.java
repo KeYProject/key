@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.KeYCrossReferenceSourceInfo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,6 +123,10 @@ public final class TypeConverter {
 
     public CharListLDT getCharListLDT() {
         return (CharListLDT) getLDT(CharListLDT.NAME);
+    }
+
+    public Collection<LDT> getLDTs() {
+        return LDTs.values();
     }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
