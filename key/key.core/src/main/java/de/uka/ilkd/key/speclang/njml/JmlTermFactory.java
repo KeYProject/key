@@ -36,7 +36,6 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -45,7 +44,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -429,7 +427,7 @@ public final class JmlTermFactory {
 
         //final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
-        return buildCastExpression(resultType, new SLExpression(t, resultType));
+        return buildIntCastExpression(resultType, new SLExpression(t, resultType));
     }
 
     public ImmutableList<Term> infflowspeclist(ImmutableList<Term> result) {
@@ -627,6 +625,7 @@ public final class JmlTermFactory {
             }
             assert result.isTerm();
             Sort origSort = result.getTerm().sort();
+            Sort targetSort = type.getSort();
 
             if (origSort == Sort.FORMULA) {
                 // This case might occur since boolean expressions
@@ -635,8 +634,8 @@ public final class JmlTermFactory {
                 if (type != services.getTypeConverter().getBooleanType()) {
                     throw exc.createException0("Cannot cast from boolean to " + type + ".");
                 }
-            } else if (origSort == services.getTypeConverter().getIntegerLDT().targetSort()) {
-                return buildCastExpression(type, result);
+            } else if (targetSort == services.getTypeConverter().getIntegerLDT().targetSort()) {
+                return buildIntCastExpression(type, result);
             } else {
                 return new SLExpression(
                         tb.cast(type.getSort(), result.getTerm()),
@@ -760,10 +759,10 @@ public final class JmlTermFactory {
                 "Please use the standard \\sum syntax."));
         final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
         // cast to specific JML type (fixes bug #1347)
-        return buildCastExpression(promo, bsumExpr);
+        return buildIntCastExpression(promo, bsumExpr);
     }
 
-    private SLExpression buildCastExpression(KeYJavaType resultType, SLExpression a) {
+    private SLExpression buildIntCastExpression(KeYJavaType resultType, SLExpression a) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
             Function cast = integerLDT.getJavaCast(resultType.getJavaType());
