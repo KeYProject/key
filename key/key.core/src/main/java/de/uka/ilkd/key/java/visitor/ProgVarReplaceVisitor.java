@@ -662,16 +662,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    public void performActionOnJmlAssert(final JmlAssert x) {
-        if (x.getCond() == null) {
+    public void performActionOnJmlAssertCondition(final Term x) {
+        if (x == null) {
             throw new IllegalStateException("JML assert is incomplete");
         }
-        Term newCond = replaceVariablesInTerm(x.getCond());
+        Term newCond = replaceVariablesInTerm(x);
         //TODO: I think that is ok this way
         stack.peek().add(newCond);
-        if (!Objects.equals(newCond, x.getCond())) {
+        if (!Objects.equals(newCond, x)) {
             changed();
         }
-        super.performActionOnJmlAssert(x);
     }
 }

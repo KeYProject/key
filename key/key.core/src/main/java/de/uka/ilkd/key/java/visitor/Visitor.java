@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -421,4 +422,15 @@ public interface Visitor {
      * @param jmlAssert the statement to perform the action on.
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
+
+    /**
+     * Performs action on the condition of a JML assert statement.
+     *
+     * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
+     * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
+     *
+     * @param cond the condition to perform an action on
+     *             (may be {@code null} if the JML assert wasn't finished)
+     */
+    void performActionOnJmlAssertCondition(final Term cond);
 }

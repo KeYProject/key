@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -1530,7 +1531,13 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
         };
         def.doAction(x);
+    }
 
+    @Override
+    public void performActionOnJmlAssertCondition(final Term cond) {
+        // should only be called by walk(), which puts an ExtList on the stack
+        assert stack.peek() != null;
+        stack.peek().add(cond);
     }
 
     /**
