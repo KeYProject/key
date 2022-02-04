@@ -230,6 +230,7 @@ pred_decl
   pred_name = funcpred_name
   (whereToBind=where_to_bind)?
   argSorts=arg_sorts
+  functionMetaData?
   SEMI
 ;
 
@@ -246,7 +247,15 @@ func_decl
   func_name = funcpred_name
 	whereToBind=where_to_bind?
   argSorts = arg_sorts
+  functionMetaData?
   SEMI
+;
+
+functionMetaData
+:
+    INFIX LPAREN (PLUS|STAR|SLASH|MINUS|EXP) RPAREN
+  | PREFIX LPAREN (MINUS|TILDE) RPAREN
+  | POSTFIX LPAREN (/*currently no overloaded operator*/) RPAREN
 ;
 
 func_decls
