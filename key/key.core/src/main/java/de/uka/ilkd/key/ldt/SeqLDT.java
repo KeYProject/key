@@ -186,8 +186,8 @@ public final class SeqLDT extends LDT {
 
     @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
+    public Function getFunctionFor(String operatorSymbol, Services services) {
+        switch (operatorSymbol) {
             case "add": return getSeqConcat();
             default: return null;
         }

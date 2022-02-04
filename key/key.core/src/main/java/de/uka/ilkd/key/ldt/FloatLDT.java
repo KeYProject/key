@@ -188,8 +188,8 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
+    public Function getFunctionFor(String operatorSymbol, Services services) {
+        switch (operatorSymbol) {
             case "gt": return getGreaterThan();
             case "geq": return getGreaterOrEquals();
             case "lt": return getLessThan();

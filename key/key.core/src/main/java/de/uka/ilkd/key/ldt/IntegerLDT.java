@@ -499,8 +499,8 @@ public final class IntegerLDT extends LDT {
 
     @Nullable
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
+    public Function getFunctionFor(String operatorSymbol, Services services) {
+        switch (operatorSymbol) {
             case "gt": return getGreaterThan();
             case "geq": return getGreaterOrEquals();
             case "lt": return getLessThan();
