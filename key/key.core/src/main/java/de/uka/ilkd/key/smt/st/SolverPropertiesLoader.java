@@ -24,7 +24,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT_PARAMS = "";
 	private static String DEFAULT_INFO = "An SMT solver.";
 	private static String DEFAULT_VERSION = "";
-	private static String DEFAULT_DELIMITERS = "\\n <delim_split> \\r";
+	private static String DEFAULT_DELIMITERS = "\n <delim_split> \r";
 	private static long DEFAULT_TIMEOUT = -1;
 	private static boolean DEFAULT_ITE = false;
 	private static String NAME = "[SolverTypeDefault]name";
