@@ -233,6 +233,9 @@ PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+INFIX: '\\infix';
+PREFIX: '\\prefix';
+POSTFIX: '\\postfix';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -310,7 +313,9 @@ PLUS:    '+' OP_SFX?;
 GREATER: '>' ;
 GREATEREQUAL:   '>' '=' | '\u2265';
 RGUILLEMETS: '>' '>' ;
-      
+
+
+
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
