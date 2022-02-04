@@ -184,16 +184,6 @@ public final class SeqLDT extends LDT {
 	return null;
     }
 
-    @Nullable
-    @Override
-    public Function getFunctionFor(String operatorSymbol, Services services) {
-        switch (operatorSymbol) {
-            case "add": return getSeqConcat();
-            default: return null;
-        }
-    }
-
-
     @Override
     public boolean hasLiteralFunction(Function f) {
 	return f.equals(seqEmpty);
