@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt.st;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -68,18 +67,18 @@ public class SolverTypes {
 	}
 
 	public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(ModifiableSolverType.class) && ((ModifiableSolverType) it).getName()
-					.equals(SolverPropertiesLoader.HardcodedSolver.Z3_CE.getName()))
+					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals("Z3_CE"))
 			.findFirst().orElse(null);
 
 	public static final SolverType Z3_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(ModifiableSolverType.class) && ((ModifiableSolverType) it).getName()
-					.equals(SolverPropertiesLoader.HardcodedSolver.Z3.getName()))
+					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals("Z3 (Legacy Translation)"))
 			.findFirst().orElse(null);
 
 	public static final SolverType CVC4_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(ModifiableSolverType.class) && ((ModifiableSolverType) it).getName()
-					.equals(SolverPropertiesLoader.HardcodedSolver.CVC4.getName()))
+					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals("CVC4 (Legacy Translation)"))
 			.findFirst().orElse(null);
 
 

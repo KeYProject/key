@@ -7,3 +7,4 @@
 [SolverTypeDefault]info=\#begCVC4 solver\#end
 [SolverTypeDefault]command=\#begcvc4\#end
 [SolverTypeDefault]version=\#beg--version\#end
+[SolverTypeDefault]delimiters=\#begCVC4>\#end

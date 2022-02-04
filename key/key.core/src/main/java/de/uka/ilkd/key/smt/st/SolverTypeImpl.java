@@ -10,7 +10,12 @@ import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Final SolverType implementation that uses building blocks for the various methods.
@@ -21,7 +26,7 @@ import java.util.Arrays;
  * - The various String parameters such as default command, params and the name
  * - TODO
  */
-public final class ModifiableSolverType implements SolverType {
+public final class SolverTypeImpl implements SolverType {
 
 	private final String NAME, INFO, DEFAULT_PARAMS, DEFAULT_COMMAND, VERSION;
 	private final long DEFAULT_TIMEOUT;
@@ -34,8 +39,9 @@ public final class ModifiableSolverType implements SolverType {
 	private boolean isSupportedVersion = false;
 	private boolean installWasChecked = false;
 	private boolean isInstalled = false;
-	private final MethodBuildingBlocks BUILDING_BLOCKS;
 	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
+	private final Class<?> TRANSLATOR_CLASS;
+	private final List<Object> translatorParams;
 
 	public static boolean isInstalled(String cmd) {
 
@@ -66,9 +72,10 @@ public final class ModifiableSolverType implements SolverType {
 
 	}
 
-	public ModifiableSolverType(String name, String info, String defaultParams, String defaultCommand, String version,
-								long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
-								MethodBuildingBlocks buildingBlocks, SolverCommunicationSocket.MessageHandler handler) {
+	public SolverTypeImpl(String name, String info, String defaultParams, String defaultCommand, String version,
+						  long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
+						  Class<?> translatorClass, List<Object> translatorParams,
+						  SolverCommunicationSocket.MessageHandler handler) {
 		NAME = name;
 		INFO = info;
 		DEFAULT_PARAMS = defaultParams;
@@ -80,23 +87,15 @@ public final class ModifiableSolverType implements SolverType {
 		DELIMITERS = delimiters;
 		ITE = supportsIfThenElse;
 		VERSION = version;
-		BUILDING_BLOCKS = buildingBlocks;
+		TRANSLATOR_CLASS = translatorClass;
 		MSG_HANDLER = handler;
-	}
-
-	/**
-	 * Create a new ModifiableSolverType with {@link MethodBuildingBlocks}.
-	 */
-	public ModifiableSolverType(String name, String info, String defaultParams, String defaultCommand, String version,
-								long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
-								SolverCommunicationSocket.MessageHandler handler) {
-		this(name, info, defaultParams, defaultCommand, version, defaultTimeout, delimiters, supportsIfThenElse,
-				MethodBuildingBlocks.DEFAULT, handler);
+		this.translatorParams = new ArrayList<>(translatorParams);
 	}
 
 	@Override
 	public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services) {
-		return BUILDING_BLOCKS.createSolver(this, problem, listener, services);
+		// TODO Make this modifiable? (similar to SMTTranslator)
+		return new SMTSolverImplementation(problem, listener, services, this);
 	}
 
 	@Override
@@ -171,7 +170,30 @@ public final class ModifiableSolverType implements SolverType {
 
 	@Override
 	public SMTTranslator createTranslator(Services services) {
-		return BUILDING_BLOCKS.createTranslator(this, services);
+		Constructor<?>[] constructors = TRANSLATOR_CLASS.getConstructors();
+		SMTTranslator smtTranslator = null;
+		boolean instantiated = false;
+		for (int i = 0; i < constructors.length; i++) {
+			try {
+				smtTranslator = (SMTTranslator) constructors[i].newInstance(translatorParams.stream().map(n -> {
+					if (n.equals("<SERVICES>")) {
+						return services;
+					}
+					return n;
+				}).collect(Collectors.toList()));
+				instantiated = true;
+				break;
+			} catch (IllegalArgumentException | ClassCastException | InstantiationException
+					| IllegalAccessException | InvocationTargetException e) {
+				instantiated = false;
+				continue;
+			}
+		}
+		// TODO different fallback option?
+		if (!instantiated) {
+			return new ModularSMTLib2Translator();
+		}
+		return smtTranslator;
 	}
 
 	@Override
@@ -185,9 +207,10 @@ public final class ModifiableSolverType implements SolverType {
 		return ITE;
 	}
 
+	// TODO How to make this modifiable?
 	@Override
 	public String modifyProblem(String problem) {
-		return BUILDING_BLOCKS.modifyProblem(this, problem);
+		return problem;
 	}
 
 	@Override
@@ -206,9 +229,14 @@ public final class ModifiableSolverType implements SolverType {
 		return version;
 	}
 
+	// TODO Fuse this with getVersion()
 	@Override
 	public String getRawVersion() {
-		return BUILDING_BLOCKS.getRawVersion(this);
+		if (isInstalled(true)) {
+			return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -253,46 +281,8 @@ public final class ModifiableSolverType implements SolverType {
 	@Nonnull
 	@Override
 	public SMTProcessLauncher getLauncher(SolverCommunication communication) {
-		return BUILDING_BLOCKS.getLauncher(communication, this);
+		// TODO Make this modifiable? (similar to SMTTranslator)
+		return new ExternalProcessLauncher(communication, getDelimiters());
 	}
 
-
-	public enum MethodBuildingBlocks {
-
-		DEFAULT,
-
-		LEGACY_TRANSLATION {
-			@Override
-			SMTTranslator createTranslator(SolverType type, Services services) {
-				// TODO mentionLogic was false for Z3...
-				return new SmtLib2Translator(services,
-						new AbstractSMTTranslator.Configuration(false, true));
-			}
-		};
-
-		SMTProcessLauncher getLauncher(SolverCommunication communication, SolverType type) {
-			return new ExternalProcessLauncher(communication, type.getDelimiters());
-		}
-
-		String getRawVersion(SolverType type) {
-			if (type.isInstalled(true)) {
-				return VersionChecker.INSTANCE.getVersionFor(type.getSolverCommand(), type.getVersionParameter());
-			} else {
-				return null;
-			}
-		}
-
-		SMTTranslator createTranslator(SolverType type, Services services) {
-			return new ModularSMTLib2Translator();
-		}
-
-		SMTSolver createSolver(SolverType type, SMTProblem problem, SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener, services, type);
-		}
-
-		String modifyProblem(SolverType type, String problem) {
-			return problem;
-		}
-
-	}
 }

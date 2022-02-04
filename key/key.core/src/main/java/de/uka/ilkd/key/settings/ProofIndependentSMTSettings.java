@@ -317,9 +317,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         objectBound = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
 
         for (SolverType type : solverTypes) {
-            type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(), type.getDefaultSolverTimeout()));
-            type.setSolverParameters(SettingsConverter.read(props, SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
-            type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(), type.getDefaultSolverCommand()));
+            type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(),
+                    type.getDefaultSolverTimeout()));
+            type.setSolverParameters(SettingsConverter.read(props, SOLVER_PARAMETERS + type.getName(),
+                    type.getDefaultSolverParameters()));
+            type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(),
+                    type.getDefaultSolverCommand()));
         }
     }
 

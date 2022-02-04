@@ -3,15 +3,16 @@ package de.uka.ilkd.key.smt.st;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Provides static SolverType objects to be reused and saves the properties to .props files.
- * Used to create {@link SolverType} (in the form of {@link ModifiableSolverType}) objects from .props files.
+ * Used to create {@link SolverType} (in the form of {@link SolverTypeImpl}) objects from .props files.
  */
 public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 
@@ -23,7 +24,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT_PARAMS = "";
 	private static String DEFAULT_INFO = "An SMT solver.";
 	private static String DEFAULT_VERSION = "";
-	private static String[] DEFAULT_DELIMITERS = {};
+	private static String DEFAULT_DELIMITERS = "\\n <delim_split> \\r";
 	private static long DEFAULT_TIMEOUT = -1;
 	private static boolean DEFAULT_ITE = false;
 	private static String NAME = "[SolverTypeDefault]name";
@@ -36,10 +37,14 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String ITE = "[SolverTypeDefault]ite";
 	private static String LEGACY = "[SolverTypeDefault]legacy";
 	private static String SOCKET_MESSAGEHANDLER = "[SolverTypeDefault]messageHandler";
-	private static String METHOD_BUILDINGBLOCK = "[SolverTypeDefault]messageHandler";
+	private static String SMTLIB_TRANSLATOR= "[SolverTypeDefault]translatorClass";
+	private static String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
 	private static String DEFAULT = "DEFAULT";
-	private static String LEGACY_TRANSLATION = "LEGACY_TRANSLATION";
+	private static String TRANSLATOR_PARAMS = "[SolverTypeDefault]translatorParams";
+	private static String DEFAULT_TRANSLATOR_PARAMS = "\\\\";
 	private static int defaultNameCounter = 0;
+
+	private static String DELIMITER_SPLIT = " <delim_split> ";
 
 	/**
 	 * Initializes {@link #SOLVERS} using the given hardcoded properties if that list is empty,
@@ -71,16 +76,18 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	}
 
 	/**
-	 * Create a {@link ModifiableSolverType} from a Properties object.
+	 * Create a {@link SolverTypeImpl} from a Properties object.
 	 */
 	private static SolverType makeSolver(Properties props) {
-		String name, command, params, version, info, buildingBlock, messageHandler;
+		String name, command, params, version, info, messageHandler;
 		boolean supportsIfThenElse;
 		long timeout;
-		ModifiableSolverType.MethodBuildingBlocks buildingBlocks;
+		Class<?> translatorClass;
+		List<Object> translatorParams = new ArrayList<>(0);
 		SolverCommunicationSocket.MessageHandler handler;
 		String[] delimiters;
 		name = SettingsConverter.read(props, NAME, DEFAULT_NAME);
+		// The solver's name has to be unique
 		if (name.equals(DEFAULT_NAME)) {
 			name = DEFAULT_NAME + defaultNameCounter;
 			defaultNameCounter++;
@@ -92,76 +99,27 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		supportsIfThenElse = Boolean.valueOf(SettingsConverter.read(props, ITE, DEFAULT_ITE));
 		timeout = Long.valueOf(SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT));
 		messageHandler = SettingsConverter.read(props, SOCKET_MESSAGEHANDLER, DEFAULT);
-		boolean legacy = Boolean.valueOf(SettingsConverter.read(props, LEGACY, "false"));
-		buildingBlock = SettingsConverter.read(props, METHOD_BUILDINGBLOCK, (legacy ? LEGACY_TRANSLATION : DEFAULT));
+		delimiters = SettingsConverter.read(props, DELIMITERS, DEFAULT_DELIMITERS).split(DELIMITER_SPLIT);
+		try {
+			translatorClass = ClassLoaderUtil.getClassforName(
+					SettingsConverter.read(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR));
+		} catch (ClassNotFoundException e) {
+			translatorClass = ModularSMTLib2Translator.class;
+		}
+		for (String str: SettingsConverter.read(props, TRANSLATOR_PARAMS, DEFAULT_TRANSLATOR_PARAMS)
+				.split("\\\\")) {
+			translatorParams.add(ParamConverter.convert(str));
+		}
 		handler = SolverCommunicationSocket.MessageHandler.valueOf(messageHandler);
-		delimiters = new String[]{"\n", "\r"}; //TODO
-		buildingBlocks = ModifiableSolverType.MethodBuildingBlocks.valueOf(buildingBlock);
-		return new ModifiableSolverType(name, info, params, command, version, timeout,
-				delimiters, supportsIfThenElse, buildingBlocks, handler);
-	}
-
-	/**
-	 * This may be used to automatically create some properties files for important solvers.
-	 */
-	public enum HardcodedSolver {
-
-		Z3("Z3 (Legacy Translation)", "z3", "-in -smt2", new String[]{"\n", "\r", System.lineSeparator()},
-				"--version", "Z3 solver by Microsoft", true, -1, true),
-
-		Z3_NEW_TL("Z3", "z3", "-in -smt2", new String[]{"\n", "\r", System.lineSeparator()},
-				"--version", "Z3 solver by Microsoft", true, -1, false),
-
-		Z3_CE("Z3_CE", "z3", "-in -smt2", new String[]{"\n", "\r", System.lineSeparator()},
-				"--version", "Z3 solver by Microsoft", true, -1, false),
-
-		CVC4("CVC4 (Legacy Translation)", "cvc4",
-				"--no-print-success -m --interactive --lang smt2",
-				new String[]{"CVC4>"}, "--version", "CVC4 solver", true, -1, true),
-
-		CVC4_NEW_TL("CVC4", "cvc4",
-				"--no-print-success -m --interactive --lang smt2",
-				new String[]{"CVC4>"}, "--version", "CVC4 solver", true, -1, false),
-
-		CVC5("CVC5", "cvc5", "--interactive -m --lang smt2",
-				new String[]{"cvc5>", "cvc5> "}, "--version", "CVC5 solver", true, -1, false);
-
-		/*INVISMT("InViSMT", "invismt", "-in -smt2", new String[]{"\n", "\r", System.lineSeparator()},
-				"--version", "Interactive SMT Solver wraps various SMT-Solvers", true,
-				60, false);*/
-
-		private String name, command, params, version, info;
-		private String[] delimiters;
-		private boolean supportsIfThenElse, isLegacy;
-		private long timeout;
-
-		HardcodedSolver(String name, String command, String params, String[] delimiters,
-						String version, String info, boolean supportsIfThenElse, long timeout, boolean isLegacy) {
-			this.name = name;
-			this.command = command;
-			this.params = params;
-			this.version = version;
-			this.timeout = timeout;
-			this.delimiters = delimiters;
-			this.supportsIfThenElse = supportsIfThenElse;
-			this.info = info;
-			this.isLegacy = isLegacy;
-		}
-
-		public boolean isLegacy() {
-			return isLegacy;
-		}
-
-		public String getName() {
-			return name;
-		}
-
+		return new SolverTypeImpl(name, info, params, command, version, timeout,
+				delimiters, supportsIfThenElse, translatorClass, translatorParams, handler);
 	}
 
 	/**
 	 * Loads the solvers that are specified in .props files in the directory
 	 * {@link PathConfig#getSmtSolverPropertiesDirectory()} into Properties objects and returns them.
 	 */
+	// TODO How to load multiple files from the resources folder at once WITHOUT knowing their name?
 	private static Collection<Properties> loadSolvers() {
 		InputStream stream = SolverPropertiesLoader.class.getResourceAsStream("defaultSolvers.txt");
 		Collection<Properties> props = new ArrayList<>();
@@ -178,6 +136,15 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 			}
 		}
 		return props;
+	}
+
+
+	private static class ParamConverter {
+
+		private static Object convert(String str) {
+			// TODO: example str.equals "AbstractSMTTranslator.Configuration(false, true)" -> create the object
+			return str;
+		}
 	}
 
 }
