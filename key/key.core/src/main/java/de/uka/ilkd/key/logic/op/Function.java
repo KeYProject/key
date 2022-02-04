@@ -19,6 +19,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 
 /**
  * Objects of this class represent function and predicate symbols. Note
@@ -26,6 +29,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * of function.
  */
 public class Function extends AbstractSortedOperator {
+    private final MixFitInfo mixFitInfo;
 
     private final boolean unique;
     private final boolean skolemConstant;
@@ -34,6 +38,24 @@ public class Function extends AbstractSortedOperator {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
+    Function(Name name,
+             Sort sort,
+             ImmutableArray<Sort> argSorts,
+             ImmutableArray<Boolean> whereToBind,
+             boolean unique,
+             boolean isRigid,
+             boolean isSkolemConstant,
+             @Nullable MixFitInfo mixFitInfo) {
+        super(name, argSorts, sort, whereToBind, isRigid);
+
+        this.unique = unique;
+        skolemConstant = isSkolemConstant;
+        assert sort != Sort.UPDATE;
+        assert !(unique && sort == Sort.FORMULA);
+        assert !(sort instanceof NullSort) || name.toString().equals("null")
+                : "Functions with sort \"null\" are not allowed: " + this;
+        this.mixFitInfo = mixFitInfo;
+    }
 
     Function(Name name,
              Sort sort,
@@ -42,23 +64,19 @@ public class Function extends AbstractSortedOperator {
              boolean unique,
              boolean isRigid,
              boolean isSkolemConstant) {
-	super(name, argSorts, sort, whereToBind, isRigid);
-
-	this.unique = unique;
-	skolemConstant = isSkolemConstant;
-	assert sort != Sort.UPDATE;
-	assert !(unique && sort == Sort.FORMULA);
-	assert !(sort instanceof NullSort) || name.toString().equals("null")
-	       : "Functions with sort \"null\" are not allowed: " + this;
+        this(name, sort, argSorts, whereToBind, unique, isRigid, isSkolemConstant, null);
     }
 
-    public Function(Name name,
-                    Sort sort,
-                    ImmutableArray<Sort> argSorts,
-                    ImmutableArray<Boolean> whereToBind,
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, ImmutableArray<Boolean> whereToBind,
                     boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
+
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, ImmutableArray<Boolean> whereToBind,
+                    boolean unique, MixFitInfo mixFitInfo) {
+        this(name, sort, argSorts, whereToBind, unique, true, false, mixFitInfo);
+    }
+
 
     public Function(Name name,
                     Sort sort,
@@ -79,6 +97,12 @@ public class Function extends AbstractSortedOperator {
              new ImmutableArray<Sort>(argSorts),
              whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind),
              unique);
+    }
+
+    public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
+                    MixFitInfo mixFitInfo) {
+        this(name, sort, new ImmutableArray<>(argSorts),
+                whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique, mixFitInfo);
     }
 
     public Function(Name name,
@@ -118,6 +142,8 @@ public class Function extends AbstractSortedOperator {
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<Sort>(), null, false, true, isSkolemConstant);
     }
+
+
 
 
     //-------------------------------------------------------------------------
@@ -171,5 +197,33 @@ public class Function extends AbstractSortedOperator {
 
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
+    }
+
+    public MixFitInfo getMixFitInfo() {
+        return mixFitInfo;
+    }
+
+    public static class MixFitInfo {
+        @Nonnull
+        public final Kind kind;
+        @Nonnull
+        public final String symbol;
+
+        public MixFitInfo(@Nonnull Kind kind, @Nonnull String symbol) {
+            this.kind = kind;
+            this.symbol = symbol;
+        }
+
+        enum Kind {PREFIX, INFIX, POSTFIX}
+
+        @Nonnull
+        public Kind getKind() {
+            return kind;
+        }
+
+        @Nonnull
+        public String getSymbol() {
+            return symbol;
+        }
     }
 }

@@ -55,6 +55,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
+        Function.MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
+
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = pred_name.substring(0, separatorIndex);
@@ -77,7 +79,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     Sort.FORMULA,
                     argSorts.toArray(new Sort[0]),
                     whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    false);
+                    false, mixFitInfo);
         }
 
         if (lookup(p.name()) == null) {
@@ -98,6 +100,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         if (whereToBind != null && whereToBind.size() != argSorts.size()) {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
+
+        Function.MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
 
         Function f = null;
         assert func_name != null;
@@ -121,7 +125,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     retSort,
                     argSorts.toArray(new Sort[0]),
                     whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    unique);
+                    unique, mixFitInfo);
         }
 
         if (lookup(f.name()) == null) {
