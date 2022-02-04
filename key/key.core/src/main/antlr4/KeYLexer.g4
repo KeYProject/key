@@ -271,137 +271,45 @@ VOCAB
    :       '\u0003'..'\u0377'
    ;
 
-SEMI
-:	';'
-    ;
+fragment OP_SFX: [-+*/&.^]+;
 
-SLASH
-:	'/'
-    ;
-
-COLON:    ':';
-
-DOUBLECOLON
-:    '::'
-  ;
-
-ASSIGN
-:    ':='
-    ;
-
-DOT
-:	'.'
-	;
-
-DOTRANGE
-:	'.' '.'
-	;
-
-COMMA
-:	','
-	;
-
-LPAREN
-:
-	'('
-	;
-
-RPAREN
-:	')'
-    ;
-
-LBRACE
-:	'{'
-	;
-
-RBRACE
-:	'}'
-    ;
-
-LBRACKET
-:	'['
-    ;
-
-RBRACKET
-:	']'
-	;
-
-EMPTYBRACKETS
-:	'[' ']'
-	;
-
-AT
-:	'@'
-	;
-
-PARALLEL
-:     '|' '|'
-	;
-
-
-OR
-:	'|' | '\u2228'
-	;
+SEMI:	 ';';
+SLASH: '/';
+COLON: ':';
+DOUBLECOLON:'::';
+ASSIGN: ':=';
+DOT:	  '.';
+DOTRANGE:	'.' '.';
+COMMA:	',';
+LPAREN:	'(';
+RPAREN:	')';
+LBRACE:	'{';
+RBRACE:	'}';
+LBRACKET:	'[';
+RBRACKET:	']';
+EMPTYBRACKETS:	'[' ']';
+AT:	'@';
+PARALLEL: '|' '|';
+OR:	'|' | '\u2228';
 
 AND
 :	'&' | '\u2227'
 	;
 
-NOT
-:	'!' | '\u00AC'
-	;
-
-IMP
-:	'->' | '\u2192'
-	;
-
-EQUALS
-:	'='
-	;
-
-NOT_EQUALS
-:	'!=' | '\u2260'
-	;
-
-SEQARROW
-:	'==>' | '\u27F9'
-	;
-
-EXP
-:	'^'
-	;
-
-TILDE
-:	'~'
-	;
-
-PERCENT
-:   '%'
-      ;
-
-STAR
-:   '*'
-      ;
-
-MINUS
-:   '-'
-      ;
-
-PLUS
-:   '+'
-      ;
-
-GREATER
-:   '>'
-      ;
-
-GREATEREQUAL
-:   '>' '=' | '\u2265'
-      ;
-
-RGUILLEMETS
-      :   '>' '>'
-      ;
+NOT:	'!' | '\u00AC';
+IMP:	'->' | '\u2192';
+EQUALS:	'=';
+NOT_EQUALS:	'!=' | '\u2260';
+SEQARROW:	'==>' | '\u27F9';
+EXP:	'^' OP_SFX?;
+TILDE:	'~' OP_SFX?;
+PERCENT: '%' OP_SFX?;
+STAR :   '*' OP_SFX?;
+MINUS:   '-' OP_SFX?;
+PLUS:    '+' OP_SFX?;
+GREATER: '>' ;
+GREATEREQUAL:   '>' '=' | '\u2265';
+RGUILLEMETS: '>' '>' ;
       
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;

@@ -308,10 +308,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
             final String opTok = ctx.op.get(i).getText();
-            // it's either + or -.
-            String opname = opTok.equals("+") ? "add" : "sub";
             Term cur = terms.get(i);
-            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
+            last = binaryLDTSpecificTerm(ctx, opTok, last, cur);
         }
         return last;
     }
@@ -344,7 +342,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
             Term cur = terms.get(i);
-            last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
+            last = binaryLDTSpecificTerm(ctx, ctx.STAR(i).getText(), last, cur);
         }
         return last;
     }
@@ -355,8 +353,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.b == null) return termL;
 
         Term termR = accept(ctx.b);
-        String opName = ctx.SLASH() != null ? "div" : "mod";
-        return binaryLDTSpecificTerm(ctx, opName, termL, termR);
+        //String opName = ctx.SLASH() != null ? "div" : "mod";
+        return binaryLDTSpecificTerm(ctx, ctx.op.getText(), termL, termR);
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
