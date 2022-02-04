@@ -635,6 +635,10 @@ public final class JmlTermFactory {
                     throw exc.createException0("Cannot cast from boolean to " + type + ".");
                 }
             } else if (targetSort == services.getTypeConverter().getIntegerLDT().targetSort()) {
+                if (origSort != services.getTypeConverter().getIntegerLDT().targetSort()) {
+                    // first cast to int and then refine ...
+                    result =  new SLExpression(tb.cast(targetSort, result.getTerm()));
+                }
                 return buildIntCastExpression(type, result);
             } else {
                 return new SLExpression(
