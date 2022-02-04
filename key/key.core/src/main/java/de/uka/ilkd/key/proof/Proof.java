@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.lookup.Lookup;
 
 
 /**
@@ -152,6 +154,9 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
      */
     private File proofFile;
+
+    @Nullable
+    private Lookup userData;
 
     /**
      * constructs a new empty proof with name
@@ -460,11 +465,32 @@ public class Proof implements Named {
     }
 
     /**
-     * returns the list of open goals
+     * Returns the list of open goals.
      * @return list with the open goals
      */
     public ImmutableList<Goal> openGoals() {
         return openGoals;
+    }
+
+    /**
+     * Returns the list of closed goals, needed to make pruning in closed branches
+     * possible. If the list needs too much memory, pruning can be disabled via the
+     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * @return list with the closed goals
+     */
+    public ImmutableList<Goal> closedGoals() {
+        return closedGoals;
+    }
+    
+    /**
+     * Returns the list of all, open and closed, goals.
+     * @return list with all goals.
+     * 
+     * @see #openGoals()
+     * @see #closedGoals()
+     */
+    public ImmutableList<Goal> allGoals() {
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
     }
 
     /**
@@ -745,6 +771,10 @@ public class Proof implements Named {
             //remove the goals of the residual leaves.
             removeOpenGoals(residualLeaves);
             removeClosedGoals(residualLeaves);
+
+            /* this ensures that the open goals are in interactive mode and thus all rules are
+             * available in the just pruned goal (see GitLab #1480) */
+            setRuleAppIndexToInteractiveMode();
 
             return subtrees;
 
@@ -1311,5 +1341,57 @@ public class Proof implements Named {
                 getServices().getProfile().getStrategyFactory(activeStrategyName) :
                     getServices().getProfile().getDefaultStrategyFactory();
 
+    }
+
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @Nonnull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 }

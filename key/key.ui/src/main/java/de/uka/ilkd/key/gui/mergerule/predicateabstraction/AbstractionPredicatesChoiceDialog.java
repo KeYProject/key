@@ -31,6 +31,8 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -39,13 +41,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 
@@ -58,13 +59,14 @@ import java.util.*;
 public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final String AVAILABLE_PROGRAM_VARIABLES_DESCR = "Available Program Variables: ";
     private static final long serialVersionUID = 1L;
-    private final static MainWindow MAIN_WINDOW_INSTANCE = //
+    private static final MainWindow MAIN_WINDOW_INSTANCE = //
             MainWindow.getInstance();
 
     /** The initial size of this dialog. */
     private static final Dimension INITIAL_SIZE = new Dimension(850, 600);
 
     private static final String DIALOG_TITLE = "Choose abstraction predicates for merge";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractionPredicatesChoiceDialog.class);
 
     private Goal goal = null;
 
@@ -126,8 +128,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private AbstractionPredicatesChoiceDialog() {
         super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, true);
-        setLocation(MAIN_WINDOW_INSTANCE.getLocation());
         setSize(INITIAL_SIZE);
+        setLocationRelativeTo(MAIN_WINDOW_INSTANCE);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         createDialog();
@@ -175,22 +177,16 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         final JPanel controlsPanel = new JPanel(new FlowLayout());
         final JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                registeredPlaceholders = null;
-                registeredPredicates = null;
-                setVisible(false);
-                dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            registeredPlaceholders = null;
+            registeredPredicates = null;
+            setVisible(false);
+            dispose();
         });
         final JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            setVisible(false);
+            dispose();
         });
         controlsPanel.add(cancelButton);
         controlsPanel.add(okButton);
@@ -306,27 +302,25 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 } catch (Exception e) {
                     placeholdersProblemsListData.clear();
                     placeholdersProblemsListData.add(e.getMessage());
+                    LOGGER.error("Exception!", e);
                 }
             }
         });
 
-        txtPlaceholderInput.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final String currInput = txtPlaceholderInput.getText();
-                if (placeholdersProblemsListData.isEmpty()
-                        && !currInput.isEmpty()) {
-                    placeholdersLstModel.addElement(currInput);
-                    txtPlaceholderInput.setText("");
+        txtPlaceholderInput.addActionListener(e -> {
+            final String currInput = txtPlaceholderInput.getText();
+            if (placeholdersProblemsListData.isEmpty()
+                    && !currInput.isEmpty()) {
+                placeholdersLstModel.addElement(currInput);
+                txtPlaceholderInput.setText("");
 
-                    final Pair<Sort, Name> parsed = parsePlaceholder(currInput);
-                    registeredPlaceholders.add(parsed);
-                    final Namespace<IProgramVariable> pvs = goal.proof()
-                            .getServices().getNamespaces().programVariables();
-                    pvs.add(new LocationVariable(
-                        new ProgramElementName(parsed.second.toString()),
-                        parsed.first));
-                }
+                final Pair<Sort, Name> parsed = parsePlaceholder(currInput);
+                registeredPlaceholders.add(parsed);
+                final Namespace<IProgramVariable> pvs = goal.proof()
+                        .getServices().getNamespaces().programVariables();
+                pvs.add(new LocationVariable(
+                    new ProgramElementName(parsed.second.toString()),
+                    parsed.first));
             }
         });
 
@@ -405,29 +399,27 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 } catch (Exception e) {
                     abstrPredProblemsListData.clear();
                     abstrPredProblemsListData.add(e.getMessage());
+                    LOGGER.error("Exception!", e);
                 }
             }
         });
 
-        txtAbstrPredInput.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final String currInput = txtAbstrPredInput.getText();
-                if (abstrPredProblemsListData.isEmpty()
-                        && !currInput.isEmpty()) {
-                    abstrPredListModel.addElement(currInput);
-                    txtAbstrPredInput.setText("");
+        txtAbstrPredInput.addActionListener(e -> {
+            final String currInput = txtAbstrPredInput.getText();
+            if (abstrPredProblemsListData.isEmpty()
+                    && !currInput.isEmpty()) {
+                abstrPredListModel.addElement(currInput);
+                txtAbstrPredInput.setText("");
 
-                    AbstractionPredicate parsed;
-                    try {
-                        parsed = parsePredicate(currInput,
-                            goal.getLocalNamespaces());
-                    } catch (Exception exc) {
-                        throw new RuntimeException(exc);
-                    }
-
-                    registeredPredicates.add(parsed);
+                AbstractionPredicate parsed;
+                try {
+                    parsed = parsePredicate(currInput,
+                        goal.getLocalNamespaces());
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
                 }
+
+                registeredPredicates.add(parsed);
             }
         });
 
@@ -450,28 +442,13 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private JPanel createLatticeTypePanel() {
         final JRadioButton simplePredLatticeBtn = new JRadioButton(
             "Simple Predicates Lattice");
-        simplePredLatticeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latticeType = SimplePredicateAbstractionLattice.class;
-            }
-        });
+        simplePredLatticeBtn.addActionListener(e -> latticeType = SimplePredicateAbstractionLattice.class);
         final JRadioButton conjPredLatticeBtn = new JRadioButton(
             "Conjunctive Predicates Lattice");
-        conjPredLatticeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latticeType = ConjunctivePredicateAbstractionLattice.class;
-            }
-        });
+        conjPredLatticeBtn.addActionListener(e -> latticeType = ConjunctivePredicateAbstractionLattice.class);
         final JRadioButton disjPredLatticeBtn = new JRadioButton(
             "Disjunctive Predicates Lattice");
-        disjPredLatticeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latticeType = DisjunctivePredicateAbstractionLattice.class;
-            }
-        });
+        disjPredLatticeBtn.addActionListener(e -> latticeType = DisjunctivePredicateAbstractionLattice.class);
 
         final ButtonGroup latticeTypeBtnGroup = new ButtonGroup();
         latticeTypeBtnGroup.add(simplePredLatticeBtn);
@@ -499,19 +476,17 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         assert infoHTML != null && infoCSS != null : //
         "Could not find css/html resources for the abstraction predicates choice dialog.";
 
-        final StringBuilder sb = new StringBuilder();
-        sb.append("<html><head>");
-        sb.append("<style type=\"text/css\">");
-        sb.append(infoCSS);
-        sb.append("</style>");
-
-        sb.append("</head><body>");
-        sb.append(infoHTML);
-        sb.append("</body></html>");
+        String sb = "<html><head>" +
+                "<style type=\"text/css\">" +
+                infoCSS +
+                "</style>" +
+                "</head><body>" +
+                infoHTML +
+                "</body></html>";
 
         final JTextPane infoLabel = new JTextPane();
         infoLabel.setContentType("text/html");
-        infoLabel.setText(sb.toString());
+        infoLabel.setText(sb);
 
         final TitledBorder infoLabelBorder = new TitledBorder(
             "Information on Merges with Predicate Abstraction");
@@ -568,8 +543,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      *            representation.
      * @return A String representation of the given abstraction predicate.
      */
-    private String abstrPredToStringRepr(
-            Optional<AbstractPredicateAbstractionDomainElement> domElem) {
+    private String abstrPredToStringRepr(Optional<AbstractPredicateAbstractionDomainElement> domElem) {
         if (domElem == null) {
             return "";
         }
@@ -578,8 +552,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             return "None.";
         }
 
-        final AbstractPredicateAbstractionDomainElement predElem = //
-                (AbstractPredicateAbstractionDomainElement) domElem.get();
+        final AbstractPredicateAbstractionDomainElement predElem = domElem.get();
 
         if (predElem.getPredicates().size() < 1) {
             return predElem.toString();
@@ -626,22 +599,22 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private static URL getURLForResourceFile(Class<?> cl, String filename) {
         URL url = cl.getResource(filename);
-        Debug.out("Load Resource:" + filename + " of class " + cl);
+        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (url == null && cl.getSuperclass() != null) {
             return getURLForResourceFile(cl.getSuperclass(), filename);
         } else if (url == null && cl.getSuperclass() == null) {
             // error message Resource not found
-            System.out.println("No resource " + filename + " found");
+            LOGGER.error("No resource {} found", filename);
             return null;
         } else {
-            Debug.out("Done.");
+            LOGGER.debug("Done.");
             return url;
         }
     }
 
     private static String readFromURL(URL url) {
         try (final InputStream is = url.openStream();
-                final Scanner s = new Scanner(is, "UTF-8")) {
+                final Scanner s = new Scanner(is, StandardCharsets.UTF_8)) {
             return s.useDelimiter("\\A").next();
         } catch (IOException e) {
             return null;
@@ -661,8 +634,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     class Result {
         private ArrayList<AbstractionPredicate> registeredPredicates;
         private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
-        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices = //
-                new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
+        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices
+                = new LinkedHashMap<>();
 
         public Result(ArrayList<AbstractionPredicate> registeredPredicates,
                 Class<? extends AbstractPredicateAbstractionLattice> latticeType,
@@ -719,7 +692,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
             final AbstractDomainLattice lattice = new MergeWithPredicateAbstraction(
                 registeredPredicates, latticeType,
-                new LinkedHashMap<ProgramVariable, AbstractDomainElement>())
+                    new LinkedHashMap<>())
                         .getAbstractDomainForSort(s, MainWindow.getInstance()
                                 .getMediator().getServices());
 
@@ -843,12 +816,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final de.uka.ilkd.key.proof.Proof proof = loadProof(
             "firstTouch/01-Agatha/project.key");
 
-        final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
+        final ArrayList<LocationVariable> differingLocVars = new ArrayList<>();
         differingLocVars.add(new LocationVariable(
             new ProgramElementName("test"),
-            (Sort) proof.getServices().getNamespaces().sorts().lookup("int")));
+                proof.getServices().getNamespaces().sorts().lookup("int")));
         differingLocVars.add(
-            new LocationVariable(new ProgramElementName("test1"), (Sort) proof
+            new LocationVariable(new ProgramElementName("test1"), proof
                     .getServices().getNamespaces().sorts().lookup("boolean")));
 
         final AbstractionPredicatesChoiceDialog dialog = //
@@ -875,9 +848,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                         de.uka.ilkd.key.proof.init.JavaProfile
                                 .getDefaultInstance(),
                         proofFile, null, null, null, true);
-            de.uka.ilkd.key.proof.Proof proof = environment.getLoadedProof();
 
-            return proof;
+            return environment.getLoadedProof();
         } catch (de.uka.ilkd.key.proof.io.ProblemLoaderException e) {
             return null;
         }

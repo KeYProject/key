@@ -1,0 +1,16 @@
+### KeY
+
+\problem { (int)42 = 42 }
+
+### contains.1
+
+(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
+(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
+
+### contains.2
+
+(assert (not (= (cast (i2u 42) sort_int) (i2u 42))))
+
+### expected
+
+valid

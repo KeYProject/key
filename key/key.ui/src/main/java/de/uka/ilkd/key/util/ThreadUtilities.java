@@ -1,11 +1,16 @@
 package de.uka.ilkd.key.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
 public final class ThreadUtilities {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
+
 
     /**
          * Invoke a runnable object on the AWT event thread and wait for the
@@ -22,14 +27,11 @@ public final class ThreadUtilities {
                 try{
                     SwingUtilities.invokeAndWait(runner);
                 } catch(InterruptedException e) {
-                	Debug.out(e);
-    //                System.err.println(e);
-    //                e.printStackTrace();
+                    LOGGER.debug("", e);
                 } catch(InvocationTargetException ite) {
                     Throwable targetExc = ite.getTargetException();
-                    System.err.println(targetExc);
-                    targetExc.printStackTrace();
-                    ite.printStackTrace();
+                    LOGGER.debug("",targetExc);
+                    LOGGER.debug("",ite);
                 }
             }
         }

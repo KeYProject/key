@@ -85,35 +85,35 @@ public abstract class AbstractProblemLoader {
 
     public static class ReplayResult {
 
-		private Node node;
-		private List<Throwable> errors;
-		private String status;
+        private Node node;
+        private List<Throwable> errors;
+        private String status;
 
-		public ReplayResult(String status, List<Throwable> errors, Node node) {
-			this.status = status;
-			this.errors = errors;
-			this.node = node;				
-		}
+        public ReplayResult(String status, List<Throwable> errors, Node node) {
+            this.status = status;
+            this.errors = errors;
+            this.node = node;
+        }
 
-		public Node getNode() {
-			return node;
-		}
+        public Node getNode() {
+            return node;
+        }
 
-		public String getStatus() {
-			return status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public List<Throwable> getErrorList() {
-			return errors;
-		}
+        public List<Throwable> getErrorList() {
+            return errors;
+        }
 
-		public boolean hasErrors() {
-			return errors != null && !errors.isEmpty();
-		}
+        public boolean hasErrors() {
+            return errors != null && !errors.isEmpty();
+        }
 
-	}
+    }
 
-	/**
+    /**
      * The file or folder to load.
      */
     private final File file;
@@ -241,6 +241,10 @@ public abstract class AbstractProblemLoader {
         this.includes = includes;
     }
 
+    protected void setProof(Proof proof) {
+        this.proof = proof;
+    }
+
     /**
      * Executes the loading process and tries to instantiate a proof
      * and to re-apply rules on it if possible.
@@ -248,53 +252,23 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public void load() throws ProofInputException, IOException, ProblemLoaderException {
+    public final void load() throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
-        FileRepo fileRepo = createFileRepo();
+        loadEnvironment();
 
-        // Read environment
-        envInput = createEnvInput(fileRepo);
-        problemInitializer = createProblemInitializer(fileRepo);
-        initConfig = createInitConfig();
-        initConfig.setFileRepo(fileRepo);
-        if (!problemInitializer.getWarnings().isEmpty()) {
-            control.reportWarnings(problemInitializer.getWarnings());
-        }
-        // Read proof obligation settings
+
         LoadedPOContainer poContainer = createProofObligationContainer();
         ProofAggregate proofList = null;
         try {
             if (poContainer == null) {
                 if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                    if (control.selectProofObligation(initConfig)) {
-                        return;
-                    } else {
-                        // That message would be reported otherwise. Undesired.
-                        // return new ProblemLoaderException(this, "Aborted.");
-                        return;
-                    }
-                } else {
-                    // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                    // to access the loaded InitConfig.
-                    return;
+                    selectAndLoadProof(control, initConfig);
                 }
+            } else {
+                proofList = createProof(poContainer);
+                loadSelectedProof(poContainer, proofList);
             }
-
-            // Create and register proof at specification repository
-            proofList = createProof(poContainer);
-
-            // try to replay first proof
-            proof = proofList.getProof(poContainer.getProofNum());
-
-
-            if (proof != null) {
-                OneStepSimplifier.refreshOSS(proof);
-                result = replayProof(proof);
-            }
-
-            // this message is propagated to the top level in console mode
-            return; // Everything fine
         } catch (Throwable t) {
             // Throw this exception; otherwise, it can for instance occur
             // that "result" will be null (if replayProof(...) fails) and
@@ -302,6 +276,53 @@ public abstract class AbstractProblemLoader {
             throw t;
         } finally {
             control.loadingFinished(this, poContainer, proofList, result);
+        }
+    }
+
+    /**
+     * Loads and initialized the proof environment.
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
+     * @see AbstractProblemLoader#load()
+     */
+    protected void loadEnvironment() throws ProofInputException, IOException {
+        FileRepo fileRepo = createFileRepo();
+
+        envInput = createEnvInput(fileRepo);
+        problemInitializer = createProblemInitializer(fileRepo);
+        initConfig = createInitConfig();
+        initConfig.setFileRepo(fileRepo);
+        if (!problemInitializer.getWarnings().isEmpty()) {
+            control.reportWarnings(problemInitializer.getWarnings());
+        }
+    }
+
+    /**
+     * Asks the user to select a proof obligation and loads it.
+     * @param control the ui controller.
+     * @param initConfig the proof configuration.
+     * @see AbstractProblemLoader#load()
+     */
+    protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
+        control.selectProofObligation(initConfig);
+    }
+    /**
+     * Loads a proof from the proof list.
+     * @param poContainer the container created by {@link #createProofObligationContainer()}.
+     * @param proofList the proof list containing the proof to load.
+     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     * @see AbstractProblemLoader#load()
+     */
+    protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList)
+            throws ProofInputException, ProblemLoaderException {
+        // try to replay first proof
+        proof = proofList.getProof(poContainer.getProofNum());
+
+
+        if (proof != null) {
+            OneStepSimplifier.refreshOSS(proof);
+            result = replayProof(proof);
         }
     }
 
@@ -586,7 +607,7 @@ public abstract class AbstractProblemLoader {
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
-        		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+                problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
             // register proof
@@ -655,7 +676,7 @@ public abstract class AbstractProblemLoader {
                         .get(StrategyProperties.OSS_OPTIONS_KEY);
         ReplayResult result;
         try {
-        	assert envInput instanceof KeYUserProblemFile;
+            assert envInput instanceof KeYUserProblemFile;
 
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
@@ -680,11 +701,13 @@ public abstract class AbstractProblemLoader {
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
         } catch (Exception e) {
-        	if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
-        	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
-        		// this exception was something unexpected
-        		errors.add(e);
-        	}
+            if (parserResult == null || parserResult.getErrors() == null
+                    || parserResult.getErrors().isEmpty()
+                    || replayer == null || replayResult == null
+                    || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
+                // this exception was something unexpected
+                errors.add(e);
+            }
         } finally {
             if (parserResult != null) {
                 status = parserResult.getStatus();

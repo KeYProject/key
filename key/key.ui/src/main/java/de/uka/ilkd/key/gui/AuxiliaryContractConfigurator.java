@@ -73,10 +73,10 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
                       final T[] contracts,
                       final String title) {
         initContractPanel(services, contractPanel, contracts, title);
-        initButtonPanelAndOkayAndCancelButtons();
+        initButtonPanelAndOkAndCancelButtons();
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         pack();
-        setLocation(70, 70);
+        setLocationRelativeTo(getOwner());
         setVisible(true);
     }
 
@@ -97,17 +97,17 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
         getContentPane().add(contractPanel);
     }
 
-    private void initButtonPanelAndOkayAndCancelButtons() {
+    private void initButtonPanelAndOkAndCancelButtons() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         Dimension buttonDim = new Dimension(100, 27);
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
-        initOkayButton(buttonDim, buttonPanel);
+        initOkButton(buttonDim, buttonPanel);
         initCancelButton(buttonDim, buttonPanel);
     }
 
-    private void initOkayButton(final Dimension dimension, final JPanel container) {
+    private void initOkButton(final Dimension dimension, final JPanel container) {
         okButton = new JButton("OK");
         okButton.setPreferredSize(dimension);
         okButton.setMinimumSize(dimension);
@@ -150,7 +150,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
     }
 
     /**
-     * Tells whether the user clicked "ok".
+     * Tells whether the user clicked "OK".
      */
     public boolean wasSuccessful() {
         return successful;

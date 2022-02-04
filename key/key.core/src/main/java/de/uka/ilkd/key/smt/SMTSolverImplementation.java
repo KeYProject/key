@@ -13,338 +13,324 @@
 
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.SolverCommunication;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+/**
+ * Represents a concrete instance of a running solver process on the KeY side. Amongst others
+ * performs the following steps:
+ * <ol>
+ *     <li>Translates the given problem to SMT format.</li>
+ *      <li>Starts the external solver process.</li>
+ *      <li>Sends the problem to the process.</li>
+ *      <li>Communicates with the solver via the solver socket.</li>
+ * </ol>
+ *
+ * @author ?
+ * @author Wolfram Pfeifer (SMT communication overhaul)
+ */
+public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
-interface SolverListener {
-        void processStarted(SMTSolver solver, SMTProblem problem);
+    /**
+     * used to generate unique ids for each running solver instance
+     */
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger();
 
-        void processInterrupted(SMTSolver solver, SMTProblem problem,
-                        Throwable e);
+    /**
+     * the unique id of this solver
+     */
+    private final int id = ID_COUNTER.incrementAndGet();
 
-        void processStopped(SMTSolver solver, SMTProblem problem);
+    /**
+     * the socket that handles solver results and interactively communicates with the running
+     * external solver process
+     */
+    private final @Nonnull
+    AbstractSolverSocket socket;
 
-        void processTimeout(SMTSolver solver, SMTProblem problem);
+    /**
+     * the ModelExtractor used to generate counterexamples (only used for CE solver type)
+     */
+    private ModelExtractor query;
 
-        void processUser(SMTSolver solver, SMTProblem problem);
-}
+    /**
+     * The SMT problem that is related to this solver
+     */
+    private final SMTProblem problem;
 
-final class SMTSolverImplementation implements SMTSolver, Runnable{
- 
-        private static int IDCounter = 0;
-        private final int ID = IDCounter++;
-        
-        private AbstractSolverSocket socket;
-        
-        private ModelExtractor query;
+    /**
+     * It is possible that a solver has a listener.
+     */
+    private final SolverListener listener;
+
+    /**
+     * starts a external process and returns the result
+     */
+    private final ExternalProcessLauncher processLauncher;
+
+    /**
+     * The services object is stored in order to have the possibility to
+     * access it in every method
+     */
+    private final Services services;
+
+    /**
+     * The record of the communication between KeY and the given solver. If everything works fine,
+     * it also contains the final result.
+     */
+    private final SolverCommunication solverCommunication = new SolverCommunication();
+
+    /**
+     * The thread that is associated with this solver.
+     */
+    private Thread thread;
+
+    /**
+     * The timeout that is associated with this solver. Represents the
+     * timertask that is started when the solver is started.
+     */
+    private SolverTimeout solverTimeout;
+
+    /**
+     * stores the reason for interruption if present (e.g. User, Timeout, Exception)
+     */
+    private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
+
+    /**
+     * the state the solver is currently in
+     */
+    private SolverState solverState = SolverState.Waiting;
+
+    /**
+     * the type of this solver (Z3, CVC4, Z3_CE, ...)
+     */
+    private final SolverType type;
+
+    /**
+     * Stores the settings that are used for the execution.
+     */
+    private SMTSettings smtSettings;
+
+    /**
+     * Stores the translation of the problem that is associated with this
+     * solver
+     */
+    private String problemString = "NOT YET COMPUTED";
+
+    /**
+     * Stores the taclet translation that is associated with this solver.
+     */
+    private TacletSetTranslation tacletTranslation;
+
+    /**
+     * If there was an exception while executing the solver it is stored in this attribute.
+     */
+    private Throwable exception;
+
+    /**
+     * the exceptions that may occur during taclet translation
+     */
+    private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
+
+    /**
+     * The timeout in seconds for this SMT solver run.
+     */
+    private long timeout = -1;
+
+    /**
+     * Creates a new instance an SMT solver.
+     *
+     * @param problem  the problem to send to the external solver process
+     * @param listener the listener that has to be informed when the solver state changes
+     * @param services the services needed to translate the problem to SMT format
+     * @param myType   the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
+     */
+    public SMTSolverImplementation(SMTProblem problem, SolverListener listener,
+                                   Services services, SolverType myType) {
+        this.problem = problem;
+        this.listener = listener;
+        this.services = services;
+        this.type = myType;
+        this.socket = AbstractSolverSocket.createSocket(type, query);
+        processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
+    }
+
+    /**
+     * Starts a solver process. This method should be accessed only by an
+     * instance of <code>SolverLauncher</code>. If you want to start a
+     * solver please have a look at <code>SolverLauncher</code>.
+     *
+     * @param timeout  the timeout to use for the solver
+     * @param settings the SMTSettings to use for this solver
+     */
+    @Override
+    public void start(SolverTimeout timeout, SMTSettings settings) {
+        thread = new Thread(this, "SMTProcessor");
+        solverTimeout = timeout;
+        smtSettings = settings;
+        thread.start();
+    }
+
+    @Override
+    public ReasonOfInterruption getReasonOfInterruption() {
+        return isRunning() ? ReasonOfInterruption.NoInterruption
+                : reasonOfInterruption;
+    }
+
+    public Throwable getException() {
+        return isRunning() ? null : exception;
+    }
+
+    public SMTProblem getProblem() {
+        return isRunning() ? null : problem;
+    }
+
+    public void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption) {
+        this.reasonOfInterruption = reasonOfInterruption;
+    }
+
+    private void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption, Throwable exc) {
+        this.reasonOfInterruption = reasonOfInterruption;
+        this.exception = exc;
+    }
+
+    @Override
+    public SolverType getType() {
+        return type;
+    }
+
+    @Override
+    public long getStartTime() {
+        if (solverTimeout == null) {
+            return -1;
+        }
+        return solverTimeout.scheduledExecutionTime();
+    }
+
+    @Override
+    public long getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    @Override
+    public SolverState getState() {
+        return solverState;
+    }
+
+    private void setSolverState(SolverState value) {
+        solverState = value;
+    }
+
+    @Override
+    public boolean wasInterrupted() {
+        return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return getState() == SolverState.Running;
+    }
 
 
-        public ModelExtractor getQuery() {
-			return query;
-		}
+    @Override
+    public void run() {
 
-		public void setQuery(ModelExtractor query) {
-			this.query = query;
-		}
+        // Firstly: Set the state to running and inform the listener.
+        setSolverState(SolverState.Running);
+        listener.processStarted(this, problem);
 
-		/** The SMT problem that is related to this solver */
-        private SMTProblem problem;
-        /** It is possible that a solver has a listener. */
-        private SolverListener listener;
-
-        /** starts a external process and returns the result */
-        private ExternalProcessLauncher<SolverCommunication> processLauncher;
-   
-        /**
-         * The services object is stored in order to have the possibility to
-         * access it in every method
-         */
-        private Services services;
-        /**
-         * The record of the communication between KeY and the given solver. If everything works fine,
-         * it also contains the final result.
-         */
-        private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
-        
-        /**
-         * This holds information relevant for retrieving information on a model
-         * from an SMT instance.
-         * null in the beginning, is created at translation time.
-         * FIXME: Why is this here? It is currently not being used!
-         */
-        // private ProblemTypeInformation problemTypeInformation = null;
-
-        /**
-         * This lock variable is responsible for the state variable
-         * <code>sovlerState</code>
-         */
-        private ReentrantLock lockStateVariable = new ReentrantLock();
-        /**
-         * This lock variable is responsible for the attribute
-         * <code>reasonOfInterruption</code>
-         */
-        private ReentrantLock lockInterruptionVariable = new ReentrantLock();
-
-        /** The thread that is associated with this solver. */
-        private Thread thread;
-        /**
-         * The timeout that is associated with this solver. Represents the
-         * timertask that is started when the solver is started.
-         */
-        private SolverTimeout solverTimeout;
-
-        private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
-        private SolverState solverState = SolverState.Waiting;
-
-        private final SolverType type;
-        /** Strores the settings that are used for the execution. */
-        private SMTSettings smtSettings;
-
-        /**
-         * Stores the translation of the problem that is associated with this
-         * solver
-         */
-        private String problemString = "NOT YET COMPUTED";
-        /** Stores the taclet translation that is associated with this solver. */
-        private TacletSetTranslation tacletTranslation;
-        /**
-         * If there was an exception while executing the solver it is stored in
-         * this attribute
-         */
-        private Throwable exception;
-        
-        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
-
- 
-
-
-        SMTSolverImplementation(SMTProblem problem, SolverListener listener,
-                        Services services, SolverType myType) {
-                this.problem = problem;
-                this.listener = listener;
-                this.services = services;
-                this.type = myType;
-                this.socket = AbstractSolverSocket.createSocket(type, query);
-                processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
-
+        // Secondly: Translate the given problem
+        String[] commands;
+        try {
+            commands = translateToCommand(problem.getSequent());
+        } catch (IllegalFormulaException e) {
+            interruptionOccurred(e);
+            listener.processInterrupted(this, problem, e);
+            setSolverState(SolverState.Stopped);
+            solverTimeout.cancel();
+            return;
         }
 
-        /**
-         * Starts a solver process. This method should be accessed only by an
-         * instance of <code>SolverLauncher</code>. If you want to start a
-         * solver please have a look at <code>SolverLauncher</code>.
-         * 
-         * @param timeout
-         * @param settings
-         */
-        public void start(SolverTimeout timeout, SMTSettings settings) {
-                thread = new Thread(this,"SMTProcessor");
-                solverTimeout = timeout;
-                smtSettings = settings;
-                thread.start();
-        }
+        // Thirdly: start the external process.
+        try {
+            processLauncher.launch(commands);
+            processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
+            //processLauncher.getPipe().sendEOF();
 
-        @Override
-        public ReasonOfInterruption getReasonOfInterruption() {
-                return isRunning() ? ReasonOfInterruption.NoInterruption
-                                : reasonOfInterruption;
-        }
-
-        public Throwable getException() {
-                return isRunning() ? null : exception;
-        }
-
-        public SMTProblem getProblem() {
-                return isRunning() ? null : problem;
-        }
-
-        public void setReasonOfInterruption(
-                        ReasonOfInterruption reasonOfInterruption) {
-                try {
-                        lockInterruptionVariable.lock();
-                        this.reasonOfInterruption = reasonOfInterruption;
-                } finally {
-                        lockInterruptionVariable.unlock();
-                }
-        }
-
-        private void setReasonOfInterruption(
-                        ReasonOfInterruption reasonOfInterruption, Throwable exc) {
-                try {
-                        lockInterruptionVariable.lock();
-                        this.reasonOfInterruption = reasonOfInterruption;
-                        this.exception = exc;
-                } finally {
-                        lockInterruptionVariable.unlock();
-                }
-        }
-
-        @Override
-        public SolverType getType() {
-                return type;
-        }
-
-        @Override
-        public long getStartTime() {
-                if (solverTimeout == null) {
-                        return -1;
-                }
-                return solverTimeout.scheduledExecutionTime();
-        }
-
-        @Override
-        public long getTimeout() {
-                if (solverTimeout == null) {
-                        return -1;
-                }
-                return solverTimeout.getTimeout();
-        }
-
-        @Override
-        public SolverState getState() {
-                try {
-                        lockStateVariable.lock();
-                        SolverState b = solverState;
-                        return b;
-                } finally { // finally trumps return
-                        lockStateVariable.unlock();
-                }
-        }
-
-        private void setSolverState(SolverState value) {
-                try {
-                        lockStateVariable.lock();
-                        solverState = value;
-                } finally { // finally trumps return
-                        lockStateVariable.unlock();
-                }
-        }
-
-        @Override
-        public boolean wasInterrupted() {
-                return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
-        }
-
-        @Override
-        public boolean isRunning() {
-                return getState() == SolverState.Running;
-        }
-
-
-        @Override
-        public void run() {
-        		
-                // Firstly: Set the state to running and inform the listener.
-                setSolverState(SolverState.Running);
-                listener.processStarted(this, problem);
-                                
-                // Secondly: Translate the given problem
-                String commands[];
-                try {
-                        commands = translateToCommand(problem.getTerm());
-                } catch (Throwable e) {
-                        interruptionOccurred(e);
-                        listener.processInterrupted(this, problem, e);
-                        setSolverState(SolverState.Stopped);
-                        solverTimeout.cancel();
-                        return;
-                }
-     
-
-                // start the external process.
-                try {
-                        processLauncher.launch(commands,type.modifyProblem(problemString),socket);
-                 
-                        solverCommunication = processLauncher.getCommunication();
-                        if(solverCommunication.exceptionHasOccurred() && 
-                          !solverCommunication.resultHasBeenSet()){ 
-                        	// if the result has already been set, the exceptions 
-                        	// must have occurred while doing the remaining communication, which is not that important.
-                        	throw new AccumulatedException(solverCommunication.getExceptions());
-                        }
-                                      
-                        // uncomment for testing
-                      //  Thread.sleep(3000);
-                        // uncomment for testing
-                       // Random random = new Random();
-                        //Thread.sleep(random.nextInt(3000)+1000);
-                        //throw new RuntimeException("Test exception");
-                } catch (Throwable e) {
-                        interruptionOccurred(e);
-                } finally {
-                        // Close every thing.
-                        solverTimeout.cancel();
-                        setSolverState(SolverState.Stopped);
-                        listener.processStopped(this, problem);
-                }
-
-        }
-
-        private void interruptionOccurred(Throwable e) {
-                ReasonOfInterruption reason = getReasonOfInterruption();
-                switch (reason) {
-                case Exception:
-                case NoInterruption:
-                        setReasonOfInterruption(ReasonOfInterruption.Exception,
-                                        e);
-                        listener.processInterrupted(this, problem, e);
-                        break;
-                case Timeout:
-                        listener.processTimeout(this, problem);
-                        break;
-                case User:
-                        listener.processUser(this, problem);
-                        break;
-                }
-        }
-
-        @Override
-        public String name() {
-                return type.getName();
-        }
-
-
-        
-        private static String indent(String string) {
-
-            StringBuilder sb = new StringBuilder();
-            int indention = 0;
-
-            for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
-                switch (c) {
-                case '(':
-                    sb.append("\n");
-                    for (int j = 0; j < indention; j++)
-                        sb.append(" ");
-                    sb.append("(");
-                    indention++;
-                    break;
-                case ')':
-                    indention--;
-                    // fall through
-                default:
-                    sb.append(c);
-                }
+            String msg = processLauncher.getPipe().readMessage();
+            while (msg != null) {
+                socket.messageIncoming(processLauncher.getPipe(), msg);
+                msg = processLauncher.getPipe().readMessage();
             }
-
-            return sb.toString();
+        } catch (IllegalStateException | IOException | InterruptedException e) {
+            interruptionOccurred(e);
+            Thread.currentThread().interrupt();
+        } finally {
+            // Close everything.
+            solverTimeout.cancel();
+            setSolverState(SolverState.Stopped);
+            listener.processStopped(this, problem);
+            processLauncher.stop();
         }
+    }
 
+    private void interruptionOccurred(Throwable e) {
+        ReasonOfInterruption reason = getReasonOfInterruption();
+        setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+        switch (reason) {
+            case Exception:
+            case NoInterruption:
+                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+                listener.processInterrupted(this, problem, e);
+                break;
+            case Timeout:
+                listener.processTimeout(this, problem);
+                break;
+            case User:
+                listener.processUser(this, problem);
+                break;
+        }
+    }
 
-    private String[] translateToCommand(Term term)
-                throws IllegalFormulaException, IOException {
-        if (getType() == SolverType.Z3_CE_SOLVER) {
+    @Override
+    public String name() {
+        return type.getName();
+    }
+
+    private static String indent(String string) {
+        try {
+            return SMTBeautifier.indent(string);
+        } catch (Exception ex) {
+            // fall back if pretty printing fails
+            ex.printStackTrace();
+            return string;
+        }
+    }
+
+    private String[] translateToCommand(Sequent sequent)
+            throws IllegalFormulaException {
+        if (getType() == SolverTypes.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 
@@ -355,113 +341,107 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                     break;
                 }
             }
-            // System.out.println(originalProof.name());
 
             KeYJavaType typeOfClassUnderTest =
                     specrep.getProofOblInput(originalProof).getContainerType();
 
             SMTObjTranslator objTrans =
                     new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(term, services, smtSettings).toString();
-            // problemTypeInformation = objTrans.getTypes();
-            ModelExtractor query = objTrans.getQuery();
-            getSocket().setQuery(query);
+            problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
+            ModelExtractor transQuery = objTrans.getQuery();
+            getSocket().setQuery(transQuery);
             tacletTranslation = null;
 
-            exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
         } else {
             SMTTranslator trans = getType().createTranslator(services);
-            //instantiateTaclets(trans);
-            problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
-            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
-            exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
+            problemString = indent(trans.translateProblem(sequent, services, smtSettings)
+                    .toString());
+            if (trans instanceof AbstractSMTTranslator) {
+                // Since taclet translation in the old form is no longer used,
+                // this will likely disappear.
+                exceptionsForTacletTranslation.addAll(
+                        ((AbstractSMTTranslator) trans).getExceptionsOfTacletTranslation());
+            }
         }
 
-        String parameters [] = this.type.getSolverParameters().split(" ");
-        String result [] = new String[parameters.length + 1];
+        String[] parameters = this.type.getSolverParameters().split(" ");
+        String[] result = new String[parameters.length + 1];
         for (int i = 0; i < result.length; i++) {
             result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1];
         }
         return result;
     }
 
-        @Override
-        public void interrupt(ReasonOfInterruption reason) {
-
-                // order of assignments is important;
-                setReasonOfInterruption(reason);
-                setSolverState(SolverState.Stopped);
-                if (solverTimeout != null) {
-                        solverTimeout.cancel();
-                }
-                if (thread != null) {
-                		processLauncher.stop();
-                        thread.interrupt();
-                }
-
+    @Override
+    public void interrupt(ReasonOfInterruption reason) {
+        // order of assignments is important
+        setReasonOfInterruption(reason);
+        setSolverState(SolverState.Stopped);
+        if (solverTimeout != null) {
+            solverTimeout.cancel();
         }
-
-        @Override
-        public SMTSolverResult getFinalResult() {
-
-                return isRunning() ? null : solverCommunication.getFinalResult();
+        if (thread != null) {
+            processLauncher.stop();
+            thread.interrupt();
         }
+    }
 
-        @Override
-        public TacletSetTranslation getTacletTranslation() {
-                return isRunning() ? null : tacletTranslation;
-        }
+    @Override
+    public SMTSolverResult getFinalResult() {
+        return isRunning() ? null : solverCommunication.getFinalResult();
+    }
 
-        @Override
-        public String getTranslation() {
-                return isRunning() ? null : problemString;
-        }
+    @Override
+    public TacletSetTranslation getTacletTranslation() {
+        return isRunning() ? null : tacletTranslation;
+    }
 
-        @Override
-        public String toString() {
-                return name() + " (ID: " + ID + ")";
-        }
+    @Override
+    public String getTranslation() {
+        return isRunning() ? null : problemString;
+    }
 
-        @Override
-        public String getSolverOutput() {       	
-        	
-         		String output = "";
-        		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-        		
-        		for(String s : solverCommunication.getMessages()){
-        			
-        			if(s.equals("endmodel")){
-        				break;
-        			}
-        			
-        			output += s+"\n";	
-        			
-        		}
-        		
-        		if(getSocket().getQuery()!=null){
-        			ModelExtractor mq = getSocket().getQuery();
-        			Model m = mq.getModel();
-        			if(m!=null){
-        				output += "\n\n";
-        				output += m.toString();
-        			}
-        			
-        			
-        			
-        		}		
-        		
-                return output;
-        }
+    @Override
+    public String toString() {
+        return name() + " (ID: " + id + ")";
+    }
 
-        @Override
-        public Collection<Throwable> getExceptionsOfTacletTranslation() {
-                
-                return exceptionsForTacletTranslation;
+    @Override
+    public String getRawSolverOutput() {
+        StringBuilder output = new StringBuilder();
+        for (Message m : solverCommunication.getOutMessages()) {
+            String s = m.getContent();
+            output.append(s).append("\n");
         }
+        return output.toString();
+    }
 
-		@Override
-        public AbstractSolverSocket getSocket() {
-	        
-	        return socket;
+    @Override
+    public String getRawSolverInput() {
+        StringBuilder input = new StringBuilder();
+
+        for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.INPUT)) {
+            String s = m.getContent();
+            input.append(s).append("\n");
         }
+        return input.toString();
+    }
+
+    @Override
+    public Collection<Throwable> getExceptionsOfTacletTranslation() {
+        return exceptionsForTacletTranslation;
+    }
+
+    @Override
+    public AbstractSolverSocket getSocket() {
+        return socket;
+    }
+
+    public ModelExtractor getQuery() {
+        return query;
+    }
+
+    public void setQuery(ModelExtractor query) {
+        this.query = query;
+    }
 }

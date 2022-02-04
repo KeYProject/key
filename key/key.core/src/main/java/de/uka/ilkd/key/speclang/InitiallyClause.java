@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 
 public interface InitiallyClause extends SpecificationElement {
@@ -33,7 +34,7 @@ public interface InitiallyClause extends SpecificationElement {
      */
     public Term getClause(ParsableVariable selfVar, TermServices services);
 
-    public PositionedString getOriginalSpec();
+    public LabeledParserRuleContext getOriginalSpec();
 
     public InitiallyClause setKJT(KeYJavaType newKjt);
 

@@ -1,0 +1,24 @@
+### Comment
+
+Unfortunately this cannot be proved automatically.
+Apparently TRUE is not translated as TRUE, but as (b2u true)
+
+### KeY
+
+\predicates { p; }
+\functions { boolean b; }
+
+\problem { (p <-> b=TRUE) -> (!p <-> b=FALSE) }
+
+### contains.1
+
+(declare-fun u_p () Bool)
+(declare-fun u_b () U)
+
+### contains.2
+
+(assert (not (=> (= u_p (= u_b (b2u true))) (= (not u_p) (= u_b (b2u false))))))
+
+### expected
+
+valid

@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.gui.colors;
 
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -10,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -24,6 +28,7 @@ import java.util.stream.Stream;
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
     public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
     private ColorSettings(Properties settings) {
@@ -50,7 +55,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static Color fromHex(String s) {
-        Long i = Long.decode(s);
+        long i = Long.decode(s);
         return new Color(
                 (int) ((i >> 16) & 0xFF),
                 (int) ((i >> 8) & 0xFF),
@@ -64,10 +69,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     /**
      * Writes the current settings to default location.
+     *
      * @see #SETTINGS_FILE
      */
     public void save() {
-        System.out.println("[ColorSettings] Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's Colors");
             writer.flush();
@@ -79,26 +85,34 @@ public class ColorSettings extends AbstractPropertiesSettings {
     private ColorProperty createColorProperty(String key,
                                               String description,
                                               Color defaultValue) {
+        Optional<ColorProperty> item =
+                getProperties().filter(it -> it.getKey().equals(key))
+                        .findFirst();
+        if (item.isPresent()) {
+            return item.get();
+        }
+
         ColorProperty pe = new ColorProperty(key, description, defaultValue);
         propertyEntries.add(pe);
         return pe;
     }
 
     public Stream<ColorProperty> getProperties() {
-        return propertyEntries.stream().map(it -> (ColorProperty) it);
+        return propertyEntries.stream().map(ColorProperty.class::cast);
     }
 
     /**
      * A property for handling colors.
      */
     public class ColorProperty implements PropertyEntry<Color> {
-        private final String key, description;
+        private final String key;
+        private final String description;
         private Color currentValue;
 
         public ColorProperty(String key, String description, Color defaultValue) {
             this.key = key;
             this.description = description;
-            if (!properties.contains(key)) {
+            if (!properties.containsKey(key)) {
                 set(defaultValue);
             }
         }
@@ -158,5 +172,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
         public String getDescription() {
             return description;
         }
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        this.properties.putAll(props);
     }
 }

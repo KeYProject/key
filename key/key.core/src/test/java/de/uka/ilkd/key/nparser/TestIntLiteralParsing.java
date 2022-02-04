@@ -10,6 +10,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -26,6 +28,8 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 @Ignore
 public class TestIntLiteralParsing extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestIntLiteralParsing.class);
+
     /**
      * Some Strings representing valid int values and the expected terms created by parsing them.
      */
@@ -137,6 +141,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
 
+
     public static int PARSEABLE = 1, ERROR = -1;
     @Parameterized.Parameter(0)
     public int type;
@@ -165,13 +170,13 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         }
     }
 
-    private Services services = getServices();
+    private final Services services = getServices();
 
     @Test
     public void testLex() {
         KeYLexer lexer = ParsingFacade.createLexer(CharStreams.fromString(input));
         List<? extends Token> toks = lexer.getAllTokens();
-        System.out.println(toks);
+        LOGGER.debug("Tokens: {}", toks);
         assertEquals(1, toks.size());
         int t = toks.get(0).getType();
         assertTrue("Wrong literal type", KeYLexer.NUM_LITERAL == t ||

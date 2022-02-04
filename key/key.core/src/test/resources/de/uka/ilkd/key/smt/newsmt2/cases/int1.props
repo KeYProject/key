@@ -1,0 +1,11 @@
+### KeY
+
+\problem { 42 * 23 > 0 }
+
+### contains.1
+
+(assert (not (> (* 42 23) 0)))
+
+### expected
+
+valid

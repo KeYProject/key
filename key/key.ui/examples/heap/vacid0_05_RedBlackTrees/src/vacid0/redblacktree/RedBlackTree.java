@@ -40,8 +40,8 @@ public class RedBlackTree implements AbstractMap {
       @ accessible \inv : footprint;
       @ accessible footprint : footprint;
       @*/
-    
-    
+
+
     /** Constructs RB tree with default value.
      * @param d default value */
     /*@ normal_behavior
@@ -55,7 +55,7 @@ public class RedBlackTree implements AbstractMap {
         //@ set theNodes = \seq_empty;
         root = Node.NIL;
     }
-    
+
 
     /*@ normal_behavior
       @ requires \contains(theNodes,z);
@@ -104,29 +104,29 @@ public class RedBlackTree implements AbstractMap {
           @*/
         while (x != root && !x.isRed){
             if (x == x.parent.left) {
-               w = x.parent.right;
-               if (w.isRed) {
-                   w.isRed = false;
-                   x.parent.isRed = true;
-                   leftRotate(x.parent);
-                   w = x.parent.right;
-               }
-               if (!w.left.isRed && !w.right.isRed){
-                   w.isRed = true;
-                   x = x.parent;
-               } else {
-                   if (!w.right.isRed) {
-                   w.right.isRed = false;
-                   w.isRed = true;
-                   rightRotate(w);
-                   w = x.parent.right;
-                   }
-                   w.isRed = x.parent.isRed;
-                   x.parent.isRed = false;
-                   w.right.isRed = false;
-                   leftRotate(x.parent);
-                   x = root;
-               }
+                w = x.parent.right;
+                if (w.isRed) {
+                    w.isRed = false;
+                    x.parent.isRed = true;
+                    leftRotate(x.parent);
+                    w = x.parent.right;
+                }
+                if (!w.left.isRed && !w.right.isRed){
+                    w.isRed = true;
+                    x = x.parent;
+                } else {
+                    if (!w.right.isRed) {
+                        w.right.isRed = false;
+                        w.isRed = true;
+                        rightRotate(w);
+                        w = x.parent.right;
+                    }
+                    w.isRed = x.parent.isRed;
+                    x.parent.isRed = false;
+                    w.right.isRed = false;
+                    leftRotate(x.parent);
+                    x = root;
+                }
             } else {
                 w = x.parent.left;
                 if (w.isRed) {
@@ -140,10 +140,10 @@ public class RedBlackTree implements AbstractMap {
                     x = x.parent;
                 } else {
                     if (!w.left.isRed) {
-                    w.left.isRed = false;
-                    w.isRed = true;
-                    leftRotate(w);
-                    w = x.parent.left;
+                        w.left.isRed = false;
+                        w.isRed = true;
+                        leftRotate(w);
+                        w = x.parent.left;
                     }
                     w.isRed = x.parent.isRed;
                     x.parent.isRed = false;
@@ -302,7 +302,7 @@ public class RedBlackTree implements AbstractMap {
             y.left = x;
 
             if (p == Node.NIL){
-                root = y; 
+                root = y;
             } else {
                 if (p.left == x)
                     p.left = y;
@@ -310,7 +310,7 @@ public class RedBlackTree implements AbstractMap {
             }
         }
     }
-    
+
     // specified by interface
     public int lookup (int key){
         Node x = get(key);
@@ -318,7 +318,7 @@ public class RedBlackTree implements AbstractMap {
             return deefolt;
         else return x.value;
     }
-   
+
     // specified by interface
     public void remove (int key){
         final Node n = get(key);
@@ -335,7 +335,7 @@ public class RedBlackTree implements AbstractMap {
             final  Node n = new Node(key,value);
             insert(n);
         }
-        else x.value = value;  
+        else x.value = value;
     }
 
     /*@ normal_behavior
@@ -363,12 +363,12 @@ public class RedBlackTree implements AbstractMap {
             if (p == Node.NIL)
                 root = y;
             else
-                if (p.left == x)
-                    p.left = y;
-                else p.right = y;
+            if (p.left == x)
+                p.left = y;
+            else p.right = y;
         }
     }
-    
+
     /** Returns the left-most node of the right subtree. */
     /*@ normal_behavior
       @   requires z != Node.NIL && \invariant_for(z);
@@ -378,23 +378,23 @@ public class RedBlackTree implements AbstractMap {
       @   ensures \contains(z.right.subtree, \result);
       @*/
     private /*@ pure helper @*/ Node treeSuccessor(Node z) {
-      Node x = z.right;
+        Node x = z.right;
       /*@ maintaining z.key < x.key;
         @ maintaining x != Node.NIL;
         @ maintaining z == \old(z);
         @ maintaining \invariant_for(x);
         @ decreasing x.height;
         @*/
-      while (x.left != Node.NIL){
-          x = x.left;
-      }
-      return x;
+        while (x.left != Node.NIL){
+            x = x.left;
+        }
+        return x;
     }
-    
-    
+
+
 
     // Standard methods (not relevant for verification)
-    
+
     public boolean equals (Object o){
         try {
             RedBlackTree t = (RedBlackTree)o;
@@ -408,6 +408,6 @@ public class RedBlackTree implements AbstractMap {
     public String toString(){
         return new String(root.subtreeToString(0));
     }
- 
+
 
 }

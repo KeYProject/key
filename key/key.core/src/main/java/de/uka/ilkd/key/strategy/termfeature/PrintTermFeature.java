@@ -25,7 +25,6 @@ public class PrintTermFeature implements TermFeature {
     private PrintTermFeature () {}
     
     public RuleAppCost compute(Term term, Services services) {
-        System.out.println ( term );
         return NumberRuleAppCost.getZeroCost();
     }
 }

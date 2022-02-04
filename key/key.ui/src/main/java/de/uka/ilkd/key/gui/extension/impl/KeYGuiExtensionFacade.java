@@ -1,14 +1,7 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
 import java.awt.Component;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,8 +15,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-
-import org.key_project.util.ServiceLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -287,7 +278,8 @@ public final class KeYGuiExtensionFacade {
     }
 
     private static void loadExtensions() {
-        extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
+        extensions = ServiceLoader.load(KeYGuiExtension.class)
+                .stream().map(ServiceLoader.Provider::type)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
                 .distinct()
                 .map(Extension::new)

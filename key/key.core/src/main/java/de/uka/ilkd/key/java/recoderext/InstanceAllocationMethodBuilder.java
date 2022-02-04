@@ -32,7 +32,6 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
     public InstanceAllocationMethodBuilder(
             CrossReferenceServiceConfiguration services, TransformerCache cache) {
         super(services, cache);
-        /// @todo Auto-generated constructor stub
     }
 
 
@@ -42,11 +41,11 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
      * The functionality will be described using taclets
      */
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
-        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
         modifiers.add(new Public());
         modifiers.add(new Static());    
         
-        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(1);
+        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<>(1);
         
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 
@@ -63,12 +62,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
         if (td instanceof ClassDeclaration) {
             attach(createAllocateMethod((ClassDeclaration)td), td, 
                     td.getMembers().size());
-//          java.io.StringWriter sw = new java.io.StringWriter();
-//          services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
-//          System.out.println(sw.toString());
-//          try { sw.close(); } catch (Exception e) {}  
         }
-
     }
 
 }

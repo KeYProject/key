@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.Collection;
 
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.smt.st.SolverType;
 
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
@@ -38,6 +40,11 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
     @Override
     public long getTimeout() {
 	return 300000;
+    }
+
+    @Override
+    public long getTimeout(SolverType type) {
+        return getTimeout();
     }
 
     @Override
@@ -122,5 +129,10 @@ public boolean invarianForall() {
 	return false;
 }
 
-    
+    @Override
+    public NewSMTTranslationSettings getNewSettings() {
+        return new NewSMTTranslationSettings();
+    }
+
+
 }

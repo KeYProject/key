@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
@@ -33,6 +34,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 public class TestParser {
     /**
@@ -84,5 +86,12 @@ public class TestParser {
     public void testIssue1566() throws ProblemLoaderException {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1566/a.key");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
+    }
+
+    @Test(expected = ProblemLoaderException.class)
+    public void testIssue39() throws ProblemLoaderException {
+        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file,
+                null, null, null);
     }
 }

@@ -11,7 +11,7 @@ final class Lemmas {
       @  strictly_pure helper
       @*/
     public static boolean compareTrans(SuffixArray sa, int a, int b, int c) {
-	return true;
+        return true;
     }
 
     /*@ public normal_behaviour
@@ -28,7 +28,7 @@ final class Lemmas {
       @  strictly_pure helper
       @*/
     public static boolean compareRun(SuffixArray sa, int a, int b, int c, int k) {
-	return true;
+        return true;
     }
 
     /*@ public normal_behaviour
@@ -39,16 +39,16 @@ final class Lemmas {
       @*/
     public static boolean compareSuffixArray(SuffixArray sa, int i, int j) {
 
-	/*@ loop_invariant
-	  @  sa.compare(sa.suffixes[m], sa.suffixes[i]) > 0 &&
-	  @  i+1 <= m && m <= j;
-	  @ decreases j - m;
-	  @ assignable \strictly_nothing;
-	  @*/
-	for(int m = i + 1; m < j; m++) {
-	    compareTrans(sa, sa.suffixes[m+1], sa.suffixes[m], sa.suffixes[i]);
-	}
-	return true;
+        /*@ loop_invariant
+          @  sa.compare(sa.suffixes[m], sa.suffixes[i]) > 0 &&
+          @  i+1 <= m && m <= j;
+          @ decreases j - m;
+          @ assignable \strictly_nothing;
+          @*/
+        for(int m = i + 1; m < j; m++) {
+            compareTrans(sa, sa.suffixes[m+1], sa.suffixes[m], sa.suffixes[i]);
+        }
+        return true;
     }
 
     /*@ public normal_behaviour
@@ -58,7 +58,7 @@ final class Lemmas {
       @  strictly_pure helper
       @*/
     public static boolean compareReflex(SuffixArray sa, int i) {
-       return true;
+        return true;
     }
 
 
@@ -76,13 +76,13 @@ final class Lemmas {
       @*/
     public static boolean neighbourMax(SuffixArray sa, int i, int j, int k) {
 
-	compareSuffixArray(sa, i, j);
+        compareSuffixArray(sa, i, j);
         if(j == i+1) {
             compareReflex(sa, sa.suffixes[i+1]);
         } else {
             compareSuffixArray(sa, i+1,j);
         }
-	compareRun(sa, sa.suffixes[j], sa.suffixes[i+1], sa.suffixes[i], k);
+        compareRun(sa, sa.suffixes[j], sa.suffixes[i+1], sa.suffixes[i], k);
         return true;
     }
 }

@@ -120,6 +120,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
 
+    /** this setting enables/disables tool tips in the source view */
+    private static final String SOURCE_VIEW_TOOLTIP = "[View]SourceViewTooltips";
+
     private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";
     /**
      *
@@ -145,6 +148,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
      *
      */
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
+
+    private static final String HIDE_INTERACTIVE_GOALS = "[View]hideInteractiveGoals";
 
     /**
      * A list of bookmark of favourite folders of the user. Can be manipulated with
@@ -193,12 +198,16 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
     private PropertyEntry<Boolean> showSequentViewTooltips =
             createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+    private PropertyEntry<Boolean> showSourceViewTooltips =
+            createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
     private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
     private PropertyEntry<Set<String>> clutterRules =
             createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    private PropertyEntry<Boolean> hideInteractiveGoals = createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
     /**
      * User-definable folder bookmarks.
@@ -513,12 +522,29 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.showSequentViewTooltips.set(showSequentViewTooltips);
     }
 
+    public boolean isShowSourceViewTooltips() {
+        return showSourceViewTooltips.get();
+    }
+
+    public void setShowSourceViewTooltips(boolean showSourceViewTooltips) {
+        this.showSourceViewTooltips.set(showSourceViewTooltips);
+    }
+
     public double getUIFontSizeFactor() {
         return uiFontSizeFactor.get();
     }
 
     public void setUIFontSizeFactor(double factor) {
         this.uiFontSizeFactor.set(factor);
+    }
+
+
+    public boolean getHideInteractiveGoals() {
+        return hideInteractiveGoals.get();
+    }
+
+    public void setHideInteractiveGoals(boolean active) {
+        hideInteractiveGoals.set(active);
     }
 
     /**

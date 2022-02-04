@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * Encapsulates all exceptions that have occurred while
@@ -22,7 +21,7 @@ import java.util.LinkedList;
  * */
 public class SolverException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
-	private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
+	private final transient Collection<SMTSolver> solvers;
 
 	public SolverException(Collection<SMTSolver> solvers) {
 		super();
@@ -38,20 +37,21 @@ public class SolverException extends RuntimeException {
 		System.err.println(toString());
 	}
 
+	@Override
 	public String toString() {
-		String s = "\n";
+		StringBuilder s = new StringBuilder("\n");
 		for (SMTSolver solver : solvers) {
-			s += "Solver: " + solver.name() + "\n";
+			s.append("Solver: ").append(solver.name()).append("\n");
 			if (solver.getProblem().getGoal() != null) {
-				s += "Goal-No.: "
-						+ solver.getProblem().getGoal().node().serialNr()
-						+ "\n";
+				s.append("Goal-No.: ")
+						.append(solver.getProblem().getGoal().node().serialNr())
+						.append("\n");
 			}
-			s += "Exception:\n";
-			s += solver.getException();
-			s += "\n";
+			s.append("Exception:\n");
+			s.append(solver.getException());
+			s.append("\n");
 
 		}
-		return s;
+		return s.toString();
 	}
 }

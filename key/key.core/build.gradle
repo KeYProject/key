@@ -3,13 +3,14 @@ plugins {
     id 'antlr'
 }
 
-repositories { jcenter() }
+//repositories { jcenter() }
 
 configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
-    api group: group, name: 'recoderkey', version: '1.0'
+    //api group: group, name: 'recoderkey', version: '1.0'
+    api project(':recoder')
     implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
@@ -17,9 +18,9 @@ dependencies {
     javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.7.1"
-    implementation "org.antlr:antlr4-runtime:4.7.1"
-    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    antlr4 "org.antlr:antlr4:4.9.3"
+    api "org.antlr:antlr4-runtime:4.9.3"
+    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 // The target directory for JavaCC (parser generation)
@@ -57,6 +58,30 @@ compileJavacc {
     }
 }
 
+task generateSMTListings {
+    def pack = "de/uka/ilkd/key/smt/newsmt2"
+    def resourcesDir = "${project.projectDir}/src/main/resources"
+    def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
+    // ${project.buildDir}
+    doLast {
+        new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
+            list.writeLine '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+            list.writeLine '<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">'
+            list.writeLine '<properties>'
+            new File("$resourcesDir/$pack").eachFile {
+                if(it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
+                    // println it.name
+                    it.eachLine { list.writeLine it }
+                }
+            }
+            list.writeLine '</properties>'
+        }
+    }
+}
+
+classes.dependsOn << generateSMTListings
+ 
+
 tasks.withType(Test) {
     enableAssertions = true
 }
@@ -82,12 +107,6 @@ test {
     }
     // pass debug flag from command line:
     systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
-
-    // TODO @AW. That is already in key/build.gradle. Here or there?
-    // useJUnit {
-    //         excludeCategories 'org.key_project.util.testcategories.Performance'
-    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
-    // }
 }
 
 testFast {
@@ -101,7 +120,6 @@ testFast {
     }
 }
 
-
 task testProveRules(type: Test) {
     description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
@@ -112,21 +130,29 @@ task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
     filter { 
-        // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
 
-
-task generateRunAllProofs(type: JavaExec) {
-    //Test runtime
-    classpath = sourceSets.test.runtimeClasspath
-    main = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
-    args "$buildDir/generated-src/rap-unittests/test"
+task testProveSMTLemmas(type: Test) {
+    description 'Prove (or load proofs for) lemmas used in the SMT translation'
+    group "verification"
+    filter {
+        includeTestsMatching "ProveSMTLemmasTest"
+    }
 }
-sourceSets.test.java.srcDir "$buildDir/generated-src/rap-unittests/test"
 
+// Run the tests for the new smt translation in strict mode
+// where "unknown" is less accepted
+task testStrictSMT(type: Test) {
+    description 'Run the tests for the new smt translation in strict mode'
+    group 'verification'
+    systemProperty("key.newsmt2.stricttests", "true")
+    filter {
+        includeTestsMatching "MasterHandlerTest"
+    }
+}
 
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
@@ -150,31 +176,67 @@ task generateVersionFiles() {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
-task runAntlr4(type: JavaExec) {
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4Key(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
-    inputs.dir "src/main/antlr4/"
-    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
+    outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
-            "-Xexact-output-dir", "-o", antlr4Output,
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
             "-package", "de.uka.ilkd.key.nparser",
             "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
     doFirst {
-        file(antlr4Output).mkdirs()
-        println("create $antlr4Output")
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn runAntlr4Key
 
-task debugLexer(type: JavaExec) {
+task debugKeyLexer(type: JavaExec) {
     main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+// @AW: Say something here. From POV this explain by itself.
+processResources.dependsOn generateVersionFiles
+
+def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
+task runAntlr4Jml(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"
+    outputs.dir antlr4OutputJml
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputJml,
+            "-package", "de.uka.ilkd.key.speclang.njml",
+            "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"]
+    doFirst {
+        file(antlr4OutputJml).mkdirs()
+        println("create $antlr4OutputJml")
+    }
+}
+compileJava.dependsOn runAntlr4Jml
+
+task debugJmlLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
 
 task ptest(type: Test) { group "verification"}
 
+task generateRAPUnitTests(type:JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    args("$buildDir/generated-src/rap/")
+}
+sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
+
+
 // @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
 // check.dependsOn << testProofRules << testRunAllProofs
+

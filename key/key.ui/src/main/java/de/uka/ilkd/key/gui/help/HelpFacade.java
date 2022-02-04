@@ -10,8 +10,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 /**
  * A gate to the KeY documentation system.
@@ -118,12 +120,27 @@ public class HelpFacade {
         return btn;
     }
 
+    public static KeyAction createHelpAction(String path) {
+        class HelpAction extends KeyAction {
+            private HelpAction() {
+                setName("");
+                setIcon(IconFactory.HELP.get());
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHelp(path);
+            }
+        }
+        return new HelpAction();
+    }
+
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
         public OpenHelpAction() {
             setName("Open help");
-            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.CTRL_DOWN_MASK));
             lookupAcceleratorKey();
         }
 

@@ -1,8 +1,0 @@
-dependencies {
-    implementation project(":key.ui")
-    implementation project(":key.core")
-
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.15.2'
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.15.2'
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
-}

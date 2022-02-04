@@ -9,6 +9,6 @@ include "key.removegenerics"
 include "key.core.proof_references"
 include "key.core.example"
 include "key.core.symbolic_execution.example"
-include 'keyext.interactionlog'
+include 'recoder'
 include 'keyext.ui.testgen'
-
+include 'keyext.exploration'

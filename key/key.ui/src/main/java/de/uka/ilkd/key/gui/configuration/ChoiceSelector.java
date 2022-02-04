@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -41,26 +39,22 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChoiceSelector extends JDialog {
-
-    /**
-     * 
-     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
-    private ChoiceSettings settings;
-    private HashMap<String, String> category2DefaultChoice;
+    private final ChoiceSettings settings;
+    private final HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
     private boolean changed=false;
 
@@ -72,53 +66,43 @@ public class ChoiceSelector extends JDialog {
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** creates a new TacletOptionsSettings, using the <code>ChoiceSettings</code>
-     * from <code>settings</code> */
-    public ChoiceSelector(ChoiceSettings settings) {  
-	super(new JFrame(), "Taclet Base Configuration", true);
-       	this.settings = settings;
-	category2DefaultChoice = settings.getDefaultChoices();
-	if(category2DefaultChoice.isEmpty()) {
-	    JOptionPane.showConfirmDialog
-		(ChoiceSelector.this,
-		 "There are no Taclet Options available as the rule-files "+
-		 "have not been parsed yet!",
-		 "No Options available", 
-		 JOptionPane.DEFAULT_OPTION);
-	    dispose();
-	} else {
-	    category2Choices = settings.getChoices();
-	    layoutChoiceSelector();
-	    setChoiceList();
-	    pack();
-	    setLocationRelativeTo(null);
-	    //setLocation(70, 70);
-	    setVisible(true);
-	}
-    }
-
-    /** creates a new TacletOptionsSettings */
-    public ChoiceSelector(){
-	this(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
+    /** Creates a new dialog for choosing taclet options.
+     * @param mainWindow the parent window (dialog is centered on this)
+     * @param settings the currently selected settings */
+    public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
+        super(mainWindow, "Taclet Base Configuration", true);
+        this.settings = settings;
+        category2DefaultChoice = settings.getDefaultChoices();
+        if(category2DefaultChoice.isEmpty()) {
+            JOptionPane.showConfirmDialog(ChoiceSelector.this,
+                "There are no Taclet Options available as the rule-files have not been parsed yet!",
+                "No Options available",
+                JOptionPane.DEFAULT_OPTION);
+            dispose();
+        } else {
+            category2Choices = settings.getChoices();
+            layoutChoiceSelector();
+            setChoiceList();
+            pack();
+            setLocationRelativeTo(mainWindow);
+            setVisible(true);
+        }
     }
 
     /** layout */
     protected void layoutChoiceSelector() {
         setIconImage(IconFactory.keyLogo());
-        JPanel listPanel=new JPanel();
+        JPanel listPanel = new JPanel();
         listPanel.setLayout(new BorderLayout());
-        String[] cats = category2DefaultChoice.keySet().toArray(new String[category2DefaultChoice.size()]);
+        String[] cats = category2DefaultChoice.keySet().toArray(new String[0]);
         Arrays.sort(cats);
         {
             catList = new JList<>(cats);
             catList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             catList.setSelectedIndex(0);
-            catList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    setChoiceList();				
-                }});
+            catList.addListSelectionListener(e -> setChoiceList());
             JScrollPane catListScroll = new
-                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             catListScroll.setBorder(new TitledBorder("Category"));
             catListScroll.getViewport().setView(catList);
@@ -130,20 +114,19 @@ public class ChoiceSelector extends JDialog {
         {
             choiceList = new JList<>();
             choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);
-            choiceList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    Object selectedValue = choiceList.getSelectedValue();
-                    if (selectedValue instanceof ChoiceEntry) {
-                       setDefaultChoice(((ChoiceEntry) selectedValue).getChoice());
-                    }
-                    else {
-                       setDefaultChoice(null);
-                    }
-                }});
+            choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]), true);
+            choiceList.addListSelectionListener(e -> {
+                ChoiceEntry selectedValue = choiceList.getSelectedValue();
+                if (selectedValue != null) {
+                   setDefaultChoice(selectedValue.getChoice());
 
-            JScrollPane choiceScrollPane = new 	    
-                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                } else {
+                   setDefaultChoice(null);
+                }
+            });
+
+            JScrollPane choiceScrollPane =
+                new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             choiceScrollPane.getViewport().setView(choiceList);
             choiceScrollPane.setBorder(new TitledBorder("Choice"));
@@ -165,65 +148,59 @@ public class ChoiceSelector extends JDialog {
         }
         JPanel buttonPanel = new JPanel();
         {
-            JButton ok = new JButton("OK");
-            ok.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if(changed){
-                        int res = JOptionPane.showOptionDialog
-                                (ChoiceSelector.this,
-                                        "Your changes will become effective when "+
-                                                "the next problem is loaded.\n", 
-                                                "Taclet Options", 
-                                                JOptionPane.DEFAULT_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE, null,
-                                                new Object[]{"OK", "Cancel"}, "OK");
-                        if (res==0){
-                            settings.setDefaultChoices(
-                                    category2DefaultChoice);
-                        }
+            JButton okButton = new JButton("OK");
+            okButton.addActionListener(e -> {
+                if(changed){
+                    int res = JOptionPane.showOptionDialog
+                            (ChoiceSelector.this,
+                                    "Your changes will become effective when "+
+                                            "the next problem is loaded.\n",
+                                            "Taclet Options",
+                                            JOptionPane.DEFAULT_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE, null,
+                                            new Object[]{"OK", "Cancel"}, "OK");
+                    if (res==0){
+                        settings.setDefaultChoices(
+                                category2DefaultChoice);
                     }
-                    setVisible(false);
-                    dispose();
                 }
+                setVisible(false);
+                dispose();
             });
-            buttonPanel.add(ok);
-            getRootPane().setDefaultButton(ok);	
+            buttonPanel.add(okButton);
+            getRootPane().setDefaultButton(okButton);
         }
         {
-            final JButton cancel = new JButton("Cancel");
-            cancel.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    setVisible(false);
-                    dispose();
-                }
+            final JButton cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(e -> {
+                setVisible(false);
+                dispose();
             });
-            ActionListener escapeListener = new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    if(event.getActionCommand().equals("ESC")) {
-                        cancel.doClick();
-                    }
+            ActionListener escapeListener = event -> {
+                if(event.getActionCommand().equals("ESC")) {
+                    cancelButton.doClick();
                 }
             };
-            cancel.registerKeyboardAction(
+            cancelButton.registerKeyboardAction(
                     escapeListener,
                     "ESC",
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);	
-            buttonPanel.add(cancel);
+                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+            buttonPanel.add(cancelButton);
         }
 
-	getContentPane().setLayout(new BorderLayout());
-	getContentPane().add(listPanel, BorderLayout.CENTER);
-	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-	
-	setResizable(false);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(listPanel, BorderLayout.CENTER);
+        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+        setResizable(false);
     }
 
 
     /** is called to set the selected choice in 
      * <code>category2DefaultChoice</code>*/
     private void setDefaultChoice(String sel) {
-	String category = (String) catList.getSelectedValue();
+	String category = catList.getSelectedValue();
 	if(sel != null){
 	    category2DefaultChoice.put(category,sel);
 	    changed = true;
@@ -235,7 +212,7 @@ public class ChoiceSelector extends JDialog {
      * the left side
      */
     private void setChoiceList() {
-	String selection = (String) catList.getSelectedValue();
+	String selection = catList.getSelectedValue();
 	ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
 	choiceList.setListData(choices);
 	ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
@@ -266,13 +243,9 @@ public class ChoiceSelector extends JDialog {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                     }
                     explanationMap.loadFromXML(is);
-                } catch (InvalidPropertiesFormatException e) {
-                    System.err.println("Cannot load help message in rule view (malformed XML).");
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    System.err.println("Cannot load help messages in rule view.");
-                    e.printStackTrace();
-                } 
+                    LOGGER.warn("Cannot load help message in rule view.", e);
+                }
             }
         }
         String result = explanationMap.getProperty(category);
@@ -337,12 +310,7 @@ public class ChoiceSelector extends JDialog {
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-       return ArrayUtil.search(choices, new IFilter<ChoiceEntry>() {
-         @Override
-         public boolean select(ChoiceEntry element) {
-            return element.getChoice().equals(choice);
-         }
-       });
+       return ArrayUtil.search(choices, element -> element.getChoice().equals(choice));
     }
 
     /**

@@ -42,10 +42,10 @@ public class LRS {
         int l = 0;
 
         /*@
-      maintaining (\forall int i; 0 <= i && i < sa.a.length;
+            maintaining (\forall int i; 0 <= i && i < sa.a.length;
                       0 <= sa.suffixes[i] && sa.suffixes[i] < sa.a.length);
                // indices are in range (follows from above, cannot hurt)
-      maintaining (\forall int i; 0 < i && i < sa.a.length; sa.suffixes[i-1] != sa.suffixes[i]);
+            maintaining (\forall int i; 0 < i && i < sa.a.length; sa.suffixes[i-1] != sa.suffixes[i]);
           @ maintaining 0 <= l && l < sa.a.length;
           @ maintaining 0 < x && x <= sa.a.length;
           @ maintaining (\forall int j; 0 <= j && j <l; sa.a[s+j] == sa.a[t+j]);
@@ -53,39 +53,39 @@ public class LRS {
           @ assignable \strictly_nothing;
           @*/
         for (int x=1; x < sa.a.length; x++) {
-		int[] temp0 = sa.a;
-		int temp1 = sa.suffixes[x];
-		int temp2 = sa.suffixes[x-1];
-		int length = LCP.lcp(temp0, temp1, temp2);
-		if (b_helper()) {
-			s = sa.suffixes[x];
-			t = sa.suffixes[x-1];
-			l = length;
-		}
+            int[] temp0 = sa.a;
+            int temp1 = sa.suffixes[x];
+            int temp2 = sa.suffixes[x-1];
+            int length = LCP.lcp(temp0, temp1, temp2);
+            if (b_helper()) {
+                s = sa.suffixes[x];
+                t = sa.suffixes[x-1];
+                l = length;
+            }
         }
         this.s = s;
         this.t = t;
         this.l = l;
     }
 
-		/*@ normal_behavior
-				ensures true;
-				strictly_pure
-		*/
-		boolean b_helper(){}
+    /*@ normal_behavior
+            ensures true;
+            strictly_pure
+    */
+    boolean b_helper(){}
 
-		/*@ normal_behavior
-				ensures true;
-				strictly_pure
-		*/
-		int t_0_helper(){}
+    /*@ normal_behavior
+            ensures true;
+            strictly_pure
+    */
+    int t_0_helper(){}
 
 
-		/*@ normal_behavior
-				ensures true;
-				strictly_pure
-		*/
-		int s_0_helper(){}
+    /*@ normal_behavior
+            ensures true;
+            strictly_pure
+    */
+    int s_0_helper(){}
 
 }
 

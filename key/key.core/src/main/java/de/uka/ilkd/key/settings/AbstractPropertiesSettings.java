@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A base class for own settings based on properties.
@@ -49,14 +50,16 @@ public abstract class AbstractPropertiesSettings implements Settings {
     }
 
     /**
-     * Translation of a string to a list of string by using {@link #SET_DELIMITER}
-     *
+     * Translation of a string to a list of strings by using {@link #SET_DELIMITER}.
      * @param str a nonnull, emptible string
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
     private static @Nonnull List<String> parseStringList(@Nonnull String str) {
-        return new ArrayList<>(Arrays.asList(str.split(SET_DELIMITER)));
+        // escape special chars (in particular the comma)
+        return Arrays.stream(str.split(SET_DELIMITER))
+                     .map(s -> SettingsConverter.convert(s, true))
+                     .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -64,7 +67,10 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
     private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
-        return String.join(SET_DELIMITER, seq);
+        // escape special chars (in particular the comma)
+        return seq.stream()
+                  .map(s -> SettingsConverter.convert(s, false))
+                  .collect(Collectors.joining(SET_DELIMITER));
     }
 
     public boolean isInitialized() {
@@ -84,15 +90,18 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     @Override
     public void writeSettings(Properties props) {
-        propertyEntries.forEach(it -> {
-            it.update();
-        });
+        propertyEntries.forEach(PropertyEntry::update);
         props.putAll(properties);
     }
 
     @Override
     public void addSettingsListener(SettingsListener l) {
         listenerList.add(l);
+    }
+    
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
     }
 
     protected void fireSettingsChange() {

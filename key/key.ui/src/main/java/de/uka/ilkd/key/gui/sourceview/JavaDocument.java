@@ -17,6 +17,8 @@ import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
  *
  * Note that tab characters have to be replaced by spaces before inserting into the document.
  *
+ * The document currently only works when newlines are represented by "\n"!
+ *
  * @author Wolfram Pfeifer
  */
 public class JavaDocument extends DefaultStyledDocument {
@@ -264,6 +266,8 @@ public class JavaDocument extends DefaultStyledDocument {
     public JavaDocument () {
         updateStyles();
         ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
+        // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
+        putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         // fill the keyword hash sets
         keywords.addAll(Arrays.asList(KEYWORDS));
@@ -431,14 +435,12 @@ public class JavaDocument extends DefaultStyledDocument {
         state = CommentState.NO;
     }
 
-    private void processChar(String str) throws BadLocationException {
-        char strChar = str.charAt(0);
-
+    private void processChar(char strChar) throws BadLocationException {
         switch (strChar) {
         case ('@'):
             checkAt();
             break;
-        case '\n':  // TODO: different line endings? -> use System.lineSeparator()
+        case '\n':
             checkLinefeed();
             break;
         case '\t':  // all tabs should have been replaced earlier!
@@ -545,7 +547,6 @@ public class JavaDocument extends DefaultStyledDocument {
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
         // insert the unformatted string as a placeholder
         super.insertString(offs, str, normal);
-
         int strLen = str.length();
         int endpos = offs + strLen;
         int strpos;
@@ -553,8 +554,14 @@ public class JavaDocument extends DefaultStyledDocument {
         for (int i = offs; i < endpos; i++) {
             currentPos = i;
             strpos = i - offs;
-            processChar(Character.toString(str.charAt(strpos)));
+            processChar(str.charAt(strpos));
         }
-        currentPos = offs;
+        // place the internal "cursor" of the document after the inserted String, reset internal
+        // state to defaults (fixes problems when editing a document)
+        currentPos = endpos;
+        tokenStart = endpos;
+        token = "";
+        mode = Mode.NORMAL;
+        state = CommentState.NO;
     }
 }

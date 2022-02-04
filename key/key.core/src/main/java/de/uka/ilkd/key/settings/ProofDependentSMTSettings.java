@@ -24,8 +24,6 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-	
-
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
@@ -50,6 +48,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
         private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
+        // FIXME Why are these fields public?!
         public boolean useExplicitTypeHierarchy     = false;
         public boolean useNullInstantiation         = true;
         public boolean useBuiltInUniqueness          = false;
@@ -59,7 +58,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         public int     maxGenericSorts               = 2;
         public long    maxInteger                   =2147483645;
         public long    minInteger                   =-2147483645;
-        
+//        TODO js: could be used once the new translation is working
+//        public boolean useLegacyTranslation = false;
+
 
 
         public  SupportedTaclets supportedTaclets;
@@ -96,7 +97,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         }
 
 
-        
+
+        @Override
         public ProofDependentSMTSettings clone(){
                 return new ProofDependentSMTSettings(this);
         }
@@ -152,7 +154,10 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 
         }
         
-
+        @Override
+        public void removeSettingsListener(SettingsListener l) {
+            listeners.remove(l);
+        }
         
        
 

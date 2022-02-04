@@ -13,20 +13,25 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -52,6 +57,9 @@ public final class ExampleChooser extends JDialog {
      */
     public static final String KEY_EXAMPLE_DIR = "key.examples.dir";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleChooser.class);
+
+
     /**
      * This class is a singleton class and this its only instance.
      */
@@ -61,7 +69,7 @@ public final class ExampleChooser extends JDialog {
     private final JButton loadButton;
     private final JButton loadProofButton;
     private final JButton cancelButton;
-    private JTabbedPane tabPane;
+    private final JTabbedPane tabPane;
 
     /**
      * The result value of the dialog. <code>null</code> if nothing to be loaded
@@ -76,7 +84,7 @@ public final class ExampleChooser extends JDialog {
     /**
      * This class wraps a {@link File} and has a special {@link #toString()} method
      * only using the short file name w/o path.
-     *
+     * <p>
      * Used for displaying files in the examples list w/o prefix
      */
     public static class Example {
@@ -137,11 +145,11 @@ public final class ExampleChooser extends JDialog {
         }
 
         public File getDirectory() {
-           return directory;
+            return directory;
         }
 
         public File getProofFile() {
-           return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
+            return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
         }
 
         public File getObligationFile() {
@@ -161,9 +169,9 @@ public final class ExampleChooser extends JDialog {
         }
 
         public List<File> getAdditionalFiles() {
-            ArrayList<File> result = new ArrayList<File>();
+            ArrayList<File> result = new ArrayList<>();
             int i = 1;
-            while(properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
+            while (properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
                 result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
                 i++;
             }
@@ -171,9 +179,9 @@ public final class ExampleChooser extends JDialog {
         }
 
         public List<File> getExportFiles() {
-            ArrayList<File> result = new ArrayList<File>();
+            ArrayList<File> result = new ArrayList<>();
             int i = 1;
-            while(properties.containsKey(EXPORT_FILE_PREFIX + i)) {
+            while (properties.containsKey(EXPORT_FILE_PREFIX + i)) {
                 result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
                 i++;
             }
@@ -196,13 +204,13 @@ public final class ExampleChooser extends JDialog {
         }
 
         private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path, int from) {
-            if(from == path.length) {
+            if (from == path.length) {
                 return root;
             }
             Enumeration<?> en = root.children();
-            while(en.hasMoreElements()) {
+            while (en.hasMoreElements()) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-                if(node.getUserObject().equals(path[from])) {
+                if (node.getUserObject().equals(path[from])) {
                     return findChild(node, path, from + 1);
                 }
             }
@@ -223,124 +231,104 @@ public final class ExampleChooser extends JDialog {
     //-------------------------------------------------------------------------
 
     private ExampleChooser(File examplesDir) {
-	super(MainWindow.getInstance(), "Load Example", true);
-	assert examplesDir != null;
-	assert examplesDir.isDirectory();
+        super(MainWindow.getInstance(), "Load Example", true);
+        assert examplesDir != null;
+        assert examplesDir.isDirectory();
 
-	//create list panel
-	final JPanel listPanel = new JPanel();
-	listPanel.setLayout(new BorderLayout());
-	getContentPane().add(listPanel);
+        //create list panel
+        final JPanel listPanel = new JPanel();
+        listPanel.setLayout(new BorderLayout());
+        getContentPane().add(listPanel);
 
-	//create example list
-	final DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode());
-	List<Example> examples = listExamples(examplesDir);
-	for (Example example : examples) {
-	   example.addToTreeModel(model);
-	}
+        //create example list
+        final DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode());
+        List<Example> examples = listExamples(examplesDir);
+        for (Example example : examples) {
+            example.addToTreeModel(model);
+        }
 
-	exampleList = new JTree();
-	exampleList.setModel(model);
-	exampleList.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-	exampleList.addTreeSelectionListener(
-	        new TreeSelectionListener() {
-	            @Override
-	            public void valueChanged(TreeSelectionEvent e) {
-	                updateDescription();
-	            }
-		});
-	exampleList.addMouseListener(new MouseAdapter() {
-        @Override
-	    public void mouseClicked(MouseEvent e){
-		if(e.getClickCount() == 2){
-		    loadButton.doClick();
-		}
-	    }
-	});
-	final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
-	exampleScrollPane.setBorder(new TitledBorder("Examples"));
-
-	//create description label
-	tabPane = new JTabbedPane(JTabbedPane.TOP);
-
-	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-	split.add(exampleScrollPane);
-	split.add(tabPane);
-	split.setDividerLocation(300);
-	listPanel.add(split, BorderLayout.CENTER);
-
-	//create button panel
-	final JPanel buttonPanel = new JPanel();
-	buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-	final Dimension buttonDim = new Dimension(140, 27);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-                                                 (int)buttonDim.getHeight()
-                                                     + 10));
-	getContentPane().add(buttonPanel);
-
-	//create "load" button
-	loadButton = new JButton("Load Example");
-	loadButton.addActionListener(new ActionListener() {
-        @Override
-	    public void actionPerformed(ActionEvent e) {
-	        assert selectedExample != null;
-		fileToLoad = selectedExample.getObligationFile();
-		setVisible(false);
-	    }
-	});
-	buttonPanel.add(loadButton);
-	getRootPane().setDefaultButton(loadButton);
-
-	//create "load proof" button
-        loadProofButton = new JButton("Load Proof");
-        loadProofButton.addActionListener(new ActionListener() {
+        exampleList = new JTree();
+        exampleList.setModel(model);
+        exampleList.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        exampleList.addTreeSelectionListener(e -> updateDescription());
+        exampleList.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                assert selectedExample != null;
-                assert selectedExample.hasProof();
-                fileToLoad = selectedExample.getProofFile();
-                setVisible(false);
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    loadButton.doClick();
+                }
             }
+        });
+        final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
+        exampleScrollPane.setBorder(new TitledBorder("Examples"));
+
+        //create description label
+        tabPane = new JTabbedPane(JTabbedPane.TOP);
+
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        split.add(exampleScrollPane);
+        split.add(tabPane);
+        split.setDividerLocation(300);
+        listPanel.add(split, BorderLayout.CENTER);
+
+        //create button panel
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        final Dimension buttonDim = new Dimension(140, 27);
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                (int) buttonDim.getHeight()
+                        + 10));
+        getContentPane().add(buttonPanel);
+
+        //create "load" button
+        loadButton = new JButton("Load Example");
+        loadButton.addActionListener(e -> {
+            if (selectedExample == null) throw new RuntimeException("No example selected");
+            fileToLoad = selectedExample.getObligationFile();
+            setVisible(false);
+        });
+        buttonPanel.add(loadButton);
+        getRootPane().setDefaultButton(loadButton);
+
+        //create "load proof" button
+        loadProofButton = new JButton("Load Proof");
+        loadProofButton.addActionListener(e -> {
+            if (selectedExample == null) throw new IllegalStateException("No example selected");
+            if (!selectedExample.hasProof()) throw new IllegalStateException("Selected example has no proof.");
+            fileToLoad = selectedExample.getProofFile();
+            setVisible(false);
         });
         buttonPanel.add(loadProofButton);
 
-	//create "cancel" button
-	cancelButton = new JButton("Cancel");
-	cancelButton.addActionListener(new ActionListener() {
-        @Override
-	    public void actionPerformed(ActionEvent e) {
-	        fileToLoad = null;
-		setVisible(false);
-	    }
-	});
-	buttonPanel.add(cancelButton);
-        ActionListener escapeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if(event.getActionCommand().equals("ESC")) {
-                    cancelButton.doClick();
-                }
+        //create "cancel" button
+        cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            fileToLoad = null;
+            setVisible(false);
+        });
+        buttonPanel.add(cancelButton);
+        ActionListener escapeListener = event -> {
+            if (event.getActionCommand().equals("ESC")) {
+                cancelButton.doClick();
             }
         };
         cancelButton.registerKeyboardAction(
-                            escapeListener,
-                            "ESC",
-                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JComponent.WHEN_IN_FOCUSED_WINDOW);
+                escapeListener,
+                "ESC",
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // select first example
-        DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode)model.getRoot()).getFirstLeaf();
+        DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
         TreePath pathToFirstLeaf = new TreePath(firstLeaf.getPath());
         exampleList.getSelectionModel().setSelectionPath(pathToFirstLeaf);
         exampleList.makeVisible(pathToFirstLeaf);
 
-	// show
+        // show
         getContentPane().setLayout(new BoxLayout(getContentPane(),
-                                                 BoxLayout.Y_AXIS));
-	setSize(800,400);
-	setLocationRelativeTo(MainWindow.getInstance());
+                BoxLayout.Y_AXIS));
+        setSize(800, 400);
     }
-
 
 
     //-------------------------------------------------------------------------
@@ -349,72 +337,60 @@ public final class ExampleChooser extends JDialog {
 
     public static File lookForExamples() {
         //weigl: using java properties: -Dkey.examples.dir="..."
-        if(System.getProperty(KEY_EXAMPLE_DIR)!=null){
+        if (System.getProperty(KEY_EXAMPLE_DIR) != null) {
             return new File(System.getProperty(KEY_EXAMPLE_DIR));
         }
 
         // greatly simplified version without parent path lookup.
         File folder = new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
         if (!folder.exists()) {
-           folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
+            folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
         }
         return folder;
     }
 
     private static String fileAsString(File f) {
         try {
-            byte[] buffer = new byte[(int) f.length()];
-            FileInputStream fis = new FileInputStream(f);
-            fis.read(buffer);
-            fis.close();
-            return new String(buffer);
+            return IOUtil.readFrom(f);
         } catch (IOException e) {
+            LOGGER.error("Could not read file '{}'", f, e);
             return "<Error reading file: " + f + ">";
         }
     }
 
-    private static StringBuilder extractDescription(File file, StringBuilder sb, Properties properties)
-            throws IOException {
-        BufferedReader r = null;
-        try {
-            r = new BufferedReader(new FileReader(file));
+    private static StringBuilder extractDescription(File file, StringBuilder sb, Properties properties) {
+        try (BufferedReader r = new BufferedReader(new FileReader(file))) {
             String line;
             boolean emptyLineSeen = false;
-            while((line = r.readLine()) != null) {
-                if(emptyLineSeen) {
+            while ((line = r.readLine()) != null) {
+                if (emptyLineSeen) {
                     sb.append(line).append("\n");
                 } else {
                     String trimmed = line.trim();
-                    if(trimmed.length() == 0) {
+                    if (trimmed.length() == 0) {
                         emptyLineSeen = true;
-                    } else if(trimmed.startsWith("#")) {
+                    } else if (trimmed.startsWith("#")) {
                         // ignore
                     } else {
                         String[] entry = trimmed.split(" *[:=] *", 2);
-                        if(entry.length > 1) {
+                        if (entry.length > 1) {
                             properties.put(entry[0], entry[1]);
                         }
                     }
                 }
             }
         } catch (IOException e) {
-            Debug.out(e);
+            LOGGER.error("", e);
             return sb;
-        } finally {
-            if(r != null) {
-                try { r.close(); }
-                catch(IOException ex) { };
-            }
         }
         return sb;
     }
 
 
-
     private void updateDescription() {
 
         TreePath selectionPath = exampleList.getSelectionModel().getSelectionPath();
-        if(selectionPath == null) {
+        if (selectionPath == null) {
             return;
         }
 
@@ -426,8 +402,8 @@ public final class ExampleChooser extends JDialog {
         if (nodeObj instanceof Example) {
             Example example = (Example) nodeObj;
 
-            if(example != selectedExample) {
-                addTab(example.getDescription().toString(), "Description", true);
+            if (example != selectedExample) {
+                addTab(example.getDescription(), "Description", true);
                 final String fileAsString = fileAsString(example.getObligationFile());
                 final int p = fileAsString.lastIndexOf("\\problem");
                 if (p >= 0) {
@@ -469,74 +445,61 @@ public final class ExampleChooser extends JDialog {
     public static File showInstance(String examplesDirString) {
         // get examples directory
         File examplesDir;
-        if(examplesDirString == null) {
+        if (examplesDirString == null) {
             examplesDir = lookForExamples();
         } else {
             examplesDir = new File(examplesDirString);
         }
 
-        if (examplesDir == null || !examplesDir.isDirectory()) {
+        if (!examplesDir.isDirectory()) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "The examples directory cannot be found.\n"+
-                    "Please install them at " +
-                            (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) +"/" : examplesDirString),
+                    "The examples directory cannot be found.\n" +
+                            "Please install them at " +
+                            (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/" : examplesDirString),
                     "Error loading examples",
                     JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
-	//show dialog
-	if(instance == null) {
-	    instance = new ExampleChooser(examplesDir);
-	}
-	instance.setVisible(true);
+        //show dialog
+        if (instance == null) {
+            instance = new ExampleChooser(examplesDir);
+        }
+        instance.setLocationRelativeTo(instance.getOwner());
+        instance.setVisible(true);
 
-	//return result
-	final File result = instance.fileToLoad;
-	return result;
+        //return result
+        return instance.fileToLoad;
     }
 
     /**
      * Lists all examples in the given directory.
      * This method is also accessed by the eclipse based projects.
+     *
      * @param examplesDir The examples directory to list examples in.
      * @return The found examples.
      */
     public static List<Example> listExamples(File examplesDir) {
-        List<Example> result = new LinkedList<Example>();
+        List<Example> result = new LinkedList<>();
 
         String line;
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(
-                    new FileReader(new File(new File(examplesDir, "index"), "samplesIndex.txt")));
-            while((line = br.readLine()) != null) {
+        final File index = new File(new File(examplesDir, "index"), "samplesIndex.txt");
+        try (BufferedReader br = new BufferedReader(new FileReader(index))) {
+            while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if(line.startsWith("#") || line.length() == 0) {
+                if (line.startsWith("#") || line.length() == 0) {
                     continue;
                 }
                 File f = new File(examplesDir, line);
                 try {
                     result.add(new Example(f));
                 } catch (IOException e) {
-                    System.err.println("Cannot parse example " +  f + "; ignoring it.");
-                    e.printStackTrace();
+                    LOGGER.warn("Cannot parse example {}; ignoring it.", f, e);
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error while reading samples");
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    br.close();
-                }
-            } catch (IOException e) {
-                System.err.println("Error while reading samples");
-                e.printStackTrace();
-            }
+            LOGGER.warn("Error while reading samples", e);
         }
-
-       return result;
+        return result;
     }
 }

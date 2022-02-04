@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.speclang.PositionedString;
 
 
 /**
@@ -23,26 +22,24 @@ import de.uka.ilkd.key.speclang.PositionedString;
  * @author Daniel Bruns
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
-    
-    private final PositionedString inv;
-    
-    
-    public TextualJMLInitially(ImmutableList<String> mods, 
-	                      PositionedString inv) {
+
+    private final LabeledParserRuleContext inv;
+
+
+    public TextualJMLInitially(ImmutableList<String> mods, LabeledParserRuleContext inv) {
         super(mods);
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
-    
-    public PositionedString getInv() {
+
+    public LabeledParserRuleContext getInv() {
         return inv;
     }
     
-    
     @Override
     public String toString() {
-        return inv.toString();
+        return inv.first.getText();
     }
     
     

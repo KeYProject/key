@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed by class CastHandler in this package</comment>
+
+    <entry key="cast.decls">(declare-fun cast (U T) U)</entry>
+    <entry key="cast.axioms">
+(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
+(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
+    </entry>
+
+</properties>

@@ -28,14 +28,13 @@ public class SMTOptionsAction extends MainWindowAction {
 
     public SMTOptionsAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("SMT Solver Options");
+        setName("Show SMT Solver Options");
         setIcon(IconFactory.toolbox(16));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         SettingsManager.getInstance().showSettingsDialog(mainWindow, SettingsManager.SMT_SETTINGS);
-        mainWindow.updateSMTSelectMenu();
 
         /*
         ProofDependentSMTSettings pdSettings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();

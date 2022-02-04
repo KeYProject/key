@@ -1,5 +1,5 @@
 example.name = Building First-order Proofs
-example.path = New Book/Using KeY
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover
 example.file = projection.key
 example.additionalFile.1 = projection.key
 

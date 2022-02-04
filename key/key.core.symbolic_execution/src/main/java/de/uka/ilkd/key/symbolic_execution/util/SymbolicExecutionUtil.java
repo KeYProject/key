@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.nparser.DebugKeyLexer;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -155,12 +156,17 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides utility methods for symbolic execution with KeY.
  * @author Martin Hentschel
  */
 public final class SymbolicExecutionUtil {
+   private static final Logger LOGGER = LoggerFactory.getLogger(SymbolicExecutionUtil.class);
+
+
    /**
     * Key for the choice option "runtimeExceptions".
     */
@@ -3766,7 +3772,7 @@ public final class SymbolicExecutionUtil {
          try {
              logicPrinter.printTerm(term);
          } catch(IOException ioe) {
-             System.err.println(ioe);
+            LOGGER.debug("", ioe);
          }
          result = logicPrinter.result();
          if (result.charAt(result.length()-1) == '\n')

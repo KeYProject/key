@@ -30,13 +30,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -45,11 +39,15 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShowProofStatistics extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
     /**
      *
@@ -237,7 +235,7 @@ public class ShowProofStatistics extends MainWindowAction {
                                                  Boolean.TRUE);
                 statisticsPane.setFont(myFont);
             } else {
-                Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
+                LOGGER.debug("KEY_FONT_PROOF_TREE not available. Use standard font.");
             }
 
             JPanel buttonPane = new JPanel();
@@ -302,9 +300,9 @@ public class ShowProofStatistics extends MainWindowAction {
             KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
                     "Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
-            fileChooser.selectFile(new File(fileName + "." + fileExtension));
-            boolean approved = fileChooser.showSaveDialog(this);
-            if (approved) {
+            fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try(BufferedWriter writer = new BufferedWriter(
                             new OutputStreamWriter(new FileOutputStream(file)));) {

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,8 +33,7 @@ import java.util.List;
 @KeYGuiExtension.Info(name = "Test Extension",
         description = "Should only be used for testing of the extension facade",
         priority = 100000,
-        optional = true,
-        experimental = true)
+        optional = true)
 public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel,
@@ -42,8 +43,10 @@ public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.KeyboardShortcuts,
         KeYGuiExtension.Settings {
 
-    KeyAction actionTest = new TestAction();
-    private ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestExtension.class);
+
+    private final KeyAction actionTest = new TestAction();
+    private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Proof underlyingObject) {
             return Collections.singletonList(actionTest);
@@ -142,7 +145,7 @@ public class TestExtension implements KeYGuiExtension,
 
         @Override
         public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-            System.out.println("TestSettingsProvider.applySettings");
+            LOGGER.trace("TestSettingsProvider.applySettings");
         }
     }
 }

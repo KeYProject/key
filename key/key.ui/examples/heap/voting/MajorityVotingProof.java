@@ -22,15 +22,15 @@ class MajorityVoting {
      */
 
     /*@ public normal_behaviour
-     @      requires (votes != null);
-     @      requires (1 <= votes.length);
-     @      requires (votes.length == V);
-     @      requires (C >= 1);
-     @      requires (\forall int a; 0 <= a && a < votes.length; 1 <= votes[a] && votes[a] <= C);
-     @      assignable \nothing;
-     @      ensures (1 <= \result && \result <= C);
-     @      ensures (\forall int a; 1 <= a && a <= C; ((\sum int b; 0 <= b && b < votes.length; votes[b] == a ? 1 : 0) <= (\sum int c; 0 <= c && c < votes.length ; votes[c] == \result ? 1 : 0)));
-     @*/
+      @      requires (votes != null);
+      @      requires (1 <= votes.length);
+      @      requires (votes.length == V);
+      @      requires (C >= 1);
+      @      requires (\forall int a; 0 <= a && a < votes.length; 1 <= votes[a] && votes[a] <= C);
+      @      assignable \nothing;
+      @      ensures (1 <= \result && \result <= C);
+      @      ensures (\forall int a; 1 <= a && a <= C; ((\sum int b; 0 <= b && b < votes.length; votes[b] == a ? 1 : 0) <= (\sum int c; 0 <= c && c < votes.length ; votes[c] == \result ? 1 : 0)));
+      @*/
     int majorityVoting(int[] votes) {
         int[] res = new int[C+1];
         int i = 0;
@@ -41,10 +41,10 @@ class MajorityVoting {
          */
 
         /*@ loop_invariant
-         @      0 <= i && i <= V && (\forall int a; 0 <= a && a < res.length; (\sum int b; 0 <= b && b < i ; votes[b] == a ? 1:0) == res[a]);
-         @      assignable res[*];
-         @      decreases V - i;
-         @*/
+          @      0 <= i && i <= V && (\forall int a; 0 <= a && a < res.length; (\sum int b; 0 <= b && b < i ; votes[b] == a ? 1:0) == res[a]);
+          @      assignable res[*];
+          @      decreases V - i;
+          @*/
         while(i < V) {
             res[votes[i]]++;
             i++;
@@ -65,10 +65,10 @@ class MajorityVoting {
          */
 
         /*@ loop_invariant
-         @      1 <= i && i <= (C+1) && (\forall int a; 1 <= a && a < i; res[a] <= max) && max == res[elect] && 1 <= elect && (elect < i || elect == 1);
-         @      assignable elect, max;
-         @      decreases (C - i + 1);
-         @*/
+          @      1 <= i && i <= (C+1) && (\forall int a; 1 <= a && a < i; res[a] <= max) && max == res[elect] && 1 <= elect && (elect < i || elect == 1);
+          @      assignable elect, max;
+          @      decreases (C - i + 1);
+          @*/
         while(i <= C) {
             if(max < res[i]) {
                 max = res[i];

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -236,60 +237,6 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new LoopContract.Variables[] { variables, nextVariables };
     }
 
-    /**
-     *
-     * @param goal
-     *            the current goal.
-     * @param result
-     *            the next goals.
-     * @param contract
-     *            the contract being applied.
-     * @param instantiation
-     *            the instantiation.
-     * @param anonOutHeaps
-     *            the heaps used in the anonOut update.
-     * @param vars
-     *            the variables for both the current and the next loop iteration.
-     * @param modifiesClauses
-     *            the modifies clauses.
-     * @param assumptions
-     *            the preconditions for the validity branch.
-     * @param usageAssumptions
-     *            the preconditions for the usage branch.
-     * @param decreasesCheck
-     *            the decreases check.
-     * @param postconditions
-     *            the postconditions for the current loop iteration.
-     * @param postconditionsNext
-     *            the postconditions for the next loop iteration.
-     * @param updates
-     *            the updates for the usage branch.
-     * @param nextRemembranceUpdate
-     *            the remembrance update for the next loop iteration.
-     * @param context
-     *            the update for the validity branch.
-     * @param configurator
-     *            a configurator.
-     * @param services
-     *            services.
-     */
-    private static void setUpGoals(final Goal goal, final ImmutableList<Goal> result,
-            final LoopContract contract, final Instantiation instantiation,
-            final Map<LocationVariable, Function> anonOutHeaps, final LoopContract.Variables[] vars,
-            final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
-            final Term[] usageAssumptions, final Term decreasesCheck, final Term[] postconditions,
-            final Term[] postconditionsNext, final Term[] updates, final Term nextRemembranceUpdate,
-            final Term context, final GoalsConfigurator configurator, final Services services) {
-        configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
-        configurator.setUpUsageGoal(result.head(), updates, usageAssumptions);
-        final ProgramVariable exceptionParameter
-                = createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
-        configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
-                nextRemembranceUpdate, anonOutHeaps, modifiesClauses, assumptions, decreasesCheck,
-                postconditions, postconditionsNext, exceptionParameter,
-                vars[0].termify(instantiation.self), vars[1]);
-    }
-
     @Override
     public Term getLastFocusTerm() {
         return lastFocusTerm;
@@ -355,8 +302,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                 = conditionsAndClausesBuilder.buildModifiesClauses();
         final Term[] assumptions = createPreconditions(instantiation.self, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
+        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Term[] postconditions
                 = createPostconditions(modifiesClauses, conditionsAndClausesBuilder);
+        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] usageAssumptions = createUsageAssumptions(postconditions, anonOutHeaps,
                 localOutVariables, conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
@@ -372,9 +321,20 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                 new TermLabelState(), instantiation, contract.getLabels(), vars[0],
                 application.posInOccurrence(), services, this);
         final ImmutableList<Goal> result = goal.split(3);
-        setUpGoals(goal, result, contract, instantiation, anonOutHeaps, vars, modifiesClauses,
-                assumptions, usageAssumptions, decreasesCheck, postconditions, postconditionsNext,
-                updates, nextRemembranceUpdate, context, configurator, services);
+
+        configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
+        configurator.setUpUsageGoal(
+                result.head(), updates,
+                ArrayUtil.add(usageAssumptions, freePostcondition));
+        final ProgramVariable exceptionParameter
+                = createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
+        configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
+                nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
+                ArrayUtil.add(assumptions, freePrecondition),
+                decreasesCheck,
+                postconditions, postconditionsNext, exceptionParameter,
+                vars[0].termify(instantiation.self), vars[1]);
+
         return result;
     }
 }

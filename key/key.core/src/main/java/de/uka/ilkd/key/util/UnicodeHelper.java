@@ -118,25 +118,6 @@ public final class UnicodeHelper {
      * Return a String containing em-spaces.
      */
     public static String emSpaces (int em) {
-        final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < em; i++) {
-            sb.append(EMSPACE);
-        }
-        return sb.toString();
+        return Character.toString(EMSPACE).repeat(em);
     }
-
-
-    /** For testing Unicode symbols. */
-//    public static void main(String[] args){
-//        System.out.println("Testing Unicode symbols:");
-//        for (java.lang.reflect.Field f: UnicodeHelper.class.getDeclaredFields()){
-//            try {
-//                System.out.print(f.get(null));
-//            } catch (Exception e) {
-//                System.out.println("Error in Unicode test.");
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
 }

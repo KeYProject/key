@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
+import de.uka.ilkd.key.util.parsing.LocatableException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nonnull;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
+import javax.annotation.Nonnull;
+import java.net.URL;
+import java.util.*;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -18,7 +19,7 @@ import java.util.Stack;
  *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
- * @see #run(Token, CharStream, IProofFileParser)
+ * @see #run(Token, CharStream, IProofFileParser, URL)
  */
 public class ProofReplayer {
     /**
@@ -32,6 +33,8 @@ public class ProofReplayer {
         }
     }
 
+    private ProofReplayer() {
+    }
 
     /**
      * Replays the proof represented by the expression given in the {@link CharStream} after the position of the
@@ -40,11 +43,13 @@ public class ProofReplayer {
      * @param token the "\proof" with in the input stream
      * @param input a valid input stream
      * @param prl   the proof replayer instance
-     * @see #run(CharStream, IProofFileParser, int)
+     * @param source the source of the stream, used for producing exceptions with locations
+     * @see #run(CharStream, IProofFileParser, int, URL)
      */
-    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl) {
+    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
+                           URL source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
-        run(input, prl, token.getLine());
+        run(input, prl, token.getLine(), source);
     }
 
     /**
@@ -57,12 +62,14 @@ public class ProofReplayer {
      * @param input     a valid input stream
      * @param prl       the proof replayer interface
      * @param startLine the starting of the sexpr needed for {@code prl}
+     * @param source    the source of the stream, used for producing exceptions with locations
      */
-    public static void run(CharStream input, IProofFileParser prl, final int startLine) {
+    public static void run(CharStream input, IProofFileParser prl, final int startLine,
+                           URL source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); //currently open proof elements
-        Stack<Integer> posStack = new Stack<>(); // stack of opened commands position
+        Deque<Integer> posStack = new ArrayDeque<>(); // stack of opened commands position
         while (true) {
             int type = stream.LA(1); //current token type
             switch (type) {
@@ -71,6 +78,13 @@ public class ProofReplayer {
                     stream.consume(); //consume the "("
                     Token idToken = stream.LT(1); // element id
                     IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
+
+                    if (cur == null) {
+                        Location loc = new Location(source, idToken.getLine() + startLine - 1,
+                            idToken.getCharPositionInLine() + 1);
+                        throw new LocatableException("Unknown proof element: " + idToken.getText(),
+                            loc);
+                    }
                     stream.consume();
 
                     String arg = null;
@@ -83,7 +97,6 @@ public class ProofReplayer {
                     }
 
                     prl.beginExpr(cur, arg);
-                    //System.out.format("Emit: %s %s%n", cur, arg);
                     stack.push(cur);
                     posStack.push(pos);
                     break;

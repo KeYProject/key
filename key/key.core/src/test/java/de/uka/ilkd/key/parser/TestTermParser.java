@@ -18,25 +18,29 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.builder.BuildingException;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 import static org.junit.Assert.*;
 
 public class TestTermParser extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
+
     private Sort elem, list;
     private Function head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;
-    private Recoder2KeY r2k;
+    private final Recoder2KeY r2k;
 
     public TestTermParser() {
         r2k = new Recoder2KeY(services, nss);
@@ -180,7 +184,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test7() throws Exception {
-        /** Bound variables are newly created by the parser,
+        /* Bound variables are newly created by the parser,
          * so we have to parse first, then extract the used variables,
          * then build the formulae. */
 
@@ -250,13 +254,14 @@ public class TestTermParser extends AbstractTestTermParser {
         //	String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
         String s = "\\<{ int x = 1; {int s = 2;} }\\> x=x";
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
     public void test11() throws Exception {
         String s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
-        System.out.println(s);
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
 
@@ -265,6 +270,7 @@ public class TestTermParser extends AbstractTestTermParser {
     public void test12() throws Exception {
         String s = "\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
         Term t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
@@ -294,6 +300,7 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t = parseTerm(s);
         s = "\\<{int[] i;}\\>\\<{}\\>true";
         t = parseTerm(s);
+        LOGGER.info("Out: {}", t);
     }
 
     @Test
@@ -363,8 +370,8 @@ public class TestTermParser extends AbstractTestTermParser {
     private void assertTermEquals(String actual, String expected) throws Exception {
         Term t = parseTerm(actual);
         Term u = parseTerm(expected);
-        System.out.println(t);
-        System.out.println(u);
+        LOGGER.debug("Actual: {}", t);
+        LOGGER.debug("Expected: {}", u);
         assertEquals(u.toString(), t.toString());
     }
 
@@ -467,6 +474,7 @@ public class TestTermParser extends AbstractTestTermParser {
         testParseQueriesAndAttributes("t.(T::g)=t.(T::h)");
     }
 
+    @Test
     public void testJavaQueryAndAttribute_all() throws Exception {
         String all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
                 + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
@@ -483,7 +491,7 @@ public class TestTermParser extends AbstractTestTermParser {
         try {
             parseTerm(s);
             parsed = true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         assertFalse("Program variables should not have arguments", parsed);
     }
