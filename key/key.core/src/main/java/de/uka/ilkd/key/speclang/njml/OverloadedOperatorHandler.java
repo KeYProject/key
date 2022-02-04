@@ -62,9 +62,15 @@ public class OverloadedOperatorHandler {
         }
     }
 
+    /**
+     * The collection of those operators which take one (not two) arguments.
+     */
     public static final Set<JMLOperator> UNARY_OPERATORS =
             EnumSet.of(JMLOperator.BITWISE_NEGATE, JMLOperator.UNARY_MINUS);
 
+    /**
+     * The collection of those operators whose result is expected to be boolean.
+     */
     public static final Set<JMLOperator> PREDICATES =
             EnumSet.of(JMLOperator.LT, JMLOperator.LTE, JMLOperator.GT, JMLOperator.GTE);
 

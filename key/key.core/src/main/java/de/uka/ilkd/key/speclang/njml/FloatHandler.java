@@ -53,6 +53,7 @@ public class FloatHandler extends LDTHandler {
         opMap.put(MULT, floatLDT.getMul());
         opMap.put(DIVISION, floatLDT.getDiv());
         opMap.put(MODULO, floatLDT.getJavaMod());
+        opMap.put(UNARY_MINUS, floatLDT.getNeg());
         opMap.put(GT, floatLDT.getGreaterThan());
         opMap.put(LT, floatLDT.getLessThan());
         opMap.put(GTE, floatLDT.getGreaterOrEquals());

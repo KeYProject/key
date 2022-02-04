@@ -27,6 +27,7 @@ public class DoubleHandler extends LDTHandler {
         opMap.put(MULT, doubleLDT.getMul());
         opMap.put(DIVISION, doubleLDT.getDiv());
         opMap.put(MODULO, doubleLDT.getJavaMod());
+        opMap.put(UNARY_MINUS, doubleLDT.getNeg());
         opMap.put(GT, doubleLDT.getGreaterThan());
         opMap.put(LT, doubleLDT.getLessThan());
         opMap.put(GTE, doubleLDT.getGreaterOrEquals());
