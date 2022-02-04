@@ -183,8 +183,12 @@ public final class RuleInteraction extends NodeInteraction {
     private static final HashMap<String, ArgumentFilter> FILTERS;
 
     private static ArgumentFilter getFilterFor(String rule) {
-        var filter = FILTERS.get(rule);
-        return filter == null ? new NoArgumentFilter() : filter;
+        if (rule.startsWith("Definition_axiom_for_") || rule.startsWith("Contract_axiom_for_")) {
+            return new FullArgumentFilter();
+        } else {
+            var filter = FILTERS.get(rule);
+            return filter == null ? new NoArgumentFilter() : filter;
+        }
     }
 
     private interface ArgumentFilter {
@@ -210,6 +214,15 @@ public final class RuleInteraction extends NodeInteraction {
         @Override
         public boolean filter(String parameter) {
             return true;
+        }
+    }
+
+    private static class FullArgumentFilter implements ArgumentFilter {
+        FullArgumentFilter() {}
+
+        @Override
+        public boolean filter(String parameter) {
+            return false;
         }
     }
 

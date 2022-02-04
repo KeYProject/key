@@ -96,7 +96,7 @@ public final class GuiUtilities {
             out.format(format, k, indentStringWith(v, innerIndent).trim());
         });
 
-        out.format(";");
+        out.format(";%n");
         return sout.toString();
     }
 
