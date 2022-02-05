@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -67,8 +69,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
-        this.services = services;
+    public JMLSpecExtractor(InitConfig initConfig) {
+        FinalHeapResolver.rememberIfFinalEnabled(initConfig);
+        this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
     }
 

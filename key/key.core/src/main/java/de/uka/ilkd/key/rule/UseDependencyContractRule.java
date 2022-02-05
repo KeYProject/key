@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -451,7 +452,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         //configure contract
-        final DependencyContract contract =
+        DependencyContract contract =
                 (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
         assert contract != null;
 

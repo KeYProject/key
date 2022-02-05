@@ -1606,6 +1606,11 @@ public class TermBuilder {
         return select(asSort, h, o, func(f));
     }
 
+    private Term readFinal(Sort asSort, Term o, Term f) {
+        return func(services.getTypeConverter().getHeapLDT()
+                .getFinal(asSort, services), o, f);
+    }
+
     public Term dot(Sort asSort, Term o, Term f) {
         return select(asSort, getBaseHeap(), o, f);
     }
@@ -1637,6 +1642,17 @@ public class TermBuilder {
                 .getFieldSort();
         return f.sort() == fieldSort ? staticDot(asSort, func(f))
                 : func(f, getBaseHeap());
+    }
+
+    public Term finalDot(Sort sort, Term o, Function f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT()
+                .getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, o, func(f))
+                : func(f, getBaseHeap(), o);
+    }
+
+    public Term finalDot(Sort asSort, Term o, Term f) {
+        return readFinal(asSort, o, f);
     }
 
     public Term arr(Term idx) {

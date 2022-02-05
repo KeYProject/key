@@ -131,6 +131,9 @@ class SelectPrinter extends FieldPrinter {
         /*
          * Is consideration for static arrays missing in this?
          * (Kai Wallisch 08/2014)
+         *
+         * No, array accesses are not static selects.
+         * This only handles the access to the static array reference.
          */
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());
