@@ -118,6 +118,7 @@ public class LogicPrinter {
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
+    private final FinalPrinter finalPrinter = new FinalPrinter(this);
     private final StorePrinter storePrinter = new StorePrinter(this);
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -1162,6 +1163,13 @@ public class LogicPrinter {
      */
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         selectPrinter.printSelect(t, tacitHeap);
+    }
+
+    /*
+     * Print a term of the form: T::final(object, field).
+     */
+    public void printFinal(Term t) throws IOException {
+        finalPrinter.printFinal(t);
     }
 
     /*
