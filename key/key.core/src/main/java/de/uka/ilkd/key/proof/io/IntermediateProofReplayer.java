@@ -98,6 +98,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
@@ -458,11 +459,11 @@ public class IntermediateProofReplayer {
      *            The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate
      *         representation.
-     * @throws TacletConstructionException
+     * @throws TacletAppConstructionException
      *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal) throws TacletConstructionException {
+            Goal currGoal) throws TacletAppConstructionException, ProblemLoaderException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -488,7 +489,7 @@ public class IntermediateProofReplayer {
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
-                throw (TacletConstructionException)new TacletConstructionException(
+                throw (TacletAppConstructionException)new TacletAppConstructionException(
                     "Wrong position information: " + pos).initCause(e);
             }
         }
@@ -510,6 +511,25 @@ public class IntermediateProofReplayer {
                     nss.programVariables(), nss.functions());
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
                 new SequentFormula(term)));
+        }
+
+        if (!ourApp.ifInstsCorrectSize(ourApp.taclet(),ifFormulaList) ) {
+            Debug.out("Proof contains wrong number of \\assumes instatiations for "
+                    + tacletName);
+            // try to find instantiations automatically
+            ImmutableList<TacletApp> instApps = ourApp
+                    .findIfFormulaInstantiations(seq, services);
+            if (instApps.size() != 1) {
+                // none or not a unique result
+                throw new TacletAppConstructionException(
+                        "Could not apply " + tacletName +
+                        " because of unknown instantiations for \\assumes. " +
+                        instApps.size()  + " candidates. " +
+                        "Perhaps the rule's definition has been changed in KeY.");
+            }
+
+            TacletApp newApp = instApps.head();
+            ifFormulaList = newApp.ifFormulaInstantiations();
         }
 
         // TODO: In certain cases, the below method call returns null and
@@ -1061,14 +1081,14 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletConstructionException extends Exception {
+    static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
-        TacletConstructionException(String s) {
+        TacletAppConstructionException(String s) {
             super(s);
         }
 
-        TacletConstructionException(Throwable cause) {
+        TacletAppConstructionException(Throwable cause) {
             super(cause);
         }
     }

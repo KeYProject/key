@@ -1060,83 +1060,95 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula instantiations
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
-	    Sequent p_seq,
-	    Services p_services) {
+            Sequent p_seq,
+            Services p_services) {
 
-	Debug.assertTrue(ifInstantiations == null,
-		"The if formulas have already been instantiated");
+        Debug.assertTrue(ifInstantiations == null,
+                "The if formulas have already been instantiated");
 
-	if (taclet().ifSequent().isEmpty())
-	    return ImmutableSLList.<TacletApp>nil().prepend(this);
+        if (taclet().ifSequent().isEmpty())
+            return ImmutableSLList.<TacletApp>nil().prepend(this);
 
-	return findIfFormulaInstantiationsHelp(
-		createSemisequentList(taclet().ifSequent() // Matching starting
-			.succedent()), // with the last formula
-		createSemisequentList(taclet().ifSequent().antecedent()),
-		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
-			.createList(p_seq, true, p_services),
-		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
-		p_services);
-
+        return findIfFormulaInstantiationsHelp(
+                createSemisequentList(taclet().ifSequent().succedent()),
+                createSemisequentList(taclet().ifSequent().antecedent()),
+                IfFormulaInstSeq.createList(p_seq, false, p_services),
+                IfFormulaInstSeq.createList(p_seq, true, p_services),
+                ImmutableSLList.<IfFormulaInstantiation>nil(),
+                matchConditions(),
+                p_services);
     }
 
     /**
      * Recursive function for matching the remaining tail of an if sequent
      *
-     * @param p_ifSeqTail
+     * @param ruleSuccTail
      *            tail of the current semisequent as list
-     * @param p_ifSeqTail2nd
+     * @param ruleAntecTail
      *            the following semisequent (i.e. antecedent) or null
-     * @param p_toMatch
+     * @param instSucc
      *            list of the formulas to match the current if semisequent
      *            formulas with
-     * @param p_toMatch2nd
+     * @param instAntec
      *            list of the formulas of the antecedent
+     * @param instAlreadyMatched
+     *            matched instantiations, for exactly those formulas that are
+     *            no longer in ruleSuccTail and ruleAntecTail
      * @param p_matchCond
      *            match conditions until now, i.e. after matching the first
      *            formulas of the if sequent
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-	    ImmutableList<SequentFormula> p_ifSeqTail,
-	    ImmutableList<SequentFormula> p_ifSeqTail2nd,
-	    ImmutableList<IfFormulaInstantiation> p_toMatch,
-	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
-	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-	    MatchConditions p_matchCond, Services p_services) {
+            ImmutableList<SequentFormula> ruleSuccTail,
+            ImmutableList<SequentFormula> ruleAntecTail,
+            ImmutableList<IfFormulaInstantiation> instSucc,
+            ImmutableList<IfFormulaInstantiation> instAntec,
+            ImmutableList<IfFormulaInstantiation> instAlreadyMatched,
+            MatchConditions p_matchCond,
+            Services p_services) {
 
-	while (p_ifSeqTail.isEmpty()) {
-	    if (p_ifSeqTail2nd == null) {
-		// All formulas have been matched, collect the results
-		TacletApp res = setAllInstantiations(p_matchCond,
-					             p_alreadyMatched,
-					             p_services);
-		if (res != null)
-		    return ImmutableSLList.<TacletApp>nil().prepend(res);
-		return ImmutableSLList.<TacletApp>nil();
-	    } else {
-		// Change from succedent to antecedent
-		p_ifSeqTail = p_ifSeqTail2nd;
-		p_ifSeqTail2nd = null;
-		p_toMatch = p_toMatch2nd;
-	    }
-	}
+        while (ruleSuccTail.isEmpty()) {
+            if (ruleAntecTail == null) {
+                // All formulas have been matched, collect the results
+                TacletApp res = setAllInstantiations(p_matchCond,
+                                                     instAlreadyMatched,
+                                                     p_services);
+                if (res != null)
+                    return ImmutableSLList.<TacletApp>nil().prepend(res);
+                return ImmutableSLList.<TacletApp>nil();
+            } else {
+                // Change from succedent to antecedent
+                ruleSuccTail = ruleAntecTail;
+                ruleAntecTail = null;
+                instSucc = instAntec;
+            }
+        }
 
-	// Match the current formula
-	IfMatchResult mr = taclet().getMatcher().matchIf(p_toMatch, p_ifSeqTail.head().formula(), p_matchCond, p_services);
+        // Match the current formula
+        IfMatchResult mr = taclet().getMatcher().matchIf(
+                instSucc,
+                ruleSuccTail.head().formula(),
+                p_matchCond,
+                p_services);
 
-	// For each matching formula call the method again to match
-	// the remaining terms
-	ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
-	Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
-	Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
-	p_ifSeqTail = p_ifSeqTail.tail();
-	while (itCand.hasNext()) {
-	    res = res.prepend(findIfFormulaInstantiationsHelp(p_ifSeqTail,
-		    p_ifSeqTail2nd, p_toMatch, p_toMatch2nd, p_alreadyMatched
-			    .prepend(itCand.next()), itMC.next(), p_services));
-	}
+        // For each matching formula call the method again to match
+        // the remaining terms
+        ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
+        Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
+        Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
+        ruleSuccTail = ruleSuccTail.tail();
+        while (itCand.hasNext()) {
+            res = res.prepend(findIfFormulaInstantiationsHelp(
+                    ruleSuccTail,
+                    ruleAntecTail,
+                    instSucc,
+                    instAntec,
+                    instAlreadyMatched.prepend(itCand.next()),
+                    itMC.next(),
+                    p_services));
+        }
 
-	return res;
+        return res;
     }
 
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
@@ -1340,7 +1352,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the list of if instantiations has the correct size or is
      *         null
      */
-    protected static boolean ifInstsCorrectSize(Taclet p_taclet,
+    public static boolean ifInstsCorrectSize(Taclet p_taclet,
 	    ImmutableList<IfFormulaInstantiation> p_list) {
 	return p_list == null
 		|| p_list.size() == (p_taclet.ifSequent().antecedent().size() + p_taclet
