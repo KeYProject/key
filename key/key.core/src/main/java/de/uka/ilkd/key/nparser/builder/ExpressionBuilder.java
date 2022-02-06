@@ -323,7 +323,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = acceptnn(ctx.a);
         if (ctx.b.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
@@ -338,11 +338,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = acceptnn(ctx.a);
         if (ctx.b == null) return termL;
 
         Term termR = accept(ctx.b);
-        //String opName = ctx.SLASH() != null ? "div" : "mod";
         return binaryLDTSpecificTerm(ctx, ctx.op.getText(), termL, termR);
     }
 
@@ -358,9 +357,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
         Term t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
-            KeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
+            KeYParser.Brace_suffixContext braceSuffix = ctx.bracket_suffix_heap(i).brace_suffix();
             ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
-            t = accept(brace_suffix, t);
+            t = accept(braceSuffix, t);
             if (heap != null) {
                 t = replaceHeap(t, accept(heap), heap);
             }
