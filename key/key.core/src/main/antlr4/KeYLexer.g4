@@ -97,6 +97,17 @@ lexer grammar KeYLexer;
 
 tokens {MODALITY}
 
+// Comments have precedence over operators // and /*.
+SL_COMMENT
+:
+	'//'
+	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
+;
+
+DOC_COMMENT: '/*!' -> more, pushMode(docComment);
+ML_COMMENT: '/*' -> more, pushMode(COMMENT);
+
+
 SORTS:'\\sorts';
 GENERIC : '\\generic';
 PROXY : '\\proxy';
@@ -275,10 +286,10 @@ VOCAB
    :       '\u0003'..'\u0377'
    ;
 
-fragment OP_SFX: [-+*/&.^]+;
+fragment OP_SFX: ('-'|'='|'+'|'*'|'/'|'&'|'.'|'|'|'^'|'!'|':'|'>'|'<')+;
 
 SEMI:	 ';';
-SLASH: '/';
+SLASH: '/' OP_SFX?;
 COLON: ':';
 DOUBLECOLON:'::';
 ASSIGN: ':=';
@@ -319,8 +330,8 @@ RGUILLEMETS: '>' '>' ;
 
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
-LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
+LESS: '<' OP_SFX?;
 LGUILLEMETS: '<' '<';
 IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
@@ -338,16 +349,6 @@ CHAR_LITERAL
 
 QUOTED_STRING_LITERAL
     : '"' ('\\' . | '\n' | ~('\n' | '"' | '\\') )* '"' ;
-
-SL_COMMENT
-:
-	'//'
-	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
-;
-
-DOC_COMMENT: '/*!' -> more, pushMode(docComment);
-ML_COMMENT: '/*' -> more, pushMode(COMMENT);
-
 
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
 

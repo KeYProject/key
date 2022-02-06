@@ -283,18 +283,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if(termR == null) {
             return updateOrigin(termL, ctx);
         }
-
-        String op_name = "";
-        if (ctx.LESS() != null)
-            op_name = "lt";
-        if (ctx.LESSEQUAL() != null)
-            op_name = "leq";
-        if (ctx.GREATER() != null)
-            op_name = "gt";
-        if (ctx.GREATEREQUAL() != null)
-            op_name = "geq";
-        return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
-
+        return binaryLDTSpecificTerm(ctx, ctx.op.getText(), termL, termR);
     }
 
     @Override

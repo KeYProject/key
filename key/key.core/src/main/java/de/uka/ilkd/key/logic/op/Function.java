@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
@@ -201,29 +200,5 @@ public class Function extends AbstractSortedOperator {
 
     public MixFitInfo getMixFitInfo() {
         return mixFitInfo;
-    }
-
-    public static class MixFitInfo {
-        @Nonnull
-        public final Kind kind;
-        @Nonnull
-        public final String symbol;
-
-        public MixFitInfo(@Nonnull Kind kind, @Nonnull String symbol) {
-            this.kind = kind;
-            this.symbol = symbol;
-        }
-
-        enum Kind {PREFIX, INFIX, POSTFIX}
-
-        @Nonnull
-        public Kind getKind() {
-            return kind;
-        }
-
-        @Nonnull
-        public String getSymbol() {
-            return symbol;
-        }
     }
 }

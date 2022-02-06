@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.MixFitInfo;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -45,6 +46,14 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Object visitFunctionMetaData(KeYParser.FunctionMetaDataContext ctx) {
+        MixFitInfo.Kind kind = ctx.PREFIX() != null
+                ? MixFitInfo.Kind.PREFIX : ctx.INFIX() != null ? MixFitInfo.Kind.INFIX
+                : MixFitInfo.Kind.POSTFIX != null ? MixFitInfo.Kind.POSTFIX : MixFitInfo.Kind.SHORTCUT;
+        return new MixFitInfo(kind, ctx.op.getText());
+    }
+
+    @Override
     public Object visitPred_decl(KeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
         List<Boolean> whereToBind = accept(ctx.where_to_bind());
@@ -55,7 +64,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
-        Function.MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
+        MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
 
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -101,7 +110,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        Function.MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
+        MixFitInfo mixFitInfo = accept(ctx.functionMetaData());
 
         Function f = null;
         assert func_name != null;
