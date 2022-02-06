@@ -264,4 +264,10 @@ public final class CharListLDT extends LDT {
 	assert false;
 	return null;
     }
+
+	@Nullable
+	@Override
+	public Function getFunctionFor(String operatorSymbol, Services services) {
+		return services.getTypeConverter().getSeqLDT().getFunctionFor(operatorSymbol, services);
+	}
 }

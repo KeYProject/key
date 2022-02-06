@@ -32,13 +32,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public final class TypeConverter {
                 return ldt;
             }
         }
-        LOGGER.debug("No LDT found for ", s);
+        LOGGER.debug("No LDT found for {}", s);
         return null;
     }
 
@@ -166,7 +165,7 @@ public final class TypeConverter {
 
     private Term convertReferencePrefix(ReferencePrefix prefix,
                                         ExecutionContext ec) {
-        LOGGER.debug("typeconverter: (prefix, class)", prefix,
+        LOGGER.debug("typeconverter: (prefix: {}, class: {})", prefix,
                 (prefix != null ? prefix.getClass() : null));
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
@@ -179,8 +178,7 @@ public final class TypeConverter {
             // the base case: the leftmost item is a local variable
             return tb.var((ProgramVariable) prefix);
         } else if (prefix instanceof VariableReference) {
-            LOGGER.debug("typeconverter: " +
-                    "variablereference:", (((VariableReference) prefix).getProgramVariable()));
+            LOGGER.debug("variablereference: {}", (((VariableReference) prefix).getProgramVariable()));
             return tb.var(((VariableReference) prefix).getProgramVariable());
         } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
@@ -404,6 +402,7 @@ public final class TypeConverter {
 
 
     // TODO Adapt for @Reals
+
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -453,39 +452,39 @@ public final class TypeConverter {
             return type1;
         } else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type2;
-    	} else if ((t2 == PrimitiveType.JAVA_FLOAT) &&
-                (t1 == PrimitiveType.JAVA_BYTE||
-                        t1 == PrimitiveType.JAVA_SHORT||
-                        t1 == PrimitiveType.JAVA_INT||
-                        t1 == PrimitiveType.JAVA_CHAR||
-                        t1 == PrimitiveType.JAVA_LONG||
-			t1 == PrimitiveType.JAVA_FLOAT)) {
+        } else if ((t2 == PrimitiveType.JAVA_FLOAT) &&
+                (t1 == PrimitiveType.JAVA_BYTE ||
+                        t1 == PrimitiveType.JAVA_SHORT ||
+                        t1 == PrimitiveType.JAVA_INT ||
+                        t1 == PrimitiveType.JAVA_CHAR ||
+                        t1 == PrimitiveType.JAVA_LONG ||
+                        t1 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
-    	} else if ((t1 == PrimitiveType.JAVA_FLOAT) &&
-                (t2 == PrimitiveType.JAVA_BYTE||
-                        t2 == PrimitiveType.JAVA_SHORT||
-                        t2 == PrimitiveType.JAVA_INT||
-                        t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_LONG||
-			t2 == PrimitiveType.JAVA_FLOAT)) {
+        } else if ((t1 == PrimitiveType.JAVA_FLOAT) &&
+                (t2 == PrimitiveType.JAVA_BYTE ||
+                        t2 == PrimitiveType.JAVA_SHORT ||
+                        t2 == PrimitiveType.JAVA_INT ||
+                        t2 == PrimitiveType.JAVA_CHAR ||
+                        t2 == PrimitiveType.JAVA_LONG ||
+                        t2 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
-    	} else if ((t2 == PrimitiveType.JAVA_DOUBLE) &&
-                (t1 == PrimitiveType.JAVA_BYTE||
-                        t1 == PrimitiveType.JAVA_SHORT||
-                        t1 == PrimitiveType.JAVA_INT||
-                        t1 == PrimitiveType.JAVA_CHAR||
-                        t1 == PrimitiveType.JAVA_LONG||
-                        t1 == PrimitiveType.JAVA_FLOAT||
-			t1 == PrimitiveType.JAVA_DOUBLE)) {
+        } else if ((t2 == PrimitiveType.JAVA_DOUBLE) &&
+                (t1 == PrimitiveType.JAVA_BYTE ||
+                        t1 == PrimitiveType.JAVA_SHORT ||
+                        t1 == PrimitiveType.JAVA_INT ||
+                        t1 == PrimitiveType.JAVA_CHAR ||
+                        t1 == PrimitiveType.JAVA_LONG ||
+                        t1 == PrimitiveType.JAVA_FLOAT ||
+                        t1 == PrimitiveType.JAVA_DOUBLE)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
-    	} else if ((t1 == PrimitiveType.JAVA_DOUBLE) &&
-                (t2 == PrimitiveType.JAVA_BYTE||
-                        t2 == PrimitiveType.JAVA_SHORT||
-                        t2 == PrimitiveType.JAVA_INT||
-                        t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_LONG||
-                        t2 == PrimitiveType.JAVA_FLOAT||
-			t2 == PrimitiveType.JAVA_DOUBLE)) {
+        } else if ((t1 == PrimitiveType.JAVA_DOUBLE) &&
+                (t2 == PrimitiveType.JAVA_BYTE ||
+                        t2 == PrimitiveType.JAVA_SHORT ||
+                        t2 == PrimitiveType.JAVA_INT ||
+                        t2 == PrimitiveType.JAVA_CHAR ||
+                        t2 == PrimitiveType.JAVA_LONG ||
+                        t2 == PrimitiveType.JAVA_FLOAT ||
+                        t2 == PrimitiveType.JAVA_DOUBLE)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         } else {
             throw new RuntimeException("Could not determine promoted type "
@@ -520,10 +519,10 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
         else if (t1 == PrimitiveType.JAVA_REAL)
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
-	else if (t1 == PrimitiveType.JAVA_FLOAT)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
-	else if (t1 == PrimitiveType.JAVA_DOUBLE)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+        else if (t1 == PrimitiveType.JAVA_FLOAT)
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+        else if (t1 == PrimitiveType.JAVA_DOUBLE)
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         else throw new RuntimeException("Could not determine promoted type " +
                     "of " + type1);
     }
@@ -1033,4 +1032,7 @@ public final class TypeConverter {
         return null;
     }
 
+    public Collection<LDT> getLDTs() {
+        return Collections.unmodifiableCollection(LDTs.values());
+    }
 }

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -55,6 +56,9 @@ public class ExprTest {
         @Nonnull Term actual = io.parseExpression(expr);
         Assert.assertNotNull(actual);
         LOGGER.info("Actual Term: {}", actual);
+
+        LOGGER.warn("Actual Term: {}",
+                LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
     }
 
     private KeyIO getIo() throws IOException {

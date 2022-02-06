@@ -253,8 +253,8 @@ func_decl
 
 functionMetaData
 :
-    INFIX LPAREN (PLUS|STAR|SLASH|MINUS|EXP) RPAREN
-  | PREFIX LPAREN (MINUS|TILDE) RPAREN
+    INFIX LPAREN op=(PLUS|STAR|SLASH|MINUS|EXP|PERCENT|LESS|LESSEQUAL|GREATER|GREATEREQUAL|LGUILLEMETS) RPAREN
+  | PREFIX LPAREN op=(MINUS|TILDE) RPAREN
   | POSTFIX LPAREN (/*currently no overloaded operator*/) RPAREN
   | SHORTCUT LPAREN IDENT RPAREN
 ;
@@ -374,7 +374,7 @@ unary_formula:
   | MODALITY sub=term60                           #modality_term
 ;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
-comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
+comparison_term: a=weak_arith_term (op=(LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
 weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
 strong_arith_term_2: a=atom_prefix (op=(PERCENT|SLASH) b=strong_arith_term_2)?;

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ldt;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -261,7 +262,7 @@ public abstract class LDT implements Named {
      * @return reference to the respective LDT-specific function for the
      * operation, null if not available
      */
-    public final @Nullable Function getFunctionFor(String operatorSymbol, Services services) {
+    public @Nullable Function getFunctionFor(String operatorSymbol, Services services) {
         for (Operator operator : functions.allElements()) {
             if(operator instanceof Function) {
                 var op = (Function) operator;
@@ -282,4 +283,8 @@ public abstract class LDT implements Named {
     public abstract Expression translateTerm(Term t, ExtList children, Services services);
     
     public abstract Type getType(Term t);
+
+    public Collection<Operator> getFunctions() {
+        return functions.allElements();
+    }
 }
