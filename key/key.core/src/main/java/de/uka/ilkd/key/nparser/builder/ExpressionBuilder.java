@@ -510,8 +510,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         String cleanJava = trimJavaBlock(s);
         sjb.opName = operatorOfJavaBlock(s);
 
-        LOGGER.debug("Modal operator name passed to getJavaBlock: ", sjb.opName);
-        LOGGER.debug("Java block passed to getJavaBlock: ", s);
+        LOGGER.debug("Modal operator name passed to getJavaBlock: {}", sjb.opName);
+        LOGGER.debug("Java block passed to getJavaBlock: {}", s);
 
         try {
             try {

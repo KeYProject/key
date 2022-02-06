@@ -317,7 +317,7 @@ public class KeYFile implements EnvInput {
         }
 
         //read .key file
-        LOGGER.debug("Reading KeY file", file);
+        LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
@@ -331,7 +331,7 @@ public class KeYFile implements EnvInput {
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
-        LOGGER.debug("Read KeY file   ", file);
+        LOGGER.debug("Read KeY file {}", file);
         return warnings;
     }
 

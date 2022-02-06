@@ -202,11 +202,11 @@ public abstract class JavaProgramElement extends JavaSourceElement
     @Override    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        LOGGER.debug("Program match start (template, source)", this, src);
+        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         if (src.getClass() != getClass()) {
-            LOGGER.debug("Program match failed. Incompatible AST nodes (template, source)", this, src);
-            LOGGER.debug("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Program match failed. Incompatible AST nodes (template {}, source {})", this, src);
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this.getClass(), src.getClass());
             return null;
         }
