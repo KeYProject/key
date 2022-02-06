@@ -256,6 +256,7 @@ functionMetaData
     INFIX LPAREN (PLUS|STAR|SLASH|MINUS|EXP) RPAREN
   | PREFIX LPAREN (MINUS|TILDE) RPAREN
   | POSTFIX LPAREN (/*currently no overloaded operator*/) RPAREN
+  | SHORTCUT LPAREN IDENT RPAREN
 ;
 
 func_decls

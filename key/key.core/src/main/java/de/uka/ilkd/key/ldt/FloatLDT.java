@@ -187,19 +187,8 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         }
     }
 
-    @Override
+/*    @Override
     public Function getFunctionFor(String operatorSymbol, Services services) {
-        switch (operatorSymbol) {
-            case "gt": return getGreaterThan();
-            case "geq": return getGreaterOrEquals();
-            case "lt": return getLessThan();
-            case "leq": return getLessOrEquals();
-            case "div": return getDiv();
-            case "mul": return getMul();
-            case "add": return getAdd();
-            case "sub": return getSub();
-            case "neg": return getNeg();
-            // Floating point extensions with "\fp_"
             case "nan": return getIsNaN();
             case "zero": return getIsZero();
             case "infinite": return getIsInfinite();
@@ -208,10 +197,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
             case "negative": return getIsNegative();
             case "positive": return getIsPositive();
             case "subnormal": return getIsSubnormal();
-            case "normal": return getIsNormal();
-        }
-        return null;
-    }
+*/
 
     @Override
     public boolean hasLiteralFunction(Function f) {
