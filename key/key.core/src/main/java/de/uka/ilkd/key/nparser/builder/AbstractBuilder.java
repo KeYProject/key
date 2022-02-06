@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,20 +28,29 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     @Nullable
     private List<BuildingIssue> buildingIssues = null;
     @Nullable
-    private Stack<Object> parameters = null;
+    private Deque<Object> parameters = null;
 
     /**
-     * Helper function for avoiding cast.
+     * Helper function for visiting the given context {@code ctx}, mainly for avoiding cast.
      *
-     * @param ctx
-     * @param <T>
-     * @return
+     * @param ctx a (parser) rule context or null
+     * @param <T> object to be cast to
+     * @return if the ctx is null, this method returns, otherwise the result of the visit method is returned
      */
-    public <T> @Nullable T accept(@Nullable RuleContext ctx) {
+    @Nullable
+    public <T> T accept(@Nullable RuleContext ctx) {
         if (ctx == null) {
             return null;
         }
         return (T) ctx.accept(this);
+    }
+
+    /**
+     * Like {@link #accept(RuleContext)} but throwing an exception on null value.
+     */
+    @Nonnull
+    public <T> T acceptnn(@Nullable RuleContext ctx) {
+        return Objects.requireNonNull(accept(ctx));
     }
 
     @Override
@@ -64,17 +73,18 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> T pop() {
-        if(parameters==null) throw new IllegalStateException("Stack is empty");
+        if (parameters == null) throw new IllegalStateException("Stack is empty");
         return (T) parameters.pop();
     }
 
     protected void push(Object... obj) {
-        if(parameters == null) parameters = new Stack<>();
+        if (parameters == null) parameters = new ArrayDeque<>();
         for (Object a : obj) parameters.push(a);
     }
 
-    protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
-        if(parameters == null) parameters = new Stack<>();
+    @Nullable
+    protected <T> T accept(@Nullable RuleContext ctx, Object... args) {
+        if (parameters == null) parameters = new ArrayDeque<>();
         int stackSize = parameters.size();
         push(args);
         T t = accept(ctx);
@@ -113,7 +123,8 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
-    public @Nonnull List<BuildingIssue> getBuildingIssues() {
+    public @Nonnull
+    List<BuildingIssue> getBuildingIssues() {
         if (buildingIssues == null) buildingIssues = new LinkedList<>();
         return buildingIssues;
     }
@@ -147,7 +158,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     /**
      * Wraps an exception into a {@link BuildingException}
      *
-     * @param e
+     * @param e the cause of the generated and thrown exception
      */
     protected void throwEx(Throwable e) {
         throw new BuildingException(e);
