@@ -264,14 +264,4 @@ public final class CharListLDT extends LDT {
 	assert false;
 	return null;
     }
-
-    @Nullable
-    @Override
-    public Function getFunctionFor(String operatorSymbol, Services services) {
-        switch (operatorSymbol) {
-			// This is not very elegant; but seqConcat is actually in the SeqLDT.
-            case "add": return services.getNamespaces().functions().lookup("seqConcat");
-            default: return null;
-        }
-    }
 }

@@ -177,19 +177,9 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
         return services.getTermBuilder().dfpTerm(doubleVal);
     }
 
-    @Override
-    public Function getFunctionFor(String operatorSymbol, Services services) {
-        switch (operatorSymbol) {
-            case "gt": return getGreaterThan();
-            case "geq": return getGreaterOrEquals();
-            case "lt": return getLessThan();
-            case "leq": return getLessOrEquals();
-            case "div": return getDiv();
-            case "mul": return getMul();
-            case "add": return getAdd();
-            case "sub": return getSub();
-            case "neg": return getNeg();
 
+/*    @Override
+    public Function getFunctionFor(String operatorSymbol, Services services) {
             // Floating point extensions with "\fp_"
             case "nan": return getIsNaN();
             case "zero": return getIsZero();
@@ -201,7 +191,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             case "subnormal": return getIsSubnormal();
         }
         return null;
-    }
+    }*/
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,

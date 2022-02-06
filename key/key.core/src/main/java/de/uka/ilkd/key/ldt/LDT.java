@@ -261,7 +261,7 @@ public abstract class LDT implements Named {
      * @return reference to the respective LDT-specific function for the
      * operation, null if not available
      */
-    public @Nullable Function getFunctionFor(String operatorSymbol, Services services) {
+    public final @Nullable Function getFunctionFor(String operatorSymbol, Services services) {
         for (Operator operator : functions.allElements()) {
             if(operator instanceof Function) {
                 var op = (Function) operator;

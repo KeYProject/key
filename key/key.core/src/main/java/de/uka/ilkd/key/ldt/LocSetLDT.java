@@ -230,16 +230,4 @@ public final class LocSetLDT extends LDT {
 	assert false;
 	return null;
     }
-
-    @Nullable
-    @Override
-    public Function getFunctionFor(String operatorSymbol, Services services) {
-        switch (operatorSymbol) {
-            case "add": return getUnion();
-            case "sub": return getSetMinus();
-            case "mul": return getIntersect();
-            case "le": return getSubset();
-            default: return null;
-        }
-    }
 }

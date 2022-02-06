@@ -235,6 +235,7 @@ TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
 INFIX: '\\infix';
 PREFIX: '\\prefix';
+SHORTCUT:'\\shortcut';
 POSTFIX: '\\postfix';
 
 RULES : '\\rules';
