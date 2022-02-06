@@ -330,12 +330,12 @@ RGUILLEMETS: '>' '>' ;
 
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
-LESSEQUAL: '<' '=' | '\u2264';
-LESS: '<' OP_SFX?;
-LGUILLEMETS: '<' '<';
-IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
+LESSEQUAL: '<' '=' | '\u2264';
+LGUILLEMETS: '<' '<';
+LESS: '<' OP_SFX?;
+IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 PRIMES:	('\'')+;
 CHAR_LITERAL
 : '\''
