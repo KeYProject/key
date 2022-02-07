@@ -520,8 +520,8 @@ public class IntermediateProofReplayer {
         }
 
         if (!ourApp.ifInstsCorrectSize(ourApp.taclet(),ifFormulaList) ) {
-            Debug.out("Proof contains wrong number of \\assumes instatiations for "
-                    + tacletName);
+            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
+                    tacletName);
             // try to find instantiations automatically
             ImmutableList<TacletApp> instApps = ourApp
                     .findIfFormulaInstantiations(seq, services);

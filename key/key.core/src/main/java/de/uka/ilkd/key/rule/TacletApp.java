@@ -1045,22 +1045,31 @@ public abstract class TacletApp implements RuleApp {
      * been instantiated.
      */
     public TacletApp setIfFormulaInstantiations(
-	    ImmutableList<IfFormulaInstantiation> p_list,
-	    Services p_services) {
-	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
-		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
-		+ "or the if formulas have already been instantiated";
+            ImmutableList<IfFormulaInstantiation> p_list,
+            Services p_services) {
+        if (p_list == null) {
+            // Apparently findIfFormulaInstantiations() might return null
+            // instantiations that should actually be nil().
+            // So we replace null with nil() here as a bugfix.
+            p_list = ImmutableSLList.<IfFormulaInstantiation> nil();
+        }
+        assert ifInstsCorrectSize(taclet, p_list) && ifInstantiations == null :
+                "If instantiations list has wrong size "
+                + "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+        MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
 
-	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
+        return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
 
     /**
      * Find all possible instantiations of the if sequent formulas within the
      * sequent "p_seq".
      *
-     * @return a list of tacletapps with the found if formula instantiations
+     * @return    a list of tacletapps with the found if formula instantiations
+     *            When the IfSequent is empty, it apparently returns a tacletapp with
+     *            ifInstantiations == null instead of
+     *            ifInstantiations == nil(), seemingly to be more efficient.
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
             Sequent p_seq,
