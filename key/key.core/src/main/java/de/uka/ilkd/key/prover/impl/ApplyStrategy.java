@@ -178,8 +178,8 @@ public class ApplyStrategy extends AbstractProverCore {
         } finally{
             time = (System.currentTimeMillis()-time);
             LOGGER.debug("Strategy stopped.");
-            LOGGER.debug("Applied ", countApplied);
-            LOGGER.debug("Time elapsed: ", time);
+            LOGGER.debug("Applied {} steps", countApplied);
+            LOGGER.debug("Time elapsed: {} ms", time);
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,

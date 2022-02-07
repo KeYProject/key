@@ -111,16 +111,16 @@ public abstract class JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
-        LOGGER.debug("Program match start (template, source)", this, src); // this.toString().equals("e")
+        LOGGER.debug("Program match start (template {}, source {})", this, src); // this.toString().equals("e")
         
         if (src == null) {
             return null;
         }
         
         if (src.getClass() != this.getClass()) {
-            LOGGER.debug("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this, src);
-            LOGGER.debug("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this.getClass(), src.getClass());
             return null;
         }
