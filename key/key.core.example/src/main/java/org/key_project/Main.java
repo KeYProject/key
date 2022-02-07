@@ -20,6 +20,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example application which proves all proof obligations of
@@ -27,6 +29,8 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Martin Hentschel
  */
 public class Main {
+   private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
    /**
     * The program entry point.
     * @param args The start parameters.
@@ -47,14 +51,14 @@ public class Main {
          // Set Taclet options
          ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
          HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-         HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+         HashMap<String, String> newSettings = new HashMap<>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
          choiceSettings.setDefaultChoices(newSettings);
          // Load source code
          KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
          try {
             // List all specifications of all types in the source location (not classPaths and bootClassPath)
-            final List<Contract> proofContracts = new LinkedList<Contract>();
+            final List<Contract> proofContracts = new LinkedList<>();
             Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
             for (KeYJavaType type : kjts) {
                if (!KeYTypeUtil.isLibraryClass(type)) {
@@ -91,11 +95,10 @@ public class Main {
                   env.getUi().getProofControl().startAndWaitForAutoMode(proof);
                   // Show proof result
                   boolean closed = proof.openGoals().isEmpty();
-                  System.out.println("Contract '" + contract.getDisplayName() + "' of " + contract.getTarget() + " is " + (closed ? "verified" : "still open") + ".");
+                  LOGGER.info("Contract '" + contract.getDisplayName() + "' of " + contract.getTarget() + " is " + (closed ? "verified" : "still open") + ".");
                }
                catch (ProofInputException e) {
-                  System.out.println("Exception at '" + contract.getDisplayName() + "' of " + contract.getTarget() + ":");
-                  e.printStackTrace();
+                  LOGGER.error("Exception at {} of {}", contract.getDisplayName(), contract.getTarget());
                }
                finally {
                   if (proof != null) {
@@ -109,8 +112,7 @@ public class Main {
          }
       }
       catch (ProblemLoaderException e) {
-         System.out.println("Exception at '" + location + "':");
-         e.printStackTrace();
+         LOGGER.info("Exception at '{}'", location, e);
       }
    }
 }

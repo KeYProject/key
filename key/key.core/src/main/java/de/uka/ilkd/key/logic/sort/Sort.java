@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.rule.HasOrigin;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,8 +22,10 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
+import javax.annotation.Nullable;
 
-public interface Sort extends Named {
+
+public interface Sort extends Named, HasOrigin {
 
     /**
      * Formulas are represented as "terms" of this sort.
@@ -102,4 +105,11 @@ public interface Sort extends Named {
     SortDependingFunction getExactInstanceofSymbol(TermServices services);
 
     String declarationString();
+
+    /**
+     * Returns an human explainable text describing this sort.
+     * This field is typical set by the parser, who captures the documentation comments.
+     */
+    @Nullable
+    default String getDocumentation() {return null;}
 }

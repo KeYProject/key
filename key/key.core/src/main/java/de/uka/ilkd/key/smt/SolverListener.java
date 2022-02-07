@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt;
 
-interface SolverListener {
+public interface SolverListener {
     void processStarted(SMTSolver solver, SMTProblem problem);
 
     void processInterrupted(SMTSolver solver, SMTProblem problem, Throwable e);

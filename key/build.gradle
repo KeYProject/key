@@ -90,10 +90,17 @@ subprojects {
 
     repositories {
         mavenCentral()
-        flatDir { dirs "lib", "$rootDir/key.core/lib", "$rootDir/key.ui/lib" }
+        maven {
+            url 'https://git.key-project.org/api/v4/projects/35/packages/maven'
+        }
     }
 
     dependencies {
+        implementation("org.slf4j:slf4j-api:1.7.32")
+        testImplementation("org.slf4j:slf4j-simple:1.7.32")
+
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
         testImplementation 'junit:junit:4.13.2'
         testImplementation project(':key.util')
@@ -256,14 +263,19 @@ subprojects {
         repositories {
             maven {
                 name = "GitlabPackages"
-		        url "https://git.key-project.org/api/v4/projects/35/packages/maven"
-		        credentials(HttpHeaderCredentials) {
-			        name = 'Private-Token'
-			        value = System.getenv("TOKEN")
-		        }
-		        authentication {
-			        header(HttpHeaderAuthentication)
-		        }           
+		url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    if(System.getenv("TOKEN") != null) {
+			name = 'Private-Token'
+		        value = System.getenv("TOKEN")
+                    }else{
+                        name = 'Job-Token'
+                        value = System.getenv("CI_JOB_TOKEN")
+                    }
+		}
+		authentication {
+		    header(HttpHeaderAuthentication)
+		}
             }
         }
     }

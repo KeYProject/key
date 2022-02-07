@@ -1998,6 +1998,7 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
+  | <DL_EMBEDDED_FUNCTION>
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2708,12 +2709,15 @@ Expression UnaryExpression() :
   result = PreIncrementExpression()
 |
   result = PreDecrementExpression()
-|
-  result = UnaryExpressionNotPlusMinus()
+| LOOKAHEAD(1)
+    // There is a grammar conflict since types may also have \dl....
+    // This annotation gives this rule
+    // precedence which is the desired behaviour.
+  result = GeneralEscapeExpression()
 |
   result = ADTGetter()
 |
-  result = GeneralEscapeExpression()
+  result = UnaryExpressionNotPlusMinus()
 )
   {
     checkConstruction(result);
@@ -3003,7 +3007,7 @@ Expression PrimaryExpression() :
                   tmpResult instanceof ADTPrefixConstruct ||
                   tmpResult instanceof VariableReference) {
               if (suffix.expr instanceof RangeExpression) {
-                  System.out.println("sucess! "+suffix.expr+" is a range"); // XXX
+                  // System.out.println("sucess! "+suffix.expr+" is a range"); // XXX
                   // XXX what if prefix ist Uncollated ???
                   tmpResult = new SeqSub((ADTPrefixConstruct) tmpResult, (RangeExpression) suffix.expr);
               } else {
@@ -3086,7 +3090,6 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 //  	NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
 //      {
 //        prefix.type = PrimaryPrefixReturnValue.THIS;
-//        System.err.println("Ignoring NonWildcardTypeArguments!");
 //      }
 //|
   lit = Literal()

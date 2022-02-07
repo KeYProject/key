@@ -30,9 +30,13 @@ import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 public class ProgramElementName extends Name 
     implements TerminalProgramElement, Label, ReferenceSuffix, MethodName {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProgramElementName.class);
 
     private final String qualifierString;
     private final String shortName;
@@ -194,7 +198,7 @@ public class ProgramElementName extends Name
             source.next();
             return matchCond;
         } else {
-            Debug.out("Program match failed (pattern, source)", this, src);
+            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }        
     }

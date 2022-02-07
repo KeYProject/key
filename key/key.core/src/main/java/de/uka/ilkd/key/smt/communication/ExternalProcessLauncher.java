@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.smt.communication;
 
+import org.key_project.util.java.IOUtil;
+
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This class is responsible for starting external processes:
@@ -30,21 +30,32 @@ import java.io.OutputStream;
  * @author Wolfram Pfeifer (overhaul)
  */
 public class ExternalProcessLauncher {
-    /** the store of all messages send to and received from the external process */
-    private final @Nonnull SolverCommunication session;
+    /**
+     * the store of all messages send to and received from the external process
+     */
+    private final @Nonnull
+    SolverCommunication session;
 
-    /** the delimiters which separate the messages */
-    private final @Nonnull  String[] messageDelimiters;
+    /**
+     * the delimiters which separate the messages
+     */
+    private final @Nonnull
+    String[] messageDelimiters;
 
-    /** the external process */
+    /**
+     * the external process
+     */
     private Process process;
 
-    /** the pipe for sending and receiving to/from the process */
-    private Pipe pipe;
+    /**
+     * the pipe for sending and receiving to/from the process
+     */
+    private SimplePipe pipe;
 
     /**
      * Creates the external process launcher.
-     * @param session the store for the messages send to and received from the process
+     *
+     * @param session           the store for the messages send to and received from the process
      * @param messageDelimiters delimiters which separate the messages
      */
     public ExternalProcessLauncher(@Nonnull SolverCommunication session,
@@ -56,10 +67,11 @@ public class ExternalProcessLauncher {
     /**
      * Main procedure of the class. Starts the external process and connects the pipe to it.
      * stderr and stdout of the process are merged.
+     *
      * @param command command (program and arguments) which is used to start the external process
      * @throws IOException if an I/O error occurs
      */
-    public void launch(final String [] command) throws IOException {
+    public void launch(final String[] command) throws IOException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
@@ -67,7 +79,7 @@ public class ExternalProcessLauncher {
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
             pipe = new SimplePipe(input, messageDelimiters, output, session, process);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             stop();
             throw ex;
         }
@@ -77,7 +89,7 @@ public class ExternalProcessLauncher {
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
     public void stop() {
-        if(process != null) {
+        if (process != null) {
             process.destroy();
         }
         // TODO: where to close the pipe?

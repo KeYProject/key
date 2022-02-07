@@ -4,6 +4,8 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.*;
 import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * An ANTLR4 error listener that stores the errors internally.
- * You can disable the additional  printing of message on the console {@link #printOnConsole} flag.
+ * You can disable the additional  printing of message on the logger {@link #logger} flag.
  * <p>
  * It supports beautiful error message via {@link SyntaxError#getBeatifulErrorMessage(String[])}.
  *
@@ -25,22 +27,24 @@ import java.util.stream.Collectors;
 public class SyntaxErrorReporter extends BaseErrorListener {
     private final List<SyntaxError> errors = new ArrayList<>();
     /**
-     * if true, errors are printed directly on System.err
-     */
-    private final boolean printOnConsole;
-
-    /**
      * if true, exception is thrown directly when an error is hit
      */
     private final boolean throwDirect;
 
-    public SyntaxErrorReporter() {
-        this(true, false);
+    private final Logger logger;
+
+    public SyntaxErrorReporter(Logger logger, boolean throwDirect) {
+        this.logger = logger;
+        this.throwDirect = throwDirect;
     }
 
-    public SyntaxErrorReporter(boolean printOnConsole, boolean throwDirect) {
-        this.printOnConsole = printOnConsole;
-        this.throwDirect = throwDirect;
+    public SyntaxErrorReporter(Class<?> loggerCategory) {
+        this(loggerCategory, false);
+    }
+
+    public SyntaxErrorReporter(Class<?> loggerCategory, boolean throwDirect) {
+        this(loggerCategory != null ? LoggerFactory.getLogger(loggerCategory) : null,
+                throwDirect);
     }
 
     @Override
@@ -60,8 +64,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 charPositionInLine,
                 msg, tok.getTokenSource().getSourceName(), stack);
 
-        if (printOnConsole) {
-            System.err.printf("[syntax-error] %s:%d:%d: %s %s (%s)%n", se.source, line, charPositionInLine, msg, tok, stack);
+        if (logger != null) {
+            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})",
+                    se.source, line, charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
 

@@ -190,7 +190,7 @@ public class ContextStatementBlock extends StatementBlock {
             final int srcPrefixLength     = prefix.getPrefixLength();
                         
             if (patternPrefixLength > srcPrefixLength) {
-                Debug.out("Program match FAILED. Source has not enough prefix elements.", 
+                LOGGER.debug("Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
                         this, source);
                 return null;
             }
@@ -252,7 +252,7 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }       
         
-        Debug.out("Successful match.");
+        LOGGER.debug("Successful match.");
         return matchCond;
     }
 
@@ -319,10 +319,10 @@ public class ContextStatementBlock extends StatementBlock {
             matchCond = executionContext.match(new SourceData(innerContext, -1, 
                     services), matchCond);
             if (matchCond == null) {
-                Debug.out("Program match. ExecutionContext mismatch.");
+                LOGGER.debug("Program match. ExecutionContext mismatch.");
                 return null;
             }
-            Debug.out("Program match. ExecutionContext matched.");
+            LOGGER.debug("Program match. ExecutionContext matched.");
         }
       
         matchCond = 

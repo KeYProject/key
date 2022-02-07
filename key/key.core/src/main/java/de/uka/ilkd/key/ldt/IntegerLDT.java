@@ -15,6 +15,7 @@ package de.uka.ilkd.key.ldt;
 
 import java.math.BigInteger;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -53,6 +54,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -63,7 +66,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 @SuppressWarnings("unused")
 public final class IntegerLDT extends LDT {
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegerLDT.class);
+
     public static final Name NAME = new Name("int");    
     
     //public name constants
@@ -553,7 +557,7 @@ public final class IntegerLDT extends LDT {
             result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
+        LOGGER.debug("integerldt: result of translating literal (lit {}, result {}):", lit, result);
         return result;
     }
 

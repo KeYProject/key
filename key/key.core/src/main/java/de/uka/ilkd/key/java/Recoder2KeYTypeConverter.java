@@ -13,6 +13,31 @@
 
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.ServiceConfiguration;
+import recoder.service.NameInfo;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.NullType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -55,6 +80,7 @@ import java.util.List;
  */
 
 public class Recoder2KeYTypeConverter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Recoder2KeYTypeConverter.class);
 
     /**
      * builder class for implicit array methods
@@ -247,7 +273,7 @@ public class Recoder2KeYTypeConverter {
                 type = PrimitiveType.getPrimitiveType(t.getFullName());
                 result = typeConverter.getKeYJavaType(type);
                 if (result == null) {
-                    Debug.out("create new KeYJavaType for primitive type "
+                    LOGGER.debug("create new KeYJavaType for primitive type "
                             + t + ". This should not happen");
                     result = new KeYJavaType(type, s);
                 }
@@ -268,8 +294,8 @@ public class Recoder2KeYTypeConverter {
 //              //TEMP!
 //              assert result.getJavaType() != null;
             } else {
-                Debug.out("recoder2key: unknown type", t);
-                Debug.out("Unknown type: " + t.getClass() + " "
+                LOGGER.debug("recoder2key: unknown type {}", t);
+                LOGGER.debug("Unknown type: " + t.getClass() + " "
                         + t.getFullName());
                 Debug.fail();
             }

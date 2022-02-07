@@ -750,9 +750,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             });
 
             if (pos != null) {
-                setFilter(new ShowSelectedSequentPrintFilter(pos));
+                setFilter(new ShowSelectedSequentPrintFilter(pos), true);
             } else {
-                setFilter(new IdentitySequentPrintFilter());
+                setFilter(new IdentitySequentPrintFilter(), true);
             }
         }
 

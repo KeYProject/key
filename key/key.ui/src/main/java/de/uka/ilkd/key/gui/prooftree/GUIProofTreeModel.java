@@ -27,6 +27,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.TaskTree;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
@@ -38,6 +39,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** An implementation of TreeModel that can be displayed using the
  * JTree class framework and reflects the state of a
@@ -54,6 +57,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 
 public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
 
 	private static final long serialVersionUID = 4253914848471158358L;
 	private Proof proof;
@@ -178,7 +182,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     /** Sets whether this object should respond to changes in the
      * the proof immediately. */
     public void setAttentive(boolean b) {
-	Debug.out("setAttentive:", b);
+	LOGGER.debug("setAttentive: {}", b);
 	if ( b != attentive && !proof.isDisposed()) {
 	    if ( b ) {
 		proof.addProofTreeListener(proofTreeListener);

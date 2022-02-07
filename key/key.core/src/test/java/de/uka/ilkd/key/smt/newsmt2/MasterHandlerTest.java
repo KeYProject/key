@@ -5,11 +5,11 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
-import org.hamcrest.core.StringContains;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -20,6 +20,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.key_project.util.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,14 +29,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static org.junit.Assert.*;
 
@@ -53,17 +52,19 @@ public class MasterHandlerTest {
      * If this variable is set when running this test class, then
      * those cases with expected result "weak_valid" will raise an
      * exception unless they can be proved using the solver.
-     *
+     * <p>
      * Otherwise a "timeout" or "unknown" is accepted. This can be
      * used to deal with test cases that should verify but do not
      * yet do so.
-     *
+     * <p>
      * (Default false)
      */
     private static final boolean STRICT_TEST =
             Boolean.getBoolean("key.newsmt2.stricttests");
 
     private static final boolean DUMP_SMT = true;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
+
 
     @Parameter(0)
     public String name;
@@ -92,7 +93,7 @@ public class MasterHandlerTest {
 
         List<Object[]> result = new ArrayList<>();
         Files.list(directory).forEach(f -> {
-            Object[] item = { f.getFileName().toString(), f };
+            Object[] item = {f.getFileName().toString(), f};
             result.add(item);
         });
 
@@ -102,16 +103,16 @@ public class MasterHandlerTest {
     @Test
     public void testTranslation() throws Exception {
 
-        if(DUMP_SMT) {
+        if (DUMP_SMT) {
             Path tmpSmt = Files.createTempFile("SMT_key_" + name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
             Files.write(tmpSmt, translation.getBytes());
-            System.err.println("SMT2 for " + name + " saved in: " + tmpSmt);
+            LOGGER.info("SMT2 for {}  saved in: {}", name, tmpSmt);
         }
 
         int i = 1;
-        while(props.containsKey("contains." + i)) {
+        while (props.containsKey("contains." + i)) {
             assertThat("Occurrence check for contains." + i,
                     translation,
                     new ContainsModuloSpaces(props.get("contains." + i).trim()));
@@ -149,7 +150,7 @@ public class MasterHandlerTest {
         Proof proof = env.getLoadedProof();
         Sequent sequent = proof.root().sequent();
 
-        SMTSettings settings = new SMTSettings(
+        SMTSettings settings = new DefaultSMTSettings(
                 proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 proof.getSettings().getNewSMTSettings(),
@@ -164,7 +165,7 @@ public class MasterHandlerTest {
     public void testZ3() throws Exception {
 
         Assume.assumeTrue("Z3 is not installed, this testcase is ignored.",
-                SolverType.Z3_SOLVER.isInstalled(false));
+                SolverTypes.Z3_SOLVER.isInstalled(false));
 
         String expectation = props.get("expected");
         Assume.assumeTrue("No Z3 expectation.", expectation != null);
@@ -204,7 +205,7 @@ public class MasterHandlerTest {
                 }
             }
 
-            if(!STRICT_TEST) {
+            if (!STRICT_TEST) {
                 Assume.assumeFalse("This is an extended test (will be run only in strict mode)",
                         "extended".equals(props.get("state")));
             }
@@ -212,14 +213,9 @@ public class MasterHandlerTest {
             if (lookFor != null) {
                 fail("Expectation not found");
             }
-        } catch(Throwable t) {
-            System.out.println("Z3 input");
-            System.out.println(translation);
-
-            System.out.println("\n\nZ3 response");
-            for (String s : response) {
-                System.out.println(s);
-            }
+        } catch (Throwable t) {
+            LOGGER.error("Z3 input {}", translation);
+            LOGGER.error("Z3 response: {}", response, t);
             throw t;
         }
     }

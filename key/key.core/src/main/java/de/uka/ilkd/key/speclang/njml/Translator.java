@@ -831,6 +831,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
+        if (ctx.THIS() != null) {
+            if (selfVar == null) {
+                raiseError("Cannot access \"this\" in a static context", ctx);
+            }
+            return getThisReceiver();
+        }
+        if (ctx.SUPER() != null) {
+            raiseError("\"super\" is currently not supported", ctx);
+        }
         appendToFullyQualifiedName(ctx.getText());
         return lookupIdentifier(ctx.getText(), null, null, ctx);
     }

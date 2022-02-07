@@ -3,10 +3,12 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 
@@ -130,6 +132,9 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestIntLiteralParsing.class);
+
+
     @Override
     public Term parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
@@ -150,7 +155,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         for (int i = 0; i < testData.length / 2; i++) {
             String input = testData[i * 2];
             String expected = testData[i * 2 + 1];
-            System.err.println("Input: " + input);
+            LOGGER.debug("Input: " + input);
             String actual = parseTerm(input).toString();
             assertEquals(expected, actual);
         }

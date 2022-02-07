@@ -13,22 +13,6 @@
 
 package de.uka.ilkd.key.core;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -43,6 +27,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
@@ -52,7 +37,22 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import recoder.ParserException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -179,6 +179,8 @@ public final class Main {
 
     private static ProofMacro autoMacro = new SkipMacro();
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     /**
      * <p>
      * This flag indicates if the example chooser should be shown
@@ -194,17 +196,13 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
-        // Runtime rt = Runtime.getRuntime();
-        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
-        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
-        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
-        // System.out.println ("Available processors:  " + rt.availableProcessors());
-
         Locale.setDefault(Locale.US);
+
+        logInformation();
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
-            verbosity = Verbosity.DEBUG;
+            verbosity = Verbosity.TRACE;
         }
 
         // does no harm on non macs
@@ -214,22 +212,33 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
+            Log.configureLogging(verbosity);
             fileArguments = cl.getFileArguments();
             fileArguments = preProcessInput(fileArguments);
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
-            System.err.println("D'oh! It seems that KeY was not built properly!");
-            e.printStackTrace();
+            LOGGER.error("D'oh! It seems that KeY was not built properly!", e);
             System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
-            if (Debug.ENABLE_DEBUG) {
-                e.printStackTrace();
-            }
+            LOGGER.error("Error in parsing the command: {}", e.getMessage());
             printUsageAndExit(true, e.getMessage(), -1);
         }
 
+    }
+
+    private static void logInformation() {
+        LOGGER.debug("Java Version: {}", System.getProperty("java.version"));
+        LOGGER.debug("Java Runtime: {}", System.getProperty("java.specification.version"));
+        LOGGER.debug("Java VM: {}", System.getProperty("java.vm"));
+        LOGGER.debug("OS: {}", System.getProperty("java.os"));
+        LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
+        Runtime rt = Runtime.getRuntime();
+        LOGGER.debug("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Available processors:  " + rt.availableProcessors());
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
@@ -244,7 +253,7 @@ public final class Main {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
         } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
-                    && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
+                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
             ui.openExamples();
         }
     }
@@ -305,15 +314,24 @@ public final class Main {
      * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
+        if (cl.isSet(EXPERIMENTAL)) {
+            if (verbosity > Verbosity.SILENT) {
+                LOGGER.info("Running in experimental mode ...");
+            }
+            setEnabledExperimentalFeatures(true);
+        } else {
+            setEnabledExperimentalFeatures(false);
+        }
+
 
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
-                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.HIGH);
+                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.DEBUG);
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
 
@@ -325,7 +343,7 @@ public final class Main {
             try {
                 java.util.Properties props = System.getProperties();
                 for (Object o : props.keySet()) {
-                    System.out.println("" + o + "=\"" + props.get(o) + "\"");
+                    LOGGER.info("" + o + "=\"" + props.get(o) + "\"");
                 }
             } finally {
                 System.exit(0);
@@ -352,7 +370,7 @@ public final class Main {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
 
@@ -366,20 +384,20 @@ public final class Main {
         }
 
         if (cl.isSet(TIMEOUT)) {
-            if (verbosity >= Verbosity.HIGH) {
-                System.out.println("Timeout is set");
+            if (verbosity >= Verbosity.DEBUG) {
+                LOGGER.info("Timeout is set");
             }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.HIGH) {
-                    System.out.println("Timeout is: " + timeout + " ms");
+                if (verbosity >= Verbosity.DEBUG) {
+                    LOGGER.info("Timeout is: " + timeout + " ms");
                 }
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
 
             if (timeout < -1) {
@@ -395,19 +413,19 @@ public final class Main {
 
         if (verbosity > Verbosity.SILENT) {
             if (Debug.ENABLE_DEBUG) {
-                System.out.println("Running in debug mode ...");
+                LOGGER.info("Running in debug mode");
             }
 
             if (Debug.ENABLE_ASSERTION) {
-                System.out.println("Using assertions ...");
+                LOGGER.info("Using assertions");
             } else {
-                System.out.println("Not using assertions ...");
+                LOGGER.info("Not using assertions");
             }
         }
 
         if (cl.isSet(EXPERIMENTAL)) {
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("Running in experimental mode ...");
+                LOGGER.info("Running in experimental mode ...");
             }
             setEnabledExperimentalFeatures(true);
         } else {
@@ -417,7 +435,7 @@ public final class Main {
         if (cl.isSet(RIFL)) {
             riflFileName = new File(cl.getString(RIFL, null));
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("[RIFL] Loading RIFL specification from " + riflFileName + " ...");
+                LOGGER.info("[RIFL] Loading RIFL specification from " + riflFileName);
             }
         }
 
@@ -441,23 +459,23 @@ public final class Main {
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
                     } catch (InstantiationException e) {
-                        System.err.println("Automatic proof macro can not be instantiated!");
+                        LOGGER.warn("Automatic proof macro can not be instantiated!");
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
-                        System.err.println("Automatic proof macro can not be accessed!");
+                        LOGGER.warn("Automatic proof macro can not be accessed!");
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
-                        System.err.println("Automatic proof macro can not be invoked!");
+                        LOGGER.warn("Automatic proof macro can not be invoked!");
                         e.printStackTrace();
                     } catch (NoSuchMethodException e) {
-                        System.err.println("Automatic proof macro can not be called!");
+                        LOGGER.warn("Automatic proof macro can not be called!");
                         e.printStackTrace();
                     }
                     break;
                 }
             }
             if (macro.equals("") || autoMacro instanceof SkipMacro) {
-                System.err.println("No automatic proof macro specified.");
+                LOGGER.warn("No automatic proof macro specified.");
             }
         }
 
@@ -484,6 +502,11 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
+        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
+        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
+        } catch (IOException e) {
+            //LOGGER.log(Level.INFO, e.getMessage(), e);
+        }*/
     }
 
     public static boolean isExperimentalMode() {
@@ -494,9 +517,9 @@ public final class Main {
      * Print a header text on to the console.
      */
     private static void printHeader() {
-        System.out.println("\nKeY Version " + KeYConstants.VERSION);
-        System.out.println(KeYConstants.COPYRIGHT + "\nKeY is protected by the " +
-                "GNU General Public License\n");
+        LOGGER.info("KeY Version " + KeYConstants.VERSION);
+        LOGGER.info(KeYConstants.COPYRIGHT);
+        LOGGER.info("KeY is protected by the GNU General Public License");
     }
 
     /**
@@ -516,14 +539,13 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:"
-                                + e.getClass().toString().substring(5));
-                        if (verbosity >= Verbosity.DEBUG) {
+                        LOGGER.error("Auto mode was terminated by an exception:", e);
+                        if (verbosity >= Verbosity.TRACE) {
                             e.printStackTrace();
                         }
                         final String msg = e.getMessage();
                         if (msg != null) {
-                            System.out.println(msg);
+                            LOGGER.info(msg);
                         }
                     }
                     System.exit(-1);
@@ -552,7 +574,7 @@ public final class Main {
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
-                        System.out.println("File does not exist anymore: " + mostRecentFile.toString());
+                        LOGGER.info("File does not exist anymore: " + mostRecentFile.toString());
                     }
                 }
             }
@@ -648,7 +670,7 @@ public final class Main {
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
-                System.out.println("[RIFL] No Java file to load from.");
+                LOGGER.info("[RIFL] No Java file to load from.");
                 System.exit(-130826);
             }
             // only use one input file
@@ -660,7 +682,7 @@ public final class Main {
                         RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
                 if (verbosity > Verbosity.SILENT) {
-                    System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
                 }
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException e) {

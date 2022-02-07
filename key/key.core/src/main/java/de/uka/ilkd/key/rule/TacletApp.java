@@ -50,6 +50,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
+import javax.annotation.Nullable;
+
 /**
  * A TacletApp object contains information required for a concrete application.
  * These information may consist of
@@ -669,6 +671,7 @@ public abstract class TacletApp implements RuleApp {
      /**
       * @return A TacletApp with this.sufficientlyComplete() or null
       */
+	 @Nullable
      public final TacletApp tryToInstantiate(Services services) {
         /*
          * TODO (DS, 2019-02-22): It should be possible to unify this with
