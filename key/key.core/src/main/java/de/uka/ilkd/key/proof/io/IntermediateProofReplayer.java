@@ -16,7 +16,6 @@ package de.uka.ilkd.key.proof.io;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -99,7 +98,6 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
@@ -519,7 +517,7 @@ public class IntermediateProofReplayer {
                 new SequentFormula(term)));
         }
 
-        if (!ourApp.ifInstsCorrectSize(ourApp.taclet(),ifFormulaList) ) {
+        if (!ourApp.ifInstsCorrectSize(ourApp.taclet(), ifFormulaList)) {
             LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
                     tacletName);
             // try to find instantiations automatically

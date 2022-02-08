@@ -1048,7 +1048,7 @@ public abstract class TacletApp implements RuleApp {
             ImmutableList<IfFormulaInstantiation> p_list,
             Services p_services) {
         if (p_list == null) {
-            // Apparently findIfFormulaInstantiations() might return null
+            // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
             // instantiations that should actually be nil().
             // So we replace null with nil() here as a bugfix.
             p_list = ImmutableSLList.<IfFormulaInstantiation> nil();
@@ -1067,6 +1067,7 @@ public abstract class TacletApp implements RuleApp {
      * sequent "p_seq".
      *
      * @return    a list of tacletapps with the found if formula instantiations
+     *            NOTE (LG 2022-02-07):
      *            When the IfSequent is empty, it apparently returns a tacletapp with
      *            ifInstantiations == null instead of
      *            ifInstantiations == nil(), seemingly to be more efficient.
