@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.uka.ilkd.key.logic.op.MixFitInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -263,12 +264,16 @@ public abstract class LDT implements Named {
      * operation, null if not available
      */
     public @Nullable Function getFunctionFor(String operatorSymbol, Services services) {
+        return getFunctionFor(operatorSymbol, MixFitInfo.Kind.INFIX, services);
+
+    }
+    public @Nullable Function getFunctionFor(String operatorSymbol, MixFitInfo.Kind kind, Services services) {
         for (Operator operator : functions.allElements()) {
             if(operator instanceof Function) {
                 var op = (Function) operator;
                 if (op.getMixFitInfo() != null) {
                     var mfi = op.getMixFitInfo();
-                    if (mfi.symbol.equals(operatorSymbol)) {
+                    if (kind == mfi.getKind() && mfi.symbol.equals(operatorSymbol)) {
                         return op;
                     }
                 }

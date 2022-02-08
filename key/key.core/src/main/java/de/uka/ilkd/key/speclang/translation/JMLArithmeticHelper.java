@@ -247,7 +247,7 @@ public class JMLArithmeticHelper {
                 ldt = doubleLDT;
             else // int, long, or bigint does not matter
                 ldt = integerLDT;
-            fun = ldt.getFunctionFor(COMPARISON_MAP.get(opStr), services);
+            fun = ldt.getFunctionFor(opStr, services);
             if (fun == null) {
                 raiseError("Operator " + opStr + " not defined for " + ldt.name());
             }

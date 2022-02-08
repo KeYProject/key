@@ -243,7 +243,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     // falling back to integer ldt (for instance for untyped schema variables)
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
-                Function op = ldt.getFunctionFor("neg", services);
+                Function op = ldt.getFunctionFor("-", MixFitInfo.Kind.PREFIX, services);
                 if(op == null) {
                     semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
