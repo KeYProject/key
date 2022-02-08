@@ -147,11 +147,11 @@ returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_declaration: type IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
-method_declaration: type IDENT param_list (method_body|SEMI_TOPLEVEL);
+field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
+method_declaration: typespec IDENT param_list (method_body|SEMI_TOPLEVEL);
 method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
-param_decl: ((NON_NULL | NULLABLE))? t=IDENT (LBRACKET RBRACKET)* p=IDENT;
+param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
 history_constraint: CONSTRAINT expression;
 datagroup_clause: (in_group_clause | maps_into_clause);
 monitors_for_clause: MONITORS_FOR expression;

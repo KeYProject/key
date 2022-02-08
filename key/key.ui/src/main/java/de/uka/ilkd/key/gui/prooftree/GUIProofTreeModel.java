@@ -182,7 +182,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     /** Sets whether this object should respond to changes in the
      * the proof immediately. */
     public void setAttentive(boolean b) {
-	LOGGER.debug("setAttentive:", b);
+	LOGGER.debug("setAttentive: {}", b);
 	if ( b != attentive && !proof.isDisposed()) {
 	    if ( b ) {
 		proof.addProofTreeListener(proofTreeListener);

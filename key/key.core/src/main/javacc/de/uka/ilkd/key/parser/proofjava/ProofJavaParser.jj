@@ -2709,7 +2709,10 @@ Expression UnaryExpression() :
   result = PreIncrementExpression()
 |
   result = PreDecrementExpression()
-|
+| LOOKAHEAD(1)
+    // There is a grammar conflict since types may also have \dl....
+    // This annotation gives this rule
+    // precedence which is the desired behaviour.
   result = GeneralEscapeExpression()
 |
   result = ADTGetter()
