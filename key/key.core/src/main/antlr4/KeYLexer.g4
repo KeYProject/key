@@ -105,7 +105,7 @@ SL_COMMENT
 ;
 
 DOC_COMMENT: '/*!' -> more, pushMode(docComment);
-ML_COMMENT: '/*' -> more, pushMode(COMMENT);
+ML_COMMENT: '/*' OP_SFX? -> more, pushMode(COMMENT);
 
 
 SORTS:'\\sorts';
