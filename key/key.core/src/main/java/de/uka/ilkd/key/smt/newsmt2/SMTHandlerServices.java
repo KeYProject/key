@@ -138,6 +138,10 @@ public class SMTHandlerServices {
     public List<SMTHandler> getFreshHandlers(Services services, MasterHandler mh,
                                              String[] handlerNames) throws IOException {
         List<SMTHandler> freshHandlers = getFreshHandlers(services, mh);
+        // default to all available handlers
+        if (handlerNames == null || handlerNames.length == 0) {
+            return freshHandlers;
+        }
         freshHandlers = freshHandlers.stream()
                                      .filter(h -> Arrays.stream(handlerNames)
                                                         .anyMatch(s -> h.getClass()

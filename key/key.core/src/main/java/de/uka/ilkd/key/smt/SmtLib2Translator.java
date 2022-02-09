@@ -91,6 +91,15 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         return BOOL;
     }
 
+    /**
+     * This constructor only exists to have a uniform constructor for both the modular and
+     * the legacy translation.
+     * @param handlerNames not used by this translator!
+     */
+    @SuppressWarnings("unused")     // can be called via reflection
+    public SmtLib2Translator(String[] handlerNames) {
+    }
+
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
                                               ArrayList<StringBuilder> assumptions,
