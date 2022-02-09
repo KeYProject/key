@@ -22,6 +22,7 @@ import java.util.ArrayList;
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
  */
+@SuppressWarnings("unused")     // used via reflection by the legacy solver types
 public class SmtLib2Translator extends AbstractSMTTranslator {
     private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
@@ -73,24 +74,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     private static final StringBuilder DISTINCT = new StringBuilder("distinct");
 
-    /**
-     * Just a constructor which starts the conversion to Simplify syntax.
-     * The result can be fetched with
-     *
-     * @param sequent  The sequent which shall be translated.
-     * @param services The Services Object belonging to the sequent.
-     */
-    public SmtLib2Translator(Sequent sequent, Services services, Configuration config) {
-        super(sequent, services, config);
-    }
-
-    /**
-     * For translating only terms and not complete sequents.
-     */
-    public SmtLib2Translator(Services s, Configuration config) {
-        super(s, config);
-    }
-
     protected StringBuilder translateNull() {
         return NULLSTRING;
     }
@@ -118,9 +101,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
                                               ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
                                               SMTSettings settings) {
         StringBuilder result = new StringBuilder();
-        if (getConfig().mentionLogic()) {
+        // always set logic now, (hopefully) does no harm with the modern SMT solvers we support
+        //if (getConfig().mentionLogic()) {
             result.append("(set-logic " + settings.getLogic() + " )\n");
-        }
+        //}
         result.append("(set-option :print-success true) \n");
         result.append("(set-option :produce-unsat-cores true)\n");
         result.append("(set-option :produce-models true)\n");
@@ -590,9 +574,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
     @Override
-    protected StringBuilder translateDistinct(FunctionWrapper[] fw) {
+    protected StringBuilder translateDistinct(FunctionWrapper[] fw, Services services) {
         if (getSettings() == null || !getSettings().useBuiltInUniqueness()) {
-            return super.translateDistinct(fw);
+            return super.translateDistinct(fw, services);
         }
         int start = 0;
         ArrayList<ArrayList<StringBuilder>> temp = new ArrayList<>();
