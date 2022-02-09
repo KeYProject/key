@@ -173,8 +173,21 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
+            ReplayResult replayResult;
 
-            ReplayResult replayResult = env.getReplayResult();
+            if (testProperty == TestProperty.NOTLOADABLE) {
+                try {
+                    replayResult = env.getReplayResult();
+                } catch (Throwable t) {
+                    LOGGER.info("... success: loading failed");
+                    return getRunAllProofsTestResult(true);
+                }
+                assertTrue("Loading problem file succeded but it shouldn't", replayResult.hasErrors());
+                LOGGER.info("... success: loading failed");
+                return getRunAllProofsTestResult(true);
+            }
+
+            replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {

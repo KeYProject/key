@@ -169,6 +169,9 @@ public class GenerateUnitTests {
                 case LOADABLE:
                     methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
+                case NOTLOADABLE:
+                    methods.append("assertUnLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
+                    break;
             }
             methods.append("}");
         }
