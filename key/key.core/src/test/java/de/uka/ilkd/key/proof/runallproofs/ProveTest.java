@@ -114,8 +114,9 @@ public class ProveTest {
                     debugOut("... success: loaded");
                 } else {
                     autoMode(env, loadedProof, script);
-                    success = (testProperty == TestProperty.PROVABLE) == loadedProof.closed();
-                    debugOut("... finished proof: " + (success ? "closed." : "open goal(s)"));
+                    boolean closed = loadedProof.closed();
+                    success = (testProperty == TestProperty.PROVABLE) == closed;
+                    debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
                     if (success)
                         reload(proofFile, loadedProof);

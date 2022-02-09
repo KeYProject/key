@@ -207,10 +207,10 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
 
             autoMode(env, loadedProof, script);
 
-            success = (testProperty == TestProperty.PROVABLE) == loadedProof
-                    .closed();
+            boolean closed = loadedProof.closed();
+            success = (testProperty == TestProperty.PROVABLE) == closed;
             if (verbose) {
-                LOGGER.info("... finished proof: " + (success ? "closed." : "open goal(s)"));
+                LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
             }
 
             // Write statistics.
