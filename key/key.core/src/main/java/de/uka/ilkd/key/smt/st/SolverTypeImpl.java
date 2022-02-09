@@ -175,12 +175,12 @@ public final class SolverTypeImpl implements SolverType {
 		boolean instantiated = false;
 		for (int i = 0; i < constructors.length; i++) {
 			try {
-				smtTranslator = (SMTTranslator) constructors[i].newInstance(translatorParams.stream().map(n -> {
+				smtTranslator = (SMTTranslator) constructors[i].newInstance(/*translatorParams.stream().map(n -> {
 					if (n.equals("<SERVICES>")) {
 						return services;
 					}
 					return n;
-				}).collect(Collectors.toList()));
+				}).collect(Collectors.toList())*/);
 				instantiated = true;
 				break;
 			} catch (IllegalArgumentException | ClassCastException | InstantiationException

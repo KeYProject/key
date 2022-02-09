@@ -58,7 +58,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 			for (Properties solverProp : loadSolvers()) {
 				SolverType createdType = makeSolver(solverProp);
 				SOLVERS.add(createdType);
-				if (Boolean.valueOf(SettingsConverter.read(solverProp, LEGACY, "false"))) {
+				if (SettingsConverter.read(solverProp, LEGACY, false)) {
 					LEGACY_SOLVERS.add(createdType);
 				}
 			}
@@ -101,8 +101,8 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		messageHandler = SettingsConverter.read(props, SOCKET_MESSAGEHANDLER, DEFAULT);
 		delimiters = SettingsConverter.read(props, DELIMITERS, DEFAULT_DELIMITERS).split(DELIMITER_SPLIT);
 		try {
-			translatorClass = ClassLoaderUtil.getClassforName(
-					SettingsConverter.read(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR));
+			String className = SettingsConverter.read(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR);
+			translatorClass = ClassLoaderUtil.getClassforName(className);
 		} catch (ClassNotFoundException e) {
 			translatorClass = ModularSMTLib2Translator.class;
 		}

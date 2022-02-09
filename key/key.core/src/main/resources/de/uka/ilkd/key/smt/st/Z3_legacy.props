@@ -1,10 +1,11 @@
 #Saved SMT solver info for: Z3 (Legacy Translation)
 #Tue Jan 25 10:54:18 CET 2022
 [SolverTypeDefault]ite=true
-[SolverTypeDefault]legacy=\#begtrue\#end
+[SolverTypeDefault]legacy=true
 [SolverTypeDefault]params=\#beg-in -smt2\#end
 [SolverTypeDefault]timeout=-1
 [SolverTypeDefault]name=\#begZ3 (Legacy Translation)\#end
 [SolverTypeDefault]info=\#begZ3 solver by Microsoft\#end
 [SolverTypeDefault]command=\#begz3\#end
 [SolverTypeDefault]version=\#beg--version\#end
+[SolverTypeDefault]translatorClass=\#begde.uka.ilkd.key.smt.SmtLib2Translator\#end
