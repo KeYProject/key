@@ -77,7 +77,7 @@ public final class TypeConverter {
                 return ldt;
             }
         }
-        LOGGER.debug("No LDT found for ", s);
+        LOGGER.debug("No LDT found for {}", s);
         return null;
     }
 
@@ -162,7 +162,7 @@ public final class TypeConverter {
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
         } else {
             LOGGER.debug("typeconverter: no data type model "
-                    + "available to convert:", op, op.getClass());
+                    + "available to convert:{} {}", op, op.getClass());
             throw new IllegalArgumentException("TypeConverter could not handle"
                     + " this operator: " + op);
         }
@@ -171,7 +171,7 @@ public final class TypeConverter {
 
     private Term convertReferencePrefix(ReferencePrefix prefix,
                                         ExecutionContext ec) {
-        LOGGER.debug("typeconverter: (prefix, class)", prefix,
+        LOGGER.debug("typeconverter: (prefix {}, class {})", prefix,
                 (prefix != null ? prefix.getClass() : null));
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
@@ -184,8 +184,7 @@ public final class TypeConverter {
             // the base case: the leftmost item is a local variable
             return tb.var((ProgramVariable) prefix);
         } else if (prefix instanceof VariableReference) {
-            LOGGER.debug("typeconverter: " +
-                    "variablereference:", (((VariableReference) prefix).getProgramVariable()));
+            LOGGER.debug("variablereference: {}", (((VariableReference) prefix).getProgramVariable()));
             return tb.var(((VariableReference) prefix).getProgramVariable());
         } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
@@ -197,7 +196,7 @@ public final class TypeConverter {
             }
             return convertToLogicElement(ec.getRuntimeInstance());
         } else {
-            LOGGER.debug("typeconverter: WARNING: unknown reference prefix:",
+            LOGGER.debug("WARNING: unknown reference prefix: {} {}",
                     prefix, prefix == null ? null : prefix.getClass());
             throw new IllegalArgumentException("TypeConverter failed to convert "
                     + prefix);
@@ -241,7 +240,7 @@ public final class TypeConverter {
     }
 
     public Term convertMethodReference(MethodReference mr, ExecutionContext ec) {
-        LOGGER.debug("TypeConverter: MethodReference: ", mr);
+        LOGGER.debug("TypeConverter: MethodReference: {}", mr);
         // FIXME this needs to handle two state?
         final ReferencePrefix prefix = mr.getReferencePrefix();
         Term p = convertReferencePrefix(prefix, ec);
@@ -267,7 +266,7 @@ public final class TypeConverter {
 
     public Term convertVariableReference(VariableReference fr,
                                          ExecutionContext ec) {
-        LOGGER.debug("TypeConverter: FieldReference: ", fr);
+        LOGGER.debug("TypeConverter: FieldReference: {}", fr);
         final ReferencePrefix prefix = fr.getReferencePrefix();
         final ProgramVariable var = fr.getProgramVariable();
         if (var instanceof ProgramConstant) {
@@ -295,7 +294,7 @@ public final class TypeConverter {
                     = heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
-        LOGGER.debug("typeconverter: Not supported reference type (fr, class):",
+        LOGGER.debug("Not supported reference type (fr {} , class {})",
                 fr, fr.getClass());
         throw new IllegalArgumentException
                 ("TypeConverter could not handle this");
@@ -337,7 +336,7 @@ public final class TypeConverter {
 
     public Term convertToLogicElement(ProgramElement pe,
                                       ExecutionContext ec) {
-        LOGGER.debug("typeconverter: called for:", pe, pe.getClass());
+        LOGGER.debug("called for: {} {}", pe, pe.getClass());
         if (pe instanceof ProgramVariable) {
             return tb.var((ProgramVariable) pe);
         } else if (pe instanceof FieldReference) {

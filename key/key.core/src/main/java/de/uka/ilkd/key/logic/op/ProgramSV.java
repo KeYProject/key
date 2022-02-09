@@ -344,7 +344,7 @@ public final class ProgramSV extends AbstractSV
         while (src != null) {
             if (!check(src, ec, services)) {
                 LOGGER.debug("taclet: Stopped list matching because of "
-                        + "incompatible elements", this, src);
+                        + "incompatible elements {} {}", this, src);
                 break;
             }
             matchedElements.add(src);
@@ -352,7 +352,7 @@ public final class ProgramSV extends AbstractSV
             src = source.getSource();
         }
 
-        LOGGER.debug("Program list match: ", this, matchedElements);
+        LOGGER.debug("Program list match: {} {}", this, matchedElements);
         return addProgramInstantiation(
                 new ProgramList(
                         new ImmutableArray<ProgramElement>(matchedElements)),
@@ -386,7 +386,7 @@ public final class ProgramSV extends AbstractSV
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
-        LOGGER.debug("Program match start (template, source)", this, src);
+        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
 
