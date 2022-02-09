@@ -31,7 +31,8 @@ import java.util.List;
 public class ModularSMTLib2Translator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
-    private String preamble;
+    private final String preamble;
+    private final String[] handlerNames;
 
     /**
      * The preamble may have to be customized, e.g. depending on the SMT solver that is used.
@@ -39,6 +40,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     public ModularSMTLib2Translator(String preamble) {
         this.preamble = preamble;
+        handlerNames = new String[0];
+    }
+
+    public ModularSMTLib2Translator(String[] handlerNames) {
+        this.preamble = SMTHandlerServices.getInstance().getPreamble();
+        this.handlerNames = handlerNames;
     }
 
     /**
@@ -46,6 +53,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     public ModularSMTLib2Translator() {
         this.preamble = SMTHandlerServices.getInstance().getPreamble();
+        handlerNames = new String[0];
     }
 
     @Override
@@ -53,7 +61,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         MasterHandler master;
         try {
-            master = new MasterHandler(services, settings);
+            master = new MasterHandler(services, settings, handlerNames);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

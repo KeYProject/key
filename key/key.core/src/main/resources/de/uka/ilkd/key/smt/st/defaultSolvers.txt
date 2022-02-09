@@ -3,3 +3,4 @@ Z3.props
 CVC5.props
 CVC4_legacy.props
 Z3_legacy.props
+MathSAT.props

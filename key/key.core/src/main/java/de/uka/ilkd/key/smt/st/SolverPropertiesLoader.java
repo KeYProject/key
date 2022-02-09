@@ -41,6 +41,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
 	private static String DEFAULT = "DEFAULT";
 	private static String TRANSLATOR_PARAMS = "[SolverTypeDefault]translatorParams";
+	private static String HANDLER_NAMES = "[SolverTypeDefault]handlers";
 	private static String DEFAULT_TRANSLATOR_PARAMS = "\\\\";
 	private static int defaultNameCounter = 0;
 
@@ -84,6 +85,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		long timeout;
 		Class<?> translatorClass;
 		List<Object> translatorParams = new ArrayList<>(0);
+		String[] handlerNames;
 		SolverCommunicationSocket.MessageHandler handler;
 		String[] delimiters;
 		name = SettingsConverter.read(props, NAME, DEFAULT_NAME);
@@ -96,8 +98,8 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		params = SettingsConverter.read(props, PARAMS, DEFAULT_PARAMS);
 		version = SettingsConverter.read(props, VERSION, DEFAULT_VERSION);
 		info = SettingsConverter.read(props, INFO, DEFAULT_INFO);
-		supportsIfThenElse = Boolean.valueOf(SettingsConverter.read(props, ITE, DEFAULT_ITE));
-		timeout = Long.valueOf(SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT));
+		supportsIfThenElse = SettingsConverter.read(props, ITE, DEFAULT_ITE);
+		timeout = SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT);
 		messageHandler = SettingsConverter.read(props, SOCKET_MESSAGEHANDLER, DEFAULT);
 		delimiters = SettingsConverter.read(props, DELIMITERS, DEFAULT_DELIMITERS).split(DELIMITER_SPLIT);
 		try {
@@ -110,9 +112,13 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 				.split("\\\\")) {
 			translatorParams.add(ParamConverter.convert(str));
 		}
+
+		// note that this will only take effect when using ModularSMTLib2Translator ...
+		handlerNames = SettingsConverter.read(props, HANDLER_NAMES, new String[0]);
+
 		handler = SolverCommunicationSocket.MessageHandler.valueOf(messageHandler);
-		return new SolverTypeImpl(name, info, params, command, version, timeout,
-				delimiters, supportsIfThenElse, translatorClass, translatorParams, handler);
+		return new SolverTypeImpl(name, info, params, command, version, timeout, delimiters,
+			supportsIfThenElse, translatorClass, handlerNames, translatorParams, handler);
 	}
 
 	/**

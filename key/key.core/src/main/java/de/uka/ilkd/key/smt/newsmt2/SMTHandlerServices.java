@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.logging.Handler;
+import java.util.stream.Collectors;
 
 /**
  * This class provides some infrastructure to the smt translation proceess.
@@ -132,6 +133,18 @@ public class SMTHandlerServices {
         }
 
         return result;
+    }
+
+    public List<SMTHandler> getFreshHandlers(Services services, MasterHandler mh,
+                                             String[] handlerNames) throws IOException {
+        List<SMTHandler> freshHandlers = getFreshHandlers(services, mh);
+        freshHandlers = freshHandlers.stream()
+                                     .filter(h -> Arrays.stream(handlerNames)
+                                                        .anyMatch(s -> h.getClass()
+                                                                        .getName()
+                                                                        .equals(s)))
+                                     .collect(Collectors.toList());
+        return freshHandlers;
     }
 
     /**

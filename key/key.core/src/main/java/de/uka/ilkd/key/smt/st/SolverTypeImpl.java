@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Final SolverType implementation that uses building blocks for the various methods.
@@ -39,6 +38,7 @@ public final class SolverTypeImpl implements SolverType {
 	private boolean isSupportedVersion = false;
 	private boolean installWasChecked = false;
 	private boolean isInstalled = false;
+	private final String[] handlerNames;
 	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
 	private final Class<?> TRANSLATOR_CLASS;
 	private final List<Object> translatorParams;
@@ -72,9 +72,11 @@ public final class SolverTypeImpl implements SolverType {
 
 	}
 
-	public SolverTypeImpl(String name, String info, String defaultParams, String defaultCommand, String version,
+	public SolverTypeImpl(String name, String info, String defaultParams, String defaultCommand,
+						  String version,
 						  long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
-						  Class<?> translatorClass, List<Object> translatorParams,
+						  Class<?> translatorClass, String[] handlerNames,
+						  List<Object> translatorParams,
 						  SolverCommunicationSocket.MessageHandler handler) {
 		NAME = name;
 		INFO = info;
@@ -88,6 +90,7 @@ public final class SolverTypeImpl implements SolverType {
 		ITE = supportsIfThenElse;
 		VERSION = version;
 		TRANSLATOR_CLASS = translatorClass;
+		this.handlerNames = handlerNames;
 		MSG_HANDLER = handler;
 		this.translatorParams = new ArrayList<>(translatorParams);
 	}
@@ -175,12 +178,13 @@ public final class SolverTypeImpl implements SolverType {
 		boolean instantiated = false;
 		for (int i = 0; i < constructors.length; i++) {
 			try {
-				smtTranslator = (SMTTranslator) constructors[i].newInstance(/*translatorParams.stream().map(n -> {
+				smtTranslator = (SMTTranslator) constructors[i].newInstance((Object) handlerNames);
+				/*translatorParams.stream().map(n -> {
 					if (n.equals("<SERVICES>")) {
 						return services;
 					}
 					return n;
-				}).collect(Collectors.toList())*/);
+				}).collect(Collectors.toList()));*/
 				instantiated = true;
 				break;
 			} catch (IllegalArgumentException | ClassCastException | InstantiationException
