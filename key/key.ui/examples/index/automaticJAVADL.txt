@@ -959,6 +959,12 @@ group reload_examples {
    loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 }
 
+# Test whether reloading works (no examples)
+group test_reload {
+   loadable ./proofReload/disjConj-manipulated.proof
+   notloadable ./proofReload/insufficient-manipulated.proof
+}
+
 group switch {
 
     # This isn't a good test as it depends on ordering and naming scheme
