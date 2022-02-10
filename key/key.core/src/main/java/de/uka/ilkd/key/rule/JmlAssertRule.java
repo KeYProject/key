@@ -60,7 +60,6 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        //TODO: copied from blockcontractrules see if it is correct here
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
