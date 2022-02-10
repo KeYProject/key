@@ -1824,7 +1824,7 @@ public final class MainWindow extends JFrame {
             for (UnionCheckBox box: checkBoxes.stream().filter(c -> c.isSelected()).collect(Collectors.toList())) {
                 types.addAll(box.getUnion().getTypes());
             }
-            if (types.size() < 2) {
+            if (types.size() < 1) {
                 return SolverTypeCollection.EMPTY_COLLECTION;
             }
             for (SolverType type: types) {
