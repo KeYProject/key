@@ -1445,7 +1445,6 @@ public class JMLSpecFactory {
      * @param pm the enclosing method
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
-        //TODO: seems like VariableCreator expects a Block, but seems to work with a JavaStatement
         final AuxiliaryContract.Variables variables = new AuxiliaryContract.VariablesCreator(
                         jmlAssert, Collections.emptyList(), pm, services)
                 .create();

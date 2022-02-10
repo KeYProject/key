@@ -20,8 +20,6 @@ import java.util.Objects;
  */
 public class JmlAssert extends JavaStatement {
 
-    //TODO: move the Kind enum somewhere else?
-    //      or maybe just use a boolean?
     /**
      * the kind of the statement, assert or assume
      */
@@ -50,25 +48,17 @@ public class JmlAssert extends JavaStatement {
     }
 
     /**
-     * copy constructor allowing changes
      *
-     * @param proto the element to copy
-     * @param changeList the changes to be made
+     * @param children the children of this element
      */
-    public JmlAssert(JmlAssert proto, ExtList changeList) {
-        super(changeList, getOr(changeList, PositionInfo.class, proto.getPositionInfo()));
-        this.kind = getOr(changeList, TextualJMLAssertStatement.Kind.class, proto.kind);
-        this.condition = getOr(changeList, LabeledParserRuleContext.class, proto.condition);
-        this.cond = getOr(changeList, Term.class, proto.cond);
+    public JmlAssert(ExtList children) {
+        super(children);
+        this.kind = children.get(TextualJMLAssertStatement.Kind.class);
+        this.condition = children.get(LabeledParserRuleContext.class);
+        this.cond = children.get(Term.class);
         if ((cond == null) == (condition == null)) {
             throw new IllegalArgumentException("exactly one of cond and condition has to be null");
         }
-    }
-
-    //TODO: move into ExtList?
-    private static <T> T getOr(ExtList changeList, Class<T> cl, T defaultValue) {
-        T result = changeList.get(cl);
-        return result == null ? defaultValue : result;
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -82,7 +72,8 @@ public class JmlAssert extends JavaStatement {
         if (cond != null) {
             return cond.toString();
         }
-        //TODO: this will lose whitespace, so e.g. \forall will not be printed correctly
+        // this will lose whitespace, so e.g. \forall will not be printed correctly
+        // but normally the term form should get printed.
         return condition.first.getText().substring(kind.name().length());
     }
 

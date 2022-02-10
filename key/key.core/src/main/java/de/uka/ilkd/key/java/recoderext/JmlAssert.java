@@ -24,12 +24,11 @@ public class JmlAssert extends JavaStatement {
        e.g. \forall
        keep this as the parse tree for now
        (blockcontracts seem to handle this similar)
-       TODO: do the visitors work good enough?
-             compare with what is done for loop/block contracts
      */
     /**
      * The condition of this statement in parse tree form
      */
+    // this isn't serializable, but that shouldn't be a problem for KeY
     private final LabeledParserRuleContext condition;
 
     /**
@@ -83,12 +82,11 @@ public class JmlAssert extends JavaStatement {
 
     @Override
     public void accept(SourceVisitor sourceVisitor) {
-        //TODO: is it fine to leave this blank?
+        // should be fine to leave blank
     }
 
     @Override
     public Statement deepClone() {
-        //TODO: clone condition?
         return new JmlAssert(this);
     }
 }

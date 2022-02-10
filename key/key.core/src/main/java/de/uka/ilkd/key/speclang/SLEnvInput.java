@@ -294,10 +294,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void transformJmlAsserts(final IProgramMethod pm) {
-        //TODO: ignore jml asserts in the recorderext AST and just create it here?
-        //      that way condition could be final, but the AST would be incomplete longer
-        //      (well, it is incomplete till the condition is translated to a Term,
-        //       but at least there isn't a missing statement)
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {

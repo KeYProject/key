@@ -1527,7 +1527,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                return new JmlAssert(x, changeList);
+                changeList.add(x.getKind());
+                return new JmlAssert(changeList);
             }
         };
         def.doAction(x);
