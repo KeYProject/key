@@ -4,10 +4,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -23,7 +20,6 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import org.key_project.util.LRUCache;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
@@ -85,11 +81,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
-        private final Map<Term, Boolean> termHasModalityCache = new LRUCache<>(2000);
-
-        // Caching more than one sequent does not help since autopilot rarely revisits nodes
-        private Sequent sequentHasModality = null;
-        private boolean sequentHasModalityValue = false;
+        private final ModalityCache modalityCache = new ModalityCache();
 
         public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
             this.delegate = proof.getActiveStrategy();
@@ -116,53 +108,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                     delegate.isApprovedApp(app, pio, goal);
         }
 
-        /*
-         * find a modality term
-         */
-        private boolean termHasModality(Term term) {
-            Boolean cached = termHasModalityCache.get(term);
-            if (cached != null) {
-                return cached;
-            }
-
-            // This is the faster comparison but rarely returns
-            if (term.op() instanceof Modality) {
-                return true;
-            }
-
-            var hasModality = false;
-            for (Term sub : term.subs()) {
-                if (termHasModality(sub)) {
-                    hasModality = true;
-                    break;
-                }
-            }
-
-            termHasModalityCache.put(term, hasModality);
-            return hasModality;
-        }
-
-        /*
-         * find a modality term in a node
-         */
-        private boolean hasModality(Sequent sequent) {
-            if (sequentHasModality == sequent) {
-                return sequentHasModalityValue;
-            }
-
-            var result = false;
-            for (SequentFormula sequentFormula : sequent) {
-                if (termHasModality(sequentFormula.formula())) {
-                    result = true;
-                    break;
-                }
-            }
-
-            sequentHasModality = sequent;
-            sequentHasModalityValue = result;
-            return result;
-        }
-
         @Override
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
@@ -171,7 +116,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if (hasModality(goal.node().sequent())) {
+            if (modalityCache.hasModality(goal.node().sequent())) {
                 return delegate.computeCost(app, pio, goal);
             }
 
