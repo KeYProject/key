@@ -30,6 +30,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nullable;
+
 
 public final class CharListLDT extends LDT {
     
@@ -261,5 +263,15 @@ public final class CharListLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
+    }
+
+    @Nullable
+    @Override
+    public Function getFunctionFor(String operationName, Services services) {
+        switch (operationName) {
+			// This is not very elegant; but seqConcat is actually in the SeqLDT.
+            case "add": return services.getNamespaces().functions().lookup("seqConcat");
+            default: return null;
+        }
     }
 }

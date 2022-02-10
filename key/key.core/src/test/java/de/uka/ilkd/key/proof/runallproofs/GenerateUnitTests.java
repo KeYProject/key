@@ -51,7 +51,7 @@ public class GenerateUnitTests {
         }
 
         outputFolder = args[0];
-        LOGGER.info("Output folder {]", outputFolder);
+        LOGGER.info("Output folder {}", outputFolder);
 
         File out = new File(outputFolder);
         out.mkdirs();

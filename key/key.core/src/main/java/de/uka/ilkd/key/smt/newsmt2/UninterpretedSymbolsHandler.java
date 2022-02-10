@@ -26,9 +26,12 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "u_";
 
+    // TODO This flag does not seem to be 100% what it is supposed to. Refactor. MU
+    private boolean enableQuantifiers;
+
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
-        // nothing to be done
+        enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
     }
 
     @Override
@@ -55,7 +58,8 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
-            if(op.sort() != Sort.FORMULA) {
+            if(op.sort() != Sort.FORMULA &&
+              (enableQuantifiers || op.arity() == 0)) {
                 trans.addAxiom(HandlerUtil.funTypeAxiom(op, name, trans));
             }
             trans.addKnownSymbol(name);

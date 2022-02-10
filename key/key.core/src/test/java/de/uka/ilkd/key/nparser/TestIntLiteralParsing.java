@@ -179,7 +179,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         LOGGER.debug("Tokens: {}", toks);
         assertEquals(1, toks.size());
         int t = toks.get(0).getType();
-        assertTrue("Wrong literal type", KeYLexer.NUM_LITERAL == t ||
+        assertTrue("Wrong literal type", KeYLexer.INT_LITERAL == t ||
                 KeYLexer.HEX_LITERAL == t ||
                 KeYLexer.BIN_LITERAL == t ||
                 KeYLexer.CHAR_LITERAL == t);

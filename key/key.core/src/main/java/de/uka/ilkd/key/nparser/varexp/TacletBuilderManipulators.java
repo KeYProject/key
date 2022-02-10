@@ -304,6 +304,9 @@ public class TacletBuilderManipulators {
         }
     };
 
+    public static final AbstractConditionBuilder IS_IN_STRICTFP =
+            new ConstructorBasedBuilder("isInStrictFp", InStrictFp.class);
+
     //region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE,
@@ -316,7 +319,8 @@ public class TacletBuilderManipulators {
                 ENUM_TYPE, CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS,
                 SAME_OBSERVER, applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE,
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
-                META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT
+                META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT,
+                IS_IN_STRICTFP
         );
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT,
                 GET_INVARIANT, GET_FREE_INVARIANT, GET_VARIANT, IS_LABELED);

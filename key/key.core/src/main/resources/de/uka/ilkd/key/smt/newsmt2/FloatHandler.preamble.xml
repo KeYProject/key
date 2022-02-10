@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>These are the preamble snippets needed for handling floating point numbers</comment>
+
+    <entry key="float.axioms">
+(assert (forall ((f Float32)) (= (u2f (f2u f)) f)))
+(assert (forall ((x U)) (=> (= (typeof x) sort_float) (= (f2u (u2f x)) x))))
+(assert (forall ((x U)) (=> (instanceof x sort_float) (= (typeof x ) sort_float))))
+(assert (forall ((f Float32)) (= (typeof (f2u f)) sort_float)))
+
+(assert (forall ((d Float64)) (= (u2d (d2u d)) d)))
+(assert (forall ((x U)) (=> (= (typeof x) sort_double) (= (d2u (u2d x)) x))))
+(assert (forall ((x U)) (=> (instanceof x sort_double) (= (typeof x ) sort_double))))
+(assert (forall ((d Float64)) (= (typeof (d2u d)) sort_double)))
+    </entry>
+
+    <entry key="float.decls">
+(declare-fun u2f (U) Float32)
+(declare-fun f2u (Float32) U)
+;(declare-const sort_float T)
+
+(declare-fun u2d (U) Float64)
+(declare-fun d2u (Float64) U)
+;(declare-const sort_double T)
+    </entry>
+
+    <entry key="sinDouble.axioms">
+        <!-- TODO this is not mentioned in the documentation.-->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a))) (and (fp.leq (sinDouble a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(fp.geq (sinDouble a) (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is NaN or an infinity, then the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.isInfinite a)) (fp.isNaN (sinDouble a)))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sinDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sinDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+    </entry>
+
+    <entry key="sinDouble.decls">
+        (declare-fun sinDouble (Float64) Float64)
+    </entry>
+
+    <entry key="cosDouble.axioms">
+        <!-- TODO this is not mentioned in the documentation.-->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a))) (and (fp.leq (cosDouble a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(fp.geq (cosDouble a) (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is NaN or an infinity, then the result is NaN -->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.isInfinite a)) (fp.isNaN (cosDouble a)))))
+
+        <!-- TODO this is not mentioned in the documentation. -->
+<!--        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000-->
+<!--        #b0000000000000000000000000000000000000000000000000000))(fp.eq (cosDouble a) (fp #b0 #b01111111111-->
+<!--        #b0000000000000000000000000000000000000000000000000000)))))-->
+    </entry>
+
+    <entry key="cosDouble.decls">
+        (declare-fun cosDouble (Float64) Float64)
+    </entry>
+
+    <entry key="asinDouble.decls">
+        (declare-fun asinDouble (Float64) Float64)
+    </entry>
+
+    <entry key="acosDouble.decls">
+        (declare-fun acosDouble (Float64) Float64)
+    </entry>
+
+    <entry key="tanDouble.decls">
+        (declare-fun tanDouble (Float64) Float64)
+    </entry>
+
+    <entry key="atan2Double.decls">
+        (declare-fun atan2Double (Float64 Float64) Float64)
+    </entry>
+
+    <entry key="sqrtDouble.axioms">
+        <!-- If the argument is NaN or less than zero, then the result is NaN-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (sqrtDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (sqrtDouble a))(fp.gt (sqrtDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is positive zero or negative zero, then the result is the same as the argument-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sqrtDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- (! isInfinite(a)) ==> ! isInfinite(sqrt(a)) -> proved by a smt solver -->
+<!--        (assert (forall ((a Float64)) (=> (not (fp.isInfinite a)) (not (fp.isInfinite (sqrtDouble a))))))-->
+
+        <!-- (a != oo) && ( a > 1) ==> sqrt(a) < a -> proved by a smt solver -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isInfinite a)) (fp.gt a (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(fp.lt (sqrtDouble a) a))))
+
+        <!-- (! isNaN(a) && a >= 0 ) ==> ! isNaN(sqrt(a)) -> proved by a smt solver -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (fp.geq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (sqrtDouble a))))))
+    </entry>
+
+    <entry key="sqrtDouble.decls">
+        (declare-fun sqrtDouble (Float64) Float64)
+    </entry>
+
+    <entry key="powDouble.decls">
+        (declare-fun powDouble (Float64 Float64) Float64)
+    </entry>
+
+    <entry key="expDouble.decls">
+        (declare-fun expDouble (Float64) Float64)
+    </entry>
+
+    <!--atanRange-->
+    <entry key="atanDouble.axioms">
+        <!-- The returned angle is in the range -pi/2 through pi/2-->
+        (assert (forall ((a Float64)) (=>  (not (fp.isNaN a)) (and (fp.geq (atanDouble a) (fp #b1 #b01111111111
+        #b1001001000011111101101010100010001000010110100011000))(fp.leq (atanDouble a) (fp #b0 #b01111111111
+        #b1001001000011111101101010100010001000010110100011000))))))
+
+        <!--  If the argument is NaN, then the result is NaN-->
+        (assert (forall ((a Float64)) (=> (fp.isNaN a)(fp.isNaN (atanDouble a)))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (atanDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (atanDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+    </entry>
+    <entry key="atanDouble.decls">
+        (declare-fun atanDouble (Float64) Float64)
+    </entry>
+
+</properties>
+

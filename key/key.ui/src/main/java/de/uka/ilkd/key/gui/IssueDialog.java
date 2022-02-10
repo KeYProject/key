@@ -547,14 +547,22 @@ public final class IssueDialog extends JDialog {
      * @return a new PositionedIssueString created from the data
      */
     private static PositionedIssueString extractMessage(Throwable exception) {
-        try (StringWriter sw = new StringWriter()) {
-            PrintWriter pw = new PrintWriter(sw);
-            Location location = ExceptionTools.getLocation(exception);
+        try (StringWriter sw = new StringWriter();
+             PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
+
+            // also add message of the cause to the string if available
+            if (exception.getCause() != null) {
+                String causeMessage = exception.getCause().getMessage();
+                message = message == null ? causeMessage :
+                    String.format("%s%n%nCaused by: %s", message, exception.getCause().toString());
+            }
+
             String resourceLocation = "";
             Position pos = Position.UNDEFINED;
+            Location location = ExceptionTools.getLocation(exception);
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
                 pos = new Position(location.getLine(), location.getColumn());

@@ -490,7 +490,7 @@ public class KeYProgModelInfo {
             return (IProgramMethod) rec2key().toKeY(constructors.get(0));
         }
         if (constructors.isEmpty()) {
-            LOGGER.debug("javainfo: Constructor not found: ", ct);
+            LOGGER.debug("javainfo: Constructor not found: {}", ct);
             return null;
         }
         Debug.fail();
@@ -517,7 +517,7 @@ public class KeYProgModelInfo {
                 return (IProgramMethod) member;
             }
         }
-        LOGGER.debug("keyprogmodelinfo: implicit method %1 not found in %2 (%1, %2) ",
+        LOGGER.debug("keyprogmodelinfo: implicit method {} not found in {}",
                 name, ct);
         return null;
     }
@@ -549,7 +549,7 @@ public class KeYProgModelInfo {
         if (methodlist.size() == 1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.isEmpty()) {
-            LOGGER.debug("javainfo: Program Method not found: ", m);
+            LOGGER.debug("javainfo: Program Method not found: {}", m);
             return null;
         } else {
             Debug.fail();
@@ -578,7 +578,7 @@ public class KeYProgModelInfo {
             if (f != null) {
                 result = result.prepend(f);
             } else {
-                LOGGER.debug("Field has no KeY equivalent (recoder field):", rf.getFullName());
+                LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf.getFullName());
                 LOGGER.debug("This happens currently as classes only available in byte code " +
                         "are only partially converted ");
             }

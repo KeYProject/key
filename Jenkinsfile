@@ -48,7 +48,7 @@ pipeline {
 
     post {
         always {
-            junit(testResults: 'key/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+            junit(testResults: 'key/*/build/test-results/*/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
         }
     }
 }

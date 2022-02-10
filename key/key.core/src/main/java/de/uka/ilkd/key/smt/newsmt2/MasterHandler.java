@@ -114,7 +114,7 @@ public class MasterHandler {
     }
 
     /**
-     * Create a new handler.
+     * Create a new handler with the default set of smt handlers.
      *
      * @param services non-null services
      * @param settings settings from the proof for the property settings.

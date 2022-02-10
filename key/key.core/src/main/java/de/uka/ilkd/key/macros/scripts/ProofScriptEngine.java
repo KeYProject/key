@@ -189,4 +189,8 @@ public class ProofScriptEngine {
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;
     }
+
+    public static ProofScriptCommand getCommand(String commandName) {
+        return COMMANDS.get(commandName);
+    }
 }

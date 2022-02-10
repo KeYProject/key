@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -156,6 +158,13 @@ public class MasterHandlerTest {
                 proof.getSettings().getNewSMTSettings(),
                 proof);
 
+        String updates = props.get("smt-settings");
+        if (updates != null) {
+            Properties map = new Properties();
+            map.load(new StringReader(updates));
+            settings.getNewSettings().readSettings(map);
+        }
+
         ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
         this.translation =
                 translator.translateProblem(sequent, env.getServices(), settings).toString();
@@ -188,7 +197,7 @@ public class MasterHandlerTest {
                     lookFor = "unsat";
                     break;
                 case "fail":
-                    lookFor = "sat";
+                    lookFor = "(sat|timeout)";
                     break;
                 case "irrelevant":
                     break;
@@ -200,7 +209,7 @@ public class MasterHandlerTest {
                 if (line.startsWith("(error ")) {
                     fail("An error in Z3: " + line);
                 }
-                if (lookFor != null && line.equals(lookFor)) {
+                if (lookFor != null && line.matches(lookFor)) {
                     return;
                 }
             }

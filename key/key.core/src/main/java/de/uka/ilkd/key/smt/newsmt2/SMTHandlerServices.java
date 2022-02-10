@@ -1,22 +1,13 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap;
 import org.key_project.util.Streams;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.logging.Handler;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +21,12 @@ import java.util.stream.Collectors;
  * @author Mattias Ulbrich
  */
 public class SMTHandlerServices {
+
+    /** The name of the package where this class resides. Used for
+     * prefixing when loading handlers.
+     */
+    private static final String PACKAGE_PREFIX =
+            SMTHandlerServices.class.getPackageName() + ".";
 
     /** Singleton instance */
     private static SMTHandlerServices theInstance;
@@ -67,7 +64,7 @@ public class SMTHandlerServices {
      * Get a list of all handlers available in the system.
      *
      * <b>Do not use this list directly, but
-     * use {@link #getFreshHandlers(Services, MasterHandler)}</b>
+     * use {@link #getFreshHandlers(Services, List, MasterHandler)}</b>
      * if you intend to initialise them and run them.
      *
      * @return always the same list of {@link SMTHandler}s, not null
@@ -106,6 +103,50 @@ public class SMTHandlerServices {
             result.add(smtHandler);
         }
         return Collections.unmodifiableList(result);
+    }
+
+    /**
+     * Loadd all handlers specified as arguments. Load the snippets that belong
+     * to these instances. This can be used if a translation does not want to
+     * use the standard array of handlers.
+     *
+     * <strong>Caution: Do not call this method too often since it adds to the
+     * static map of instances to snippets.</strong>
+     *
+     * It would be a good idea to call this method (at most) once for each
+     * solver type with a custom array of handlers.
+     *
+     * The strings in the argument can either be fully qualified class names
+     * or class names package. In the latter case the prefix for this package
+     * here will be added.
+     *
+     * @param classNames a non-null list of non-null strings with classnames (s. above)
+     *
+     * @return a fresh array of freshly created handlers.
+     */
+    public List<SMTHandler> makeHandlers(Collection<String> classNames) throws IOException {
+        List<SMTHandler> result = new ArrayList<>();
+        for (String className : classNames) {
+            if (!className.contains(".")) {
+                className = PACKAGE_PREFIX + className;
+            }
+            try {
+                SMTHandler smtHandler = (SMTHandler) Class.forName(className).getConstructor().newInstance();
+                result.add(smtHandler);
+            } catch (Exception e) {
+                throw new IOException("Cannot instantiate SMTHandler " + className, e);
+            }
+        }
+
+        for (SMTHandler smtHandler : result) {
+            Properties handlerSnippets = loadSnippets(smtHandler.getClass());
+            if (handlerSnippets != null) {
+                snippetMap.put(smtHandler,  handlerSnippets);
+            }
+            smtProperties.addAll(smtHandler.getProperties());
+        }
+
+        return result;
     }
 
     /**

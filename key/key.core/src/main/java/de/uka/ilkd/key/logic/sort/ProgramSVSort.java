@@ -185,6 +185,16 @@ public abstract class ProgramSVSort extends AbstractSort {
                     new PrimitiveType[] { PrimitiveType.JAVA_LONG }
                     );
 
+    public static final ProgramSVSort SIMPLEJAVAFLOATEXPRESSION
+	= new SimpleExpressionSpecialPrimitiveTypeSort
+	("JavaFloatExpression", new
+	 PrimitiveType[]{PrimitiveType.JAVA_FLOAT});
+
+    public static final ProgramSVSort SIMPLEJAVADOUBLEEXPRESSION
+	= new SimpleExpressionSpecialPrimitiveTypeSort
+	("JavaDoubleExpression", new
+	 PrimitiveType[]{PrimitiveType.JAVA_DOUBLE});
+
     public static final ProgramSVSort SIMPLEJAVABYTESHORTEXPRESSION =
             new SimpleExpressionSpecialPrimitiveTypeSort(
                     "JavaByteShortExpression",
@@ -290,6 +300,13 @@ public abstract class ProgramSVSort extends AbstractSort {
             new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
 
 
+    //--------------- Specials excepting some primitive types--------------
+    
+    public static final ProgramSVSort SIMPLEEXPRESSIONNONFLOATDOUBLE
+	= new SimpleExpressionExceptingTypeSort 
+	("SimpleExpressionNonFloatDouble", new
+	 PrimitiveType[]{PrimitiveType.JAVA_FLOAT,
+			 PrimitiveType.JAVA_DOUBLE});
 
     //--------------- Specials that can be get rid of perhaps--------------
 
@@ -1204,6 +1221,40 @@ protected boolean canStandFor(ProgramElement check, Services services) {
                 }
             }
             return false;
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that match
+     * on simple expressions, except if they match a special primitive type.
+     */
+    private static final class SimpleExpressionExceptingTypeSort 
+	extends SimpleExpressionSort{
+
+	private final PrimitiveType[] forbidden_types;
+
+	public SimpleExpressionExceptingTypeSort
+	    (String name, PrimitiveType[] forbidden_types) {
+	    
+	    super(new Name(name));
+	    this.forbidden_types = forbidden_types;           
+	}
+
+	public boolean canStandFor(ProgramElement check, 
+				   ExecutionContext ec,
+				   Services services) {
+	    if (!super.canStandFor(check, ec, services)) {
+		return false;
+	    }
+	    final KeYJavaType kjt = getKeYJavaType(check, ec, services);
+            if (kjt != null) {
+                final Type type = kjt.getJavaType();
+                for (PrimitiveType forbidden_type : forbidden_types) {
+                    if (type == forbidden_type)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 

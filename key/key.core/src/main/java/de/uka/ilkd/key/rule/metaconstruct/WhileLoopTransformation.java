@@ -212,7 +212,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     public ProgramElement result() {
-        LOGGER.debug("While-Loop-Tranform-Result: ", result);
+        LOGGER.debug("While-Loop-Tranform-Result: {}", result);
         return result;
     }
 
