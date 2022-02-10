@@ -1,10 +1,10 @@
 #Saved SMT solver info for: CVC5
 #Tue Jan 25 10:54:18 CET 2022
-[SolverTypeDefault]ite=true
-[SolverTypeDefault]params=\#beg--interactive -m --lang smt2\#end
-[SolverTypeDefault]timeout=-1
-[SolverTypeDefault]name=\#begCVC5\#end
-[SolverTypeDefault]info=\#begCVC5 solver\#end
-[SolverTypeDefault]command=\#begcvc5\#end
-[SolverTypeDefault]version=\#beg--version\#end
-[SolverTypeDefault]messageHandler=\#begCVC5\#end
+ite=true
+params=--interactive -m --lang smt2
+timeout=-1
+name=CVC5
+info=CVC5 solver
+command=cvc5
+version=--version
+messageHandler=CVC5

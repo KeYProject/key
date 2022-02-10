@@ -1,12 +1,12 @@
 #Saved SMT solver info for: CVC4 (Legacy Translation)
 #Tue Jan 25 10:54:18 CET 2022
-[SolverTypeDefault]ite=true
-[SolverTypeDefault]legacy=true
-[SolverTypeDefault]params=\#beg--no-print-success -m --interactive --lang smt2\#end
-[SolverTypeDefault]timeout=-1
-[SolverTypeDefault]name=\#begCVC4 (Legacy Translation)\#end
-[SolverTypeDefault]info=\#begCVC4 solver\#end
-[SolverTypeDefault]command=\#begcvc4\#end
-[SolverTypeDefault]version=\#beg--version\#end
-[SolverTypeDefault]translatorClass=\#begSmtLib2Translator\#end
-[SolverTypeDefault]translatorClass=\#begde.uka.ilkd.key.smt.SmtLib2Translator\#end
+ite=true
+legacy=true
+params=--no-print-success -m --interactive --lang smt2
+timeout=-1
+name=CVC4 (Legacy Translation)
+info=CVC4 solver
+command=cvc4
+version=--version
+translatorClass=SmtLib2Translator
+translatorClass=de.uka.ilkd.key.smt.SmtLib2Translator

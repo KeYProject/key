@@ -67,17 +67,17 @@ public class SolverTypes {
 	}
 
 	public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals(SolverTypeImplementation.class) && it.getName()
 					.equals("Z3_CE"))
 			.findFirst().orElse(null);
 
 	public static final SolverType Z3_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals(SolverTypeImplementation.class) && it.getName()
 					.equals("Z3 (Legacy Translation)"))
 			.findFirst().orElse(null);
 
 	public static final SolverType CVC4_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
-					.equals(SolverTypeImpl.class) && ((SolverTypeImpl) it).getName()
+					.equals(SolverTypeImplementation.class) && it.getName()
 					.equals("CVC4 (Legacy Translation)"))
 			.findFirst().orElse(null);
 

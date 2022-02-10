@@ -25,7 +25,7 @@ import java.util.List;
  * - The various String parameters such as default command, params and the name
  * - TODO
  */
-public final class SolverTypeImpl implements SolverType {
+public final class SolverTypeImplementation implements SolverType {
 
 	private final String NAME, INFO, DEFAULT_PARAMS, DEFAULT_COMMAND, VERSION;
 	private final long DEFAULT_TIMEOUT;
@@ -41,7 +41,6 @@ public final class SolverTypeImpl implements SolverType {
 	private final String[] handlerNames;
 	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
 	private final Class<?> TRANSLATOR_CLASS;
-	private final List<Object> translatorParams;
 
 	public static boolean isInstalled(String cmd) {
 
@@ -72,12 +71,11 @@ public final class SolverTypeImpl implements SolverType {
 
 	}
 
-	public SolverTypeImpl(String name, String info, String defaultParams, String defaultCommand,
-						  String version,
-						  long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
-						  Class<?> translatorClass, String[] handlerNames,
-						  List<Object> translatorParams,
-						  SolverCommunicationSocket.MessageHandler handler) {
+	public SolverTypeImplementation(String name, String info, String defaultParams, String defaultCommand,
+									String version,
+									long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
+									Class<?> translatorClass, String[] handlerNames,
+									SolverCommunicationSocket.MessageHandler handler) {
 		NAME = name;
 		INFO = info;
 		DEFAULT_PARAMS = defaultParams;
@@ -90,9 +88,9 @@ public final class SolverTypeImpl implements SolverType {
 		ITE = supportsIfThenElse;
 		VERSION = version;
 		TRANSLATOR_CLASS = translatorClass;
-		this.handlerNames = handlerNames;
+		// copy the array so that it cannot accidentally be manipulated from the outside
+		this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
 		MSG_HANDLER = handler;
-		this.translatorParams = new ArrayList<>(translatorParams);
 	}
 
 	@Override

@@ -1,32 +1,31 @@
 #Saved SMT solver info for: MathSAT
 #Wed Feb 09 22:29:00 CET 2022
-[SolverTypeDefault]ite=true
-[SolverTypeDefault]params=\#beg\#end
-[SolverTypeDefault]timeout=-1
-[SolverTypeDefault]name=\#begMathSAT\#end
-[SolverTypeDefault]info=\#begThe MathSAT 5 SMT solver\#end
-[SolverTypeDefault]command=\#begmathsat\#end
-[SolverTypeDefault]version=\#beg-version\#end
+ite=true
+timeout=-1
+name=MathSAT
+info=The MathSAT 5 SMT solver
+command=mathsat
+version=-version
 #
 # let's try to use the default handler to handle the output
-[SolverTypeDefault]messageHandler=\#begDEFAULT\#end
+messageHandler=DEFAULT
 #
 # MathSAT does not support quantifiers (in most cases), so we use the modular translation and disable the quantifier handler
-[SolverTypeDefault]translatorClass=\#begde.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator\#end
+translatorClass=de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator
 #
 # all handlers but the QuantifierHandler
 # note: having to write #\beg ... #\end is really annoying...
-[SolverTypeDefault]handlers=\#begde.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.CastHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.FieldConstantHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.InstanceOfHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.IntegerOpHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.PolymorphicHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.SeqDefHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.SumProdHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler\#end,\
-                            \#begde.uka.ilkd.key.smt.newsmt2.UpdateHandler\#end
+[SolverTypeDefault]handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,
+                            de.uka.ilkd.key.smt.newsmt2.CastHandler,
+                            de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler,
+                            de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler,
+                            de.uka.ilkd.key.smt.newsmt2.FieldConstantHandler,
+                            de.uka.ilkd.key.smt.newsmt2.InstanceOfHandler,
+                            de.uka.ilkd.key.smt.newsmt2.IntegerOpHandler,
+                            de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler,
+                            de.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler,
+                            de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,
+                            de.uka.ilkd.key.smt.newsmt2.SeqDefHandler,
+                            de.uka.ilkd.key.smt.newsmt2.SumProdHandler,
+                            de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler,
+                            de.uka.ilkd.key.smt.newsmt2.UpdateHandler

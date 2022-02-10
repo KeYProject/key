@@ -1,9 +1,9 @@
 #Saved SMT solver info for: Z3_CE
 #Tue Jan 25 10:54:18 CET 2022
-[SolverTypeDefault]ite=true
-[SolverTypeDefault]params=\#beg-in -smt2\#end
-[SolverTypeDefault]timeout=-1
-[SolverTypeDefault]name=\#begZ3_CE\#end
-[SolverTypeDefault]info=\#begZ3 solver by Microsoft\#end
-[SolverTypeDefault]command=\#begz3\#end
-[SolverTypeDefault]version=\#beg--version\#end
+ite=true
+params=-in -smt2
+timeout=-1
+name=Z3_CE
+info=Z3 solver by Microsoft
+command=z3
+version=--version
