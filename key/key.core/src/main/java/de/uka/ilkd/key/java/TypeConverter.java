@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.KeYCrossReferenceSourceInfo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,8 +51,6 @@ public final class TypeConverter {
 
     // Maps LDT names to LDT instances.
     private final Map<Name, LDT> LDTs = new HashMap<>();
-
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     private HeapLDT heapLDT = null;
     //private IntegerLDT integerLDT = null;
@@ -67,20 +66,13 @@ public final class TypeConverter {
 
     private void init(Map<Name, LDT> map) {
         LDTs.putAll(map);
-        models = ImmutableSLList.<LDT>nil();
-        for (LDT ldt : LDTs.values()) {
-            models = models.prepend(ldt);
-        }
         heapLDT = getHeapLDT();
         //integerLDT = getIntegerLDT();
     }
 
-    public ImmutableList<LDT> getModels() {
-        return models;
-    }
 
-    public LDT getModelFor(Sort s) {
-        for (LDT ldt : models) {
+    public LDT getLDTFor(Sort s) {
+        for (LDT ldt : LDTs.values()) {
             if (s.equals(ldt.targetSort())) {
                 return ldt;
             }
@@ -95,6 +87,14 @@ public final class TypeConverter {
 
     public IntegerLDT getIntegerLDT() {
         return (IntegerLDT) getLDT(IntegerLDT.NAME);
+    }
+
+    public FloatLDT getFloatLDT() {
+        return (FloatLDT) getLDT(FloatLDT.NAME);
+    }
+
+    public DoubleLDT getDoubleLDT() {
+        return (DoubleLDT) getLDT(DoubleLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
@@ -123,6 +123,10 @@ public final class TypeConverter {
 
     public CharListLDT getCharListLDT() {
         return (CharListLDT) getLDT(CharListLDT.NAME);
+    }
+
+    public Collection<LDT> getLDTs() {
+        return LDTs.values();
     }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
@@ -403,6 +407,7 @@ public final class TypeConverter {
     }
 
 
+    // TODO Adapt for @Reals
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -452,6 +457,40 @@ public final class TypeConverter {
             return type1;
         } else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type2;
+    	} else if ((t2 == PrimitiveType.JAVA_FLOAT) &&
+                (t1 == PrimitiveType.JAVA_BYTE||
+                        t1 == PrimitiveType.JAVA_SHORT||
+                        t1 == PrimitiveType.JAVA_INT||
+                        t1 == PrimitiveType.JAVA_CHAR||
+                        t1 == PrimitiveType.JAVA_LONG||
+			t1 == PrimitiveType.JAVA_FLOAT)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+    	} else if ((t1 == PrimitiveType.JAVA_FLOAT) &&
+                (t2 == PrimitiveType.JAVA_BYTE||
+                        t2 == PrimitiveType.JAVA_SHORT||
+                        t2 == PrimitiveType.JAVA_INT||
+                        t2 == PrimitiveType.JAVA_CHAR||
+                        t2 == PrimitiveType.JAVA_LONG||
+			t2 == PrimitiveType.JAVA_FLOAT)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+    	} else if ((t2 == PrimitiveType.JAVA_DOUBLE) &&
+                (t1 == PrimitiveType.JAVA_BYTE||
+                        t1 == PrimitiveType.JAVA_SHORT||
+                        t1 == PrimitiveType.JAVA_INT||
+                        t1 == PrimitiveType.JAVA_CHAR||
+                        t1 == PrimitiveType.JAVA_LONG||
+                        t1 == PrimitiveType.JAVA_FLOAT||
+			t1 == PrimitiveType.JAVA_DOUBLE)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+    	} else if ((t1 == PrimitiveType.JAVA_DOUBLE) &&
+                (t2 == PrimitiveType.JAVA_BYTE||
+                        t2 == PrimitiveType.JAVA_SHORT||
+                        t2 == PrimitiveType.JAVA_INT||
+                        t2 == PrimitiveType.JAVA_CHAR||
+                        t2 == PrimitiveType.JAVA_LONG||
+                        t2 == PrimitiveType.JAVA_FLOAT||
+			t2 == PrimitiveType.JAVA_DOUBLE)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         } else {
             throw new RuntimeException("Could not determine promoted type "
                     + "of " + t1 + " and " + t2);
@@ -485,6 +524,10 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
         else if (t1 == PrimitiveType.JAVA_REAL)
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+	else if (t1 == PrimitiveType.JAVA_FLOAT)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+	else if (t1 == PrimitiveType.JAVA_DOUBLE)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         else throw new RuntimeException("Could not determine promoted type " +
                     "of " + type1);
     }
@@ -547,7 +590,7 @@ public final class TypeConverter {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             Function function = (Function) term.op();
-            for (LDT model : models) {
+            for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
                 }
@@ -563,7 +606,7 @@ public final class TypeConverter {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
         } else if (term.op() instanceof Function) {
             Function function = (Function) term.op();
-            for (LDT model : models) {
+            for (LDT model : LDTs.values()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
                 }
@@ -604,7 +647,7 @@ public final class TypeConverter {
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
         } else if (t.op() instanceof Function) {
-            for (LDT ldt : models) {
+            for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
                     result = services.getJavaInfo().getKeYJavaType(type);

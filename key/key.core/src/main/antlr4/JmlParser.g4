@@ -291,12 +291,14 @@ expressionlist: expression (COMMA expression)*;
 constant: javaliteral;
 javaliteral
   : integerliteral
+  | fractionalliteral
   | stringliteral
   | charliteral
   ;
 stringliteral: STRING_LITERAL;
 charliteral: CHAR_LITERAL;
 integerliteral: (HEXLITERAL | DECLITERAL | OCTLITERAL | BINLITERAL);
+fractionalliteral: FLOAT_LITERAL | DOUBLE_LITERAL | REAL_LITERAL;
 jmlprimary
   : RESULT                                                                            #primaryResult
   | EXCEPTION                                                                         #primaryException
@@ -314,6 +316,7 @@ jmlprimary
   //| JML_IDENT (LPAREN (expressionlist)? RPAREN)                                       #primaryDLCall
   | MAPEMPTY                                                                          #primaryMapEmpty
   | mapExpression LPAREN (expressionlist)? RPAREN                                     #primaryMapExpr
+  | fpOperator LPAREN expression RPAREN                                               #primaryFloatingPoint
   | SEQ2MAP LPAREN (expressionlist)? RPAREN                                           #primarySeq2Map
   | NOT_MODIFIED LPAREN storeRefUnion RPAREN                                          #primaryNotMod
   | NOT_ASSIGNED LPAREN storeRefUnion RPAREN                                          #primaryNotAssigned
@@ -372,6 +375,7 @@ sequence
   ;
 
 mapExpression: MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE;
+fpOperator: FP_ABS | FP_INFINITE | FP_NAN | FP_NEGATIVE | FP_NICE | FP_NORMAL | FP_POSITIVE | FP_SUBNORMAL;
 quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;

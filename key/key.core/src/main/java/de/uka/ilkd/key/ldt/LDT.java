@@ -33,6 +33,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nullable;
+
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 
  * shipped with KeY. Usually, this rule file declares a sort (such as "int")
@@ -232,13 +234,37 @@ public abstract class LDT implements Named {
      */ 
     public abstract Term translateLiteral(Literal lit, Services services);
 
-    /** returns the function symbol for the given operation 
-     * @return  the function symbol for the given operation 
+    /**
+     * returns the function symbol for the given <em>Java</em> operator.
+     *
+     * @return  the function symbol for the given operation, null if
+     * not supported in general or not supported for this particular
+     * operator.
      */
     public abstract Function getFunctionFor(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Services services, 
 	    		ExecutionContext ec);
+
+    /**
+     * get the function in this LDT for an operation identified by generic
+     * operationName. If the LDT does not support this named function, it should
+     * return null.
+     *
+     * This is used to resolve overloaded symbols.
+     *
+     * For example: "+" may map to "add" for integers, and to "addFloat" for
+     * floats.
+     *
+     * @param operationName non-null operationName for a generic function
+     * @param services      services to use
+     * @return reference to the respective LDT-specific function for the
+     * operation, null if not available
+     */
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
+        // by default an LDT does not support overloaded symbols
+        return null;
+    }
 
     public abstract boolean hasLiteralFunction(Function f);
 

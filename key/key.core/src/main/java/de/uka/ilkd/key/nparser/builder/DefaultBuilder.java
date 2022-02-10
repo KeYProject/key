@@ -182,7 +182,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 }
             }
         }
-        semanticError(ctx, "Could not found (program) variable or constant %s", varfuncName);
+        semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
         return null;
     }
 

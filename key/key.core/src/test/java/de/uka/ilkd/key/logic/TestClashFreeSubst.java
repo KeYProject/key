@@ -56,7 +56,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 		nss = services.getNamespaces();
 		tf = services.getTermFactory();
 		io = new KeyIO(services, nss);
-		String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+		String sorts = "\\sorts{boolean;int;LocSet;Seq;double;float;}";
 		parseDecls(sorts);
 		Assert.assertNotNull(nss.sorts().lookup("boolean"));
 

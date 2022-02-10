@@ -21,3 +21,8 @@ aa%bb*cc < -123
 #\forall int j; {globalIntPV:=j} globalIntPV = j
 #\exists elem x; \forall list ys; \forall list xs; ( xs = cons(x,ys))
 #\<{T0 t;}\> t(1,2) = t()
+1.f + 1f = 20e-1f * (2f-1f)
+1.d + 1d <= 20e+1d * .01d
+1f <= 2f
+2d > 1d
+seqEmpty + seqEmpty

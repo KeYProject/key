@@ -43,6 +43,11 @@ public class HandlerUtil {
                             "axioms. They make the translation more precise, but may " +
                             "also cost efficiency.");
 
+    public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS =
+            new BooleanProperty("NoQuantifiers",
+                    "Reduce the number of introduced universal quantifiers",
+                    "TODO");
+
     /**
      * This lists the handler properties that do not belong to a particular
      * SMT handler.

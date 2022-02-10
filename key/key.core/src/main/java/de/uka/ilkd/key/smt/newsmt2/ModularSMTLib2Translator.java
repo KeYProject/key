@@ -11,6 +11,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,12 +32,23 @@ import java.util.List;
 public class ModularSMTLib2Translator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
+    /** If there is a custom list of smt handlers, store them here */
+    private final @Nullable List<SMTHandler> smtHandlers;
+
+    public ModularSMTLib2Translator(List<SMTHandler> smtHandlers) {
+        this.smtHandlers = smtHandlers;
+    }
+
+    public ModularSMTLib2Translator() {
+        this.smtHandlers = null;
+    }
+
     @Override
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
         MasterHandler master;
         try {
-            master = new MasterHandler(services, settings);
+            master = new MasterHandler(services, settings, smtHandlers);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

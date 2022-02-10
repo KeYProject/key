@@ -153,6 +153,11 @@ public class SMTTermNumber extends SMTTerm {
 			tab = tab.append(" ");
 		}
 		
+		// Negative, bounded value
+		if (bitSize > 0 && intValue < 0) {
+			return tab + "(bvneg (_ bv"+String.valueOf(-intValue)+" "+ bitSize + "))";
+		}
+
 		if (bitSize > 0)
 			return tab + "(_ bv"+String.valueOf(intValue)+" "+ bitSize + ")";
 			
