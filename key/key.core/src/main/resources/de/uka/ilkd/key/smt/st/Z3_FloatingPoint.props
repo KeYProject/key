@@ -1,0 +1,10 @@
+ite=true
+params=-in -smt2
+timeout=-1
+name=Z3_FP
+info=solver by Microsoft
+command=z3
+version=--version
+handlers=de.uka.ilkd.key.smt.newsmt2.FloatHandler,
+	 de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler,
+	 de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler

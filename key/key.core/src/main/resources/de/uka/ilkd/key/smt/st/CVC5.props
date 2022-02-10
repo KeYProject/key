@@ -1,5 +1,3 @@
-#Saved SMT solver info for: CVC5
-#Tue Jan 25 10:54:18 CET 2022
 ite=true
 params=--interactive -m --lang smt2
 timeout=-1

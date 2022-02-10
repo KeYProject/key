@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.st;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.key_project.util.Streams;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import java.io.*;
@@ -43,23 +44,41 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
 	private static String DEFAULT = "DEFAULT";
 	private static String HANDLER_NAMES = "handlers";
+	private static String PREAMBLE_FILE = "preamble";
 	private static String[] DEFAULT_DELIMITERS = new String[] {"\r", "\n"};
 	private static long DEFAULT_TIMEOUT = -1;
 	private static boolean DEFAULT_ITE = false;
 
 	/**
-	 * Counter for default names.
-	 * If a props file does not contain a solver name, it needs to get a default, unique
-	 * one as the name is what makes SolverTypeImplementation objects distinguishable later on.
-	 * The counter is used for uniqueness.
+	 * If a props file does not contain a solver name or two files have the same name,
+	 * unique names have to be created because interacting with the solvers later requires uniqueness.
+	 * The counters are used for uniqueness.
 	 */
-	private static int defaultNameCounter = 0;
+	private static Map<String, Integer> nameCounters = new HashMap<>();
 
+	private static String uniqueName(String name) {
+		Integer counter = nameCounters.get(name);
+		// if name has not been used yet, use it and set counter to 0
+		if (counter == null) {
+			nameCounters.put(name, 0);
+			return name;
+		}
+		// if name was already used, use <name>_<counter> as name and increase counter afterwards
+		StringBuilder nameBuilder = new StringBuilder();
+		nameBuilder.append(name);
+		nameBuilder.append("_");
+		nameBuilder.append(counter);
+		counter++;
+		nameCounters.put(name, counter);
+		// <name>_<counter> is now also a name that has been used and must be unique
+		return uniqueName(nameBuilder.toString());
+	}
 
 	/**
 	 * Methods to read from properties files.
 	 * {@link de.uka.ilkd.key.settings.SettingsConverter} is not used as it expects
 	 * delimiters that are not fit for humans to write or read.
+	 * TODO problems arise if whitespaces are to be contained in a value or a list element should contain ","
 	 */
 
 	private static String readString(Properties props, String key, String defaultValue) {
@@ -68,6 +87,22 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 			value = defaultValue;
 		}
 		return value;
+	}
+
+	private static String readFile(Properties props, String key, String defaultValue) {
+		String filePath = props.getProperty(key);
+		if (filePath == null) {
+			return defaultValue;
+		}
+		InputStream fileContent = SolverPropertiesLoader.class.getResourceAsStream(filePath);
+		if (fileContent == null) {
+			return defaultValue;
+		}
+		try {
+			return Streams.toString(fileContent);
+		} catch (IOException e) {
+			return defaultValue;
+		}
 	}
 
 	private static String[] readStringList(Properties props, String key, String[] defaultValue) {
@@ -121,22 +156,18 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	 * Create a {@link SolverTypeImplementation} from a Properties object.
 	 */
 	private static SolverType makeSolver(Properties props) {
-		String name, command, params, version, info, messageHandler;
+		String name, command, params, version, info, messageHandler, preamble;
 		boolean supportsIfThenElse;
 		long timeout;
+		SolverCommunicationSocket.MessageHandler handler;
 		Class<?> translatorClass;
 		String[] handlerNames;
-		SolverCommunicationSocket.MessageHandler handler;
 		String[] delimiters;
 
 		// Read props file to create a SolverTypeImplementation object:
 
-		name = readString(props, NAME, DEFAULT_NAME);
 		// the solver's name has to be unique
-		if (name.equals(DEFAULT_NAME)) {
-			name = DEFAULT_NAME + defaultNameCounter;
-			defaultNameCounter++;
-		}
+		name = uniqueName(readString(props, NAME, DEFAULT_NAME));
 
 		// default solver command, timeout, parameters, version parameter, solver info (some string)
 		command = readString(props, COMMAND, DEFAULT_COMMAND);
@@ -168,9 +199,11 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		// note that this will only take effect when using ModularSMTLib2Translator ...
 		handlerNames = readStringList(props, HANDLER_NAMES, new String[0]);
 
-		// create the solver object with the properties that have just been read
+		// the solver specific preamble, may be null
+		preamble = readFile(props, PREAMBLE_FILE, null);
 		return new SolverTypeImplementation(name, info, params, command, version, timeout, delimiters,
-			supportsIfThenElse, translatorClass, handlerNames, handler);
+				supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
+
 	}
 
 	/**
@@ -181,6 +214,10 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static Collection<Properties> loadSolvers() {
 		InputStream stream = SolverPropertiesLoader.class.getResourceAsStream("defaultSolvers.txt");
 		Collection<Properties> props = new ArrayList<>();
+		// return an empty list if no defaultSolvers file was read
+		if (stream == null) {
+			return props;
+		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		List<String> propsNames = reader.lines().collect(Collectors.toList());
 		for (String fileName : propsNames) {

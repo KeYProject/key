@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
@@ -92,12 +93,13 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     /**
-     * This constructor only exists to have a uniform constructor for both the modular and
+     * This constructor only exists to have uniform constructors for both the modular and
      * the legacy translation.
      * @param handlerNames not used by this translator!
+     * @param preamble also not used
      */
     @SuppressWarnings("unused")     // can be called via reflection
-    public SmtLib2Translator(String[] handlerNames) {
+    public SmtLib2Translator(String[] handlerNames, @Nullable String preamble){
     }
 
     @Override

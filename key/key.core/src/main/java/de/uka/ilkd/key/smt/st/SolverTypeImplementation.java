@@ -9,12 +9,11 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Final SolverType implementation that uses building blocks for the various methods.
@@ -41,6 +40,8 @@ public final class SolverTypeImplementation implements SolverType {
 	private final String[] handlerNames;
 	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
 	private final Class<?> TRANSLATOR_CLASS;
+	@Nullable
+	private final String preamble;
 
 	public static boolean isInstalled(String cmd) {
 
@@ -75,7 +76,7 @@ public final class SolverTypeImplementation implements SolverType {
 									String version,
 									long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
 									Class<?> translatorClass, String[] handlerNames,
-									SolverCommunicationSocket.MessageHandler handler) {
+									SolverCommunicationSocket.MessageHandler handler, String preamble) {
 		NAME = name;
 		INFO = info;
 		DEFAULT_PARAMS = defaultParams;
@@ -91,6 +92,7 @@ public final class SolverTypeImplementation implements SolverType {
 		// copy the array so that it cannot accidentally be manipulated from the outside
 		this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
 		MSG_HANDLER = handler;
+		this.preamble = preamble;
 	}
 
 	@Override
@@ -169,6 +171,7 @@ public final class SolverTypeImplementation implements SolverType {
 		return DEFAULT_TIMEOUT;
 	}
 
+	// TODO services is never used
 	@Override
 	public SMTTranslator createTranslator(Services services) {
 		Constructor<?>[] constructors = TRANSLATOR_CLASS.getConstructors();
@@ -176,7 +179,7 @@ public final class SolverTypeImplementation implements SolverType {
 		boolean instantiated = false;
 		for (int i = 0; i < constructors.length; i++) {
 			try {
-				smtTranslator = (SMTTranslator) constructors[i].newInstance((Object) handlerNames);
+				smtTranslator = (SMTTranslator) constructors[i].newInstance(handlerNames, preamble);
 				/*translatorParams.stream().map(n -> {
 					if (n.equals("<SERVICES>")) {
 						return services;

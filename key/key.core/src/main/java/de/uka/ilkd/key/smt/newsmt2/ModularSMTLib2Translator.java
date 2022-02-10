@@ -36,25 +36,25 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private final String[] handlerNames;
 
     /**
-     * The preamble may have to be customized, e.g. depending on the SMT solver that is used.
-     * @param preamble the customized preamble String
+     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the default values.
+     * @param preamble
+     * @param handlerNames
      */
-    public ModularSMTLib2Translator(String preamble) {
-        this.preamble = preamble;
-        handlerNames = new String[0];
-    }
-
-    public ModularSMTLib2Translator(String[] handlerNames) {
-        this.preamble = SMTHandlerServices.getInstance().getPreamble();
+    public ModularSMTLib2Translator(String[] handlerNames, @Nullable String preamble) {
+        if (preamble == null) {
+            this.preamble = SMTHandlerServices.getInstance().getPreamble();
+        } else {
+            this.preamble = preamble;
+        }
         this.handlerNames = handlerNames;
     }
 
     /**
-     * If the preamble doesn't have to be customized, it may be the one from {@link SMTHandlerServices#getPreamble()}.
+     * If the preamble and handlers don't have to be customized, the handlers are empty
+     * and the preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
      */
     public ModularSMTLib2Translator() {
-        this.preamble = SMTHandlerServices.getInstance().getPreamble();
-        handlerNames = new String[0];
+        this(new String[0], null);
     }
 
     @Override
@@ -72,8 +72,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("; --- Preamble");
+        sb.append("; --- Preamble\n");
         sb.append(preamble);
+        sb.append(System.lineSeparator());
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(sequent, services, master, sequentAsserts);

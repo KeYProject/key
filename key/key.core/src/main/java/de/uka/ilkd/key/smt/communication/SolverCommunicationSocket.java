@@ -98,7 +98,7 @@ public class SolverCommunicationSocket {
                     if (msg.contains("WARNING:")) {
                         return;
                     }
-                    throw new IOException("Error while executing Z3: " + msg);
+                    throw new IOException("Error while executing " + socket.getName() + ": " + msg);
                 }
 
                 // used only to steer the interaction with the solver and thus filtered out currently
@@ -159,7 +159,7 @@ public class SolverCommunicationSocket {
 
                 if (msg.contains("error") || msg.contains("Error")) {
                     sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-                    throw new IOException("Error while executing CVC4: " + msg);
+                    throw new IOException("Error while executing " + socket.getName() + ": " + msg);
                 }
 
                 // Currently we rely on the solver to terminate after receiving "(exit)". If this does
@@ -200,7 +200,7 @@ public class SolverCommunicationSocket {
 
                 if (msg.contains("error") || msg.contains("Error")) {
                     sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-                    throw new IOException("Error while executing CVC5: " + msg);
+                    throw new IOException("Error while executing " + socket.getName() + ": " + msg);
                 }
 
                 // Currently we rely on the solver to terminate after receiving "(exit)". If this does
@@ -236,7 +236,7 @@ public class SolverCommunicationSocket {
                     if (msg.contains("WARNING:")) {
                         return;
                     }
-                    throw new IOException("Error while executing Z3: " + msg);
+                    throw new IOException("Error while executing " + socket.getName() + ": " + msg);
                 }
                 // These two messages are only used to steer the interaction with the solver and are thus
                 // currently filtered out to avoid cluttering up the output.
