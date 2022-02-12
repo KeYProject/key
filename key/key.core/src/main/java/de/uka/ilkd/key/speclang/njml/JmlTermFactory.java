@@ -668,6 +668,15 @@ public final class JmlTermFactory {
         return buildEqualityTerm(left, right);
     }
 
+    public SLExpression fpEq(SLExpression left, SLExpression right) {
+        return new SLExpression(tb.fpEq(left.getTerm(), right.getTerm()));
+    }
+
+    public SLExpression fpNeq(SLExpression left, SLExpression right) {
+        return new SLExpression(tb.not(tb.fpEq(left.getTerm(), right.getTerm())));
+    }
+
+
     public SLExpression neq(SLExpression left, SLExpression right) {
         checkSLExpressions(left, right, "!=");
         SLExpression eq = buildEqualityTerm(left, right);

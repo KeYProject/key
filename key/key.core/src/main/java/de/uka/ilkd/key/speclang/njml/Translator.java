@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -509,14 +510,46 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitEqualityexpr(JmlParser.EqualityexprContext ctx) {
         List<SLExpression> expr = mapOf(ctx.relationalexpr());
         SLExpression result = expr.get(0);
+
+        // Does this chaining make sense at all? eq results in a formula?!
         for (int i = 1; i < expr.size(); i++) {
             TerminalNode tok = ctx.EQ_NEQ(i - 1);
+            // floats require special casing for == and !=
+            SLExpression floatResult = floatEqualityExpr(tok.getText(), result, expr.get(i));
+            if (floatResult != null) {
+                return floatResult;
+            }
             if (tok.getText().equals("=="))
                 result = termFactory.eq(result, expr.get(i));
             else
                 result = termFactory.neq(result, expr.get(i));
         }
         return result;
+    }
+
+    private SLExpression floatEqualityExpr(String img, SLExpression lhs, SLExpression rhs) {
+        if (lhs.getType() == null || rhs.getType() == null) {
+            return null;
+        }
+        Type lhsTy = lhs.getType().getJavaType();
+        Type rhsTy = lhs.getType().getJavaType();
+        if (rhsTy != PrimitiveType.JAVA_DOUBLE && rhsTy != PrimitiveType.JAVA_FLOAT &&
+                lhsTy != PrimitiveType.JAVA_DOUBLE && lhsTy != PrimitiveType.JAVA_FLOAT) {
+            return null;
+        }
+        KeYJavaType promotedType = services.getTypeConverter().getPromotedType(lhs.getType(), rhs.getType());
+
+        if(lhs.getType() != promotedType) {
+            lhs = termFactory.cast(promotedType, lhs);
+        }
+        if(rhs.getType() != promotedType) {
+            rhs = termFactory.cast(promotedType, rhs);
+        }
+
+        if (img.equals("=="))
+            return termFactory.fpEq(lhs, rhs);
+        else
+            return termFactory.fpNeq(lhs, rhs);
     }
 
     @Override
