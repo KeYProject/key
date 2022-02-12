@@ -884,10 +884,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         if (ctx.TRANSIENT() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return lookupIdentifier("<transient>", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return new SLExpression(
                     services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
                             tb.var(selfVar),
@@ -897,10 +903,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         if (ctx.INV() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return termFactory.createInv(receiver.getTerm(), receiver.getType());
         }
         if (ctx.MULT() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return new SLExpression(tb.allFields(receiver.getTerm()),
                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
