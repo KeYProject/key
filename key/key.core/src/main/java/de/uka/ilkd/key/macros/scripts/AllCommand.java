@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class AllCommand extends AbstractCommand<Map<String, String>> {
+public class AllCommand extends AbstractCommand<Map<String, Object>> {
 
     public AllCommand() {
         super(null);
     }
 
     @Override
-    public Map<String, String> evaluateArguments(EngineState state, Map<String, String> arguments) {
+    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
         return arguments;
     }
 
@@ -24,8 +24,8 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     }
 
     @Override
-    protected void execute(Map<String, String> args) throws ScriptException, InterruptedException {
-        String wrappedCmdname = args.get("#2");
+    protected void execute(Map<String, Object> args) throws ScriptException, InterruptedException {
+        String wrappedCmdname = args.get("#2").toString();
         if(wrappedCmdname == null) {
             throw new ScriptException("Missing command to apply onAll to");
         }
@@ -35,7 +35,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
             throw new ScriptException("Unknown command: " + wrappedCmdname);
         }
 
-        HashMap<String, String> newArgs = rearrangeArgs(args);
+        var newArgs = rearrangeArgs(args);
 
         try {
             executeWrappedCommand(command, newArgs);
@@ -45,9 +45,9 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
 
     }
 
-    private HashMap<String, String> rearrangeArgs(Map<String, String> args) {
-        HashMap<String, String> newArgs = new HashMap<>();
-        for (Entry<String, String> en : args.entrySet()) {
+    private HashMap<String, Object> rearrangeArgs(Map<String, Object> args) {
+        HashMap<String, Object> newArgs = new HashMap<>();
+        for (Entry<String, Object> en : args.entrySet()) {
             if(en.getKey().matches("#[0-9]+")) {
                 int no = Integer.parseInt(en.getKey().substring(1));
                 if(no != 1) {
@@ -60,7 +60,8 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
         return newArgs;
     }
 
-    private <A> void executeWrappedCommand(ProofScriptCommand<A> command, HashMap<String, String> newArgs) throws Exception {
+    private <A> void executeWrappedCommand(ProofScriptCommand<A> command,
+                                           Map<String, Object> newArgs) throws Exception {
         A params = command.evaluateArguments(state, newArgs);
 
         // Node selectedNode = state.getSelectedNode();

@@ -832,7 +832,8 @@ proofScriptParameter :  ((pname=IDENT EQUALS)? expr=proofScriptExpression);
 proofScriptExpression:
     boolean_literal
   | char_literal
-  | number
+  | integer
+  | floatnum
   | string_literal
   | term
   | seq;
