@@ -13,16 +13,19 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestTermBuilder {
@@ -110,6 +113,42 @@ public class TestTermBuilder {
         checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);
     }
 
-    
-    
+    private void testDoubleLongPatterns(String number) {
+        double doubleVal = Double.parseDouble(number);
+        Term doubleTerm = tb.dfpTerm(doubleVal);
+        DoubleLiteral literal = services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
+        assertEquals(doubleVal, Double.parseDouble(literal.getValue()), "for double value " + number);
+    }
+
+    @Test
+    public void testDoubleLongPatterns() {
+        testDoubleLongPatterns("1");
+        testDoubleLongPatterns("0.");
+        testDoubleLongPatterns("-1");
+        testDoubleLongPatterns("-0.");
+        testDoubleLongPatterns("123.33");
+        testDoubleLongPatterns("123e-2");
+        testDoubleLongPatterns("22e307");
+        testDoubleLongPatterns("-22e307");
+    }
+
+    private void testFloatPatterns(String number) {
+        float floatval = Float.parseFloat(number);
+        Term floatTerm = tb.fpTerm(floatval);
+        FloatLiteral literal = services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
+        assertEquals(floatval, Float.parseFloat(literal.getValue()), "for double value " + number);
+    }
+
+    @Test
+    public void testFloatPatterns() {
+        testFloatPatterns("1");
+        testFloatPatterns("0.");
+        testFloatPatterns("-1");
+        testFloatPatterns("-0.");
+        testFloatPatterns("123.33");
+        testFloatPatterns("123e-2");
+        testFloatPatterns("22e37");
+        testFloatPatterns("-22e37");
+    }
+
 }

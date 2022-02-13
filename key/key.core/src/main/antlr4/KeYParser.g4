@@ -119,7 +119,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | NUM_LITERAL
+  simple_ident (DOT simple_ident)* | INT_LITERAL
 ;
 
 simple_ident_dots_comma_list
@@ -344,7 +344,8 @@ boolean_literal: TRUE | FALSE;
 literals:
     boolean_literal
   | char_literal
-  | number
+  | integer
+  | floatnum
   | string_literal
 ;
 
@@ -541,8 +542,14 @@ argument_list
     RPAREN
 ;
 
-number:
-  (MINUS)? (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+integer:
+  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+;
+
+floatnum: // called floatnum because "float" collide with the Java language
+    (MINUS)? FLOAT_LITERAL  #floatLiteral
+  | (MINUS)? DOUBLE_LITERAL #doubleLiteral
+  | (MINUS)? REAL_LITERAL   #realLiteral
 ;
 
 char_literal:
@@ -620,7 +627,7 @@ varexp
   negate=NOT_?
   varexpId
   (LBRACKET  parameter+=IDENT (COMMA parameter+=IDENT)* RBRACKET)?
-  LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
+  (LPAREN varexp_argument (COMMA varexp_argument)* RPAREN)?
 ;
 
 
@@ -673,6 +680,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | GET_FREE_INVARIANT
   | GET_VARIANT
   | IS_LABELED
+  | ISINSTRICTFP
 ;
 
 varexp_argument

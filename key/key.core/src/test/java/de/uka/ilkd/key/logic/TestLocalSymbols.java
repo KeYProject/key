@@ -4,7 +4,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
@@ -124,7 +122,7 @@ public class TestLocalSymbols {
 
     // there was a bug.
     @Test
-    public void testDoubleInstantiation() throws IOException, InterruptedException, ScriptException {
+    public void testDoubleInstantiation() throws Exception {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
@@ -173,7 +171,7 @@ public class TestLocalSymbols {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  proofFileName);
         Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
-        try {
+        try{
             KeYEnvironment<?> environment = KeYEnvironment.load(
                     JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
@@ -184,5 +182,4 @@ public class TestLocalSymbols {
             return null;
         }
     }
-
 }

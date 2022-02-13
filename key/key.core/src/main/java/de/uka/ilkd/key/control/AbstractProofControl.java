@@ -125,7 +125,7 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
-            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node",
+            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                     focusedGoal.node().serialNr());
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getFindTaclet(TacletFilter.TRUE,
@@ -398,7 +398,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced, boolean interactive) {
       assert goal != null;
 
       ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
@@ -415,7 +415,12 @@ public abstract class AbstractProofControl implements ProofControl {
       }
 
       if (app != null && app.rule() == rule) {
-         goal.apply(app);
+         if (interactive) {
+             applyInteractive(app, goal);
+         } else {
+             goal.apply(app);
+         }
+
          return;
       }
     }

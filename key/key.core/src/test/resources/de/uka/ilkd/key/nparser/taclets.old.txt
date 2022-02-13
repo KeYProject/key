@@ -5846,8 +5846,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == equality_comparison_simple (equality comparison) =========================================
 equality_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0==#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#se0,#se1),TRUE,FALSE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0==#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -7597,8 +7597,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == greater_equal_than_comparison_simple (greater-or-equal than distinction) =========================================
 greater_equal_than_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0>=#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geq(#se0,#se1),TRUE,FALSE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>=#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -7618,8 +7618,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == greater_than_comparison_simple (greater than distinction) =========================================
 greater_than_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0>#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gt(#se0,#se1),TRUE,FALSE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -8952,8 +8952,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == inequality_comparison_simple (inequality comparison) =========================================
 inequality_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0!=#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#se0,#se1),FALSE,TRUE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0!=#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),FALSE,TRUE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -9896,8 +9896,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == less_equal_than_comparison_simple (less-or-equal than distinction) =========================================
 less_equal_than_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0<=#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leq(#se0,#se1),TRUE,FALSE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<=#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -9974,8 +9974,8 @@ Choices: {programRules:Java}}
 -----------------------------------------------------
 == less_than_comparison_simple (lesser than distinction) =========================================
 less_than_comparison_simple {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0<#se1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(lt(#se0,#se1),TRUE,FALSE)),#allmodal(post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<#senf1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(lt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------

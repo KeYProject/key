@@ -55,7 +55,9 @@ public class TestDeclParser {
         nb.addSort("boolean")
                 .addSort("int")
                 .addSort("Seq")
-                .addSort("LocSet");
+                .addSort("LocSet")
+                .addSort("double")
+                .addSort("float");
         //String sorts = "\\sorts{boolean;int;LocSet;}";
         //parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
