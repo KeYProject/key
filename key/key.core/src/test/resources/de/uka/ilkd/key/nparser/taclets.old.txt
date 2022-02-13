@@ -14575,7 +14575,8 @@ Choices: {programRules:Java}}
 wellFormedStoreObjectEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), )
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
 \heuristics(simplify_enlarging)
 Choices: {programRules:Java}}
 -----------------------------------------------------
