@@ -189,6 +189,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             case "negative": return getIsNegative();
             case "positive": return getIsPositive();
             case "subnormal": return getIsSubnormal();
+            case "normal": return getIsNormal();
         }
         return null;
     }*/

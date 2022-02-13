@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.ldt;
 
-import java.math.BigInteger;
-
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
