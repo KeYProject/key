@@ -222,7 +222,7 @@ public class TestTacletParser {
         builder.addTacletGoalTemplate(new
                 RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                 ImmutableSLList.nil(),
-                parseFma("!b0->!b")));
+                parseFma("!b0 -> !b")));
         builder.setName(new Name("contraposition"));
         Taclet contraposition = builder.getRewriteTaclet();
         String contrapositionString =
