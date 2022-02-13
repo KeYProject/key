@@ -121,7 +121,7 @@ public class TestLocalSymbols extends TestCase {
     }
 
     // there was a bug.
-    public void testDoubleInstantiation() throws IOException, InterruptedException, ScriptException {
+    public void testDoubleInstantiation() throws Exception {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
@@ -166,20 +166,14 @@ public class TestLocalSymbols extends TestCase {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    private KeYEnvironment<?> loadProof(String proofFileName) {
+    private KeYEnvironment<?> loadProof(String proofFileName) throws ProblemLoaderException {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  proofFileName);
         assertTrue("Proof file does not exist"+ proofFile, proofFile.exists());
 
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
-                    null, true);
-            return environment;
-        }
-        catch (ProblemLoaderException e) {
-            fail("Proof could not be loaded.");
-            return null;
-        }
+        KeYEnvironment<?> environment = KeYEnvironment.load(
+                JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, true);
+        return environment;
     }
 
 }

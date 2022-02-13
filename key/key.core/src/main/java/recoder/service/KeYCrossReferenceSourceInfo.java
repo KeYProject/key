@@ -609,7 +609,7 @@ public class KeYCrossReferenceSourceInfo
             changeHistory.updateModel();
 
             stubClasses.put(typeString, cu);
-            LOGGER.debug("Dynamically created class: ", typeString);
+            LOGGER.debug("Dynamically created class: {}", typeString);
 
             register(cu);
 

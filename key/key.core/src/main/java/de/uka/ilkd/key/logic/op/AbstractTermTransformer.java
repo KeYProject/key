@@ -148,8 +148,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         }
 
         if (top != numbers) {
-            LOGGER.debug("abstractmetaoperator: Cannot convert to number:", term);
-            throw (new NumberFormatException());
+            LOGGER.debug("abstractmetaoperator: Cannot convert to number: {}", term);
+            throw new NumberFormatException();
         }
 
         term = term.sub(0);

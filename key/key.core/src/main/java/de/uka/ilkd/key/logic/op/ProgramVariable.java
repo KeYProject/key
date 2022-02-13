@@ -305,7 +305,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         if (src == this) {
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed. Not same program variable (pattern, source)", this, src);
+            LOGGER.debug("Program match failed. Not same program variable (pattern {}, source {})", this, src);
             return null;
         }     
     }
