@@ -1,20 +1,19 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.key_project.util.collection.ImmutableList;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -22,14 +21,16 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    public Parameters evaluateArguments(
+            EngineState state,
+            Map<String, String> arguments
+    ) throws Exception {
         // Check formula syntax here, only BuildingExceptions are allowed
         var formula = arguments.get("formula");
         if (formula != null) {
             try {
                 state.toTerm(formula, null);
-            } catch(BuildingException | TermCreationException e) {
+            } catch (BuildingException | TermCreationException e) {
                 // Ignored
             }
         }
@@ -59,6 +60,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     @Override
     public void execute(Parameters args)
             throws ScriptException, InterruptedException {
+        if (args.occ < 0) {
+            throw new IllegalArgumentException("Occurrence has to be positive");
+        }
         Goal g;
         if (args.number != null && args.formula == null
                 && args.branch == null) {
@@ -76,10 +80,10 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                 throw new IllegalArgumentException(
                         "A limitation in a select command has to be either empty, succedent or antecedent");
             }
-            g = findGoalWithFormula(args.formula, state.getProof(), selection);
+            g = findGoalWithFormula(args.formula, state.getProof(), selection, args.occ);
         } else if (args.branch != null && args.formula == null
                 && args.number == null) {
-            g = findGoalWith(args.branch, state.getProof());
+            g = findGoalWith(args.branch, state.getProof(), args.occ);
         } else {
             throw new ScriptException(
                     "Exactly one of 'formula', 'branch' or 'number' are required");
@@ -88,12 +92,12 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         state.setGoal(g);
     }
 
-    private Goal findGoalWith(String branchTitle, Proof proof)
+    private Goal findGoalWith(String branchTitle, Proof proof, int occ)
             throws ScriptException {
         return findGoalWith(
                 node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                         .orElse("").equals(branchTitle),
-                node -> getFirstSubtreeGoal(node, proof), proof);
+                node -> getFirstSubtreeGoal(node, proof), proof, occ);
     }
 
     private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
@@ -125,36 +129,44 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         try {
             var term = state.toTerm(formula, null);
             return contains(node.sequent(), term, selection);
-        } catch(BuildingException | TermCreationException e) {
+        } catch (BuildingException | TermCreationException e) {
             return false;
-        } catch(ParserException | ScriptException e) {
+        } catch (ParserException | ScriptException e) {
             // Should not happen, let's print it anyways
             new Exception("Syntax was checked earlier and should be valid here", e).printStackTrace();
             return false;
         }
     }
 
-    private Goal findGoalWithFormula(String formula, Proof proof, Selection selection)
+    private Goal findGoalWithFormula(String formula, Proof proof, Selection selection, int occ)
             throws ScriptException {
         return findGoalWith(
                 node -> node.leaf() && findFormulaInLeaf(formula, node, selection),
-                node -> EngineState.getGoal(proof.openGoals(), node), proof);
+                node -> EngineState.getGoal(proof.openGoals(), node), proof, occ);
     }
 
-    private Goal findGoalWith(Function<Node, Boolean> filter,
-            Function<Node, Goal> goalRetriever, Proof proof)
+    private Goal findGoalWith(
+            Function<Node, Boolean> filter,
+            Function<Node, Goal> goalRetriever, Proof proof, int occ
+    )
             throws ScriptException {
         Deque<Node> choices = new LinkedList<Node>();
         Node node = proof.root();
 
+        int occurrences = 0;
         while (node != null) {
             assert !node.isClosed();
             int childCount = node.childrenCount();
 
             if (filter.apply(node)) {
                 final Goal g = goalRetriever.apply(node);
+
                 if (g.isAutomatic()) {
-                    return g;
+                    if (occ == occurrences) {
+                        return g;
+                    } else {
+                        occurrences += 1;
+                    }
                 }
             }
 
@@ -185,7 +197,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
         }
 
-        throw new ScriptException("There is no such goal");
+        throw new ScriptException("There is no such goal, found " + occurrences + " matching goals but requested index " + occ);
     }
 
     private boolean contains(Sequent seq, Term formula, Selection selection) {
@@ -208,10 +220,14 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     public class Parameters {
-        /** A formula defining the goal to select */
+        /**
+         * A formula defining the goal to select
+         */
         @Option(value = "formula", required = false)
         public String formula;
-        /** match only on succedent or antecedent */
+        /**
+         * match only on succedent or antecedent
+         */
         @Option(value = "#2", required = false)
         public String succedent;
         /**
@@ -220,9 +236,16 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
          */
         @Option(value = "number", required = false)
         public Integer number;
-        /** The name of the branch to select */
+        /**
+         * The name of the branch to select
+         */
         @Option(value = "branch", required = false)
         public String branch;
+        /**
+         * The occurrence of named branch to select
+         */
+        @Option(value = "occ", required = false)
+        public Integer occ = 0;
     }
 
 }
