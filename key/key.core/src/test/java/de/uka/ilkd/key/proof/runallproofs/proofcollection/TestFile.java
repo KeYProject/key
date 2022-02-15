@@ -182,7 +182,7 @@ public class TestFile implements Serializable {
                     LOGGER.info("... success: loading failed");
                     return getRunAllProofsTestResult(true);
                 }
-                assertTrue("Loading problem file succeded but it shouldn't", replayResult.hasErrors());
+                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
                 LOGGER.info("... success: loading failed");
                 return getRunAllProofsTestResult(true);
             }
