@@ -221,12 +221,14 @@ public class MasterHandlerTest {
                     fail("Unexpected expectation: " + expectation);
             }
 
-            for (String line : response) {
-                if (line.startsWith("(error ")) {
-                    fail("An error in Z3: " + line);
-                }
-                if (line.matches(lookFor)) {
-                    return;
+            if (lookFor != null) {
+                for (String line : response) {
+                    if (line.startsWith("(error ")) {
+                        fail("An error in Z3: " + line);
+                    }
+                    if (line.matches(lookFor)) {
+                        return;
+                    }
                 }
             }
 
