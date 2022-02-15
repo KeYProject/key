@@ -245,7 +245,7 @@ public final class DependencyContractPO extends AbstractPO
              buildFreePre(heaps, selfVar,
                    contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
                    permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
-                         null, proofServices));
+                         preHeapVars, proofServices));
 
        assert heaps.size() == heapCount * contract.getTarget().getStateCount();
        //prepare target term
