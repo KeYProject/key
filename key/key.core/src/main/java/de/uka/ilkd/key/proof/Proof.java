@@ -219,7 +219,6 @@ public class Proof implements Named {
 
     private Proof(String name, Sequent problem, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
-
         this ( new Name ( name ), initConfig );
 
         if (!ProofIndependentSettings.DEFAULT_INSTANCE
@@ -227,26 +226,26 @@ public class Proof implements Named {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 
-        Node rootNode = new Node(this, problem);
-
-        NodeInfo info = rootNode.getNodeInfo();
+        register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
+        var rootNode = new Node(this, problem);
+        var sources = lookup(ProofJavaSourceCollection.class);
 
         rootNode.sequent().forEach(formula -> {
             OriginTermLabel originLabel = (OriginTermLabel)
                     formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
-                    info.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                    sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
                 }
 
                 originLabel.getSubtermOrigins().stream()
                     .filter(o -> o instanceof FileOrigin)
                     .map(o -> (FileOrigin) o)
-                    .forEach(o -> info.addRelevantFile(o.fileName));
+                    .forEach(o -> sources.addRelevantFile(o.fileName));
             }
         });
 
-        Goal firstGoal = new Goal(rootNode,
+        var firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                         new BuiltInRuleAppIndex(builtInRules), getServices())
                 );

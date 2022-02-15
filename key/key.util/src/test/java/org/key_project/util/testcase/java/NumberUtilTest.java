@@ -1,15 +1,16 @@
 package org.key_project.util.testcase.java;
 
-import junit.framework.TestCase;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.java.NumberUtil;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link NumberUtil}.
  * @author Martin Hentschel
  */
-public class NumberUtilTest extends TestCase {
+public class NumberUtilTest {
    /**
     * Tests {@link NumberUtil#parseFullInt(String)}.
     */
@@ -78,13 +79,13 @@ public class NumberUtilTest extends TestCase {
    @Test
    public void testToFullString_long() {
       assertEquals(Long.toString(Long.MIN_VALUE), NumberUtil.toFullString(Long.MIN_VALUE));
-      assertEquals("-0000000000000000123", NumberUtil.toFullString(-123l));
-      assertEquals("-0000000000000000012", NumberUtil.toFullString(-12l));
-      assertEquals("-0000000000000000001", NumberUtil.toFullString(-1l));
-      assertEquals("+0000000000000000000", NumberUtil.toFullString(0l));
-      assertEquals("+0000000000000000001", NumberUtil.toFullString(1l));
-      assertEquals("+0000000000000000012", NumberUtil.toFullString(12l));
-      assertEquals("+0000000000000000123", NumberUtil.toFullString(123l));
+      assertEquals("-0000000000000000123", NumberUtil.toFullString(-123L));
+      assertEquals("-0000000000000000012", NumberUtil.toFullString(-12L));
+      assertEquals("-0000000000000000001", NumberUtil.toFullString(-1L));
+      assertEquals("+0000000000000000000", NumberUtil.toFullString(0L));
+      assertEquals("+0000000000000000001", NumberUtil.toFullString(1L));
+      assertEquals("+0000000000000000012", NumberUtil.toFullString(12L));
+      assertEquals("+0000000000000000123", NumberUtil.toFullString(123L));
       assertEquals("+" + Long.MAX_VALUE, NumberUtil.toFullString(Long.MAX_VALUE));
    }
    
@@ -105,11 +106,11 @@ public class NumberUtilTest extends TestCase {
     */
    @Test
    public void testGetAlgebraicSign_long() {
-      assertEquals('-', NumberUtil.getAlgebraicSign(-10l));
-      assertEquals('-', NumberUtil.getAlgebraicSign(-1l));
-      assertEquals('+', NumberUtil.getAlgebraicSign(0l));
-      assertEquals('+', NumberUtil.getAlgebraicSign(1l));
-      assertEquals('+', NumberUtil.getAlgebraicSign(10l));
+      assertEquals('-', NumberUtil.getAlgebraicSign(-10L));
+      assertEquals('-', NumberUtil.getAlgebraicSign(-1L));
+      assertEquals('+', NumberUtil.getAlgebraicSign(0L));
+      assertEquals('+', NumberUtil.getAlgebraicSign(1L));
+      assertEquals('+', NumberUtil.getAlgebraicSign(10L));
    }
    
    /**
@@ -142,19 +143,19 @@ public class NumberUtilTest extends TestCase {
    @Test
    public void testNumberOfDigits_long() {
       // Test positive values
-      assertEquals(1, NumberUtil.numberOfDigits(0l));
-      assertEquals(1, NumberUtil.numberOfDigits(1l));
-      assertEquals(2, NumberUtil.numberOfDigits(10l));
-      assertEquals(2, NumberUtil.numberOfDigits(11l));
-      assertEquals(3, NumberUtil.numberOfDigits(100l));
-      assertEquals(3, NumberUtil.numberOfDigits(111l));
+      assertEquals(1, NumberUtil.numberOfDigits(0L));
+      assertEquals(1, NumberUtil.numberOfDigits(1L));
+      assertEquals(2, NumberUtil.numberOfDigits(10L));
+      assertEquals(2, NumberUtil.numberOfDigits(11L));
+      assertEquals(3, NumberUtil.numberOfDigits(100L));
+      assertEquals(3, NumberUtil.numberOfDigits(111L));
       // Test negative values
-      assertEquals(1, NumberUtil.numberOfDigits(-0l));
-      assertEquals(1, NumberUtil.numberOfDigits(-1l));
-      assertEquals(2, NumberUtil.numberOfDigits(-10l));
-      assertEquals(2, NumberUtil.numberOfDigits(-11l));
-      assertEquals(3, NumberUtil.numberOfDigits(-100l));
-      assertEquals(3, NumberUtil.numberOfDigits(-111l));
+      assertEquals(1, NumberUtil.numberOfDigits(-0L));
+      assertEquals(1, NumberUtil.numberOfDigits(-1L));
+      assertEquals(2, NumberUtil.numberOfDigits(-10L));
+      assertEquals(2, NumberUtil.numberOfDigits(-11L));
+      assertEquals(3, NumberUtil.numberOfDigits(-100L));
+      assertEquals(3, NumberUtil.numberOfDigits(-111L));
       // Test max values
       assertEquals(NumberUtil.MAX_LONG_DIGITS, NumberUtil.numberOfDigits(Long.MAX_VALUE));
       assertEquals(NumberUtil.MAX_LONG_DIGITS, NumberUtil.numberOfDigits(Long.MIN_VALUE));

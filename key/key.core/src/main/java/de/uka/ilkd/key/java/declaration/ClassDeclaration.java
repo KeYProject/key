@@ -212,13 +212,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     /**
-     * Classes are never strictfp.
-     */
-    public boolean isStrictFp() {
-        return false;
-    }
-
-    /**
      * Classes are never transient.
      */
     public boolean isTransient() {

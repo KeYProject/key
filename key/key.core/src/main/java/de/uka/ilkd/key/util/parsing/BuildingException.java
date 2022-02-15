@@ -30,7 +30,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(@Nullable Token t, String message, Throwable e) {
-        super(message, e);
+        super(message + " at " + getPosition(t), e);
         offendingSymbol = t;
     }
 
@@ -41,7 +41,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
-        this(ctx.start, "", ex);
+        this(ctx.start, ex.getMessage(), ex);
     }
 
     @Override

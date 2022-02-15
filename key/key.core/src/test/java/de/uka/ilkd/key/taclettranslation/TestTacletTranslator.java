@@ -19,27 +19,25 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
-import junit.framework.TestCase;
 import org.antlr.v4.runtime.CharStreams;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class TestTacletTranslator extends TestCase {
+public class TestTacletTranslator {
 
     private NamespaceSet nss;
     private Services services;
     private KeyIO io;
     private Namespace<SchemaVariable> lastSchemaNamespace;
 
-
-    public TestTacletTranslator(String name) {
-        super(name);
-    }
 
     // some methods essentially "stolen" from TestTacletParser
 
@@ -55,7 +53,8 @@ public class TestTacletTranslator extends TestCase {
                     "  \\variables S z;\n}\n";
 
 
-    protected void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         nss = new NamespaceSet();
         services = new Services(AbstractProfile.getDefaultProfile());
         io = new KeyIO(services, nss);
@@ -81,22 +80,23 @@ public class TestTacletTranslator extends TestCase {
         }
     }
 
-    private void testTaclet(String tacletString, String termString) throws Exception {
+    private void testTaclet(String tacletString, String termString) {
         tacletString = DECLS + "\n\\rules { " + tacletString + "; }";
 
         Taclet taclet = parseTaclet(tacletString);
         Term expected = parseTerm(termString);
         Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
-        assertEquals("Taclet " + taclet.name() + " not translated as expected", expected,
-                translation);
+        Assertions.assertEquals(expected, translation,
+                "Taclet " + taclet.name() + " not translated as expected");
     }
 
     //
     // The actual test cases go here
     //
 
-    public void testPropositional1() throws Exception {
+    @Test
+    public void testPropositional1() {
         testTaclet("propositional1 { \n" +
                         "\\assumes( assume_left ==> assume_right ) \n" +
                         "\\find( const1 ) \n" +
@@ -112,7 +112,8 @@ public class TestTacletTranslator extends TestCase {
                         " -> (assume_left -> assume_right)");
     }
 
-    public void testPropositional2() throws Exception {
+    @Test
+    public void testPropositional2() {
         testTaclet("propositionalLeft { \n" +
                         "\\assumes( assume_left ==> assume_right ) \n" +
                         "\\find( phi ==> ) \n" +
@@ -131,7 +132,8 @@ public class TestTacletTranslator extends TestCase {
                         " -> (!phi | (assume_left -> assume_right))");
     }
 
-    public void testNoPolarity() throws Exception {
+    @Test
+    public void testNoPolarity() {
         testTaclet("noPolarity { \n" +
                         "\\assumes( assume_left ==> assume_right ) \n" +
                         "\\find( phi  ) \n" +
@@ -145,7 +147,8 @@ public class TestTacletTranslator extends TestCase {
                         " -> (assume_left -> assume_right)");
     }
 
-    public void testPositivePolarity() throws Exception {
+    @Test
+    public void testPositivePolarity() {
         testTaclet("positivePolarity { \n" +
                         "\\assumes( assume_left ==> assume_right ) \n" +
                         "\\find( phi  ) \n" +
@@ -162,7 +165,8 @@ public class TestTacletTranslator extends TestCase {
                         " -> (assume_left -> assume_right)");
     }
 
-    public void testNegativePolarity() throws Exception {
+    @Test
+    public void testNegativePolarity() {
         testTaclet("negativePolarity { \n" +
                         "\\assumes( assume_left ==> assume_right ) \n" +
                         "\\find( phi  ) \n" +

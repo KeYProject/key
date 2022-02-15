@@ -1,21 +1,20 @@
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.logic.Term;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserSorts extends AbstractTestTermParser {
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");

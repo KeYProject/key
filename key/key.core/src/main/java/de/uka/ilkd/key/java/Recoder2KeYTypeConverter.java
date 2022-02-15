@@ -294,7 +294,7 @@ public class Recoder2KeYTypeConverter {
 //              //TEMP!
 //              assert result.getJavaType() != null;
             } else {
-                LOGGER.debug("recoder2key: unknown type", t);
+                LOGGER.debug("recoder2key: unknown type {}", t);
                 LOGGER.debug("Unknown type: " + t.getClass() + " "
                         + t.getFullName());
                 Debug.fail();

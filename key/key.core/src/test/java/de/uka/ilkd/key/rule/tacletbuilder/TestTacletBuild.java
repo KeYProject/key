@@ -17,19 +17,19 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Before;
-import org.junit.Test;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * class tests the building of Taclets in TacletBuilders, especially the
@@ -45,7 +45,7 @@ public class TestTacletBuild {
 
     private TermBuilder tb;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         TacletForTests.setStandardFile(TacletForTests.testRules);
         TacletForTests.parse();
@@ -73,8 +73,8 @@ public class TestTacletBuild {
         } catch (RuntimeException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as there are different "
-                + "prefixes at different occurrences", thrown);
+        assertTrue(thrown, "An exception should be thrown as there are different "
+                + "prefixes at different occurrences");
         sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
         sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
         sb.getTaclet();  //no exception is thrown here anymore
@@ -101,8 +101,8 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable " +
-                "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable " +
+                "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -127,8 +127,8 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable "
-                + "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
+                + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -147,8 +147,8 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable " +
-                "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable " +
+                "occurs more than once in the Taclets if and find");
     }
 
     private final HelperClassForTests helper = new HelperClassForTests();
@@ -161,11 +161,9 @@ public class TestTacletBuild {
             helper.parseThrowException(new File(testRules + File.separator +
                     "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
-            assertTrue("Position of error message is wrong.",
-                e.toString().contains("schemaVarInAddruleRespectPrefix.key:21:2"));
-            assertTrue("Cause should be prefix error",
-                    e.getCause().getMessage()
-                            .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."));
+            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:21:2"), "Position of error message is wrong.");
+            assertTrue(e.getCause().getMessage()
+                    .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."), "Cause should be prefix error");
             return;
         } catch (ProofInputException e) {
             fail("Unexpected exception");

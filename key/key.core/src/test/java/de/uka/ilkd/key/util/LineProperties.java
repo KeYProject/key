@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class LineProperties {
 
-    private Map<String, String> map = new LinkedHashMap<>();
+    private final Map<String, String> map = new LinkedHashMap<>();
 
     public void read(InputStream is) throws IOException {
         read(new InputStreamReader(is));
@@ -53,7 +53,7 @@ public class LineProperties {
         BufferedReader br = new BufferedReader(reader);
 
         String line;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String lastKey = null;
 
         while ((line = br.readLine()) != null) {
@@ -84,7 +84,7 @@ public class LineProperties {
 
     }
 
-    public String get(Object key) {
+    public String get(String key) {
         return map.get(key);
     }
 
@@ -96,7 +96,7 @@ public class LineProperties {
         return map.entrySet();
     }
 
-    public String getOrDefault(Object key, String defaultValue) {
+    public String getOrDefault(String key, String defaultValue) {
         return map.getOrDefault(key, defaultValue);
     }
 

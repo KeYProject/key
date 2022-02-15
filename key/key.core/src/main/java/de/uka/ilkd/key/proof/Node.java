@@ -188,12 +188,8 @@ public class Node implements Iterable<Node> {
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
             SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
-            ImmutableSet<URI> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
-
             this.nodeInfo = new NodeInfo(this);
-
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
-            this.nodeInfo.addRelevantFiles(oldRelevantFiles);
         } else {
             this.nodeInfo = new NodeInfo(this);
         }
@@ -366,7 +362,6 @@ public class Node implements Iterable<Node> {
         newChild.siblingNr = children.size();
         children.add(newChild);
         newChild.parent = this;
-        newChild.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         proof().fireProofExpanded(this);
     }
 
@@ -380,7 +375,6 @@ public class Node implements Iterable<Node> {
         for (int i = 0; i < newChildren.length; i++) {
             newChildren[i].siblingNr = i + size;
             newChildren[i].parent = this;
-            newChildren[i].nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         }
 
         Collections.addAll(children, newChildren);

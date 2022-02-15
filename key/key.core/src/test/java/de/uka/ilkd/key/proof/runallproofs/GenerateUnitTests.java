@@ -51,7 +51,7 @@ public class GenerateUnitTests {
         }
 
         outputFolder = args[0];
-        LOGGER.info("Output folder {]", outputFolder);
+        LOGGER.info("Output folder {}", outputFolder);
 
         File out = new File(outputFolder);
         out.mkdirs();
@@ -139,7 +139,7 @@ public class GenerateUnitTests {
         Set<String> usedMethodNames = new TreeSet<>();
         int clashCounter = 0;
 
-        for (TestFile<?> file : unit.getTestFiles()) {
+        for (TestFile file : unit.getTestFiles()) {
             File keyFile = file.getKeYFile();
             String testName = keyFile.getName()
                     .replaceAll("\\.java", "")

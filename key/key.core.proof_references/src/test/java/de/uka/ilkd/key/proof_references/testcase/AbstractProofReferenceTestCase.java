@@ -13,22 +13,6 @@
 
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-
-import junit.framework.TestCase;
-
-import org.junit.Assert;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Choice;
@@ -47,17 +31,30 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Provides the basic functionality to test the proof reference API.
  * @author Martin Hentschel
  */
-public abstract class AbstractProofReferenceTestCase extends TestCase {
+public abstract class AbstractProofReferenceTestCase {
     public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
 
     static {
-        Assert.assertNotNull("Could not find test case directory",
-                TESTCASE_DIRECTORY);
+       assertNotNull(TESTCASE_DIRECTORY, "Could not find test case directory");
    }
 
    /**
@@ -161,28 +158,25 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
    protected IProofTester createReferenceMethodTester(final IProofReferencesAnalyst analyst,
                                                       final IFilter<IProofReference<?>> currentReferenceFilter,
                                                       final ExpectedProofReferences... expectedReferences) {
-      return new IProofTester() {
-         @Override
-         public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
-            // Compute proof references
-            ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
-            if (analyst != null) {
-               analysts = analysts.append(analyst);
-            }
-            LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(proof, analysts);
-            // Filter references
-            if (currentReferenceFilter != null) {
-               LinkedHashSet<IProofReference<?>> filteredReferences = new LinkedHashSet<IProofReference<?>>();
-               for (IProofReference<?> reference : references) {
-                  if (currentReferenceFilter.select(reference)) {
-                     filteredReferences.add(reference);
-                  }
-               }
-               references = filteredReferences;
-            }
-            // Assert proof references
-            assertReferences(references, expectedReferences);
+      return (environment, proof) -> {
+         // Compute proof references
+         ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
+         if (analyst != null) {
+            analysts = analysts.append(analyst);
          }
+         LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(proof, analysts);
+         // Filter references
+         if (currentReferenceFilter != null) {
+            LinkedHashSet<IProofReference<?>> filteredReferences = new LinkedHashSet<IProofReference<?>>();
+            for (IProofReference<?> reference : references) {
+               if (currentReferenceFilter.select(reference)) {
+                  filteredReferences.add(reference);
+               }
+            }
+            references = filteredReferences;
+         }
+         // Assert proof references
+         assertReferences(references, expectedReferences);
       };
    }
 
@@ -237,7 +231,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
    protected void assertReferences(LinkedHashSet<IProofReference<?>> current, ExpectedProofReferences... expected) {
       assertNotNull(current);
       assertNotNull(expected);
-      assertEquals("Computed References: " + current, expected.length, current.size());
+      assertEquals(expected.length, current.size(), "Computed References: " + current);
       int i = 0;
       for (IProofReference<?> currentReference : current) {
          ExpectedProofReferences expectedReference = expected[i];
@@ -261,12 +255,12 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       /**
        * The expected kind.
        */
-      private String kind;
+      private final String kind;
 
       /**
        * The expected target.
        */
-      private String target;
+      private final String target;
 
       /**
        * Constructor.
@@ -338,12 +332,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          assertNotNull(containerKJT);
          // Search observer function
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
-         IObserverFunction target = CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
-            @Override
-            public boolean select(IObserverFunction element) {
-               return targetName.equals(element.toString());
-            }
-         });
+         IObserverFunction target = CollectionUtil.search(targets, element -> targetName.equals(element.toString()));
          assertNotNull(target);
          // Find first contract.
          ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(containerKJT, target);
@@ -464,13 +453,13 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * Executes some proof steps with on given {@link Proof}.
     * @author Martin Hentschel
     */
-   protected static interface IProofTester {
+   protected interface IProofTester {
       /**
        * Execute the test.
        * @param environment The {@link KeYEnvironment} to test.
        * @param proof The {@link Proof} to test.
        * @throws Exception Occurred Exception.
        */
-      public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
+      void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
    }
 }

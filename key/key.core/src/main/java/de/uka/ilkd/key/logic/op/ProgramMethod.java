@@ -494,7 +494,7 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed (pattern, source)", this, src);
+            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }

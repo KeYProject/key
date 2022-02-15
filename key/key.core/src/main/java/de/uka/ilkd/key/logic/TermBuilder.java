@@ -1173,14 +1173,14 @@ public class TermBuilder {
     }
 
     /**
-     * Creates Z-/C-terms for ints/chars.
+     * Creates terms to be used in Z/C/FP/DFP/R notations.
+     * The result does not have such a constructor applied yet.
      *
      * @param numberString a string containing the number in a decimal representation
-     * @param containsChar true iff the number represents a char
-     * @return Term in Z-/C-Notation representing the given number
+     * @return Term in "number" notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    private Term numberTerm(String numberString, boolean containsChar) {
+    private Term numberTerm(String numberString) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1199,66 +1199,44 @@ public class TermBuilder {
 
         int digit;
         for (int i = j, sz = numberString.length(); i < sz; i++) {
-            switch (numberString.charAt(i)) {
-                case '0':
-                    digit = 0;
-                    break;
-                case '1':
-                    digit = 1;
-                    break;
-                case '2':
-                    digit = 2;
-                    break;
-                case '3':
-                    digit = 3;
-                    break;
-                case '4':
-                    digit = 4;
-                    break;
-                case '5':
-                    digit = 5;
-                    break;
-                case '6':
-                    digit = 6;
-                    break;
-                case '7':
-                    digit = 7;
-                    break;
-                case '8':
-                    digit = 8;
-                    break;
-                case '9':
-                    digit = 9;
-                    break;
-                default:
-                    throw new NumberFormatException(numberString + " is not a number.");
+            char c = numberString.charAt(i);
+            if ('0' <= c && c <= '9') {
+                digit = c - '0';
+            } else {
+                throw new NumberFormatException(numberString + " is not a number.");
             }
             numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
             numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        // chars get a surrounding C, ints a surrounding Z
-        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
-                numberLiteralTerm);
+
+        // return the raw number literal term ('C', 'Z' or 'R' must still be added)
         return numberLiteralTerm;
     }
 
     /**
-     * @param numberString String representing an integer with radix 10, may be negative
+     * Get term for an integer literal.
+     *
+     * @param numberString
+     *            String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term zTerm(String numberString) {
-        return numberTerm(numberString, false);
+        return func(services.getTypeConverter().getIntegerLDT().getNumberSymbol(),
+                numberTerm(numberString));
     }
 
     /**
-     * @param number an integer
+     * Get term for an integer literal.
+     *
+     * @param number
+     *            an integer
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(long number) {
-        return zTerm("" + number);
+        return zTerm(Long.toString(number));
     }
 
     /**
@@ -1267,7 +1245,36 @@ public class TermBuilder {
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term cTerm(String numberString) {
-        return numberTerm(numberString, true);
+        return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
+                numberTerm(numberString));
+    }
+
+    /**
+     * Create a floating point literal value from a float value.
+     *
+     * @param value any float value (even NaN)
+     * @return a term representing the value
+     */
+    public Term fpTerm(float value) {
+        int bitPattern = Float.floatToIntBits(value);
+        String patternStr = Integer.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        return func(services.getTypeConverter().getFloatLDT().getFloatSymbol(),
+                numberTerm);
+    }
+
+    /**
+     * Create a double floating point literal value from a double value.
+     *
+     * @param value any double value (even NaN)
+     * @return a term representing the value
+     */
+    public Term dfpTerm(double value) {
+        long bitPattern = Double.doubleToLongBits(value);
+        String patternStr = Long.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
+                numberTerm);
     }
 
     public Term add(Term t1, Term t2) {

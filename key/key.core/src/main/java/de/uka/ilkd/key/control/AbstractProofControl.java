@@ -125,7 +125,7 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
-            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node",
+            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                     focusedGoal.node().serialNr());
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getFindTaclet(TacletFilter.TRUE,

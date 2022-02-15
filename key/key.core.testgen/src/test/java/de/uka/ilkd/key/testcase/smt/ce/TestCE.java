@@ -11,15 +11,14 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCE extends TestCommons {
     public static final File testFile = new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
@@ -64,7 +63,7 @@ public class TestCE extends TestCommons {
         assertTrue(this.correctResult(new File(testFile, "overflow1.key"), true));
     }
 
-    private boolean correctResult(File file, boolean b) throws IOException, ProblemLoaderException {
+    private boolean correctResult(File file, boolean b) throws ProblemLoaderException {
         return correctResult(file.getAbsolutePath(), b);
     }
 
@@ -125,7 +124,7 @@ public class TestCE extends TestCommons {
                 KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
-            Assert.assertNotNull(proof);
+            Assertions.assertNotNull(proof);
             FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
             se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             TryCloseMacro close = new TryCloseMacro();
