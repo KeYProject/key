@@ -348,7 +348,7 @@ public final class JavaInfo {
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
-        if (type2KJTCache != null) {
+        if(type2KJTCache != null) {
             type2KJTCache.put(type, result);
         }
 

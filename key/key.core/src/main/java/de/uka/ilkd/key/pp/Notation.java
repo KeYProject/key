@@ -15,6 +15,8 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -661,7 +663,109 @@ public abstract class Notation {
 	}
     }
     
+	/**
+     * The standard concrete syntax for the float literal indicator `FP'.
+     */
+    static final class FloatLiteral extends Notation {
 
+        private final static int EXP_MASK = 0x7f80_0000;
+
+        public FloatLiteral() {
+            super(120);
+        }
+
+        public static String printFloatTerm(Term floatTerm) {
+
+            if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
+                return null;
+            }
+
+            try {
+                int bits = extractValue(floatTerm.sub(0));
+                float f = Float.intBitsToFloat(bits);
+                if (Float.isNaN(f)) {
+                    return "floatNaN";
+				} else if (f == Float.POSITIVE_INFINITY) {
+					return "floatInf";
+				} else if (f == Float.NEGATIVE_INFINITY) {
+					return "-floatInf";
+                } else {
+                    return f + "f";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        private static int extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+				int result = digit + 10 * extractValue(t.sub(0));
+				return result;
+            }
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printFloatTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+    }
+
+    /**
+     * The standard concrete syntax for the double literal indicator `DFP'.
+     */
+    static final class DoubleLiteral extends Notation {
+        public DoubleLiteral() {
+            super(120);
+        }
+
+        public static String printDoubleTerm(Term doubleTerm) {
+
+            if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
+                return null;
+            }
+
+            try {
+                long bits = extractValue(doubleTerm.sub(0));
+                double f = Double.longBitsToDouble(bits);
+                if (Double.isNaN(f)) {
+                    return "floatNaN";
+                } else if (f == Double.POSITIVE_INFINITY) {
+					return "doubleInf";
+				} else if (f == Double.NEGATIVE_INFINITY) {
+					return "-doubleInf";
+                } else {
+                    return f + "d";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        private static long extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0L;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+                return digit + 10 * extractValue(t.sub(0));
+            }
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printDoubleTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+    }
   
 
     /**

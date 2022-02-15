@@ -73,6 +73,11 @@ public class ExprTest {
                 .addVariable("bb", "int")
                 .addVariable("cc", "int")
                 .addProgramVariable("int", "x");
+
+        // Without this call, the LDTs are not available to the expression
+        // builder. Probably a problem of the mocking here. (MU)
+        services.getTypeConverter().init();
+
         return io;
     }
 }

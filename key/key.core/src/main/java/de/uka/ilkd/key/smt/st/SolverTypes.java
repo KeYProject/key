@@ -31,11 +31,13 @@ public class SolverTypes {
      * @param <T>   the solver type
      * @return an instance of {@code T} or null if no such solver type was loaded.
      */
-    @SuppressWarnings("unchecked")
     @Nullable
     public static <T extends SolverType> T get(Class<T> clazz) {
-        return (T) getSolverTypes().stream().filter(it -> it.getClass().equals(clazz))
-                .findFirst().orElse(null);
+        for (SolverType solverType : getSolverTypes()) {
+            if(solverType.getClass() == clazz)
+                return clazz.cast(solverType);
+        }
+        return null;
     }
 
 
@@ -64,6 +66,11 @@ public class SolverTypes {
      * Z3 with new modular translator
      */
     public static final SolverType Z3_NEW_TL_SOLVER = get(Z3NewTLSolverType.class);
+
+    /**
+     * temporary: Z3 floating points
+     */
+    public static final SolverType Z3_FP_SOLVER = get(Z3NewTLFPOnlySolverType.class);
 
     /**
      * Class for the Z3 solver. It makes use of the SMT2-format.
