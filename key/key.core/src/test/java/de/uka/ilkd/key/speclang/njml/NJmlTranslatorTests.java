@@ -4,20 +4,16 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.v4.runtime.Token;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Alexander Weigl
@@ -27,18 +23,13 @@ public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
             + File.separator + "speclang"
             + File.separator + "testFile.key";
-    private TermBuilder TB;
-    private JavaInfo javaInfo;
-    private JmlIO jmlIO;
-    private Services services;
-    private KeYJavaType testClassType;
+    private final JmlIO jmlIO;
 
     public NJmlTranslatorTests() {
-        javaInfo = new HelperClassForTests().parse(
+        JavaInfo javaInfo = new HelperClassForTests().parse(
                 new File(testFile)).getFirstProof().getJavaInfo();
-        services = javaInfo.getServices();
-        TB = services.getTermBuilder();
-        testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
+        Services services = javaInfo.getServices();
+        KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         jmlIO = new JmlIO().services(services).classType(testClassType);
     }
 
@@ -49,8 +40,7 @@ public class NJmlTranslatorTests {
         ImmutableList<TextualJMLConstruct> result =
                 jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
         assertNotNull(result);
-        Assert.assertEquals("Too many invariants found.", 1, result.size());
-        ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
+        assertEquals(1, result.size(), "Too many invariants found.");
     }
 
 // weigl: ignored since fix #1640, due to interface change
@@ -90,9 +80,7 @@ public class NJmlTranslatorTests {
         assertNotNull(result);
         ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
         PositionedString message = warnings.head();
-        assertEquals(
-                "Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
-                        "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
-                message.toString());
+        assertEquals("Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
+                "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)", message.toString());
     }
 }

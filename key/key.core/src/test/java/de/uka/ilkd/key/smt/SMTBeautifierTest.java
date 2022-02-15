@@ -1,47 +1,43 @@
 package de.uka.ilkd.key.smt;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.key_project.util.Streams;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
+import java.util.stream.Stream;
 
-@RunWith(Parameterized.class)
-public class SMTBeautifierTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Parameter(0)
-    public String smt;
+public class SMTBeautifierTest {
+    public static Stream<Arguments> parameters() throws IOException {
+        final var r1 = SMTBeautifierTest.class.getResourceAsStream("beautifier.in.smt2");
+        final var r2 = SMTBeautifierTest.class.getResourceAsStream("beautifier.out.smt2");
 
-    @Parameter(1)
-    public String expected;
+        Assumptions.assumeTrue(r1 != null);
+        Assumptions.assumeTrue(r2 != null);
 
-    @Parameters
-    public static Object[][] parameters() throws IOException {
-        String[] smt = Streams.toString(SMTBeautifierTest.class.getResourceAsStream("beautifier.in.smt2")).split("; *----+");
-        String[] expected = Streams.toString(SMTBeautifierTest.class.getResourceAsStream("beautifier.out.smt2")).split("; *----+");
-        assertEquals("The two files must have same number of clauses", smt.length, expected.length);
-        Object[][] result = new Object[smt.length][];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new Object[] { smt[i], expected[i] };
+        String[] smt = Streams.toString(r1).split("; *----+");
+        String[] expected = Streams.toString(r2).split("; *----+");
+        assertEquals(smt.length, expected.length, "The two files must have same number of clauses");
+        var b = Stream.<Arguments>builder();
+        for (int i = 0; i < smt.length; i++) {
+            b.add(Arguments.of(smt[i], expected[i]));
         }
-        return result;
+        return b.build();
     }
 
-    @Test
-    public void testSMTBeautifier() throws IOException {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testSMTBeautifier(String smt, String expected) {
         assertEquals(expected.trim(), SMTBeautifier.indent(smt, 80).trim());
     }
 
-    // revealed bugs!
-    @Test
-    public void testIdemPotent() throws IOException {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testIdemPotent(String smt, String expected) {
         String result1 = SMTBeautifier.indent(smt, 80).trim();
         String result2 = SMTBeautifier.indent(result1, 80).trim();
         assertEquals(result1, result2);

@@ -11,9 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * this class is used to parse in Taclet from a file that are used by tests
- */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -37,14 +34,17 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
 import java.io.StringReader;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * this class is used to parse in Taclet from a file that are used by tests
+ */
 public class TacletForTests {
 
     private TacletForTests() {
@@ -194,17 +194,14 @@ public class TacletForTests {
     public static Term parseTerm(String termstr, Services services) {
         if (termstr.equals("")) return null;
 
-        StringReader br = null;
         try {
             KeyIO io = new KeyIO(services, nss);
             //TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail("Exception occurred while parsing of " + termstr);
+            fail("Exception occurred while parsing of " + termstr);
             return null;
-        } finally {
-            if (br != null) br.close();
         }
 
     }

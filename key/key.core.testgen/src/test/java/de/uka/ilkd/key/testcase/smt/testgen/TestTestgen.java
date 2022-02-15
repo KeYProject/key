@@ -7,17 +7,18 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import de.uka.ilkd.key.testcase.smt.ce.TestCommons;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public class TestTestgen {
+public class TestTestgen extends TestCommons {
     public static final File testFile = new File(
             HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/tg");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
@@ -25,8 +26,13 @@ public class TestTestgen {
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
 
-    @Before
-    public void toolNotInstalled() {
+    @BeforeEach
+    public void setup(){
+        assumeFalse(toolNotInstalled());
+    }
+
+    @Override
+    public boolean toolNotInstalled() {
         if (!installChecked) {
             isInstalled = getSolverType().isInstalled(true);
             installChecked = true;
@@ -42,7 +48,7 @@ public class TestTestgen {
                 }
             }
         }
-        Assume.assumeTrue(isInstalled);
+        return isInstalled;
     }
 
     public SolverType getSolverType() {
@@ -58,7 +64,7 @@ public class TestTestgen {
     @Test
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
-        assertTrue("File " + file + " does not exists!", file.exists());
+        assertTrue(file.exists(), "File " + file + " does not exists!");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();

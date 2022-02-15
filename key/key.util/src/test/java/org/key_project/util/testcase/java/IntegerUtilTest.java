@@ -13,16 +13,16 @@
 
 package org.key_project.util.testcase.java;
 
-import junit.framework.TestCase;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.java.IntegerUtil;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link IntegerUtil}
  * @author Martin Hentschel
  */
-public class IntegerUtilTest extends TestCase {
+public class IntegerUtilTest {
    /**
     * Tests {@link IntegerUtil#factorial(int)}.
     */

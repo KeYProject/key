@@ -1,21 +1,5 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
@@ -23,6 +7,19 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.java.IOUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This class contains test cases for loading and saving proof bundles.
@@ -39,7 +36,7 @@ public class TestProofBundleIO {
     /**
      * Set up the test path and store the current allowBundleSaving setting.
      */
-    @BeforeClass
+    @BeforeAll
     public static void prepare() {
         testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
@@ -52,7 +49,7 @@ public class TestProofBundleIO {
     /**
      * Reset settings to value before tests.
      */
-    @AfterClass
+    @AfterAll
     public static void cleanUp() {
         // reset the settings to value before test
         ProofIndependentSettings.DEFAULT_INSTANCE

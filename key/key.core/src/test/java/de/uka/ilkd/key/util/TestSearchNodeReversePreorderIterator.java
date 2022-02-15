@@ -13,25 +13,28 @@
 
 package de.uka.ilkd.key.util;
 
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link SearchNodeReversePreorderIterator}.
  * @author Martin Hentschel
  */
-public class TestSearchNodeReversePreorderIterator extends TestCase {
+public class TestSearchNodeReversePreorderIterator {
    /**
     * Tests a tree of {@link Node}s with three levels after root.
     */
+   @Test
    public void testNodesThreeLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -56,6 +59,7 @@ public class TestSearchNodeReversePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with two levels after root.
     */
+   @Test
    public void testNodesTwoLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -77,6 +81,7 @@ public class TestSearchNodeReversePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with one level after root.
     */
+   @Test
    public void testNodesOneLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -92,6 +97,7 @@ public class TestSearchNodeReversePreorderIterator extends TestCase {
    /**
     * Tests only a root {@link Node}.
     */
+   @Test
    public void testEmptyRoot() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -106,7 +112,7 @@ public class TestSearchNodeReversePreorderIterator extends TestCase {
     */
    protected void assertRoot(Node root) {
       NodePreorderIterator iter = new NodePreorderIterator(root);
-      ImmutableList<Node> reverseList = ImmutableSLList.<Node>nil();
+      ImmutableList<Node> reverseList = ImmutableSLList.nil();
       while (iter.hasNext()) {
          Node next = iter.next();
          reverseList = reverseList.prepend(next);
@@ -127,7 +133,7 @@ public class TestSearchNodeReversePreorderIterator extends TestCase {
          assertEquals(previous, expectedReverseList.head());
          expectedReverseList = expectedReverseList.take(1); // Remove head
       }
-      assertTrue("Reverse still contains " + expectedReverseList.size() + " elements.", expectedReverseList.isEmpty());
+      assertTrue(expectedReverseList.isEmpty(), "Reverse still contains " + expectedReverseList.size() + " elements.");
    }
 
    /**

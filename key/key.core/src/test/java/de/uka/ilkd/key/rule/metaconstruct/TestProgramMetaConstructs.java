@@ -27,25 +27,20 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * tests the symbolic execution of the program meta constructs
  */
-public class TestProgramMetaConstructs extends TestCase {
-
+public class TestProgramMetaConstructs {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestProgramMetaConstructs.class);
 
-    public TestProgramMetaConstructs(String name) {
-        super(name);
-        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-    }
-
-    public void setUp() {
-    }
-
+    @Test
     public void testDoBreak() {
         LabeledStatement labeledBlock = (LabeledStatement) ((StatementBlock) TacletForTests
                 .parsePrg
@@ -62,7 +57,8 @@ public class TestProgramMetaConstructs extends TestCase {
     /**
      * tests AST walkers
      */
-    public void xtestASTWalker() {
+    @Test@Disabled
+    public void testASTWalker() {
         ProgramElement block = TacletForTests.parsePrg(
                 "{int a=5; test1:test2:while (true) " + "{test3: {int j=3;}}}");
         JavaASTCollector coll = new JavaASTCollector(block,
@@ -79,6 +75,7 @@ public class TestProgramMetaConstructs extends TestCase {
         LOGGER.debug("Result:" + trans);
     }
 
+    @Test
     public void testTypeOf() { // this is no really sufficient test
         Services services = new Services(AbstractProfile.getDefaultProfile());
         // but I can't access programs here
@@ -91,6 +88,7 @@ public class TestProgramMetaConstructs extends TestCase {
                 SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName());
     }
 
+    @Test
     public void testBugId183() {
         StatementBlock bl = (StatementBlock) TacletForTests
                 .parsePrg("{ while ( true ) {} }");
@@ -112,18 +110,21 @@ public class TestProgramMetaConstructs extends TestCase {
 
     }
 
+    @Test
     public void testForInitUnfoldTransformer1() {
         forInitUnfoldTransformerTest(
                 "{ for (int i = 4, y = 42; i <= 6; i++) { } }",
                 new String[]{"int i = 4,y = 42;"});
     }
 
+    @Test
     public void testForInitUnfoldTransformer2() {
         forInitUnfoldTransformerTest("{ for (int i = 4; i <= 6; i++) { } }",
                 new String[]{"int i = 4;"});
     }
 
     // By Dominic
+    @Test
     public void testForInitUnfoldTransformer3() {
         forInitUnfoldTransformerTest(
                 "{ int i = 4, z = 42; for (i++, i--, z = 17; i <= 6; i++) { } }",

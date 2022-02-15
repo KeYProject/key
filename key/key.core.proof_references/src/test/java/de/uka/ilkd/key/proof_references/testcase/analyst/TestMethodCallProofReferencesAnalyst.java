@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof_references.testcase.analyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link MethodCallProofReferencesAnalyst}.
@@ -25,6 +26,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "constructorTest".
     */
+   @Test
    public void testConstructorTest() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/constructorTest/ConstructorTest.java", 
@@ -44,6 +46,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCall".
     */
+   @Test
    public void testMethodCall() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCall/MethodCall.java", 
@@ -57,6 +60,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCallSuper".
     */
+   @Test
    public void testMethodCallSuper() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCallSuper/MethodCallSuper.java", 
@@ -70,6 +74,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCallWithAssignment".
     */
+   @Test
    public void testMethodCallWithAssignment() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCallWithAssignment/MethodCall.java",
@@ -83,6 +88,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCallWithAssignmentSuper".
     */
+   @Test
    public void testMethodCallWithAssignmentSuper() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCallWithAssignmentSuper/MethodCallWithAssignmentSuper.java",
@@ -96,6 +102,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCallWithAssignmentWithinClass".
     */
+   @Test
    public void testMethodCallWithAssignmentWithinClass() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCallWithAssignmentWithinClass/MethodCallWithAssignmentWithinClass.java", 
@@ -109,6 +116,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "methodCallWithinClass".
     */
+   @Test
    public void testMethodCallWithinClass() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/methodCallWithinClass/MethodCallWithinClass.java", 
@@ -122,6 +130,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "staticMethodCall".
     */
+   @Test
    public void testStaticMethodCall() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/staticMethodCall/StaticMethodCall.java", 
@@ -135,6 +144,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "staticMethodCallStaticViaTypereference".
     */
+   @Test
    public void testStaticMethodCallStaticViaTypereference() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/staticMethodCallStaticViaTypereference/StaticMethodCallStaticViaTypereference.java", 
@@ -148,6 +158,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    /**
     * Tests "staticMethodCallStaticWithAssignmentViaTypereference".
     */
+   @Test
    public void testStaticMethodCallStaticWithAssignmentViaTypereference() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/staticMethodCallStaticWithAssignmentViaTypereference/StaticMethodCallStaticWithAssignmentViaTypereference.java", 

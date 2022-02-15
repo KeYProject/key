@@ -12,12 +12,11 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.runtime.RecognitionException;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Class providing methods for parser tests.
@@ -100,7 +99,8 @@ public class AbstractTestTermParser {
     }
 
     protected static void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
-        assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""),
+                message);
     }
 
     protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
@@ -121,7 +121,7 @@ public class AbstractTestTermParser {
                 + "Parsed string \"" + expectedPrettySyntax + "\", which results in term:\n"
                 + parsedPrettySyntax + "\nBut expected parse result is:\n"
                 + expectedParseResult + "\n";
-        assertEquals(message, expectedParseResult, parsedPrettySyntax);
+        assertEquals(expectedParseResult, parsedPrettySyntax, message);
     }
 
     /**
@@ -164,8 +164,8 @@ public class AbstractTestTermParser {
         /*
          * Optionally, further string representations of the same term will be parsed here.
          */
-        for (int i = 0; i < optionalStringRepresentations.length; i++) {
-            assertEquals(expectedParseResult, parseTerm(optionalStringRepresentations[i]));
+        for (String optionalStringRepresentation : optionalStringRepresentations) {
+            assertEquals(expectedParseResult, parseTerm(optionalStringRepresentation));
         }
     }
 

@@ -13,6 +13,19 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.object_model.*;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.junit.jupiter.api.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.StringUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,70 +33,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.experimental.categories.Category;
-import org.junit.runners.MethodSorters;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.StringUtil;
-
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import org.key_project.util.lookup.Inject;
-import org.key_project.util.testcategories.Slow;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Category(Slow.class)
-@Ignore
+@TestMethodOrder(MethodOrderer.MethodName.class)
+@Tag("slow")
+@Disabled
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
-//   @Test public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
-//      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
-//             "SimpleLinkedOjbectsWithAdditionalInstances",
-//             "/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/oracle/",
-//             "SimpleLinkedOjbectsWithAdditionalInstances.xml",
-//             "testSimpleLinkedOjbectsWithAdditionalInstances_initial",
-//             ".xml",
-//             "testSimpleLinkedOjbectsWithAdditionalInstances_current",
-//             ".xml",
-//             null);
-//   }
-
-//   @Test public void testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition() throws Exception {
-//      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
-//             "SimpleLinkedOjbectsWithAdditionalInstances",
-//             "/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/oracle/",
-//             "SimpleLinkedOjbectsWithAdditionalInstances.xml",
-//             "testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition_initial",
-//             ".xml",
-//             "testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition_current",
-//             ".xml",
-//             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
-//   }
-
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   @Test public void testEmptyArrayCreationTest() throws Exception {
+   @Test
+   public void testEmptyArrayCreationTest() throws Exception {
       doTest("/set/configurationExtractorEmptyArrayCreationTest/test/EmptyArrayCreationTest.java",
              "EmptyArrayCreationTest",
              "/set/configurationExtractorEmptyArrayCreationTest/oracle/",
@@ -790,7 +755,6 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
    /**
     * Executes the test steps.
     * @param proofFilePathInkeyRepDirectory The path to the Proof file.
-    * @param containerTypeName The class name.
     * @param oraclePathInBaseDir The path to the oracle directory.
     * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
     * @param initialStatesOraclePrefix Prefix for initial memory layout oracles.
@@ -798,7 +762,6 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * @param currentStatesOraclePrefix Prefix for current memory layout oracles.
     * @param currentStatesOracleFileExtension Current memory layout oracle file extension.
     * @param precondition An optional precondition.
-    * @param useOperationContracts Use operation contracts?
     * @throws Exception Occurred Exception.
     */
    protected void doTest(String proofFilePathInkeyRepDirectory,
@@ -908,13 +871,8 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       }
    }
 
-   /**
-    * Compares the given {@link ISymbolicLayout}s.
-    * @param expected The expected instance.
-    * @param current The current instance.
-    */
    protected static void createOracleFile(ISymbolicLayout model,
-                                          String oraclePathInBaseDirFile) throws IOException, ProofInputException {
+                                          String oraclePathInBaseDirFile) throws IOException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(tempNewOracleDirectory, oraclePathInBaseDirFile);
@@ -1043,7 +1001,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       while (expectedIter.hasNext() && currentIter.hasNext()) {
          String nextExpected = expectedIter.next();
          String nextCurrent = currentIter.next();
-         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", StringUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent), "\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"");
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -1080,7 +1038,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
-         assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()), "\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"");
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertEquals(expected.getConditionString(), current.getConditionString());
       }

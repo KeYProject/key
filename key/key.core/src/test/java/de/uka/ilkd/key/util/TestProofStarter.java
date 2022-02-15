@@ -5,12 +5,13 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.File;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link ProofStarter}.
@@ -25,7 +26,7 @@ public class TestProofStarter {
      *
      * @throws ProblemLoaderException Occurred Exception
      */
-    @Test(timeout = 60000)
+    @Test() @Timeout(60000)
     public void testDirectProof() throws ProblemLoaderException {
         doProofStarter(false);
     }
@@ -37,7 +38,7 @@ public class TestProofStarter {
      *
      * @throws ProblemLoaderException Occurred Exception
      */
-    @Test(timeout = 120000)
+    @Test@Timeout(120000)
     public void testDirectProofWithOneStepSimplification() throws ProblemLoaderException {
         doProofStarter(true);
     }
