@@ -11,6 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
+/*
+ * tests if match checks the variable conditions in Taclets. 
+ */
 package de.uka.ilkd.key.rule.match.legacy;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,21 +24,21 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * tests if match checks the variable conditions in Taclets.
  */
-
 public class TestLegacyTacletMatch {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestLegacyTacletMatch.class);
 
@@ -53,10 +56,10 @@ public class TestLegacyTacletMatch {
     Taclet[] conflict;
     Services services;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         File ruleFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + "/../de/uka/ilkd/key/rule/testRuleMatch.txt");
-        assertTrue("File '" + ruleFile + "' does not exist.", ruleFile.exists());
+        assertTrue(ruleFile.exists(), "File '" + ruleFile + "' does not exist.");
         TacletForTests.setStandardFile(ruleFile.getAbsolutePath());
         TacletForTests.parse();
 
@@ -96,7 +99,7 @@ public class TestLegacyTacletMatch {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if_addrule_conflict = null;
         find_addrule_conflict = null;
@@ -124,13 +127,11 @@ public class TestLegacyTacletMatch {
                         MatchConditions.EMPTY_MATCHCONDITIONS,
                         services);
 
-        assertNotNull("Matches have been expected.", svi);
+        assertNotNull(svi, "Matches have been expected.");
 
         SchemaVariable sv = TacletForTests.svLookup("#stmnt_list");
-        assertTrue("Expected list of statement to be instantiated.",
-                svi.getInstantiations().isInstantiated(sv));
-        assertEquals("The three statements behind the break should be matched.",
-                3, ((ImmutableArray<?>) svi.getInstantiations().getInstantiation(sv)).size());
+        assertTrue(svi.getInstantiations().isInstantiated(sv), "Expected list of statement to be instantiated.");
+        assertEquals(3, ((ImmutableArray<?>) svi.getInstantiations().getInstantiation(sv)).size(), "The three statements behind the break should be matched.");
     }
 
     @Test
@@ -143,13 +144,11 @@ public class TestLegacyTacletMatch {
                 (match, taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
-        assertNotNull("There should be instantiations", svi);
-        assertTrue("#e2 should be instantiated",
-                svi.getInstantiations().isInstantiated(TacletForTests
-                        .svLookup("#e2")));
-        assertTrue("#p1 should be instantiated",
-                svi.getInstantiations().isInstantiated(TacletForTests
-                        .svLookup("#p1")));
+        assertNotNull(svi, "There should be instantiations");
+        assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
+                .svLookup("#e2")), "#e2 should be instantiated");
+        assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
+                .svLookup("#p1")), "#p1 should be instantiated");
 
         Term matchTwo = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=true; break;} "
                 + "}int k=1;} }\\> true");
@@ -211,7 +210,7 @@ public class TestLegacyTacletMatch {
 
         svi = new LegacyTacletMatcher(var_decl_taclet).matchJavaBlock
                 (emptyBlock, var_decl_taclet.find(),
-                        MatchConditions.EMPTY_MATCHCONDITIONS, services);
+                        MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNull(svi);
 
         Term emptyLabel =

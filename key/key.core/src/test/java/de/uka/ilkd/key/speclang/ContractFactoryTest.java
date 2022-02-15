@@ -13,14 +13,15 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This class holds tests for the ContractFactory.
@@ -48,7 +49,7 @@ public class ContractFactoryTest {
     /**
      * Creates the JavaInfo, Services, and JmlIO.
      */
-    @Before
+    @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo = new HelperClassForTests().parse(new File(TEST_FILE))
@@ -79,7 +80,7 @@ public class ContractFactoryTest {
                             "@  signals_only RuntimeException;\n" +
                             "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
-        Assert.assertEquals("empty", woLabels.toString());
+        assertEquals("empty", woLabels.toString());
     }
 
     /**
@@ -103,7 +104,7 @@ public class ContractFactoryTest {
                             "@  signals_only RuntimeException;\n" +
                             "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
-        Assert.assertEquals("empty<<impl>>", woLabels.toString());
+        assertEquals("empty<<impl>>", woLabels.toString());
     }
 
     /**
@@ -127,11 +128,9 @@ public class ContractFactoryTest {
                             "@  signals_only RuntimeException;\n" +
                             "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
-        Assert.assertEquals(
-            "intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs)," +
-                "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l)," +
-                "allLocs))",
-            woLabels.toString());
+        assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs)," +
+            "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l)," +
+            "allLocs))", woLabels.toString());
     }
 
     /**
@@ -158,7 +157,7 @@ public class ContractFactoryTest {
                 contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, c1));
             }
         }
-        Assert.assertEquals(2, contractSet.size());
+        assertEquals(2, contractSet.size());
 
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];
         int i = 0;

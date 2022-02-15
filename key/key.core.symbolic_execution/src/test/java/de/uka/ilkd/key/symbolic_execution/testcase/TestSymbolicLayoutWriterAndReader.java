@@ -13,42 +13,33 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.*;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableSLList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableSLList;
-import org.xml.sax.SAXException;
-
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessAssociation;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessLayout;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessObject;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessState;
-import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessValue;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import static org.junit.Assert.*;
-import org.junit.Test;
-
 /**
  * Tests {@link SymbolicLayoutWriter} and {@link SymbolicLayoutReader}
  * @author Martin Hentschel
  */
-public class TestSymbolicLayoutWriterAndReader extends TestCase {
+public class TestSymbolicLayoutWriterAndReader  {
    /**
     * Tests the writing and reading of an {@link ISymbolicLayout}.
     */
-   @Test public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test
+   public void testWritingAndReading() throws ParserConfigurationException, SAXException, IOException {
       // Create model
       ISymbolicLayout expectedNode = createModel();
       // Serialize model to XML string
@@ -69,7 +60,7 @@ public class TestSymbolicLayoutWriterAndReader extends TestCase {
       try {
          tempFile.delete();
          writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile);
-         assertTrue(tempFile.isFile());
+         Assertions.assertTrue(tempFile.isFile());
          // Read from temporary file
          currentNode = reader.read(tempFile);
          TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);

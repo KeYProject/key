@@ -13,26 +13,26 @@
 
 package de.uka.ilkd.key.rule.loop;
 
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Test;
-
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
-import junit.framework.TestCase;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on
  * more subtle and exotic cases, like nested loops with multiple labeled breaks
  * and continues, combination with exceptional behavior / try-catch, etc.
- * 
+ * <p>
  * TODO: Add more test cases for the scenarios sketched above.
  *
  * @author Dominic Scheurer
  */
-public class LoopScopeInvRuleTests extends TestCase {
+public class LoopScopeInvRuleTests {
 
     private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "loopScopeInvRule/");
 
@@ -44,7 +44,7 @@ public class LoopScopeInvRuleTests extends TestCase {
         final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "Test.key");
         MergeRuleTests.startAutomaticStrategy(proof);
 
-        assertTrue(proof.closed());
+        Assertions.assertTrue(Objects.requireNonNull(proof).closed());
     }
 
 }

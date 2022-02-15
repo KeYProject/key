@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
+import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
-import junit.framework.TestCase;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link DefaultEntry}.
@@ -29,8 +30,9 @@ public class TestDefaultEntry {
     * Tests {@link DefaultEntry#getKey()}, {@link DefaultEntry#getValue()} and
     * {@link DefaultEntry#setValue(Object)}.
     */
-   @Test public void testGetterAndSetter() {
-      Entry<String, String> entry = new DefaultEntry<String, String>("A", "B");
+   @Test
+   public void testGetterAndSetter() {
+      Entry<String, String> entry = new DefaultEntry<>("A", "B");
       assertEquals("A", entry.getKey());
       assertEquals("B", entry.getValue());
       entry.setValue("C");

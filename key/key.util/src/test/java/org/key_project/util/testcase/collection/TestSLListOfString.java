@@ -13,9 +13,8 @@
 
 package org.key_project.util.testcase.collection;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
@@ -24,12 +23,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * tests non-destructive list implementation with String
  */
-
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
@@ -44,7 +42,7 @@ public class TestSLListOfString {
     ImmutableList<String> e1;   // "A" "B" null
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
         a1 = ImmutableSLList.<String>nil()
@@ -76,22 +74,22 @@ public class TestSLListOfString {
             int size = newList[i].size();
             if (i > 0) { // list should have elements
                 assertTrue(it.hasNext());
-                assertEquals(size, i);
+				assertEquals(size, i);
             } else { // list is empty
-                assertFalse(it.hasNext());
-                assertEquals(0, size);
+				assertFalse(it.hasNext());
+				assertEquals(0, size);
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[size - 1 - nr]);
+                assertSame(it.next(), str[size - 1 - nr]);
                 nr++;
             }
             // list has right length
-            assertEquals(nr, size);
+			assertEquals(nr, size);
         }
         // prepend two lists
         ImmutableList<String> prepList = newList[1].prepend(newList[2]);
-        assertEquals(3, prepList.size());
+		assertEquals(3, prepList.size());
         // right order
         assertEquals(str[1], prepList.head());
         assertEquals(str[0], prepList.tail().head());
@@ -114,23 +112,23 @@ public class TestSLListOfString {
             int size = newList[i].size();
             if (i > 0) { // list should have elements
                 assertTrue(it.hasNext());
-                assertEquals(size, i);
+				assertEquals(size, i);
             } else { // list is empty
-                assertFalse(it.hasNext());
-                assertEquals(0, size);
+				assertFalse(it.hasNext());
+				assertEquals(0, size);
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[nr]);
+                assertSame(it.next(), str[nr]);
                 nr++;
             }
             // list has right length
-            assertEquals(nr, size);
+			assertEquals(nr, size);
         }
 
         // append two lists
         ImmutableList<String> appList = newList[2].append(newList[1]);
-        assertEquals(3, appList.size());
+		assertEquals(3, appList.size());
         // right order
         assertEquals(str[0], appList.head());
         assertEquals(str[1], appList.tail().head());
@@ -149,8 +147,8 @@ public class TestSLListOfString {
         }
         // test cascading tail
         for (int i = 0; i < str.length; i++) {
-            Assert.assertSame(newList[i + 1].tail(), newList[i]);
-            Assert.assertSame(newList[i + 1].head(), str[i]);
+            assertSame(newList[i + 1].tail(), newList[i]);
+            assertSame(newList[i + 1].head(), str[i]);
         }
     }
 
@@ -180,7 +178,8 @@ public class TestSLListOfString {
         }
         newList = newList.append(str[0]);
         newList = newList.removeAll(str[0]);
-        assertFalse("str[0] should have been removed", newList.contains(str[0]));
+		assertFalse(newList.contains(str[0]), "str[0] should have been removed");
+
     }
 
     @Test
@@ -196,27 +195,25 @@ public class TestSLListOfString {
         newList = newList.removeFirst(str[0]);
 
 
-        assertTrue("Only first occurrence should have been removed",
-                !Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1);
+        assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1, "Only first occurrence should have been removed");
 
         newList = newList.removeFirst(str[0]);
-        assertEquals("Only first occurrence should have been removed", newList.size(), oldSize - 2);
+		assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");
         newList = newList.removeFirst(str[0]);
 
-        assertTrue("Only first occurrence should have been removed",
-                !(newList.contains(str[0])) && newList.size() == oldSize - 3);
+        assertTrue(!(newList.contains(str[0])) && newList.size() == oldSize - 3, "Only first occurrence should have been removed");
 
     }
 
     @Test
     public void testEquals() {
-        assertEquals("a==a1", a, a1);
-        assertNotEquals("a!=b", a, b);
-        assertNotEquals("a!=c", a, c);
-        assertNotEquals("a!=d", a, d);
-        assertNotEquals("a!=e", a, e);
-        assertNotEquals("e!=a", e, a);
-        assertEquals("e==e1", e, e1);
+		assertEquals(a, a1, "a==a1");
+		assertNotEquals(a, b, "a!=b");
+		assertNotEquals(a, c, "a!=c");
+		assertNotEquals(a, d, "a!=d");
+		assertNotEquals(a, e, "a!=e");
+		assertNotEquals(e, a, "e!=a");
+		assertEquals(e, e1, "e==e1");
     }
 
 
