@@ -19,7 +19,6 @@ import java.io.OutputStream;
  */
 public class IOForwarder extends Thread {
 
-
     private final InputStream from;
     private final OutputStream to;
 

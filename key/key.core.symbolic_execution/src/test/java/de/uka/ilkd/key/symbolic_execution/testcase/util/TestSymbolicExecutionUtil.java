@@ -26,30 +26,32 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 import java.util.HashMap;
-import static org.junit.Assert.*;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link SymbolicExecutionUtil}
  *
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase {
     /**
-     * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
+     * Tests {@link SymbolicExecutionUtil#improveReadability(Term, Services)}
      */
-    @Test public void test1ImproveReadability() throws ProblemLoaderException {
+    @Test
+    public void test1ImproveReadability() throws ProblemLoaderException {
         File location = new File(testCaseDirectory,
                 "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
                 .getAbsoluteFile();
-        Assert.assertTrue("Could not find required resource: " + location, location.exists());
+        assertTrue(location.exists(), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
         Services services = environment.getServices();
@@ -84,7 +86,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
         Term agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
         Term agtBMinusOne = TB.gt(a, bMinusOne);
         // Test null
-        assertNull(SymbolicExecutionUtil.improveReadability(null, services));
+        Assertions.assertNull(SymbolicExecutionUtil.improveReadability(null, services));
         assertTerm(notAleqb, SymbolicExecutionUtil.improveReadability(notAleqb, null));
         // Test simple ! <, ! <=, ! >, ! >= improvements
         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(notAleqb, services));
@@ -124,7 +126,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
      * {@link SymbolicExecutionUtil#setChoiceSetting(String, String)} and
      * {@link SymbolicExecutionUtil#isChoiceSettingInitialised()}.
      */
-    @Test public void test2GetAndSetChoiceSetting() throws Exception {
+    @Test public void test2GetAndSetChoiceSetting() {
         String originalValue = null;
         try {
             //weigl: disable, no clue why the choice settings should be initialised
@@ -139,11 +141,11 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             // Change value and make sure that it has changed
             String newValue = SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW.equals(originalValue) ? SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN : SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW;
             SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            assertEquals(newValue, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+            Assertions.assertEquals(newValue, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
             // Make sure that all other settings are unchanged.
             HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            assertEquals(defaultSettings, changedSettings);
+            Assertions.assertEquals(defaultSettings, changedSettings);
         } finally {
             if (originalValue != null) {
                 SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalValue);

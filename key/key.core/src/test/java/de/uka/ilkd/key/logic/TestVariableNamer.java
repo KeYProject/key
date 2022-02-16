@@ -13,32 +13,15 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -46,10 +29,17 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+
+import java.util.Collections;
+import java.util.Iterator;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class TestVariableNamer extends TestCase {
+public class TestVariableNamer {
     
 
     private final Proof proof = new Proof("TestVariableNamer", 
@@ -71,11 +61,6 @@ public class TestVariableNamer extends TestCase {
 						false);
     
     
-    public TestVariableNamer(String name) {
-	super(name);
-    }
-        
-
     private ProgramVariable constructProgramVariable(ProgramElementName name) {
 	KeYJavaType myKeyJavaType
 	    = new KeYJavaType(new SortImpl(new Name("mysort")));
@@ -84,7 +69,7 @@ public class TestVariableNamer extends TestCase {
 
     private ProgramVariable constructProgramVariable(String name) {
     	ProgramElementName pen = VariableNamer.parseName(name);
-	assertTrue(pen.toString().equals(name));
+		assertEquals(pen.toString(), name);
     	return constructProgramVariable(pen);
     }
 
@@ -107,9 +92,8 @@ public class TestVariableNamer extends TestCase {
     private Goal constructGoal(SequentFormula containedFormula) {
     	Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
     	Semisequent ante = empty.insert(0, containedFormula).semisequent();
-	Semisequent succ = empty;
 
-    	Sequent seq = Sequent.createSequent(ante, succ);
+		Sequent seq = Sequent.createSequent(ante, empty);
 	Node node = new Node(proof, seq);
 
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -174,20 +158,22 @@ public class TestVariableNamer extends TestCase {
     }
 
 
+	@Test
     private void testTemporaryNames(VariableNamer vn) {
     	ProgramElementName name = vn.getTemporaryNameProposal("x");
-	assertFalse(name.getProgramName().equals("x"));
+		assertNotEquals("x", name.getProgramName());
 
 	ProgramVariable v = constructProgramVariable(name);
 	SequentFormula formula = constructFormula(v);
 	Goal goal = constructGoal(formula);
 	PosInOccurrence pio = constructPIO(formula);
 	v = vn.rename(v, goal, pio);
-	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
+		assertEquals("x", v.getProgramElementName().getProgramName());
     }
 
 
-    public void testInnerRename() {    	
+    @Test
+	public void testInnerRename() {
     	VariableNamer vn = services.getVariableNamer();
 	ProgramVariable v, w;
 
@@ -195,19 +181,19 @@ public class TestVariableNamer extends TestCase {
  	Goal goal = constructGoal(formulaWithX);
 
 	v = vn.rename(y, goal, pio);
-	assertTrue(v.getProgramElementName().getProgramName().equals("y"));
+		assertEquals("y", v.getProgramElementName().getProgramName());
 
    	v = vn.rename(xx, goal, pio);
-	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
+		assertEquals("x", v.getProgramElementName().getProgramName());
 
 //        proof.getNamespaces().programVariables().addSafely(v);
 	addGlobal(goal, v);
 	w = vn.rename(x, goal, pio);
-        assertTrue(w.getProgramElementName().getProgramName().equals("x_1"));
+		assertEquals("x_1", w.getProgramElementName().getProgramName());
 	assertTrue(inGlobals(goal, v));
 
 	// Reset progVar namespace which was altered due to addGlobal()
-	proof.getNamespaces().setProgramVariables(new Namespace<IProgramVariable>());
+	proof.getNamespaces().setProgramVariables(new Namespace<>());
 	testTemporaryNames(vn);
     }
 
@@ -229,7 +215,8 @@ public class TestVariableNamer extends TestCase {
     //	assertTrue(inTacletApps(goal, v));
     //    }
     
-    public void testNameProposals() {
+    @Test
+	public void testNameProposals() {
     	VariableNamer vn = services.getVariableNamer();
 	ProgramElementName proposal;
 
@@ -241,7 +228,7 @@ public class TestVariableNamer extends TestCase {
 						       pio,
 						       null,
 						       null);
-	assertTrue(proposal.toString().equals("var_2"));
+		assertEquals("var_2", proposal.toString());
 
         proof.getNamespaces().programVariables().addSafely(var_2);
 	addGlobal(goal, var_2);
@@ -251,11 +238,12 @@ public class TestVariableNamer extends TestCase {
 						       pio,
 						       null,
 						       null);
-	assertTrue(proposal.toString().equals("var_2"));
+		assertEquals("var_2", proposal.toString());
     }
     
     
-    public void testInnerRenameUniqueness() {     	
+    @Test
+	public void testInnerRenameUniqueness() {
     	VariableNamer vn = services.getVariableNamer();
 	ProgramVariable v;
 	
@@ -266,6 +254,6 @@ public class TestVariableNamer extends TestCase {
 	addTacletApp(goal, x_2);
 	
 	v = vn.rename(x, goal, pio);
-	assertTrue(v.getProgramElementName().getProgramName().equals("x_2"));
+		assertEquals("x_2", v.getProgramElementName().getProgramName());
     }
 }

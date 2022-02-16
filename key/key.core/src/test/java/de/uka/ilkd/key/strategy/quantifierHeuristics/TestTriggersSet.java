@@ -13,32 +13,18 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
-import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 //most Code are copyed from Logic.TestUpdateFactory
@@ -47,11 +33,11 @@ public class TestTriggersSet {
 
 	private Proof proof;
     
-	private Namespace<QuantifiableVariable> variables = new Namespace<>();
+	private final Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-	private Namespace<Function> functions = new Namespace<>();
+	private final Namespace<Function> functions = new Namespace<>();
 
-	private Namespace<Sort> sorts = new Namespace<>();
+	private final Namespace<Sort> sorts = new Namespace<>();
 
 	//sort 
 	private Sort r;
@@ -109,7 +95,7 @@ public class TestTriggersSet {
 		super();
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		//sort
 		r = new SortImpl(new Name("r"));
@@ -145,12 +131,12 @@ public class TestTriggersSet {
         
         
         	        //function
-		frr = new Function(new Name("frr"), r, new Sort[] { r });
-		f2rr = new Function(new Name("f2rr"), r, new Sort[] { r });
-		fsr = new Function(new Name("fsr"), r, new Sort[] { s });
-		ftr = new Function(new Name("ftr"), r, new Sort[] { t });
-		fstr= new Function(new Name("fst"),r, new Sort[] {s,t});
-		frstr=new Function(new Name("frstr"),r,new Sort[]{r,s,t});
+		frr = new Function(new Name("frr"), r, r);
+		f2rr = new Function(new Name("f2rr"), r, r);
+		fsr = new Function(new Name("fsr"), r, s);
+		ftr = new Function(new Name("ftr"), r, t);
+		fstr= new Function(new Name("fst"),r, s,t);
+		frstr=new Function(new Name("frstr"),r, r,s,t);
 		
 		functions.add(frr);
 		functions.add(f2rr);
@@ -159,11 +145,11 @@ public class TestTriggersSet {
 		functions.add(fstr);
 		functions.add(frstr);
         
-		gss = new Function(new Name("gss"), s, new Sort[] { s });
-		grs = new Function(new Name("grs"), s, new Sort[] { r });
-		gts = new Function(new Name("gts"), s, new Sort[] { t });
-		grts= new Function(new Name("grts"),s, new Sort[] {r,t});
-		grsts=new Function(new Name("grsts"),s,new Sort[]{r,s,t});
+		gss = new Function(new Name("gss"), s, s);
+		grs = new Function(new Name("grs"), s, r);
+		gts = new Function(new Name("gts"), s, t);
+		grts= new Function(new Name("grts"),s, r,t);
+		grsts=new Function(new Name("grsts"),s, r,s,t);
 
 		functions.add(gss);
 		functions.add(grs);
@@ -171,11 +157,11 @@ public class TestTriggersSet {
 		functions.add(grts);
 		functions.add(grsts);
         
-		htt = new Function(new Name("htt"), t, new Sort[] { t });
-		hrt = new Function(new Name("hrt"), t, new Sort[] { r });
-		hst = new Function(new Name("hst"), t, new Sort[] { s });
-		hrst= new Function(new Name("hrst"),t, new Sort[] {r,s});
-		hrstt=new Function(new Name("hrstt"),t,new Sort[]{r,s,t});
+		htt = new Function(new Name("htt"), t, t);
+		hrt = new Function(new Name("hrt"), t, r);
+		hst = new Function(new Name("hst"), t, s);
+		hrst= new Function(new Name("hrst"),t, r,s);
+		hrstt=new Function(new Name("hrstt"),t, r,s,t);
 	
 		functions.add(htt);
 		functions.add(hrt);
@@ -185,18 +171,18 @@ public class TestTriggersSet {
         
 		//Formula function
 		pp=new Function(new Name("pp"),Sort.FORMULA,
-				                    new Sort[]{Sort.FORMULA});
-		pr=new Function(new Name("pr"),Sort.FORMULA,new Sort[]{r});
-		ps=new Function(new Name("ps"),Sort.FORMULA,new Sort[]{s});
-		pt=new Function(new Name("pt"),Sort.FORMULA,new Sort[]{t});
+				Sort.FORMULA);
+		pr=new Function(new Name("pr"),Sort.FORMULA, r);
+		ps=new Function(new Name("ps"),Sort.FORMULA, s);
+		pt=new Function(new Name("pt"),Sort.FORMULA, t);
 		prs=new Function(new Name("prs"),Sort.FORMULA,
-				        new Sort[]{r,s});
+				r,s);
 		prt=new Function(new Name("prt"),Sort.FORMULA,
-				        new Sort[]{r,t});
+				r,t);
 		pst=new Function(new Name("pst"),Sort.FORMULA,
-				        new Sort[]{s,t});
+				s,t);
 		prst=new Function(new Name("prst"),Sort.FORMULA,
-				        new Sort[]{r,s,t});
+				r,s,t);
 		//pi=new Function(new Name("pi"),Sort.FORMULA,new Sort[]{});
 		functions.add(pp);
 		functions.add(pr);
@@ -216,15 +202,15 @@ public class TestTriggersSet {
 		proof.add(g);
 
 		proof.setNamespaces(new NamespaceSet(variables, functions, sorts,
-				new Namespace<RuleSet>(), new Namespace<Choice>(),
-				new Namespace<IProgramVariable>() ));
+				new Namespace<>(), new Namespace<>(),
+				new Namespace<>() ));
 
 	}
 
 	private Term parseTerm(String termstr) {
 		return TacletForTests.parseTerm(termstr, new NamespaceSet(
-				variables, functions, sorts, new Namespace<RuleSet>(),
-				new Namespace<Choice>(), new Namespace<IProgramVariable>()));
+				variables, functions, sorts, new Namespace<>(),
+				new Namespace<>(), new Namespace<>()));
 	}
 
 	@Test
@@ -234,21 +220,21 @@ public class TestTriggersSet {
 		Term trigger1= allterm.sub(0);
 		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
-		assertEquals (1,triggerNum);
+		assertEquals(1, triggerNum);
 		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
-		assertEquals (trigger1,trigger2);
+		assertEquals(trigger1, trigger2);
 	}
 
 	@Test
-	@Ignore("See Issues #1499")
+	@Disabled("See Issues #1499")
 	public void testTrigger2(){
 		String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
 		Term allterm = parseTerm(term1);
 		Term trigger1= allterm.sub(0).sub(1);
 		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
-		assertEquals (1,triggerNum);
+		assertEquals(1, triggerNum);
 		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
-		assertEquals (trigger1,trigger2);
+		assertEquals(trigger1, trigger2);
 	}
 }

@@ -7,12 +7,14 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class RewriteTest {
 
@@ -25,11 +27,11 @@ public class RewriteTest {
         File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
         File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
 
-        Assume.assumeTrue("Required script file not found: " + script, script.exists());
-        Assume.assumeTrue("Required KeY file not found: " + keyFile, keyFile.exists());
+        assumeTrue(script.exists(), "Required script file not found: " + script);
+        assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
-        Assert.assertNotNull(env);
+        assertNotNull(env);
 
         Proof p = env.getLoadedProof();
         ProofScriptEngine engine = new ProofScriptEngine(script);
@@ -38,7 +40,7 @@ public class RewriteTest {
         String firstOpenGoal = p.openGoals().head().sequent().toString();
         String expectedSequent = "[equals(x,f),equals(x,z)]==>[equals(z,f)]";
 
-        Assert.assertEquals(expectedSequent, firstOpenGoal);
+        assertEquals(expectedSequent, firstOpenGoal);
     }
 
     /**
@@ -50,8 +52,8 @@ public class RewriteTest {
         File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
         File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
 
-        Assume.assumeTrue("Required script file not found: " + script, script.exists());
-        Assume.assumeTrue("Required KeY file not found: " + keyFile, keyFile.exists());
+        assumeTrue(script.exists(), "Required script file not found: " + script);
+        assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         Proof proof = env.getLoadedProof();
@@ -61,6 +63,6 @@ public class RewriteTest {
         String firstOpenGoal = proof.openGoals().head().sequent().toString();
         String expectedSequent = "[]==>[imp(and(gt(x,f),lt(x,z)),lt(f,z))]";
 
-        Assert.assertEquals(expectedSequent, firstOpenGoal);
+        assertEquals(expectedSequent, firstOpenGoal);
     }
 }

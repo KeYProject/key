@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -41,6 +42,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
     * of symbolic execution tree nodes to make sure that the
     * stop conditions works correctly in combination with the goal chooser.
     */
+   @Test//weigl not prev. activated
    public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;

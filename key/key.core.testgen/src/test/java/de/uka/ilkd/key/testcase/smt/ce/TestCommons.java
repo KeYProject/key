@@ -24,8 +24,10 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +35,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Use this class for testing SMT: It provides a mechanism to load proofs and
@@ -70,7 +71,7 @@ public abstract class TestCommons {
 
     public abstract boolean toolNotInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid) throws IOException, ProblemLoaderException {
+    protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
         if (toolNotInstalled()) {
             return true;
         }
@@ -99,12 +100,12 @@ public abstract class TestCommons {
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected SMTSolverResult checkFile(String filepath) throws IOException, ProblemLoaderException {
+    protected SMTSolverResult checkFile(String filepath) throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
-            Assert.assertNotNull(proof);
-            assertTrue(proof.openGoals().size() == 1);
+            assertNotNull(proof);
+            assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
             return checkGoal(g);
         } finally {
@@ -144,7 +145,7 @@ public abstract class TestCommons {
 
     protected HashSet<String> getTacletNames() {
         Collection<Taclet> set = getTaclets();
-        HashSet<String> names = new HashSet<String>();
+        HashSet<String> names = new HashSet<>();
         for (Taclet taclet : set) {
             names.add(taclet.name().toString());
         }
@@ -170,8 +171,8 @@ public abstract class TestCommons {
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
      * @param file problem file.
+     * @param pro  determines the profile that should be used.
      * @return ProofAggregate of the problem file.
-     * @profile determines the profile that should be used.
      */
     protected ProofAggregate parse(File file, Profile pro) {
         assertTrue(file.exists());
@@ -187,8 +188,7 @@ public abstract class TestCommons {
             services = initConfig.getServices();
             // po.close();
         } catch (Exception e) {
-            fail("Error while loading problem file " + file + ":\n\n"
-                    + e.getMessage());
+            fail("Error while loading problem file " + file + ":\n\n" + e.getMessage());
         }
         return result;
     }

@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,18 +26,23 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link ExecutionNodePreorderIterator}.
  * @author Martin Hentschel
  */
-public class TestExecutionNodePreorderIterator extends TestCase {
+public class TestExecutionNodePreorderIterator {
    /**
     * Tests a tree of {@link IExecutionNode}s with three levels after root.
     */
-   @Test public void testNodesThreeLevel() throws ProofInputException {
+   @Test
+   public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
@@ -217,7 +218,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       /**
        * The expected name.
        */
-      private String expectedName;
+      private final String expectedName;
       
       /**
        * The expected children.
@@ -267,11 +268,11 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    protected ExpectedNode[] createExpectedNodes(String[] expectedNames, ExpectedNode[]... children) {
       assertEquals(expectedNames.length, children.length);
-      List<ExpectedNode> result = new LinkedList<ExpectedNode>();
+      List<ExpectedNode> result = new LinkedList<>();
       for (int i = 0; i < expectedNames.length; i++) {
          result.add(new ExpectedNode(expectedNames[i], children[i]));
       }
-      return result.toArray(new ExpectedNode[result.size()]);
+      return result.toArray(new ExpectedNode[0]);
    }
    
    /**
@@ -280,11 +281,11 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @return The created {@link ExpectedNode}s.
     */
    protected ExpectedNode[] createExpectedNodes(String... expectedNames) {
-      List<ExpectedNode> result = new LinkedList<ExpectedNode>();
+      List<ExpectedNode> result = new LinkedList<>();
       for (String name : expectedNames) {
          result.add(new ExpectedNode(name));
       }
-      return result.toArray(new ExpectedNode[result.size()]);
+      return result.toArray(new ExpectedNode[0]);
    }
    
    /**

@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.runners.MethodSorters;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
@@ -20,15 +9,14 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +24,15 @@ import org.slf4j.LoggerFactory;
  * Tests for {@link TruthValueTracingUtil}.
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    private static final Logger LOGGER = LoggerFactory.getLogger(TestTruthValueEvaluationUtil.class);
 
    /**
     * Tests example: /set/truthValueWeakeningTest
     */
-	@Test public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+	@Test
+    public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
       // Create expected results
       ExpectedBranchResult seGoal = new ExpectedBranchResult();
       ExpectedBranchResult weakeningGoal = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.FALSE),
@@ -194,7 +183,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueBlockContractMagic42
     */
-	@Ignore
+   @Test
+   @Disabled
 	public void IGNORE_testBlockContractMagic42() throws Exception {
       // Create expected results
       ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
@@ -267,6 +257,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueAddingOfLabeledSubtree
     */
+   @Test@Disabled
    public void IGNORE_testAddingOfLabeledSubtree() throws Exception {
       // Create expected results
       ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
@@ -297,8 +288,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueAssignableAndLoop
     */
-	@Ignore
-    public void IGNORE_testAssignableAndLoop() throws Exception {
+   @Test@Disabled
+   public void IGNORE_testAssignableAndLoop() throws Exception {
       // Create expected results
       ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
@@ -814,8 +805,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-	@Ignore
-	public void IGNORE_testArrayUtil_NoOneStepSimplification() throws Exception {
+   @Test@Disabled
+   public void IGNORE_testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
@@ -840,8 +831,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-	@Ignore
-	public void IGNORE_testArrayUtil() throws Exception {
+   @Test@Disabled
+   public void IGNORE_testArrayUtil() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
@@ -972,8 +963,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    
    /**
     * Performs an {@link TruthValueTracingUtil} test.
-    * @param javaPathInBaseDir The path to the java file inside the base directory.
-    * @param baseContractName The name of the contract.
+    * @param proofFilePathInBaseDir The path to the java file inside the base directory.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
@@ -1079,7 +1069,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, 
                                              ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
-      List<TruthValueTracingResult> currentResults = new LinkedList<TruthValueTracingResult>();
+      List<TruthValueTracingResult> currentResults = new LinkedList<>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
       while (iter.hasNext()) {
          IExecutionNode<?> next = iter.next();
@@ -1120,15 +1110,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param current The current results.
     */
    protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueTracingResult> current) {
-      assertEquals(expected.length, current.size());
+      Assertions.assertEquals(expected.length, current.size());
       int i = 0;
       Iterator<TruthValueTracingResult> currentIter = current.iterator();
       while (i < expected.length && currentIter.hasNext()) {
          assertTruthValueResults(expected[i], currentIter.next());
          i++;
       }
-      assertEquals(expected.length, i);
-      assertFalse(currentIter.hasNext());
+      Assertions.assertEquals(expected.length, i);
+      Assertions.assertFalse(currentIter.hasNext());
    }
    
    /**
@@ -1138,7 +1128,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueTracingResult current) {
       BranchResult[] currentResults = current.getBranchResults();
-      assertEquals(expected.branchResults.length, currentResults.length);
+      Assertions.assertEquals(expected.branchResults.length, currentResults.length);
       for (int i = 0; i < currentResults.length; i++) {
          assertBranchResult(expected.branchResults[i], currentResults[i]);
       }
@@ -1151,18 +1141,18 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
       Map<String, MultiEvaluationResult> currentResults = current.getResults();
-      assertTrue("To many expected results at goal " + current.getLeafNode().serialNr(), expected.labelResults.size() <= currentResults.size());
+      Assertions.assertTrue(expected.labelResults.size() <= currentResults.size(), "To many expected results at goal " + current.getLeafNode().serialNr());
       for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
          MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
-         assertNotNull("Current result of " + expectedEntry.getKey() + " is missing at goal " + current.getLeafNode().serialNr() + ".", currentInstruction);
+         assertNotNull(currentInstruction, "Current result of " + expectedEntry.getKey() + " is missing at goal " + current.getLeafNode().serialNr() + ".");
          TruthValue currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
          TruthValue expectedValue = expectedEntry.getValue();
          if (expectedValue == null) {
-            assertNull(currentResult);
+            Assertions.assertNull(currentResult);
          }
          else {
-            assertNotNull("Current result of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + " is not available.", currentResult);
-            assertEquals("Wrong truth value of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + ".", expectedValue, currentResult);
+            assertNotNull(currentResult, "Current result of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + " is not available.");
+            Assertions.assertEquals(expectedValue, currentResult, "Wrong truth value of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + ".");
          }
       }
    }
@@ -1194,7 +1184,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       /**
        * The truth values of all labels.
        */
-      private final Map<String, TruthValue> labelResults = new HashMap<String, TruthValue>();
+      private final Map<String, TruthValue> labelResults = new HashMap<>();
 
       /**
        * Constructor.

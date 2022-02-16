@@ -13,41 +13,16 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelException;
-import de.uka.ilkd.key.logic.label.TermLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -61,64 +36,74 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link TermLabelManager}
  * @author Martin Hentschel
  */
-public class TestTermLabelManager extends TestCase {
-   /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
-    */
+public class TestTermLabelManager {
+   @Test
    public void testrefactorGoal_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE);
    }
 
-   /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
-    */
+   @Test
    public void testrefactorGoal_childrenAndGrandchildren_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE, "rule");
    }
 
-   /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
-    */
+
+   @Test
    public void testrefactorGoal_directChildren_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_DIRECT_CHILDREN);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
+    * 
     */
+   @Test
    public void testrefactorGoal_directChildren_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_DIRECT_CHILDREN, "rule");
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
+    * 
     */
+   @Test
    public void testrefactorGoal_none_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(false, false, RefactoringScope.NONE);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
+    * 
     */
+   @Test
    public void testrefactorGoal_none_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(false, false, RefactoringScope.NONE, "rule");
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
+    * 
     */
+   @Test
    public void testrefactorGoal_sequent_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.SEQUENT);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Rule, Goal, Term)}
+    * 
     */
+   @Test
    public void testrefactorGoal_sequent_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.SEQUENT, "rule");
    }
@@ -221,8 +206,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_updates_allRules() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")));
       Services services = null;
@@ -248,8 +234,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_updates_ruleSpecific() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")), "rule");
       Services services = null;
@@ -274,8 +261,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_childAndGrandchildPolicies_allRules() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
       Services services = null;
@@ -323,8 +311,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_childAndGrandchildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
       Services services = null;
@@ -360,9 +349,10 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     * @throws ProblemLoaderException Occurred Exception
     */
+   @Test
    public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
       Services services = createTestServices(null, null, policy, null, null, null).getServices();
@@ -395,8 +385,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_directChildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
       Services services = null;
@@ -428,8 +419,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_modalityTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
       Services services = null;
@@ -442,7 +434,7 @@ public class TestTermLabelManager extends TestCase {
       Term modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
       LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
       Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
-      Term updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
+      Term updateApp = TB.apply(update, modality, new ImmutableArray<>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
       PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
       Term taclet = TB.tt();
       Rule rule = new DummyRule("rule");
@@ -457,8 +449,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_applicationTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
       Services services = null;
@@ -481,8 +474,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_taclet() {
       Services services = null;
     try {
@@ -492,7 +486,7 @@ public class TestTermLabelManager extends TestCase {
     }
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(), new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("TACLET"))));
+      Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(), new ImmutableArray<>(new ParameterlessTermLabel(new Name("TACLET"))));
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
       assertEquals(1, labels.size());
@@ -500,8 +494,9 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    *
     */
+   @Test
    public void testInstantiateLabels_null() {
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), null, null, null, null, null, null, null, null, null, null, null, null);
       assertNotNull(labels);
@@ -527,9 +522,8 @@ public class TestTermLabelManager extends TestCase {
       return TB.label(TB.add(one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
    }
 
-   /**
-    * Tests {@link TermLabelManager#parseLabel(String, List)}.
-    */
+
+   @Test
    public void testParseLabel() throws TermLabelException {
       Services services = null;
     try {
@@ -566,6 +560,7 @@ public class TestTermLabelManager extends TestCase {
    /**
     * Tests {@link TermLabelManager#getSupportedTermLabelNames(Services)}.
     */
+   @Test
    public void testGetSupportedTermLabelNames() {
       // Test null
       ImmutableList<Name> names = TermLabelManager.getSupportedTermLabelNames(null);
@@ -591,8 +586,9 @@ public class TestTermLabelManager extends TestCase {
    /**
     * Tests {@link TermLabelManager#getTermLabelManager(de.uka.ilkd.key.java.Services)}.
     */
+   @Test
    public void testGetTermLabelManager() {
-      assertNull(TermLabelManager.getTermLabelManager(null));
+      Assertions.assertNull(TermLabelManager.getTermLabelManager(null));
       Services services = new Services(JavaProfile.getDefaultProfile());
       TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
       assertSame(services.getProfile().getTermLabelManager(), manager);
@@ -658,7 +654,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {
-      private RefactoringScope scope;
+      private final RefactoringScope scope;
 
       private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
 
@@ -681,7 +677,7 @@ public class TestTermLabelManager extends TestCase {
 
       @Override
       public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
-         List<TermLabel> changedLabels = new LinkedList<TermLabel>();
+         List<TermLabel> changedLabels = new LinkedList<>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {
                changedLabels.add(label);
@@ -697,7 +693,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class LoggingTermLabelUpdate implements TermLabelUpdate {
-      private TermLabel toAdd;
+      private final TermLabel toAdd;
 
       private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
 
@@ -715,16 +711,14 @@ public class TestTermLabelManager extends TestCase {
 
       @Override
       public void updateLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
-         if (!labels.contains(toAdd)) {
-            labels.add(toAdd);
-         }
+          labels.add(toAdd);
       }
    }
 
    private static class LoggingChildTermLabelPolicy implements ChildTermLabelPolicy {
       private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
 
-      private List<TermLabel> log = new LinkedList<TermLabel>();
+      private final List<TermLabel> log = new LinkedList<>();
 
       public LoggingChildTermLabelPolicy(String... supportedRules) {
          for (String rule : supportedRules) {
@@ -754,7 +748,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class LoggingTermLabelPolicy implements TermLabelPolicy {
-      private List<TermLabel> log = new LinkedList<TermLabel>();
+      private final List<TermLabel> log = new LinkedList<>();
 
       @Override
       public TermLabel keepLabel(TermLabelState state,
@@ -781,22 +775,22 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class LoggingFactory implements TermLabelFactory<TermLabel> {
-      private Name label;
+      private final Name label;
 
       public LoggingFactory(Name label) {
          this.label = label;
       }
 
       @Override
-      public TermLabel parseInstance(List<String> arguments, TermServices services) throws TermLabelException {
+      public TermLabel parseInstance(List<String> arguments, TermServices services) {
          return new LoggingTermLabel(label, arguments);
       }
    }
 
    private static class LoggingTermLabel implements TermLabel {
-      private Name name;
+      private final Name name;
 
-      private List<String> arguments;
+      private final List<String> arguments;
 
       public LoggingTermLabel(Name name, List<String> arguments) {
          assert name != null;
@@ -821,7 +815,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class DummyRule implements Rule {
-      private String name;
+      private final String name;
 
       public DummyRule(String name) {
          this.name = name;

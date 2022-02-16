@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -39,6 +40,7 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition extends Abstr
    /**
     * Does some step return tests on one branch.
     */
+   @Test//weigl was not prev. activated
    public void testStepReturn() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;

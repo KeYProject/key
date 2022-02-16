@@ -1,15 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -23,8 +13,17 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofUserManager;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.java.ArrayUtil;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link SideProofStore}
@@ -45,7 +44,8 @@ public class TestSideProofStore {
     * </ul>
     */
    @SuppressWarnings("unchecked")
-   @Test public void testProofManagement() {
+   @Test
+   public void testProofManagement() {
       LoggingProofStoreListener listener = new LoggingProofStoreListener();
       try {
          SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
@@ -64,33 +64,38 @@ public class TestSideProofStore {
          assertEntries(allProofs, new Proof[0]);
          // Add proof p1
          SideProofStore.DEFAULT_INSTANCE.addProof("P1", p1);
-         assertEntries(allProofs, new Proof[0], new Pair<String, Proof>("P1", p1));
-         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE, new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p1)}));
+         assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1));
+         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
+                 new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p1)}));
          listener.assertRemovedLog();
          // Add proof p2
          SideProofStore.DEFAULT_INSTANCE.addProof("P2", p2);
-         assertEntries(allProofs, new Proof[0], new Pair<String, Proof>("P1", p1), new Pair<String, Proof>("P2", p2));
-         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE, new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p2)}));
+         assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1), new Pair<>("P2", p2));
+         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
+                 new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p2)}));
          listener.assertRemovedLog();
          // Add proof p3
          SideProofStore.DEFAULT_INSTANCE.addProof("P3", p3);
-         assertEntries(allProofs, new Proof[0], new Pair<String, Proof>("P1", p1), new Pair<String, Proof>("P2", p2), new Pair<String, Proof>("P3", p3));
-         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE, new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p3)}));
+         assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1), new Pair<>("P2", p2), new Pair<>("P3", p3));
+         listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
+                 new Entry[] {SideProofStore.DEFAULT_INSTANCE.getEntry(p3)}));
          listener.assertRemovedLog();
          // Remove p1 and p3
-         List<Entry> toRemove = new LinkedList<Entry>();
+         List<Entry> toRemove = new LinkedList<>();
          toRemove.add(SideProofStore.DEFAULT_INSTANCE.getEntry(p1));
          toRemove.add(SideProofStore.DEFAULT_INSTANCE.getEntry(p3));
          SideProofStore.DEFAULT_INSTANCE.removeEntries(toRemove);
-         assertEntries(allProofs, new Proof[] {p1, p3}, new Pair<String, Proof>("P2", p2));
+         assertEntries(allProofs, new Proof[] {p1, p3}, new Pair<>("P2", p2));
          listener.assertAddedLog();
-         listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE, toRemove.toArray(new Entry[toRemove.size()])));
+         listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
+                 toRemove.toArray(new Entry[0])));
          // Remove p2
          toRemove = Collections.singletonList(SideProofStore.DEFAULT_INSTANCE.getEntry(p2));
          SideProofStore.DEFAULT_INSTANCE.removeEntries(toRemove);
          assertEntries(allProofs, new Proof[] {p1, p2, p3});
          listener.assertAddedLog();
-         listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE, toRemove.toArray(new Entry[toRemove.size()])));
+         listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
+                 toRemove.toArray(new Entry[0])));
       }
       finally {
          SideProofStore.DEFAULT_INSTANCE.removeProofStoreListener(listener);
@@ -103,25 +108,26 @@ public class TestSideProofStore {
     * @param disposedProofs The expected disposed {@link Proof}s.
     * @param expectedEntries The expected entries in {@link SideProofStore#DEFAULT_INSTANCE}.
     */
-   private void assertEntries(Proof[] allProofs, Proof[] disposedProofs, @SuppressWarnings("unchecked") Pair<String, Proof>... expectedEntries) {
+   @SuppressWarnings("unchecked")
+   private void assertEntries(Proof[] allProofs, Proof[] disposedProofs,  Pair<String, Proof>... expectedEntries) {
       // Test entries
-      List<Proof> containedProofs = new LinkedList<Proof>();
+      List<Proof> containedProofs = new LinkedList<>();
       assertEquals(expectedEntries.length, SideProofStore.DEFAULT_INSTANCE.countEntries());
       Entry[] entries = SideProofStore.DEFAULT_INSTANCE.getEntries();
       assertEquals(expectedEntries.length, entries.length);
       for (int i = 0; i < expectedEntries.length; i++) {
          assertEquals(entries[i].getDescription(), expectedEntries[i].first);
-         assertSame(entries[i].getProof(), expectedEntries[i].second);
-         assertSame(entries[i], SideProofStore.DEFAULT_INSTANCE.getEntryAt(i));
+         Assertions.assertSame(entries[i].getProof(), expectedEntries[i].second);
+         Assertions.assertSame(entries[i], SideProofStore.DEFAULT_INSTANCE.getEntryAt(i));
          KeYEnvironment<DefaultUserInterfaceControl> ui = entries[i].getEnvironment();
-         assertNotNull(ui);
+         Assertions.assertNotNull(ui);
          KeYEnvironment<DefaultUserInterfaceControl> uiAgain = entries[i].getEnvironment();
-         assertSame(ui, uiAgain);
+         Assertions.assertSame(ui, uiAgain);
          containedProofs.add(expectedEntries[i].second);
-         assertFalse(entries[i].getProof().isDisposed());
+         Assertions.assertFalse(entries[i].getProof().isDisposed());
          Object[] user = ProofUserManager.getInstance().getUsers(entries[i].getProof());
          assertEquals(1, user.length);
-         assertSame(SideProofStore.DEFAULT_INSTANCE, user[0]);
+         Assertions.assertSame(SideProofStore.DEFAULT_INSTANCE, user[0]);
       }
       // Test proofs
       for (Proof proof : allProofs) {
@@ -141,12 +147,12 @@ public class TestSideProofStore {
       /**
        * The log with added entries.
        */
-      private final List<SideProofStoreEvent> addedLog = new LinkedList<SideProofStoreEvent>();
+      private final List<SideProofStoreEvent> addedLog = new LinkedList<>();
       
       /**
        * The log with removed entries.
        */
-      private final List<SideProofStoreEvent> removedLog = new LinkedList<SideProofStoreEvent>();
+      private final List<SideProofStoreEvent> removedLog = new LinkedList<>();
 
       /**
        * {@inheritDoc}
@@ -212,24 +218,26 @@ public class TestSideProofStore {
          SideProofStore.DEFAULT_INSTANCE.setEnabled(false);
          SideProofStore.DEFAULT_INSTANCE.addPropertyChangeListener(SideProofStore.PROP_ENABLED, listener);
          // Test initial disabled state
-         assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
+         Assertions.assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
          listener.assertLog();
          // Set disabled again
          SideProofStore.DEFAULT_INSTANCE.setEnabled(false);
-         assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
+         Assertions.assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
          listener.assertLog();
          // Change to enabled
          SideProofStore.DEFAULT_INSTANCE.setEnabled(true);
-         assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
-         listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE, SideProofStore.PROP_ENABLED, false, true));
+         Assertions.assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
+         listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE, SideProofStore.PROP_ENABLED,
+                 false, true));
          // Set enabled again
          SideProofStore.DEFAULT_INSTANCE.setEnabled(true);
-         assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
+         Assertions.assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
          listener.assertLog();
          // Change to dissabled
          SideProofStore.DEFAULT_INSTANCE.setEnabled(false);
-         assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
-         listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE, SideProofStore.PROP_ENABLED, true, false));
+         Assertions.assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
+         listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE, SideProofStore.PROP_ENABLED,
+                 true, false));
       }
       finally {
          SideProofStore.DEFAULT_INSTANCE.removePropertyChangeListener(SideProofStore.PROP_ENABLED, listener);
@@ -245,7 +253,7 @@ public class TestSideProofStore {
       /**
        * The log.
        */
-      private final List<PropertyChangeEvent> log = new LinkedList<PropertyChangeEvent>();
+      private final List<PropertyChangeEvent> log = new LinkedList<>();
 
       /**
        * {@inheritDoc}

@@ -6,8 +6,8 @@
  */
 package recoder.testsuite.transformation;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.DefaultSourceFileRepository;
@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 //import application.Obfuscate;
 
 
@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Tests some transformations.
  */
-@Ignore
+@Disabled
 public class TransformationTests {
     private CrossReferenceServiceConfiguration crsc;
     private DefaultSourceFileRepository dsfr;

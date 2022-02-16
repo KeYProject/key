@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestName extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+public class TestName {
+    @Test
     public void testEquals (){
         Name n = new Name("test");
         Name m = new Name(new String("test"));
