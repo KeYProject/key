@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
@@ -17,6 +17,6 @@ public class SMTCommandTest {
 
         SMTCommand cmd = new SMTCommand();
         SMTCommand.SMTCommandArguments o = cmd.evaluateArguments(new EngineState(null), args);
-        Assert.assertEquals("z3", o.solver);
+        Assertions.assertEquals("z3", o.solver);
     }
 }

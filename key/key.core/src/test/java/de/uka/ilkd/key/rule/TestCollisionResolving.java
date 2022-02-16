@@ -11,56 +11,40 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/** these tests are used to control if the collision mechanisms work
- * correct. Collisions may be: collisions between variablesv, with the
- * context or or inside formula- and termsvs
- */
 package de.uka.ilkd.key.rule;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCollisionResolving extends TestCase {
+/** these tests are used to control if the collision mechanisms work
+ * correct. Collisions may be: collisions between variablesv, with the
+ * context or or inside formula- and termsvs
+ */
+public class TestCollisionResolving {
 
     Sort s;
     Goal goal;
     Services services;
 
-    public TestCollisionResolving(String name) {
-	super(name);
-    }
-
-    @Override
-    public void setUp() {
+    @BeforeEach
+	public void setUp() {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	s = (Sort)TacletForTests.getSorts().lookup(new Name("s"));
+	s = TacletForTests.getSorts().lookup(new Name("s"));
 
    	services = TacletForTests.services();
 
@@ -77,19 +61,20 @@ public class TestCollisionResolving extends TestCase {
 	goal = new Goal(node, ruleAppIndex);
     }
 
-    @Override
-    public void tearDown() {
+    @AfterEach
+	public void tearDown() {
         s = null;
         goal = null;
         services = null;
     }
 
+	@Test
     public void testCollisionResolvingOfSchemaVariable() {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, s);
+	Function q = new Function(new Name("q"), Sort.FORMULA, s);
 
 	Term t_x = services.getTermFactory().createTerm(x);
 	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
@@ -122,21 +107,19 @@ public class TestCollisionResolving extends TestCase {
 	    =  TacletForTests.getSchemaVariables().lookup(new Name("v"));
 
 	SVInstantiations insts=result.instantiations();
-	assertTrue("Same object for different conceptual variables",
-		   ((Term)insts.getInstantiation(b)).sub(0).op() !=
-		   ((Term)insts.getInstantiation(c)).sub(0).op());
-	assertSame(((Term)insts.getInstantiation(u)).op(),
-		   ((Term)insts.getInstantiation(b)).sub(0).op());
-	assertSame(((Term)insts.getInstantiation(v)).op(),
-		   ((Term)insts.getInstantiation(c)).sub(0).op());
+		assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(),
+				((Term) insts.getInstantiation(c)).sub(0).op(), "Same object for different conceptual variables");
+	assertSame(((Term) insts.getInstantiation(u)).op(), ((Term) insts.getInstantiation(b)).sub(0).op());
+	assertSame(((Term) insts.getInstantiation(v)).op(), ((Term) insts.getInstantiation(c)).sub(0).op());
     }
 
-    public void testCollisionResolvingWithContext() {
+    @Test
+	public void testCollisionResolvingWithContext() {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, s);
+	Function q = new Function(new Name("q"), Sort.FORMULA, s);
 
 	TermBuilder tb = services.getTermBuilder();
 
@@ -177,14 +160,12 @@ public class TestCollisionResolving extends TestCase {
 	    =  TacletForTests.getSchemaVariables().lookup(new Name("u"));
 
 	SVInstantiations insts=result.instantiations();
-	assertTrue("Same object for different conceptual variables",
-		   ((Term)insts.getInstantiation(b)).sub(0).op() !=
-		   ((Term)insts.getInstantiation(c)).sub(0).op());
-	assertSame(((Term)insts.getInstantiation(u)).op(),
-		   ((Term)insts.getInstantiation(c)).sub(0).op());
+		assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(), ((Term) insts.getInstantiation(c)).sub(0).op(), "Same object for different conceptual variables");
+	assertSame(((Term) insts.getInstantiation(u)).op(), ((Term) insts.getInstantiation(c)).sub(0).op());
     }
 
-    public void testVarNamespaceCreationWithContext() {
+    @Test
+	public void testVarNamespaceCreationWithContext() {
 	Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
 
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
@@ -211,26 +192,25 @@ public class TestCollisionResolving extends TestCase {
 	boolean exceptionthrown = false;
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
-	} catch (IllegalStateException e){
-	    exceptionthrown=true;
-	} catch (SVInstantiationException ipe){
+	} catch (IllegalStateException | SVInstantiationException e){
 	    exceptionthrown=true;
 	}
-	assertTrue("Calling the creation of TacletApps before Input should "
-		   +"throw exception", exceptionthrown);
+		assertTrue(exceptionthrown, "Calling the creation of TacletApps before Input should "
+			+ "throw exception");
 
 	instModel.setValueAt("x",1,1);
 
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
 	} catch (Exception e) {
-	    fail("The exception "+e+ "has not been expected.");
+	    fail("The exception " + e + "has not been expected.");
 	}
 
 	assertNotNull(app);
     }
 
-    public void testVarNamespaceCreationWithPrefix() {
+    @Test
+	public void testVarNamespaceCreationWithPrefix() {
         TacletApp app = TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
         TacletApp app1=app.prepareUserInstantiation(services);
@@ -244,13 +224,11 @@ public class TestCollisionResolving extends TestCase {
         boolean exceptionthrown=false;
         try {
             app=instModel.createTacletAppFromVarInsts();
-        } catch (IllegalStateException e){
-            exceptionthrown=true;
-        }  catch (SVInstantiationException ipe){
+        } catch (IllegalStateException | SVInstantiationException e){
             exceptionthrown=true;
         }
-        assertTrue("Calling the creation of TacletApps before Input should "
-                +"throw exception", exceptionthrown);
+		assertTrue(exceptionthrown, "Calling the creation of TacletApps before Input should "
+				+ "throw exception");
         SchemaVariable u
         = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         if (instModel.getValueAt(0,0)==u) {
@@ -263,13 +241,14 @@ public class TestCollisionResolving extends TestCase {
         try {
             app=instModel.createTacletAppFromVarInsts();
         } catch (Exception e) {
-            fail("The exception "+e+ "has not been expected.");
+            fail("The exception " + e + "has not been expected.");
         }
         assertNotNull(app);
 
     }
 
-     public void testNameConflict1() {
+     @Test
+	 public void testNameConflict1() {
          Services services = new Services(AbstractProfile.getDefaultProfile());
          SchemaVariable u
 	    =  TacletForTests.getSchemaVariables().lookup(new Name("u"));
@@ -302,15 +281,14 @@ public class TestCollisionResolving extends TestCase {
 	    = PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos);
 	*/
 	TacletApp app1=app.prepareUserInstantiation(services);
-	assertTrue("A different TacletApp should have been created to resolve"
-		   +" name conflicts", app!=app1);
+		 assertNotSame(app, app1, "A different TacletApp should have been created to resolve"
+				 + " name conflicts");
 
-	assertTrue("The names of the instantiations of u and v should be different",
-		   !(((Term)app1.instantiations().getInstantiation(u)).op().name().equals
-		     (((Term)app1.instantiations().getInstantiation(v)).op().name())));
+		 assertNotEquals(((Term) app1.instantiations().getInstantiation(u)).op().name(), ((Term) app1.instantiations().getInstantiation(v)).op().name(), "The names of the instantiations of u and v should be different");
     }
 
-    public void testNameConflictAfterInput() throws SVInstantiationException {
+    @Test
+	public void testNameConflictAfterInput() throws SVInstantiationException {
 
 	TacletApp app = TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
@@ -325,13 +303,11 @@ public class TestCollisionResolving extends TestCase {
 	boolean exceptionthrown=false;
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
-	} catch (IllegalStateException e){
-	    exceptionthrown=true;
-	}  catch (SVInstantiationException ipe){
+	} catch (IllegalStateException | SVInstantiationException e){
 	    exceptionthrown=true;
 	}
-	assertTrue("Calling the creation of TacletApps before Input should "
-		   +"throw exception", exceptionthrown);
+		assertTrue(exceptionthrown, "Calling the creation of TacletApps before Input should "
+			+ "throw exception");
 	SchemaVariable u
 	    = TacletForTests.getSchemaVariables().lookup(new Name("u"));
 	SchemaVariable v
@@ -351,13 +327,11 @@ public class TestCollisionResolving extends TestCase {
 	exceptionthrown=false;
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
-	} catch (IllegalStateException e){
-	    exceptionthrown=true;
-	}  catch (SVInstantiationException ipe){
+	} catch (IllegalStateException | SVInstantiationException e){
 	    exceptionthrown=true;
 	}
-	assertTrue("As names of instantiations of VarSVs u and v in prefix of w0"
-		   +"are equal, an exception should be thrown.", exceptionthrown);
+		assertTrue(exceptionthrown, "As names of instantiations of VarSVs u and v in prefix of w0"
+			+ "are equal, an exception should be thrown.");
 	// next attempt
 	for (int i=0; i<3; i++) {
 	    if (instModel.getValueAt(i,0)==u) {
@@ -372,7 +346,7 @@ public class TestCollisionResolving extends TestCase {
 	}
 	app = instModel.createTacletAppFromVarInsts();
 
-	assertNotNull("Correct instantiation input should be honored!",app);
+	assertNotNull(app, "Correct instantiation input should be honored!");
     }
 
 /* COMMENTED OUT! It has to be checked if the instantiation checking is to restrictive.
@@ -408,7 +382,8 @@ public class TestCollisionResolving extends TestCase {
 
 */
 
-    public void testNameConflictWithContextAfterInput() throws SVInstantiationException {
+    @Test
+	public void testNameConflictWithContextAfterInput() throws SVInstantiationException {
 
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict_with_context2").taclet();
@@ -422,7 +397,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletApp app
 	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
 	TacletApp app1=app.prepareUserInstantiation(services);
-	assertSame("Actually there are no conflicts yet.", app, app1);
+	assertSame(app, app1, "Actually there are no conflicts yet.");
 	TacletFindModel instModel
 	    = new TacletFindModel(app, services,
 						 TacletForTests.getNamespaces(),
@@ -431,13 +406,11 @@ public class TestCollisionResolving extends TestCase {
 	boolean exceptionthrown=false;
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
-	} catch (IllegalStateException e){
-	    exceptionthrown=true;
-	}  catch (SVInstantiationException ipe){
+	} catch (IllegalStateException | SVInstantiationException e){
 	    exceptionthrown=true;
 	}
-	assertTrue("Calling the creation of TacletApps before Input should "
-		   +"throw exception", exceptionthrown);
+		assertTrue(exceptionthrown, "Calling the creation of TacletApps before Input should "
+			+ "throw exception");
 	SchemaVariable v
 	    = TacletForTests.getSchemaVariables().lookup(new Name("v"));
 	SchemaVariable w0 = TacletForTests.getSchemaVariables().lookup(new Name("w0"));
@@ -452,13 +425,11 @@ public class TestCollisionResolving extends TestCase {
 	exceptionthrown=false;
 	try {
 	    app=instModel.createTacletAppFromVarInsts();
-	} catch (IllegalStateException e){
-	    exceptionthrown=true;
-	}  catch (SVInstantiationException ipe){
+	} catch (IllegalStateException | SVInstantiationException e){
 	    exceptionthrown=true;
 	}
-	assertTrue("As names of x and instantiations of VarSV v in prefix of w0"
-		   +"are equal, an exception should be thrown.", exceptionthrown);
+		assertTrue(exceptionthrown, "As names of x and instantiations of VarSV v in prefix of w0"
+			+ "are equal, an exception should be thrown.");
 	// next attempt
 	for (int i=1; i<3; i++) {
 	    if (instModel.getValueAt(i,0)==v) {
@@ -469,7 +440,7 @@ public class TestCollisionResolving extends TestCase {
 	    }
 	}
 	app=instModel.createTacletAppFromVarInsts();
-	assertNotNull("Correct instantiation input should be honored!",app);
+	assertNotNull(app, "Correct instantiation input should be honored!");
 
     }
 

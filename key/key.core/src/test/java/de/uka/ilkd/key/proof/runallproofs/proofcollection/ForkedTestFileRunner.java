@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Executes KeY prover for a list of {@link TestFile}s in a separate process.
@@ -70,13 +71,15 @@ public abstract class ForkedTestFileRunner implements Serializable {
      */
     public static TestResult processTestFile(TestFile testFile,
                                              Path pathToTempDir) throws Exception {
-        return processTestFiles(Arrays.asList(testFile), pathToTempDir).get(0);
+        List<TestFile> files = List.of(testFile);
+        return processTestFiles(files, pathToTempDir).get(0);
     }
 
     /**
      * Process a list of {@link TestFile}s in a separate subprocess.
      *
-     * @param testName Name of the test used as prefix for test folder.
+     * @param testFiles files to be tested
+     * @param pathToTempDir a path to the temporary data directory
      */
     public static List<TestResult> processTestFiles(List<TestFile> testFiles,
                                                     Path pathToTempDir) throws Exception {
@@ -86,7 +89,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
         writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
-                testFiles.toArray(new TestFile[testFiles.size()]));
+                testFiles.toArray(new TestFile[0]));
 
         ProcessBuilder pb = new ProcessBuilder(
                 "java", "-classpath", System.getProperty("java.class.path"),
@@ -125,8 +128,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Process process = pb.start();
         IOForwarder.forward(process);
         process.waitFor();
-        assertEquals("Executed process terminated with non-zero exit value.",
-                process.exitValue(), 0);
+        assertEquals(0,process.exitValue(), "Executed process terminated with non-zero exit value.");
 
         /*
          * Check if an exception occured and rethrow it if one occured.
@@ -143,8 +145,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
          * Read serialized list of test results and return.
          */
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
-        assertTrue("File containing serialized test results not present.",
-                testResultsFile.toFile().exists());
+        assertTrue(testResultsFile.toFile().exists(), "File containing serialized test results not present.");
         TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
 
         return Arrays.asList(array);
@@ -164,8 +165,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
         boolean error = false;
         try {
-            TestFile[] testFiles =
-                    ForkedTestFileRunner.readObject(
+            TestFile[] testFiles = ForkedTestFileRunner.readObject(
                             getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
@@ -178,7 +178,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
-                    testResults.toArray(new TestResult[testResults.size()]));
+                    testResults.toArray(new TestResult[0]));
         } catch (Throwable t) {
             try {
                 writeObject(getLocationOfSerializedException(tempDirectory), t);
@@ -235,7 +235,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     if (verbose) {
                         System.err.println("Timeout watcher launched (" + timeout + " secs.)");
                     }
-                    Thread.sleep(timeout * 1000);
+                    Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
                             new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);

@@ -13,35 +13,36 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * This {@link TestCase} tests the parallel usage of {@link KeYParser}
+ * This TestCase tests the parallel usage of {@link de.uka.ilkd.key.nparser.KeYParser}
  * and {@link SchemaJavaParser}.
  * @author Martin Hentschel
  */
-public class TestParallelParsing extends TestCase {
+public class TestParallelParsing  {
    /**
     * Loads both proof files contained in {@code "examples/_testcase/parser/MultipleRecursion"}
     * in parallel using {@code 4} {@link Thread}s in total.
     * @throws Exception Occurred Exception.
     */
+   @Test
    public void testLoadingOfTwoDifferentProofFiles() throws Exception {
       doParallelTest(HelperClassForTests.TESTCASE_DIRECTORY,
                      2,
                      "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
                      "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
    }
-   
+
    /**
     * Executes the test steps.
     * @param baseDir The base directory.
@@ -56,7 +57,7 @@ public class TestParallelParsing extends TestCase {
       try {
          HelperClassForTests.setOneStepSimplificationEnabled(null, true);
          // Create threads
-         List<LoadThread> threads = new LinkedList<LoadThread>();
+         List<LoadThread> threads = new LinkedList<>();
          for (String path : locations) {
             for (int i = 0; i < numOfThreadsPerLocation; i++) {
                final File location = new File(baseDir, path);
@@ -69,13 +70,11 @@ public class TestParallelParsing extends TestCase {
          }
          // Wait for threads
          for (LoadThread thread : threads) {
-            while (thread.isAlive()) {
                try {
-                  Thread.sleep(500);
+                  thread.join();
                }
-               catch (InterruptedException e) {
+               catch (InterruptedException ignored) {
                }
-            }
          }
          // Test results
          for (LoadThread thread : threads) {
@@ -89,7 +88,7 @@ public class TestParallelParsing extends TestCase {
          HelperClassForTests.setOneStepSimplificationEnabled(null, originalOneStepSimplification);
       }
    }
-   
+
    /**
     * Helper {@link Thread} used by {@link TestParallelParsing#doParallelTest(File, int, String...)}
     * to load a location in KeY.
@@ -100,14 +99,14 @@ public class TestParallelParsing extends TestCase {
        * The location to load.
        */
       private final File location;
-      
+
       /**
        * Occurred {@link Exception}.
        */
       private Exception exception;
-      
+
       /**
-       * Constructor. 
+       * Constructor.
        * @param location The location to load.
        */
       public LoadThread(File location) {

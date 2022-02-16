@@ -49,12 +49,17 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
      * Returns the elementary update operator for the passed left hand side.
      */
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
-	WeakReference<ElementaryUpdate> result = instances.get(lhs);
-	if(result == null || result.get() == null) {
-	    result = new WeakReference<ElementaryUpdate>(new ElementaryUpdate(lhs));
-	    instances.put(lhs, result);
-	}
-	return result.get();
+        WeakReference<ElementaryUpdate> ref = instances.get(lhs);
+        ElementaryUpdate result = null;
+        if(ref != null) {
+            result = ref.get();
+        }
+        if(result == null) {
+            result = new ElementaryUpdate(lhs);
+            ref = new WeakReference<ElementaryUpdate>(result);
+            instances.put(lhs, ref);
+        }
+        return result;
     }
     
     

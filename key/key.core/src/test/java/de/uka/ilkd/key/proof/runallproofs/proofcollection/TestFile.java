@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Data structure for .key-files that will be tested during
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile<Directories extends RunAllProofsDirectories> implements Serializable {
+public class TestFile implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestFile.class);
 
     private static final long serialVersionUID = 7779439078807127045L;
@@ -42,7 +42,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
     private final String path;
     private final ProofCollectionSettings settings;
 
-    public final Directories directories;
+    public final RunAllProofsDirectories directories;
 
     /**
      * In order to ensure that the implementation is independent of working
@@ -86,17 +86,17 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
     }
 
     protected TestFile(TestProperty testProperty, String path,
-                       ProofCollectionSettings settings, Directories directories) {
+                       ProofCollectionSettings settings, RunAllProofsDirectories directories) {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
         this.directories = directories;
     }
 
-    public static TestFile<RunAllProofsDirectories> createInstance(
+    public static TestFile createInstance(
             TestProperty testProperty, String path,
             ProofCollectionSettings settings) {
-        return new TestFile<>(testProperty, path,
+        return new TestFile(testProperty, path,
                 settings, new RunAllProofsDirectories(settings.runStart));
     }
 
@@ -183,7 +183,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
                 }
             }
 
-            assertFalse("Loading problem file failed", replayResult.hasErrors());
+            assertFalse(replayResult.hasErrors(), "Loading problem file failed");
 
             // For a reload test we are done at this point. Loading was successful.
             if (testProperty == TestProperty.LOADABLE) {
@@ -297,7 +297,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
             }
 
             reloadedProof = proofLoadEnvironment.getLoadedProof();
-            assertTrue("Reloaded proof did not close: " + proofFile, reloadedProof.closed());
+            assertTrue(reloadedProof.closed(), "Reloaded proof did not close: " + proofFile);
         } catch (Throwable t) {
             throw new Exception(
                     "Exception while loading proof (see cause for details): "

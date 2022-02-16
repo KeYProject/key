@@ -13,20 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -34,12 +22,20 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Iterator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** class tests the tree of proof
 */
 
 
-public class TestProofTree extends TestCase {
+public class TestProofTree {
     Proof p;
     Node n1;
     Node n2;
@@ -50,11 +46,8 @@ public class TestProofTree extends TestCase {
     Node n7;
 
 
-    public TestProofTree(String name) {
-	super(name);
-    }
-
-    public void setUp() {
+    @BeforeEach
+	public void setUp() {
 	Sort s = new SortImpl(new Name("s"));
 	LogicVariable b1=new LogicVariable(new Name("b1"),s);
 	LogicVariable b2=new LogicVariable(new Name("b2"),s);
@@ -137,7 +130,8 @@ public class TestProofTree extends TestCase {
 	p.setRoot(n1);
     }
     
-    public void tearDown() {
+    @AfterEach
+	public void tearDown() {
         p = null;
         n1 = null;
         n2 = null;
@@ -148,69 +142,60 @@ public class TestProofTree extends TestCase {
         n7 = null;
     }
 
-    public static ImmutableList<Goal> emptyGoalList() {
-	return ImmutableSLList.<Goal>nil();
-    }
-    
 
+	@Test
     public void testLeaves() {
 
 	//test sanityCheck
-	assertTrue("tree should have good sanity",
-		   p.root().sanityCheckDoubleLinks()); 
-	
-        assertTrue("Root has sibling nr -1", n1.siblingNr() == -1);
-        assertTrue("n2 should have sibling nr 0", n2.siblingNr() == 0);
-        assertTrue("n3 should have sibling nr 1", n3.siblingNr() == 1);
-        assertTrue("n4 should have sibling nr 2", n4.siblingNr() == 2);
-        assertTrue("n5 should have sibling nr 0", n5.siblingNr() == 0);
+	assertTrue(p.root().sanityCheckDoubleLinks(), "tree should have good sanity");
+
+		assertEquals(-1, n1.siblingNr(), "Root has sibling nr -1");
+		assertEquals(0, n2.siblingNr(), "n2 should have sibling nr 0");
+		assertEquals(1, n3.siblingNr(), "n3 should have sibling nr 1");
+		assertEquals(2, n4.siblingNr(), "n4 should have sibling nr 2");
+		assertEquals(0, n5.siblingNr(), "n5 should have sibling nr 0");
 
 	Iterator<Node> it=p.root().leavesIterator();
 	int i=0;
 	while (it.hasNext()) {
-	    assertEquals(it.next().toString(),
-			 (new Node[]{n2,n6,n7,n4})[i].toString());
+	    assertEquals(it.next().toString(), (new Node[]{n2, n6, n7, n4})[i].toString());
 	    i++;
 	}	
 	it=p.root().childrenIterator();
 
 	i=0;
 	while (it.hasNext()) {
-	    assertEquals(it.next().toString(),
-			 (new Node[]{n2,n3,n4})[i].toString());
+	    assertEquals(it.next().toString(), (new Node[]{n2, n3, n4})[i].toString());
 	    i++;
 	}
 	
         n3.remove();
-        assertTrue("n3 is no longer a sibling and should have sibling nr -1", 
-                n3.siblingNr() == -1);
-        assertTrue("n2 should have sibling nr 0", n2.siblingNr() == 0);
-        assertTrue("n4 should have sibling nr 1", n4.siblingNr() == 1);
+		assertEquals(-1, n3.siblingNr(), "n3 is no longer a sibling and should have sibling nr -1");
+		assertEquals(0, n2.siblingNr(), "n2 should have sibling nr 0");
+		assertEquals(1, n4.siblingNr(), "n4 should have sibling nr 1");
         
         it=p.root().childrenIterator();
 	i=0;
 	while (it.hasNext()) {
-	    assertEquals(it.next().toString(),(new
-		Node[]{n2,n4})[i].toString());   
+	    assertEquals(it.next().toString(), (new
+				Node[]{n2, n4})[i].toString());
 	    i++;
 	}
 	
         n1.remove(n2);
-        assertTrue("n2 is no longer a sibling and should have sibling nr -1", 
-                n2.siblingNr() == -1);        
-        assertTrue("n4 should have sibling nr 0", n4.siblingNr() == 0);
+		assertEquals(-1, n2.siblingNr(), "n2 is no longer a sibling and should have sibling nr -1");
+		assertEquals(0, n4.siblingNr(), "n4 should have sibling nr 0");
 	
         it=p.root().childrenIterator();
 	i=0;
 	while (it.hasNext()) {
-	    assertEquals(it.next().toString(),(new Node[]{n4})[i].toString());
+	    assertEquals(it.next().toString(), (new Node[]{n4})[i].toString());
 	    i++;
 	}
         
         n1.remove(n4);
-        assertTrue("n4 is no longer a sibling and should have sibling nr -1", 
-                n4.siblingNr() == -1);        
-        assertTrue(n1.childrenCount() == 0);
+		assertEquals(-1, n4.siblingNr(), "n4 is no longer a sibling and should have sibling nr -1");
+		assertEquals(0, n1.childrenCount());
         
         
     }    

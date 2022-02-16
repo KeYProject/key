@@ -1,26 +1,16 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import org.junit.jupiter.api.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-
-import org.antlr.runtime.TokenStream;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
-import de.uka.ilkd.key.proof.runallproofs.Function;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import org.key_project.util.testcategories.Performance;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
@@ -28,11 +18,10 @@ import org.key_project.util.testcategories.Performance;
  * so that statistical data about that method can be recorded (time duration,
  * number of invocations and potentially other stuff).
  */
-@RunWith(Parameterized.class)
-@Category(Performance.class)
+@Tag("performance") @Tag("owntest")
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
-
     private static ProfilingDirectories directories;
+    static File plotScript;
 
     /**
      * Note: This static initialisation block should only be executed once for
@@ -45,42 +34,31 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
         directories = new ProfilingDirectories(runStart);
     }
 
-    public RunAllProofsTestWithComputeCostProfiling(RunAllProofsTestUnit unit) {
-        super(unit);
-    }
-
-    @Parameters(name = "{0}")
-    public static List<RunAllProofsTestUnit[]> data() throws Exception {
-        ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt",
-                new Function<TokenStream, ProofCollectionParser>() {
-                    @Override
-                    public ProofCollectionParser apply(TokenStream t) {
-                        return new DataRecordingParser(t);
-                    }
-                });
+    @TestFactory
+    Stream<DynamicTest> data() throws Exception {
+        ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
     }
 
-    static File plotScript;
 
-    @BeforeClass
-    public static void initPlotScriptLocation() throws IOException {
+    @BeforeAll
+    public static void initPlotScriptLocation() {
         plotScript = new File("../scripts/tools/runAllProofs_createPerformancePlots/plot2png.sh");
         if (!plotScript.exists()) {
             throw new RuntimeException("Error: Script for plot creation not found!");
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void createPlots() throws IOException {
         createPlots(directories.computeCostDataDir);
         createPlots(directories.instantiateAppDataDir);
     }
 
     public static void createPlots(File dataDir) throws IOException {
-        for (File ruleData : dataDir.listFiles()) {
+        for (File ruleData : Objects.requireNonNull(dataDir.listFiles())) {
             String ruleName = ruleData.getAbsolutePath();
             // /.../rulename.data -> /.../rulename [remove file ending]
             ruleName = ruleName.substring(0, ruleName.length() - 5);
@@ -97,5 +75,4 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             }
         }
     }
-
 }
