@@ -1,27 +1,26 @@
 package de.uka.ilkd.key.smt;
 
+import org.key_project.util.java.StringUtil;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Simple routine to prettyprint an SMT2 input.
- *
+ * <p>
  * This is not specific to KeY at all.
- *
+ * <p>
  * However, it is rather pragmatic and I cannot guarantee that it works correctly on all
  * SMTLib2 input.
- *
+ * <p>
  * Use the static method {@link #indent(String)} to obtain a nice indented version of
  * your SMTLib2-code.
  *
  * @author Mattias Ulbrich
  */
-public class SMTBeautifier {
+public abstract class SMTBeautifier {
 
-    // not to be instantiated
     private SMTBeautifier() {
-        throw new Error();
     }
 
     // A kind of "int*" in Java.
@@ -39,7 +38,7 @@ public class SMTBeautifier {
             if (head != null) {
                 result += head.length();
             }
-            if(children != null) {
+            if (children != null) {
                 for (Element child : children) {
                     result += child.length();
                 }
@@ -59,7 +58,7 @@ public class SMTBeautifier {
 
         public boolean hasComments() {
             return isComment() ||
-                   (children != null && children.stream().anyMatch(Element::hasComments));
+                    (children != null && children.stream().anyMatch(Element::hasComments));
         }
 
         public boolean isComment() {
@@ -74,10 +73,10 @@ public class SMTBeautifier {
 
     /**
      * Indent a piece of SMTLib2-code.
-     *
+     * <p>
      * Each line consists of some initial spaces and then at most 80 characters
      * (not counting spaces again).
-     *
+     * <p>
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
@@ -90,14 +89,14 @@ public class SMTBeautifier {
 
     /**
      * Indent a piece of SMTLib2-code.
-     *
+     * <p>
      * Each line consists of some initial spaces and then at most lineLength characters
      * (not counting spaces again).
-     *
+     * <p>
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
-     * @param smtCode the code to indent.
+     * @param smtCode    the code to indent.
      * @param lineLength the number of characters per line, > 0
      * @return a string representation equivalent to the input
      */
@@ -105,13 +104,10 @@ public class SMTBeautifier {
         MutableInt pos = new MutableInt();
         StringBuilder sb = new StringBuilder();
         Element element = parse(smtCode, pos);
-//        System.err.println(smtCode);
         while (element != null) {
-//            System.err.println(element);
             sb.append(prettyPrint(element, 1, lineLength)).append("\n");
             element = parse(smtCode, pos);
         }
-//        System.err.println(sb);
         return sb.toString();
     }
 
@@ -159,7 +155,7 @@ public class SMTBeautifier {
                     result.head = s.substring(start, pos.val);
                     return result;
             }
-            pos.val ++;
+            pos.val++;
         }
         // no further element
         return null;
@@ -169,11 +165,11 @@ public class SMTBeautifier {
         assert s.charAt(pos.val) == '(';
         Element result = new Element();
         result.children = new ArrayList<>();
-        pos.val ++;
+        pos.val++;
         while (pos.val < s.length() && s.charAt(pos.val) != ')') {
             result.children.add(parse(s, pos));
-            while(pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
-                pos.val ++;
+            while (pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
+                pos.val++;
             }
         }
         pos.val++;
@@ -189,25 +185,18 @@ public class SMTBeautifier {
                 if (first) {
                     first = false;
                 } else {
-                    if(oneLine) {
+                    if (oneLine) {
                         sb.append(" ");
                     } else {
                         sb.append("\n");
-                        // newer Java verion: sb.append("  ".repeat(indent));
-                        for (int i = 0; i < indent; i++) {
-                            sb.append("  ");
-                        }
+                        sb.append("  ".repeat(indent));
                     }
                 }
                 sb.append(prettyPrint(child, indent + 1, lineLength));
             }
             if (element.lastChildIsComment()) {
                 // was a bug: if comment at end of SExpr, the ")" would be in comment
-                sb.append("\n");
-                // new Java version: sb.append("  ".repeat(indent));
-                for (int i = 0; i < indent; i++) {
-                    sb.append("  ");
-                }
+                sb.append("\n").append("  ".repeat(indent));
             }
             sb.append(")");
             return sb;

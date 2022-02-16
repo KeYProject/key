@@ -1,16 +1,15 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
-
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Tests for {@link ExecutionVariableExtractor}.
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests example: /set/variablesEmptyArrayCreationTest

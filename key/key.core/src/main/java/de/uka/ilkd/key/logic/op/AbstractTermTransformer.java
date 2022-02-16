@@ -25,6 +25,9 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Abstract class factoring out commonalities of typical term transformer implementations.
@@ -32,6 +35,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class AbstractTermTransformer extends AbstractSortedOperator
         implements TermTransformer {
+    public static final Logger LOGGER = LoggerFactory.getLogger(AbstractTermTransformer.class);
 
     // must be first
     /** The metasort sort **/
@@ -144,8 +148,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         }
 
         if (top != numbers) {
-            Debug.out("abstractmetaoperator: Cannot convert to number:", term);
-            throw (new NumberFormatException());
+            LOGGER.debug("abstractmetaoperator: Cannot convert to number: {}", term);
+            throw new NumberFormatException();
         }
 
         term = term.sub(0);

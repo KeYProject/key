@@ -19,20 +19,15 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * On each side of the pipe there are sender and receivers:
- ***** Receiver ====<=Output======= Sender    ******************
- *KeY* Sender	======Input=>====== Receiver  *External Process*
- ***** Receiver ====<=Error======== Sender    ******************
+ * **** Receiver ====<=Output======= Sender    ******************
+ * KeY* Sender	======Input=>====== Receiver  *External Process*
+ * **** Receiver ====<=Error======== Sender    ******************
  *
  * @author Benjamin Niedermann (original)
  * @author Mattias Ulbrich (ovrhaul)
@@ -55,22 +50,22 @@ class LegacyPipe implements Pipe {
     private final String[] messageDelimiters;
 
     private static final Message EXCEPTION_MESSAGE =
-        new Message("Exception", MessageType.ERROR);
+            new Message("Exception", MessageType.ERROR);
 
     private static final Message STREAM_CLOSED_MESSAGE =
-        new Message("Stream closed", MessageType.ERROR);
+            new Message("Stream closed", MessageType.ERROR);
 
     /**
      * User specific data.
      */
     private final SolverCommunication session;
     private OutputStreamWriter outputWriter;
-    private BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
     private Exception thrownException;
     private Process process;
 
 
-    public LegacyPipe(SolverCommunication session, String [] messageDelimiters) {
+    public LegacyPipe(SolverCommunication session, String[] messageDelimiters) {
         this.session = session;
         this.messageDelimiters = messageDelimiters;
     }
@@ -96,12 +91,12 @@ class LegacyPipe implements Pipe {
             // do not use BufferedReader, but this wrapper in order to support different
             // message delimiters.
             BufferedMessageReader reader =
-                new BufferedMessageReader(new InputStreamReader(input),
-                    messageDelimiters);
+                    new BufferedMessageReader(new InputStreamReader(input),
+                            messageDelimiters);
 
             try {
 
-                while(true) {
+                while (true) {
                     if (Thread.interrupted()) {
                         break;
                     }
@@ -114,9 +109,9 @@ class LegacyPipe implements Pipe {
                     deliverMessage(message, type);
                 }
 
-            } catch(InterruptedIOException ex) {
+            } catch (InterruptedIOException ex) {
                 // Interruption is ok and needs not be reported
-            } catch(IOException e) {
+            } catch (IOException e) {
                 close();
                 thrownException = e;
                 messageQueue.add(EXCEPTION_MESSAGE);
@@ -127,7 +122,7 @@ class LegacyPipe implements Pipe {
                         deliverMessage(buf, type);
                     }
                     input.close();
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     // considered harmless.
                 }
                 alive = false;
@@ -167,7 +162,12 @@ class LegacyPipe implements Pipe {
         process.destroy();
     }
 
-    public void join()  throws InterruptedException {
+    @Override
+    public void sendEOF() {
+        //not used anymore
+    }
+
+    public void join() throws InterruptedException {
         stdoutReceiver.join();
         stderrReceiver.join();
     }
@@ -180,8 +180,9 @@ class LegacyPipe implements Pipe {
 
 
     @Override
-    public @Nullable String readMessage() throws IOException, InterruptedException {
-        while(isAlive()) {
+    public @Nullable
+    String readMessage() throws IOException, InterruptedException {
+        while (isAlive()) {
             Message result = messageQueue.take();
             if (result == EXCEPTION_MESSAGE) {
                 // Special indicator for a raised exception.
@@ -190,7 +191,7 @@ class LegacyPipe implements Pipe {
                 } else {
                     throw new IOException(thrownException);
                 }
-            } else if(result == STREAM_CLOSED_MESSAGE) {
+            } else if (result == STREAM_CLOSED_MESSAGE) {
                 // This is a mere indicator to run isAlive once more ...
             } else {
                 // just to fix compile problems, the message type is completely thrown away here
@@ -205,7 +206,8 @@ class LegacyPipe implements Pipe {
         return stderrReceiver.alive && stdoutReceiver.alive;
     }
 
-    public @Nonnull SolverCommunication getSolverCommunication() {
+    public @Nonnull
+    SolverCommunication getSolverCommunication() {
         return session;
     }
 }

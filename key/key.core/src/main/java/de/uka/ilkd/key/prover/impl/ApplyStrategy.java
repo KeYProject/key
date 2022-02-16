@@ -39,6 +39,9 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Applies rules in an automated fashion.
@@ -46,6 +49,7 @@ import de.uka.ilkd.key.util.Debug;
  * @author Richard Bubel
  */
 public class ApplyStrategy extends AbstractProverCore {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
 
     /**
      * the proof that is worked with
@@ -137,7 +141,7 @@ public class ApplyStrategy extends AbstractProverCore {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
         try{
-            Debug.out("Strategy started.");
+            LOGGER.debug("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
                                                           time, countApplied, srInfo);
 
@@ -173,9 +177,9 @@ public class ApplyStrategy extends AbstractProverCore {
                                          countApplied, closedGoals);
         } finally{
             time = (System.currentTimeMillis()-time);
-            Debug.out("Strategy stopped.");
-            Debug.out("Applied ", countApplied);
-            Debug.out("Time elapsed: ", time);
+            LOGGER.debug("Strategy stopped.");
+            LOGGER.debug("Applied {} steps", countApplied);
+            LOGGER.debug("Time elapsed: {} ms", time);
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,

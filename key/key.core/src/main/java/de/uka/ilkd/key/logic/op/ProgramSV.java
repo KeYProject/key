@@ -52,6 +52,9 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Objects of this class are schema variables matching program constructs within
@@ -60,6 +63,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public final class ProgramSV extends AbstractSV
         implements ProgramConstruct, UpdateableOperator {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION = new ProgramList(
             new ImmutableArray<ProgramElement>(new ProgramElement[0]));
@@ -339,8 +343,8 @@ public final class ProgramSV extends AbstractSV
 
         while (src != null) {
             if (!check(src, ec, services)) {
-                Debug.out("taclet: Stopped list matching because of "
-                        + "incompatible elements", this, src);
+                LOGGER.debug("taclet: Stopped list matching because of "
+                        + "incompatible elements {} {}", this, src);
                 break;
             }
             matchedElements.add(src);
@@ -348,7 +352,7 @@ public final class ProgramSV extends AbstractSV
             src = source.getSource();
         }
 
-        Debug.out("Program list match: ", this, matchedElements);
+        LOGGER.debug("Program list match: {} {}", this, matchedElements);
         return addProgramInstantiation(
                 new ProgramList(
                         new ImmutableArray<ProgramElement>(matchedElements)),
@@ -382,14 +386,14 @@ public final class ProgramSV extends AbstractSV
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
-        Debug.out("Program match start (template, source)", this, src);
+        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         if (!check(src, ec, services)) {
-            Debug.out("taclet: MATCH FAILED. Sort of SchemaVariable cannot "
+            LOGGER.debug("taclet: MATCH FAILED. Sort of SchemaVariable cannot "
                     + "stand for the program");
             return null; // FAILED
         }
@@ -406,7 +410,7 @@ public final class ProgramSV extends AbstractSV
                 return null;
             }
         } else {
-            Debug.out("taclet: MATCH FAILED 3. Former match of "
+            LOGGER.debug("taclet: MATCH FAILED 3. Former match of "
                     + " SchemaVariable incompatible with "
                     + " the current match.");
             return null; // FAILED mismatch

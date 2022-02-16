@@ -7,11 +7,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProofExplorationServiceTest {
     ProofExplorationService expService;
@@ -19,17 +23,17 @@ public class ProofExplorationServiceTest {
     File location;
     KeYEnvironment<?> env;
 
-    @Before
+    @BeforeEach
     public void setup() throws ProblemLoaderException {
         location = new File("src/test/resources//org/key_project/exploration/testAdditions.key");
-        Assume.assumeTrue("File testAdditions.key not found.", location.exists());
+        Assumptions.assumeTrue(location.exists(), "File testAdditions.key not found.");
         env = KeYEnvironment.load(location);
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());
     }
 
     //p -> q -> !q -> !p
-    @After
+    @AfterEach
     public void tearDown() {
         env = null;
         expService = null;
@@ -38,10 +42,8 @@ public class ProofExplorationServiceTest {
     }
 
 
-//region Addition
-
     /**
-     * Tests that the added term is added correctly and that meta data was added as well
+     * Tests that the added term is added correctly and that metadata was added as well
      */
     @Test
     public void testAdditionAntec() {
@@ -49,16 +51,16 @@ public class ProofExplorationServiceTest {
         expService.soundAddition(currentProof.getGoal(currentProof.root()), add, true);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
-        Assert.assertEquals("Two new goals created", 2, goals.size());
+        assertEquals(2, goals.size(), "Two new goals created");
 
         Goal first = goals.head();
         Goal second = goals.tail().head();
 
         ExplorationNodeData lookup = first.node().lookup(ExplorationNodeData.class);
-        Assert.assertNotNull("First goal is marked as exploration node", lookup);
+        assertNotNull(lookup, "First goal is marked as exploration node");
 
         ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
-        Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
+        assertNotNull(lookup2, "Second goal is marked as exploration node");
 
         Goal withAddedTerm;
         Goal justification;
@@ -73,19 +75,20 @@ public class ProofExplorationServiceTest {
         }
 
         testAddition(withAddedTerm, justification, add, true);
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
 
 
-        Assert.assertTrue("Parent is marked as ExplorationNode and data contains Exploration Action", checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()));
+        assertTrue(checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()),
+                "Parent is marked as ExplorationNode and data contains Exploration Action");
 
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
 
     }
 
     /**
-     * Test tests that the added term is added correctly and that meta data was added as well
+     * Test tests that the added term is added correctly and that metadata was added as well
      */
     @Test
     public void testAdditionSucc() {
@@ -93,16 +96,16 @@ public class ProofExplorationServiceTest {
         expService.soundAddition(currentProof.getGoal(currentProof.root()), added, false);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
-        Assert.assertEquals("Two new goals created", 2, goals.size());
+        assertEquals(2, goals.size(), "Two new goals created");
 
         Goal first = goals.head();
         Goal second = goals.tail().head();
 
         ExplorationNodeData lookup = first.node().lookup(ExplorationNodeData.class);
-        Assert.assertNotNull("First goal is marked as exploration node", lookup);
+        assertNotNull(lookup, "First goal is marked as exploration node");
 
         ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
-        Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
+        assertNotNull(lookup2, "Second goal is marked as exploration node");
 
         Goal withAddedTerm;
         Goal justification;
@@ -118,11 +121,11 @@ public class ProofExplorationServiceTest {
 
         testAddition(withAddedTerm, justification, added, false);
 
-        Assert.assertTrue("Parent is marked as ExplorationNode and data contains Exploration Action",
-                checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()));
+        assertTrue(checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()),
+                "Parent is marked as ExplorationNode and data contains Exploration Action");
 
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
-        Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
+        assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
 
 
     }
@@ -137,13 +140,13 @@ public class ProofExplorationServiceTest {
     public void testChangeFormula() {
         Term change = parseTerm("p->p");
         ImmutableList<Goal> goals = currentProof.openGoals();
-        Assert.assertSame("Prerequisite for test", 1, goals.size());
+        assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
         PosInOccurrence pio = new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
         expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(), change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
-        Assert.assertEquals("Two new goals created", 2, newCreatedGoals.size());
+        assertEquals(2, newCreatedGoals.size(), "Two new goals created");
 
         //find hide branch
         Goal applicationBranch = newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
@@ -151,20 +154,18 @@ public class ProofExplorationServiceTest {
         Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
                 newCreatedGoals.tail().head();
 
-        //System.out.println("applicationBranch = " + applicationBranch.sequent());
-        //System.out.println("justificationBranch.sequent() = " + justificationBranch.sequent());
         //check meta data
         Node hideNode = applicationBranch.node().parent();
 
-        Assert.assertNotNull(hideNode.lookup(ExplorationNodeData.class));
-        Assert.assertNotNull(justificationBranch.node().lookup(ExplorationNodeData.class));
+        assertNotNull(hideNode.lookup(ExplorationNodeData.class));
+        assertNotNull(justificationBranch.node().lookup(ExplorationNodeData.class));
 
-        Assert.assertEquals("Hide Right was applied", new Name("hide_right"), hideNode.getAppliedRuleApp().rule().name());
+        assertEquals(new Name("hide_right"), hideNode.getAppliedRuleApp().rule().name(), "Hide Right was applied");
         //set all goals to interactive
         justificationBranch.setEnabled(true);
         //perform proof, it has to close
         env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
-        Assert.assertTrue("Proof is closed", currentProof.closed());
+        assertTrue(currentProof.closed(), "Proof is closed");
 
     }
 
@@ -174,25 +175,34 @@ public class ProofExplorationServiceTest {
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
         Semisequent semiSeqAdded = antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfAdded = antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent parentSemiSeqOfAdded = antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
-        Semisequent semiSeqUntouched = !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfUntouched = !antec ? withAddedTerm.node().parent().sequent().antecedent() : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent semiSeqUntouched = !antec
+                ? withAddedTerm.sequent().antecedent()
+                : withAddedTerm.sequent().succedent();
+
+        Semisequent parentSemiSeqOfUntouched = !antec
+                ? withAddedTerm.node().parent().sequent().antecedent()
+                : withAddedTerm.node().parent().sequent().succedent();
 
 
-        Assert.assertSame("The size of the added semisequent has changed", semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1);
-        Assert.assertEquals("Added Term is indeed added", semiSeqAdded.get(0).formula(), added);
-        Assert.assertFalse("Justification branch is marked as interactive", justification.isAutomatic());
+        assertSame(semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1,
+                "The size of the added semisequent has changed");
+        assertEquals(semiSeqAdded.get(0).formula(), added, "Added Term is indeed added");
+        assertFalse(justification.isAutomatic(), "Justification branch is marked as interactive");
 
-        Assert.assertSame("The size if untouched semisequents is the same", semiSeqUntouched.size(), parentSemiSeqOfUntouched.size());
-        Assert.assertEquals("The  untouched semisequents are equal", semiSeqUntouched, parentSemiSeqOfUntouched);
+        assertSame(semiSeqUntouched.size(), parentSemiSeqOfUntouched.size(),
+                "The size if untouched semisequents is the same");
+        assertEquals(semiSeqUntouched, parentSemiSeqOfUntouched,
+                "The  untouched semisequents are equal");
 
         Node parent = withAddedTerm.node().parent();
 
-        Assert.assertEquals("Both nodes have the same parent", parent, justification.node().parent());
-        Assert.assertEquals("The addition was inserted using the cut rule", new Name("cut"), parent.getAppliedRuleApp().rule().name());
-
-
+        assertEquals(parent, justification.node().parent(), "Both nodes have the same parent");
+        assertEquals(new Name("cut"), parent.getAppliedRuleApp().rule().name(),
+                "The addition was inserted using the cut rule");
     }
 
     /**

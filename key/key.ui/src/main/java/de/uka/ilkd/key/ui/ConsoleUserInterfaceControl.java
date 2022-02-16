@@ -13,17 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -57,23 +46,32 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
  */
 public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
-   private static final int PROGRESS_BAR_STEPS = 50;
-   private static final String PROGRESS_MARK = ">";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleUserInterfaceControl.class);
 
+    private static final int PROGRESS_BAR_STEPS = 50;
+    private static final String PROGRESS_MARK = ">";
 
-   // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-   ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
+    // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
+    ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
 
-   final byte verbosity;
-   final KeYMediator mediator;
+    final byte verbosity;
+    final KeYMediator mediator;
 
-   // for a progress bar
-   int progressMax = 0;
+    // for a progress bar
+    int progressMax = 0;
 
 
     // flag to indicate that a file should merely be loaded not proved. (for
@@ -96,136 +94,122 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
         this.verbosity = verbosity;
-        this.mediator  = new KeYMediator(this);
+        this.mediator = new KeYMediator(this);
         this.loadOnly = loadOnly;
     }
 
     public ConsoleUserInterfaceControl(boolean verbose, boolean loadOnly) {
-        this(verbose? Verbosity.DEBUG: Verbosity.NORMAL, loadOnly);
+        this(verbose ? Verbosity.TRACE : Verbosity.NORMAL, loadOnly);
     }
 
-   private void printResults(final int openGoals,
-                                  TaskFinishedInfo info,
-                                  final Object result2) {
-       if (verbosity >= Verbosity.HIGH) {
-           System.out.println("]"); // end progress bar
-       }
-       if (verbosity > Verbosity.SILENT) {
-           System.out.println("[ DONE  ... rule application ]");
-           if (verbosity >= Verbosity.HIGH) {
-               System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-               final Statistics stat = info.getProof().getStatistics();
-               System.out.println("Proof steps: "+stat.nodes);
-               System.out.println("Branches: "+stat.branches);
-               System.out.println("Automode Time: " + stat.autoModeTimeInMillis + "ms");
-               System.out.println("Time per step: " + stat.timePerStepInMillis + "ms");
-           }
-           System.out.println("Number of goals remaining open: " + openGoals);
-           if(openGoals == 0){
-        	   System.out.println("Proved");
-           }else{
-        	   System.out.println("Not proved");
-           }
-           System.out.flush();
-       }
-       // this seems to be a good place to free some memory
-       Runtime.getRuntime().gc();
+    private void printResults(final int openGoals,
+                              TaskFinishedInfo info,
+                              final Object result2) {
+        if (verbosity >= Verbosity.DEBUG) {
+            LOGGER.info("]"); // end progress bar
+        }
+        if (verbosity > Verbosity.SILENT) {
+            LOGGER.info("[ DONE  ... rule application ]");
+            if (verbosity >= Verbosity.DEBUG) {
+                LOGGER.info("\n== Proof " + (openGoals > 0 ? "open" : "closed") + " ==");
+                final Statistics stat = info.getProof().getStatistics();
+                LOGGER.info("Proof steps: " + stat.nodes);
+                LOGGER.info("Branches: " + stat.branches);
+                LOGGER.info("Automode Time: " + stat.autoModeTimeInMillis + "ms");
+                LOGGER.info("Time per step: " + stat.timePerStepInMillis + "ms");
+            }
+            LOGGER.info("Number of goals remaining open: " + openGoals);
+            if (openGoals == 0) {
+                LOGGER.info("Proved");
+            } else {
+                LOGGER.info("Not proved");
+            }
+            System.out.flush();
+        }
+        // this seems to be a good place to free some memory
+        Runtime.getRuntime().gc();
 
-       /*
-        * It is assumed that this part of the code is never reached, unless a
-        * value has been assigned to keyProblemFile in method loadProblem(File).
-        */
-       assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-               + " save a proof but no corresponding key problem file is "
-               + "available.";
-       allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
-       /*
-        * We "delete" the value of keyProblemFile at this point by assigning
-        * null to it. That way we prevent KeY from saving another proof (that
-        * belongs to another key problem file) for a key problem file whose
-        * execution cycle has already been finished (and whose proof has
-        * already been saved). It is assumed that a new value has been assigned
-        * beforehand in method loadProblem(File), if this part of the code is
-        * reached again.
-        */
-       keyProblemFile = null;
-   }
+        /*
+         * It is assumed that this part of the code is never reached, unless a
+         * value has been assigned to keyProblemFile in method loadProblem(File).
+         */
+        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
+                + " save a proof but no corresponding key problem file is "
+                + "available.";
+        allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
+        /*
+         * We "delete" the value of keyProblemFile at this point by assigning
+         * null to it. That way we prevent KeY from saving another proof (that
+         * belongs to another key problem file) for a key problem file whose
+         * execution cycle has already been finished (and whose proof has
+         * already been saved). It is assumed that a new value has been assigned
+         * beforehand in method loadProblem(File), if this part of the code is
+         * reached again.
+         */
+        keyProblemFile = null;
+    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {
-       super.taskFinished(info);
-       progressMax = 0; // reset progress bar marker
-       final Proof proof = info.getProof();
-       if (proof==null) {
-           if (verbosity > Verbosity.SILENT) {
-               System.out.println("Proof loading failed");
-               final Object error = info.getResult();
-               if (error instanceof Throwable) {
-                   ((Throwable) error).printStackTrace();
-               }
-           }
-           System.exit(1);
-       }
-       final int openGoals = proof.openGoals().size();
-       final Object result2 = info.getResult();
+    public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
+        progressMax = 0; // reset progress bar marker
+        final Proof proof = info.getProof();
+        if (proof == null) {
+            if (verbosity > Verbosity.SILENT) {
+                LOGGER.info("Proof loading failed");
+                final Object error = info.getResult();
+                if (error instanceof Throwable) {
+                    ((Throwable) error).printStackTrace();
+                }
+            }
+            System.exit(1);
+        }
+        final int openGoals = proof.openGoals().size();
+        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore
                 || info.getSource() instanceof ProofMacro) {
-           if (!isAtLeastOneMacroRunning()) {
-               printResults(openGoals, info, result2);
-           }
-       } else if (info.getSource() instanceof ProblemLoader) {
-            if (verbosity > Verbosity.SILENT) {
-                System.out.println("[ DONE ... loading ]");
+            if (!isAtLeastOneMacroRunning()) {
+                printResults(openGoals, info, result2);
             }
-           if (result2 != null) {
-                if (verbosity > Verbosity.SILENT) {
-                    System.out.println(result2);
-                }
-               if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
-                   ((Throwable) result2).printStackTrace();
-               }
-               System.exit(-1);
-           }
-           if(loadOnly ||  openGoals==0) {
-                if (verbosity > Verbosity.SILENT) {
-                    System.out.println("Number of open goals after loading: " + openGoals);
-                }
-               System.exit(0);
-           }
-           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-           if(problemLoader.hasProofScript()) {
-               try {
-                   Pair<String, Location> script = problemLoader.readProofScript();
-                   ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                    this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
-                                                                "Script started", 0));
-                   pse.execute(this, proof);
-                   // The start and end messages are fake to persuade the system ...
-                   // All this here should refactored anyway ...
-                   this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-               } catch (Exception e) {
-                   // TODO
-                   e.printStackTrace();
-                   System.exit(-1);
-               }
-           } else if (macroChosen()) {
-               applyMacro();
-           } else {
-               finish(proof);
-           }
-       }
-   }
+        } else if (info.getSource() instanceof ProblemLoader) {
+            LOGGER.debug("{}", result2);
+            System.exit(-1);
+        }
+        if (loadOnly || openGoals == 0) {
+            LOGGER.info("Number of open goals after loading: " + openGoals);
+            System.exit(0);
+        }
+        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+        if (problemLoader.hasProofScript()) {
+            try {
+                Pair<String, Location> script = problemLoader.readProofScript();
+                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
+                        "Script started", 0));
+                pse.execute(this, proof);
+                // The start and end messages are fake to persuade the system ...
+                // All this here should refactored anyway ...
+                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+            } catch (Exception e) {
+                LOGGER.debug("", e);
+                System.exit(-1);
+            }
+        } else if (macroChosen()) {
+            applyMacro();
+        } else {
+            finish(proof);
+        }
+    }
+
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
         progressMax = info.getSize();
-        if (verbosity >= Verbosity.HIGH) {
-            if (TaskKind.Strategy.equals(info.getKind())) {
-                System.out.print(info.getMessage()+" ["); // start progress bar
-            } else {
-                System.out.println(info.getMessage());
-            }
+        if (TaskKind.Strategy.equals(info.getKind())) {
+            LOGGER.debug(info.getMessage() + " ["); // start progress bar
+        } else {
+            LOGGER.debug(info.getMessage());
         }
     }
 
@@ -243,24 +227,24 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
+     * @param file          the File with the problem description or the proof
+     * @param classPath     the class path entries to use.
      * @param bootClassPath the boot class path to use.
-     * @param includes the included files to use
+     * @param includes      the included files to use
      */
     public void loadProblem(File file,
                             List<File> classPath,
                             File bootClassPath,
                             List<File> includes) {
         ProblemLoader problemLoader =
-            getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
+                getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
     public void loadProofFromBundle(File proofBundle, File proofFilename) {
         ProblemLoader problemLoader =
-            getProblemLoader(proofBundle, null, null, null, getMediator());
+                getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
         problemLoader.runAsynchronously();
     }
@@ -273,68 +257,48 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     void finish(Proof proof) {
-       // setInteractive(false) has to be called because the ruleAppIndex
-       // has to be notified that we work in auto mode (CS)
-       mediator.setInteractive(false);
-       getProofControl().startAndWaitForAutoMode(proof);
-       if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-           System.out.println(proof.getStatistics());
-       }
-   }
+        // setInteractive(false) has to be called because the ruleAppIndex
+        // has to be notified that we work in auto mode (CS)
+        mediator.setInteractive(false);
+        getProofControl().startAndWaitForAutoMode(proof);
+        LOGGER.debug("{}", proof.getStatistics());
+    }
 
     @Override
     final public void progressStarted(Object sender) {
-        // TODO Implement ProblemInitializerListener.progressStarted
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
     }
 
     @Override
     final public void progressStopped(Object sender) {
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
     }
 
     @Override
     final public void reportException(Object sender, ProofOblInput input, Exception e) {
-        // TODO Implement ProblemInitializerListener.reportException
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.reportException(" + sender + "," + input + "," + e + ")");
-            e.printStackTrace();
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
     }
 
     @Override
     final public void reportStatus(Object sender, String status, int progress) {
-        // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
     }
 
     @Override
     final public void reportStatus(Object sender, String status) {
-        // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
     }
 
     @Override
     final public void resetStatus(Object sender) {
-        // TODO Implement ProblemInitializerListener.resetStatus
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
     }
 
     @Override
     final public void taskProgress(int position) {
         super.taskProgress(position);
-        if (verbosity >= Verbosity.HIGH && progressMax > 0) {
-            if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
+        if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
+            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);
             }
         }
@@ -342,153 +306,138 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public void setMaximum(int maximum) {
-        // TODO Implement ProgressMonitor.setMaximum
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
     }
 
     @Override
     final public void setProgress(int progress) {
-        // TODO Implement ProgressMonitor.setProgress
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
-        }
+        LOGGER.debug("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
     }
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        if(verbosity >= Verbosity.DEBUG) {
-         System.out.println("Taclet match completion not supported by console.");
-        }
+        LOGGER.debug("Taclet match completion not supported by console.");
     }
 
-   @Override
-   final public void openExamples() {
-       System.out.println("Open Examples not suported by console UI.");
-   }
+    @Override
+    final public void openExamples() {
+        LOGGER.info("Open Examples not suported by console UI.");
+    }
 
-   @Override
-   final public ProblemInitializer createProblemInitializer(Profile profile) {
-      ProblemInitializer pi = new ProblemInitializer(this,
-            new Services(profile),
-            this);
-      return pi;
-   }
+    @Override
+    final public ProblemInitializer createProblemInitializer(Profile profile) {
+        ProblemInitializer pi = new ProblemInitializer(this,
+                new Services(profile),
+                this);
+        return pi;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-       super.proofDisposing(e);
-       if (!proofStack.isEmpty()) {
-          Proof p = proofStack.head();
-          proofStack = proofStack.removeAll(p);
-          assert p.name().equals(e.getSource().name());
-          mediator.setProof(proofStack.head());
-      } else {
-          // proofStack might be empty, though proof != null. This can
-          // happen for symbolic execution tests, if proofCreated was not
-          // called by the test setup.
-      }
+        super.proofDisposing(e);
+        if (!proofStack.isEmpty()) {
+            Proof p = proofStack.head();
+            proofStack = proofStack.removeAll(p);
+            assert p.name().equals(e.getSource().name());
+            mediator.setProof(proofStack.head());
+        } else {
+            // proofStack might be empty, though proof != null. This can
+            // happen for symbolic execution tests, if proofCreated was not
+            // called by the test setup.
+        }
     }
 
     @Override
     final public boolean selectProofObligation(InitConfig initConfig) {
-    	//ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
         ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
-    	return sel.selectProofObligation();
-//        if(verbosity >= Verbosity.DEBUG) {
-//            System.out.println("Proof Obligation selection not supported by console.");
-//        }
-//        return false;
+        return sel.selectProofObligation();
     }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYMediator getMediator() {
-      return mediator;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYMediator getMediator() {
+        return mediator;
+    }
 
-   @Override
-   public void notify(NotificationEvent event) {
-      if(verbosity >= Verbosity.DEBUG) {
-         System.out.println(event);
-      }
-   }
+    @Override
+    public void notify(NotificationEvent event) {
+        LOGGER.trace("{}", event);
+    }
 
-   @Override
-   public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-      return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
-   }
+    @Override
+    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+        return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-      // Nothing to do
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+        warnings.forEach(it -> LOGGER.info("{}", it));
+    }
 
     /**
      * Save proof.
      *
-     * @param result the result
-     * @param proof the proof
+     * @param result         the result
+     * @param proof          the proof
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-   public static boolean saveProof(Object result, Proof proof,
-         File keyProblemFile) {
-      if (result instanceof Throwable) {
-         throw new Error("Error in batchmode.", (Throwable) result);
-      }
+    public static boolean saveProof(Object result, Proof proof,
+                                    File keyProblemFile) {
+        if (result instanceof Throwable) {
+            throw new RuntimeException("Error in batchmode.", (Throwable) result);
+        }
 
-      // Save the proof before exit.
-      String baseName = keyProblemFile.getAbsolutePath();
-      int idx = baseName.indexOf(".key");
-      if (idx == -1) {
-         idx = baseName.indexOf(".proof");
-      }
-      baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
+        // Save the proof before exit.
+        String baseName = keyProblemFile.getAbsolutePath();
+        int idx = baseName.indexOf(".key");
+        if (idx == -1) {
+            idx = baseName.indexOf(".proof");
+        }
+        baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
-      File f;
-      int counter = 0;
-      do {
-         f = new File(baseName + ".auto." + counter + ".proof");
-         counter++;
+        File f;
+        int counter = 0;
+        do {
+            f = new File(baseName + ".auto." + counter + ".proof");
+            counter++;
         } while (f.exists());
 
-      try {
-         // a copy with running number to compare different runs
-         proof.saveToFile(new File(f.getAbsolutePath()));
-         // save current proof under common name as well
-         proof.saveToFile(new File(baseName + ".auto.proof"));
+        try {
+            // a copy with running number to compare different runs
+            proof.saveToFile(new File(f.getAbsolutePath()));
+            // save current proof under common name as well
+            proof.saveToFile(new File(baseName + ".auto.proof"));
 
             // save proof statistics
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-                    ) {
+                         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+            ) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
             } catch (IOException e) {
-         e.printStackTrace();
+                e.printStackTrace();
                 assert false;
             }
         } catch (IOException e) {
             e.printStackTrace();
-      }
+        }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof
         return proof.openGoals().size() == 0;
-   }
+    }
 
-   @Override
-   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
-      return null;
-   }
+    @Override
+    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+        return null;
+    }
 }

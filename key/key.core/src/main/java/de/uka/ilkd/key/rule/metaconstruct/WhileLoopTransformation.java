@@ -13,50 +13,12 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.LinkedHashMap;
-import java.util.Stack;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.Default;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabelJumpStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -67,16 +29,28 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.Stack;
 
 /** Walks through a java AST in depth-left-fist-order.
  * This walker is used to transform a loop (not only
  * while loops) according to the rules of the dynamic logic.
  */
 public class WhileLoopTransformation extends JavaASTVisitor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WhileLoopTransformation.class);
 
     protected static final Boolean CHANGED = Boolean.TRUE;
     protected static final int TRANSFORMATION = 0;
     protected static final int CHECK          = 1;
+
     /** the replacement element */
     protected ProgramElement replacement;
     /** break outerlabel */
@@ -86,19 +60,19 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**  */
     protected ExtList labelList = new ExtList();
     /**  */
-    protected Stack<ExtList> stack = new Stack<ExtList>();
+    protected Deque<ExtList> stack = new ArrayDeque<>();
     /** if there is a loop inside the loop the breaks of these inner loops have
      * not to be replaced. The replaceBreakWithNoLabel counts the depth of the
      * loop cascades. Replacements are only performed if the value of the
      * variable is zero.
      */
-    protected int replaceBreakWithNoLabel = 0;
+    protected int replaceBreakWithNoLabel;
     /** there are two modes the visitor can be run. The check and transformation
      * mode. In the check mode it is only looked if there are unlabeled break
      * and continues that needs to be replaced, the transformation mode performs
      * the unwinding of the loop with all necessary replacements
      */
-    protected int runMode                     = TRANSFORMATION;
+    protected int runMode;
     /** indicates if an unlabled break has been found and an outer
      * label is needed
      */
@@ -238,7 +212,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     public ProgramElement result() {
-        Debug.out("While-Loop-Tranform-Result: ", result);
+        LOGGER.debug("While-Loop-Tranform-Result: {}", result);
         return result;
     }
 
@@ -652,8 +626,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the outermost loop
-            Debug.log4jError("Enhanced for loops may not be toplevel in WhileLoopTransformation",
-                             null);
+            LOGGER.error("Enhanced for loops may not be toplevel in WhileLoopTransformation");
             doDefaultAction(x);
         } else {
             if (changeList.getFirst() == CHANGED) {

@@ -15,9 +15,12 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +31,8 @@ import java.util.Objects;
  * position information is used for error reporting.
  */
 public class PositionedString {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PositionedString.class);
+
     public static final String UNDEFINED_FILE = "<unknown>";
 
     @Nonnull
@@ -80,7 +85,7 @@ public class PositionedString {
 
     public PositionedString prependAndUpdatePosition(String text) {
         if (this.pos.getColumn() < text.length()) {
-            Debug.out("Column of given position " + pos
+            LOGGER.debug("Column of given position " + pos
                     + " is smaller than prepended text " + "\"" + text
                     + "\". This will result in a negative column value for "
                     + "returned " + PositionedString.class.getSimpleName() + ".");

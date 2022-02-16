@@ -95,7 +95,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
             source.next();
             return matchCond;
         } else {
-            Debug.out("Program match failed (pattern, source)", this, src);
+            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }        
     }

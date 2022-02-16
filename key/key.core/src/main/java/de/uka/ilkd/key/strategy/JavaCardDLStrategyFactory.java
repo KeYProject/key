@@ -193,9 +193,9 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "<li> Reexpansion of identical query terms is suppressed.</li>"
             + "<li> A query is not expanded if one of its arguments contains a literal greater<br>"
             + " than "
-            + QueryExpandCost.ConsideredAsBigLiteral
+            + QueryExpandCost.CONSIDERED_AS_BIG_LITERAL
             + ", or smaller than "
-            + (-QueryExpandCost.ConsideredAsBigLiteral)
+            + (-QueryExpandCost.CONSIDERED_AS_BIG_LITERAL)
             + ". This helps detecting loops in a proof.</li>"
             + "<li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>"
             + " branch of the loop invariant rule.</li>"

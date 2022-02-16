@@ -24,7 +24,7 @@ baseDirectory = ../
  * Defines a statistics file.
  * Path is relative to base directory.
  */
-statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
+statisticsFile = ../../key.core/build/reports/runallproofs/runStatistics.csv
 
 /*
  * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
@@ -44,7 +44,7 @@ reloadEnabled = true
  * Temporary directory, which is used for inter process communication when using forked mode.
  * The given path is relative to baseDirectory.
  */
-tempDir = ../../key.core.test/runallproofs_tmp
+tempDir = ../../key.core/build/runallproofs_tmp
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses are terminated as
@@ -957,4 +957,28 @@ group reload_examples {
    loadable ./heap/verifyThis15_3_DLL/doUndo.proof
    loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
    loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
+}
+
+group switch {
+
+    # This isn't a good test as it depends on ordering and naming scheme
+    # but it should be ok as regression test
+    # keep as first test in this group
+    provable ./standard_key/java_dl/switch/labeled_case.key
+
+    provable ./standard_key/java_dl/switch/empty_switch.key
+
+    # testing that side effects of the expression matter
+    provable ./standard_key/java_dl/switch/empty_switch_null.key
+    provable ./standard_key/java_dl/switch/empty_switch_null_catch.key
+    provable ./standard_key/java_dl/switch/empty_switch_array_out_of_bounds.key
+    provable ./standard_key/java_dl/switch/empty_switch_array_out_of_bounds_catch.key
+
+    # test that breaks and labels are handled correctly with nested switches
+    provable ./standard_key/java_dl/switch/switch_in_switch.key
+
+    provable ./standard_key/java_dl/switch/while_and_switch.key
+
+    # this is to test that proving large switch statements are reasonable fast
+    provable ./standard_key/java_dl/switch/large_switch.key
 }

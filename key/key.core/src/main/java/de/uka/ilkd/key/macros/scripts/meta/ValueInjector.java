@@ -172,6 +172,8 @@ public class ValueInjector {
                 //    throw new ConversionException("The typed returned '" + val.getClass()
                 //            + "' from the converter mismatched with the
                 // type of the field " + meta.getType(), meta);
+                // FIXME: I had to add this, otherwise I would receive an illegal access exception.
+                meta.getField().setAccessible(true);
                 meta.getField().set(obj, value);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection",

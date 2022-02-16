@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -31,17 +32,18 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
+import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,10 +56,12 @@ import static java.text.MessageFormat.format;
  * Old legacy factory methods for constructing KeY terms for JML constructs.
  */
 public final class JmlTermFactory {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JmlTermFactory.class);
+
     public Services services;
     public final TermBuilder tb;
     public final SLExceptionFactory exc;
-    public final JavaIntegerSemanticsHelper intHelper;
+    // public final JMLArithmeticHelper arithmeticHelper;
     public final List<PositionedString> warnings = new ArrayList<>();
     public static final Map<String, String> jml2jdl;
 
@@ -77,15 +81,16 @@ public final class JmlTermFactory {
         jml2jdl = Collections.unmodifiableMap(tmp);
     }
 
+    private final OverloadedOperatorHandler overloadedFunctionHandler;
+
 
     public JmlTermFactory(SLExceptionFactory exc,
-                          Services services,
-                          JavaIntegerSemanticsHelper intHelper) {
+                          Services services) {
 
         this.exc = exc;
         this.services = services;
         this.tb = services.getTermBuilder();
-        this.intHelper = intHelper;
+        overloadedFunctionHandler = new OverloadedOperatorHandler(services, exc);
     }
 
     //region reach
@@ -420,13 +425,9 @@ public final class JmlTermFactory {
         if (resultType == null)
             resultType = services.getTypeConverter().getKeYJavaType(t2);
 
-        final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, exc);
+        //final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
-        try {
-            return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
-        } catch (SLTranslationException e) {
-            throw new RuntimeException(e);
-        }
+        return buildIntCastExpression(resultType, new SLExpression(t, resultType));
     }
 
     public ImmutableList<Term> infflowspeclist(ImmutableList<Term> result) {
@@ -435,6 +436,36 @@ public final class JmlTermFactory {
 
     public Term notModified(Term term, SLExpression t) {
         return null;
+    }
+
+    @Nonnull
+    public SLExpression binary(OverloadedOperatorHandler.JMLOperator jmlOperator, SLExpression left, SLExpression right) {
+        try {
+            SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
+            if(result == null) {
+                throw exc.createException0(
+                        String.format("Cannot resolve JML operation %s %s %s (types %s %s %s).",
+                                left.getTerm(), jmlOperator.getImage(), right.getTerm(),
+                                left.getType(), jmlOperator.getImage(), right.getType()));
+            }
+            return result;
+        } catch (SLTranslationException e) {
+            throw exc.createException0("Error while converting a binary expression", e);
+        }
+    }
+
+    public SLExpression unary(JMLOperator unaryOp, SLExpression arg) {
+        try {
+            SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
+            if(result == null) {
+                throw exc.createException0(
+                        String.format("Cannot resolve JML operation %s %s (types %s).",
+                                unaryOp.getImage(), arg.getTerm(), arg.getType()));
+            }
+            return result;
+        } catch (SLTranslationException e) {
+            throw exc.createException0("Error while converting a unary expression", e);
+        }
     }
 
 
@@ -593,21 +624,22 @@ public final class JmlTermFactory {
                 throw exc.createException0("Casting of type variables not (yet) supported.");
             }
             assert result.isTerm();
-            Sort origType = result.getTerm().sort();
+            Sort origSort = result.getTerm().sort();
+            Sort targetSort = type.getSort();
 
-            if (origType == Sort.FORMULA) {
+            if (origSort == Sort.FORMULA) {
                 // This case might occur since boolean expressions
                 // get converted prematurely (see bug #1121).
                 // Just check whether there is a cast to boolean.
                 if (type != services.getTypeConverter().getBooleanType()) {
                     throw exc.createException0("Cannot cast from boolean to " + type + ".");
                 }
-            } else if (intHelper.isIntegerTerm(result)) {
-                try {
-                    return intHelper.buildCastExpression(type, result);
-                } catch (SLTranslationException e) {
-                    throw new RuntimeException(e);
+            } else if (targetSort == services.getTypeConverter().getIntegerLDT().targetSort()) {
+                if (origSort != services.getTypeConverter().getIntegerLDT().targetSort()) {
+                    // first cast to int and then refine ...
+                    result =  new SLExpression(tb.cast(targetSort, result.getTerm()));
                 }
+                return buildIntCastExpression(type, result);
             } else {
                 return new SLExpression(
                         tb.cast(type.getSort(), result.getTerm()),
@@ -618,60 +650,6 @@ public final class JmlTermFactory {
         }
         return result;
     }
-
-    //region binary operators
-
-    public SLExpression shiftRight(SLExpression a, SLExpression e) {
-        checkNotBigint(a);
-        checkNotBigint(e);
-        try {
-            return intHelper.buildRightShiftExpression(a, e);
-        } catch (SLTranslationException slTranslationException) {
-            throw new RuntimeException(slTranslationException);
-        }
-    }
-
-
-    public SLExpression shiftLeft(SLExpression result, SLExpression e) {
-        checkNotBigint(result);
-        checkNotBigint(e);
-        try {
-            return intHelper.buildLeftShiftExpression(result, e);
-        } catch (SLTranslationException slTranslationException) {
-            throw new RuntimeException(slTranslationException);
-        }
-    }
-
-    public SLExpression unsignedShiftRight(SLExpression left, SLExpression right) {
-        checkNotBigint(left);
-        checkNotBigint(right);
-        try {
-            return intHelper.buildUnsignedRightShiftExpression(left, right);
-        } catch (SLTranslationException e1) {
-            throw new RuntimeException(e1);
-        }
-    }
-
-    //endregion
-
-    //region arithmetic operations
-    public SLExpression add(SLExpression left, SLExpression right) {
-        try {
-            return intHelper.buildAddExpression(left, right);
-        } catch (SLTranslationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public SLExpression substract(SLExpression left, SLExpression right) {
-        try {
-            return intHelper.buildSubExpression(left, right);
-        } catch (SLTranslationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    // endergion
 
     //region equalities
     public SLExpression equivalence(SLExpression left, SLExpression right) {
@@ -690,6 +668,15 @@ public final class JmlTermFactory {
         return buildEqualityTerm(left, right);
     }
 
+    public SLExpression fpEq(SLExpression left, SLExpression right) {
+        return new SLExpression(tb.fpEq(left.getTerm(), right.getTerm()));
+    }
+
+    public SLExpression fpNeq(SLExpression left, SLExpression right) {
+        return new SLExpression(tb.not(tb.fpEq(left.getTerm(), right.getTerm())));
+    }
+
+
     public SLExpression neq(SLExpression left, SLExpression right) {
         checkSLExpressions(left, right, "!=");
         SLExpression eq = buildEqualityTerm(left, right);
@@ -700,7 +687,7 @@ public final class JmlTermFactory {
         }
     }
 
-    protected void checkSLExpressions(SLExpression left, SLExpression right, String eqSymb) {
+    private void checkSLExpressions(SLExpression left, SLExpression right, String eqSymb) {
         if (left.isType() != right.isType()) {
             throw exc.createException0(
                     "Cannot build equality expression (" + eqSymb
@@ -785,10 +772,23 @@ public final class JmlTermFactory {
                 "Please use the standard \\sum syntax."));
         final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
         // cast to specific JML type (fixes bug #1347)
+        return buildIntCastExpression(promo, bsumExpr);
+    }
+
+    private SLExpression buildIntCastExpression(KeYJavaType resultType, SLExpression a) {
+        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            return this.intHelper.buildCastExpression(promo, bsumExpr);
-        } catch (SLTranslationException e) {
-            throw new RuntimeException(e);
+            Function cast = integerLDT.getJavaCast(resultType.getJavaType());
+            if (cast != null)
+                return new SLExpression(tb.func(cast, a.getTerm()), resultType);
+            else { // there is no cast to \bigint
+//                if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT) {
+//                    throw exc.createException0("Cannot cast expression " + a + " to " + resultType + ".");
+//                }
+                return new SLExpression(a.getTerm(), resultType);
+            }
+        } catch (RuntimeException e) {
+            throw exc.createException0("Error while casting expression " + a + " to " + resultType + ".", e);
         }
     }
 
@@ -936,7 +936,7 @@ public final class JmlTermFactory {
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
-                        Debug.out("Can't create a locset from local variable " + t + ".\n" +
+                        LOGGER.debug("Can't create a locset from local variable " + t + ".\n" +
                                 "In this version of KeY, you do not need to put them in assignable clauses.");
                     } else {
                         throw exc.createException0("Can't create a locset from " + t + ".");

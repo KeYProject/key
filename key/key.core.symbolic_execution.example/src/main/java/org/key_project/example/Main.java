@@ -29,6 +29,8 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example application which symbolically executes
@@ -36,6 +38,8 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Martin Hentschel
  */
 public class Main {
+   private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
    /**
     * The program entry point.
     * @param args The start parameters.
@@ -54,7 +58,7 @@ public class Main {
          // Set Taclet options
          ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
          HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-         HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+         HashMap<String, String> newSettings = new HashMap<>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
          newSettings.put("methodExpansion", "methodExpansion:noRestriction");
          choiceSettings.setDefaultChoices(newSettings);
@@ -86,7 +90,7 @@ public class Main {
                                                                                     true); // Simplify conditions
             builder.analyse();
             // Optionally, create an SymbolicExecutionEnvironment which provides access to all relevant objects for symbolic execution
-            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(env, builder);
+            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<>(env, builder);
             printSymbolicExecutionTree("Initial State", builder);
             // Configure strategy for full exploration
             SymbolicExecutionUtil.initializeStrategy(builder);
@@ -119,8 +123,7 @@ public class Main {
          }
       }
       catch (Exception e) {
-         System.out.println("Exception at '" + location + "':");
-         e.printStackTrace();
+         LOGGER.debug("Exception at '{}':", location, e);
       }
    }
    

@@ -13,17 +13,17 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.HashMap;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Assert;
+public class TestKeYRecoderMapping {
 
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-
-public class TestKeYRecoderMapping extends TestCase{
-
-    private HashMap<Object, Object> map, revmap;
     private recoder.java.ProgramElement rp,rp2;
     private ProgramElement kp;
     private recoder.ModelElement rm, rm2;
@@ -31,15 +31,10 @@ public class TestKeYRecoderMapping extends TestCase{
     private KeYRecoderMapping mapping;
 
 
-
-    public TestKeYRecoderMapping(String name){
-        super(name);
-    }
-
-
+    @BeforeEach
     public void setUp(){
-        map = new HashMap<Object, Object>();
-        revmap = new HashMap<Object, Object>();
+        HashMap<Object, Object> map = new HashMap<>();
+        HashMap<Object, Object> revmap = new HashMap<>();
         rp = new recoder.java.declaration.ClassDeclaration();
         kp = new EmptyStatement();
         rm = new recoder.java.statement.Case();
@@ -54,20 +49,22 @@ public class TestKeYRecoderMapping extends TestCase{
     }
     
 
+    @Test
     public void testtoKeY(){
-        Assert.assertTrue("Fehler[1] in toKeY(recoder.java.ProgramElement)", kp.equals(mapping.toKeY(rp)));
-        Assert.assertTrue("Fehler[2] in toKeY(recoder.java.ProgramElement)", null==mapping.toKeY(rp2));
-        Assert.assertTrue("Fehler[3] in toKeY(recoder.ModelElement)", km.equals(mapping.toKeY(rm)));
-        Assert.assertTrue("Fehler[4] in toKeY(recoder.ModelElement)", null==mapping.toKeY(rm2));
+        assertEquals(kp, mapping.toKeY(rp), "Fehler[1] in toKeY(recoder.java.ProgramElement)");
+        assertNull(mapping.toKeY(rp2), "Fehler[2] in toKeY(recoder.java.ProgramElement)");
+        assertEquals(km, mapping.toKeY(rm), "Fehler[3] in toKeY(recoder.ModelElement)");
+        assertNull(mapping.toKeY(rm2), "Fehler[4] in toKeY(recoder.ModelElement)");
     }
 
 
 
 
+    @Test
     public void testtoRecoder(){
-       Assert.assertTrue("Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", rp.equals(mapping.toRecoder(kp)));
+        assertEquals(rp, mapping.toRecoder(kp), "Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)");
 //        Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", null==mapping.toRecoder(kp2));
-       Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)", rm.equals(mapping.toRecoder(km)));
+        assertEquals(rm, mapping.toRecoder(km), "Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)");
 //        Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ModelElement)", null==mapping.toRecoder(km2));
     }
 

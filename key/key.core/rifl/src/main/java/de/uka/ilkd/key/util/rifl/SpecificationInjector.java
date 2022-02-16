@@ -13,15 +13,6 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 import recoder.abstraction.ClassType;
 import recoder.java.*;
@@ -29,6 +20,10 @@ import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.SourceInfo;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a
@@ -64,8 +59,9 @@ public class SpecificationInjector extends SourceVisitor {
 
         private final String indentation;
         private final Map<String, Set<Entry<String, Type>>> respects =
-                new HashMap<String, Set<Entry<String, Type>>>();
+                new HashMap<>();
         private SpecificationContainer sc;
+
         JMLFactory(SpecificationContainer sc) {
             indentation = DEFAULT_INDENTATION;
             this.sc = sc;
@@ -73,10 +69,7 @@ public class SpecificationInjector extends SourceVisitor {
 
         @SuppressWarnings("unused")
         JMLFactory(int indent) {
-            final StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < indent; i++)
-                sb.append(' ');
-            indentation = sb.toString();
+            indentation = " ".repeat(indent);
         }
 
         @SuppressWarnings("unused")
@@ -86,7 +79,9 @@ public class SpecificationInjector extends SourceVisitor {
 
         // TODO allow more respects clauses
 
-        /** Adds \result to a determines clause labeled by key. */
+        /**
+         * Adds \result to a determines clause labeled by key.
+         */
         void addResultToDetermines(String key, Type t) {
             put(key, t, RESULT);
         }
@@ -105,63 +100,47 @@ public class SpecificationInjector extends SourceVisitor {
         }
 
         String getRespects(Set<String> oneRespect) {
-            String result = "";
-            if (oneRespect != null && 0 < oneRespect.size()) {
-                for (final String elem : oneRespect) {
-                    result += " "+elem+",";
-                }
-                result = result.substring(0,result.length()-1);
+            if (oneRespect != null && !oneRespect.isEmpty()) {
+                return String.join(", ", oneRespect);
             } else {
-                result = " \\nothing";
+                return " \\nothing";
             }
-            return result;
         }
 
         String getRespects(Set<Entry<String, Type>> oneRespect, final Type t) {
-            String result = "";
-            boolean found = false;
-            if (oneRespect != null && 0 < oneRespect.size()) {
-                for (final Entry<String, Type> elem : oneRespect) {
-                    if (t == elem.getValue()) {
-                        result += " "+elem.getKey()+",";
-                        found = true;
-                    }
-                }
-                if (found) {
-                    result = result.substring(0,result.length()-1);
-                } else {
-                    result = " \\nothing";
-                }
+            var r = oneRespect.stream().filter(p -> p.getValue() == t)
+                    .map(Entry::getKey)
+                    .collect(Collectors.joining(", "));
+            if (r.isEmpty()) {
+                return " \\nothing";
             }
-            return result;
+            return r;
         }
 
-        /** Gets a formatted JML comment. */
+        /**
+         * Gets a formatted JML comment.
+         */
         String getSpecification() {
             // start JML
-            final StringBuffer sb = new StringBuffer();
-            
-            // debug
-            //System.out.println("Respects: "+respects);
+            final var sb = new StringBuilder();
+
 
             // respects clauses
-            for (final Entry<String, Set<Entry<String,Type>>> oneRespect : respects.entrySet()) {
+            for (final Entry<String, Set<Entry<String, Type>>> oneRespect : respects.entrySet()) {
                 final String domain = oneRespect.getKey();
                 final Set<String> flowsFromDomain = sc.flows(domain);
-                // debug
-                // System.out.println("flows to "+domain+" "+flowsFromDomain);
 
-            	Set<String> oneRespects = new LinkedHashSet<String>();
+                Set<String> oneRespects = new LinkedHashSet<>();
                 for (final String flowsFrom : flowsFromDomain) {
                     final Set<Entry<String, Type>> es = respects.get(flowsFrom);
                     if (es != null) { // sources
-                        for (final Entry<String, Type> e: es) {
+                        for (final Entry<String, Type> e : es) {
                             if (e.getValue() == Type.SOURCE) {
                                 oneRespects.add(e.getKey());
                             }
                         }
                     }
-            	}
+                }
                 final Set<Entry<String, Type>> es = respects.get(domain);
                 if (es != null) { // sources
                     for (final Entry<String, Type> reflFlow : es) {
@@ -171,35 +150,29 @@ public class SpecificationInjector extends SourceVisitor {
                     }
                 }
 
-            	sb.append(indentation);
+                sb.append(indentation);
                 sb.append(DEFAULT_INDENTATION);
                 sb.append(JML_LINE_START);
                 sb.append(DETERMINES);
                 sb.append(getRespects(domain, Type.SINK)); // sinks
                 sb.append(BY);
                 sb.append(getRespects(oneRespects));
-                // debug
-                // final Set<String> set = new LinkedHashSet<String>();
-                // set.addAll(flowsFromDomain);
-                // set.add(domain);
                 sb.append(JML_CLAUSE_END);
-                // sb.append(" // "+ domain + " -> " + set);
                 sb.append(LINE_BREAK);
             }
-            
-            if(!sb.toString().trim().isEmpty()){
-            	sb.insert(0,indentation + JML_START + LINE_BREAK);
-            	// close JML
+
+            if (!sb.toString().trim().isEmpty()) {
+                sb.insert(0, indentation + JML_START + LINE_BREAK);
+                // close JML
                 sb.append(indentation);
                 sb.append(DEFAULT_INDENTATION);
                 sb.append(JML_END);
                 return sb.toString();
+            } else {
+                return null;
             }
-            else{
-            	return null;
-            }
-            
-            
+
+
         }
 
         private void put(String key, Entry<String, Type> value) {
@@ -207,31 +180,31 @@ public class SpecificationInjector extends SourceVisitor {
                 return;
             Set<Entry<String, Type>> target = respects.get(key);
             if (target == null) {
-                target = new LinkedHashSet<Entry<String, Type>>();
+                target = new LinkedHashSet<>();
             }
             target.add(value);
             respects.put(key, target);
         }
 
         private void put(String key, Type t, String value) {
-            put(key, new AbstractMap.SimpleEntry<String, Type>(value, t));
+            put(key, new AbstractMap.SimpleEntry<>(value, t));
         }
     } // private class end
 
 
     private final SpecificationContainer sc;
     private final SourceInfo si;
-    
+
     private List<MethodDeclaration> specifiedMethodDeclarations;
 
     public SpecificationInjector(SpecificationContainer sc, SourceInfo sourceInfo) {
         this.sc = sc;
         si = sourceInfo;
-        specifiedMethodDeclarations = new LinkedList<MethodDeclaration>();
+        specifiedMethodDeclarations = new LinkedList<>();
     }
-    
-    public List<MethodDeclaration> getSpecifiedMethodDeclarations(){
-    	return specifiedMethodDeclarations;
+
+    public List<MethodDeclaration> getSpecifiedMethodDeclarations() {
+        return specifiedMethodDeclarations;
     }
 
     // ////////////////////////////////////////////////////////////
@@ -244,14 +217,14 @@ public class SpecificationInjector extends SourceVisitor {
     }
 
     private void addComment(JavaProgramElement se, String comment) {
-    	//remember which methods were specified and generate po files only for them
-    	if(se instanceof MethodDeclaration){
-    		specifiedMethodDeclarations.add((MethodDeclaration) se);
-    	}
-    	
+        //remember which methods were specified and generate po files only for them
+        if (se instanceof MethodDeclaration) {
+            specifiedMethodDeclarations.add((MethodDeclaration) se);
+        }
+
         // fixes issue with Recoder that it writes comments _after_ the element
         final NonTerminalProgramElement parent = se.getASTParent();
-        assert parent != null : "Program element "+se+" with null parent";
+        assert parent != null : "Program element " + se + " with null parent";
         for (int i = 0; i < parent.getChildCount(); i++) {
             if (i > 0 && parent.getChildAt(i) == se) {
                 // chose previous element
@@ -259,12 +232,12 @@ public class SpecificationInjector extends SourceVisitor {
             } // TODO: what if se is the 0th child ??
         }
 
-        final ASTArrayList<Comment> commentList = new ASTArrayList<Comment>();
+        final ASTArrayList<Comment> commentList = new ASTArrayList<>();
         final ASTList<Comment> oldComments = se.getComments();
         if (oldComments != null)
             commentList.addAll(oldComments);
-        if(comment != null && !comment.isEmpty()){
-        	commentList.add(new Comment(comment));
+        if (comment != null && !comment.isEmpty()) {
+            commentList.add(new Comment(comment));
         }
         se.setComments(commentList);
     }
@@ -300,22 +273,16 @@ public class SpecificationInjector extends SourceVisitor {
 
         // add return value
         final String returnDomainSrc = sc.returnValue(md, Type.SOURCE);
-        // debug
-        // System.out.println(".... return domain: "+returnDomain);
         factory.addResultToDetermines(returnDomainSrc, Type.SOURCE);
         final String returnDomainSnk = sc.returnValue(md, Type.SINK);
-        // debug
-        // System.out.println(".... return domain: "+returnDomain);
         factory.addResultToDetermines(returnDomainSnk, Type.SINK);
 
         // add parameters
         for (int i = 0; i < md.getParameterDeclarationCount(); i++) {
             final ParameterDeclaration pd = md.getParameterDeclarationAt(i);
             final String paraName = pd.getVariableSpecification().getName();
-            final String paramSrc = sc.parameter(md, i+1, Type.SOURCE);
-            final String paramSnk = sc.parameter(md, i+1, Type.SINK);
-            // debug
-            // System.out.println(".... "+ pd.getVariableSpecification().getName() +" domain: " + sc.parameter(md, i+1));
+            final String paramSrc = sc.parameter(md, i + 1, Type.SOURCE);
+            final String paramSnk = sc.parameter(md, i + 1, Type.SINK);
             factory.addToDetermines(paraName, Type.SOURCE, paramSrc);
             factory.addToDetermines(paraName, Type.SINK, paramSnk);
         }
@@ -331,16 +298,14 @@ public class SpecificationInjector extends SourceVisitor {
                 final String fName = cls + "." + field;
                 final String fieldSrc = sc.field(pkg, cls, field, Type.SOURCE);
                 final String fieldSnk = sc.field(pkg, cls, field, Type.SINK);
-                // debug
-                // System.out.println(".... "+ field +" domain: " + sc.field(pkg, cls, field));
                 factory.addToDetermines(fName, Type.SOURCE, fieldSrc);
                 factory.addToDetermines(fName, Type.SINK, fieldSnk);
             }
         }
         //only add comment for methods for which we generated a specification
         String comment = factory.getSpecification();
-        if(comment != null){
-        	addComment(md, factory.getSpecification());
-        }     
+        if (comment != null) {
+            addComment(md, factory.getSpecification());
+        }
     }
 }

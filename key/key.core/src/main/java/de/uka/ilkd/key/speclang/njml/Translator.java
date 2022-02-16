@@ -6,8 +6,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
@@ -22,6 +25,8 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
+import de.uka.ilkd.key.speclang.njml.JmlParser.PrimaryFloatingPointContext;
+import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
@@ -41,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -55,11 +61,11 @@ import static java.util.Objects.requireNonNull;
  * @version 1 (5/10/20)
  */
 class Translator extends JmlParserBaseVisitor<Object> {
+
     private final Services services;
     private final TermBuilder tb;
     private final JavaInfo javaInfo;
     private final KeYJavaType containerType;
-    private final IntegerLDT intLDT;
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
@@ -74,7 +80,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     // Helper objects
     private final JMLResolverManager resolverManager;
-    private final JavaIntegerSemanticsHelper intHelper;
 
     Translator(Services services,
                KeYJavaType specInClass,
@@ -89,7 +94,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.tb = services.getTermBuilder();
         this.javaInfo = services.getJavaInfo();
         containerType = specInClass;
-        this.intLDT = services.getTypeConverter().getIntegerLDT();
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
@@ -102,8 +106,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        intHelper = new JavaIntegerSemanticsHelper(services, this.exc);
-        this.termFactory = new JmlTermFactory(this.exc, services, intHelper);
+        this.termFactory = new JmlTermFactory(this.exc, services);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
                 specInClass, selfVar, this.exc);
@@ -125,10 +128,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return (T) ctx.accept(this);
     }
 
+    @SuppressWarnings("unchecked")
     private <T> List<T> mapOf(List<? extends ParserRuleContext> contexts) {
         return contexts.stream().map(it -> (T) accept(it)).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     private <T> ImmutableList<T> listOf(List<? extends ParserRuleContext> contexts) {
         ImmutableList<T> seq = ImmutableSLList.nil();
         for (ParserRuleContext context : contexts) {
@@ -465,17 +470,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = seq.get(0);
         for (int i = 1; i < seq.size(); i++) {
             SLExpression expr = seq.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedOrExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-                }
-            } else {
-                result = new SLExpression(
-                        tb.or(tb.convertToFormula(result.getTerm()),
-                                tb.convertToFormula(expr.getTerm())));
-            }
+            result = termFactory.binary(BITWISE_OR, result, expr);
         }
         return result;
     }
@@ -488,18 +483,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedXorExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-                }
-            } else {
-                Term resultFormula = tb.convertToFormula(result.getTerm());
-                Term exprFormula = tb.convertToFormula(expr.getTerm());
-                result = new SLExpression(tb.or(tb.and(resultFormula, tb.not(exprFormula)),
-                        tb.and(tb.not(resultFormula), exprFormula)));
-            }
+            result = termFactory.binary(BITWISE_XOR, result, expr);
         }
         return result;
     }
@@ -513,16 +497,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedAndExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-
-                }
-            } else {
-                result = new SLExpression(tb.and(tb.convertToFormula(result.getTerm()),
-                        tb.convertToFormula(expr.getTerm())));
+            try {
+                result = termFactory.binary(BITWISE_AND, result, expr);
+            } catch(RuntimeException ex) {
+                raiseError(ctx, ex);
             }
         }
         return result;
@@ -532,14 +510,46 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitEqualityexpr(JmlParser.EqualityexprContext ctx) {
         List<SLExpression> expr = mapOf(ctx.relationalexpr());
         SLExpression result = expr.get(0);
+
+        // Does this chaining make sense at all? eq results in a formula?!
         for (int i = 1; i < expr.size(); i++) {
             TerminalNode tok = ctx.EQ_NEQ(i - 1);
+            // floats require special casing for == and !=
+            SLExpression floatResult = floatEqualityExpr(tok.getText(), result, expr.get(i));
+            if (floatResult != null) {
+                return floatResult;
+            }
             if (tok.getText().equals("=="))
                 result = termFactory.eq(result, expr.get(i));
             else
                 result = termFactory.neq(result, expr.get(i));
         }
         return result;
+    }
+
+    private SLExpression floatEqualityExpr(String img, SLExpression lhs, SLExpression rhs) {
+        if (lhs.getType() == null || rhs.getType() == null) {
+            return null;
+        }
+        Type lhsTy = lhs.getType().getJavaType();
+        Type rhsTy = lhs.getType().getJavaType();
+        if (rhsTy != PrimitiveType.JAVA_DOUBLE && rhsTy != PrimitiveType.JAVA_FLOAT &&
+                lhsTy != PrimitiveType.JAVA_DOUBLE && lhsTy != PrimitiveType.JAVA_FLOAT) {
+            return null;
+        }
+        KeYJavaType promotedType = services.getTypeConverter().getPromotedType(lhs.getType(), rhs.getType());
+
+        if(lhs.getType() != promotedType) {
+            lhs = termFactory.cast(promotedType, lhs);
+        }
+        if(rhs.getType() != promotedType) {
+            rhs = termFactory.cast(promotedType, rhs);
+        }
+
+        if (img.equals("=="))
+            return termFactory.fpEq(lhs, rhs);
+        else
+            return termFactory.fpNeq(lhs, rhs);
     }
 
     @Override
@@ -616,32 +626,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> expressions = mapOf(ctx.shiftexpr());
         SLExpression result = null;
         for (int i = 1; i < expressions.size(); i++) {
-            Function f = null;
-            Token op = ctx.op.get(i - 1);
-            switch (op.getType()) {
-                case JmlLexer.LT:
-                    f = intLDT.getLessThan();
-                    break;
-                case JmlLexer.GT:
-                    f = intLDT.getGreaterThan();
-                    break;
-                case JmlLexer.GEQ:
-                    f = intLDT.getGreaterOrEquals();
-                    break;
-                case JmlLexer.LEQ:
-                    f = intLDT.getLessOrEquals();
-                    break;
-                default:
-                    raiseError(ctx, "Unexpected syntax case.");
-            }
-
+            Token opToken = ctx.op.get(i - 1);
+            JMLOperator jop = JMLOperator.get(opToken.getText());
             SLExpression left = expressions.get(i - 1);
             SLExpression right = expressions.get(i);
-            SLExpression rel = new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
-            if (result == null) {
-                result = rel;
-            } else {
-                result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
+            try {
+                SLExpression rel = termFactory.binary(jop, left, right);
+                if (result != null) {
+                    result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
+                } else {
+                    result = rel;
+                }
+            } catch (RuntimeException ex) {
+                raiseError(ctx, ex);
             }
         }
         assert result != null;
@@ -654,20 +651,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> e = mapOf(ctx.additiveexpr());
         SLExpression result = e.get(0);
         for (int i = 1; i < e.size(); i++) {
-            String op = ctx.op.get(i - 1).getText();
+            String opToken = ctx.op.get(i - 1).getText();
             SLExpression expr = e.get(i);
-            switch (op) {
-                case "<<":
-                    result = termFactory.shiftLeft(result, expr);
-                    break;
-                case ">>":
-                    result = termFactory.shiftRight(result, expr);
-                    break;
-                case ">>>":
-                    result = termFactory.unsignedShiftRight(result, expr);
-                    break;
-                default:
-                    raiseError(ctx, "Unexpected syntax case.");
+            JMLOperator op = JMLOperator.get(opToken);
+            try {
+                result = termFactory.binary(op, result, expr);
+            } catch (RuntimeException ex) {
+                raiseError(ctx, ex);
             }
         }
         return result;
@@ -675,15 +665,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAdditiveexpr(JmlParser.AdditiveexprContext ctx) {
-        List<SLExpression> e = mapOf(ctx.multexpr());
-        SLExpression result = e.get(0);
-        for (int i = 1; i < e.size(); i++) {
-            String op = ctx.op.get(i - 1).getText();
-            SLExpression expr = e.get(i);
-            if (op.equals("+"))
-                result = termFactory.add(result, expr);
-            else
-                result = termFactory.substract(result, expr);
+        List<SLExpression> exprs = mapOf(ctx.multexpr());
+        SLExpression result = exprs.get(0);
+        for (int i = 1; i < exprs.size(); i++) {
+            SLExpression expr = exprs.get(i);
+            String opToken = ctx.op.get(i - 1).getText();
+            JMLOperator op = JMLOperator.get(opToken);
+            try {
+                result = termFactory.binary(op, result, expr);
+            } catch (RuntimeException ex) {
+                raiseError(ctx, ex);
+            }
         }
         return result;
     }
@@ -701,22 +693,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (e.isType()) {
                 raiseError("Cannot multiply by type " + e.getType().getName() + ".", ctx);
             }
+            JMLOperator jop = get(op.getText());
             try {
-                switch (op.getType()) {
-                    case JmlLexer.MULT:
-                        result = intHelper.buildMulExpression(result, e);
-                        break;
-                    case JmlLexer.DIV:
-                        result = intHelper.buildDivExpression(result, e);
-                        break;
-                    case JmlLexer.MOD:
-                        result = intHelper.buildModExpression(result, e);
-                        break;
-                    default:
-                        raiseError(ctx, "Unexpected syntax case.");
-                }
-            } catch (SLTranslationException e1) {
-                raiseError(ctx, e1);
+                result = termFactory.binary(jop, result, e);
+            } catch (RuntimeException ex) {
+                raiseError(ctx, ex);
             }
         }
         return result;
@@ -725,17 +706,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitUnaryexpr(JmlParser.UnaryexprContext ctx) {
         if (ctx.PLUS() != null) {
+            // This allows also "+null" to be parsed as "null". But that is not
+            // so terrible perhaps.
             SLExpression result = accept(ctx.unaryexpr());
             assert result != null;
             if (result.isType()) {
                 raiseError("Cannot build  +" + result.getType().getName() + ".", ctx);
             }
             assert result.isTerm();
-            try {
-                return intHelper.buildPromotedUnaryPlusExpression(result);
-            } catch (SLTranslationException e) {
-                raiseError(ctx, e);
-            }
+            return result;
         }
         if (ctx.DECLITERAL() != null) {
             String text = ctx.getText();
@@ -759,8 +738,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             assert result.isTerm();
             try {
-                return intHelper.buildUnaryMinusExpression(result);
-            } catch (SLTranslationException e) {
+                return termFactory.unary(UNARY_MINUS, result);
+            } catch (RuntimeException e) {
                 raiseError(ctx, e);
             }
         }
@@ -795,10 +774,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert e != null;
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             try {
-                return intHelper.buildPromotedNegExpression(e);
-            } catch (SLTranslationException e1) {
-                raiseError(ctx, e1);
-
+                return termFactory.unary(BITWISE_NEGATE, e);
+            } catch (RuntimeException ex) {
+                raiseError(ctx, ex);
             }
         }
         return accept(ctx.postfixexpr());
@@ -831,6 +809,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
+        if (ctx.THIS() != null) {
+            if (selfVar == null) {
+                raiseError("Cannot access \"this\" in a static context", ctx);
+            }
+            return getThisReceiver();
+        }
+        if (ctx.SUPER() != null) {
+            raiseError("\"super\" is currently not supported", ctx);
+        }
         appendToFullyQualifiedName(ctx.getText());
         return lookupIdentifier(ctx.getText(), null, null, ctx);
     }
@@ -930,10 +917,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         if (ctx.TRANSIENT() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return lookupIdentifier("<transient>", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return new SLExpression(
                     services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
                             tb.var(selfVar),
@@ -943,10 +936,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         if (ctx.INV() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return termFactory.createInv(receiver.getTerm(), receiver.getType());
         }
         if (ctx.MULT() != null) {
             assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
             return new SLExpression(tb.allFields(receiver.getTerm()),
                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
@@ -1079,6 +1078,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+    @Override
+    public SLExpression visitFractionalliteral(JmlParser.FractionalliteralContext ctx) {
+        SLExpression result = null;
+        String text = ctx.getText();
+        try {
+            if (ctx.FLOAT_LITERAL() != null) {
+                Term floatLit = services.getTypeConverter().getFloatLDT().translateLiteral(new FloatLiteral(text), services);
+                result = new SLExpression(floatLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_FLOAT));
+            } else if (ctx.DOUBLE_LITERAL() != null) {
+                Term doubleLit = services.getTypeConverter().getDoubleLDT().translateLiteral(new DoubleLiteral(text), services);
+                result = new SLExpression(doubleLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE));
+            } else if (ctx.REAL_LITERAL() != null) {
+                throw new Error("not yet implemented; needed real ldt");
+            } else {
+                raiseError(ctx, "Unexpected literal %s", text);
+            }
+        } catch(NumberFormatException ex) {
+            raiseError(ctx, ex);
+        }
+
+        return result;
+    }
 
     @Override
     public Object visitPrimaryResult(JmlParser.PrimaryResultContext ctx) {
@@ -1177,6 +1198,23 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.translateMapExpressionToJDL(ctx.SEQ2MAP().getText(), list, services);
     }
 
+    @Override
+    public Object visitPrimaryFloatingPoint(PrimaryFloatingPointContext ctx) {
+        SLExpression argument = accept(ctx.expression());
+        assert argument != null;
+        LDT ldt = services.getTypeConverter().getLDTFor(argument.getTerm().sort());
+        if (ldt == null) {
+            raiseError(ctx, "LDT for %s cannot be found.", argument.getTerm().sort());
+        }
+        String opName = ctx.getStart().getText();
+        assert opName.startsWith("\\fp_");
+        Function op = ldt.getFunctionFor(opName.substring(4), services);
+        if (op == null) {
+            raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
+        }
+
+        return new SLExpression(tb.func(op, argument.getTerm()));
+    }
 
     @Override
     public Object visitPrimaryNotMod(JmlParser.PrimaryNotModContext ctx) {

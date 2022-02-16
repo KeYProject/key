@@ -13,20 +13,27 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestTermBuilder extends TestCase {
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+public class TestTermBuilder {
 
     private Services services;
     private TermBuilder tb;
     
+    @BeforeEach
     public void setUp() {
         HelperClassForTests helper =  new HelperClassForTests();
         final ProofAggregate agg = helper.parse(new File(TestJavaInfo.testfile));
@@ -55,7 +62,7 @@ public class TestTermBuilder extends TestCase {
         assertSame(intLDT.getNumberTerminator(), number.op());
     }
 
-    
+    @Test
     public void testNumberIsNegativeInt() {
        String[] numbers  = new String[]{ "-4096", "-1", ""+Integer.MIN_VALUE, ""+Long.MIN_VALUE}; 
        int[][] expected = new int[][] { { 4, 0, 9, 6}, 
@@ -69,6 +76,7 @@ public class TestTermBuilder extends TestCase {
        }
     }
     
+    @Test
     public void testNumberIsPositiveInt() {
         String[] numbers  = new String[]{ "4096", "1", "0", ""+Integer.MAX_VALUE, ""+Long.MAX_VALUE}; 
         int[][] expected = new int[][] { { 4, 0, 9, 6}, 
@@ -83,6 +91,7 @@ public class TestTermBuilder extends TestCase {
         }        
     }
     
+    @Test
     public void testNumberIsVeryBigPositiveInteger() {
         String number  = "16576152376524231864936749621436926134961274698712643261489762897364"; 
         int[] expected = new int[] { 
@@ -94,6 +103,7 @@ public class TestTermBuilder extends TestCase {
     }
     
 
+    @Test
     public void testNumberIsVerySmallNegativeInteger() {
         String number  = "-16576152376524231864936749621436926134961274698712643261489762897364"; 
         int[] expected = new int[] { 
@@ -103,6 +113,42 @@ public class TestTermBuilder extends TestCase {
         checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);
     }
 
-    
-    
+    private void testDoubleLongPatterns(String number) {
+        double doubleVal = Double.parseDouble(number);
+        Term doubleTerm = tb.dfpTerm(doubleVal);
+        DoubleLiteral literal = services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
+        assertEquals(doubleVal, Double.parseDouble(literal.getValue()), "for double value " + number);
+    }
+
+    @Test
+    public void testDoubleLongPatterns() {
+        testDoubleLongPatterns("1");
+        testDoubleLongPatterns("0.");
+        testDoubleLongPatterns("-1");
+        testDoubleLongPatterns("-0.");
+        testDoubleLongPatterns("123.33");
+        testDoubleLongPatterns("123e-2");
+        testDoubleLongPatterns("22e307");
+        testDoubleLongPatterns("-22e307");
+    }
+
+    private void testFloatPatterns(String number) {
+        float floatval = Float.parseFloat(number);
+        Term floatTerm = tb.fpTerm(floatval);
+        FloatLiteral literal = services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
+        assertEquals(floatval, Float.parseFloat(literal.getValue()), "for double value " + number);
+    }
+
+    @Test
+    public void testFloatPatterns() {
+        testFloatPatterns("1");
+        testFloatPatterns("0.");
+        testFloatPatterns("-1");
+        testFloatPatterns("-0.");
+        testFloatPatterns("123.33");
+        testFloatPatterns("123e-2");
+        testFloatPatterns("22e37");
+        testFloatPatterns("-22e37");
+    }
+
 }

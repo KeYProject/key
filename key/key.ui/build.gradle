@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    
+
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
@@ -17,16 +17,16 @@ dependencies {
 
     api 'com.miglayout:miglayout-swing:11.0'
 
-    api group: group, name: 'docking-frames-common', version: '1.0'
-    api group: group, name: 'docking-frames-core', version: '1.0'
+    //logging implementation used by the slf4j
+    implementation 'ch.qos.logback:logback-classic:1.2.10'
 
-    implementation "org.antlr:antlr4-runtime:4.7.1"
+    api 'org.dockingframes:docking-frames-common:1.1.3p1'
+    api 'org.dockingframes:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
 
-    runtimeOnly project(":keyext.interactionlog")
-    runtimeOnly project(":keyext.exploration")
     //runtimeOnly project(":keyext.script.ui")
+    runtimeOnly project(":keyext.exploration")
 }
 
 task createExamplesZip(type: Zip) {
@@ -63,3 +63,17 @@ run {
     //jvmArgs += "-Dsun.awt.disablegrab=true"
 }
 
+task runWithProfiler(type: JavaExec) {
+    group("application")
+    description("""Run key.ui with flight recoder enabled. 
+                   See https://www.baeldung.com/java-flight-recorder-monitoring for a how to.""")
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "de.uka.ilkd.key.core.Main"
+    jvmArgs = ["-XX:+FlightRecorder",
+               "-XX:StartFlightRecording=duration=30s,filename=key_profile.jfr",
+               "-XX:FlightRecorderOptions=stackdepth=256"]
+    afterEvaluate {
+        println "A file key_profile.jfr should be created in folder 'key.ui'. You can open it in IntelliJ."
+    }
+}

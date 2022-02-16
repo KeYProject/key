@@ -210,7 +210,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
-        //TODO System.out.println("TODO .getAbbreviations");
+        /* weigl: prepare for future use of generated abbreviations from JML specifications*/
         return new Triple[0];
     }
 

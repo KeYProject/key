@@ -18,13 +18,16 @@ import java.io.StringWriter;
 import java.net.URI;
 
 import org.key_project.util.ExtList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *  Top level implementation of a Java {@link SourceElement}.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 public abstract class JavaSourceElement implements SourceElement {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaSourceElement.class);
 
     private final PositionInfo posInfo;
 
@@ -178,18 +181,16 @@ public abstract class JavaSourceElement implements SourceElement {
     
     /*Sometimes CompilableJavaPP must be given as argument instead of the ordinary PrettyPrinter */
     public String toString(PrettyPrinter pp, StringWriter sw){
-	try {
-	    pp.setIndentationLevel(0);
-	    prettyPrint(pp);
-	} catch (IOException e) {
-	    System.err.println("Pretty printing of JavaSourceElemet failed");
-	    System.err.println("Due to " + e);
-	    e.printStackTrace();
-	}
-	String r = sw.toString();
-	r = r.replace('\n',' ');
-	r = r.replace('\t',' ');
-	return r;
+        try {
+            pp.setIndentationLevel(0);
+            prettyPrint(pp);
+        } catch (IOException e) {
+            LOGGER.error("Pretty printing of JavaSourceElement failed", e);
+        }
+        String r = sw.toString();
+        r = r.replace('\n',' ');
+        r = r.replace('\t',' ');
+        return r;
     }
 
     

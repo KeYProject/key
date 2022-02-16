@@ -53,11 +53,15 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Symbolically executes a method invocation
  */
 public class MethodCall extends ProgramTransformer {
+    public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 
     private final SchemaVariable resultVar;
 
@@ -220,7 +224,7 @@ public class MethodCall extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        Debug.out("method-call: called for ", pe);
+        LOGGER.debug("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
@@ -287,7 +291,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleStatic(Services services) {
         Statement result;
-        Debug.out("method-call: invocation of static method detected");
+        LOGGER.debug("method-call: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef,
             services);
@@ -298,7 +302,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleSuperReference(Services services) {
         Statement result;
-        Debug.out("method-call: super invocation of method detected."
+        LOGGER.debug("method-call: super invocation of method detected."
                 + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef,
             services);
@@ -313,11 +317,11 @@ public class MethodCall extends ProgramTransformer {
             ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
-            Debug.out("method-call: invocation of private method detected."
+            LOGGER.debug("method-call: invocation of private method detected."
                     + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
-            Debug.out("method-call: invocation of non-private"
+            LOGGER.debug("method-call: invocation of non-private"
                     + " instance method detected."
                     + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps = services.getJavaInfo()

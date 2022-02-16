@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -48,6 +49,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The program method represents a (pure) method in the logic. In case of a
@@ -56,6 +59,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 public final class ProgramMethod extends ObserverFunction
         implements ProgramInLogic, IProgramMethod {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramMethod.class);
 
     private final MethodDeclaration method;
     /**
@@ -489,7 +494,7 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            Debug.out("Program match failed (pattern, source)", this, src);
+            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }

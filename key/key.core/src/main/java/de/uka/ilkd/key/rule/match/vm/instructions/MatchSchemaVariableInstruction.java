@@ -7,9 +7,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable> extends Instruction<SV> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
     public MatchSchemaVariableInstruction(SV op) {
         super(op);
@@ -42,7 +44,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable> 
         try {           
             return matchCond.setInstantiations(inst.add(op, term, services));
         } catch (IllegalInstantiationException e) {
-            Debug.out("FAILED. Exception thrown at sorted schema variable", e);
+            LOGGER.debug("FAILED. Exception thrown at sorted schema variable", e);
         }
         
         return null;

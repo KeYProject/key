@@ -13,57 +13,35 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.*;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import junit.framework.TestCase;
-
-import org.xml.sax.SAXException;
-
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYLessLink;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBlockContract;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessConstraint;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessExceptionalMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessJoin;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopStatement;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodCall;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturnValue;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessOperationContract;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessTermination;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import static org.junit.Assert.*;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link ExecutionNodeWriter} and {@link ExecutionNodeReader}
  * @author Martin Hentschel
  */
-public class TestExecutionNodeWriterAndReader extends TestCase {
+public class TestExecutionNodeWriterAndReader {
    /**
     * Tests the reading and writing process without variables and without call stack.
     */
-   @Test public void testWritingAndReading_withoutVariables_and_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test
+   public void testWritingAndReading_withoutVariables_and_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(false, false, true, true);
    }
    
@@ -117,10 +95,6 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
    }
    
    /**
-    * Executes the test steps of {@link #testWritingAndReading()},
-    * {@link #testWritingAndReading_withoutVariables()},
-    * {@link #testWritingAndReading_withoutCallStack()} and
-    * {@link #testWritingAndReading_withoutVariables_and_withoutCallStack()}.
     * @param saveVariabes Save variables?
     * @param saveCallStack Save call stack?
     * @param saveReturnValues Save method return values?

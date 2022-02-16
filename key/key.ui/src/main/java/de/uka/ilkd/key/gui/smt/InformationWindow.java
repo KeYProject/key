@@ -21,10 +21,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 
 
@@ -101,7 +101,7 @@ public class InformationWindow extends JDialog {
    }
    
    private void initModel(SMTSolver solver){
-	   if(solver.getType() != SolverType.Z3_CE_SOLVER){		   
+	   if(solver.getType() != SolverTypes.Z3_CE_SOLVER){
 		   return;
 	   }
 	   if(solver.getSocket().getQuery()==null){

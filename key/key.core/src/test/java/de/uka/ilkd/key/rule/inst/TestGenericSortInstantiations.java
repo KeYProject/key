@@ -13,29 +13,22 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.GenericSupersortException;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.*;
 
-public class TestGenericSortInstantiations extends TestCase {
+import java.util.Iterator;
 
-    static final ImmutableSet<Sort> emptySortSet = DefaultImmutableSet.<Sort>nil();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class TestGenericSortInstantiations {
+
+    static final ImmutableSet<Sort> emptySortSet = DefaultImmutableSet.nil();
 
 
     /**
@@ -164,15 +157,9 @@ public class TestGenericSortInstantiations extends TestCase {
     SchemaVariable sva4 = SchemaVariableFactory.createTermSV ( new Name ( "sva4" ), A4 );
     */
 
-    public TestGenericSortInstantiations(String name)
-	throws GenericSupersortException {
-	super(name);
 
-	
-    }
-
-    @Override
-    public void setUp() {
+    @BeforeEach
+	public void setUp() {
        // this ensures that necessary Java types are loaded
        TacletForTests.services ().getJavaInfo().readJavaBlock("{}");  
        
@@ -242,7 +229,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
     public static ImmutableList<GenericSort> sorts ( ImmutableList<GenericSortCondition> p_conditions ) {
 	Iterator<GenericSortCondition> it = p_conditions.iterator ();
-	ImmutableList<GenericSort> res = ImmutableSLList.<GenericSort>nil();
+	ImmutableList<GenericSort> res = ImmutableSLList.nil();
 
 	while ( it.hasNext () )
 	    res = res.prepend ( it.next ().getGenericSort () );
@@ -260,492 +247,424 @@ public class TestGenericSortInstantiations extends TestCase {
     }
     */
 
+	@Test
     public void testGeneric1 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A4 ) );
 	
 	Services services = TacletForTests.services();
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A4 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A6 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, B1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, B5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, B2 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, B2), gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
 
-    public void testGeneric2 () {
+    @Test
+	public void testGeneric2 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, A2 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, A2), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B3 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, B3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, B3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B3 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ).put ( G2, B4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3).put(G2, B4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ).put ( G2, B4 ).put ( G4, A5 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3).put(G2, B4).put(G4, A5), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A4 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ).put ( G2, B4 ).put ( G4, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4).put(G2, B4).put(G4, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, B1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, B4 ).put ( G4, B1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY).put(G2, B4).put(G4, B1), gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
 
-    public void testGeneric2Array () {
+    @Test
+	public void testGeneric2Array () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, A2 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, A2), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D3 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, D3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, D3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D3 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ).put ( G2, D4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3).put(G2, D4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ).put ( G2, D4 ).put ( G4, A5 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3).put(G2, D4).put(G4, A5), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A4 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ).put ( G2, D4 ).put ( G4, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4).put(G2, D4).put(G4, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, D1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, D4 ).put ( G4, D1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY).put(G2, D4).put(G4, D1), gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
 
-    public void testGeneric3 () {
+    @Test
+	public void testGeneric3 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, A2).put(G3, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A5).put(G2, A2).put(G3, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1).put(G2, A2).put(G3, A3).put(G4, A1), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, B1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );	
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, A2 ).put ( G3, Sort.ANY ).put ( G4, B1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY).put(G2, A2).put(G3, Sort.ANY).put(G4, B1), gsi.getAllInstantiations(), "Instantiations should be equal");
 	
-	cs =  ImmutableSLList.<GenericSortCondition>nil();
+	cs =  ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3 ).put ( G2, B2 ).put ( G4, A5 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3).put(G2, B2).put(G4, A5), gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
 
-    public void testGeneric4 () {
+    @Test
+	public void testGeneric4 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A4 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A2 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A2 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A3 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H2, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H2, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H2, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H2, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A4 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H3, A1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H3, A1), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H3, A1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H3, A1 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H3, A1), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A6 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
     }
 
 
-    public void testGeneric5 () {
+    @Test
+	public void testGeneric5 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H1, A4 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A3 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H1, A4 ).put ( H2, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H1, A4).put(H2, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H1, A6 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H1, Sort.ANY ).put ( H2, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H1, Sort.ANY).put(H2, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 	
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A4 ) );
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 	
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H1, A3 ).put ( H2, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H1, A3).put(H2, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A5 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H1, A3 ).put ( H3, A5 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H1, A3).put(H3, A5), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A5 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H4, A6 ) );
 
 	try {
 	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	    fail ( "Expected GenericSortException" );
+	    fail("Expected GenericSortException");
 	} catch ( GenericSortException e ) {}
 
     }
 
 
-    public void testGeneric6 () {
+    @Test
+	public void testGeneric6 () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A4 ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G4, true ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G3, false ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4).put(G4, A4).put(G3, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A4).put(G4, A4).put(G3, A4), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G3, false ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A5).put(G2, A2).put(G3, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G4, true ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A5 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A5).put(G2, A2).put(G3, A3).put(G4, A5), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( H3, true ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H3, A3 ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(H3, A3), gsi.getAllInstantiations(), "Instantiations should be equal");
 
     }
 
-    public void testNullsort () {
+    @Test
+	public void testNullsort () {
 	ImmutableList<GenericSortCondition> cs;
 	GenericSortInstantiations gsi;
 	
@@ -758,53 +677,43 @@ public class TestGenericSortInstantiations extends TestCase {
 		                                                     .prepend(A5OBJ)
 		                                                     .prepend(A6OBJ));
 	
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1OBJ ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1OBJ), gsi.getAllInstantiations(), "Instantiations should be equal");
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2OBJ ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A3OBJ ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A3OBJ), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, A1OBJ ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, A1OBJ), gsi.getAllInstantiations(), "Instantiations should be equal");
 	
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY), gsi.getAllInstantiations(), "Instantiations should be equal");
 
-	cs = ImmutableSLList.<GenericSortCondition>nil();
+	cs = ImmutableSLList.nil();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
-	assertEquals ( "Instantiations should be equal",
-	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
-	               gsi.getAllInstantiations () );
+	assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap()
+			.put(G1, Sort.ANY), gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
 }

@@ -44,6 +44,7 @@ public class ThreadSpec2 {
 
 
     /*@ model_behavior
+      requires \old(stateInv());
       requires stateInv();
       ensures \result ==> (\old(preStart(\dl_currentThread())) ==> preStart(this));
       accessible<heap> staticPermissions();
@@ -53,6 +54,7 @@ public class ThreadSpec2 {
       helper model two_state boolean startTransfer(); @*/
 
     /*@ model_behavior
+      requires \old(stateInv());
       requires stateInv();
       ensures \result ==> (\old(postJoin(this)) ==> postJoin(\dl_currentThread()));
       accessible<heap> staticPermissions();

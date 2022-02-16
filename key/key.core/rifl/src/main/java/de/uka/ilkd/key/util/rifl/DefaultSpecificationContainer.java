@@ -31,10 +31,10 @@ import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
  */
 public class DefaultSpecificationContainer implements SpecificationContainer {
 
-	private final Map<Field, String> field2domain = new HashMap<Field, String>();
-	private final Map<Parameter, String> param2domain = new HashMap<Parameter, String>();
-	private final Map<ReturnValue, String> return2domain = new HashMap<ReturnValue, String>();
-	private final Set<Entry<String,String>> flow = new LinkedHashSet<Entry<String,String>>();
+	private final Map<Field, String> field2domain = new HashMap<>();
+	private final Map<Parameter, String> param2domain = new HashMap<>();
+	private final Map<ReturnValue, String> return2domain = new HashMap<>();
+	private final Set<Entry<String,String>> flow = new LinkedHashSet<>();
 
 	public DefaultSpecificationContainer(Map<SpecificationEntity, String> domainAssignments,
 	                                     Set<Entry<String, String>> flow2) {
@@ -48,9 +48,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 				return2domain.put((ReturnValue) e.getKey(), e.getValue());
 			}
 		}
-		for(final Entry<String,String> e : flow2) {
-			this.flow.add(e);
-		}
+		this.flow.addAll(flow2);
 	}
 
 	@Override
@@ -115,14 +113,12 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
 	@Override
 	public Set<String> flows(String domain) {
-		Set<String> result = new LinkedHashSet<String>();
+		Set<String> result = new LinkedHashSet<>();
 		for (final Entry<String,String> e : flow) {
 			if(e.getValue().equals(domain)){
 				result.add(e.getKey());
 			}
 		}
-		// debug
-		// System.out.println("GET: "+domain+" = "+result);
 		return result;
 	}
 }

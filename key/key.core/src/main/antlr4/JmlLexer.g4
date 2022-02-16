@@ -8,13 +8,16 @@ import java.util.stream.Collectors;
 }
 
 @members{
+   // needed for double literals and ".."
+   private int _lex_pos;
+
    private int parenthesisLevel = 0;
-   private void incrParen() { parenthesisLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrParen() { parenthesisLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrParen() { parenthesisLevel++;}
+   private void decrParen() { parenthesisLevel--;}
 
    private int bracesLevel = 0;
-   private void incrBrace() { bracesLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrBrace() { bracesLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrBrace() { bracesLevel++;}
+   private void decrBrace() { bracesLevel--;}
 
    private int bracketLevel = 0;
    private void incrBracket() { bracketLevel++;}
@@ -218,6 +221,15 @@ EVERYTHING: '\\everything';
 EXCEPTION: '\\exception';
 EXISTS: '\\exists';
 FORALL: '\\forall';
+FP_ABS: '\\fp_abs';  //KeY extension, not official JML
+FP_INFINITE : '\\fp_infinite';   //KeY extension, not official JML
+FP_NAN: '\\fp_nan';   //KeY extension, not official JML
+FP_NEGATIVE: '\\fp_negative';   //KeY extension, not official JML
+FP_NICE: '\\fp_nice'; //KeY syntactic sugar
+FP_NORMAL: '\\fp_normal';   //KeY extension, not official JML
+FP_POSITIVE: '\\fp_positive';   //KeY extension, not official JML
+FP_SUBNORMAL: '\\fp_subnormal';   //KeY extension, not official JML
+FP_ZERO: '\\fp_zero';   //KeY extension, not official JML
 FREE: '\\free';  //KeY extension, not official JML
 FRESH: '\\fresh';
 INDEX: '\\index';
@@ -296,7 +308,6 @@ WORKINGSPACE: '\\working_space';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
 
-
 E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
 E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
 E_JML_ML_END: '*/' -> channel(HIDDEN);
@@ -361,10 +372,64 @@ fragment BINPREFIX: '0' ('b'|'B');
 fragment OCTPREFIX: '0';
 fragment HEXPREFIX: '0' ('x'|'X');
 fragment LONGSUFFIX: 'l' | 'L';
+
 BINLITERAL: BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?;
 OCTLITERAL: OCTPREFIX OCTDIGIT ((OCTDIGIT | '_')* OCTDIGIT)? LONGSUFFIX?;
 DECLITERAL: ('0' | (NONZERODECDIGIT ((DECDIGIT | '_')* DECDIGIT)?)) LONGSUFFIX?;
 HEXLITERAL: HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?;
+
+fragment
+FractionalNumber
+    :   DIGIT+ '.' DIGIT* Exponent?
+    |   '.' DIGIT+ Exponent?
+    |   DIGIT+ Exponent?
+    ;
+
+fragment
+Exponent
+    :   ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+    ;
+
+fragment
+FloatSuffix
+    :   'f' | 'F'
+    ;
+
+fragment
+DoubleSuffix
+    :   'd' | 'D'
+    ;
+
+fragment
+RealSuffix
+    :   'r' | 'R'
+    ;
+
+FLOAT_LITERAL
+    :   FractionalNumber FloatSuffix
+    ;
+
+REAL_LITERAL
+    :   FractionalNumber RealSuffix
+    ;
+
+DOUBLE_LITERAL
+    :  /*  MU2018: DIGITS was removed, the following was not accessible.
+        *  It is strange anyway ...
+        *  MU2019: But necessary, since otherwise 1..x would be parsed as (1.).x
+        *  MU2021: Brought to ANTLR4 as by
+        *     https://stackoverflow.com/questions/35724082/syntactic-predicates-in-antlr-lexer-rules
+        */
+        DIGIT+ '.' DIGIT+ Exponent? DoubleSuffix?
+    |   DIGIT+ '.'? Exponent DoubleSuffix?
+    |   DIGIT+ '.' DoubleSuffix
+    |   '.' DIGIT+ Exponent? DoubleSuffix?
+    |   DIGIT+ Exponent DoubleSuffix?
+    |   DIGIT+  { _lex_pos=_input.index(); setType(DECLITERAL); emit(); }
+         '.' '.' { _input.seek(_lex_pos); }
+    |   DIGIT+ '.'
+    ;
+
 
 fragment
 LETTERORDIGIT: LETTER | DIGIT;

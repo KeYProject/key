@@ -8,57 +8,36 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
  * @version 1 (5/14/20)
  */
-@RunWith(Parameterized.class)
 public class ExpressionTranslatorTest {
-    @Parameterized.Parameter
-    public String expr;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionTranslatorTest.class);
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> getFiles() throws IOException {
-        List<Object[]> seq = new LinkedList<>();
-        try (InputStream s = ExpressionTranslatorTest.class.getResourceAsStream("exprs.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
-            String l;
-            while ((l = reader.readLine()) != null) {
-                if (l.trim().isEmpty() || l.startsWith("#")) {
-                    continue;
-                }
-                seq.add(new Object[]{l});
-            }
-        }
-        return seq;
-    }
-
-    private Recoder2KeY r2k;
     private Services services;
 
-    @Before
+    @BeforeEach
     public void setup() {
         if (services != null) return;
         services = TacletForTests.services();
-        r2k = new Recoder2KeY(services, services.getNamespaces());
+        Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
         r2k.parseSpecialClasses();
     }
 
-    @Test
-    public void parseAndInterpret() {
+    @ParameterizedTest
+    @CsvFileSource(resources = "exprs.txt", delimiter = '^')
+    public void parseAndInterpret(String expr) {
         KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
@@ -67,9 +46,9 @@ public class ExpressionTranslatorTest {
         lexer._mode = JmlLexer.expr;
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.ExpressionContext ctx = parser.expression();
-        Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
+        Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
                 new HashMap<>(), new HashMap<>());
-        System.out.println(ctx.accept(et));
+        LOGGER.debug("{}", ctx.accept(et));
     }
 }

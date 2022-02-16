@@ -3,6 +3,8 @@ package de.uka.ilkd.key.proof.runallproofs;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.regex.Pattern;
  * @version 1 (6/14/20)
  */
 public class GenerateUnitTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
     /**
      * Output folder. Set on command line.
      */
@@ -48,13 +51,13 @@ public class GenerateUnitTests {
         }
 
         outputFolder = args[0];
-        log("Output folder %s%n", outputFolder);
+        LOGGER.info("Output folder {}", outputFolder);
 
         File out = new File(outputFolder);
         out.mkdirs();
 
         for (String index : collections) {
-            log("Index file: %s", index);
+            LOGGER.info("Index file: {}", index);
             ProofCollection col = RunAllProofsTest.parseIndexFile(index);
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
                 createUnitClass(col, unit);
@@ -74,9 +77,10 @@ public class GenerateUnitTests {
             //"@RunWith(NamedRunner.class)\n" +
             "public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {\n" +
             "\n" +
+            "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"+
             "  @Before public void setUp() {\n" +
             "    this.baseDirectory = \"$baseDirectory\";\n" +
-            "    this.statisticsFile = \"$statisticsFile\";\n" +
+            "    this.statisticsFile = STATISTIC_FILE;\n" +
             "    this.name = \"$name\";\n" +
             "    this.reloadEnabled = $reloadEnabled;\n" +
             "    this.tempDir = \"$tempDir\";\n" +
@@ -100,7 +104,7 @@ public class GenerateUnitTests {
      * @throws IOException if the file is not writable
      */
     private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit) throws IOException {
-        String packageName = "de.uka.ilkd.key.proof.runallproofs";
+        String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
         String className = name
                 .replaceAll("\\.java", "")
@@ -135,7 +139,7 @@ public class GenerateUnitTests {
         Set<String> usedMethodNames = new TreeSet<>();
         int clashCounter = 0;
 
-        for (TestFile<?> file : unit.getTestFiles()) {
+        for (TestFile file : unit.getTestFiles()) {
             File keyFile = file.getKeYFile();
             String testName = keyFile.getName()
                     .replaceAll("\\.java", "")
@@ -172,7 +176,7 @@ public class GenerateUnitTests {
 
         Pattern regex = Pattern.compile("[$](\\w+)");
         Matcher m = regex.matcher(TEMPLATE_CONTENT);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String key = m.group(1);
             m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/"));
@@ -181,9 +185,5 @@ public class GenerateUnitTests {
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
         Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"), sb.toString().getBytes());
-    }
-
-    private static void log(String fmt, Object... args) {
-        System.out.printf(">>> " + fmt + "\n", args);
     }
 }

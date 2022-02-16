@@ -13,306 +13,290 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.ArrayList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import java.util.ArrayList;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
  */
 public class SmtLib2Translator extends AbstractSMTTranslator {
+    private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
+    private static final StringBuilder BOOL = new StringBuilder("Bool");
 
-    private static StringBuffer INTSTRING = new StringBuffer("Int");
+    private static final String GAP = "          ";
 
-    private static final StringBuffer BOOL = new StringBuffer("Bool");
+    private static final StringBuilder FALSESTRING = new StringBuilder("false");
 
-	private static final String GAP = "          ";
+    private static final StringBuilder TRUESTRING = new StringBuilder("true");
 
-    private static StringBuffer FALSESTRING = new StringBuffer("false");
+    private static final StringBuilder ALLSTRING = new StringBuilder("forall");
 
-    private static StringBuffer TRUESTRING = new StringBuffer("true");
+    private static final StringBuilder EXISTSTRING = new StringBuilder("exists");
 
-    private static StringBuffer ALLSTRING = new StringBuffer("forall");
+    private static final StringBuilder ANDSTRING = new StringBuilder("and");
 
-    private static StringBuffer EXISTSTRING = new StringBuffer("exists");
+    private static final StringBuilder ORSTRING = new StringBuilder("or");
 
-    private static StringBuffer ANDSTRING = new StringBuffer("and");
+    private static final StringBuilder NOTSTRING = new StringBuilder("not");
 
-    private static StringBuffer ORSTRING = new StringBuffer("or");
+    private static final StringBuilder EQSTRING = new StringBuilder("=");
 
-    private static StringBuffer NOTSTRING = new StringBuffer("not");
+    private static final StringBuilder IMPLYSTRING = new StringBuilder("=>");
 
-    private static StringBuffer EQSTRING = new StringBuffer("=");
+    private static final StringBuilder PLUSSTRING = new StringBuilder("+");
 
-    private static StringBuffer IMPLYSTRING = new StringBuffer("=>");
+    private static final StringBuilder MINUSSTRING = new StringBuilder("-");
 
-    private static StringBuffer PLUSSTRING = new StringBuffer("+");
+    private static final StringBuilder MULTSTRING = new StringBuilder("*");
 
-    private static StringBuffer MINUSSTRING = new StringBuffer("-");
+    private static final StringBuilder DIVSTRING = new StringBuilder("div");
 
-    private static StringBuffer MULTSTRING = new StringBuffer("*");
+    private static final StringBuilder LTSTRING = new StringBuilder("<");
 
-    private static StringBuffer DIVSTRING = new StringBuffer("div");
-        
-    private static StringBuffer LTSTRING = new StringBuffer("<");
+    private static final StringBuilder GTSTRING = new StringBuilder(">");
 
-    private static StringBuffer GTSTRING = new StringBuffer(">");
+    private static final StringBuilder LEQSTRING = new StringBuilder("<=");
 
-    private static StringBuffer LEQSTRING = new StringBuffer("<=");
+    private static final StringBuilder GEQSTRING = new StringBuilder(">=");
 
-    private static StringBuffer GEQSTRING = new StringBuffer(">=");
+    private static final StringBuilder NULLSTRING = new StringBuilder("null");
 
-    private static StringBuffer NULLSTRING = new StringBuffer("null");
+    private static final StringBuilder NULLSORTSTRING = new StringBuilder("NULLSORT");
 
-    private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
+    private static final StringBuilder LOGICALIFTHENELSE = new StringBuilder("ite");
 
-    private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("ite");
+    private static final StringBuilder TERMIFTHENELSE = new StringBuilder("ite");
 
-    private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
-
-    private static StringBuffer DISTINCT = new StringBuffer("distinct");
+    private static final StringBuilder DISTINCT = new StringBuilder("distinct");
 
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
      *
-     * @param sequent
-     *                The sequent which shall be translated.
-     *
+     * @param sequent  The sequent which shall be translated.
      * @param services The Services Object belonging to the sequent.
      */
     public SmtLib2Translator(Sequent sequent, Services services, Configuration config) {
-	super(sequent, services,config);
+        super(sequent, services, config);
     }
 
     /**
      * For translating only terms and not complete sequents.
      */
-    public SmtLib2Translator(Services s,Configuration config) {
-	super(s,config);
+    public SmtLib2Translator(Services s, Configuration config) {
+        super(s, config);
     }
 
-    protected StringBuffer translateNull() {
-	return NULLSTRING;
-    }
-
-    @Override
-    protected StringBuffer getNullName() {
+    protected StringBuilder translateNull() {
         return NULLSTRING;
     }
 
-    protected StringBuffer translateNullSort() {
-	return NULLSORTSTRING;
+    @Override
+    protected StringBuilder getNullName() {
+        return NULLSTRING;
     }
 
-    protected StringBuffer getBoolSort() {
+    protected StringBuilder translateNullSort() {
+        return NULLSORTSTRING;
+    }
+
+    protected StringBuilder getBoolSort() {
         return BOOL;
     }
 
     @Override
-    protected StringBuffer buildCompleteText(StringBuffer formula,
-    	    ArrayList<StringBuffer> assumptions,
-    	    ArrayList<ContextualBlock> assumptionBlocks,
-    	    ArrayList<ArrayList<StringBuffer>> functions,
-    	    ArrayList<ArrayList<StringBuffer>> predicates,
-    	    ArrayList<ContextualBlock> predicateBlocks,
-    	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
-    	    SMTSettings settings){
-    	StringBuffer result = new StringBuffer();
-    	if(getConfig().mentionLogic()){
-    		result.append("(set-logic "+settings.getLogic() +" )\n");
-    	}
-    	result.append("(set-option :print-success true) \n");
-    	result.append("(set-option :produce-unsat-cores true)\n");
-    	result.append("(set-option :produce-models true)\n");
-    	// One cannot ask for proofs and models at one time
-    	// rather have models than proofs (MU, 2013-07-19)
-    	// see bug #1236
-    	// result.append("(set-option :produce-proofs true)\n");
+    protected StringBuilder buildCompleteText(StringBuilder formula,
+                                              ArrayList<StringBuilder> assumptions,
+                                              ArrayList<ContextualBlock> assumptionBlocks,
+                                              ArrayList<ArrayList<StringBuilder>> functions,
+                                              ArrayList<ArrayList<StringBuilder>> predicates,
+                                              ArrayList<ContextualBlock> predicateBlocks,
+                                              ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
+                                              SMTSettings settings) {
+        StringBuilder result = new StringBuilder();
+        if (getConfig().mentionLogic()) {
+            result.append("(set-logic " + settings.getLogic() + " )\n");
+        }
+        result.append("(set-option :print-success true) \n");
+        result.append("(set-option :produce-unsat-cores true)\n");
+        result.append("(set-option :produce-models true)\n");
+        // One cannot ask for proofs and models at one time
+        // rather have models than proofs (MU, 2013-07-19)
+        // see bug #1236
+        // result.append("(set-option :produce-proofs true)\n");
 
 
-    	createSortDeclaration(types, result);
-    	createFunctionDeclarations(result, predicates, predicateBlocks,functions);
-    	StringBuffer assump = createAssumptions(assumptions, assumptionBlocks);
+        createSortDeclaration(types, result);
+        createFunctionDeclarations(result, predicates, predicateBlocks, functions);
+        StringBuilder assump = createAssumptions(assumptions, assumptionBlocks);
 
-    	result.append("(assert(not \n");
-    	if(assump.length() >0){
-    		result.append("(=> ").append(assump);
-    	}
-    	result.append("\n\n"+GAP+"; The formula to be proved:\n\n");
+        result.append("(assert(not \n");
+        if (assump.length() > 0) {
+            result.append("(=> ").append(assump);
+        }
+        result.append("\n\n" + GAP + "; The formula to be proved:\n\n");
 
-    	result.append(formula);
+        result.append(formula);
 
-    	if(assump.length()>0){
-    		result.append("\n)"+GAP +"; End of imply.");
-    	}
-    	result.append("\n))"+GAP+"; End of assert.");
-    	result.append("\n\n(check-sat)");
+        if (assump.length() > 0) {
+            result.append("\n)" + GAP + "; End of imply.");
+        }
+        result.append("\n))" + GAP + "; End of assert.");
+        result.append("\n\n(check-sat)");
 
 
-    	return result.append("\n"+GAP+"; end of smt problem declaration");
+        return result.append("\n" + GAP + "; end of smt problem declaration");
     }
 
-    private StringBuffer createAssumptions( ArrayList<StringBuffer> assumptions,
-    	    ArrayList<ContextualBlock> assumptionBlocks){
-    	String [] commentAssumption = new String[9];
-    	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "Assumptions for dummy variables:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "Assumptions for function definitions:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "Assumptions for sort predicates:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "Assumptions for type hierarchy:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "Assumptions for taclets:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "Assumptions for uniqueness of functions:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "Assumptions for very small and very big integers:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "Assumptions for uninterpreted multiplication:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts - there is at least one object of every sort:";
+    private StringBuilder createAssumptions(ArrayList<StringBuilder> assumptions,
+                                            ArrayList<ContextualBlock> assumptionBlocks) {
+        String[] commentAssumption = new String[9];
+        commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "Assumptions for dummy variables:";
+        commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "Assumptions for function definitions:";
+        commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "Assumptions for sort predicates:";
+        commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "Assumptions for type hierarchy:";
+        commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "Assumptions for taclets:";
+        commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT] = "Assumptions for uniqueness of functions:";
+        commentAssumption[ContextualBlock.ASSUMPTION_INTEGER] = "Assumptions for very small and very big integers:";
+        commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION] = "Assumptions for uninterpreted multiplication:";
+        commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY] =
+                "Assumptions for sorts - there is at least one object of every sort:";
 
 
-    	//add the assumptions
-    	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
-    	    StringBuffer assump = new StringBuffer();
-    	boolean needsAnd = assumptions.size() > 1;
+        //add the assumptions
+        ArrayList<StringBuilder> AssumptionsToRemove = new ArrayList<>();
+        StringBuilder assump = new StringBuilder();
+        boolean needsAnd = assumptions.size() > 1;
 
-    	for(int k=0; k < commentAssumption.length; k++){
-    	    ContextualBlock block = assumptionBlocks.get(k);
+        for (int k = 0; k < commentAssumption.length; k++) {
+            ContextualBlock block = assumptionBlocks.get(k);
 
-    	    if (block.getStart() <= block.getEnd()) {
-    	   	    assump.append("\n"+GAP+"; "+commentAssumption[block.getType()]+"\n");
-    	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
-    	    		AssumptionsToRemove.add(assumptions.get(i));
-    	    		assump.append(assumptions.get(i));
-    	    		assump.append("\n");
-    	    	    }
-    		}
-    	}
-
-
+            if (block.getStart() <= block.getEnd()) {
+                assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()]).append("\n");
+                for (int i = block.getStart(); i <= block.getEnd(); i++) {
+                    AssumptionsToRemove.add(assumptions.get(i));
+                    assump.append(assumptions.get(i));
+                    assump.append("\n");
+                }
+            }
+        }
 
 
+        assumptions.removeAll(AssumptionsToRemove);
 
 
-    	assumptions.removeAll(AssumptionsToRemove);
+        if (!assumptions.isEmpty()) {
+            assump.append("\n" + GAP + "; Other assumptions:\n");
+            for (StringBuilder s : assumptions) {
+                assump.append(s).append("\n");
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        if (needsAnd) {
+            result.append("(and\n");
+            result.append(assump);
+            result.append("\n)" + GAP + "; End of assumptions.\n");
 
-
-
-    	if (assumptions.size() > 0) {
-    	    assump.append("\n"+GAP+"; Other assumptions:\n");
-    	    for (StringBuffer s : assumptions) {
-    			assump.append(s).append("\n");
-    	    }
-    	}
-    	StringBuffer result = new StringBuffer();
-    	if(needsAnd){
-    		result.append("(and\n");
-    		result.append(assump);
-    		result.append("\n)"+GAP+"; End of assumptions.\n");
-
-    	}
-    	return result;
+        }
+        return result;
     }
 
-    private void createFunctionDeclarations(StringBuffer result,
-    	    ArrayList<ArrayList<StringBuffer>> predicates,
-    	    ArrayList<ContextualBlock> predicateBlocks,
-    	    ArrayList<ArrayList<StringBuffer>> functions){
-    	StringBuffer temp = new StringBuffer();
-    	createPredicateDeclaration(temp, predicates, predicateBlocks);
-    	createFunctionDeclaration(temp,functions);
-    	if(temp.length() > 0){
-    		//result.append("\n:funs(");
-    		result.append(temp);
-    		//result.append("\n)"+GAP+"; end of function declaration \n");
-
-    	}
+    private void createFunctionDeclarations(StringBuilder result,
+                                            ArrayList<ArrayList<StringBuilder>> predicates,
+                                            ArrayList<ContextualBlock> predicateBlocks,
+                                            ArrayList<ArrayList<StringBuilder>> functions) {
+        StringBuilder temp = new StringBuilder();
+        createPredicateDeclaration(temp, predicates, predicateBlocks);
+        createFunctionDeclaration(temp, functions);
+        if (temp.length() > 0) {
+            result.append(temp);
+        }
     }
 
-    private void createFunctionDeclaration(StringBuffer result,   ArrayList<ArrayList<StringBuffer>>  functions){
-    	// add the function declarations
-    	if (functions.size() > 0) {
-    	    result.append(translateComment(1,"Function declarations\n"));
-    	    for (ArrayList<StringBuffer> function : functions) {
-    	    	createFunctionDeclaration(function, false, result);
-    	    }
-    	}
+    private void createFunctionDeclaration(StringBuilder result, ArrayList<ArrayList<StringBuilder>> functions) {
+        // add the function declarations
+        if (!functions.isEmpty()) {
+            result.append(translateComment(1, "Function declarations\n"));
+            for (ArrayList<StringBuilder> function : functions) {
+                createFunctionDeclaration(function, false, result);
+            }
+        }
     }
 
-    private void createPredicateDeclaration(StringBuffer result,
-    	    ArrayList<ArrayList<StringBuffer>> predicates,
-    	    ArrayList<ContextualBlock> predicateBlocks){
-    	String [] commentPredicate = new String[2];
-    	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "Predicates used in formula:\n";
-    	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "Types expressed by predicates:\n";
+    private void createPredicateDeclaration(StringBuilder result,
+                                            ArrayList<ArrayList<StringBuilder>> predicates,
+                                            ArrayList<ContextualBlock> predicateBlocks) {
+        String[] commentPredicate = new String[2];
+        commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "Predicates used in formula:\n";
+        commentPredicate[ContextualBlock.PREDICATE_TYPE] = "Types expressed by predicates:\n";
 
-    	ArrayList<ArrayList<StringBuffer>> PredicatesToRemove = new ArrayList<ArrayList<StringBuffer>>();
+        ArrayList<ArrayList<StringBuilder>> predicatesToRemove = new ArrayList<>();
 
-    	StringBuffer temp = new StringBuffer();
+        StringBuilder temp = new StringBuilder();
 
-    	for(int k=0; k < commentPredicate.length; k++){
-    		ContextualBlock block = predicateBlocks.get(k);
+        for (int k = 0; k < commentPredicate.length; k++) {
+            ContextualBlock block = predicateBlocks.get(k);
 
 
-    		if (block.getStart() <= block.getEnd()) {
-    			temp.append(translateComment(0,commentPredicate[block.getType()]+"\n"));
+            if (block.getStart() <= block.getEnd()) {
+                temp.append(translateComment(0, commentPredicate[block.getType()] + "\n"));
 
-    		    for (int i = block.getStart(); i <= block.getEnd(); i++) {
-    		    	PredicatesToRemove.add(predicates.get(i));
-    		    	createFunctionDeclaration(predicates.get(i),true, temp);
-    		    }
+                for (int i = block.getStart(); i <= block.getEnd(); i++) {
+                    predicatesToRemove.add(predicates.get(i));
+                    createFunctionDeclaration(predicates.get(i), true, temp);
+                }
 
-    		}
-    	}
+            }
+        }
 
-    	predicates.removeAll(PredicatesToRemove);
+        predicates.removeAll(predicatesToRemove);
 
-    	// add other predicates
-    	if (predicates.size() > 0) {
-    		temp.append(translateComment(1,"Other predicates\n"));
-     	    for (ArrayList<StringBuffer> predicate : predicates) {
-     	    	createFunctionDeclaration(predicate,true, temp);
-    	    }
-    	}
+        // add other predicates
+        if (!predicates.isEmpty()) {
+            temp.append(translateComment(1, "Other predicates\n"));
+            for (ArrayList<StringBuilder> predicate : predicates) {
+                createFunctionDeclaration(predicate, true, temp);
+            }
+        }
 
-    	if(temp.length()>0){
-    		result.append(temp);
-    	}
+        if (temp.length() > 0) {
+            result.append(temp);
+        }
 
 
     }
 
-    private void createFunctionDeclaration(ArrayList<StringBuffer> function,boolean isPredicate, StringBuffer result) {
-		result.append("(declare-fun ");
-		StringBuffer name = function.remove(0);
-		StringBuffer returnType = isPredicate ? BOOL : function.remove(function.size()-1);
-		result.append(name);
-		result.append(" (");
-		for (StringBuffer s : function) {
-		    result.append(s);
-		    result.append(" ");
-		}
-		result.append(") ");
-		result.append(returnType);
-		result.append(" )\n");
+    private void createFunctionDeclaration(ArrayList<StringBuilder> function, boolean isPredicate,
+                                           StringBuilder result) {
+        result.append("(declare-fun ");
+        StringBuilder name = function.remove(0);
+        StringBuilder returnType = isPredicate ? BOOL : function.remove(function.size() - 1);
+        result.append(name);
+        result.append(" (");
+        for (StringBuilder s : function) {
+            result.append(s);
+            result.append(" ");
+        }
+        result.append(") ");
+        result.append(returnType);
+        result.append(" )\n");
     }
 
-    private void createSortDeclaration(ArrayList<StringBuffer> types, StringBuffer result){
-    	result.append("\n"+GAP+"; Declaration of sorts.\n");
-    	for(StringBuffer type : types){
-    		if (!(type == INTSTRING || type.equals(INTSTRING))){
-    			createSortDeclaration(type,result);
-    		}
-    	}
-    //	if(temp.length() > 0){
-    	//	result.append("\n:sorts (");
-    	//	result.append(temp);
-    	//	result.append(")\n");
-    	//}
-
+    private void createSortDeclaration(ArrayList<StringBuilder> types, StringBuilder result) {
+        result.append("\n" + GAP + "; Declaration of sorts.\n");
+        for (StringBuilder type : types) {
+            if (!(type == INTSTRING || type.equals(INTSTRING))) {
+                createSortDeclaration(type, result);
+            }
+        }
     }
 
-    private void createSortDeclaration(StringBuffer type, StringBuffer result){
-    	result.append("(declare-sort "+type+" 0)\n");
+    private void createSortDeclaration(StringBuilder type, StringBuilder result) {
+        result.append("(declare-sort ").append(type).append(" 0)\n");
 
 
     }
@@ -320,266 +304,262 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     /**
      * Translate a sort.
      *
-     * @param name
-     *                the sorts name
-     * @param isIntVal
-     *                true, if the sort should represent some kind of
-     *                integer
-     *
+     * @param name     the sorts name
+     * @param isIntVal true, if the sort should represent some kind of
+     *                 integer
      * @return Argument 1 of the return value is the sort used in var
-     *         declarations, Argument2 is the sort used for type predicates
+     * declarations, Argument2 is the sort used for type predicates
      */
-    protected StringBuffer translateSort(String name, boolean isIntVal) {
-	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
-	return uniqueName;
+    protected StringBuilder translateSort(String name, boolean isIntVal) {
+        return makeUnique(new StringBuilder(name));
     }
 
     @Override
     protected boolean isMultiSorted() {
-	return true;
+        return true;
     }
 
     @Override
-    protected StringBuffer getIntegerSort() {
-	return INTSTRING;
+    protected StringBuilder getIntegerSort() {
+        return INTSTRING;
     }
 
     @Override
-    protected StringBuffer translateFunction(StringBuffer name,
-	    ArrayList<StringBuffer> args) {
-	return buildFunction(name, args);
+    protected StringBuilder translateFunction(StringBuilder name,
+                                              ArrayList<StringBuilder> args) {
+        return buildFunction(name, args);
     }
 
     @Override
-    protected StringBuffer translateFunctionName(StringBuffer name) {
-	return makeUnique(name);
+    protected StringBuilder translateFunctionName(StringBuilder name) {
+        return makeUnique(name);
     }
 
     @Override
-    protected StringBuffer translateIntegerDiv(StringBuffer arg1,
-	    StringBuffer arg2) {
-        ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+    protected StringBuilder translateIntegerDiv(StringBuilder arg1,
+                                                StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
         return buildFunction(DIVSTRING, args);
     }
-    
+
 
     @Override
-    protected StringBuffer translateIntegerGeq(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(GEQSTRING, args);
+    protected StringBuilder translateIntegerGeq(StringBuilder arg1,
+                                                StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(GEQSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerGt(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(GTSTRING, args);
+    protected StringBuilder translateIntegerGt(StringBuilder arg1,
+                                               StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(GTSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerLeq(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(LEQSTRING, args);
+    protected StringBuilder translateIntegerLeq(StringBuilder arg1,
+                                                StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(LEQSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerLt(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(LTSTRING, args);
+    protected StringBuilder translateIntegerLt(StringBuilder arg1,
+                                               StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(LTSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerMinus(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(MINUSSTRING, args);
+    protected StringBuilder translateIntegerMinus(StringBuilder arg1,
+                                                  StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(MINUSSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerMod(StringBuffer arg1,
-	    StringBuffer arg2) {
-	return new StringBuffer("unknownOp");
+    protected StringBuilder translateIntegerMod(StringBuilder arg1,
+                                                StringBuilder arg2) {
+        return new StringBuilder("unknownOp");
     }
 
     @Override
-    protected StringBuffer translateIntegerMult(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(MULTSTRING, args);
+    protected StringBuilder translateIntegerMult(StringBuilder arg1,
+                                                 StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(MULTSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerPlus(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(PLUSSTRING, args);
+    protected StringBuilder translateIntegerPlus(StringBuilder arg1,
+                                                 StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(PLUSSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerUnaryMinus(StringBuffer arg) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	StringBuffer n = new StringBuffer("0");
-	args.add(n);
-	args.add(arg);
-	return buildFunction(MINUSSTRING, args);
+    protected StringBuilder translateIntegerUnaryMinus(StringBuilder arg) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        StringBuilder n = new StringBuilder("0");
+        args.add(n);
+        args.add(arg);
+        return buildFunction(MINUSSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateIntegerValue(long val) {
+    protected StringBuilder translateIntegerValue(long val) {
 
-	StringBuffer arg =  new StringBuffer(Long.toString(val));
+        StringBuilder arg = new StringBuilder(Long.toString(val));
 
-	if(val < 0){
-	   // delete the minus sign.
-	   arg = new StringBuffer(arg.substring(1, arg.length()));
-	   arg = translateIntegerUnaryMinus(arg);
-	}
+        if (val < 0) {
+            // delete the minus sign.
+            arg = new StringBuilder(arg.substring(1, arg.length()));
+            arg = translateIntegerUnaryMinus(arg);
+        }
 
-	return arg;
+        return arg;
     }
 
     @Override
-    protected StringBuffer translateLogicalConstant(StringBuffer name) {
-	return makeUnique(name);
+    protected StringBuilder translateLogicalConstant(StringBuilder name) {
+        return makeUnique(name);
     }
 
     @Override
-    protected StringBuffer translateLogicalVar(StringBuffer name) {
-	StringBuffer toReturn = (new StringBuffer(""))
-		.append(makeUnique(name));
-	return toReturn;
+    protected StringBuilder translateLogicalVar(StringBuilder name) {
+        return (new StringBuilder())
+                .append(makeUnique(name));
     }
 
     @Override
-    protected StringBuffer translateLogicalAll(StringBuffer var,
-	    StringBuffer type, StringBuffer form) {
-	StringBuffer toReturn = new StringBuffer();
-	toReturn.append("(");
-	toReturn.append(ALLSTRING);
+    protected StringBuilder translateLogicalAll(StringBuilder var,
+                                                StringBuilder type, StringBuilder form) {
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("(");
+        toReturn.append(ALLSTRING);
 
-	toReturn.append(" ((");
-	toReturn.append(var);
-	toReturn.append(" ");
-	toReturn.append(type);
-	toReturn.append(")) ");
+        toReturn.append(" ((");
+        toReturn.append(var);
+        toReturn.append(" ");
+        toReturn.append(type);
+        toReturn.append(")) ");
 
-	toReturn.append(form);
+        toReturn.append(form);
 
-	toReturn.append(")");
-	return toReturn;
+        toReturn.append(")");
+        return toReturn;
     }
 
     @Override
-    protected StringBuffer translateLogicalAnd(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(ANDSTRING, args);
+    protected StringBuilder translateLogicalAnd(StringBuilder arg1,
+                                                StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(ANDSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateLogicalEquivalence(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
+    protected StringBuilder translateLogicalEquivalence(StringBuilder arg1,
+                                                        StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
 
-	ArrayList<StringBuffer> argsrev = new ArrayList<StringBuffer>();
-	argsrev.add(arg2);
-	argsrev.add(arg1);
+        ArrayList<StringBuilder> argsrev = new ArrayList<>();
+        argsrev.add(arg2);
+        argsrev.add(arg1);
 
-	ArrayList<StringBuffer> forms = new ArrayList<StringBuffer>();
-	forms.add(buildFunction(IMPLYSTRING, args));
-	forms.add(buildFunction(IMPLYSTRING, argsrev));
-	return buildFunction(ANDSTRING, forms);
+        ArrayList<StringBuilder> forms = new ArrayList<>();
+        forms.add(buildFunction(IMPLYSTRING, args));
+        forms.add(buildFunction(IMPLYSTRING, argsrev));
+        return buildFunction(ANDSTRING, forms);
     }
 
     @Override
-    protected StringBuffer translateLogicalExist(StringBuffer var,
-	    StringBuffer type, StringBuffer form) {
-	StringBuffer toReturn = new StringBuffer();
-	toReturn.append("(");
-	toReturn.append(EXISTSTRING);
+    protected StringBuilder translateLogicalExist(StringBuilder var,
+                                                  StringBuilder type, StringBuilder form) {
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("(");
+        toReturn.append(EXISTSTRING);
 
-	toReturn.append("((");
-	toReturn.append(var);
-	toReturn.append(" ");
-	toReturn.append(type);
-	toReturn.append("))");
+        toReturn.append("((");
+        toReturn.append(var);
+        toReturn.append(" ");
+        toReturn.append(type);
+        toReturn.append("))");
 
-	toReturn.append(form);
+        toReturn.append(form);
 
-	toReturn.append(")");
-	return toReturn;
+        toReturn.append(")");
+        return toReturn;
     }
 
     @Override
-    protected StringBuffer translateLogicalFalse() {
-	return new StringBuffer(FALSESTRING);
+    protected StringBuilder translateLogicalFalse() {
+        return new StringBuilder(FALSESTRING);
     }
 
     @Override
-    protected StringBuffer translateLogicalImply(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(IMPLYSTRING, args);
+    protected StringBuilder translateLogicalImply(StringBuilder arg1,
+                                                  StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(IMPLYSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateLogicalNot(StringBuffer arg) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg);
-	return buildFunction(NOTSTRING, args);
+    protected StringBuilder translateLogicalNot(StringBuilder arg) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg);
+        return buildFunction(NOTSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateLogicalOr(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(ORSTRING, args);
+    protected StringBuilder translateLogicalOr(StringBuilder arg1,
+                                               StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(ORSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateLogicalTrue() {
-	return new StringBuffer(TRUESTRING);
+    protected StringBuilder translateLogicalTrue() {
+        return new StringBuilder(TRUESTRING);
     }
 
     @Override
-    protected StringBuffer translateObjectEqual(StringBuffer arg1,
-	    StringBuffer arg2) {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	args.add(arg1);
-	args.add(arg2);
-	return buildFunction(EQSTRING, args);
+    protected StringBuilder translateObjectEqual(StringBuilder arg1,
+                                                 StringBuilder arg2) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(EQSTRING, args);
     }
 
     @Override
-    protected StringBuffer translateLogicalIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) {
-        ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+    protected StringBuilder translateLogicalIfThenElse(StringBuilder cond, StringBuilder ifterm,
+                                                       StringBuilder elseterm) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(cond);
         args.add(ifterm);
         args.add(elseterm);
@@ -587,8 +567,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     @Override
-    protected StringBuffer translateTermIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) throws IllegalFormulaException {
-	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+    protected StringBuilder translateTermIfThenElse(StringBuilder cond, StringBuilder ifterm,
+                                                    StringBuilder elseterm) {
+        ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(cond);
         args.add(ifterm);
         args.add(elseterm);
@@ -596,79 +577,71 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     @Override
-    protected StringBuffer translatePredicate(StringBuffer name,
-	    ArrayList<StringBuffer> args) {
+    protected StringBuilder translatePredicate(StringBuilder name,
+                                               ArrayList<StringBuilder> args) {
 
-	return buildFunction(name, args);
+        return buildFunction(name, args);
     }
 
     @Override
-    protected StringBuffer translatePredicateName(StringBuffer name) {
-	return makeUnique(name);
+    protected StringBuilder translatePredicateName(StringBuilder name) {
+        return makeUnique(name);
     }
-
-
-
-
 
 
     @Override
-    protected StringBuffer translateDistinct(FunctionWrapper [] fw){
-	if(getSettings() == null || !getSettings().useBuiltInUniqueness()){
-	    return super.translateDistinct(fw);
-	}
-	int start =0;
-	ArrayList<ArrayList<StringBuffer>> temp = new ArrayList<ArrayList<StringBuffer>>();
+    protected StringBuilder translateDistinct(FunctionWrapper[] fw) {
+        if (getSettings() == null || !getSettings().useBuiltInUniqueness()) {
+            return super.translateDistinct(fw);
+        }
+        int start = 0;
+        ArrayList<ArrayList<StringBuilder>> temp = new ArrayList<>();
 
-	StringBuffer rightSide = new StringBuffer();
-	rightSide.append("( "+ DISTINCT + " ");
-	for(int i=0; i < fw.length; i++){
-		temp.add(createGenericVariables(fw[i].getFunction().arity(),start));
-		start += fw[i].getFunction().arity();
-		rightSide.append(buildFunction(fw[i].getName(),temp.get(i))+" ");
+        StringBuilder rightSide = new StringBuilder();
+        rightSide.append("( ").append(DISTINCT).append(" ");
+        for (int i = 0; i < fw.length; i++) {
+            temp.add(createGenericVariables(fw[i].getFunction().arity(), start));
+            start += fw[i].getFunction().arity();
+            rightSide.append(buildFunction(fw[i].getName(), temp.get(i))).append(" ");
 
-	}
+        }
 
-	rightSide.append(")");
+        rightSide.append(")");
 
-	for(int j=0; j < fw.length; j++){
-	    for(int i=0; i < fw[j].getFunction().arity(); i++){
-		      Sort sort = fw[j].getFunction().argSorts().get(i);
-		      rightSide = translateLogicalAll(temp.get(j).get(i),usedDisplaySort.get(sort),rightSide);
+        for (int j = 0; j < fw.length; j++) {
+            for (int i = 0; i < fw[j].getFunction().arity(); i++) {
+                Sort sort = fw[j].getFunction().argSorts().get(i);
+                rightSide = translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort), rightSide);
 
-		 }
-	}
-	return rightSide;
+            }
+        }
+        return rightSide;
 
     }
 
-    private StringBuffer buildFunction(StringBuffer name,
-	    ArrayList<StringBuffer> args) {
-	StringBuffer toReturn = new StringBuffer();
-	if (args.size() == 0) {
-	    toReturn.append(name);
-	} else {
-	    toReturn.append("(");
-	    toReturn.append(name+" ");
+    private StringBuilder buildFunction(StringBuilder name,
+                                        ArrayList<StringBuilder> args) {
+        StringBuilder toReturn = new StringBuilder();
+        if (args.isEmpty()) {
+            toReturn.append(name);
+        } else {
+            toReturn.append("(");
+            toReturn.append(name).append(" ");
 
-	    for (int i = 0; i < args.size(); i++) {
-		toReturn.append(args.get(i)+" ");
-	    }
-	    toReturn.append(")");
-	}
-	return toReturn;
+            for (StringBuilder arg : args) {
+                toReturn.append(arg).append(" ");
+            }
+            toReturn.append(")");
+        }
+        return toReturn;
     }
 
 
-
-
-
-    protected StringBuffer translateComment(int newLines, String comment){
-    	StringBuffer buffer = new StringBuffer();
-    	for(int i=0; i < newLines; i++){
-    		buffer.append("\n");
-    	}
-    	return buffer.append( GAP+"; "+ comment);
+    @Override
+    protected StringBuilder translateComment(int newLines, String comment) {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("\n".repeat(Math.max(0, newLines)));
+        return buffer.append(GAP + "; ").append(comment);
     }
 
 

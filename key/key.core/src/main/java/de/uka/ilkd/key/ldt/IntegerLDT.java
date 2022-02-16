@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.ldt;
 
-import java.math.BigInteger;
-
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -25,7 +23,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
 import de.uka.ilkd.key.java.expression.operator.BinaryOr;
@@ -51,8 +48,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
 
 
 /** 
@@ -63,7 +63,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 @SuppressWarnings("unused")
 public final class IntegerLDT extends LDT {
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegerLDT.class);
+
     public static final Name NAME = new Name("int");    
     
     //public name constants
@@ -285,12 +286,14 @@ public final class IntegerLDT extends LDT {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
 
-
-    private boolean isNumberLiteral(Function f) {
-        char c = f.name().toString().charAt(0);
-        return (c-'0'>=0) && (c-'0'<=9);
+    private boolean isNumberLiteral(Operator f) {
+        String n = f.name().toString();
+        if(n.length() == 1) {
+            char c = n.charAt(0);
+            return '0' <= c && c <= '9';
+        }
+        return false;
     }
 
     private Term makeDigit(int digit, TermBuilder tb) {
@@ -493,7 +496,24 @@ public final class IntegerLDT extends LDT {
             return null;
         }
     }
-    
+
+    @Nullable
+    @Override
+    public Function getFunctionFor(String op, Services services) {
+        switch (op) {
+            case "gt": return getGreaterThan();
+            case "geq": return getGreaterOrEquals();
+            case "lt": return getLessThan();
+            case "leq": return getLessOrEquals();
+            case "div": return getDiv();
+            case "mul": return getMul();
+            case "add": return getAdd();
+            case "sub": return getSub();
+            case "mod": return getMod();
+            case "neg": return getNeg();
+        }
+        return null;
+    }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
@@ -553,13 +573,30 @@ public final class IntegerLDT extends LDT {
             result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
+        LOGGER.debug("integerldt: result of translating literal (lit {}, result {}):", lit, result);
         return result;
     }
 
     @Override
     public boolean hasLiteralFunction(Function f) {
         return containsFunction(f) && (f.arity()==0 || isNumberLiteral(f));
+    }
+
+    public String toNumberString(Term t) {
+        StringBuffer sb = new StringBuffer();
+        Operator f = t.op();
+        while (isNumberLiteral(f)) {
+            sb.insert(0, f.name().toString().charAt(0));
+            t = t.sub(0);
+            f = t.op();
+        }
+
+        if (f != sharp) {
+            throw new RuntimeException(
+                    "IntegerLDT: This is not a numeral literal: " + t);
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -569,21 +606,13 @@ public final class IntegerLDT extends LDT {
         }
         Function f = (Function)t.op();
         if(isNumberLiteral(f) || f == numbers || f == charID) {     
-            StringBuffer sb = new StringBuffer("");
+
             Term it = t;
             if (f == charID || f == numbers) {
                 it = it.sub(0); 
-                f = (Function)it.op();      
             }
-            while (isNumberLiteral(f)) {
-                sb.insert(0, f.name().toString().charAt(0));
-                it=it.sub(0);
-                f = (Function)it.op();      
-            }
-            // numbers must end with a sharp
-            if (f == sharp) {
-                return new IntLiteral(sb.toString());     // TODO: what if number too large for int?
-            }
+
+            return new IntLiteral(toNumberString(it));     // TODO: what if number too large for int?
         }
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: "
                                    +t);

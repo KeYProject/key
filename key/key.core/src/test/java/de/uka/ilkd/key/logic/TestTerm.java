@@ -19,12 +19,12 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestTerm {
@@ -52,7 +52,7 @@ public class TestTerm {
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); //pv0:S1
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tb = TacletForTests.services().getTermBuilder();
         tf = tb.tf();
@@ -119,10 +119,10 @@ public class TestTerm {
     public void testProgramElementEqualsModRenaming() {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
-        assertTrue("Terms should be equalModRenaming (0).", match1.sub(0).equalsModRenaming(match2));
-        assertTrue("Terms should be equalModRenaming (1).", match1.sub(0).equalsModRenaming(match1.sub(1)));
+        assertTrue(match1.sub(0).equalsModRenaming(match2), "Terms should be equalModRenaming (0).");
+        assertTrue(match1.sub(0).equalsModRenaming(match1.sub(1)), "Terms should be equalModRenaming (1).");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
-        assertNotEquals("Terms should not be equal.", match1, match3);
+        assertNotEquals(match1, match3, "Terms should not be equal.");
 
     }
 
@@ -130,13 +130,13 @@ public class TestTerm {
     public void testEqualsModRenamingWithLabels() {
         Term match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
-        assertTrue("Terms should be equalModRenaming.", match1.equalsModRenaming(match2));
+        assertTrue(match1.equalsModRenaming(match2), "Terms should be equalModRenaming.");
         Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");
-        assertTrue("Terms should be equalModRenaming.", match3.equalsModRenaming(match4));
+        assertTrue(match3.equalsModRenaming(match4), "Terms should be equalModRenaming.");
         Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-        assertTrue("Terms should be equalModRenaming.", match5.equalsModRenaming(match6));
+        assertTrue(match5.equalsModRenaming(match6), "Terms should be equalModRenaming.");
     }
 
     @Test
@@ -150,9 +150,8 @@ public class TestTerm {
                 tb.all(z,
                         tb.all(z, pz)));
 
-        assertTrue("Terms " + quant1 + " and " + quant2
-                        + " should be equal mod renaming",
-                quant1.equalsModRenaming(quant2));
+        assertTrue(quant1.equalsModRenaming(quant2), "Terms " + quant1 + " and " + quant2
+                        + " should be equal mod renaming");
 
     }
     
@@ -187,14 +186,10 @@ public class TestTerm {
 
     @Test
     public void testRigidness0() {
-        assertTrue("Term t1 should be rigid",
-                t1().isRigid());
-        assertTrue("Term t2 should be rigid",
-                t2().isRigid());
-        assertTrue("Term t3 should be rigid",
-                t3().isRigid());
-        assertFalse("Term t4 should not be rigid",
-                t4().isRigid());
+        assertTrue(t1().isRigid(), "Term t1 should be rigid");
+        assertTrue(t2().isRigid(), "Term t2 should be rigid");
+        assertTrue(t3().isRigid(), "Term t3 should be rigid");
+        assertFalse(t4().isRigid(), "Term t4 should not be rigid");
     }
 
     /**

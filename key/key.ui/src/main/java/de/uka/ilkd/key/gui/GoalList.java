@@ -29,8 +29,11 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -48,6 +51,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
     public static final Icon GOAL_LIST_ICON =
             IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
@@ -161,8 +165,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         if (myFont != null) {
             setFont(myFont);
         } else {
-            Debug.out(
-                    "goallist: Warning: Use standard font. Could not find font:",
+            LOGGER.debug("goallist: Warning: Use standard font. Could not find font: {}",
                     Config.KEY_FONT_GOAL_LIST_VIEW);
         }
     }
@@ -226,7 +229,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             } catch (IllegalStateException e) {
                 // this exception occurs if no proof is loaded
                 // do nothing
-                Debug.out("GoalList: No proof loaded.");
+                LOGGER.debug("GoalList: No proof loaded.");
             }
         }
 
@@ -602,7 +605,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         public void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("GoalList: initialize with new proof");
+            LOGGER.debug("GoalList: initialize with new proof");
             selectingListModel.setProof(e.getSource().getSelectedProof());
             validate();
         }

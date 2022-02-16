@@ -13,24 +13,24 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Tests for {@link SymbolicExecutionStrategy}
  * @author Martin Hentschel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests example: /set/blockContractPreconditionNotVerified
     */
-   @Test public void testBlockContractPreconditionNotVerified_SymbolicExecution() throws Exception {
+   @Test
+   public void testBlockContractPreconditionNotVerified_SymbolicExecution() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.java", 
                           "BlockContractPreconditionNotVerified",

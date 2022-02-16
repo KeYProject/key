@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
@@ -24,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
@@ -34,13 +33,15 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class is used to perform program transformations needed for the symbolic
  * execution of a switch-case statement.
  */
 public class SwitchToIf extends ProgramTransformer {
 
-    public static int labelCount = 0;
     private boolean noNewBreak = true;
 
     /**
@@ -57,62 +58,60 @@ public class SwitchToIf extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         Switch sw = (Switch) pe;
-        int i = 0;
-        ExtList extL = new ExtList();
-        StatementBlock result;
-        Expression defCond = null;
-        Label l = new ProgramElementName("_l" + labelCount);
-        labelCount++;
-        Break newBreak = KeYJavaASTFactory.breakStatement(l);
 
         VariableNamer varNamer = services.getVariableNamer();
+
+        Label l = varNamer.getTemporaryNameProposal("_l");
+        Break newBreak = KeYJavaASTFactory.breakStatement(l);
+
         ProgramElementName name = varNamer.getTemporaryNameProposal("_var");
 
-        Statement[] ifs = new Statement[sw.getBranchCount()];
         final ExecutionContext ec = insts.getExecutionContext();
         ProgramVariable exV = KeYJavaASTFactory.localVariable(name,
             sw.getExpression().getKeYJavaType(services, ec));
         Statement s = KeYJavaASTFactory.declare(name,
             sw.getExpression().getKeYJavaType(services, ec));
-        result = KeYJavaASTFactory.block(s,
-            KeYJavaASTFactory.assign(exV, sw.getExpression()));
 
+        sw = changeBreaks(sw, newBreak);
+        Statement currentBlock = null;
+        for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
+            if (sw.getBranchAt(i) instanceof Default) {
+                currentBlock = collectStatements(sw, i);
+            }
+        }
+        for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
+            if (sw.getBranchAt(i) instanceof Case) {
+                Equals guard = KeYJavaASTFactory.equalsOperator(exV,
+                        ((Case) sw.getBranchAt(i)).getExpression());
+                StatementBlock caseBlock = collectStatements(sw, i);
+                // Avoid creating a Else(null) block
+                if (currentBlock != null) {
+                    currentBlock = KeYJavaASTFactory.ifElse(
+                            guard,
+                            caseBlock,
+                            currentBlock);
+                } else {
+                    currentBlock = KeYJavaASTFactory.ifThen(
+                            guard,
+                            caseBlock);
+                }
+            }
+        }
         // mulbrich: Added additional null check for enum constants
         if (!(sw.getExpression().getKeYJavaType(services, ec)
                 .getJavaType() instanceof PrimitiveType)) {
-            result = KeYJavaASTFactory.insertStatementInBlock(result,
-                mkIfNullCheck(services, exV));
+            currentBlock = mkIfNullCheck(services, exV, currentBlock);
         }
 
-        extL.add(exV);
-        sw = changeBreaks(sw, newBreak);
-        while (i < sw.getBranchCount()) {
-            if (sw.getBranchAt(i) instanceof Case) {
-                extL.add(((Case) sw.getBranchAt(i)).getExpression());
-                ifs[i] = KeYJavaASTFactory.ifThen(
-                    KeYJavaASTFactory.equalsOperator(extL),
-                    collectStatements(sw, i));
-                extL.remove(((Case) sw.getBranchAt(i)).getExpression());
-            } else {
-                for (int j = 0; j < sw.getBranchCount(); j++) {
-                    if (sw.getBranchAt(j) instanceof Case) {
-                        extL.add(((Case) sw.getBranchAt(j)).getExpression());
-                        if (defCond != null) {
-                            defCond = KeYJavaASTFactory.logicalAndOperator(
-                                defCond,
-                                KeYJavaASTFactory.notEqualsOperator(extL));
-                        } else {
-                            defCond = KeYJavaASTFactory.notEqualsOperator(extL);
-                        }
-                        extL.remove(((Case) sw.getBranchAt(j)).getExpression());
-                    }
-                }
-                ifs[i] = KeYJavaASTFactory.ifThen(defCond,
-                    collectStatements(sw, i));
-            }
-            i++;
+        StatementBlock result;
+        if (currentBlock != null) {
+            result = KeYJavaASTFactory.block(s,
+                    KeYJavaASTFactory.assign(exV, sw.getExpression()),
+                    currentBlock);
+        } else {
+            // empty switch of primitive type, the expression can still have side-effects
+            result = KeYJavaASTFactory.block(s, KeYJavaASTFactory.assign(exV, sw.getExpression()));
         }
-        result = KeYJavaASTFactory.insertStatementInBlock(result, ifs);
         if (noNewBreak) {
             return new ProgramElement[] { result };
         } else {
@@ -123,13 +122,12 @@ public class SwitchToIf extends ProgramTransformer {
 
     /**
      * return a check of the kind
-     * <code>if(v == null) throw new NullPointerException();</code>
+     * <code>if(v == null) throw new NullPointerException(); else elseBlock</code>
      *
-     * @return an if-statement that performs a null check, wrapped in a
-     *         single-element array.
+     * @return an if-statement that performs a null check
      */
 
-    private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
+    private If mkIfNullCheck(Services services, ProgramVariable var, Statement elseBlock) {
         final New exception = KeYJavaASTFactory
                 .newOperator(services.getJavaInfo()
                         .getKeYJavaType("java.lang.NullPointerException"));
@@ -137,7 +135,13 @@ public class SwitchToIf extends ProgramTransformer {
 
         final Expression cnd = KeYJavaASTFactory.equalsNullOperator(var);
 
-        return new Statement[] { KeYJavaASTFactory.ifThen(cnd, t) };
+        // Avoid creating a Else(null) block
+        if (elseBlock != null) {
+            // for some reason the Statement variant is declared to return a Statement
+            return (If) KeYJavaASTFactory.ifElse(cnd, t, elseBlock);
+        } else {
+            return KeYJavaASTFactory.ifThen(cnd, t);
+        }
     }
 
     /**
@@ -224,17 +228,15 @@ public class SwitchToIf extends ProgramTransformer {
      *            the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
-        int n = 0;
-        int k = 0;
-        Statement[] stats;
-        for (int i = count; i < s.getBranchCount(); i++) {
-            n += s.getBranchAt(i).getStatementCount();
-        }
-        stats = new Statement[n];
-        for (int i = count; i < s.getBranchCount(); i++) {
+        List<Statement> stats = new ArrayList<>();
+        outer: for (int i = count; i < s.getBranchCount(); i++) {
             for (int j = 0; j < s.getBranchAt(i).getStatementCount(); j++) {
-                stats[k] = s.getBranchAt(i).getStatementAt(j);
-                k++;
+                Statement statement = s.getBranchAt(i).getStatementAt(j);
+                stats.add(statement);
+                if (statement instanceof JumpStatement) {
+                    //unconditional jump to outside the case (?)
+                    break outer;
+                }
             }
         }
         return KeYJavaASTFactory.block(stats);
