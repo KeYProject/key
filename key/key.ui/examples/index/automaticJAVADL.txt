@@ -959,6 +959,18 @@ group reload_examples {
    loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 }
 
+# Test whether reloading works (no examples)
+group proofLoadRepair {
+
+   # Demonstrate that loading a manipulated proof with wrong
+   # assumes instantiations works (MR !516).
+   # Provided that there is a unique candidate to instantiate.
+   loadable ./proofLoadRepair/disjConj-manipulated.proof
+
+   # There are two possible candidates to instantiate the assumes sequent.
+   notloadable ./proofLoadRepair/insufficient-manipulated.proof
+}
+
 group switch {
 
     # This isn't a good test as it depends on ordering and naming scheme
