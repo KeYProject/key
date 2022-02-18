@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Stack;
-import java.util.WeakHashMap;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.proof.*;
+import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.event.EventListenerList;
@@ -26,21 +27,7 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-
-import de.uka.ilkd.key.gui.TaskTree;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.GoalListener;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 /** An implementation of TreeModel that can be displayed using the
  * JTree class framework and reflects the state of a
@@ -68,6 +55,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
     private boolean attentive = true;
 
+    private boolean batchGoalStateChange = false;
 
     /** construct a GUIProofTreeModel that mirrors the given
      * Proof.
@@ -96,9 +84,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
             @Override
             public void automaticStateChanged(Goal source, boolean oldAutomatic, boolean newAutomatic) {
-                if (ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
-                    setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, false);
-                    setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, true);
+                if (!batchGoalStateChange && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
+                    updateTree((TreeNode) null);
                 }
             }
         };
@@ -157,7 +144,16 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
    }
 
-
+    /**
+     * This can be used to pause tree updates when many goals get their state changed at once.
+     * The tree is updated automatically after this is set to false.
+     */
+    public void setBatchGoalStateChange(boolean value) {
+        if (!value && batchGoalStateChange) {
+            updateTree((TreeNode) null);
+        }
+        batchGoalStateChange = value;
+    }
 
     /** Call this when the GUIProofTreeModel is no longer needed.
      * GUIProofTreeModel registers a Listener with its associated
