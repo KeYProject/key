@@ -960,14 +960,15 @@ group reload_examples {
 }
 
 # Test whether reloading works (no examples)
-group test_reload {
+group proofLoadRepair {
 
-   # Demonstrate that loading a manipulated proof with wrong assumes instantiations
-   # works after MR !516. Provided that there is a unique candidate to instantiate.
-   loadable ./proofReloading/disjConj-manipulated.proof
+   # Demonstrate that loading a manipulated proof with wrong
+   # assumes instantiations works (MR !516).
+   # Provided that there is a unique candidate to instantiate.
+   loadable ./proofLoadRepair/disjConj-manipulated.proof
 
    # There are two possible candidates to instantiate the assumes sequent.
-   notloadable ./proofReloading/insufficient-manipulated.proof
+   notloadable ./proofLoadRepair/insufficient-manipulated.proof
 }
 
 group switch {

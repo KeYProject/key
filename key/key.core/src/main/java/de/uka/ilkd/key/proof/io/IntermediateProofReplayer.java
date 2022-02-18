@@ -467,7 +467,7 @@ public class IntermediateProofReplayer {
      *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal) throws TacletAppConstructionException, ProblemLoaderException {
+            Goal currGoal) throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -517,7 +517,7 @@ public class IntermediateProofReplayer {
                 new SequentFormula(term)));
         }
 
-        if (!ourApp.ifInstsCorrectSize(ourApp.taclet(), ifFormulaList)) {
+        if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
             LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
                     tacletName);
             // try to find instantiations automatically
@@ -526,9 +526,9 @@ public class IntermediateProofReplayer {
             if (instApps.size() != 1) {
                 // none or not a unique result
                 throw new TacletAppConstructionException(
-                        "Could not apply " + tacletName +
-                        " because of unknown instantiations for \\assumes. " +
-                        instApps.size()  + " candidates. " +
+                        "\nCould not apply " + tacletName +
+                        "\nUnknown instantiations for \\assumes. " +
+                        instApps.size()  + " candidates.\n" +
                         "Perhaps the rule's definition has been changed in KeY.");
             }
 
@@ -800,7 +800,6 @@ public class IntermediateProofReplayer {
                                 .instantiateAbstractDomain(ph.first,
                                     applicablePredicates, latticeType, services)
                                 .fromString(abstrElemStr, services);
-
                         final Named pv = services.getNamespaces()
                                 .programVariables().lookup(ph.second);
 
