@@ -38,7 +38,7 @@ import java.util.LinkedHashMap;
  */
 public class CreateObjectBuilder extends JavaTransformer {
 
-    public static final String IMPLICIT_OBJECT_CREATE = "<createObject>";
+    public static final String IMPLICIT_OBJECT_CREATE = "$createObject";
     public static final String NEW_OBJECT_VAR_NAME = "__NEW__";
     private final HashMap<TypeDeclaration<?>, SimpleName> class2SimpleName;
 

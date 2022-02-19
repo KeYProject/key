@@ -1,7 +1,7 @@
 public class Test {
     public static int abc;
     static {
-        abc = 2;
+        abc = 1+1; // should be resolved to 2
     }
 
     public int memberVar;

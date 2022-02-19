@@ -37,7 +37,7 @@ import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMeth
  * preparation.
  */
 public class ClassInitializeMethodBuilder extends JavaTransformer {
-    public static final String CLASS_INITIALIZE_IDENTIFIER = "<clinit>";
+    public static final String CLASS_INITIALIZE_IDENTIFIER = "$clinit";
 
     /**
      * Creates an instance of the class preparation method model
@@ -148,7 +148,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * </code>
      */
     private CatchClause createCatchClause(String caughtType, String caughtParam, ThrowStmt t) {
-        NodeList<Statement> catcher = new NodeList<Statement>();
+        NodeList<Statement> catcher = new NodeList<>();
         var resetInitInProgress =
                 assign(new KeyPassiveExpression(
                                 new NameExpr(new SimpleName(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
@@ -186,8 +186,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
 
         if (td instanceof ClassOrInterfaceDeclaration && !td.resolve().isJavaLangObject()) {
             var cd = (ClassOrInterfaceDeclaration) td;
-            final var superType = cd.getExtendedTypes(0);
-            final var scope = new NameExpr(superType.getName()); //TODO convert fqn
+            var type = cd.resolve();
+            final var superType = type.getAncestors().get(0);
+            final var scope = new NameExpr(superType.getQualifiedName());
             initializerExecutionBody.add(0,
                     new ExpressionStmt(
                             new KeyPassiveExpression(
@@ -218,7 +219,6 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * creates the body of the initialize method
      */
     private BlockStmt createInitializeMethodBody(TypeDeclaration<?> td) {
-
         var methodBody = new NodeList<Statement>();
         var clInitializeBody = new NodeList<Statement>();
         var clInitNotInProgressBody = new NodeList<Statement>();
@@ -320,7 +320,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * @return the created class preparation method
      */
     private MethodDeclaration createInitializeMethod(TypeDeclaration<?> td) {
-        NodeList<Modifier> modifiers = new NodeList<Modifier>();
+        NodeList<Modifier> modifiers = new NodeList<>();
         modifiers.add(new Modifier(Modifier.Keyword.STATIC));
         modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
         MethodDeclaration md = new MethodDeclaration(modifiers,

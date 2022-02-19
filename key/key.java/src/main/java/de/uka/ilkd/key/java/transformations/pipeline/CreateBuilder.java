@@ -38,7 +38,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
  */
 public class CreateBuilder extends JavaTransformer {
 
-    public static final String IMPLICIT_CREATE = "<create>";
+    public static final String IMPLICIT_CREATE = "$create";
 
     public CreateBuilder(TransformationPipelineServices services) {
         super(services);

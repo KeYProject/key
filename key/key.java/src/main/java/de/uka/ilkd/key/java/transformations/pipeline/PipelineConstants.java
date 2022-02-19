@@ -21,5 +21,5 @@ public interface PipelineConstants {
     String VIRTUAL_CLASS_FOR_PARSING = "$virtual_class_for_parsing";
     String IMPLICIT_OBJECT_PREPARE = "$prepare";
     String IMPLICIT_OBJECT_PREPARE_ENTER = "$prepareEnter";
-    String IMPLICIT_INSTANCE_ALLOCATE = "<allocate>";
+    String IMPLICIT_INSTANCE_ALLOCATE = "$allocate";
 }

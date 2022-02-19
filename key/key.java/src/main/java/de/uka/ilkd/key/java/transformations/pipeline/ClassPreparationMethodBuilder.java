@@ -42,7 +42,7 @@ import java.util.List;
 public class ClassPreparationMethodBuilder extends JavaTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
 
-    public static final String CLASS_PREPARE_IDENTIFIER = "<clprepare>";
+    public static final String CLASS_PREPARE_IDENTIFIER = "$clprepare";
 
     /**
      * maps a class to its static NON-CONSTANT fields
@@ -134,7 +134,10 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
         MethodDeclaration method = new MethodDeclaration(modifiers,
                 new VoidType(),  // return type is void
                 CLASS_PREPARE_IDENTIFIER);
-        method.setBody(new BlockStmt(class2staticFields.get(td)));
+        final var statements = class2staticFields.get(td);
+        if (statements != null) {
+            method.setBody(new BlockStmt(statements));
+        }
         return method;
     }
 

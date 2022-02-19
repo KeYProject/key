@@ -1,6 +1,12 @@
-import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.key.KeyPassiveExpression;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
+import com.github.javaparser.printer.Printer;
+import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.transformations.KeyJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
@@ -57,6 +63,9 @@ public class KeyJavaPipelineTest {
         final File outputFolder;
         final Set<File> alreadyWritten = new HashSet<>();
         private static final Logger LOGGER = LoggerFactory.getLogger(DebugOutputTransformer.class);
+        private Printer myPrinter = new DefaultPrettyPrinter(
+                MyPrintVisitor::new,
+                new DefaultPrinterConfiguration());
 
 
         public DebugOutputTransformer(File s, TransformationPipelineServices services) {
@@ -73,12 +82,30 @@ public class KeyJavaPipelineTest {
                 if (!alreadyWritten.contains(file)) {
                     alreadyWritten.add(file);
                     try {
+                        unit.printer(myPrinter);
                         Files.writeString(file.toPath(), unit.toString());
                     } catch (IOException e) {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
             }
+        }
+    }
+
+    private static class MyPrintVisitor extends DefaultPrettyPrinterVisitor {
+        public MyPrintVisitor(PrinterConfiguration configuration) {
+            super(configuration);
+        }
+
+        public MyPrintVisitor(PrinterConfiguration configuration, SourcePrinter printer) {
+            super(configuration, printer);
+        }
+
+        @Override
+        public void visit(KeyPassiveExpression n, Void arg) {
+            printer.print("@(");
+            n.getExpr().accept(this, arg);
+            printer.print(")");
         }
     }
 }
