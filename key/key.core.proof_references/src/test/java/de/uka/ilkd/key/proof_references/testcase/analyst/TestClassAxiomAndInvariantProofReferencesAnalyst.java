@@ -99,18 +99,16 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                 new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
-    /**
-     * Tests "AccessibleTest".
-     */
-    @Test
-    public void testAccessibleTest() throws Exception {
-        doReferenceFunctionTest(TESTCASE_DIRECTORY,
-                "/proofReferences/AccessibleTest/AccessibleTest.java",
-                "test.B",
-                "java.lang.Object::<inv>",
-                false,
-                new ClassAxiomAndInvariantProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
-    }
+   /**
+    * Tests "AccessibleTest".
+    */
+   public void testAccessibleTest() throws Exception {
+      doReferenceFunctionTest(TESTCASE_DIRECTORY,
+                              "/proofReferences/AccessibleTest/AccessibleTest.java",
+                              "test.B",
+                              "java.lang.Object::<inv>",
+                              false,
+                              new ClassAxiomAndInvariantProofReferencesAnalyst(),
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"));
+   }
 }
