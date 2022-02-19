@@ -1,0 +1,11 @@
+plugins {}
+
+dependencies {
+    api project(':key.util')
+    api project(':key.core')
+
+    api 'com.github.javaparser:javaparser-core:3.23.2-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-core-serialization:3.23.2-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-symbol-solver-core:3.23.2-SNAPSHOT'
+
+}
