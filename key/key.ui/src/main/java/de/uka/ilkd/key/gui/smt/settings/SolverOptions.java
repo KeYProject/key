@@ -62,13 +62,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        String[] versions = solverType.getSupportedVersions();
-        StringBuilder result = new StringBuilder(versions.length > 1 ? "The following versions are supported: " :
-                "The following version is supported: ");
-        for (int i = 0; i < versions.length; i++) {
-            result.append(versions[i]);
-            result.append(i < versions.length - 1 ? ", " : "");
-        }
+        StringBuilder result = new StringBuilder("The following minimal version is supported: ");
+        result.append(solverType.getMinimumSupportedVersion());
         return result.toString();
     }
 

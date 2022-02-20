@@ -594,14 +594,8 @@ public class SolverListener implements SolverLauncherListener {
          StringBuffer message = new StringBuffer();
          message.append("You are using a version of "+type.getName()+
                         " which has not been tested for this version of KeY.\nIt can therefore be that" +
-                        " errors occur that would not occur\nusing " +
-                        (type.getSupportedVersions().length > 1 ? 
-                        "one of the following versions:\n" :
-                         "the following version:\n"));
-         for (String v: type.getSupportedVersions()){
-             message.append(v + ", ");
-         }
-         message.deleteCharAt(message.lastIndexOf(","));
+                        " errors occur that would not occur\nusing the following version or higher:\n");
+         message.append(type.getMinimumSupportedVersion());
          return message.toString();
       }
 		

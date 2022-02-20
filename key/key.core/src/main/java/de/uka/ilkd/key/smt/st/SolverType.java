@@ -116,9 +116,9 @@ public interface SolverType {
     String getVersionParameter();
 
     /**
-     * Returns an array of all versions that are supported by KeY.
+     * Returns the minimum supported version of the solver.
      */
-    String[] getSupportedVersions();
+    String getMinimumSupportedVersion();
 
     /**
      * Returns the current version that is installed, if it has already been checked, otherwise null.

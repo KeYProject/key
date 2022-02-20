@@ -30,6 +30,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT_PARAMS = "";
 	private static String DEFAULT_INFO = "An SMT solver.";
 	private static String DEFAULT_VERSION = "";
+	private static String DEFAULT_MINIMUM_VERSION = "";
 	private static String NAME = "name";
 	private static String COMMAND = "command";
 	private static String PARAMS = "params";
@@ -38,6 +39,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String INFO = "info";
 	private static String TIMEOUT = "timeout";
 	private static String ITE = "ite";
+	private static String MINIMUM_VERSION = "minVersion";
 	private static String LEGACY = "legacy";
 	private static String SOCKET_MESSAGEHANDLER = "messageHandler";
 	private static String SMTLIB_TRANSLATOR= "translatorClass";
@@ -156,7 +158,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	 * Create a {@link SolverTypeImplementation} from a Properties object.
 	 */
 	private static SolverType makeSolver(Properties props) {
-		String name, command, params, version, info, messageHandler, preamble;
+		String name, command, params, version, info, messageHandler, preamble, minVersion;
 		boolean supportsIfThenElse;
 		long timeout;
 		SolverCommunicationSocket.MessageHandler handler;
@@ -174,6 +176,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		timeout = readLong(props, TIMEOUT, DEFAULT_TIMEOUT);
 		params = readString(props, PARAMS, DEFAULT_PARAMS);
 		version = readString(props, VERSION, DEFAULT_VERSION);
+		minVersion = readString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);
 		info = readString(props, INFO, DEFAULT_INFO);
 
 		// does the solver support if-then-else?
@@ -201,7 +204,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 
 		// the solver specific preamble, may be null
 		preamble = readFile(props, PREAMBLE_FILE, null);
-		return new SolverTypeImplementation(name, info, params, command, version, timeout, delimiters,
+		return new SolverTypeImplementation(name, info, params, command, version, minVersion, timeout, delimiters,
 				supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
 
 	}

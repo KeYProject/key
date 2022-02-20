@@ -26,40 +26,61 @@ import java.util.Arrays;
  */
 public final class SolverTypeImplementation implements SolverType {
 
-	private final String NAME, INFO, DEFAULT_PARAMS, DEFAULT_COMMAND, VERSION;
+	/**
+	 * The default values of this solver type object, final and private as they should not be changed after creation.
+	 */
+	private final String NAME, INFO, DEFAULT_PARAMS, DEFAULT_COMMAND, VERSION, MINIMUM_SUPPORTED_VERSION;
 	private final long DEFAULT_TIMEOUT;
-	private String params, command;
 	private final String[] DELIMITERS;
 	private final boolean ITE;
+	/**
+	 * The current command line parameters, timeout and command to be used instead of the default values, changeable.
+	 */
+	private String params, command;
 	private long timeout;
+	/**
+	 * Booleans signalling whether the support/installation of the
+	 * created solver type as an actual program has been checked.
+	 */
 	private boolean supportHasBeenChecked = false;
-	private String version;
 	private boolean isSupportedVersion = false;
 	private boolean installWasChecked = false;
 	private boolean isInstalled = false;
+	/**
+	 * The version of the solver type at hand, returned by the actual program using the {@link #VERSION} cmd parameter.
+	 */
+	private String version;
+	/**
+	 * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the {@link SMTTranslator}
+	 * that is created with {@link #createTranslator(Services)}.
+	 */
 	private final String[] handlerNames;
+	/**
+	 * The {@link de.uka.ilkd.key.smt.communication.SolverCommunicationSocket.MessageHandler} used by
+	 * the {@link SolverCommunicationSocket} created with {@link #getSocket(ModelExtractor)}.
+	 */
 	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
+	/**
+	 * The class of the {@link SMTTranslator} to be created with {@link #createTranslator(Services)}.
+	 */
 	private final Class<?> TRANSLATOR_CLASS;
+	/**
+	 * The preamble String for the created {@link SMTTranslator}, may be null.
+	 */
 	@Nullable
 	private final String preamble;
 
 	public static boolean isInstalled(String cmd) {
-
-
 		if (checkEnvVariable(cmd)) {
 			return true;
 		} else {
-
 			File file = new File(cmd);
-
 			return file.exists() && !file.isDirectory();
-
 		}
 	}
 
 	private static boolean checkEnvVariable(String cmd) {
 		String path = System.getenv("PATH");
-
 		String[] res = path.split(File.pathSeparator);
 		for (String s : res) {
 			File file = new File(s + File.separator + cmd);
@@ -67,16 +88,34 @@ public final class SolverTypeImplementation implements SolverType {
 				return true;
 			}
 		}
-
 		return false;
-
 	}
 
+	/**
+	 * Instantiate the solver type object with all its default values.
+	 * The changeable values such as {@link #command} and {@link #params}
+	 * are initially the same as their default values.
+	 * @param name the name, e.g. "Z3"
+	 * @param info some information about the solver type
+	 * @param defaultParams the default command line PARAMETERS used to start the actual solver program
+	 * @param defaultCommand the default command line COMMAND used to start the actual solver program
+	 * @param version the command line parameter used to get the version of the actual solver program
+	 * @param minimumSupportedVersion the minimum supported version of the solver type at hand
+	 * @param defaultTimeout the default solver timeout for SMT processes using this solver type
+	 * @param delimiters the message delimiters used by the actual solver program
+	 * @param supportsIfThenElse whether the solver type at hand supports "ite" ? (TODO correct?)
+	 * @param translatorClass the {@link SMTTranslator} class used by this solver type
+	 * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used
+	 *                        by the {@link SMTTranslator} created by this solver type
+	 * @param messageHandler the {@link de.uka.ilkd.key.smt.communication.SolverCommunicationSocket.MessageHandler}
+	 *                         used by the solver type at hand
+	 * @param preamble the preamble String for the created {@link SMTTranslator}, may be null.
+	 */
 	public SolverTypeImplementation(String name, String info, String defaultParams, String defaultCommand,
-									String version,
+									String version, String minimumSupportedVersion,
 									long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
 									Class<?> translatorClass, String[] handlerNames,
-									SolverCommunicationSocket.MessageHandler handler, String preamble) {
+									SolverCommunicationSocket.MessageHandler messageHandler, String preamble) {
 		NAME = name;
 		INFO = info;
 		DEFAULT_PARAMS = defaultParams;
@@ -84,6 +123,7 @@ public final class SolverTypeImplementation implements SolverType {
 		DEFAULT_COMMAND = defaultCommand;
 		command = defaultCommand;
 		DEFAULT_TIMEOUT = defaultTimeout;
+		MINIMUM_SUPPORTED_VERSION = minimumSupportedVersion;
 		timeout = defaultTimeout;
 		DELIMITERS = delimiters;
 		ITE = supportsIfThenElse;
@@ -91,7 +131,7 @@ public final class SolverTypeImplementation implements SolverType {
 		TRANSLATOR_CLASS = translatorClass;
 		// copy the array so that it cannot accidentally be manipulated from the outside
 		this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
-		MSG_HANDLER = handler;
+		MSG_HANDLER = messageHandler;
 		this.preamble = preamble;
 	}
 
@@ -224,9 +264,8 @@ public final class SolverTypeImplementation implements SolverType {
 	}
 
 	@Override
-	public String[] getSupportedVersions() {
-		// TODO
-		return new String[]{"none"};
+	public String getMinimumSupportedVersion() {
+		return MINIMUM_SUPPORTED_VERSION;
 	}
 
 	@Override
@@ -246,8 +285,10 @@ public final class SolverTypeImplementation implements SolverType {
 
 	@Override
 	public boolean isSupportedVersion() {
-		// TODO: contained in getSupportedVersions -> depends on whether that is kept...
-		return false;
+		if (!supportHasBeenChecked) {
+			checkForSupport();
+		}
+		return isSupportedVersion;
 	}
 
 	@Override
@@ -262,14 +303,16 @@ public final class SolverTypeImplementation implements SolverType {
 			isSupportedVersion = false;
 			return false;
 		}
+		/*
 		for (String supportedVersion : getSupportedVersions()) {
 			if (version.indexOf(supportedVersion) > -1) {
 				isSupportedVersion = true;
 				return true;
 			}
-		}
-		isSupportedVersion = false;
-		return false;
+		} */
+		// TODO is just comparing the actual version to the minimum version lexicographically enough?
+		isSupportedVersion = version.compareTo(getMinimumSupportedVersion()) >= 0;
+		return isSupportedVersion;
 	}
 
 	@Override

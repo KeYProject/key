@@ -80,9 +80,8 @@ public abstract class AbstractTestGenerator {
        return;
     }
     if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
-       log.writeln("Warning: z3 supported versions are: "
-             + Arrays.toString(SolverTypes.Z3_CE_SOLVER
-                   .getSupportedVersions()));
+       log.writeln("Warning: z3 supported minimum supported version is: "
+               + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
     }
     if(originalProof.closed() && settings.includePostCondition()){
     	log.writeln("Cannot generate test cases from closed proof with "
