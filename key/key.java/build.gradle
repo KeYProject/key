@@ -4,8 +4,9 @@ dependencies {
     api project(':key.util')
     api project(':key.core')
 
-    api 'com.github.javaparser:javaparser-core:3.23.2-SNAPSHOT'
-    api 'com.github.javaparser:javaparser-core-serialization:3.23.2-SNAPSHOT'
-    api 'com.github.javaparser:javaparser-symbol-solver-core:3.23.2-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-core:3.24.1-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-core-serialization:3.24.1-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-symbol-solver-core:3.24.1-SNAPSHOT'
 
+    testImplementation("com.google.truth:truth:1.1.3")
 }
