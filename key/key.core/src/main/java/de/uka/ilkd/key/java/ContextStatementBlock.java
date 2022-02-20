@@ -190,7 +190,7 @@ public class ContextStatementBlock extends StatementBlock {
             final int srcPrefixLength     = prefix.getPrefixLength();
                         
             if (patternPrefixLength > srcPrefixLength) {
-                LOGGER.debug("Program match FAILED. Source has not enough prefix elements.", 
+                LOGGER.debug("Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
                         this, source);
                 return null;
             }

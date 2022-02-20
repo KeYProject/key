@@ -2,12 +2,11 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {

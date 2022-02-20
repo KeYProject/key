@@ -295,7 +295,7 @@ public abstract class SequentView extends JEditorPane {
                         .changeHighlight(highlighter, 0, 0);
             }
         } catch (BadLocationException badLocation) {
-            LOGGER.warn("SequentView tried to highlight an area that does not exist: {]", range);
+            LOGGER.warn("SequentView tried to highlight an area that does not exist: {}", range);
         }
     }
 

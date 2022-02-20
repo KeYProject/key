@@ -6,11 +6,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,29 +16,27 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author Alexander Weigl
  * @version 1 (5/15/20)
  */
-@RunWith(Parameterized.class)
 public class ClasslevelTranslatorTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClasslevelTranslatorTest.class);
 
-    @Parameterized.Parameter()
-    public String expr = "";
-
-    @Parameterized.Parameters()
-    public static Collection<Object[]> getFiles() throws IOException {
+    @TestFactory
+    Stream<DynamicTest> getFiles() throws IOException {
         InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("classlevel.txt");
-        return readInputs(resourceAsStream);
+        return readInputs(resourceAsStream, this::parseAndInterpret);
     }
 
-    static Collection<Object[]> readInputs(InputStream resourceAsStream) throws IOException {
-        List<Object[]> seq = new LinkedList<>();
+    static Stream<DynamicTest> readInputs(InputStream resourceAsStream, Consumer<String> fn)
+            throws IOException {
+        List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;
              BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
@@ -55,19 +51,16 @@ public class ClasslevelTranslatorTest {
             for (String value : split) {
                 value = value.trim();
                 if (!value.isEmpty())
-                    seq.add(new Object[]{value.replaceAll("---Contract---", "")});
+                    seq.add(value.replaceAll("---Contract---", ""));
             }
         }
-        return seq;
+        return seq.stream().map(it ->
+                DynamicTest.dynamicTest(it, () -> fn.accept(it))
+        );
     }
 
-
-    @Before
-    public void setup() {}
-
-    @Test
-    public void parseAndInterpret() {
-        Assert.assertNotEquals("", expr);
+    public void parseAndInterpret(String expr) {
+        Assertions.assertNotEquals("", expr);
         KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         ProgramVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
@@ -77,12 +70,12 @@ public class ClasslevelTranslatorTest {
         JmlParser.Classlevel_commentsContext ctx = parser.classlevel_comments();
         if (parser.getNumberOfSyntaxErrors() != 0) {
             System.out.println(expr);
-            debugLexer();
+            debugLexer(expr);
         }
-        Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
+        Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 
-    private void debugLexer() {
+    private void debugLexer(String expr) {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         DebugJmlLexer.debug(lexer);
     }

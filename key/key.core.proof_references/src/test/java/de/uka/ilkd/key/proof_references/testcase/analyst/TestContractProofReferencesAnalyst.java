@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof_references.testcase.analyst;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link ContractProofReferencesAnalyst}.
@@ -25,6 +26,7 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
    /**
     * Tests "UseOperationContractTest".
     */
+   @Test
    public void testUseOperationContracts() throws Exception {
       doReferenceMethodTest(TESTCASE_DIRECTORY,
                             "/proofReferences/UseOperationContractTest/UseOperationContractTest.java",

@@ -35,6 +35,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nullable;
+
 
 public final class SeqLDT extends LDT {
     
@@ -182,7 +184,16 @@ public final class SeqLDT extends LDT {
 	return null;
     }
 
-    
+    @Nullable
+    @Override
+    public Function getFunctionFor(String operationName, Services services) {
+        switch (operationName) {
+            case "add": return getSeqConcat();
+            default: return null;
+        }
+    }
+
+
     @Override
     public boolean hasLiteralFunction(Function f) {
 	return f.equals(seqEmpty);

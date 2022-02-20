@@ -13,24 +13,29 @@
 
 package de.uka.ilkd.key.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Tests for {@link NodePreorderIterator}.
  * @author Martin Hentschel
  */
-public class TestNodePreorderIterator extends TestCase {
+public class TestNodePreorderIterator {
    /**
     * Tests a tree of {@link Node}s with three levels after root.
     */
+   @Test
    public void testNodesThreeLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -61,6 +66,7 @@ public class TestNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with two levels after root.
     */
+   @Test
    public void testNodesTwoLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -86,6 +92,7 @@ public class TestNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link Node}s with one level after root.
     */
+   @Test
    public void testNodesOneLevel() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -102,6 +109,7 @@ public class TestNodePreorderIterator extends TestCase {
    /**
     * Tests only a root {@link Node}.
     */
+   @Test
    public void testEmptyRoot() {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
@@ -139,16 +147,16 @@ public class TestNodePreorderIterator extends TestCase {
                                      boolean iterateOverSubtree,
                                      int expectedParentReturns) {
       if (expectedRoots != null) {
-         assertNotNull(iter);
+         Assertions.assertNotNull(iter);
          int previousChildrenDepth = 0;
          for (ExpectedNode node : expectedRoots) {
-            assertTrue(iter.hasNext());
+            Assertions.assertTrue(iter.hasNext());
             int childIndexOnParent = iter.getChildIndexOnParent();
             int returnedParents = iter.getReturnedParents();
             assertEquals(previousChildrenDepth, returnedParents);
             Node next = iter.next();
             assertEquals(computeChildIndexOnParent(next), childIndexOnParent);
-            assertNotNull(next);
+            Assertions.assertNotNull(next);
             assertEquals(node.getExpectedSerialNr(), next.serialNr());
             if (iterateOverSubtree) {
                assertRoot(next, new ExpectedNode[] {node});
@@ -180,7 +188,7 @@ public class TestNodePreorderIterator extends TestCase {
       /**
        * The expected serialnr.
        */
-      private int expectedSerialNr;
+      private final int expectedSerialNr;
       
       /**
        * The expected children.
@@ -238,11 +246,11 @@ public class TestNodePreorderIterator extends TestCase {
     */
    protected ExpectedNode[] createExpectedNodes(int[] serialNrs, ExpectedNode[]... children) {
       assertEquals(serialNrs.length, children.length);
-      List<ExpectedNode> result = new LinkedList<ExpectedNode>();
+      List<ExpectedNode> result = new LinkedList<>();
       for (int i = 0; i < serialNrs.length; i++) {
          result.add(new ExpectedNode(serialNrs[i], children[i]));
       }
-      return result.toArray(new ExpectedNode[result.size()]);
+      return result.toArray(new ExpectedNode[0]);
    }
    
    /**
@@ -251,11 +259,11 @@ public class TestNodePreorderIterator extends TestCase {
     * @return The created {@link ExpectedNode}s.
     */
    protected ExpectedNode[] createExpectedNodes(int... serialNrs) {
-      List<ExpectedNode> result = new LinkedList<ExpectedNode>();
+      List<ExpectedNode> result = new LinkedList<>();
       for (int serialNr : serialNrs) {
          result.add(new ExpectedNode(serialNr));
       }
-      return result.toArray(new ExpectedNode[result.size()]);
+      return result.toArray(new ExpectedNode[0]);
    }
    
    /**

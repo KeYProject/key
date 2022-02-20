@@ -90,9 +90,6 @@ public class NodeInfo {
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
 
-    /** @see #getRelevantFiles() */
-    private ImmutableSet<URI> relevantFiles = DefaultImmutableSet.nil();
-
     public NodeInfo(Node node) {
         this.node = node;
     }
@@ -402,55 +399,6 @@ public class NodeInfo {
      */
     public boolean getScriptRuleApplication() {
         return scriptingApplication;
-    }
-
-    /**
-     * <p> Returns a set containing URIs of all files relevant to this node. </p>
-     *
-     * <p> This includes the files contained in the {@link PositionInfo} of all modalities
-     *  as well as the files in the {@link OriginTermLabel}s of all terms in this node's sequent.
-     *  </p>
-     *
-     * @return the set of URIs of files relevant to this node.
-     */
-    public ImmutableSet<URI> getRelevantFiles() {
-        return relevantFiles;
-    }
-
-    /**
-     * Add a file to the set returned by {@link #getRelevantFiles()}.
-     *
-     * @param relevantFile the URI of the file to add.
-     */
-    public void addRelevantFile(URI relevantFile) {
-        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
-
-        this.relevantFiles = this.relevantFiles.add(relevantFile);
-
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
-    }
-
-    /**
-     * Add some files to the set returned by {@link #getRelevantFiles()}.
-     *
-     * @param relevantFiles the URIs of the files to add.
-     */
-    public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
-        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
-
-        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
-            this.relevantFiles = relevantFiles;
-        } else {
-            this.relevantFiles = this.relevantFiles.union(relevantFiles);
-        }
-
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
     }
 
     /** Add user-provided plain-text annotations.

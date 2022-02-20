@@ -44,9 +44,9 @@ public class TermLabelSettings implements Settings, Cloneable {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
             LOGGER.debug(
-                    "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\".\n" +
+                    "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"." +
                     "Using the default value: true." +
-                    "\nThe string read was: ", str);
+                    "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }
