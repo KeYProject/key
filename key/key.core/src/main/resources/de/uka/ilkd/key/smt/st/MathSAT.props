@@ -13,19 +13,19 @@ translatorClass=de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator
 #
 # all handlers but the QuantifierHandler
 # note: having to write #\beg ... #\end is really annoying...
-handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,
-                            de.uka.ilkd.key.smt.newsmt2.CastHandler,
-                            de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler,
-                            de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler,
-                            de.uka.ilkd.key.smt.newsmt2.FieldConstantHandler,
-                            de.uka.ilkd.key.smt.newsmt2.InstanceOfHandler,
-                            de.uka.ilkd.key.smt.newsmt2.IntegerOpHandler,
-                            de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler,
-                            de.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler,
-                            de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,
-                            de.uka.ilkd.key.smt.newsmt2.SeqDefHandler,
-                            de.uka.ilkd.key.smt.newsmt2.SumProdHandler,
-                            de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler,
-                            de.uka.ilkd.key.smt.newsmt2.UpdateHandler
+handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
+            de.uka.ilkd.key.smt.newsmt2.CastHandler,\
+            de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler,\
+            de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler,\
+            de.uka.ilkd.key.smt.newsmt2.FieldConstantHandler,\
+            de.uka.ilkd.key.smt.newsmt2.InstanceOfHandler,\
+            de.uka.ilkd.key.smt.newsmt2.IntegerOpHandler,\
+            de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler,\
+            de.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler,\
+            de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
+            de.uka.ilkd.key.smt.newsmt2.SeqDefHandler,\
+            de.uka.ilkd.key.smt.newsmt2.SumProdHandler,\
+            de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler,\
+            de.uka.ilkd.key.smt.newsmt2.UpdateHandler
 
 preamble = MathSATpreamble.smt2

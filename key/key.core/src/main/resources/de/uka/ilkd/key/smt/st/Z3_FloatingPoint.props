@@ -2,9 +2,9 @@ ite=true
 params=-in -smt2
 timeout=-1
 name=Z3_FP
-info=solver by Microsoft
+info=SMT solver by Microsoft, using only floating point SMT handlers.
 command=z3
 version=--version
-handlers=de.uka.ilkd.key.smt.newsmt2.FloatHandler,
-	 de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler,
-	 de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler
+handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
+            de.uka.ilkd.key.smt.newsmt2.FloatHandler,\
+            de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler
