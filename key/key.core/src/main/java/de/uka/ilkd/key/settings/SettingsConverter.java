@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.settings;
 
+import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
+import org.key_project.util.Streams;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class SettingsConverter {
@@ -65,6 +70,39 @@ public class SettingsConverter {
         }
     }
 
+    public static String readRawString(Properties props, String key, String defaultValue) {
+        String value = props.getProperty(key);
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    public static String[] readRawStringList(Properties props, String key, String split, String[] defaultValue) {
+        String value = props.getProperty(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value.split(split);
+    }
+
+
+    public static String readFile(Properties props, String key, String defaultValue) {
+        String filePath = props.getProperty(key);
+        if (filePath == null) {
+            return defaultValue;
+        }
+        InputStream fileContent = SolverPropertiesLoader.class.getResourceAsStream(filePath);
+        if (fileContent == null) {
+            return defaultValue;
+        }
+        try {
+            return Streams.toString(fileContent);
+        } catch (IOException e) {
+            return defaultValue;
+        }
+    }
+
     public static int read(Properties props, String key, int defaultVal) {
         String eth = props.getProperty(key);
         if (eth == null) {
@@ -106,7 +144,6 @@ public class SettingsConverter {
 
 
     public static String[] read(Properties props, String key, String[] defaultVal) {
-
         String val = props.getProperty(key);
         if (val == null) {
             return defaultVal;

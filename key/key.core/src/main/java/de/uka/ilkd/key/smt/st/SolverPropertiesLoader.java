@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.Streams;
@@ -77,55 +78,6 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	}
 
 	/**
-	 * Methods to read from properties files.
-	 * {@link de.uka.ilkd.key.settings.SettingsConverter} is not used as it expects
-	 * delimiters that are not fit for humans to write or read.
-	 * TODO problems arise if whitespaces are to be contained in a value or a list element should contain ","
-	 */
-
-	private static String readString(Properties props, String key, String defaultValue) {
-		String value = props.getProperty(key);
-		if (value == null) {
-			value = defaultValue;
-		}
-		return value;
-	}
-
-	private static String readFile(Properties props, String key, String defaultValue) {
-		String filePath = props.getProperty(key);
-		if (filePath == null) {
-			return defaultValue;
-		}
-		InputStream fileContent = SolverPropertiesLoader.class.getResourceAsStream(filePath);
-		if (fileContent == null) {
-			return defaultValue;
-		}
-		try {
-			return Streams.toString(fileContent);
-		} catch (IOException e) {
-			return defaultValue;
-		}
-	}
-
-	private static String[] readStringList(Properties props, String key, String[] defaultValue) {
-		String value = props.getProperty(key);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value.split(SPLIT);
-	}
-
-	private static boolean readBoolean(Properties props, String key, Boolean defaultValue) {
-		return Boolean.parseBoolean(readString(props, key, defaultValue.toString()));
-	}
-
-	private static long readLong(Properties props, String key, Long defaultValue) {
-		return Long.parseLong(readString(props, key, defaultValue.toString()));
-	}
-
-
-
-	/**
 	 * Initializes {@link #SOLVERS} using the given hardcoded properties if that list is empty,
 	 * otherwise just returns the existing list.
 	 *
@@ -137,7 +89,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 			for (Properties solverProp : loadSolvers()) {
 				SolverType createdType = makeSolver(solverProp);
 				SOLVERS.add(createdType);
-				if (readBoolean(solverProp, LEGACY, false)) {
+				if (SettingsConverter.read(solverProp, LEGACY, false)) {
 					LEGACY_SOLVERS.add(createdType);
 				}
 			}
@@ -169,30 +121,30 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		// Read props file to create a SolverTypeImplementation object:
 
 		// the solver's name has to be unique
-		name = uniqueName(readString(props, NAME, DEFAULT_NAME));
+		name = uniqueName(SettingsConverter.readRawString(props, NAME, DEFAULT_NAME));
 
 		// default solver command, timeout, parameters, version parameter, solver info (some string)
-		command = readString(props, COMMAND, DEFAULT_COMMAND);
-		timeout = readLong(props, TIMEOUT, DEFAULT_TIMEOUT);
-		params = readString(props, PARAMS, DEFAULT_PARAMS);
-		version = readString(props, VERSION, DEFAULT_VERSION);
-		minVersion = readString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);
-		info = readString(props, INFO, DEFAULT_INFO);
+		command = SettingsConverter.readRawString(props, COMMAND, DEFAULT_COMMAND);
+		timeout = SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT);
+		params = SettingsConverter.readRawString(props, PARAMS, DEFAULT_PARAMS);
+		version = SettingsConverter.readRawString(props, VERSION, DEFAULT_VERSION);
+		minVersion = SettingsConverter.readRawString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);
+		info = SettingsConverter.readRawString(props, INFO, DEFAULT_INFO);
 
 		// does the solver support if-then-else?
-		supportsIfThenElse = readBoolean(props, ITE, DEFAULT_ITE);
+		supportsIfThenElse = SettingsConverter.read(props, ITE, DEFAULT_ITE);
 
 		// the communication socket used for communication with the created solver
 		// (class SolverCommunicationSocket)
-		messageHandler = readString(props, SOCKET_MESSAGEHANDLER, DEFAULT);
+		messageHandler = SettingsConverter.readRawString(props, SOCKET_MESSAGEHANDLER, DEFAULT);
 		handler = SolverCommunicationSocket.MessageHandler.valueOf(messageHandler);
 
 		// the message delimiters used by the created solver in its stdout
-		delimiters = readStringList(props, DELIMITERS, DEFAULT_DELIMITERS);
+		delimiters = SettingsConverter.readRawStringList(props, DELIMITERS, SPLIT, DEFAULT_DELIMITERS);
 
 		// the smt translator (class SMTTranslator) used by the created solver
 		try {
-			String className = readString(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR);
+			String className = SettingsConverter.readRawString(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR);
 			translatorClass = ClassLoaderUtil.getClassforName(className);
 		} catch (ClassNotFoundException e) {
 			translatorClass = ModularSMTLib2Translator.class;
@@ -200,10 +152,10 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 
 		// the SMTHandlers used by the created solver
 		// note that this will only take effect when using ModularSMTLib2Translator ...
-		handlerNames = readStringList(props, HANDLER_NAMES, new String[0]);
+		handlerNames = SettingsConverter.readRawStringList(props, HANDLER_NAMES, SPLIT, new String[0]);
 
 		// the solver specific preamble, may be null
-		preamble = readFile(props, PREAMBLE_FILE, null);
+		preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
 		return new SolverTypeImplementation(name, info, params, command, version, minVersion, timeout, delimiters,
 				supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
 
