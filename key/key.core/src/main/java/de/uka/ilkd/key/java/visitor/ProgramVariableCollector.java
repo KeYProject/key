@@ -279,4 +279,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(collector.result());
     }
 
+    @Override
+    public void performActionOnJmlAssertCondition(final Term x) {
+        if (x == null) {
+            throw new IllegalStateException("JML assert is incomplete");
+        }
+        TermProgramVariableCollector tpvc = services.getFactory()
+                .create(services);
+        x.execPostOrder(tpvc);
+        result.addAll(tpvc.result());
+    }
 }

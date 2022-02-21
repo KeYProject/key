@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -33,6 +28,7 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.JmlAssertRule;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
@@ -50,8 +46,12 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -197,7 +197,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   .prepend(LoopApplyHeadRule.INSTANCE);
+                                   .prepend(LoopApplyHeadRule.INSTANCE)
+                                   .prepend(JmlAssertRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
