@@ -101,7 +101,7 @@ public class JmlAssert extends JavaStatement {
         if (cond != null) {
             throw new IllegalStateException("condition can only be set once");
         }
-        this.cond = jmlIo.translateTerm(condition);
+        this.cond = jmlIo.translateTermAsFormula(condition);
         condition = null;
     }
 
