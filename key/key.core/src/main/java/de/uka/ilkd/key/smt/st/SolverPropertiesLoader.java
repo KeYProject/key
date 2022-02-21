@@ -2,6 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.smt.AbstractSMTTranslator;
 import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -155,9 +156,8 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
-        return new SolverTypeImplementation(name, info, params, command, version, minVersion, timeout, delimiters,
-                supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
-
+        return new SolverTypeImplementation(name, info, params, command, version,
+                minVersion, timeout, delimiters, supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
     }
 
     /**
