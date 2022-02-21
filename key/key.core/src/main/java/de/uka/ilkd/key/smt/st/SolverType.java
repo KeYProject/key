@@ -36,7 +36,7 @@ public interface SolverType {
      * Creates an instance of SMTSolver representing a concrete instance of that solver.
      */
     SMTSolver createSolver(SMTProblem problem,
-						   SolverListener listener, Services services);
+                           SolverListener listener, Services services);
 
     /**
      * Returns the name of the solver.
@@ -153,7 +153,7 @@ public interface SolverType {
      * @return the newly created socket
      */
     @Nonnull
-	SolverSocket getSocket(ModelExtractor query);
+    SolverSocket getSocket(ModelExtractor query);
 
     @Nonnull
     ExternalProcessLauncher getLauncher(SolverCommunication communication);

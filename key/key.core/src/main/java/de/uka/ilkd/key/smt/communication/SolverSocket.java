@@ -83,7 +83,7 @@ public class SolverSocket {
      * @return the newly created socket
      */
     public static @Nonnull
-	SolverSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
+    SolverSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
         return type.getSocket(query);
     }
 
