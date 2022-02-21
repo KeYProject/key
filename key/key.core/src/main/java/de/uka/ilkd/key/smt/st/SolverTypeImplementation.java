@@ -2,9 +2,8 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
+import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
-import de.uka.ilkd.key.smt.communication.SMTProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
@@ -56,10 +55,10 @@ public final class SolverTypeImplementation implements SolverType {
 	 */
 	private final String[] handlerNames;
 	/**
-	 * The {@link de.uka.ilkd.key.smt.communication.SolverCommunicationSocket.MessageHandler} used by
-	 * the {@link SolverCommunicationSocket} created with {@link #getSocket(ModelExtractor)}.
+	 * The {@link SolverSocket.MessageHandler} used by
+	 * the {@link SolverSocket} created with {@link #getSocket(ModelExtractor)}.
 	 */
-	private final SolverCommunicationSocket.MessageHandler MSG_HANDLER;
+	private final SolverSocket.MessageHandler MSG_HANDLER;
 	/**
 	 * The class of the {@link SMTTranslator} to be created with {@link #createTranslator(Services)}.
 	 */
@@ -107,7 +106,7 @@ public final class SolverTypeImplementation implements SolverType {
 	 * @param translatorClass the {@link SMTTranslator} class used by this solver type
 	 * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used
 	 *                        by the {@link SMTTranslator} created by this solver type
-	 * @param messageHandler the {@link de.uka.ilkd.key.smt.communication.SolverCommunicationSocket.MessageHandler}
+	 * @param messageHandler the {@link SolverSocket.MessageHandler}
 	 *                         used by the solver type at hand
 	 * @param preamble the preamble String for the created {@link SMTTranslator}, may be null.
 	 */
@@ -115,7 +114,7 @@ public final class SolverTypeImplementation implements SolverType {
 									String version, String minimumSupportedVersion,
 									long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
 									Class<?> translatorClass, String[] handlerNames,
-									SolverCommunicationSocket.MessageHandler messageHandler, String preamble) {
+									SolverSocket.MessageHandler messageHandler, String preamble) {
 		NAME = name;
 		INFO = info;
 		DEFAULT_PARAMS = defaultParams;
@@ -322,13 +321,13 @@ public final class SolverTypeImplementation implements SolverType {
 
 	@Nonnull
 	@Override
-	public SolverCommunicationSocket getSocket(ModelExtractor query) {
-		return new SolverCommunicationSocket(NAME, query, MSG_HANDLER);
+	public SolverSocket getSocket(ModelExtractor query) {
+		return new SolverSocket(NAME, query, MSG_HANDLER);
 	}
 
 	@Nonnull
 	@Override
-	public SMTProcessLauncher getLauncher(SolverCommunication communication) {
+	public ExternalProcessLauncher getLauncher(SolverCommunication communication) {
 		// TODO Make this modifiable? (similar to SMTTranslator)
 		return new ExternalProcessLauncher(communication, getDelimiters());
 	}

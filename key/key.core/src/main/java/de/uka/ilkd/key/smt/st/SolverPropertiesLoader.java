@@ -2,9 +2,8 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
+import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
-import org.key_project.util.Streams;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import java.io.*;
@@ -113,7 +112,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		String name, command, params, version, info, messageHandler, preamble, minVersion;
 		boolean supportsIfThenElse;
 		long timeout;
-		SolverCommunicationSocket.MessageHandler handler;
+		SolverSocket.MessageHandler handler;
 		Class<?> translatorClass;
 		String[] handlerNames;
 		String[] delimiters;
@@ -137,7 +136,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 		// the communication socket used for communication with the created solver
 		// (class SolverCommunicationSocket)
 		messageHandler = SettingsConverter.readRawString(props, SOCKET_MESSAGEHANDLER, DEFAULT);
-		handler = SolverCommunicationSocket.MessageHandler.valueOf(messageHandler);
+		handler = SolverSocket.MessageHandler.valueOf(messageHandler);
 
 		// the message delimiters used by the created solver in its stdout
 		delimiters = SettingsConverter.readRawStringList(props, DELIMITERS, SPLIT, DEFAULT_DELIMITERS);

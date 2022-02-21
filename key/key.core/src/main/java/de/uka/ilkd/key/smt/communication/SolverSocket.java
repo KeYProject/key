@@ -16,7 +16,7 @@ import java.io.IOException;
  * @author mihai
  * @author Wolfram Pfeifer (overhaul, removed legacy solvers)
  */
-public class SolverCommunicationSocket {
+public class SolverSocket {
     /** Indicates that the solver has not yet sent a sat/unsat/unknown result. */
     protected static final int WAIT_FOR_RESULT = 0;
 
@@ -47,7 +47,7 @@ public class SolverCommunicationSocket {
      * @param name the name of the solver in use
      * @param query the ModelExtractor used to extract a counterexample
      */
-    public SolverCommunicationSocket(@Nonnull String name, ModelExtractor query, MessageHandler handler) {
+    public SolverSocket(@Nonnull String name, ModelExtractor query, MessageHandler handler) {
         this.name = name;
         this.query = query;
         this.handler = handler;
@@ -83,7 +83,7 @@ public class SolverCommunicationSocket {
      * @return the newly created socket
      */
     public static @Nonnull
-    SolverCommunicationSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
+	SolverSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
         return type.getSocket(query);
     }
 
@@ -91,7 +91,7 @@ public class SolverCommunicationSocket {
 
         DEFAULT {
             @Override
-            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverCommunicationSocket socket) throws IOException {
+            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException {
                 SolverCommunication sc = pipe.getSolverCommunication();
                 if (msg.startsWith("(error")) {
                     sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
@@ -146,7 +146,7 @@ public class SolverCommunicationSocket {
 
         CVC4 {
             @Override
-            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverCommunicationSocket socket) throws IOException {
+            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException {
                 SolverCommunication sc = pipe.getSolverCommunication();
                 if ("".equals(msg.trim())) {
                     return;
@@ -187,7 +187,7 @@ public class SolverCommunicationSocket {
 
         CVC5 {
             @Override
-            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverCommunicationSocket socket) throws IOException {
+            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException {
                 SolverCommunication sc = pipe.getSolverCommunication();
                 if ("".equals(msg.trim())) {
                     return;
@@ -228,7 +228,7 @@ public class SolverCommunicationSocket {
 
         Z3CE {
             @Override
-            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverCommunicationSocket socket) throws IOException {
+            public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException {
                 SolverCommunication sc = pipe.getSolverCommunication();
 
                 if (msg.startsWith("(error")) {
@@ -296,7 +296,7 @@ public class SolverCommunicationSocket {
 
         MessageHandler() {}
 
-        public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverCommunicationSocket socket) throws IOException;
+        public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException;
 
     }
 }

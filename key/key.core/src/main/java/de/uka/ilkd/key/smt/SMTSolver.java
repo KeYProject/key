@@ -15,7 +15,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 
-import de.uka.ilkd.key.smt.communication.SolverCommunicationSocket;
+import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
@@ -182,7 +182,7 @@ public interface SMTSolver {
     Collection<Throwable> getExceptionsOfTacletTranslation();
     
     
-    SolverCommunicationSocket getSocket();
+    SolverSocket getSocket();
     
     
 
