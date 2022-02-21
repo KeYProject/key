@@ -4,7 +4,7 @@ timeout=-1
 name=Z3_FP
 info=SMT solver by Microsoft, using only floating point SMT handlers.
 command=z3
-version=--version
+version=-version
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
             de.uka.ilkd.key.smt.newsmt2.FloatHandler,\
             de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler

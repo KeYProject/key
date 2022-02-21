@@ -22,6 +22,8 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
+import javax.annotation.Nullable;
+
 /**
  * Instances of this class are the controlling units of the translation. They
  * control how the translation is delegated to different {@link SMTHandler}s and
@@ -122,11 +124,11 @@ public class MasterHandler {
      *                     If empty, all available handlers are used.
      * @throws IOException
      */
-    public MasterHandler(Services services, SMTSettings settings, String[] handlerNames)
+    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames)
         throws IOException {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, this, handlerNames);
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
     }
 
     /**

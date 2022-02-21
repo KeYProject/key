@@ -48,7 +48,7 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
 	private static String DEFAULT = "DEFAULT";
 	private static String HANDLER_NAMES = "handlers";
 	private static String PREAMBLE_FILE = "preamble";
-	private static String[] DEFAULT_DELIMITERS = new String[] {"\r", "\n"};
+	private static String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
 	private static long DEFAULT_TIMEOUT = -1;
 	private static boolean DEFAULT_ITE = false;
 

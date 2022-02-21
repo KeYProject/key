@@ -64,7 +64,7 @@ public class SMTHandlerServices {
      * Get a list of all handlers available in the system.
      *
      * <b>Do not use this list directly, but
-     * use {@link #getFreshHandlers(Services, List, MasterHandler)}</b>
+     * use {@link #getFreshHandlers(Services, String[], MasterHandler)}</b>
      * if you intend to initialise them and run them.
      *
      * @return always the same list of {@link SMTHandler}s, not null
@@ -159,11 +159,22 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, MasterHandler mh) throws IOException {
+    public List<SMTHandler> getFreshHandlers(Services services, @Nullable String[] handlerNames,
+                                             MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
-        for (SMTHandler originalHandler : getOriginalHandlers()) {
+        List<SMTHandler> usedHandlers =
+                (handlerNames == null || handlerNames.length == 0)
+                        ? getOriginalHandlers()
+                        : getOriginalHandlers().stream()
+                        .filter(h -> Arrays.stream(handlerNames)
+                        .anyMatch(s -> h.getClass()
+                                .getName()
+                                .equals(s)))
+                        .collect(Collectors.toList());
+
+        for (SMTHandler originalHandler : usedHandlers) {
             try {
                 SMTHandler copy = originalHandler.getClass().getConstructor().newInstance();
                 copy.init(mh, services, snippetMap.get(originalHandler));
@@ -174,22 +185,6 @@ public class SMTHandlerServices {
         }
 
         return result;
-    }
-
-    public List<SMTHandler> getFreshHandlers(Services services, MasterHandler mh,
-                                             String[] handlerNames) throws IOException {
-        List<SMTHandler> freshHandlers = getFreshHandlers(services, mh);
-        // default to all available handlers
-        if (handlerNames == null || handlerNames.length == 0) {
-            return freshHandlers;
-        }
-        freshHandlers = freshHandlers.stream()
-                                     .filter(h -> Arrays.stream(handlerNames)
-                                                        .anyMatch(s -> h.getClass()
-                                                                        .getName()
-                                                                        .equals(s)))
-                                     .collect(Collectors.toList());
-        return freshHandlers;
     }
 
     /**
