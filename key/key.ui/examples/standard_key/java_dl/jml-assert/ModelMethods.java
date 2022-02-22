@@ -37,7 +37,7 @@ public class ModelMethods {
     /*@ public normal_behaviour
       @ requires true;
       @*/
-    public void test4() {
+    public static void test4() {
         Test t = new Test()
         //@ assert t.testModel();
     }
