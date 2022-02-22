@@ -38,7 +38,7 @@ public class ModelMethods {
       @ requires true;
       @*/
     public static void test4() {
-        Test t = new Test()
+        Test t = new Test();
         //@ assert t.testModel();
     }
 }
