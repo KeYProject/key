@@ -3,9 +3,13 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.ReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.ExtList;
@@ -32,6 +36,10 @@ public class JmlAssert extends JavaStatement {
      * the condition in Term form
      */
     private Term cond;
+    /**
+     * the program variables used to create the Term form of the condition
+     */
+    private ProgramVariableCollection vars;
 
     /**
      *
@@ -56,6 +64,7 @@ public class JmlAssert extends JavaStatement {
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);
         this.cond = children.get(Term.class);
+        this.vars = children.get(ProgramVariableCollection.class);
         if ((cond == null) == (condition == null)) {
             throw new IllegalArgumentException("exactly one of cond and condition has to be null");
         }
@@ -88,6 +97,27 @@ public class JmlAssert extends JavaStatement {
         return cond;
     }
 
+    /**
+     * Returns the condition in Term form.
+     *
+     * You have to call translateCondition(JmlIO) before getting useful values.
+     *
+     * @return the condition in Term form if it was already translated else null
+     * @param self the Term for {@code this} in the current context
+     * @param services services
+     */
+    public Term getCond(final Term self, final Services services) {
+        if (self != null) {
+            final ReplacementMap<Term, Term> replacementMap =
+                    new ReplacementMap.NoIrrelevantLabelsReplacementMap<>(services.getTermFactory());
+            replacementMap.put(services.getTermBuilder().var(vars.selfVar), self);
+            final OpReplacer replacer = new OpReplacer(
+                    replacementMap, services.getTermFactory(), services.getProof());
+            return replacer.replace(cond);
+        }
+        return cond;
+    }
+
 
     /**
      * Translates the condition of this JML assert statement to a Term.
@@ -95,12 +125,20 @@ public class JmlAssert extends JavaStatement {
      * Use as soon as possible, but can only be called once.
      *
      * @param jmlIo the JmlIO to use to translate the condition
+     * @param pv the program variables to use for the translation
      * @throws IllegalStateException if this JmlAssert already has a condition in Term form
      */
-    public void translateCondition(final JmlIO jmlIo) {
+    public void translateCondition(final JmlIO jmlIo, final ProgramVariableCollection pv) {
         if (cond != null) {
             throw new IllegalStateException("condition can only be set once");
         }
+        this.vars = pv;
+        jmlIo.selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar)
+                .exceptionVariable(pv.excVar)
+                .atPres(pv.atPres)
+                .atBefore(pv.atBefores);
         this.cond = jmlIo.translateTermAsFormula(condition);
         condition = null;
     }
@@ -145,5 +183,9 @@ public class JmlAssert extends JavaStatement {
     @Override
     public void visit(Visitor v) {
         v.performActionOnJmlAssert(this);
+    }
+
+    public ProgramVariableCollection getVars() {
+        return vars;
     }
 }
