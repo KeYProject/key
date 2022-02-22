@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.ReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -108,11 +109,12 @@ public class JmlAssert extends JavaStatement {
      */
     public Term getCond(final Term self, final Services services) {
         if (self != null) {
+            final TermFactory termFactory = services.getTermFactory();
             final ReplacementMap<Term, Term> replacementMap =
-                    new ReplacementMap.NoIrrelevantLabelsReplacementMap<>(services.getTermFactory());
+                    new ReplacementMap.NoIrrelevantLabelsReplacementMap<>(termFactory);
             replacementMap.put(services.getTermBuilder().var(vars.selfVar), self);
             final OpReplacer replacer = new OpReplacer(
-                    replacementMap, services.getTermFactory(), services.getProof());
+                    replacementMap, termFactory, services.getProof());
             return replacer.replace(cond);
         }
         return cond;
