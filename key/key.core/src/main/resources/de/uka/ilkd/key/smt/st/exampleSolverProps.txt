@@ -43,6 +43,12 @@ ite=true/false
 handlers=de.uka.ilkd.key.smt.newsmt2.HANDLER_CLASS,\
 	...
 
+# The handler options (a list of arbitrary Strings) for the SMTHandlers used by the SMTTranslator. 
+# If the property is not specified, it is an empty list by default leading to default behavior of the SMTHandlers.
+# All the used handlers handle the options on their own.
+handlerOptions=option1,\
+	...
+
 # The fully specified class name of the SMTTranslator class used by the solver at hand. 
 # Currently possible values for TRANSLATOR_CLASS:
 # SmtLib2Translator (legacy solvers), ModularSMTLib2Translator
