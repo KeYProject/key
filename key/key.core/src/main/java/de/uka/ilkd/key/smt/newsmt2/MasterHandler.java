@@ -124,11 +124,11 @@ public class MasterHandler {
      *                     If empty, all available handlers are used.
      * @throws IOException
      */
-    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames)
+    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames, String[] handlerOptions)
         throws IOException {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
     }
 
     /**

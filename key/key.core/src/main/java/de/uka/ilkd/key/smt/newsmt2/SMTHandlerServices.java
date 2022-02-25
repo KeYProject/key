@@ -64,7 +64,7 @@ public class SMTHandlerServices {
      * Get a list of all handlers available in the system.
      *
      * <b>Do not use this list directly, but
-     * use {@link #getFreshHandlers(Services, String[], MasterHandler)}</b>
+     * use {@link #getFreshHandlers(Services, String[], String[], MasterHandler)}</b>
      * if you intend to initialise them and run them.
      *
      * @return always the same list of {@link SMTHandler}s, not null
@@ -160,7 +160,7 @@ public class SMTHandlerServices {
      */
 
     public List<SMTHandler> getFreshHandlers(Services services, @Nullable String[] handlerNames,
-                                             MasterHandler mh) throws IOException {
+                                             String[] handlerOptions, MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
@@ -177,6 +177,7 @@ public class SMTHandlerServices {
         for (SMTHandler originalHandler : usedHandlers) {
             try {
                 SMTHandler copy = originalHandler.getClass().getConstructor().newInstance();
+                copy.setOptions(handlerOptions);
                 copy.init(mh, services, snippetMap.get(originalHandler));
                 result.add(copy);
             } catch (Exception e) {

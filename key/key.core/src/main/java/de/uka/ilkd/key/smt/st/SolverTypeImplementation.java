@@ -54,6 +54,7 @@ public final class SolverTypeImplementation implements SolverType {
      * that is created with {@link #createTranslator(Services)}.
      */
     private final String[] handlerNames;
+    private final String[] handlerOptions;
     /**
      * The {@link SolverSocket.MessageHandler} used by
      * the {@link SolverSocket} created with {@link #getSocket(ModelExtractor)}.
@@ -113,7 +114,7 @@ public final class SolverTypeImplementation implements SolverType {
     public SolverTypeImplementation(String name, String info, String defaultParams, String defaultCommand,
                                     String version, String minimumSupportedVersion,
                                     long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
-                                    Class<?> translatorClass, String[] handlerNames,
+                                    Class<?> translatorClass, String[] handlerNames, String[] handlerOptions,
                                     SolverSocket.MessageHandler messageHandler, String preamble) {
         NAME = name;
         INFO = info;
@@ -130,6 +131,7 @@ public final class SolverTypeImplementation implements SolverType {
         TRANSLATOR_CLASS = translatorClass;
         // copy the array so that it cannot accidentally be manipulated from the outside
         this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
+        this.handlerOptions = Arrays.copyOf(handlerOptions, handlerOptions.length);
         MSG_HANDLER = messageHandler;
         this.preamble = preamble;
     }
@@ -218,7 +220,7 @@ public final class SolverTypeImplementation implements SolverType {
         boolean instantiated = false;
         for (int i = 0; i < constructors.length; i++) {
             try {
-                smtTranslator = (SMTTranslator) constructors[i].newInstance(handlerNames, preamble);
+                smtTranslator = (SMTTranslator) constructors[i].newInstance(handlerNames, handlerOptions, preamble);
                 /*translatorParams.stream().map(n -> {
                     if (n.equals("<SERVICES>")) {
                         return services;

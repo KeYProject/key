@@ -34,19 +34,22 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private final String preamble;
     private final String[] handlerNames;
+    private final String[] handlerOptions;
 
     /**
      * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the default values.
      * @param preamble
+     * @param handlerOptions
      * @param handlerNames
      */
-    public ModularSMTLib2Translator(String[] handlerNames, @Nullable String preamble) {
+    public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions, @Nullable String preamble) {
         if (preamble == null) {
             this.preamble = SMTHandlerServices.getInstance().getPreamble();
         } else {
             this.preamble = preamble;
         }
         this.handlerNames = handlerNames;
+        this.handlerOptions = handlerOptions;
     }
 
     /**
@@ -54,7 +57,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * and the preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
      */
     public ModularSMTLib2Translator() {
-        this(new String[0], null);
+        this(new String[0], new String[0], null);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         MasterHandler master;
         try {
-            master = new MasterHandler(services, settings, handlerNames);
+            master = new MasterHandler(services, settings, handlerNames, handlerOptions);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

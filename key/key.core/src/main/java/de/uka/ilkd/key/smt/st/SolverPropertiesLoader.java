@@ -47,6 +47,7 @@ public class SolverPropertiesLoader {
     private static String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
     private static String DEFAULT = "DEFAULT";
     private static String HANDLER_NAMES = "handlers";
+    private static String HANDLER_OPTIONS = "handlerOptions";
     private static String PREAMBLE_FILE = "preamble";
     private static String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
     private static long DEFAULT_TIMEOUT = -1;
@@ -113,8 +114,7 @@ public class SolverPropertiesLoader {
         long timeout;
         SolverSocket.MessageHandler handler;
         Class<?> translatorClass;
-        String[] handlerNames;
-        String[] delimiters;
+        String[] handlerNames, handlerOptions, delimiters;
 
         // Read props file to create a SolverTypeImplementation object:
 
@@ -151,11 +151,13 @@ public class SolverPropertiesLoader {
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
         handlerNames = SettingsConverter.readRawStringList(props, HANDLER_NAMES, SPLIT, new String[0]);
+        handlerOptions = SettingsConverter.readRawStringList(props, HANDLER_OPTIONS, SPLIT, new String[0]);
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
         return new SolverTypeImplementation(name, info, params, command, version,
-                minVersion, timeout, delimiters, supportsIfThenElse, translatorClass, handlerNames, handler, preamble);
+                minVersion, timeout, delimiters, supportsIfThenElse, translatorClass,
+                handlerNames, handlerOptions, handler, preamble);
     }
 
     /**
