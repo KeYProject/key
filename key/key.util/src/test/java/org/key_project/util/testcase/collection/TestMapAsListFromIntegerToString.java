@@ -13,143 +13,144 @@
 
 package org.key_project.util.testcase.collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
-/** JUnit test for MapAsList<Integer,String> implementation */
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * JUnit test for MapAsList<Integer,String> implementation
+ */
 
 
-public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
+public class TestMapAsListFromIntegerToString {
 
     private String[] entryStr;
     private Integer[] entryInt;
 
-    /** puts i and str in the corresponding arrays at place nr */
-    private void put(int nr,int i,String str) {
-	entryInt[nr]=Integer.valueOf(i);
-	entryStr[nr]=str;
+    /**
+     * puts i and str in the corresponding arrays at place nr
+     */
+    private void put(int nr, int i, String str) {
+        entryInt[nr] = i;
+        entryStr[nr] = str;
     }
 
-    public TestMapAsListFromIntegerToString(String name) {
-	super(name);
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
-	entryStr=new String[4];
-	entryInt=new Integer[4];
-	put(0,0,"Null");
-	put(1,1,"Eins");
-	put(2,2,"Zwei");
-	put(3,3,"Drei");
+        entryStr = new String[4];
+        entryInt = new Integer[4];
+        put(0, 0, "Null");
+        put(1, 1, "Eins");
+        put(2, 2, "Zwei");
+        put(3, 3, "Drei");
     }
 
-    private ImmutableMap<Integer,String> createMap() {
-	ImmutableMap<Integer,String> map = DefaultImmutableMap.<Integer,String>nilMap();
-	// create map with entrys like (1,"Eins")
-	for (int i=0;i<entryStr.length;i++) {
-	    map=map.put(entryInt[i],entryStr[i]);
-	}
-	return map;
+    private ImmutableMap<Integer, String> createMap() {
+        ImmutableMap<Integer, String> map = DefaultImmutableMap.nilMap();
+        // create map with entrys like (1,"Eins")
+        for (int i = 0; i < entryStr.length; i++) {
+            map = map.put(entryInt[i], entryStr[i]);
+        }
+        return map;
     }
 
     @Test
     public void testMapEntriesAreTheSameThatHaveBeenPutInside() {
-	ImmutableMap<Integer,String> map=createMap();
-	// assert that all entries are in list
-	for (int i=0;i<entryStr.length;i++) {
-	    assertEquals("Map does not contain entry("+entryInt[i]+
-			", "+entryStr[i]+")",
-			entryStr[i], map.get(entryInt[i]));
-	}
+        ImmutableMap<Integer, String> map = createMap();
+        // assert that all entries are in list
+        for (int i = 0; i < entryStr.length; i++) {
+            assertEquals(entryStr[i], map.get(entryInt[i]),
+                    "Map does not contain entry(" + entryInt[i] + ", " + entryStr[i] + ")");
+        }
     }
 
     @Test
     public void testReplaceIfSameKeyWithNewValueIsPutInMap() {
-	ImmutableMap<Integer,String> map=createMap();
-	map=map.put(Integer.valueOf(0),"Zero");
-	// zero is in list
-	assertTrue("Zero is not in list.",map.containsValue("Zero"));
-	// but not so old element Null with same key (0)
-	assertTrue("Null is in list but should have been replaced by Zero",!map.containsValue("Null"));
+        ImmutableMap<Integer, String> map = createMap();
+        map = map.put(0, "Zero");
+        // zero is in list
+        assertTrue(map.containsValue("Zero"), "Zero is not in list.");
+        // but not so old element Null with same key (0)
+        assertFalse(map.containsValue("Null"), "Null is in list but should have been replaced by Zero");
     }
 
     @Test
     public void testImmutability() {
-	ImmutableMap<Integer,String> map=createMap();
-	ImmutableMap<Integer,String> old=map;
-	map=map.put(Integer.valueOf(5),"Fuenf");
-	// 5 is in map but not in old
-	assertTrue("Fuenf is not in map",map.containsValue("Fuenf"));
-	assertTrue("Fuenf is in old map, but it should not be there. Map is not immutable.", !old.containsValue("Fuenf"));
+        ImmutableMap<Integer, String> map = createMap();
+        ImmutableMap<Integer, String> old = map;
+        map = map.put(5, "Fuenf");
+        // 5 is in map but not in old
+        assertTrue(map.containsValue("Fuenf"), "Fuenf is not in map");
+        assertFalse(old.containsValue("Fuenf"), "Fuenf is in old map, but it should not be there. Map is not immutable.");
     }
 
     @Test
     public void testMapCanContainSameValueWithDifferentKeys() {
-	ImmutableMap<Integer,String> map=createMap();
-	// add a mapping with a value that has been mapped to
-	// another key before
-	Integer hundred=Integer.valueOf(100);
-	map=map.put(hundred,entryStr[1]);
-	assertSame(entryStr[1]+" is not mapped to the newer key 100", map.get(hundred),entryStr[1]);
-	assertSame(entryStr[1]+" is not mapped to the older key "+entryInt[1], map.get(entryInt[1]),entryStr[1]);
+        ImmutableMap<Integer, String> map = createMap();
+        // add a mapping with a value that has been mapped to
+        // another key before
+        Integer hundred = 100;
+        map = map.put(hundred, entryStr[1]);
+        assertSame(map.get(hundred), entryStr[1], entryStr[1] + " is not mapped to the newer key 100");
+        assertSame(map.get(entryInt[1]), entryStr[1], entryStr[1] + " is not mapped to the older key " + entryInt[1]);
     }
 
     @Test
     public void testRemoveOneMappingWithSpecifiedKey() {
-	ImmutableMap<Integer,String> map=createMap();
-	// delete map (1,"Eins")
-	map=map.remove(entryInt[1]);
-	assertTrue("Deleted Mapping found in map", !map.containsKey(entryInt[1]));
+        ImmutableMap<Integer, String> map = createMap();
+        // delete map (1,"Eins")
+        map = map.remove(entryInt[1]);
+        assertFalse(map.containsKey(entryInt[1]), "Deleted Mapping found in map");
     }
 
     @Test
     public void testRemoveAllMappingToSpecifiedValue() {
-	ImmutableMap<Integer,String> map=createMap();
-	// add a mapping with a value that has been mapped to
-	// another key before
-	Integer hundred=Integer.valueOf(100);
-	map=map.put(hundred,entryStr[1]);	
-	// delete map (*,"Eins")
-	map=map.removeAll(entryStr[1]);
-	assertTrue("Value :"+entryStr[1]+" found in map. But I deleted all"+
-		   " of these values :-(", !map.containsValue(entryStr[1]));
+        ImmutableMap<Integer, String> map = createMap();
+        // add a mapping with a value that has been mapped to
+        // another key before
+        Integer hundred = 100;
+        map = map.put(hundred, entryStr[1]);
+        // delete map (*,"Eins")
+        map = map.removeAll(entryStr[1]);
+        assertFalse(map.containsValue(entryStr[1]), "Value :" + entryStr[1] + " found in map. But I deleted all" +
+                " of these values :-(");
     }
 
     @Test
     public void testSpecialCases() {
-	ImmutableMap<Integer,String> map=DefaultImmutableMap.<Integer,String>nilMap();
-	map = map.put(Integer.valueOf(0), "A");
-	assertTrue("Map should be empty and therefore equal to the EMPTY_MAP",
-	       map.remove(Integer.valueOf(0)).isEmpty());
+        ImmutableMap<Integer, String> map = DefaultImmutableMap.nilMap();
+        map = map.put(0, "A");
+        assertTrue(map.remove(0).isEmpty(),
+                "Map should be empty and therefore equal to the EMPTY_MAP");
 
-	assertTrue("Repeated key removal should not change anything",
-		   map.remove(Integer.valueOf(0)).remove(Integer.valueOf(0)).isEmpty());
-
-
-	map = map.put(Integer.valueOf(0), "B");
-	assertTrue("Map should have only one element with key 0 and value \"B\" ", 
-	       map.size() == 1 && "B".equals(map.get(Integer.valueOf(0))));
+        assertTrue(map.remove(0).remove(0).isEmpty(),
+                "Repeated key removal should not change anything");
 
 
-	map = map.removeAll("B");
-	assertTrue("Map should be empty",
-		   map.isEmpty());
+        map = map.put(0, "B");
+        assertTrue(map.size() == 1 && "B".equals(map.get(0)),
+                "Map should have only one element with key 0 and value \"B\" ");
 
 
-	map = map.put(Integer.valueOf(0), "B");
-	map = map.put(Integer.valueOf(1), "C");
-	map = map.put(Integer.valueOf(2), "B");
-	
-	map = map.removeAll("B");
-	assertTrue("Map should not contain value \"B\" any longer ",
-	       map.size() == 1 && !map.containsValue("B"));
+        map = map.removeAll("B");
+        assertTrue(map.isEmpty(),
+                "Map should be empty");
 
-	map = map.removeAll("B");
-	assertTrue("Removing non-existant values should not change anything",
-	       map.size() == 1 && !map.containsValue("B"));
+
+        map = map.put(0, "B");
+        map = map.put(1, "C");
+        map = map.put(2, "B");
+
+        map = map.removeAll("B");
+        assertTrue(map.size() == 1 && !map.containsValue("B"),
+                "Map should not contain value \"B\" any longer ");
+
+        map = map.removeAll("B");
+        assertTrue(map.size() == 1 && !map.containsValue("B"),
+                "Removing non-existant values should not change anything");
 
     }
 

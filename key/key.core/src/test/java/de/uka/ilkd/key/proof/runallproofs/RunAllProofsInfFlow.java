@@ -17,15 +17,10 @@ package de.uka.ilkd.key.proof.runallproofs;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Stream;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.
@@ -37,35 +32,37 @@ import java.util.Collections;
  *
  * @author M. Ulbrich
  */
-@RunWith(Parameterized.class)
-public class RunAllProofsInfFlow extends RunAllProofsTest {
-
+@Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
+public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection;
+    private static ProofCollection proofCollection = getProofCollection();
 
-    public RunAllProofsInfFlow(RunAllProofsTestUnit unit) {
-        super(unit);
+    private static ProofCollection getProofCollection() {
+        if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
+            try {
+                return parseIndexFile(INDEX_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assertions.fail();
+            }
+        }
+        return null;
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
-
-        if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
-            return Collections.emptyList();
-        }
-
-        proofCollection = parseIndexFile(INDEX_FILE);
+    @TestFactory
+    Stream<DynamicTest> data() throws IOException {
+        Assumptions.assumeTrue(proofCollection != null);
         return data(proofCollection);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpStatisticsFile() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
     }
 
-    @AfterClass
+    @AfterAll
     public static void computeSumsAndAverages() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.computeSumsAndAverages();

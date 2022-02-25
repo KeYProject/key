@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -2321,6 +2323,20 @@ public class TermBuilder {
             return t1;
         } else {
             return tf.createTerm(Junctor.OR, t1, t2);
+        }
+    }
+
+    /**
+     * Floating-point aware equality for floats and double
+     */
+    public Term fpEq(Term t1, Term t2) {
+        FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+        if(t1.sort() == floatLDT.targetSort()) {
+            return func(floatLDT.getEquals(), t1, t2);
+        } else {
+            // If it is not float, assume double. It will fail if wrong args
+            DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
+            return func(doubleLDT.getEquals(), t1, t2);
         }
     }
 }

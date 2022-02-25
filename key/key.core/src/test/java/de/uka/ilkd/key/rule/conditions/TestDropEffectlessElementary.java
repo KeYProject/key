@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,10 +23,14 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.junit.jupiter.api.Test;
 
-public class TestDropEffectlessElementary extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    public void testSelfAssignments() throws Exception {
+public class TestDropEffectlessElementary {
+
+    @Test
+    public void testSelfAssignments() {
 
         Term term = TacletForTests.parseTerm("{ i := i }(i=0)");
         Term result = applyDrop(term);
@@ -44,7 +47,8 @@ public class TestDropEffectlessElementary extends TestCase {
         assertEquals(expected, result);
     }
 
-    public void testDoubleAssignment() throws Exception {
+    @Test
+    public void testDoubleAssignment() {
 
         Term term = TacletForTests.parseTerm("{ i := j || j := i }(i=0)");
         Term result = applyDrop(term);
@@ -63,7 +67,8 @@ public class TestDropEffectlessElementary extends TestCase {
     }
 
     // this was bug #1269
-    public void testFaultyCase() throws Exception {
+    @Test
+    public void testFaultyCase() {
         // The parser cannot parse this but this can appear as 
         // result of the sequential to parallel of {i:=i+1}{i:=i}
 
@@ -78,8 +83,7 @@ public class TestDropEffectlessElementary extends TestCase {
             Term t3 = tb.apply(t0, t1, null);
             term = tb.apply(t3, t2, null);
         }
-        assertEquals("{{i:=i + 1}i:=i}(i = 0)", 
-                LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
+        assertEquals("{{i:=i + 1}i:=i}(i = 0)", LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
 
         Term result = applyDrop(term);
         assertEquals(term, result);

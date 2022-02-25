@@ -11,12 +11,12 @@ dependencies {
     api project(':key.util')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
-    implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
+    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.9.3"
     api "org.antlr:antlr4-runtime:4.9.3"
@@ -69,7 +69,7 @@ task generateSMTListings {
             list.writeLine '<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">'
             list.writeLine '<properties>'
             new File("$resourcesDir/$pack").eachFile {
-                if(it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
+                if (it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
                     // println it.name
                     it.eachLine { list.writeLine it }
                 }
@@ -80,56 +80,24 @@ task generateSMTListings {
 }
 
 classes.dependsOn << generateSMTListings
- 
+
 
 tasks.withType(Test) {
     enableAssertions = true
 }
 
-test {
-    /*filter {
-        // use testProofRules or testRunAllProofs, avoid double execution on jenkins
-        excludeTestsMatching "ProveRulesTest"
-        excludeTestsMatching "RunAllProofsTestSuite"
-        excludeTestsMatching "RunAllProofsInfFlow"
-        excludeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
-        excludeTestsMatching "RunAllProofsFunctional"
-        excludeTestsMatching "TestParallelParsing"
-        excludeTestsMatching "TestCvc4"
-    }*/
-    filter {
-        // To make test cases deterministic there is only one class per
-        // project called "Tests" that programmatically collects
-        // all test cases.
-        // See these classes for configuring the test runs!
-        // CAUTION! "excludeCategories" more filters are to be defined in the class!
-        includeTestsMatching "de.uka.ilkd.key.Tests"
-    }
-    // pass debug flag from command line:
-    systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
-}
-
-testFast {
-    filter {
-        // To make test cases deterministic there is only one class per
-        // project called "Tests" that programmatically collects
-        // all test cases.
-        // See these classes for configuring the test runs!
-        // CAUTION! "excludeCategories" more filters are to be defined in the class!
-        includeTestsMatching "de.uka.ilkd.key.FastTests"
-    }
-}
 
 task testProveRules(type: Test) {
     description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
+    //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
 task testRunAllProofs(type: Test) {
-    description 'Proof/reload all keyfiles tagged for regression testing'
+    description 'Prove/reload all keyfiles tagged for regression testing'
     group "verification"
-    filter { 
+    filter {
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
@@ -227,9 +195,9 @@ task debugJmlLexer(type: JavaExec) {
     standardInput = System.in
 }
 
-task ptest(type: Test) { group "verification"}
+task ptest(type: Test) { group "verification" }
 
-task generateRAPUnitTests(type:JavaExec) {
+task generateRAPUnitTests(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
     args("$buildDir/generated-src/rap/")

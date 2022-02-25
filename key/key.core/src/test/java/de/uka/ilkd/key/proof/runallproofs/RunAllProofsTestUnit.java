@@ -19,8 +19,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
  * @author Kai Wallisch
  */
 public final class RunAllProofsTestUnit implements Serializable {
-
-    private static final long serialVersionUID = -2406881153415390937L;
+    private static final long serialVersionUID = -2406881153415390252L;
 
    /**
     * The name of this test.

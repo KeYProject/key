@@ -21,14 +21,14 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
 
     final DataRecordingTestFile dataRecordingTestFile;
 
-    DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) throws IOException {
+    DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) {
         super(proof, proof.getInitConfig().getSettings().getStrategySettings().getActiveStrategyProperties());
         this.dataRecordingTestFile = dataRecordingTestFile;
 
-        File computeCostDataDir = dataRecordingTestFile.directories.computeCostDataDir;
+        File computeCostDataDir = dataRecordingTestFile.getProfileDirectories().computeCostDataDir;
         computeCostData = new FunctionPerformanceData(computeCostDataDir, dataRecordingTestFile);
 
-        File instantiateAppDataDir = dataRecordingTestFile.directories.instantiateAppDataDir;
+        File instantiateAppDataDir = dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
         instantiateAppData = new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
     }
 

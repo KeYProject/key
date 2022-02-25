@@ -13,15 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.Test;
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -30,23 +21,32 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
-import static org.junit.Assert.*;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test class makes sure that parallel site proofs are working. It is only
  * verified that no exception is thrown and not that correct results are computed.
  * @author Martin Hentschel
  */
-// TODO: Add test case class to test suite "TestKey" after fixing exceptions
 public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    private static final int NUMBER_OF_THREADS = 21;
 
-/**
+   /**
     * Tests parallel site proofs on a new instantiate proof after applying "resume" on it.
     */
-   //Commented out for the moment as Hudson throws an OOM Exception
-   public void xxxtestNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   @Test
+   @Disabled("Commented out for the moment as Hudson throws an OOM Exception")
+   public void xxxtestNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException, InterruptedException {
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.java";
       String containerTypeName = "Magic42";
@@ -64,11 +64,11 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          env.dispose();
       }
    }
-   
+
    /**
     * Tests parallel site proofs on a proof reconstructed from a *.proof file.
     */
-   @Test public void testProofFile() throws ProofInputException, IOException, ProblemLoaderException {
+   @Test public void testProofFile() throws ProblemLoaderException, InterruptedException {
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
@@ -81,19 +81,19 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          env.dispose();
       }
    }
-   
+
    /**
     * Executes the test steps to make sure that parallel tests are working
-    * without thrown {@link Exception}s. 
+    * without thrown {@link Exception}s.
     * @param env The {@link SymbolicExecutionEnvironment} to use.
     */
-   protected void doParallelSiteProofTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env) {
+   protected void doParallelSiteProofTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env) throws InterruptedException {
       // Create threads
-      List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
+      List<SiteProofThread<?>> threads = new LinkedList<>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
       while (iter.hasNext() && threads.size() < NUMBER_OF_THREADS) {
-         IExecutionNode<?> next = iter.next(); 
-         if (next instanceof IExecutionNode) {
+         IExecutionNode<?> next = iter.next();
+         if (next != null) {
             threads.add(new ExecutionVariableSiteProofThread(next));
          }
          if (next instanceof IExecutionMethodReturn) {
@@ -113,24 +113,28 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          // Make sure that no exception is thrown.
          if (thread.getException() != null) {
             thread.getException().printStackTrace();
-            fail(thread.getException().getMessage());
+            Assertions.fail(thread.getException().getMessage());
          }
          // Make sure that something was computed in site proofs.
-         assertNotNull(thread.getResult());
+         Assertions.assertNotNull(thread.getResult());
       }
    }
-   
+
    /**
     * Waits until the given {@link Thread}s have terminated.
     * @param threads The {@link Thread}s to wait for.
     */
-   public static void waitForThreads(List<SiteProofThread<?>> threads, long timeout) {
+   public static void waitForThreads(List<SiteProofThread<?>> threads, long timeout) throws InterruptedException {
       long start = System.currentTimeMillis();
       if (threads != null) {
          for (SiteProofThread<?> thread : threads) {
-            while (thread.isAlive()) {
+            thread.join(timeout);
+            if (System.currentTimeMillis() > start + timeout) {
+               Assertions.fail("Timeout during wait for parallel site proofs.");
+            }
+            /*while (thread.isAlive()) {
                if (System.currentTimeMillis() > start + timeout) {
-                  fail("Timeout during wait for parallel site proofs.");
+                  Assertions.fail("Timeout during wait for parallel site proofs.");
                }
                try {
                   Thread.sleep(100);
@@ -138,11 +142,11 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
                catch (InterruptedException e) {
                   // Nothing to do.
                }
-            }
+            }*/
          }
       }
    }
-   
+
    /**
     * Utility {@link Thread} to execute a parallel site proof.
     * @author Martin Hentschel
@@ -152,7 +156,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
        * A possibly caught exception.
        */
       private Exception exception;
-      
+
       /**
        * The result of the executed site proof.
        */
@@ -190,7 +194,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          this.result = result;
       }
    }
-   
+
    /**
     * A {@link Thread} which computes the variables of a given {@link IExecutionNode}
     * via site proofs.
@@ -200,10 +204,10 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       /**
        * The {@link IExecutionNode} to read variables from.
        */
-      private IExecutionNode<?> node;
+      private final IExecutionNode<?> node;
 
       /**
-       * Constructor. 
+       * Constructor.
        * @param node The {@link IExecutionNode} to read variables from.
        */
       public ExecutionVariableSiteProofThread(IExecutionNode<?> node) {
@@ -223,9 +227,9 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          }
       }
    }
-   
+
    /**
-    * A {@link Thread} which computes the method return value of a given 
+    * A {@link Thread} which computes the method return value of a given
     * {@link IExecutionMethodReturn} via a site proof.
     * @author Martin Hentschel
     */
@@ -233,7 +237,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       /**
        * The {@link IExecutionMethodReturn} to read method return value from.
        */
-      private IExecutionMethodReturn returnNode;
+      private final IExecutionMethodReturn returnNode;
 
       /**
        * Constructor

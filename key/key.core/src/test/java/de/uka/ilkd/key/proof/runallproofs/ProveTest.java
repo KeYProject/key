@@ -13,12 +13,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * This class provides an API for running proves in JUnit test cases.
@@ -63,6 +63,10 @@ public class ProveTest {
         runKey(file, TestProperty.LOADABLE);
     }
 
+    protected void assertUnLoadability(String file) throws Exception {
+        runKey(file, TestProperty.NOTLOADABLE);
+    }
+
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
@@ -72,7 +76,7 @@ public class ProveTest {
         }
 
         File keyFile = new File(file);
-        assertTrue("File " + keyFile + " does not exists", keyFile.exists());
+        assertTrue(keyFile.exists(), "File " + keyFile + " does not exists");
 
         // Name resolution for the available KeY file.
         debugOut("Now processing file %s", keyFile);
@@ -98,18 +102,25 @@ public class ProveTest {
                 }
             }
 
-            assertFalse("Loading problem file failed", replayResult.hasErrors());
-
-            // For a reload test we are done at this point. Loading was successful.
-            if (testProperty == TestProperty.LOADABLE) {
+            if (testProperty == TestProperty.NOTLOADABLE) {
+                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
                 success = true;
-                debugOut("... success: loaded");
             } else {
-                autoMode(env, loadedProof, script);
-                success = (testProperty == TestProperty.PROVABLE) == loadedProof.closed();
-                debugOut("... finished proof: " + (success ? "closed." : "open goal(s)"));
-                appendStatistics(loadedProof, keyFile);
-                if (success) reload(proofFile, loadedProof);
+                assertFalse(replayResult.hasErrors(), "Loading problem file failed");
+
+                // For a reload test we are done at this point. Loading was successful.
+                if (testProperty == TestProperty.LOADABLE) {
+                    success = true;
+                    debugOut("... success: loaded");
+                } else {
+                    autoMode(env, loadedProof, script);
+                    boolean closed = loadedProof.closed();
+                    success = (testProperty == TestProperty.PROVABLE) == closed;
+                    debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                    appendStatistics(loadedProof, keyFile);
+                    if (success)
+                        reload(proofFile, loadedProof);
+                }
             }
         } finally {
             if (loadedProof != null) {
@@ -141,8 +152,8 @@ public class ProveTest {
             loadedProof.saveToFile(proofFile);
             boolean reloadedClosed = reloadProof(proofFile);
 
-            assertEquals("Reloaded proof did not close: " + proofFile,
-                    loadedProof.closed(), reloadedClosed);
+            assertEquals(loadedProof.closed(), reloadedClosed,
+                    "Reloaded proof did not close: " + proofFile);
             debugOut("... success: reloaded.");
         }
     }

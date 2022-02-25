@@ -305,9 +305,20 @@ public class TacletGenerator {
                 kjt.getJavaType() instanceof ClassDeclaration
                 && ((ClassDeclaration) kjt.getJavaType()).isFinal();
         final Sequent ifSeq;
-        if (target.isStatic() || finalClass) {
+        if (target.isStatic()) {
             ifSeq = null;
+        } else if (finalClass) {
+            /* part of fix for #1598
+             * invariants for final class should not be applied to null
+             * \assumes ( ==> self = null ) */
+            //ifSeq = null;
+            final Term ifFormula = TB.equals(TB.var(selfSV), TB.NULL());
+            final SequentFormula ifCf = new SequentFormula(ifFormula);
+            final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT
+                    .insertFirst(ifCf).semisequent();
+            ifSeq = Sequent.createSuccSequent(ifSemiSeq);
         } else {
+            /* \assumes ( Sort.exactInstance(self) ==> ) */
             final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(
                     selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
@@ -764,14 +775,26 @@ public class TacletGenerator {
             }
         }
 
-        //\assumes(self = EQ ==>)
         if (eqVersion) {
             assert !isStatic;
-            final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
-            final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
-                    ifCf).semisequent();
-            final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+            // \assumes( self = EQ ==> EQ = null )
+            final Term selfEQ = TB.equals(TB.var(selfSV), TB.var(eqSV));
+            final Term eqNull = TB.equals(TB.var(eqSV), TB.NULL());
+            final SequentFormula selfEQSF = new SequentFormula(selfEQ);
+            final SequentFormula eqNullSF = new SequentFormula(eqNull);
+            final Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    selfEQSF).semisequent();
+            final Semisequent ant = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    eqNullSF).semisequent();
+            final Sequent ifSeq = Sequent.createSequent(succ, ant);
+            tacletBuilder.setIfSequent(ifSeq);
+        } else if (!isStatic) {
+            // \assumes( ==> self = null )
+            final Term selfNull = TB.equals(TB.var(selfSV), TB.NULL());
+            final SequentFormula selfNullSF = new SequentFormula(selfNull);
+            final Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    selfNullSF).semisequent();
+            final Sequent ifSeq = Sequent.createSuccSequent(succ);
             tacletBuilder.setIfSequent(ifSeq);
         }
 

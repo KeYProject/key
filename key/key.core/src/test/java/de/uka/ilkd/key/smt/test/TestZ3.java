@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.smt.test;
 
-import org.junit.Assert;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uka.ilkd.key.smt.st.SolverTypes;
-import org.junit.Assert;
 
-import de.uka.ilkd.key.smt.st.SolverType;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class TestZ3 extends TestSMTSolver {
@@ -69,20 +69,24 @@ public class TestZ3 extends TestSMTSolver {
     }
     
     //These testcases are z3 specific, because other solver don't support integer division.
+    @Test
     public void testDiv1() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div1.key", true));
+        assertTrue(correctResult(testFile + "div1.key", true));
     }
     
+    @Test
     public void testDiv3() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div3.key", true));
+        assertTrue(correctResult(testFile + "div3.key", true));
     }
     
+    @Test
     public void testDiv5() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div5.key", false));
+        assertTrue(correctResult(testFile + "div5.key", false));
     }
     
+    @Test
     public void testDiv6() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div6.key", false));
+        assertTrue(correctResult(testFile + "div6.key", false));
     }
     
 }

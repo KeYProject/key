@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTest
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 public class TestLineBreakpointStopConditionSimpleWithConditions extends AbstractSymbolicExecutionTestCase {
+   @Test//weigl not prev. activated
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain=null;
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain=null;

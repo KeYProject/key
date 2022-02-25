@@ -16,9 +16,16 @@ package de.uka.ilkd.key.parser.proofjava;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import junit.framework.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import recoder.ParserException;
+import recoder.ServiceConfiguration;
+import recoder.java.Expression;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Expression;
@@ -32,20 +39,21 @@ import recoder.java.Expression;
  * @version 2006-10-27
  */
 
-public class TestProofJavaParser extends TestCase {
+public class TestProofJavaParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestProofJavaParser.class);
 
     private static ServiceConfiguration sc;
 
     private static ProofJavaProgramFactory factory;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setUp() throws Exception {
         sc = new KeYCrossReferenceServiceConfiguration(
                 new KeYRecoderExcHandler());
         factory = (ProofJavaProgramFactory) sc.getProgramFactory();
     }
 
+    @Test
     public void testGenericWithWithoutSpaces() throws ParserException {
         factory.parseCompilationUnit("class A < B > { B m() { return new B(); }}");
         factory.parseCompilationUnit("class A <B> { B m() { return new B(); }}");
@@ -60,6 +68,7 @@ public class TestProofJavaParser extends TestCase {
         }
     }
 
+    @Test
     public void testExpressions() {
         testExpr("<a>+2");
         testExpr("a >> <a>");
@@ -67,14 +76,14 @@ public class TestProofJavaParser extends TestCase {
         testExpr("A<T>.<B><S>.class");
     }
 
+    @Test
     public void testGenericClassDeclarations() throws ParserException {
-        factory
-                .parseCompilationUnit("class <A><B> { B m() { return new B(); }}");
-        factory
-                .parseCompilationUnit("class <A><E> { public <S><A>< <A><S> ><M>(){  } }");
+        factory.parseCompilationUnit("class <A><B> { B m() { return new B(); }}");
+        factory.parseCompilationUnit("class <A><E> { public <S><A>< <A><S> ><M>(){  } }");
 
     }
 
+    @Test
     public void testMemberDeclarations() throws ParserException {
         factory.parseMemberDeclaration("<A><T> <B> = <A>[].class;");
         factory.parseMemberDeclaration("private A<T>[];");

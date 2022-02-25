@@ -13,21 +13,19 @@
 
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
-import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.util.LinkedHashSet;
 
 /**
  * Tests for {@link ProofReferenceUtil}.
@@ -38,6 +36,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
+   @Test
    public void testReferenceComputation_ExpandAndContract() throws Exception {
       doAPITest(TESTCASE_DIRECTORY,
                 "/proofReferences/UseOperationContractTest/UseOperationContractTest.java",
@@ -53,19 +52,21 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
+   @Test
    public void testReferenceComputation_NoAnalysts() throws Exception {
       doAPITest(TESTCASE_DIRECTORY,
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
                 "MethodBodyExpand",
                 "main",
                 false,
-                ImmutableSLList.<IProofReferencesAnalyst>nil());
+                ImmutableSLList.nil());
    }
 
    /**
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
+   @Test
    public void testReferenceComputation_ContractOnly() throws Exception {
       doAPITest(TESTCASE_DIRECTORY,
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
@@ -79,6 +80,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
+   @Test
    public void testReferenceComputation_ExpandOnly() throws Exception {
       doAPITest(TESTCASE_DIRECTORY,
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
@@ -94,6 +96,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node)}.
     */
+   @Test
    public void testReferenceComputation_DefaultAnalysts() throws Exception {
       doAPITest(TESTCASE_DIRECTORY,
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
@@ -125,26 +128,20 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                             boolean useContracts,
                             final ImmutableList<IProofReferencesAnalyst> analysts,
                             final ExpectedProofReferences... expectedReferences) throws Exception {
-      IProofTester tester = new IProofTester() {
-         @Override
-         public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
-            // Extract and assert proof references
-            final LinkedHashSet<IProofReference<?>> references = analysts != null ?
-                                                                 ProofReferenceUtil.computeProofReferences(proof, analysts) :
-                                                                 ProofReferenceUtil.computeProofReferences(proof);
-            assertReferences(references, expectedReferences);
-            // Test references of each node individually
-            proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
-               @Override
-               public void visit(Proof proof, Node visitedNode) {
-                  LinkedHashSet<IProofReference<?>> expectedNodeRefs = findReferences(references, visitedNode);
-                  LinkedHashSet<IProofReference<?>> currentNodeRefs = analysts != null ?
-                                                                      ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices(), analysts) :
-                                                                      ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices());
-                  assertReferences(expectedNodeRefs, currentNodeRefs);
-               }
-            });
-         }
+      IProofTester tester = (environment, proof) -> {
+         // Extract and assert proof references
+         final LinkedHashSet<IProofReference<?>> references = analysts != null ?
+                                                              ProofReferenceUtil.computeProofReferences(proof, analysts) :
+                                                              ProofReferenceUtil.computeProofReferences(proof);
+         assertReferences(references, expectedReferences);
+         // Test references of each node individually
+         proof.breadthFirstSearch(proof.root(), (proof1, visitedNode) -> {
+            LinkedHashSet<IProofReference<?>> expectedNodeRefs = findReferences(references, visitedNode);
+            LinkedHashSet<IProofReference<?>> currentNodeRefs = analysts != null ?
+                                                                ProofReferenceUtil.computeProofReferences(visitedNode, proof1.getServices(), analysts) :
+                                                                ProofReferenceUtil.computeProofReferences(visitedNode, proof1.getServices());
+            assertReferences(expectedNodeRefs, currentNodeRefs);
+         });
       };
       doProofMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, tester);
    }

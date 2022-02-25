@@ -139,7 +139,7 @@ public class GenerateUnitTests {
         Set<String> usedMethodNames = new TreeSet<>();
         int clashCounter = 0;
 
-        for (TestFile<?> file : unit.getTestFiles()) {
+        for (TestFile file : unit.getTestFiles()) {
             File keyFile = file.getKeYFile();
             String testName = keyFile.getName()
                     .replaceAll("\\.java", "")
@@ -168,6 +168,9 @@ public class GenerateUnitTests {
                     break;
                 case LOADABLE:
                     methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
+                    break;
+                case NOTLOADABLE:
+                    methods.append("assertUnLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
             }
             methods.append("}");

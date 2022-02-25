@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -28,7 +28,7 @@ public class TestEnumClassDeclaration {
 
     ProgramFactory factory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         factory = ProofJavaProgramFactory.getInstance();
         ServiceConfiguration sc = new DefaultServiceConfiguration();
