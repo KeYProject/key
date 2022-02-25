@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Provides static SolverType objects to be reused and saves the properties to .props files.
  * Used to create {@link SolverType} (in the form of {@link SolverTypeImplementation}) objects from .props files.
  */
-public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
+public class SolverPropertiesLoader {
 
     private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
     private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(2);
@@ -83,7 +83,6 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
      *
      * @return true iff SOLVERS was freshly initialized using the given solverProperties
      */
-    @Override
     public Collection<SolverType> getSolvers() {
         if (SOLVERS.isEmpty()) {
             for (Properties solverProp : loadSolvers()) {
@@ -100,7 +99,6 @@ public class SolverPropertiesLoader implements SolverTypes.SolverLoader {
     /**
      * @return a copy of LEGACY_SOLVERS
      */
-    @Override
     public Collection<SolverType> getLegacySolvers() {
         getSolvers();
         return new ArrayList<>(LEGACY_SOLVERS);

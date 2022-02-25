@@ -46,14 +46,9 @@ public class SolverTypes {
     @Nonnull
     public static Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
-            ServiceLoader<SolverLoader> loaderLoader = ServiceLoader.load(SolverLoader.class);
-            var s =
-                    StreamSupport.stream(loaderLoader.spliterator(), false)
-                            .collect(Collectors.toList());
-            for (SolverLoader solverLoader : s) {
-                SOLVERS.addAll(solverLoader.getSolvers());
-                LEGACY_SOLVERS.addAll(solverLoader.getLegacySolvers());
-            }
+            SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
+            SOLVERS.addAll(solverLoader.getSolvers());
+            LEGACY_SOLVERS.addAll(solverLoader.getLegacySolvers());
         }
         return new ArrayList<>(SOLVERS);
     }
@@ -80,11 +75,5 @@ public class SolverTypes {
                     .equals(SolverTypeImplementation.class) && it.getName()
                     .equals("CVC4 (Legacy Translation)"))
             .findFirst().orElse(null);
-
-
-    public interface SolverLoader {
-        Collection<SolverType> getSolvers();
-        Collection<SolverType> getLegacySolvers();
-    }
 
 }
