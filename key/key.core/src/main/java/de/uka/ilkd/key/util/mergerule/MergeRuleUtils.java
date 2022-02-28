@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.nparser.KeyIO;
 import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -40,7 +41,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -1621,7 +1621,7 @@ public class MergeRuleUtils {
     private static ImmutableSet<LocationVariable> getProgramLocations(
             Term programCounterTerm, Services services) {
         CollectLocationVariablesVisitor visitor = new CollectLocationVariablesVisitor(
-                programCounterTerm.javaBlock().program(), true, services);
+                programCounterTerm.javaBlock().program(), services);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
@@ -1655,7 +1655,7 @@ public class MergeRuleUtils {
         }
 
         CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
-                program, true, services);
+                program, services);
 
         // Collect program variables in Java block
         visitor.start();
@@ -2174,13 +2174,17 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitor
-            extends CreatingASTVisitor {
+            extends JavaASTVisitor {
         private ImmutableSet<LocationVariable> variables = DefaultImmutableSet
                 .nil();
 
-        public CollectLocationVariablesVisitor(ProgramElement root,
-                boolean preservesPos, Services services) {
-            super(root, preservesPos, services);
+        public CollectLocationVariablesVisitor(ProgramElement root, Services services) {
+            super(root, services);
+        }
+
+        @Override
+        protected void doDefaultAction(final SourceElement node) {
+            //ignore
         }
 
         @Override
@@ -2196,7 +2200,6 @@ public class MergeRuleUtils {
         public ImmutableSet<LocationVariable> getLocationVariables() {
             return variables;
         }
-
     }
 
     /**
@@ -2205,12 +2208,16 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitorHashSet
-            extends CreatingASTVisitor {
+            extends JavaASTVisitor {
         private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
 
-        public CollectLocationVariablesVisitorHashSet(ProgramElement root,
-                boolean preservesPos, Services services) {
-            super(root, preservesPos, services);
+        public CollectLocationVariablesVisitorHashSet(ProgramElement root, Services services) {
+            super(root, services);
+        }
+
+        @Override
+        protected void doDefaultAction(final SourceElement node) {
+            // ignore
         }
 
         @Override
@@ -2226,7 +2233,6 @@ public class MergeRuleUtils {
         public HashSet<LocationVariable> getLocationVariables() {
             return variables;
         }
-
     }
 
     /**
