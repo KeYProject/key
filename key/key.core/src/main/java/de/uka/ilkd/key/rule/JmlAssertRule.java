@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Optional;
@@ -108,7 +110,11 @@ public final class JmlAssertRule implements BuiltInRule {
                 .map(JmlAssert.class::cast)
                 .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        final Term condition = jmlAssert.getCond();
+        final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(),
+                services);
+        final Term self = MiscTools.getSelfTerm(frame, services);
+
+        final Term condition = jmlAssert.getCond(self, services);
 
         final ImmutableList<Goal> result;
         if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {

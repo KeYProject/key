@@ -226,6 +226,11 @@ group jmlAsserts {
    provable ./standard_key/java_dl/jml-assert/recursion-assume.key
    provable ./standard_key/java_dl/jml-assert/quantor-assert.key
    provable ./standard_key/java_dl/jml-assert/quantor-assume.key
+   # issue 1698
+   provable ./standard_key/java_dl/jml-assert/model-methods-static-static.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-instance-static.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-instance-instance.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-static-instance.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)

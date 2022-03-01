@@ -1449,14 +1449,7 @@ public class JMLSpecFactory {
                         jmlAssert, Collections.emptyList(), pm, services)
                 .create();
         final ProgramVariableCollection pv = createProgramVariables(pm, jmlAssert, variables);
-        jmlIo.classType(pm.getContainerType())
-                .selfVar(pv.selfVar)
-                .parameters(pv.paramVars)
-                .resultVariable(pv.resultVar)
-                .exceptionVariable(pv.excVar)
-                .atPres(pv.atPres)
-                .atBefore(pv.atBefores);
-        jmlAssert.translateCondition(jmlIo);
+        jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 
     /**
