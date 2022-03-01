@@ -135,12 +135,12 @@ public interface SMTHandler {
      * Set options of the handler, e.g. shut off if-then-else terms.
      * @param options an array of arbitrary option Strings that each SMTHandler handles on its own.
      */
-    default void setOptions(String[] options) { return; }
+    default void setOptions(String[] options) {}
 
     /**
      * Not all options impact all SMTHandlers.
      *
      * @return the options set for the SMTHandler at hand that have an impact on it.
      */
-    default String[] getOptions() { return new String[]{}; };
+    default String[] getOptions() { return new String[]{}; }
 }
