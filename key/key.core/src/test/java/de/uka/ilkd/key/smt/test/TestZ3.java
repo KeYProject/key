@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -28,10 +29,13 @@ public class TestZ3 extends TestSMTSolver {
     public static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(TestZ3.class);
 
-
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
-    
+
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream().filter(it -> it.getClass()
+                    .equals(SolverTypeImplementation.class) && it.getName()
+                    .equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
     
     @Override
     public boolean toolNotInstalled() {
@@ -60,7 +64,7 @@ public class TestZ3 extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverTypes.Z3_SOLVER;
+       SolverType type = Z3_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);
