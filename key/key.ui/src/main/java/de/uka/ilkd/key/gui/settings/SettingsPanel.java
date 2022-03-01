@@ -257,24 +257,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return field;
     }
 
-    /**
-     * @param title
-     * @param min
-     * @param max
-     * @param step
-     * @param info
-     * @param validator
-     * @return
-     */
-    protected JSpinner addIntNumberField(String title, int min, int max, int step, String info,
-                                      final Validator<Integer> validator) {
-        JSpinner field = createNumberTextField(min, max, step, validator);
-        addTitledComponent(title, field, info);
-        return field;
-    }
-
-    protected JSpinner addLongNumberField(String title, long min, long max, long step, String info,
-                                      final Validator<Long> validator) {
+    protected <T extends Number & Comparable> JSpinner addNumberField(String title, T min, T max, T step, String info,
+                                                         final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;

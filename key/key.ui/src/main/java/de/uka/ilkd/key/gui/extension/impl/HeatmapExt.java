@@ -164,7 +164,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         addRadio(HeatmapMode.TERMS_AGE);
         addRadio(HeatmapMode.TERMS_NEWEST);
 
-        spinnerAge = addIntNumberField("Maximal age:", MIN_AGE, MAX_AGE, 1, TEXTFIELD_LABEL, e -> {
+        spinnerAge = addNumberField("Maximal age:", MIN_AGE, MAX_AGE, 1, TEXTFIELD_LABEL, e -> {
             //LIVE UPDATE: VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue()));
         });
     }

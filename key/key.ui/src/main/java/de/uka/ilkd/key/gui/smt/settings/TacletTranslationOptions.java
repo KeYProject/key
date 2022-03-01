@@ -57,7 +57,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     }
 
     protected JSpinner createMaxNumberOfGenerics() {
-        return addIntNumberField("Maximum number of generic sorts.", 0,
+        return addNumberField("Maximum number of generic sorts.", 0,
                 Integer.MAX_VALUE, 1, infoMaxNumberOfGenerics,
                 emptyValidator());
     }

@@ -131,9 +131,9 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JSpinner createMaxField() {
-        JSpinner max = addLongNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
+        JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
             if (settings != null) {
-                settings.maxInteger = e;
+                settings.maxInteger = e.longValue();
             }
         });
         try {
@@ -146,8 +146,8 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JSpinner createMinField() {
-        return addLongNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "",
-                val -> settings.minInteger = val);
+        return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "",
+                val -> settings.minInteger = val.longValue());
     }
 
     protected JCheckBox createConstantsForIntegers() {

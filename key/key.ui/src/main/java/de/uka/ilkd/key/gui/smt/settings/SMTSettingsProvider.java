@@ -95,35 +95,35 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addLongNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setLocsetBound(e));
+        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+                e -> settings.setLocsetBound(e.longValue()));
     }
 
     private JSpinner createMaxProcesses() {
-        return addIntNumberField("Concurrent processes:",
+        return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.setMaxConcurrentProcesses(e));
+                e -> settings.setMaxConcurrentProcesses(e.intValue()));
     }
 
     private JSpinner createTimeoutField() {
-        return addLongNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e * 1000L));
+        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
+                e -> settings.setTimeout(e.longValue() * 1000L));
     }
 
     private JSpinner createIntBoundField() {
-        return addLongNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setIntBound(e));
+        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+                e -> settings.setIntBound(e.longValue()));
     }
 
     private JSpinner createSeqBoundField() {
-        return addLongNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setSeqBound(e));
+        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+                e -> settings.setSeqBound(e.longValue()));
     }
 
     private JSpinner createObjectBoundField() {
-        return addLongNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setObjectBound(e));
+        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
+                e -> settings.setObjectBound(e.longValue()));
     }
 
     private JComboBox<String> getProgressModeBox() {
