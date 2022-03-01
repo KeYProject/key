@@ -1,4 +1,3 @@
-ite=true
 timeout=-1
 name=MathSAT
 info=The MathSAT 5 SMT solver

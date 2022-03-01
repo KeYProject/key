@@ -1,4 +1,3 @@
-ite=true
 params=-in -smt2
 timeout=-1
 name=Z3_CE

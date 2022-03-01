@@ -1,8 +1,9 @@
-CVC4.props
 Z3.props
 Z3_CE.props
-CVC5.props
-CVC4_legacy.props
-Z3_legacy.props
 Z3_FloatingPoint.props
+Z3_legacy.props
+CVC4.props
+CVC4_legacy.props
+CVC5.props
 MathSAT.props
+Princess.props

@@ -1,9 +1,8 @@
-ite=true
 legacy=true
 params=-in -smt2
 timeout=-1
 name=Z3 (Legacy Translation)
-info=Z3 solver by Microsoft
+info=Z3 solver by Microsoft.
 command=z3
 version=--version
 translatorClass=de.uka.ilkd.key.smt.SmtLib2Translator
