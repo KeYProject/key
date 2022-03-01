@@ -31,7 +31,6 @@ public final class SolverTypeImplementation implements SolverType {
     private final String NAME, INFO, DEFAULT_PARAMS, DEFAULT_COMMAND, VERSION, MINIMUM_SUPPORTED_VERSION;
     private final long DEFAULT_TIMEOUT;
     private final String[] DELIMITERS;
-    private final boolean ITE;
     /**
      * The current command line parameters, timeout and command to be used instead of the default values, changeable.
      */
@@ -103,7 +102,6 @@ public final class SolverTypeImplementation implements SolverType {
      * @param minimumSupportedVersion the minimum supported version of the solver type at hand
      * @param defaultTimeout the default solver timeout for SMT processes using this solver type
      * @param delimiters the message delimiters used by the actual solver program
-     * @param supportsIfThenElse whether the solver type at hand supports "ite" ? (TODO correct?)
      * @param translatorClass the {@link SMTTranslator} class used by this solver type
      * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used
      *                        by the {@link SMTTranslator} created by this solver type
@@ -113,7 +111,7 @@ public final class SolverTypeImplementation implements SolverType {
      */
     public SolverTypeImplementation(String name, String info, String defaultParams, String defaultCommand,
                                     String version, String minimumSupportedVersion,
-                                    long defaultTimeout, String[] delimiters, boolean supportsIfThenElse,
+                                    long defaultTimeout, String[] delimiters,
                                     Class<?> translatorClass, String[] handlerNames, String[] handlerOptions,
                                     SolverSocket.MessageHandler messageHandler, String preamble) {
         NAME = name;
@@ -126,7 +124,6 @@ public final class SolverTypeImplementation implements SolverType {
         MINIMUM_SUPPORTED_VERSION = minimumSupportedVersion;
         timeout = defaultTimeout;
         DELIMITERS = delimiters;
-        ITE = supportsIfThenElse;
         VERSION = version;
         TRANSLATOR_CLASS = translatorClass;
         // copy the array so that it cannot accidentally be manipulated from the outside
@@ -246,11 +243,6 @@ public final class SolverTypeImplementation implements SolverType {
     public String[] getDelimiters() {
         // Copy the delimiters array so that it cannot accidentally be manipulated from the outside.
         return Arrays.copyOf(DELIMITERS, DELIMITERS.length);
-    }
-
-    @Override
-    public boolean supportsIfThenElse() {
-        return ITE;
     }
 
     // TODO How to make this modifiable?

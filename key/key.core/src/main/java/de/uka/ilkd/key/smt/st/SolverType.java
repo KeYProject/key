@@ -99,11 +99,6 @@ public interface SolverType {
     String[] getDelimiters();
 
     /**
-     * Returns true if and only if the solver supports if-then-else terms.
-     */
-    boolean supportsIfThenElse();
-
-    /**
      * Directly before the problem description is sent to the solver one can modify the problem string by using
      * this method.
      */

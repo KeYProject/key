@@ -39,7 +39,6 @@ public class SolverPropertiesLoader {
     private static String DELIMITERS = "delimiters";
     private static String INFO = "info";
     private static String TIMEOUT = "timeout";
-    private static String ITE = "ite";
     private static String MINIMUM_VERSION = "minVersion";
     private static String LEGACY = "legacy";
     private static String SOCKET_MESSAGEHANDLER = "messageHandler";
@@ -51,7 +50,6 @@ public class SolverPropertiesLoader {
     private static String PREAMBLE_FILE = "preamble";
     private static String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
     private static long DEFAULT_TIMEOUT = -1;
-    private static boolean DEFAULT_ITE = false;
 
     /**
      * If a props file does not contain a solver name or two files have the same name,
@@ -110,7 +108,6 @@ public class SolverPropertiesLoader {
      */
     private static SolverType makeSolver(Properties props) {
         String name, command, params, version, info, messageHandler, preamble, minVersion;
-        boolean supportsIfThenElse;
         long timeout;
         SolverSocket.MessageHandler handler;
         Class<?> translatorClass;
@@ -128,9 +125,6 @@ public class SolverPropertiesLoader {
         version = SettingsConverter.readRawString(props, VERSION, DEFAULT_VERSION);
         minVersion = SettingsConverter.readRawString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);
         info = SettingsConverter.readRawString(props, INFO, DEFAULT_INFO);
-
-        // does the solver support if-then-else?
-        supportsIfThenElse = SettingsConverter.read(props, ITE, DEFAULT_ITE);
 
         // the communication socket used for communication with the created solver
         // (class SolverCommunicationSocket)
@@ -156,7 +150,7 @@ public class SolverPropertiesLoader {
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
         return new SolverTypeImplementation(name, info, params, command, version,
-                minVersion, timeout, delimiters, supportsIfThenElse, translatorClass,
+                minVersion, timeout, delimiters, translatorClass,
                 handlerNames, handlerOptions, handler, preamble);
     }
 
