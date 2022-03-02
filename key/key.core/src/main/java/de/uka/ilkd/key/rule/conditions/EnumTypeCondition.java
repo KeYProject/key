@@ -21,6 +21,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This variable condition checks if a type is an enum type.
@@ -29,6 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @since 2006-12-14
  */
 public final class EnumTypeCondition extends VariableConditionAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnumTypeCondition.class);
 
     private final TypeResolver resolver;
     private final boolean negated;
@@ -53,7 +56,7 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
 
         if (!resolver.isComplete(var, candidate, svInst, services)) {
             // not yet complete
-            System.err.println(resolver + " not complete");
+            LOGGER.warn("{} not complete", resolver);
             return true;
         } else {
             // complete

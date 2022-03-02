@@ -24,7 +24,7 @@ baseDirectory = ../
  * Defines a statistics file.
  * Path is relative to base directory.
  */
-statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
+statisticsFile = ../../key.core/build/reports/runallproofs/runStatistics.csv
 
 /*
  * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
@@ -44,7 +44,7 @@ reloadEnabled = true
  * Temporary directory, which is used for inter process communication when using forked mode.
  * The given path is relative to baseDirectory.
  */
-tempDir = ../../key.core.test/runallproofs_tmp
+tempDir = ../../key.core/build/runallproofs_tmp
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses are terminated as
@@ -203,18 +203,34 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./standard_key/java_dl/jml-assert/assert_assume_order.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
-   provable ./heap/block_loop_contracts/Free/assertions0.key
-   provable ./heap/block_loop_contracts/Free/assertions1.key
    provable ./heap/block_loop_contracts/Free/blockContracts0.key
    provable ./heap/block_loop_contracts/Free/blockContracts1.key
    notprovable ./heap/block_loop_contracts/Finally/block_finally.key
    notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
+}
+
+
+group jmlAsserts {
+   provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./heap/block_loop_contracts/Free/assertions0.key
+   provable ./heap/block_loop_contracts/Free/assertions1.key
+   # issue 1669
+   provable ./standard_key/java_dl/jml-assert/recursion-assert.key
+   provable ./standard_key/java_dl/jml-assert/recursion-assume.key
+   provable ./standard_key/java_dl/jml-assert/quantor-assert.key
+   provable ./standard_key/java_dl/jml-assert/quantor-assume.key
+   # issue 1698
+   provable ./standard_key/java_dl/jml-assert/model-methods-static-static.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-instance-static.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-instance-instance.key
+   provable ./standard_key/java_dl/jml-assert/model-methods-static-instance.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -870,13 +886,12 @@ group permissionHeap {
    provable ./heap/permissions/threads/Plotter_initPost_accessible.key
    provable ./heap/permissions/threads/Plotter_inv_accessible1.key
    provable ./heap/permissions/threads/Plotter_inv_accessible2.key
-   provable ./heap/permissions/threads/Plotter_joinTransfer_accessible.key
    provable ./heap/permissions/threads/Plotter_joinTransfer_contract.key
    provable ./heap/permissions/threads/Plotter_Plotter.key
    provable ./heap/permissions/threads/Plotter_postJoin_accessible.key
    provable ./heap/permissions/threads/Plotter_preStart_accessible.key
-   provable ./heap/permissions/threads/Plotter_startTransfer_accessible.key
    provable ./heap/permissions/threads/Plotter_stateInv_accessible.key
+   provable ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
    provable ./heap/permissions/threads/Plotter_workingPermissions_accessible.key
    provable ./heap/permissions/threads/Sampler_initPost_accessible.key
    provable ./heap/permissions/threads/Sampler_inv_accessible1.key
@@ -924,10 +939,15 @@ group permissionHeap {
    # provable: ./heap/permissions/threads/Plotter_run.key
    # provable: ./heap/permissions/threads/Main_main.key
 
-   # Should be provable, but isn't at the moment:
-   # provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
    # Is provable, but very heavy (~400000 steps)
-   # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
+   # provable ./heap/permissions/threads/Plotter_startTransfer_contract.key
+     loadable ./heap/permissions/threads/Plotter_startTransfer_contract.proof
+
+   # after !513 no longer provable in automode but the old proofs are still loadable:
+   # provable ./heap/permissions/threads/Plotter_startTransfer_accessible.key
+     loadable ./heap/permissions/threads/Plotter_startTransfer_accessible.proof
+   # provable ./heap/permissions/threads/Plotter_joinTransfer_accessible.key
+     loadable ./heap/permissions/threads/Plotter_joinTransfer_accessible.proof
 }
 
 # Completion scopes / Exec statement tests
@@ -956,4 +976,40 @@ group reload_examples {
    loadable ./heap/verifyThis15_3_DLL/doUndo.proof
    loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
    loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
+}
+
+# Test whether reloading works (no examples)
+group proofLoadRepair {
+
+   # Demonstrate that loading a manipulated proof with wrong
+   # assumes instantiations works (MR !516).
+   # Provided that there is a unique candidate to instantiate.
+   loadable ./proofLoadRepair/disjConj-manipulated.proof
+
+   # There are two possible candidates to instantiate the assumes sequent.
+   notloadable ./proofLoadRepair/insufficient-manipulated.proof
+}
+
+group switch {
+
+    # This isn't a good test as it depends on ordering and naming scheme
+    # but it should be ok as regression test
+    # keep as first test in this group
+    provable ./standard_key/java_dl/switch/labeled_case.key
+
+    provable ./standard_key/java_dl/switch/empty_switch.key
+
+    # testing that side effects of the expression matter
+    provable ./standard_key/java_dl/switch/empty_switch_null.key
+    provable ./standard_key/java_dl/switch/empty_switch_null_catch.key
+    provable ./standard_key/java_dl/switch/empty_switch_array_out_of_bounds.key
+    provable ./standard_key/java_dl/switch/empty_switch_array_out_of_bounds_catch.key
+
+    # test that breaks and labels are handled correctly with nested switches
+    provable ./standard_key/java_dl/switch/switch_in_switch.key
+
+    provable ./standard_key/java_dl/switch/while_and_switch.key
+
+    # this is to test that proving large switch statements are reasonable fast
+    provable ./standard_key/java_dl/switch/large_switch.key
 }

@@ -42,6 +42,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
 
     @Override
     public @Nonnull List<PositionedString> check(@Nonnull ParserRuleContext ctx) {
+        warnings.clear();
         ctx.accept(this);
         return warnings;
     }

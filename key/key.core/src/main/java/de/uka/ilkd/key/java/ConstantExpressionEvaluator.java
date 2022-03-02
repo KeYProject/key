@@ -13,16 +13,18 @@
 
 package de.uka.ilkd.key.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.DefaultConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
-
 public class ConstantExpressionEvaluator {
 
-    private Services services = null;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConstantExpressionEvaluator.class);
+	private Services services = null;
 
     private ConstantEvaluator recCe = null;
 
@@ -72,16 +74,13 @@ public class ConstantExpressionEvaluator {
     }
 
 
-    private recoder.java.Expression parseExpression(Expression expr) {
-	recoder.java.Expression recExpr = null;
-	try {
-	    recExpr = JavaProgramFactory.getInstance().
-		parseExpression(expr.toString());
-	} catch (recoder.ParserException exc) {
-	    System.err.println("Failed to parse \n"+expr+
-			       "\nas Java expression!");
+	private recoder.java.Expression parseExpression(Expression expr) {
+		recoder.java.Expression recExpr = null;
+		try {
+	    recExpr = JavaProgramFactory.getInstance().parseExpression(expr.toString());
+		} catch (recoder.ParserException exc) {
+			LOGGER.error("Failed to parse {} as Java expression!", expr);
+		}
+		return recExpr;
 	}
-	return recExpr;
-    }
-
 }

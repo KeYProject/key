@@ -31,6 +31,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
+import javax.annotation.Nullable;
+
 
 public final class LocSetLDT extends LDT {
     
@@ -227,5 +229,17 @@ public final class LocSetLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
-    }    
+    }
+
+    @Nullable
+    @Override
+    public Function getFunctionFor(String operationName, Services services) {
+        switch (operationName) {
+            case "add": return getUnion();
+            case "sub": return getSetMinus();
+            case "mul": return getIntersect();
+            case "le": return getSubset();
+            default: return null;
+        }
+    }
 }

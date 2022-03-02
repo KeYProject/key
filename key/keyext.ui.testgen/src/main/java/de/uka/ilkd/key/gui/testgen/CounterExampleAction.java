@@ -18,7 +18,7 @@ import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
@@ -119,7 +119,7 @@ public class CounterExampleAction extends MainWindowAction {
             getMediator().addInterruptedListener(worker);
             worker.execute();
         } catch (Exception exc) {
-            ExceptionDialog.showDialog(mainWindow, exc);
+            IssueDialog.showExceptionDialog(mainWindow, exc);
         }
     }
 
@@ -132,7 +132,7 @@ public class CounterExampleAction extends MainWindowAction {
          * {@inheritDoc}
          */
         @Override
-        protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
@@ -202,7 +202,7 @@ public class CounterExampleAction extends MainWindowAction {
          * {@inheritDoc}
          */
         @Override
-        protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof) {
             return new SolverListener(settings, proof);
         }
     }

@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 /**
  * This class models s-expressions to be used for the SMT translation.
- *
+ * <p>
  * Every s-expression has got a {@link #name} and a (potentially empty) list of
  * {@link #children}.
- *
+ * <p>
  * They can be printed out, non-simple names are escaped for SMT.
  *
  * @author Mattias Ulbrich
@@ -63,7 +63,7 @@ public class SExpr implements Writable {
 
     /** The regular expression used to check if |...| escapes are needed. */
     private static final Pattern EXTRACHAR_PATTERN =
-            Pattern.compile("[^-A-Za-z0-9+/*=%?!.$_~&^<>@]");
+        Pattern.compile("[^-#A-Za-z0-9+/*=%?!.$_~&^<>@]");
 
     /** The string name of the atom used in this sexpr. */
     private final String name;

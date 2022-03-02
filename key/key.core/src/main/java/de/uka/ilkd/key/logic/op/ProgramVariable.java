@@ -42,6 +42,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * The objects of this class represent program variables and program 
@@ -65,6 +68,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     				                 ParsableVariable, 
     				                 ReferenceSuffix, 
     				                 ProgramInLogic {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 
     private final KeYJavaType type;
     private final boolean isStatic;
@@ -301,7 +305,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         if (src == this) {
             return matchCond;
         } else {
-            Debug.out("Program match failed. Not same program variable (pattern, source)", this, src);
+            LOGGER.debug("Program match failed. Not same program variable (pattern {}, source {})", this, src);
             return null;
         }     
     }

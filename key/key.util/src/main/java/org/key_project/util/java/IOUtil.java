@@ -408,6 +408,7 @@ public final class IOUtil {
         }
     }
 
+
     /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
      * {@link IOUtil#computeLineInformation(InputStream)}.
@@ -671,6 +672,37 @@ public final class IOUtil {
     }
 
     /**
+     * Copies the content from the {@link Reader} to the {@link Writer}.
+     *
+     * @param source The {@link InputStream} to read from.
+     * @param target The {@link OutputStream} to write to.
+     * @return {@code true} if copy was performed and {@code false} if not performed.
+     * @throws IOException Occurred Exception.
+     */
+    public static boolean copy(Reader source, StringWriter target) throws IOException {
+        try {
+            if (source != null && target != null) {
+                char[] buffer = new char[BUFFER_SIZE];
+                int read;
+                while ((read = source.read(buffer)) >= 1) {
+                    target.write(buffer, 0, read);
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (target != null) {
+                target.close();
+            }
+        }
+
+    }
+
+    /**
      * Copies the content from the {@link InputStream} to the {@link OutputStream}
      * and closes both streams.
      *
@@ -875,8 +907,9 @@ public final class IOUtil {
     private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
         String jarFile = matcher.group(1);
         String file = matcher.group(2);
-        ZipFile zipFile = new ZipFile(jarFile);
-        ZipEntry entry = zipFile.getEntry(file);
-        return zipFile.getInputStream(entry);
+        try (ZipFile zipFile = new ZipFile(jarFile)) {
+            ZipEntry entry = zipFile.getEntry(file);
+            return zipFile.getInputStream(entry);
+        }
     }
 }

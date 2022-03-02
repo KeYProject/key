@@ -39,7 +39,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 import javax.annotation.Nonnull;
-import java.io.StringReader;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -425,23 +424,14 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         ParserRuleContext ctx = stat.getContext().first;
 
-        // Convert to block with block contract, attach to AST.
         de.uka.ilkd.key.java.Position pos = new de.uka.ilkd.key.java.Position(
                 ctx.start.getLine(),
                 ctx.start.getCharPositionInLine());
-
+        final Kind kind = stat.getKind();
+        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext());
         try {
-            String comment = String.format(
-                    "/*@ normal_behavior\n"
-                    + "  @ %s %s\n"
-                    + "  @ assignable \\strictly_nothing;\n"
-                    + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
-
-            StatementBlock block = services.getProgramFactory().parseStatementBlock(
-                    new StringReader(String.format("{\n%s\n{;;}}", comment)));
-
-            updatePositionInformation(block, pos);
-            doAttach(block, astParent, childIndex);
+            updatePositionInformation(jmlAssert, pos);
+            doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
                     String.format("%s (%s)", e.getMessage(), e.getClass().getName()),

@@ -1,5 +1,5 @@
 example.name = methodCall.key
-example.path = New Book/Using KeY/Building Dynamic Logic Proofs/methodCall2
+example.path = The KeY Book/Chapter 15 - Using the KeY Prover/Building Dynamic Logic Proofs/methodCall2
 example.file = methodCall2.key
 example.additionalFile.1 = methodExample/Person.java
 example.additionalFile.2 = methodCall2.key

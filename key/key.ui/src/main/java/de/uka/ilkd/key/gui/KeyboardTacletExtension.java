@@ -23,10 +23,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -39,6 +41,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * TODO Add documentation!
+ *
  * @author Alexander Weigl
  * @version 1 (28.05.19)
  */
@@ -85,8 +89,8 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
 
 //@SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
-    private static final long serialVersionUID = 7177463219802611202L;
     private static final String PROP_MODEL = "taclets";
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyboardTacletPanel.class);
     private final Services services;
     private final JTextField txtInput = new JTextField();
     private final ActivateAction actionActivate = new ActivateAction();
@@ -167,7 +171,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         if (model != null) {
             Optional<RuleApp> app = model.getFirstMatchingTacletApp();
             app.ifPresent(this::applyRule);
-            System.out.println("applied");
+            LOGGER.debug("selected taclet applied");
         }
     }
 
@@ -297,18 +301,16 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             };
             try {
                 ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(
-                        filter, pos.getPosInOccurrence(), services
-                );
+                        filter, pos.getPosInOccurrence(), services);
                 t.forEach(taclets::add);
             } catch (NullPointerException e) {
-                //	at de.uka.ilkd.key.proof.TacletAppIndex.getIndex(TacletAppIndex.java:215)
-                e.printStackTrace();
+                LOGGER.debug("NPE", e);
             }
         } else {
             taclets = lastGoal.getAllBuiltInRuleApps();
             taclets.addAll(lastGoal.getAllTacletApps(services));
         }
-        System.out.format("Found %d taclets\n", taclets.size());
+        LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
             taclets = taclets.stream().filter(RuleApp::complete)
@@ -317,40 +319,18 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
         setModel(newModel);
-        System.out.format("Took: %d ms%n", System.currentTimeMillis() - time);
+        LOGGER.debug("Took: {} ms", System.currentTimeMillis() - time);
     }
 
     public boolean isActive() {
         return actionActivate.isSelected();
     }
 
-    /*public void processKeyPressed(KeyEvent e) {
-        if (model != null) {
-            model.processChar(e.getKeyChar());
-            if (isDirectMode()) {
-                Optional<RuleApp> app = model.getSelectedTacletsApp();
-                app.ifPresent(ruleApp -> {
-                    ruleApp.execute(lastGoal, services);
-                    System.out.println("applied");
-                });
-            }
-
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                Optional<RuleApp> app = model.getFirstMatchingTacletApp();
-                app.ifPresent(ruleApp -> ruleApp.execute(lastGoal, services));
-                System.out.println("applied");
-            }
-        }
-    }
-    */
-
     public boolean isDirectMode() {
         return actionDirectMode.isSelected();
     }
 
     private class ActivateAction extends KeyAction {
-        private static final long serialVersionUID = -4742232031922075724L;
-
         public ActivateAction() {
             setName("Active");
             setSelected(false);
@@ -363,7 +343,6 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class FilterMouseAction extends KeyAction {
-        private static final long serialVersionUID = 1164072669829431402L;
 
         public FilterMouseAction() {
             setSelected(true);
@@ -377,8 +356,6 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class DirectModeAction extends KeyAction {
-        private static final long serialVersionUID = 6088849221857521104L;
-
         public DirectModeAction() {
             setName("Apply directly on unique match.");
             setSelected(true);
@@ -391,8 +368,6 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class OnlyCompleteTacletsAction extends KeyAction {
-        private static final long serialVersionUID = -5530054898175961064L;
-
         public OnlyCompleteTacletsAction() {
             setName("Show only completed taclets");
             setSelected(false);
@@ -408,7 +383,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 /**
  *
  */
-//@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("WeakerAccess")
 class KeyboardTacletModel {
     public static final String PROP_CURRENT_PREFIX = "currentPrefix";
     public static final String PROP_CURRENT_POS = "currentPos";
@@ -444,8 +419,9 @@ class KeyboardTacletModel {
         int i = 0;
         for (; i < Math.min(a.length(), b.length()) &&
                 (a.charAt(i) == b.charAt(i) || !charValid(a.charAt(i)) || !charValid(b.charAt(i)))
-                ; i++)
+                ; i++) {
             ;//empty
+        }
         return i;
     }
 

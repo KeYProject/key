@@ -131,6 +131,8 @@ public class LDTInput implements EnvInput {
 	for (int i=0; i<keyFiles.length; i++) {
 	    keyFiles[i].readFuncAndPred();
 	}
+    // create LDT objects to have them available for parsing
+    initConfig.getServices().getTypeConverter().init();
 	for (int i=0; i<keyFiles.length; i++) {
 	    if (listener != null) {
 		listener.reportStatus("Reading " + keyFiles[i].name(),
@@ -139,8 +141,7 @@ public class LDTInput implements EnvInput {
 	    keyFiles[i].readRules();
 	}
 
-        //create LDT objects
-        initConfig.getServices().getTypeConverter().init();
+
         return DefaultImmutableSet.nil();
     }
 

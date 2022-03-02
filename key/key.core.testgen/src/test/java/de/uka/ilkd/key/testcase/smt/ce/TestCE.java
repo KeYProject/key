@@ -8,16 +8,22 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCE extends TestCommons {
     public static final File testFile = new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestCE.class);
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
 
@@ -26,19 +32,14 @@ public class TestCE extends TestCommons {
             isInstalled = getSolverType().isInstalled(true);
             installChecked = true;
             if (!isInstalled) {
-                System.out.println("Warning: " + getSolverType().getName()
-                        + " is not installed, tests skipped.");
-                System.out.println("Maybe use JVM system property \""
-                        + SYSTEM_PROPERTY_SOLVER_PATH
-                        + "\" to define the path to the Z3 command.");
+                LOGGER.warn("Warning: {} is not installed, tests skipped.", getSolverType().getName());
+                LOGGER.warn("Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                        SYSTEM_PROPERTY_SOLVER_PATH);
             }
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
-                    System.out
-                            .println("Warning: "
-                                    + "The version of the solver "
-                                    + getSolverType().getName()
-                                    + " used for the following tests may not be supported.");
+                    LOGGER.warn("Warning: The version of the solver {} " +
+                            "used for the following tests may not be supported.", getSolverType().getName());
                 }
             }
         }
@@ -47,7 +48,7 @@ public class TestCE extends TestCommons {
 
     @Override
     public SolverType getSolverType() {
-        SolverType type = SolverType.Z3_CE_SOLVER;
+        SolverType type = SolverTypes.Z3_CE_SOLVER;
         // SolverType type = SolverType.Z3_SOLVER;
         String solverPathProperty = System
                 .getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
@@ -62,7 +63,7 @@ public class TestCE extends TestCommons {
         assertTrue(this.correctResult(new File(testFile, "overflow1.key"), true));
     }
 
-    private boolean correctResult(File file, boolean b) throws IOException, ProblemLoaderException {
+    private boolean correctResult(File file, boolean b) throws ProblemLoaderException {
         return correctResult(file.getAbsolutePath(), b);
     }
 
@@ -119,10 +120,11 @@ public class TestCE extends TestCommons {
     @Test
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
+        KeYEnvironment<DefaultUserInterfaceControl> env =
+                KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
-            assertNotNull(proof);
+            Assertions.assertNotNull(proof);
             FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
             se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             TryCloseMacro close = new TryCloseMacro();
@@ -136,9 +138,7 @@ public class TestCE extends TestCommons {
                 assertTrue(correctResult(g, false));
             }
         } finally {
-            if (env != null) {
-                env.dispose();
-            }
+            env.dispose();
         }
     }
 }

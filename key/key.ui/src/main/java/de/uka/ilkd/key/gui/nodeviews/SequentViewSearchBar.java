@@ -76,7 +76,8 @@ public class SequentViewSearchBar extends SearchBar {
 
     public void setSequentView(SequentView sequentView) {
         if(this.sequentView != sequentView) {
-            sequentView.setFilter(this.sequentView.getFilter()); 
+            // search always does a repaint, therefore don't force update in setFilter
+            sequentView.setFilter(this.sequentView.getFilter(), false);
         }
         this.sequentView = sequentView;
         search();
@@ -113,21 +114,22 @@ public class SequentViewSearchBar extends SearchBar {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                    // search always does a repaint, therefore don't force update in setFilter
                     switch ((SearchMode) searchModeBox.getSelectedItem()) {
                     case HIDE:
-                        sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()));
+                        sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                         break;
                     case REGROUP:
-                        sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()));
+                        sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                         break;
                     case HIGHLIGHT:
-                        sequentView.setFilter(new IdentitySequentPrintFilter());
+                        sequentView.setFilter(new IdentitySequentPrintFilter(), false);
                         search();
                         break;
                     default:
-                        sequentView.setFilter(new IdentitySequentPrintFilter());
+                        sequentView.setFilter(new IdentitySequentPrintFilter(), true);
                         break;
                     }
                 }

@@ -31,6 +31,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * <p> An {@link OriginTermLabel} saves a term's origin in the JML specification
@@ -50,6 +53,7 @@ import de.uka.ilkd.key.util.Debug;
  * @author lanzinger
  */
 public class OriginTermLabel implements TermLabel {
+    public static final Logger LOGGER = LoggerFactory.getLogger(OriginTermLabel.class);
 
     /**
      * Display name for {@link OriginTermLabel}s.
@@ -329,7 +333,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         if (commonFileName == null) {
-            Debug.out("commonFileName is null!");
+            LOGGER.debug("commonFileName is null!");
             return new Origin(SpecType.NONE);
         }
 
@@ -714,7 +718,8 @@ public class OriginTermLabel implements TermLabel {
             assert line >= 0;
 
             // wrap fileName into URI
-            if (fileName.equals("no file")) {
+            // bugfix #1622: do not interpret "<unknown>" as file name
+            if (fileName.equals("no file") || fileName.equals("<unknown>")) {
                 this.fileName = null;
             } else {
                 this.fileName = new File(fileName).toURI();

@@ -130,6 +130,7 @@ testFile[ProofCollectionSettings settings]  returns [TestFile file]
         'provable' {testProperty=TestProperty.PROVABLE;}
         | 'notprovable' {testProperty=TestProperty.NOTPROVABLE;}
         | 'loadable' {testProperty=TestProperty.LOADABLE;}
+        | 'notloadable' {testProperty=TestProperty.NOTLOADABLE;}
     )
     { assert testProperty != null: "Parser should have assigned a value other that null to variable testProperty at this point."; }
     ':'? // double colon is optional (doesn't hurt if omitted)

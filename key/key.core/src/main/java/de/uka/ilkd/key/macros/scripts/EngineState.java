@@ -56,6 +56,7 @@ public class EngineState {
     public EngineState(Proof proof) {
         this.proof = proof;
         valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
+        valueInjector.addConverter(Sequent.class, this::toSequent);
         valueInjector.addConverter(Sort.class, this::toSort);
     }
 

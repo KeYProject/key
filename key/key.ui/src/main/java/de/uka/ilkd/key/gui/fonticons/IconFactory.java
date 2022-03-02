@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -133,30 +135,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
     public static final IconProvider EXPORT_MU_SCRIPT_CLIPBOARD =
             new IconFontProvider(FontAwesomeRegular.COPY);
-    public static final IconProvider INTERLOG_LOAD =
-            new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
-    public static final IconProvider INTERLOG_SAVE =
-            new IconFontProvider(FontAwesomeRegular.SAVE);
-    public static final IconProvider INTERLOG_ADD_USER_NOTE =
-            new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
-    public static final IconProvider INTERLOG_TOGGLE_FAV =
-            new IconFontProvider(FontAwesomeSolid.HEART);
     public static final IconProvider JUMP_INTO_TREE =
             new IconFontProvider(FontAwesomeSolid.MAP_MARKED);
-    public static final IconProvider INTERLOG_TRY_APPLY =
-            new IconFontProvider(FontAwesomeSolid.REDO);
-    public static final IconProvider INTERLOG_EXPORT_KPS =
-            new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
-    public static final IconProvider INTERLOG_EXPORT_MARKDOWN =
-            new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
-    public static final IconProvider INTERLOW_EXTENDED_ACTIONS =
-            new IconFontProvider(FontAwesomeSolid.WRENCH);
-    public static final IconProvider INTERLOG_RESUME =
-            new IconFontProvider(FontAwesomeSolid.PAUSE_CIRCLE);
-    public static final IconProvider INTERLOG_PAUSE =
-            new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE);
-    public static final IconProvider INTERLOG_ICON =
-            new IconFontProvider(FontAwesomeSolid.BOOK);
 
     public static final IconProvider HEATMAP_DEACTIVATE =
             new IconFontProvider(FontAwesomeSolid.SHOE_PRINTS);
@@ -186,6 +166,8 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_LABELS =
             new IconFontProvider(FontAwesomeSolid.ROUTE);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
+
     private static Image keyHole = getImage("images/ekey-mono.gif");
     private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
     private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
@@ -193,7 +175,8 @@ public final class IconFactory {
     private static Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
+    // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
     private static Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
     private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
@@ -231,16 +214,16 @@ public final class IconFactory {
     private static ImageIcon createImageIcon(Class<?> cl, String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = cl.getResource(filename);
-        Debug.out("Load Resource:" + filename + " of class " + cl);
+        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (iconURL == null && cl.getSuperclass() != null) {
             return createImageIcon(cl.getSuperclass(),
                     filename);
         } else if (iconURL == null && cl.getSuperclass() == null) {
             // error message Resource not found
-            System.out.println("No image resource " + filename + " found");
+            LOGGER.warn("No image resource " + filename + " found");
             return null;
         } else {
-            Debug.out("Done.");
+            LOGGER.trace("Done.");
             return new ImageIcon(iconURL);
         }
     }

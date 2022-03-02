@@ -33,6 +33,9 @@ import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /** 
  * A no position taclet application has no position information yet. This can
@@ -49,6 +52,7 @@ import de.uka.ilkd.key.util.Debug;
  * 
  */
 public class NoPosTacletApp extends TacletApp {
+	public static final Logger LOGGER = LoggerFactory.getLogger(NoPosTacletApp.class);
 
     /** creates a NoPosTacletApp for the given taclet and no instantiation
      * information and CHECKS variable conditions as well as it resolves
@@ -404,7 +408,7 @@ public class NoPosTacletApp extends TacletApp {
 
 	if ( updateContextFixed &&
 	     !updateContextCompatible ( res ) ) {
-           /* Debug.out("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext (),
+           /* LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext (),
                       res.matchConditions().getInstantiations().getUpdateContext());*/
             return null;
         }
@@ -430,7 +434,7 @@ public class NoPosTacletApp extends TacletApp {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
 								mc );
 	    if (mc == null) {
-                Debug.out("NoPosTacletApp: Update prefix check failed.");
+                LOGGER.debug("NoPosTacletApp: Update prefix check failed.");
             }
         }
         

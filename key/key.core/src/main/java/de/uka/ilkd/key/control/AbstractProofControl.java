@@ -31,13 +31,17 @@ import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a basic implementation of {@link ProofControl}.
  * @author Martin Hentschel
  */
 public abstract class AbstractProofControl implements ProofControl {
-   /**
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProofControl.class);
+
+    /**
     * Optionally, the {@link RuleCompletionHandler} to use.
     */
    private final RuleCompletionHandler ruleCompletionHandler;
@@ -50,7 +54,7 @@ public abstract class AbstractProofControl implements ProofControl {
    /**
     * Contains all available {@link AutoModeListener}.
     */
-   private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
+   private final List<AutoModeListener> autoModeListener = new LinkedList<>();
 
    private boolean minimizeInteraction; // minimize user interaction
 
@@ -98,7 +102,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
    @Override
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
-        ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
+        ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
@@ -121,14 +125,14 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
-            Debug.out("NoPosTacletApp: Looking for applicables rule at node",
+            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                     focusedGoal.node().serialNr());
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getFindTaclet(TacletFilter.TRUE,
                             pos,
                             focusedGoal.proof().getServices()), pos);
         }
-        return ImmutableSLList.<TacletApp>nil();
+        return ImmutableSLList.nil();
     }
 
     @Override
@@ -140,7 +144,7 @@ public abstract class AbstractProofControl implements ProofControl {
                             focusedGoal.proof().getServices()), pos);
         }
 
-        return ImmutableSLList.<TacletApp>nil();
+        return ImmutableSLList.nil();
     }
 
     /**
@@ -148,8 +152,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * the contained TacletApps
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence pos) {
-        java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<>();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp app : tacletInstances) {
             if (isMinimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates
@@ -215,7 +219,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
             }
        if (ifSeqInteraction || !firstApp.complete()) {
-         LinkedList<TacletApp> l = new LinkedList<TacletApp>();
+         LinkedList<TacletApp> l = new LinkedList<>();
          l.add(firstApp);
             TacletInstantiationModel[] models = completeAndApplyApp(l, goal);
          completeAndApplyTacletMatch(models, goal);
@@ -223,7 +227,7 @@ public abstract class AbstractProofControl implements ProofControl {
           applyInteractive(firstApp, goal);
        }
    } else if (applics.size() > 1) {
-            java.util.List<TacletApp> appList = new java.util.LinkedList<TacletApp>();
+            java.util.List<TacletApp> appList = new java.util.LinkedList<>();
 
        for (int i = 0; i < applics.size(); i++) {
            TacletApp rapp = it.next();
@@ -248,8 +252,9 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+        var node = goal.node();
         goal.apply(app);
-        emitInteractiveRuleApplication(goal, app);
+        emitInteractiveRuleApplication(node, app);
     }
 
 
@@ -280,10 +285,8 @@ public abstract class AbstractProofControl implements ProofControl {
         interactionListeners.forEach((l) -> l.runPrune(node));
     }
 
-    protected void emitInteractiveRuleApplication(Goal goal, RuleApp app) {
-        interactionListeners.forEach((l) -> {
-            l.runRule(goal, app);
-        });
+    protected void emitInteractiveRuleApplication(Node node, RuleApp app) {
+        interactionListeners.forEach((l) -> l.runRule(node, app));
     }
 
     /**
@@ -318,8 +321,8 @@ public abstract class AbstractProofControl implements ProofControl {
             PosInOccurrence pos,
             TacletFilter filter) {
         Services services = goal.proof().getServices();
-        ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
-        ImmutableList<TacletApp> fittingApps = ImmutableSLList.<TacletApp>nil();
+        ImmutableSet<TacletApp> result = DefaultImmutableSet.nil();
+        ImmutableList<TacletApp> fittingApps = ImmutableSLList.nil();
         final RuleAppIndex index = goal.ruleAppIndex();
 
         if (pos == null) {
@@ -339,13 +342,12 @@ public abstract class AbstractProofControl implements ProofControl {
                 result = result.add(app);
             }
         }
-//if (result.size()==0) System.err.println("Available was "+fittingApps);
         return result;
     }
 
     public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal) {
         TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
-        LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<TacletInstantiationModel>();
+        LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<>();
 
         int appCounter = 0;
         for (final TacletApp tA : apps) {
@@ -396,17 +398,14 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced, boolean interactive) {
       assert goal != null;
 
       ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
       if (set.size() > 1) {
-         System.err.println("keymediator:: Expected a single app. If " +
-               "it is OK that there are more than one " +
-               "built-in rule apps. You have to add a " +
-               "selection dialog here");
-         System.err.println("keymediator:: Ambigous applications, " +
-               "taking the first in list.");
+         LOGGER.warn("Expected a single app. If it is OK that there are more than one built-in rule apps. " +
+                 "You have to add a selection dialog here");
+         LOGGER.warn("Ambiguous applications, taking the first in list.");
       }
 
       IBuiltInRuleApp app = set.iterator().next();
@@ -416,7 +415,12 @@ public abstract class AbstractProofControl implements ProofControl {
       }
 
       if (app != null && app.rule() == rule) {
-         goal.apply(app);
+         if (interactive) {
+             applyInteractive(app, goal);
+         } else {
+             goal.apply(app);
+         }
+
          return;
       }
     }
@@ -432,7 +436,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(Goal focusedGoal, BuiltInRule rule,
             PosInOccurrence pos) {
 
-        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
 
         for (final IBuiltInRuleApp app : focusedGoal.ruleAppIndex().
                 getBuiltInRules(focusedGoal, pos)) {
@@ -455,8 +459,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a SetOf<RuleApp> with all possible applications of the rule
      */
     protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence pos) {
-        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
-        ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
+        ImmutableList<BuiltInRule> match = ImmutableSLList.nil();
 
         //get all possible rules for current position in sequent
         ImmutableList<BuiltInRule> list = getBuiltInRule(focusedGoal, pos);

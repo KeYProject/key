@@ -13,24 +13,19 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import com.sun.java.accessibility.util.Translator;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -39,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestJMLTranslator {
@@ -54,7 +49,7 @@ public class TestJMLTranslator {
     private JmlIO jmlIO;
 
 
-    @Before
+    @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo = new HelperClassForTests().parse(
@@ -141,8 +136,8 @@ public class TestJMLTranslator {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != instance");
         assertNotNull(result);
-        assertEquals(result.op(), Junctor.IMP);
-        assertEquals(result.sub(0).op(), Junctor.AND);
+        assertEquals(Junctor.IMP, result.op());
+        assertEquals(Junctor.AND, result.sub(0).op());
         assertTrue(termContains(result, TB.zTerm("5")));
         assertTrue(termContains(result, selfVar));
     }
@@ -167,10 +162,8 @@ public class TestJMLTranslator {
     @Test
     public void testPrimitiveField() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
         Term result = jmlIO.parseExpression("this.i");
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
         assertTrue(termContains(result, selfVar));
     }
 
@@ -193,7 +186,7 @@ public class TestJMLTranslator {
         Term result = jmlIO.parseExpression("(\\forall int i; (0 <= i && i <= 2147483647) )");
 
         assertNotNull(result);
-        assertEquals(result.op(), Quantifier.ALL);
+        assertEquals(Quantifier.ALL, result.op());
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
@@ -207,8 +200,7 @@ public class TestJMLTranslator {
                                         TB.var(i)),
                                         TB.leq(TB.var(i),
                                                 TB.zTerm("2147483647")))));
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
 
@@ -216,7 +208,7 @@ public class TestJMLTranslator {
     public void testForEx() {
         Term result = jmlIO.parseExpression("(\\exists int i; (0 <= i && i <= 2147483647) )");
         assertNotNull(result);
-        assertEquals(result.op(), Quantifier.EX);
+        assertEquals(Quantifier.EX, result.op());
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
@@ -230,8 +222,7 @@ public class TestJMLTranslator {
                                         TB.var(i)),
                                         TB.leq(TB.var(i),
                                                 TB.zTerm("2147483647")))));
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
 
@@ -250,9 +241,8 @@ public class TestJMLTranslator {
                                 TB.zTerm("2147483647"),
                                 TB.var(i)));
         assertNotNull(result);
-        assertSame(q, result.sub(0).op());
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        Assertions.assertSame(q, result.sub(0).op());
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
 
@@ -270,9 +260,8 @@ public class TestJMLTranslator {
                         TB.zTerm("2147483647"),
                         TB.var(i));
         assertNotNull(result);
-        assertSame(q, result.op());
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        Assertions.assertSame(q, result.op());
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
     @Test
@@ -283,11 +272,10 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
                 new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        assertSame(unionOp, result.op());
+        Assertions.assertSame(unionOp, result.op());
         Term guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))), TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
     @Test
@@ -299,11 +287,10 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
                 new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        assertSame(unionOp, result.op());
+        Assertions.assertSame(unionOp, result.op());
         Term guard = TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                result.equalsModRenaming(expected));
+        assertTrue(result.equalsModRenaming(expected), "Result was: " + result + "; \nExpected was: " + expected);
     }
 
 
@@ -311,15 +298,14 @@ public class TestJMLTranslator {
     public void testComplexExists() {
         Term result = jmlIO.parseExpression("(\\exists TestClass t; t != null; t.i == 0)");
         assertNotNull(result);
-        assertEquals(result.op(), Quantifier.EX);
-        assertEquals(result.sub(0).op(), Junctor.AND);
+        assertEquals(Quantifier.EX, result.op());
+        assertEquals(Junctor.AND, result.sub(0).op());
         assertTrue(termContains(result, TB.NULL()));
     }
 
     @Test
     public void testOld() {
         ProgramVariable excVar = buildExcVar();
-        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         Term result = jmlIO
                 .exceptionVariable(excVar)
@@ -327,10 +313,9 @@ public class TestJMLTranslator {
                 .parseExpression("this.i == \\old(this.i)");
 
         assertNotNull(result);
-        assertEquals(result.op(), Equality.EQUALS);
-        assertTrue(
-                termContains(result,
-                        services.getTypeConverter().getHeapLDT().getHeap()));
+        assertEquals(Equality.EQUALS, result.op());
+        assertTrue(termContains(result,
+                services.getTypeConverter().getHeapLDT().getHeap()));
         assertTrue(termContains(result, atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
     }
 
@@ -352,7 +337,7 @@ public class TestJMLTranslator {
                 .parseExpression("\\result == 1");
 
         assertNotNull(result);
-        assertEquals(result.op(), Equality.EQUALS);
+        assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, resultVar));
 
     }
@@ -361,16 +346,12 @@ public class TestJMLTranslator {
     @Test
     public void testNonNullElements() {
 
-        ProgramVariable array = javaInfo.getAttribute(
-                "testPackage.TestClass::array");
-
         Term result = jmlIO
                 .atPres(atPres)
                 .parseExpression(
                         "\\nonnullelements(this.array)");
 
         assertNotNull(result);
-        //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
         assertTrue(termContains(result, TB.NULL()));
     }
 
@@ -379,7 +360,7 @@ public class TestJMLTranslator {
     public void testIsInitialized() {
         Term result = jmlIO.atPres(atPres).parseExpression("\\is_initialized(testPackage.TestClass)");
         assertNotNull(result);
-        assertEquals(result.op(), Equality.EQUALS);
+        assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, TB.var(
                 javaInfo.getAttribute(
                         ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
@@ -390,7 +371,7 @@ public class TestJMLTranslator {
     public void testHexLiteral() {
         Term result = jmlIO.parseExpression(" i == 0x12 ");
         assertNotNull(result);
-        assertEquals(result.op(), Equality.EQUALS);
+        assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, TB.zTerm("18")));
     }
 
@@ -507,9 +488,8 @@ public class TestJMLTranslator {
                         TB.equals(TB.var(qv), TB.var(selfVar))));
 
         final boolean condition = result.equalsModRenaming(expected);
-        assertTrue(format("Expected:%s\n Was:%s",
-                ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)),
-                condition);
+        assertTrue(condition, format("Expected:%s\n Was:%s",
+                ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
     }
 
 }

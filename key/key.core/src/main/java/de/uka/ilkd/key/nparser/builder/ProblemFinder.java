@@ -38,14 +38,14 @@ public class ProblemFinder extends ExpressionBuilder {
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
-                chooseContract = ParsingFacade.getValue(ctx.chooseContract);
+                chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
                 //.replace("\\\\:", ":");
             else
                 chooseContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
-                proofObligation = ParsingFacade.getValue(ctx.proofObligation);
+                proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
                 //.replace("\\\\:", ":");
             else
                 proofObligation = "";

@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.lookup.Lookup;
 
 
 /**
@@ -153,6 +155,9 @@ public class Proof implements Named {
      */
     private File proofFile;
 
+    @Nullable
+    private Lookup userData;
+
     /**
      * constructs a new empty proof with name
      */
@@ -214,7 +219,6 @@ public class Proof implements Named {
 
     private Proof(String name, Sequent problem, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
-
         this ( new Name ( name ), initConfig );
 
         if (!ProofIndependentSettings.DEFAULT_INSTANCE
@@ -222,26 +226,26 @@ public class Proof implements Named {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 
-        Node rootNode = new Node(this, problem);
-
-        NodeInfo info = rootNode.getNodeInfo();
+        register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
+        var rootNode = new Node(this, problem);
+        var sources = lookup(ProofJavaSourceCollection.class);
 
         rootNode.sequent().forEach(formula -> {
             OriginTermLabel originLabel = (OriginTermLabel)
                     formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
-                    info.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                    sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
                 }
 
                 originLabel.getSubtermOrigins().stream()
                     .filter(o -> o instanceof FileOrigin)
                     .map(o -> (FileOrigin) o)
-                    .forEach(o -> info.addRelevantFile(o.fileName));
+                    .forEach(o -> sources.addRelevantFile(o.fileName));
             }
         });
 
-        Goal firstGoal = new Goal(rootNode,
+        var firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                         new BuiltInRuleAppIndex(builtInRules), getServices())
                 );
@@ -460,11 +464,32 @@ public class Proof implements Named {
     }
 
     /**
-     * returns the list of open goals
+     * Returns the list of open goals.
      * @return list with the open goals
      */
     public ImmutableList<Goal> openGoals() {
         return openGoals;
+    }
+
+    /**
+     * Returns the list of closed goals, needed to make pruning in closed branches
+     * possible. If the list needs too much memory, pruning can be disabled via the
+     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * @return list with the closed goals
+     */
+    public ImmutableList<Goal> closedGoals() {
+        return closedGoals;
+    }
+    
+    /**
+     * Returns the list of all, open and closed, goals.
+     * @return list with all goals.
+     * 
+     * @see #openGoals()
+     * @see #closedGoals()
+     */
+    public ImmutableList<Goal> allGoals() {
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
     }
 
     /**
@@ -1315,5 +1340,57 @@ public class Proof implements Named {
                 getServices().getProfile().getStrategyFactory(activeStrategyName) :
                     getServices().getProfile().getDefaultStrategyFactory();
 
+    }
+
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @Nonnull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 }

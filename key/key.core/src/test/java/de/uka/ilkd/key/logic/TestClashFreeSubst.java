@@ -21,17 +21,15 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.IOException;
 import java.util.Stack;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestClashFreeSubst extends AbstractTestTermParser {
 
@@ -50,15 +48,15 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     ProgramVariable pv0;
 
-    @Before
+    @BeforeEach
 	public void setUp() throws IOException {
 		services = new Services(AbstractProfile.getDefaultProfile());
 		nss = services.getNamespaces();
 		tf = services.getTermFactory();
 		io = new KeyIO(services, nss);
-		String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+		String sorts = "\\sorts{boolean;int;LocSet;Seq;double;float;}";
 		parseDecls(sorts);
-		Assert.assertNotNull(nss.sorts().lookup("boolean"));
+		assertNotNull(nss.sorts().lookup("boolean"));
 
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		r2k.parseSpecialClasses();
@@ -123,7 +121,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
     }
 
     private class ToMultiVisitor extends DefaultVisitor {
-	private Stack<Term> subStack;
+	private final Stack<Term> subStack;
 
 	ToMultiVisitor() {
 	    subStack = new Stack<>();
@@ -170,9 +168,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,x)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitution",
-		     parseTerm("g(f(x),x)"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("g(f(x),x)"), cfs.apply(t), "substitution");
     }
 
 	@Test
@@ -180,9 +176,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitution",
-		     parseTerm("q(f(x),x)"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("q(f(x),x)"), cfs.apply(t), "substitution");
     }
 
 	@Test
@@ -190,8 +184,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,f(x))");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
-	assertSame("share unchanged subterms",
-		   t.sub(1), cfs.apply(t).sub(1));
+	assertSame(t.sub(1), cfs.apply(t).sub(1), "share unchanged subterms");
     }
 
 	@Test
@@ -199,8 +192,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,f(x))");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
-	assertSame("share unchanged subterms",
-		   t.sub(1), cfs.apply(t).sub(1));
+	assertSame(t.sub(1), cfs.apply(t).sub(1), "share unchanged subterms");
     }
 
     /*
@@ -232,9 +224,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
 	ns.add(x1);
 	nss.setVariables(ns);
-	assertEquals("clash resolution",
-		     parseTerm("\\exists x1; q(x1,f(x))"),
-		     res);
+	assertEquals(parseTerm("\\exists x1; q(x1,f(x))"), res, "clash resolution");
 	nss.setVariables(nss.variables().parent());
     }
 
@@ -243,9 +233,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitute into substitution term",
-		     parseTerm("{\\subst y; f(f(x))}g(y,f(x))"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("{\\subst y; f(f(x))}g(y,f(x))"), cfs.apply(t), "substitute into substitution term");
     }
 
 	@Test
@@ -259,9 +247,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
-	assertEquals("clash resolution in substitution term",
-		     parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"),
-		     res);
+	assertEquals(parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"), res, "clash resolution in substitution term");
 	nss.setVariables(nss.variables().parent());
     }
 
@@ -271,9 +257,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitution on multi",
-		     toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")),
-		     cfs.apply(t));
+	assertEquals(toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")), cfs.apply(t), "substitution on multi");
     }
 
 	private Term parseFma(String s) throws Exception { return parseTerm(s); }
@@ -283,13 +267,13 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
-	assertSame("sharing on multi",
-		   cfs.apply(t), t);
+	assertSame(cfs.apply(t), t, "sharing on multi");
     }
 
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by TermFactory. /AR 040420
-    public void xtestMultiClash() throws Exception {
+    @Test@Disabled
+	public void xtestMultiClash() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -299,16 +283,14 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
-	assertEquals("clash resolution in multi term",
-		     toMulti(parseTerm(
-			       "\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")),
-		     res);
+	assertEquals(toMulti(parseTerm(
+		  "\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")), res, "clash resolution in multi term");
 	nss.setVariables(nss.variables().parent());
     }
 
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by TermFactory. /AR 040420
-    public void xtestMultiClash1() throws Exception {
+    @Test@Disabled public void xtestMultiClash1() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -318,10 +300,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
-	assertEquals("clash resolution in multi term",
-		     toMulti(parseTerm(
-			       "q(g(x1,y),g(f(x),z))")),
-		     res.sub(0));
+	assertEquals(toMulti(parseTerm(
+		  "q(g(x1,y),g(f(x),z))")), res.sub(0), "clash resolution in multi term");
 	nss.setVariables(nss.variables().parent());
     }
 
@@ -331,9 +311,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitution",
-		     parseTerm("q(f(pv0),x)"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("q(f(pv0),x)"), cfs.apply(t), "substitution");
     }
 
 	@Test
@@ -341,9 +319,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
-	assertEquals("substitution",
-		     parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"), cfs.apply(t), "substitution");
     }
 
 	@Test
@@ -357,11 +333,9 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
-	assertEquals("substitution",
-		     parseTerm("{\\subst " + x1.name () +
-			       "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," +
-			       x1.name () + ") )"),
-		     cfs.apply(t));
+	assertEquals(parseTerm("{\\subst " + x1.name () +
+		  "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," +
+		  x1.name () + ") )"), cfs.apply(t), "substitution");
 	nss.setVariables(nss.variables().parent());
     }
 }

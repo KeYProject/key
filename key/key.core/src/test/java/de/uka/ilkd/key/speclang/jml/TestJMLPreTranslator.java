@@ -13,28 +13,23 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.njml.JmlFacade;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
-import junit.framework.TestCase;
 import org.antlr.v4.runtime.Token;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.List;
 
 import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertSame;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestJMLPreTranslator {
@@ -60,11 +55,7 @@ public class TestJMLPreTranslator {
     @Test
     public void testEnabledKeysLexer() {
         String contract = "/*-key@ invariant x == 54; */";
-        JmlLexer lex = JmlFacade.createLexer(contract);
-        List<? extends Token> toks = lex.getAllTokens();
-        for (Token tok : toks) {
-            System.out.println(tok);
-        }
+        lex(contract, COMMENT);
     }
 
     @Test
@@ -147,11 +138,10 @@ public class TestJMLPreTranslator {
             t = lexer.nextToken();
             System.out.printf("%s\n", t);
             if (idx < expected.length) {
-                assertEquals(
-                        String.format("Token wanted '%s', but got '%s'. ",
-                                lexer.getVocabulary().getDisplayName(expected[idx]),
-                                lexer.getVocabulary().getDisplayName(t.getType())),
-                        expected[idx++], t.getType());
+                Assertions.assertEquals(expected[idx], t.getType(), String.format("Token wanted '%s', but got '%s'. ",
+                        lexer.getVocabulary().getDisplayName(expected[idx]),
+                        lexer.getVocabulary().getDisplayName(t.getType())));
+                idx++;
             }
         } while (t.getType() != -1);
     }
@@ -164,18 +154,18 @@ public class TestJMLPreTranslator {
                         + "     requires true;\n"
                         + "  */");
 
-        assertNotNull(constructs);
-        assertEquals(1, constructs.size());
+        Assertions.assertNotNull(constructs);
+        Assertions.assertEquals(1, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
 
-        TestCase.assertSame(specCase.getBehavior(), Behavior.NORMAL_BEHAVIOR);
-        assertEquals(1, specCase.getRequires().size());
-        assertEquals(0, specCase.getAssignable().size());
-        assertEquals(0, specCase.getEnsures().size());
-        assertEquals(0, specCase.getSignals().size());
-        assertEquals(0, specCase.getSignalsOnly().size());
-        assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
+        Assertions.assertSame(Behavior.NORMAL_BEHAVIOR, specCase.getBehavior());
+        Assertions.assertEquals(1, specCase.getRequires().size());
+        Assertions.assertEquals(0, specCase.getAssignable().size());
+        Assertions.assertEquals(0, specCase.getEnsures().size());
+        Assertions.assertEquals(0, specCase.getSignals().size());
+        Assertions.assertEquals(0, specCase.getSignalsOnly().size());
+        Assertions.assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
     }
 
 
@@ -191,25 +181,25 @@ public class TestJMLPreTranslator {
                 + "  @  assignable \\nothing;\n"
                 + "  @*/");
 
-        assertNotNull(constructs);
-        assertEquals(1, constructs.size());
+        Assertions.assertNotNull(constructs);
+        Assertions.assertEquals(1, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
 
-        assertSame(specCase.getBehavior(), Behavior.BEHAVIOR);
-        assertEquals(2, specCase.getRequires().size());
-        assertEquals(1, specCase.getAssignable().size());
-        assertEquals(1, specCase.getEnsures().size());
-        assertEquals(1, specCase.getSignals().size());
-        assertEquals(1, specCase.getSignalsOnly().size());
+        Assertions.assertSame(Behavior.BEHAVIOR, specCase.getBehavior());
+        Assertions.assertEquals(2, specCase.getRequires().size());
+        Assertions.assertEquals(1, specCase.getAssignable().size());
+        Assertions.assertEquals(1, specCase.getEnsures().size());
+        Assertions.assertEquals(1, specCase.getSignals().size());
+        Assertions.assertEquals(1, specCase.getSignalsOnly().size());
 
         System.out.println(specCase);
 
-        assertEquals("ensuresfalse;", specCase.getEnsures().head().first.getText().trim());
-        assertEquals("assignable\\nothing;", specCase.getAssignable().head().first.getText().trim());
-        assertEquals("signals(Exception)e;", specCase.getSignals().head().first.getText().trim());
-        assertEquals("signals_onlyonlythis;", specCase.getSignalsOnly().head().first.getText().trim());
-        assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
+        Assertions.assertEquals("ensuresfalse;", specCase.getEnsures().head().first.getText().trim());
+        Assertions.assertEquals("assignable\\nothing;", specCase.getAssignable().head().first.getText().trim());
+        Assertions.assertEquals("signals(Exception)e;", specCase.getSignals().head().first.getText().trim());
+        Assertions.assertEquals("signals_onlyonlythis;", specCase.getSignalsOnly().head().first.getText().trim());
+        Assertions.assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
     }
 
 
@@ -224,26 +214,26 @@ public class TestJMLPreTranslator {
                 + "//@  requires o == null;\n"
                 + "//@  signals (Exception) e;\n");
 
-        assertNotNull(constructs);
-        assertEquals(2, constructs.size());
+        Assertions.assertNotNull(constructs);
+        Assertions.assertEquals(2, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         assertTrue(constructs.tail().head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase1 = (TextualJMLSpecCase) constructs.head();
         TextualJMLSpecCase specCase2 = (TextualJMLSpecCase) constructs.tail().head();
 
-        assertSame(specCase1.getBehavior(), Behavior.NORMAL_BEHAVIOR);
-        assertEquals(0, specCase1.getRequires().size());
-        assertEquals(1, specCase1.getAssignable().size());
-        assertEquals(1, specCase1.getEnsures().size());
-        assertEquals(0, specCase1.getSignals().size());
-        assertEquals(0, specCase1.getSignalsOnly().size());
+        Assertions.assertSame(Behavior.NORMAL_BEHAVIOR, specCase1.getBehavior());
+        Assertions.assertEquals(0, specCase1.getRequires().size());
+        Assertions.assertEquals(1, specCase1.getAssignable().size());
+        Assertions.assertEquals(1, specCase1.getEnsures().size());
+        Assertions.assertEquals(0, specCase1.getSignals().size());
+        Assertions.assertEquals(0, specCase1.getSignalsOnly().size());
 
-        assertSame(specCase2.getBehavior(), Behavior.EXCEPTIONAL_BEHAVIOR);
-        assertEquals(1, specCase2.getRequires().size());
-        assertEquals(0, specCase2.getAssignable().size());
-        assertEquals(0, specCase2.getEnsures().size());
-        assertEquals(1, specCase2.getSignals().size());
-        assertEquals(0, specCase2.getSignalsOnly().size());
+        Assertions.assertSame(Behavior.EXCEPTIONAL_BEHAVIOR, specCase2.getBehavior());
+        Assertions.assertEquals(1, specCase2.getRequires().size());
+        Assertions.assertEquals(0, specCase2.getAssignable().size());
+        Assertions.assertEquals(0, specCase2.getEnsures().size());
+        Assertions.assertEquals(1, specCase2.getSignals().size());
+        Assertions.assertEquals(0, specCase2.getSignalsOnly().size());
     }
 
     @Test
@@ -257,29 +247,31 @@ public class TestJMLPreTranslator {
                         "  @*/");
     }
 
-    @Test(expected = Exception.class)
-    @Ignore
+    @Test
+    @Disabled
     public void disabled_testMLCommentEndInSLComment1() {
-        parseMethodSpec("//@ requires @*/ true;");
-        fail("Characters '@*/' should not be parsed");
+        assertThrows(Exception.class, () ->
+                        parseMethodSpec("//@ requires @*/ true;"),
+                "Characters '@*/' should not be parsed");
     }
 
-    @Test(expected = Exception.class)
-    @Ignore
+    @Test
+    @Disabled
     public void disabled_testMLCommentEndInSLComment2() {
         parseMethodSpec("//@ requires */ true;");
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testFailure() {
-        parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;  @*/");
-        fail();
+        assertThrows(Exception.class, () ->
+                parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;  @*/"));
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testFailure2() {
-        parseMethodSpec("/*@ behaviour\n"
-                + "  @  requires (;((;;);();();(();;;(;)));\n"
-                + "  @*/");
+        assertThrows(Exception.class, () ->
+                parseMethodSpec("/*@ behaviour\n"
+                        + "  @  requires (;((;;);();();(();;;(;)));\n"
+                        + "  @*/"));
     }
 }

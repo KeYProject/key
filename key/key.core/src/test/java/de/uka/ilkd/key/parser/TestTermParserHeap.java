@@ -2,16 +2,15 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import javax.annotation.Nonnull;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Parser tests for heap terms.
@@ -19,9 +18,10 @@ import static org.junit.Assert.fail;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParserHeap.class);
     private Term h, a, f, next;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         parseDecls("\\programVariables {Heap h, h2;}");
         parseDecls("\\programVariables {int i;}");
@@ -29,11 +29,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
         parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
 
-        Assert.assertNotNull(nss.programVariables().lookup("a"));
-        Assert.assertNotNull(nss.programVariables().lookup("a1"));
-        Assert.assertNotNull(nss.programVariables().lookup("array"));
-        Assert.assertNotNull(nss.programVariables().lookup("h"));
-        Assert.assertNotNull(nss.programVariables().lookup("h2"));
+        assertNotNull(nss.programVariables().lookup("a"));
+        assertNotNull(nss.programVariables().lookup("a1"));
+        assertNotNull(nss.programVariables().lookup("array"));
+        assertNotNull(nss.programVariables().lookup("h"));
+        assertNotNull(nss.programVariables().lookup("h2"));
 
         this.h = parseTerm("h");
         this.a = parseTerm("a");
@@ -112,7 +112,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      */
     @Test
     public void testAtOperator_1() throws Exception {
-        Term expectedParseResult;
         String prettySyntax, verboseSyntax;
 
         prettySyntax = "a.f@h";
@@ -200,7 +199,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
             @Nonnull Term t = io.parseExpression("(a.f + a.f)@h2");
-            System.out.println(t);
+            LOGGER.info("Out: {}", t);
             fail();
         } catch (Exception e) {
             //assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));

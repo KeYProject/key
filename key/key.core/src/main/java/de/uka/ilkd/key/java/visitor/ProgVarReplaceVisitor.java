@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.util.ExtList;
@@ -36,7 +37,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor.DefaultAction;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -657,5 +657,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 newFreeInvariants, newMods, newInfFlowSpecs, newVariant,
                 newSelfTerm, newLocalIns, newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
+    }
+
+    @Override
+    public void performActionOnJmlAssertCondition(final Term x) {
+        if (x == null) {
+            throw new IllegalStateException("JML assert is incomplete");
+        }
+        Term newCond = replaceVariablesInTerm(x);
+        stack.peek().add(newCond);
+        if (!Objects.equals(newCond, x)) {
+            changed();
+        }
     }
 }

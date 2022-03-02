@@ -1,18 +1,21 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.proof.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class ScriptNode {
-    
-    private Map<String, String> command;
-    private int fromPos;
-    private int toPos;
-    private ScriptNode parent;
-    private List<ScriptNode> children = new LinkedList<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptNode.class);
+
+    private final Map<String, String> command;
+    private final int fromPos;
+    private final int toPos;
+    private final ScriptNode parent;
+    private final List<ScriptNode> children = new LinkedList<>();
     private Node proofNode;
     private Throwable encounteredException;
 
@@ -28,11 +31,10 @@ public class ScriptNode {
     }
     
     public void dump(int indent) {
-        for (int i = 0; i < indent; i++) {
-            System.out.print(" ");
-        }
-        System.out.print(proofNode == null ? "xxx" : proofNode.serialNr() );
-        System.out.println(" " + command);
+        LOGGER.debug("{} {} {}",
+                " ".repeat(indent),
+                proofNode == null ? "xxx" : proofNode.serialNr(),
+                command);
         for (ScriptNode child : children) {
             child.dump(indent + 1);
         }

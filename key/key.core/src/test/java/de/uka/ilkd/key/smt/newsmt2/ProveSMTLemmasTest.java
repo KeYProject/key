@@ -3,28 +3,23 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.key_project.util.Streams;
-import org.key_project.util.collection.PropertiesUtil;
-import org.key_project.util.testcategories.Slow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,42 +28,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
-
 /**
  * This test case makes sure that all KeY formulas which are translated
  * to axioms in SMT can actually be proved in KeY.
  *
  * @author Mattias Ulbrich
  */
-@RunWith(Parameterized.class)
-@Category(Slow.class)
+@Tag("slow")
 public class ProveSMTLemmasTest {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProveSMTLemmasTest.class);
     private static String HEADER;
 
-    @Parameter(0)
-    public String name;
-
-    @Parameter(1)
-    public String lemmaString;
-
-    @BeforeClass
+    @BeforeAll
     public static void setUpPreamble() throws IOException {
-        HEADER = Streams.toString(ProveSMTLemmasTest.class.
-                getResourceAsStream("smt-lemma-header.key"));
+        HEADER = Streams.toString(ProveSMTLemmasTest.class.getResourceAsStream("smt-lemma-header.key"));
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         HEADER = null;
     }
 
-    @Test
-    public void testSMTLemmaSoundness() throws Exception {
-
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSMTLemmaSoundness(String name,String lemmaString) throws Exception {
         URL proofFile = getClass().getResource("SMT_lemma_" + name + ".proof");
-
         Path path;
         if (proofFile != null) {
             assert proofFile.getProtocol().equals("file");
@@ -81,7 +65,7 @@ public class ProveSMTLemmasTest {
 
         File file = path.toFile();
 
-        System.err.println("Now processing file " + file);
+        LOGGER.info("Now processing file {}", file);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
         try {
@@ -91,21 +75,20 @@ public class ProveSMTLemmasTest {
                 File saveFile = new File(file.getAbsoluteFile() + ".proof");
                 ProofSaver saver = new ProofSaver(loadedProof, saveFile);
                 saver.save();
-                fail("Proof does not close. See " + file + " and " + saveFile);
+                Assertions.fail("Proof does not close. See " + file + " and " + saveFile);
             } else {
                 if (proofFile == null) {
                     // delete temp files
                     file.delete();
                 } else {
                     // and check if proofs are actually for the right theorem!
-                    DefaultTermParser tp = new DefaultTermParser();
-                    Term parsedLemma = tp.parse(new StringReader(lemmaString), Sort.FORMULA,
-                            loadedProof.getServices(), loadedProof.getNamespaces(), new AbbrevMap());
+                    KeyIO io = new KeyIO(loadedProof.getServices());
+                    Term parsedLemma = io.parseExpression(lemmaString);
                     Term actual = loadedProof.root().sequent().succedent().get(0).formula();
                     if (!actual.equalsModRenaming(parsedLemma)) {
-                        System.out.println("Stored : " + parsedLemma);
-                        System.out.println("Proven : " + actual);
-                        fail("The proven lemma is different from the stored one.");
+                        LOGGER.info("Stored : {}", parsedLemma);
+                        LOGGER.warn("Proven : {}", actual);
+                        Assertions.fail("The proven lemma is different from the stored one.");
                     }
                 }
 
@@ -115,9 +98,7 @@ public class ProveSMTLemmasTest {
         }
     }
 
-    @Parameters(name = "{0}")
     public static List<String[]> data() throws IOException {
-
         URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource file which should have been generated by gradle");
@@ -132,7 +113,7 @@ public class ProveSMTLemmasTest {
 
         for (String name : props.stringPropertyNames()) {
             if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-                String[] params = { name, props.getProperty(name) };
+                String[] params = {name, props.getProperty(name)};
                 result.add(params);
             }
         }

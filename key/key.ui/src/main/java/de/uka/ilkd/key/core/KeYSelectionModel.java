@@ -13,17 +13,16 @@
 
 package de.uka.ilkd.key.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class KeYSelectionModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
     /** the proof to listen to */
     private Proof proof;
@@ -36,10 +35,10 @@ public class KeYSelectionModel {
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
-    private KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
+    private final KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
 
     public KeYSelectionModel() {
-        listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
+        listenerList = Collections.synchronizedList(new ArrayList<>(5));
         goalIsValid = false;
     }
 
@@ -47,8 +46,7 @@ public class KeYSelectionModel {
      * Does not take care of GUI effects
      */
     public void setProof(Proof p) {
-        assert p != null;
-        proof = p;
+        proof = Objects.requireNonNull(p);
         Goal g = proof.openGoals().iterator().next();
         if (g == null) {
             selectedNode = proof.root().leavesIterator().next();
@@ -66,7 +64,7 @@ public class KeYSelectionModel {
      *
      * @see KeYMediator#setProof(Proof)
      */
-    void setSelectedProof(Proof p) {
+    public void setSelectedProof(Proof p) {
         goalIsValid = false;
         proof = p;
         if (proof != null) {
@@ -242,7 +240,7 @@ public class KeYSelectionModel {
             }
         }
 
-        /**
+        /*
          * Order of preference: 1. Not yet closable goals 2. Goals which are not closed
          * for all metavariable instantiations 3. The first node of the tree
          */
@@ -255,14 +253,6 @@ public class KeYSelectionModel {
                 setSelectedNode(proof.root().leavesIterator().next());
             }
         }
-        /*
-         * if (selectedNode != null) { Iterator<Node> nodeIt =
-         * selectedNode.leavesIterator(); while (nodeIt.hasNext()) { g =
-         * proof.getGoal(nodeIt.next()); if (g != null) { break; } } } if (g == null &&
-         * !proof.openGoals().isEmpty() ) { g = proof.openGoals().iterator().next(); }
-         * if (g != null) { setSelectedGoal(g); } else {
-         * setSelectedNode(proof.root().leavesIterator().next()); }
-         */
     }
 
     /**
@@ -315,16 +305,24 @@ public class KeYSelectionModel {
         return null;
     }
 
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+        synchronized (listenerList) {
+            if(!listenerList.contains(listener)) {
+                addKeYSelectionListener(listener);
+            }
+        }
+    }
+
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            Debug.log4jInfo("Adding " + listener.getClass(), "key.threading");
+            LOGGER.info("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            Debug.log4jInfo("Removing " + listener.getClass(), "key.threading");
+            LOGGER.info("Removing {}",  listener.getClass());
             listenerList.remove(listener);
         }
     }
@@ -339,11 +337,11 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedProofChanged() {
         synchronized (listenerList) {
-            Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
+            LOGGER.info("Selected Proof changed, firing...");
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }
-            Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
+            LOGGER.info("Selected Proof changed, done firing.");
         }
     }
 

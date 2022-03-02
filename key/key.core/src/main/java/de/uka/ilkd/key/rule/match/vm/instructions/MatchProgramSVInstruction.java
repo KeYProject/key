@@ -10,9 +10,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
-import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<ProgramSV> implements MatchOperatorInstruction {
+public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<ProgramSV>
+        implements MatchOperatorInstruction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
 
     public MatchProgramSVInstruction(ProgramSV sv) {
         super(sv);
@@ -37,8 +41,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
                 return matchCond
                         .setInstantiations(instantiations.add(op, pe, services));
             } catch (IllegalInstantiationException e) {
-                Debug
-                .out("Exception thrown by class Taclet at setInstantiations");
+                LOGGER.debug("Exception thrown by class Taclet at setInstantiations");
             }
         } else {
             Object peForCompare = pe;

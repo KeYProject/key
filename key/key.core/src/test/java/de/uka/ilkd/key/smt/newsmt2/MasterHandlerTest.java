@@ -5,37 +5,39 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
-import org.hamcrest.core.StringContains;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.key_project.util.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Run this with
@@ -43,40 +45,23 @@ import static org.junit.Assert.*;
  *     gradlew :key.core:testStrictSMT
  * </pre>
  */
-
-@RunWith(Parameterized.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MasterHandlerTest {
-
     /**
      * If this variable is set when running this test class, then
      * those cases with expected result "weak_valid" will raise an
      * exception unless they can be proved using the solver.
-     *
+     * <p>
      * Otherwise a "timeout" or "unknown" is accepted. This can be
      * used to deal with test cases that should verify but do not
      * yet do so.
-     *
+     * <p>
      * (Default false)
      */
-    private static final boolean STRICT_TEST =
-            Boolean.getBoolean("key.newsmt2.stricttests");
-
+    private static final boolean STRICT_TEST = Boolean.getBoolean("key.newsmt2.stricttests");
     private static final boolean DUMP_SMT = true;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
 
-    @Parameter(0)
-    public String name;
-
-    @Parameter(1)
-    public Path path;
-
-    private String translation;
-
-    private LineProperties props;
-
-    @Parameters(name = "{0}")
-    public static List<Object[]> data() throws IOException, URISyntaxException {
-
+    public static List<Arguments> data() throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -87,90 +72,135 @@ public class MasterHandlerTest {
         }
 
         Path directory = Paths.get(url.toURI());
-        assertTrue(Files.isDirectory(directory));
+        Assertions.assertTrue(Files.isDirectory(directory));
 
-        List<Object[]> result = new ArrayList<>();
-        Files.list(directory).forEach(f -> {
-            Object[] item = { f.getFileName().toString(), f };
-            result.add(item);
-        });
-
+        var files = Files.list(directory).collect(Collectors.toList());
+        List<Arguments> result = new ArrayList<>(files.size());
+        for (Path file : files) {
+            try {
+                final var testData = TestData.create(file);
+                if (testData != null) {
+                    result.add(Arguments.of(testData));
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error reading {}", file, e);
+            }
+        }
         return result;
     }
 
-    @Test
-    public void testTranslation() throws Exception {
+    public static class TestData {
+        public final String name;
+        public final Path path;
+        private final String translation;
+        private final LineProperties props;
 
-        if(DUMP_SMT) {
-            Path tmpSmt = Files.createTempFile("SMT_key_" + name, ".smt2");
+        public TestData(String name, Path path, LineProperties props, String translation) {
+            this.name = name;
+            this.path = path;
+            this.translation = translation;
+            this.props = props;
+        }
+
+        @Nullable
+        public static TestData create(Path path) throws IOException, ProblemLoaderException {
+            var name = path.getFileName().toString();
+            var props = new LineProperties();
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                props.read(reader);
+            }
+
+            if ("ignore".equals(props.get("state"))) {
+                LOGGER.info("Test case has been marked ignore");
+                return null;
+            }
+
+            List<String> sources = props.getLines("sources");
+            List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+            if (!sources.isEmpty()) {
+                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                Path tmpSrc = srcDir.resolve("src.java");
+                Files.write(tmpSrc, sources);
+                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+            }
+
+            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+            Files.write(tmpKey, lines);
+
+            KeYEnvironment<DefaultUserInterfaceControl> env =
+                    KeYEnvironment.load(tmpKey.toFile());
+
+            Proof proof = env.getLoadedProof();
+            Sequent sequent = proof.root().sequent();
+
+            SMTSettings settings = new DefaultSMTSettings(
+                    proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(),
+                    proof);
+
+        String updates = props.get("smt-settings");
+        if (updates != null) {
+            Properties map = new Properties();
+            map.load(new StringReader(updates));
+            settings.getNewSettings().readSettings(map);
+        }
+
+            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+            var translation = translator.translateProblem(sequent, env.getServices(), settings).toString();
+            return new TestData(name, path, props, translation);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testTranslation(TestData data) throws Exception {
+        if (DUMP_SMT) {
+            Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
-            Files.write(tmpSmt, translation.getBytes());
-            System.err.println("SMT2 for " + name + " saved in: " + tmpSmt);
+            Files.write(tmpSmt, data.translation.getBytes());
+            LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
         int i = 1;
-        while(props.containsKey("contains." + i)) {
-            assertThat("Occurrence check for contains." + i,
-                    translation,
-                    new ContainsModuloSpaces(props.get("contains." + i).trim()));
+        while (data.props.containsKey("contains." + i)) {
+            assertTrue(containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
+                    "Occurrence check for contains." + i);
             i++;
         }
 
     }
 
-    @Before
-    public void makeTranslation() throws IOException, ProblemLoaderException {
-
-        BufferedReader reader = Files.newBufferedReader(path);
-        this.props = new LineProperties();
-        props.read(reader);
-
-        Assume.assumeFalse("Test case has been marked ignore",
-                "ignore".equals(props.get("state")));
-
-        List<String> sources = props.getLines("sources");
-        List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-        if (!sources.isEmpty()) {
-            Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-            Path tmpSrc = srcDir.resolve("src.java");
-            Files.write(tmpSrc, sources);
-            lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-        }
-
-        Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-        Files.write(tmpKey, lines);
-
-        KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(tmpKey.toFile());
-
-        Proof proof = env.getLoadedProof();
-        Sequent sequent = proof.root().sequent();
-
-        SMTSettings settings = new SMTSettings(
-                proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                proof.getSettings().getNewSMTSettings(),
-                proof);
-
-        ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-        this.translation =
-                translator.translateProblem(sequent, env.getServices(), settings).toString();
+    public static boolean containsModuloSpaces(String haystack, String needle) {
+        String n = needle.replaceAll("\\s+", " ");
+        String h = haystack.replaceAll("\\s+", " ");
+        return h.contains(n);
     }
 
-    @Test
-    public void testZ3() throws Exception {
 
-        String expectation = props.get("expected");
-        Assume.assumeTrue("No Z3 expectation.", expectation != null);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testZ3(TestData data) throws Exception {
+        Assumptions.assumeTrue(SolverTypes.Z3_SOLVER != null);
+        Assumptions.assumeTrue(SolverTypes.Z3_SOLVER.isInstalled(false),
+                "Z3 is not installed, this testcase is ignored.");
+
+        String expectation = data.props.get("expected");
+        Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
         expectation = expectation.toLowerCase().trim();
 
         // TODO Run Z3 on the SMT translation
         // FIXME This is a hack.
         Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
         OutputStream os = proc.getOutputStream();
-        os.write(translation.getBytes());
+        os.write(data.translation.getBytes());
         os.write("\n\n(check-sat)".getBytes());
         os.close();
 
@@ -183,7 +213,7 @@ public class MasterHandlerTest {
                     lookFor = "unsat";
                     break;
                 case "fail":
-                    lookFor = "sat";
+                    lookFor = "(sat|timeout)";
                     break;
                 case "irrelevant":
                     break;
@@ -191,31 +221,28 @@ public class MasterHandlerTest {
                     fail("Unexpected expectation: " + expectation);
             }
 
-            for (String line : response) {
-                if (line.startsWith("(error ")) {
-                    fail("An error in Z3: " + line);
-                }
-                if (lookFor != null && line.equals(lookFor)) {
-                    return;
+            if (lookFor != null) {
+                for (String line : response) {
+                    if (line.startsWith("(error ")) {
+                        fail("An error in Z3: " + line);
+                    }
+                    if (line.matches(lookFor)) {
+                        return;
+                    }
                 }
             }
 
-            if(!STRICT_TEST) {
-                Assume.assumeFalse("This is an extended test (will be run only in strict mode)",
-                        "extended".equals(props.get("state")));
+            if (!STRICT_TEST) {
+                assumeFalse("extended".equals(data.props.get("state")),
+                        "This is an extended test (will be run only in strict mode)");
             }
 
             if (lookFor != null) {
                 fail("Expectation not found");
             }
-        } catch(Throwable t) {
-            System.out.println("Z3 input");
-            System.out.println(translation);
-
-            System.out.println("\n\nZ3 response");
-            for (String s : response) {
-                System.out.println(s);
-            }
+        } catch (Throwable t) {
+            LOGGER.error("Z3 input {}", data.translation);
+            LOGGER.error("Z3 response: {}", response, t);
             throw t;
         }
     }

@@ -429,7 +429,7 @@ public class JMLSpecFactory {
                 axioms.isEmpty() //either the list is empty
                         || (axioms.size() == 1 //or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
-                        && ((JmlParser.Method_declarationContext) axioms.head().first).BODY() == null);
+                        && ((JmlParser.Method_declarationContext) axioms.head().first).method_body() == null);
         if (empty) {
             clauses.axioms.put(heap, null);
         } else {
@@ -1436,6 +1436,20 @@ public class JMLSpecFactory {
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, clauses.decreases, services).create();
+    }
+
+    /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final AuxiliaryContract.Variables variables = new AuxiliaryContract.VariablesCreator(
+                        jmlAssert, Collections.emptyList(), pm, services)
+                .create();
+        final ProgramVariableCollection pv = createProgramVariables(pm, jmlAssert, variables);
+        jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 
     /**

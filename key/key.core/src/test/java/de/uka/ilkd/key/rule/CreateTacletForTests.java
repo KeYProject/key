@@ -25,16 +25,19 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /** 
  * create Taclet for test cases.
  */
 public class CreateTacletForTests extends AbstractTestTermParser {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CreateTacletForTests.class);
 	private Sort nat;
 
     public static AntecTaclet impleft;
@@ -144,7 +147,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 			t_0);
 
 	// help rule r1: find(rn) replacewith(0) replacewith(0)
-	RewriteTacletBuilder<RewriteTaclet> rwb1=new RewriteTacletBuilder<RewriteTaclet>();	
+	RewriteTacletBuilder<RewriteTaclet> rwb1= new RewriteTacletBuilder<>();
 	rwb1.setName(new Name("r1"));
 	rwb1.setFind(t_rn);
 	rwb1.addTacletGoalTemplate(new
@@ -156,7 +159,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
 	//pred-succ-elim-rule
 	// find(rn -1 +1) replacewith(rn) replacewith(0 +1) addrule(r1)
-	RewriteTacletBuilder<RewriteTaclet> rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	RewriteTacletBuilder<RewriteTaclet> rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(t_rnminus1plus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -172,7 +175,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
 	//plus-zero-elim
 	// find(rn + 0) replacewith(rn)
-	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
 			t_rn, t_0));
 	rwbuilder.addTacletGoalTemplate(new
@@ -184,7 +187,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
 	//zero-plus-elim
 	// find(0 + rn) replacewith(rn)
-	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
 			t_0, t_rn));
 	rwbuilder.addTacletGoalTemplate(new
@@ -217,7 +220,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 	Term t_rnplusrmplus1=tf.createTerm(func_plus1,
 			t_rnplusrm);
 
-	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(t_rnplus1plusrm);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -234,7 +237,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 			t_rm);
 	Term t_rnplus_rmplus1=tf.createTerm(func_plus,
 			t_rn, t_rmplus1);
-	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -247,7 +250,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 	// find(rn +1 = rm +1) replacewith(rn=rm)
 	Term t_rneqrm=tf.createTerm(func_eq,
 			t_rn, t_rm);
-	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
+	rwbuilder= new RewriteTacletBuilder<>();
 	rwbuilder.setFind(tf.createTerm(func_eq,
 			t_rnplus1,
 			t_rmplus1));
@@ -287,7 +290,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 	try{
 		t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblemTerm();
 	} catch (Exception e) {
-	    System.err.println("Parser Error or Input Error");
+	    LOGGER.error("Parser Error or Input Error",e);
 	    fail("Parser Error");
 	}	
 	SequentFormula cf=new SequentFormula(t_test1);

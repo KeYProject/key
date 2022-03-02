@@ -64,12 +64,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
     private static final long serialVersionUID = 6867808795064180589L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 
@@ -89,6 +93,8 @@ public abstract class SequentView extends JEditorPane {
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
+    public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
+
 
     private final MainWindow mainWindow;
 
@@ -140,8 +146,10 @@ public abstract class SequentView extends JEditorPane {
     private final HashMap<Color, HighlightPainter> color2Highlight
             = new LinkedHashMap<>();
 
-    /** the last observed mouse position for which a highlight was created */
-    private Point lastMousePosition;
+    /** The last observed mouse position for which a highlight was created.
+     * <code>OUTSIDE_MOUSE_POSITION</code> means no highlight is applied.
+     */
+    private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
 
     private SequentViewInputListener sequentViewInputListener;
 
@@ -197,7 +205,7 @@ public abstract class SequentView extends JEditorPane {
             putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
-            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
+            LOGGER.debug("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
         }
     }
 
@@ -287,9 +295,7 @@ public abstract class SequentView extends JEditorPane {
                         .changeHighlight(highlighter, 0, 0);
             }
         } catch (BadLocationException badLocation) {
-            System.err.println("SequentView tried to highlight an area "
-                    + "that does not exist: "+range);
-            badLocation.printStackTrace();
+            LOGGER.warn("SequentView tried to highlight an area that does not exist: {}", range);
         }
     }
 
@@ -319,7 +325,7 @@ public abstract class SequentView extends JEditorPane {
             highlight
                     = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
-            Debug.out("Highlight range out of scope.");
+            LOGGER.debug("Highlight range out of scope.");
             e.printStackTrace();
         }
         return highlight;
@@ -348,7 +354,12 @@ public abstract class SequentView extends JEditorPane {
      * and highlighted mouse position.
      */
     public PosInSequent getLastPosInSequent() {
-        return getPosInSequent(lastMousePosition);
+        if(lastMousePosition.equals(OUTSIDE_MOUSE_POSITION)) {
+            // point to toplevel if mouse was outside.
+            return PosInSequent.createSequentPos();
+        } else {
+            return getPosInSequent(lastMousePosition);
+        }
     }
 
     /**
@@ -454,7 +465,7 @@ public abstract class SequentView extends JEditorPane {
         try {
             getHighlighter().changeHighlight(highlight, 0, 0);
         } catch (BadLocationException e) {
-            Debug.out("Invalid range for highlight");
+            LOGGER.debug("Invalid range for highlight");
             e.printStackTrace();
         }
     }
@@ -466,6 +477,7 @@ public abstract class SequentView extends JEditorPane {
     public void disableHighlights() {
         disableHighlight(currentHighlight);
         disableHighlight(additionalJavaHighlight);
+        setLastMousePosition(OUTSIDE_MOUSE_POSITION);
     }
 
     /**
@@ -513,6 +525,17 @@ public abstract class SequentView extends JEditorPane {
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            // quick-and-dirty-fixception:
+            // result.end() is sometimes -1 even though the text is nonempty
+            // this really should not happen
+            if (result.end() < 0) {
+                // Let's write some debug info since we can't reproduce
+                LOGGER.debug("SequentView::getHighlightRange rangeForIndex returned invalid range. " +
+                                "Result was {}, character index {}, point {}.",
+                        result, characterIndex, p);
+                LOGGER.debug("Sequence text: {}", seqText);
+                return null;
+            }
             result = new Range(result.start() + 1, result.end() + 1);
 
             return result;
@@ -590,7 +613,7 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
@@ -606,7 +629,7 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
@@ -666,12 +689,16 @@ public abstract class SequentView extends JEditorPane {
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
+            LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
 
 
     public void highlight(Point p) {
+        if (p == null) {
+            throw new IllegalArgumentException("p is null");
+        }
+
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
         setLastMousePosition(p);
@@ -912,14 +939,16 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
-	public void setFilter(SequentPrintFilter sequentPrintFilter) {
+	public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
 		this.filter = sequentPrintFilter;
 		Node selectedNode = getMainWindow().getMediator().getSelectedNode();
 		if (selectedNode != null) {
 		    // bugfix #1458 (gitlab). The selected node may be null if no proof.
 		    this.filter.setSequent(selectedNode.sequent());
 		}
-		printSequent();
+        if (forceUpdate) {
+            printSequent();
+        }
 
 		if (getParent() != null) {
 	        getParent().revalidate();

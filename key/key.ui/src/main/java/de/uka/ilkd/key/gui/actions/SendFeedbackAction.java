@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.FlowLayout;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
@@ -12,9 +9,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.LinkedList;
@@ -24,10 +25,11 @@ import java.util.zip.ZipOutputStream;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.HTMLEditorKit;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,13 +38,18 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 
 /**
- * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
- * button was pressed.
+ * Action that executes if "Send Feedback..." was pressed. There are currently two locations:
+ * In {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
  *
- * @author Kai Wallisch
+ * For a documentation of the backend of the auto-send mechanism, refer to the
+ * file key-report.php in the same directory as this file.
+ *
+ * @author Kai Wallisch, Mattias Ulbrich
  *
  */
 public class SendFeedbackAction extends AbstractAction {
@@ -52,7 +59,12 @@ public class SendFeedbackAction extends AbstractAction {
     /*
      * This is the email address to which feedback will be sent.
      */
-    private static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
+    private static final String FEEDBACK_RECIPIENT = "support@key-project.org";
+
+    /**
+     * This is the url to which the feedback will be sent.
+     */
+    private static final String REPORT_URL ="https://formal.kastel.kit.edu/key/key-report.php";
 
     private static String serializeStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
@@ -332,54 +344,88 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private class SendAction implements ActionListener {
-        private final JDialog dialog;
-        private final JTextArea message;
 
-        public SendAction(JDialog dialog, JTextArea bugDescription) {
-            this.dialog = dialog;
-            this.message = bugDescription;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-
+        private void saveZIP(String message) {
             try {
-                int confirmed = JOptionPane.showConfirmDialog(
-                        parent,
-                        "A zip archive containing the selected data will be created.\n"
-                                + "To report a problem, send it in an e-mail to the KeY developers\n"
-                                + "at " + FEEDBACK_RECIPIENT + ".", "Send Bug Report",
-                        JOptionPane.OK_CANCEL_OPTION);
+                JFileChooser jfc = new JFileChooser();
+                jfc.addChoosableFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.getName().toLowerCase().endsWith(".zip");
+                    }
 
-                if(confirmed != JOptionPane.OK_OPTION) {
-                    return;
-                }
-
-                KeYFileChooser fileChooser = KeYFileChooser.getFileChooser("Select path to save");
-                fileChooser.setFileFilter(KeYFileChooser.ZIP_FILTER);
-
-                int answer = fileChooser.showSaveDialog(parent);
+                    @Override
+                    public String getDescription() {
+                        return "ZIP archives";
+                    }
+                });
+                int answer = jfc.showSaveDialog(parent);
                 if (answer == JFileChooser.APPROVE_OPTION) {
-                    saveMetaDataToFile(fileChooser.getSelectedFile(), message.getText());
+                    saveMetaDataToFile(jfc.getSelectedFile(), message);
                     JOptionPane.showMessageDialog(parent,
-                            String.format("Your message has been saved to the file %s.",
-                                    fileChooser.getSelectedFile()));
+                            String.format("Your message has been saved to the file %s.\n" +
+                                            "If you want to report a bug, you can enclose this file in an\n" +
+                                            "e-mail to " + FEEDBACK_RECIPIENT + ".",
+                                    jfc.getSelectedFile()));
                 }
             } catch (Exception e) {
-                ExceptionDialog.showDialog(parent, e);
+                IssueDialog.showExceptionDialog(parent, e);
+            }
+        }
+
+        private void sendReport(String message) {
+
+            String[] msgs = {
+//            tp.setEditable(false);
+//            tp.setBackground(UIManager.getColor("label.background"));
+//            tp.setEditorKit(new HTMLEditorKit());
+//            tp.setText("<html>" +
+                    "The data you have collected and the description text will now be sent via",
+                    "https to the server formal.kastel.kit.edu, stored on the server and forwarded",
+                    "to the KeY mailing list.", "", "Click OK if you want to send the report now."
+            };
+            int answer = JOptionPane.showConfirmDialog(parent, msgs, "Ready to send?", JOptionPane.YES_NO_OPTION);
+            if (answer != JOptionPane.YES_OPTION) {
+                return;
             }
 
-            dialog.dispose();
+            try {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                saveMetaData(buffer, message);
+                URLConnection connection = new URL(REPORT_URL).openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/zip");
+                connection.setRequestProperty("KeY-Version",
+                        "KeY " + KeYResourceManager.getManager().getVersion());
+                try(OutputStream os = connection.getOutputStream()) {
+                    os.write(buffer.toByteArray());
+                }
+                connection.connect();
+                int responseCode = ((HttpURLConnection) connection).getResponseCode();
+
+                if(responseCode == 200) {
+                    JOptionPane.showMessageDialog(parent, "Your report has been filed successfully.");
+                } else {
+                    String msg = Streams.toString(((HttpURLConnection) connection).getErrorStream());
+                    throw new IOException("The server responded with an error message (" +
+                            responseCode + "): " + msg);
+                }
+
+            } catch (Exception e) {
+                IssueDialog.showExceptionDialog(parent, e);
+            }
+        }
+
+
+    private void saveMetaDataToFile(File zipFile, String message) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(zipFile)) {
+            saveMetaData(fos, message);
         }
     }
 
-    private void saveMetaDataToFile(File zipFile, String message) throws IOException {
-
-        ZipOutputStream stream = null;
-        try {
-            stream = new ZipOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(zipFile)));
+    private void saveMetaData(OutputStream os, String message) throws IOException {
+        try(ZipOutputStream stream =
+                    new ZipOutputStream(new BufferedOutputStream(os))) {
             for (SendFeedbackItem item : items) {
                 if (item.isSelected() && item.isEnabled()) {
                     item.appendDataToZipOutputStream(stream);
@@ -391,11 +437,6 @@ public class SendFeedbackAction extends AbstractAction {
         }
         catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(parent, e.getMessage());
-        }
-        finally {
-            if (stream != null) {
-                stream.close();
-            }
         }
     }
 
@@ -459,24 +500,45 @@ public class SendFeedbackAction extends AbstractAction {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton sendFeedbackReportButton = new JButton("Send Feedback...");
-        sendFeedbackReportButton.addActionListener(new SendAction(dialog, bugDescription));
-
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-            }
+        JButton saveFeedbackReportButton = new JButton("Save Feedback...");
+        saveFeedbackReportButton.setToolTipText("<html>Information about current proof state are saved to a file.<br>" +
+                "This file can be also used when reporting a bug via e-mail.");
+        saveFeedbackReportButton.addActionListener(e -> {
+            saveZIP(bugDescription.getText());
+            dialog.dispose();
         });
 
+        JButton sendFeedbackReportButton = new JButton("Send Feedback...");
+        sendFeedbackReportButton.setToolTipText("<html>Information about current proof state are sent via a " +
+                "secure https connection to the developers.<br>" +
+                "The receiving server is located at KIT (formal.kastel.kit.edu).");
+        sendFeedbackReportButton.addActionListener(e ->  {
+            sendReport(bugDescription.getText());
+            dialog.dispose();
+        });
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(saveFeedbackReportButton);
         buttonPanel.add(sendFeedbackReportButton);
         buttonPanel.add(cancelButton);
 
+        JTextPane labels = new JTextPane();
+        labels.setEditorKit(new HTMLEditorKit());
+        labels.setEditable(false);
+        labels.setBackground(UIManager.getColor("Label.background"));
+        labels.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        labels.setText("<html>The report feature can be used to send information about your current state of KeY to report a bug or to ask for advice from the KeY team.<br>" +
+                "You can either store the information in a zip locally (and then e.g. send that via e-mail to " + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>" +
+                "Please select the information that you want to include from the list on the right.<br>" +
+                "If you send the information directly, <b>please make sure to indicate your e-mail address</b> " +
+                "in the message below such that the team can respond.");
         Container container = dialog.getContentPane();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        container.add(topPanel);
-        container.add(buttonPanel);
+        container.setLayout(new BorderLayout());
+        container.add(labels, BorderLayout.NORTH);
+        container.add(topPanel, BorderLayout.CENTER);
+        container.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.pack();
 

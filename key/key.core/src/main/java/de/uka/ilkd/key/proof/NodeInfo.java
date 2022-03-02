@@ -48,6 +48,8 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -56,8 +58,9 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
  * carry something of logical value.
  */
 public class NodeInfo {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
+    private static Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;
@@ -86,9 +89,6 @@ public class NodeInfo {
 
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
-
-    /** @see #getRelevantFiles() */
-    private ImmutableSet<URI> relevantFiles = DefaultImmutableSet.nil();
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -334,14 +334,13 @@ public class NodeInfo {
                 Object val = tacletApp.instantiations().lookupValue(new Name(arg));
                 if (val == null) {
                     // chop off the leading '#'
-                    String arg2 = arg.substring(1, arg.length());
+                    String arg2 = arg.substring(1);
                     val = tacletApp.instantiations().lookupValue(new Name(arg2));
                 }
                 String res;
                 if (val == null) {
-                    System.err.println("No instantiation for " + arg
-                            + ". Probably branch label not up to date in "
-                            + tacletApp.rule().name());
+                    LOGGER.warn("No instantiation for {}. Probably branch label not up to date in {}"
+                            , arg,  tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
@@ -400,55 +399,6 @@ public class NodeInfo {
      */
     public boolean getScriptRuleApplication() {
         return scriptingApplication;
-    }
-
-    /**
-     * <p> Returns a set containing URIs of all files relevant to this node. </p>
-     *
-     * <p> This includes the files contained in the {@link PositionInfo} of all modalities
-     *  as well as the files in the {@link OriginTermLabel}s of all terms in this node's sequent.
-     *  </p>
-     *
-     * @return the set of URIs of files relevant to this node.
-     */
-    public ImmutableSet<URI> getRelevantFiles() {
-        return relevantFiles;
-    }
-
-    /**
-     * Add a file to the set returned by {@link #getRelevantFiles()}.
-     *
-     * @param relevantFile the URI of the file to add.
-     */
-    public void addRelevantFile(URI relevantFile) {
-        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
-
-        this.relevantFiles = this.relevantFiles.add(relevantFile);
-
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
-    }
-
-    /**
-     * Add some files to the set returned by {@link #getRelevantFiles()}.
-     *
-     * @param relevantFiles the URIs of the files to add.
-     */
-    public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
-        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
-
-        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
-            this.relevantFiles = relevantFiles;
-        } else {
-            this.relevantFiles = this.relevantFiles.union(relevantFiles);
-        }
-
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
     }
 
     /** Add user-provided plain-text annotations.

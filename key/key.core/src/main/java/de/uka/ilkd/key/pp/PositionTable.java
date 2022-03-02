@@ -272,6 +272,7 @@ public class PositionTable {
         SequentPrintFilterEntry filterEntry = getFilterEntry(cfmaNo, filter);
 
         // This can raise a NPE sporadically. (MU 19)
+        // This raises an NPE repeatably (JS/MU 21) #1650
         SequentFormula cfma = filterEntry.getOriginalFormula();
 
         PosInOccurrence currentPos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(),

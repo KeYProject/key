@@ -54,12 +54,7 @@ public class SettingsChecker implements Checker {
         // parse the settings of each proof file
         List<ProofSettings> proofSettings = new ArrayList<>();
         for (KeYUserProblemFile f : problemFiles) {
-            try {
-                proofSettings.add(f.readPreferences());
-            } catch (ProofInputException e) {
-                throw new ProofManagementException("Proof settings could not be read from " + f
-                        + System.lineSeparator() + e.toString());
-            }
+            proofSettings.add(f.readPreferences());
         }
 
         // actual consistency check of the settings

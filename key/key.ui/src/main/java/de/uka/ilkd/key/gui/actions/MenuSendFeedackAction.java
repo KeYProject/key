@@ -2,7 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 
 public class MenuSendFeedackAction extends MainWindowAction {
@@ -15,7 +15,7 @@ public class MenuSendFeedackAction extends MainWindowAction {
     }
 
    /**
-    * Re-using {@link SendFeedbackAction} from {@link ExceptionDialog} for this.
+    * Re-using {@link SendFeedbackAction} from {@link IssueDialog} for this.
     */
    private final SendFeedbackAction action = new SendFeedbackAction(mainWindow);
 

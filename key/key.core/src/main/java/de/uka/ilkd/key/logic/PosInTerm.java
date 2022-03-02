@@ -39,7 +39,16 @@ public final class PosInTerm {
     private volatile char hash = (char)-1;
     private volatile boolean copy;
 
-    
+    public PosInTerm(int[] path) {
+        size = (char) path.length;
+        positions = new char[size];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = (char) path[i];
+        }
+        copy=false;
+    }
+
+
     /** 
      * create a position from the string
      * 

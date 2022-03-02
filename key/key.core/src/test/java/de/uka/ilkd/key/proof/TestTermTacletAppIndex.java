@@ -11,17 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/** tests the TacletIndex class.*/
+/* tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
-
-import java.io.File;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -36,9 +27,21 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class TestTermTacletAppIndex extends TestCase{   
+public class TestTermTacletAppIndex {
 
     NoPosTacletApp ruleRewriteNonH1H2; 
     NoPosTacletApp ruleNoFindNonH1H2H3;
@@ -50,17 +53,14 @@ public class TestTermTacletAppIndex extends TestCase{
     NoPosTacletApp remove_ff;
     NoPosTacletApp remove_zero;
         
-    public TestTermTacletAppIndex(String name) {
-	super(name);
-    }
-
     private Taclet taclet(String name) {
 	return TacletForTests.getTaclet(name).taclet();
     }
     
+    @BeforeEach
     public void setUp() {
         File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
-        assertTrue("File '" + tacletFile + "' does not exist.", tacletFile.exists());     
+        assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         ruleRewriteNonH1H2 = NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
@@ -74,6 +74,7 @@ public class TestTermTacletAppIndex extends TestCase{
         remove_zero = NoPosTacletApp.createNoPosTacletApp(taclet("remove_zero"));
     }
     
+    @AfterEach
     public void tearDown() {
         ruleRewriteNonH1H2 = null;
         ruleNoFindNonH1H2H3 = null;
@@ -88,7 +89,7 @@ public class TestTermTacletAppIndex extends TestCase{
 	noCache = null;	
     }
 
-    private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES ); 
+    private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     private TermTacletAppIndexCacheSet realCache =
         new TermTacletAppIndexCacheSet (termTacletAppIndexCache);
@@ -104,10 +105,12 @@ public class TestTermTacletAppIndex extends TestCase{
     };
     
 
+    @Test
     public void testIndex0 () {
         doTestIndex0(noCache);
     }
 
+    @Test
     public void testIndex0WithCache () {
         for ( int i = 0; i != 3; ++i )
             doTestIndex0 ( realCache );
@@ -174,7 +177,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex(PosInOccurrence pio,
                                 TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> listA = ImmutableSLList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
         
@@ -188,7 +191,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex2(PosInOccurrence pio,
 				 TermTacletAppIndex termIdx) {
-	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+	ImmutableList<Taclet> listA = ImmutableSLList.nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
 	ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -201,7 +204,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex3(PosInOccurrence pio,
 				 TermTacletAppIndex termIdx) {
-	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+	ImmutableList<Taclet> listA = ImmutableSLList.nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
 	ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 	ImmutableList<Taclet> listD = listB.prepend(remove_ff.taclet());
@@ -216,8 +219,10 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTacletList ( ImmutableList<NoPosTacletApp> p_toCheck,
 				   ImmutableList<Taclet>         p_template ) {
-	assertTrue ( p_toCheck.size () == p_template.size () );
-        for (NoPosTacletApp aP_toCheck : p_toCheck) assertTrue(p_template.contains(aP_toCheck.taclet()));
+        assertEquals(p_toCheck.size(), p_template.size());
+        for (NoPosTacletApp aP_toCheck : p_toCheck) {
+            assertTrue(p_template.contains(aP_toCheck.taclet()));
+        }
     }
     
 }

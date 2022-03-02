@@ -111,16 +111,16 @@ public abstract class JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
-        Debug.out("Program match start (template, source)", this, src); // this.toString().equals("e")
+        LOGGER.debug("Program match start (template {}, source {})", this, src); // this.toString().equals("e")
         
         if (src == null) {
             return null;
         }
         
         if (src.getClass() != this.getClass()) {
-            Debug.out("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this, src);
-            Debug.out("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this.getClass(), src.getClass());
             return null;
         }
@@ -176,7 +176,7 @@ public abstract class JavaNonTerminalProgramElement
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
         if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
-            Debug.out("Source has unmatched elements.");
+            LOGGER.debug("Source has unmatched elements.");
             return null;
         }
 

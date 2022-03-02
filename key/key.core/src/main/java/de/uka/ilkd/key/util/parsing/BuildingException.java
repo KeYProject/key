@@ -25,12 +25,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
         offendingSymbol = null;
     }
 
-    public BuildingException(ParserRuleContext ctx, String format, Throwable e) {
-        this(ctx == null ? null : ctx.start, format, e);
+    public BuildingException(ParserRuleContext ctx, String message, Throwable e) {
+        this(ctx == null ? null : ctx.start, message, e);
     }
 
-    public BuildingException(@Nullable Token t, String format, Throwable e) {
-        super(format + getPosition(t), e);
+    public BuildingException(@Nullable Token t, String message, Throwable e) {
+        super(message + " at " + getPosition(t), e);
         offendingSymbol = t;
     }
 
@@ -41,7 +41,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
-        this(ctx.start, "", ex);
+        this(ctx.start, ex.getMessage(), ex);
+    }
+
+    @Override
+    public String toString() {
+        return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
     @Nullable
@@ -51,7 +56,9 @@ public class BuildingException extends RuntimeException implements HasLocation {
             return new Location(MiscTools.parseURL(
                     offendingSymbol.getTokenSource().getSourceName()),
                     offendingSymbol.getLine(),
-                    offendingSymbol.getCharPositionInLine());
+                    /* Location is assumed to be 1-based in line and column, while ANTLR
+                     * generates 1-based line and 0-based column numbers! */
+                    offendingSymbol.getCharPositionInLine() + 1);
         }
         return null;
     }

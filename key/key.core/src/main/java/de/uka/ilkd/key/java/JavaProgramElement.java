@@ -20,6 +20,9 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  *  Top level implementation of a Java {@link ProgramElement}.
@@ -27,8 +30,9 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class JavaProgramElement extends JavaSourceElement
                                          implements ProgramElement {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JavaProgramElement.class);
 
-    private final static Comment[] NO_COMMENTS = new Comment[0];
+    private static final Comment[] NO_COMMENTS = new Comment[0];
 
     private final Comment[] comments;
     
@@ -198,11 +202,11 @@ public abstract class JavaProgramElement extends JavaSourceElement
     @Override    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        Debug.out("Program match start (template, source)", this, src);
+        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         if (src.getClass() != getClass()) {
-            Debug.out("Program match failed. Incompatible AST nodes (template, source)", this, src);
-            Debug.out("Incompatible AST nodes (template, source)", 
+            LOGGER.debug("Program match failed. Incompatible AST nodes (template {}, source {})", this, src);
+            LOGGER.debug("Incompatible AST nodes (template {}, source {})",
                     this.getClass(), src.getClass());
             return null;
         }

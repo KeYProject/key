@@ -15,11 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -50,6 +46,8 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
    A configurable pretty printer for Java source elements originally from COMPOST.
@@ -59,6 +57,7 @@ import de.uka.ilkd.key.util.Debug;
    CHANGED FOR KeY. Comments are not printed!
  */
 public class PrettyPrinter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PrettyPrinter.class);
 
     /**
        Line number, not directly used.
@@ -78,9 +77,6 @@ public class PrettyPrinter {
     protected StringBuffer outBuf;
     protected boolean noLinefeed=false;
     protected boolean noSemicolons=false;
-    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.testgen.pp.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
-
-    protected Type classToPrint = null;
 
     protected int firstStatementStart = -1;
     protected int firstStatementEnd = -1;
@@ -88,10 +84,12 @@ public class PrettyPrinter {
     protected boolean endAlreadyMarked = false;
     protected Object firstStatement = null;
     protected SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+
     /** Remembers the start of a keyword to create a range. */
-    private final Stack<Integer> keywordStarts = new Stack<Integer>();
+    private final Stack<Integer> keywordStarts = new Stack<>();
+
     /** Contains the java keyword ranges. */
-    private ArrayList<Range> keywordRanges = new ArrayList<Range>();
+    private ArrayList<Range> keywordRanges = new ArrayList<>();
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(Writer o) {
@@ -140,9 +138,6 @@ public class PrettyPrinter {
      */
     protected void markStart(int n, Object stmt){
         if (!startAlreadyMarked) {
-
-            // System.err.println("Mark start ... called");
-
             firstStatementStart = getCurrentPos() + n;
             firstStatement = stmt;
             startAlreadyMarked = true;
@@ -154,9 +149,6 @@ public class PrettyPrinter {
      */
     protected void markEnd(int n, Object stmt){
 	if (!endAlreadyMarked && (firstStatement == stmt)) {
-
-	    //  System.err.println("Mark end ... called ");
-
 	    firstStatementEnd = getCurrentPos() + n;
 	    endAlreadyMarked = true;
 	}
@@ -198,7 +190,7 @@ public class PrettyPrinter {
 	endAlreadyMarked = false;
 	writtenCharacters = 0;
 	outBuf = new StringBuffer();
-	keywordRanges = new ArrayList<Range>();
+	keywordRanges = new ArrayList<>();
     }
 
 
@@ -209,7 +201,7 @@ public class PrettyPrinter {
     private boolean isPrintingSingleLineComments = false;
 
 
-    protected HashMap<SourceElement, Position> indentMap=new LinkedHashMap<SourceElement, Position>();
+    protected HashMap<SourceElement, Position> indentMap= new LinkedHashMap<>();
 
     /**
        Set a new stream to write to. Useful to redirect the output
@@ -275,12 +267,8 @@ public class PrettyPrinter {
     private static final char[] FEEDS = new char[8];
 
     static {
-        for (int i = 0; i < FEEDS.length; i++) {
-            FEEDS[i] = '\n';
-        }
-        for (int i = 0; i < BLANKS.length; i++) {
-            BLANKS[i] = ' ';
-        }
+        Arrays.fill(FEEDS, '\n');
+        Arrays.fill(BLANKS, ' ');
     }
 
     /**
@@ -1476,17 +1464,17 @@ public class PrettyPrinter {
     }
 
     protected ImmutableArray<Modifier> removeFinal(ImmutableArray<Modifier> ma){
-	LinkedList<Modifier> l = new LinkedList<Modifier>();
+	LinkedList<Modifier> l = new LinkedList<>();
 	for (Modifier mod : ma){
 	    if (!(mod instanceof Final)) {
 		l.add(mod);
 	    }
 	}
-	return new ImmutableArray<Modifier>(l);
+	return new ImmutableArray<>(l);
     }
 
     protected ImmutableArray<Modifier> replacePrivateByPublic(ImmutableArray<Modifier> ma){
-	LinkedList<Modifier> l = new LinkedList<Modifier>();
+	LinkedList<Modifier> l = new LinkedList<>();
 	boolean publicFound = false;
 	for(int i=0; i<ma.size(); i++){
 	    if(ma.get(i) instanceof Private){
@@ -1505,7 +1493,7 @@ public class PrettyPrinter {
 	if(!publicFound){
 	    l.add(new Public());
 	}
-	return new ImmutableArray<Modifier>(l);
+	return new ImmutableArray<>(l);
     }
 
     public void printFieldDeclaration(FieldDeclaration x)
@@ -3010,8 +2998,7 @@ public class PrettyPrinter {
     			} else if (o instanceof ImmutableArray/*<ProgramElement>*/) {
     				writeBlockList((ImmutableArray<ProgramElement>)o);
     			} else {
-    				Debug.log4jWarn("No PrettyPrinting available for " + o.getClass().getName(),
-    						PrettyPrinter.class.getName());
+    				LOGGER.warn("No PrettyPrinting available for {}",  o.getClass().getName());
     			}
     		}
     		if (!noSemicolons) {
@@ -3094,7 +3081,7 @@ public class PrettyPrinter {
      * Prints an exec statement. Initial code copied from
      * {@link #printTry(Try)}.
      *
-     * @param exec
+     * @param x
      * @throws IOException
      */
     public void printExec(Exec x) throws IOException {
@@ -3123,7 +3110,7 @@ public class PrettyPrinter {
      * Prints a ccatch statement. Initial code copied from
      * {@link #printCatch(Catch)}.
      *
-     * @param ccatch
+     * @param x
      */
     public void printCcatch(Ccatch x) throws java.io.IOException {
         printHeader(x);
@@ -3244,4 +3231,33 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    /**
+     * Prints the JML assert statement.
+     *
+     * @param jmlAssert the statement to print
+     * @exception IOException occasionally thrown.
+     */
+    public void printJmlAssert(JmlAssert jmlAssert) throws IOException {
+        printHeader(jmlAssert);
+        writeInternalIndentation(jmlAssert);
+
+        final String kind = jmlAssert.getKind().name();
+
+        markStart(0, jmlAssert);
+
+        markKeywordStart();
+        write("@");
+        write(kind);
+        markKeywordEnd();
+        write(" ");
+
+        write(jmlAssert.getConditionText());
+
+        write(";");
+
+        output();
+        markEnd(0, jmlAssert);
+
+        printFooter(jmlAssert);
+    }
 }

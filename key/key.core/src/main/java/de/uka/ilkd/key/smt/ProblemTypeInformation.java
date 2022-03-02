@@ -76,7 +76,6 @@ public class ProblemTypeInformation {
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public SMTSort putConstantType(String key, SMTSort value) {
-		//System.err.println("PUT: "+key + " "+value.getId());
 		return constantsTypes.put(key, value);
 	}
 

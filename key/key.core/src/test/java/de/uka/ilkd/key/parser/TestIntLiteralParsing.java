@@ -3,12 +3,21 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.antlr.runtime.RecognitionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.*;
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class provides tests for parsing int, long, and char literals.
@@ -38,9 +47,9 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "'9'", "C(7(5(#)))",
             "'\\u0000'", "C(0(#))",
             "'\\uffff'", "C(5(3(5(5(6(#))))))",
-        "'\u0000'"         ,       "C(0(#))",
-        "'\u0394'"         ,       "C(6(1(9(#))))",        // greek uppercase delta
-        "'\uffff'"         ,       "C(5(3(5(5(6(#))))))"
+            "'\u0000'", "C(0(#))",
+            "'\u0394'", "C(6(1(9(#))))",        // greek uppercase delta
+            "'\uffff'", "C(5(3(5(5(6(#))))))"
     };
 
     /**
@@ -130,45 +139,57 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestIntLiteralParsing.class);
+
+
+    private final JmlIO jio;
+    private static KeYJavaType containerType;
+    private static ProgramVariable self;
+
+    public TestIntLiteralParsing() {
+        containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
+        self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        jio = new JmlIO()
+                .services(getServices())
+                .classType(containerType)
+                .selfVar(self);
+    }
+
+
     @Override
     public Term parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
         /* containerType and self variable are not relevant for the tests
          * currently and can be changed if needed.
          */
-        KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self =
-                services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO()
-                .services(getServices())
-                .classType(containerType)
-                .selfVar(self);
-        return io.parseExpression(p);
+        return jio.parseExpression(p);
     }
 
-    public void createTestCases(String[] testData) throws RecognitionException {
-        for (int i = 0; i < testData.length / 2; i++) {
-            String input = testData[i * 2];
-            String expected = testData[i * 2 + 1];
-            System.err.println("Input: " + input);
-            String actual = parseTerm(input).toString();
-            assertEquals(expected, actual);
-        }
+    public Stream<DynamicTest> createTestCases(String[] testData) {
+        return IntStream.range(0, testData.length / 2)
+                .mapToObj(i -> {
+                    String input = testData[i * 2];
+                    String expected = testData[i * 2 + 1];
+                    return DynamicTest.dynamicTest(input, () -> {
+                        String actual = parseTerm(input).toString();
+                        Assertions.assertEquals(expected, actual);
+                    });
+                });
     }
 
-    @Test
-    public void testCharLiteralParsing() throws RecognitionException {
-        createTestCases(CHARSTRINGS);
+    @TestFactory
+    public Stream<DynamicTest> testCharLiteralParsing() {
+        return createTestCases(CHARSTRINGS);
     }
 
-    @Test
-    public void testIntLiteralParsing() throws RecognitionException {
-        createTestCases(INTSTRINGS);
+    @TestFactory
+    public Stream<DynamicTest> testIntLiteralParsing() throws RecognitionException {
+        return createTestCases(INTSTRINGS);
     }
 
-    @Test
-    public void testLongLiteralParsing() throws RecognitionException {
-        createTestCases(LONGSTRINGS);
+    @TestFactory
+    public Stream<DynamicTest> testLongLiteralParsing() {
+        return createTestCases(LONGSTRINGS);
     }
 
     /**
@@ -177,33 +198,27 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      *
      * @throws RecognitionException if a parsing error occurs
      */
-    @Test
-    public void testIntRange() throws RecognitionException {
-        for (String it : INTRANGESTRINGS) {
-            try {
-                parseTerm(it);
-                fail();
-            } catch (RuntimeException e) {
-                assertTrue(e.getCause().getMessage().startsWith("Number constant out of bounds"));
-            }
-        }
+    @TestFactory
+    public Stream<DynamicTest> testIntRange() throws RecognitionException {
+        return Arrays.stream(INTRANGESTRINGS)
+                .map(it -> DynamicTest.dynamicTest(it, () -> {
+                    RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
+                    assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
+                }));
     }
 
     /**
      * This method tests if meaningful ("out of bounds") error messages get printed for long
      * literals which are just outside the range of long.
      *
-     * @throws RecognitionException if a parsing error occurs
+     * @return
      */
-    @Test
-    public void testLongRange() throws RecognitionException {
-        for (String it : LONGRANGESTRINGS) {
-            try {
-                parseTerm(it);
-                fail();
-            } catch (RuntimeException e) {
-                assertTrue(e.getCause().getMessage().startsWith("Number constant out of bounds"));
-            }
-        }
+    @TestFactory
+    public Stream<DynamicTest> testLongRange() {
+        return Arrays.stream(LONGRANGESTRINGS)
+                .map(it -> DynamicTest.dynamicTest(it, () -> {
+                    RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
+                    assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
+                }));
     }
 }

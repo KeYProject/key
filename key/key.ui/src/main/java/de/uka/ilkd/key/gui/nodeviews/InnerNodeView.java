@@ -41,11 +41,14 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sequent view for an inner node.
  */
 public final class InnerNodeView extends SequentView {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InnerNodeView.class);
 
     private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR =
             ColorSettings.define("[innerNodeView]ruleAppHighlight", "",
@@ -58,10 +61,8 @@ public final class InnerNodeView extends SequentView {
     private static final ColorSettings.ColorProperty SELECTION_COLOR =
             ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -6542881446084654358L;
+
 
     private InitialPositionTable posTable;
 
@@ -90,9 +91,9 @@ public final class InnerNodeView extends SequentView {
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3, 0, 0, 0, Color.black),
                 new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setEditable(false);
 
 //        updateUI();
-        printSequent();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER
@@ -118,10 +119,7 @@ public final class InnerNodeView extends SequentView {
             }
 
         } catch (BadLocationException badLocation) {
-            System.err.println("NonGoalInfoView tried to "
-                    + "highlight an area "
-                    + "that does not exist.");
-            System.err.println("Exception:" + badLocation);
+            LOGGER.warn("NonGoalInfoView tried to highlight an area that does not exist.",badLocation);
         }
     }
 
@@ -185,6 +183,10 @@ public final class InnerNodeView extends SequentView {
 
     @Override
     public String getTitle() {
+        // If a leaf becomes an inner node, it is already closed.
+        if (node.leaf()) {
+            return "Closed Goal";
+        }
         return "Inner Node";
     }
 

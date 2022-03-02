@@ -68,10 +68,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TacletMatchCompletionDialog.class);
 
 	/**
 	 *
@@ -144,7 +148,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 //	{
 //	    public void setUI(javax.swing.plaf.SplitPaneUI ui) {
 //	        try{ super.setUI(ui); } catch(NullPointerException e)
-//	        { Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI");}
+//	        { LOGGER.debug("Exception thrown by class TacletMatchCompletionDialog at setUI");}
 //	    }
 //	};
 		splitPaneBot.setResizeWeight(1);
@@ -156,7 +160,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 //
 //	    public void setUI(javax.swing.plaf.SplitPaneUI ui) {
 //	        try{ super.setUI(ui); } catch(NullPointerException e) 
-//	        {Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI"); }
+//	        {LOGGER.debug("Exception thrown by class TacletMatchCompletionDialog at setUI"); }
 //	    }
 //	}; 
 		// work around bug in com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
@@ -308,7 +312,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 					ed.setCaretPosition( col - 1 );
 
 				} catch (IllegalArgumentException iae) {
-					Debug.out("tacletmatchcompletiondialog:: something is " +
+					LOGGER.debug("tacletmatchcompletiondialog:: something is " +
 							"wrong with the caret position calculation.");
 
 				}
@@ -342,7 +346,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 								((SVInstantiationExceptionWithPosition) exc).getColumn(),
 								((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 					}
-					ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, exc);
+					IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
 					return ;
 				}
 				InstantiationFileHandler.saveListFor(model[current()]);

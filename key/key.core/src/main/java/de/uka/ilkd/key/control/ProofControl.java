@@ -81,8 +81,9 @@ public interface ProofControl {
     * @param forced a boolean indicating that if the rule is complete or can be made complete
     * automatically then the rule should be applied automatically without asking the user at all
     * (e.g. if a loop invariant is available do not ask the user to provide one)
+    * @param interactive whether the rule was applied by the user
     */
-   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced);
+   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced, boolean interactive);
    
    /**
     * Returns the default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.

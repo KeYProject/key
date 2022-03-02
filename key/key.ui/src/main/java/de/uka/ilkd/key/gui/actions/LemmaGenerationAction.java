@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.lemmatagenerator.LoadUserTacletsDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
@@ -62,7 +62,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     abstract protected boolean proofIsRequired();
     
     protected final void handleException(Throwable exception){
-        ExceptionDialog.showDialog(mainWindow, exception);
+        IssueDialog.showExceptionDialog(mainWindow, exception);
     }
 
     @Override
@@ -149,7 +149,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void doStopped(Throwable exception) {
-                                ExceptionDialog.showDialog(ProveKeYTaclets.this.mainWindow, exception);
+                                IssueDialog.showExceptionDialog(ProveKeYTaclets.this.mainWindow,
+                                    exception);
                         }
 
                         @Override
@@ -234,7 +235,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void doStopped(Throwable exception) {
-                            ExceptionDialog.showDialog(ProveUserDefinedTaclets.this.mainWindow, exception);
+                            IssueDialog.showExceptionDialog(ProveUserDefinedTaclets.this.mainWindow,
+                                exception);
                     }
 
                     @Override
@@ -311,7 +313,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void doStopped(Throwable exception) {
-                           ExceptionDialog.showDialog(ProveAndAddTaclets.this.mainWindow, exception);
+                           IssueDialog.showExceptionDialog(ProveAndAddTaclets.this.mainWindow,
+                               exception);
                      }
 
                     @Override

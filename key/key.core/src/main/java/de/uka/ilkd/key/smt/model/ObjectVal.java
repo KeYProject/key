@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Represents an object inside a heap.
- * 
+ *
  * @author mihai
  *
  */
@@ -196,7 +196,6 @@ public class ObjectVal {
      * @return the value associated to the field (or null if no value is known)
      */
     public String get(String field) {
-        // System.out.println(fieldvalues.keySet());
         return fieldvalues.get(field);
     }
 
@@ -220,12 +219,13 @@ public class ObjectVal {
         if (fieldvalues.containsKey(name)) {
             return fieldvalues.get(name);
         } else {
-            for (String field : fieldvalues.keySet()) {
-                if (field.endsWith(name) || field.endsWith(
-                        name + "|")) { return fieldvalues.get(field); }
+            for (var pair: fieldvalues.entrySet()) {
+                String field = pair.getKey();
+                if (field.endsWith(name) || field.endsWith(name + "|")) {
+                    return pair.getValue();
+                }
             }
         }
-
         return null;
     }
 
@@ -237,41 +237,41 @@ public class ObjectVal {
         String tab = "   ";
 
         // for null we don't care about length, type, etc.
-        if (name.startsWith("#o0")) { 
-            return tab + "Object " + name + "\n"; 
+        if (name.startsWith("#o0")) {
+            return tab + "Object " + name + "\n";
         }
 
         String type = sort == null ? "java.lang.Object"
                 : sort.name().toString();
 
-        String result = tab + "Object " + name + "\n";
+        StringBuilder result = new StringBuilder(tab + "Object " + name + "\n");
 
-        result += tab + tab + "length = " + length + "\n";
-        result += tab + tab + "type =" + type + "\n";
-        result += tab + tab + "exactInstance =" + this.exactInstance + "\n";
-        // result += tab+tab+"<inv> = "+this.inv+"\n";
+        result.append(tab).append(tab).append("length = ").append(length).append("\n");
+        result.append(tab).append(tab).append("type =").append(type).append("\n");
+        result.append(tab).append(tab).append("exactInstance =").append(this.exactInstance).append("\n");
 
         List<String> fields = new LinkedList<>(fieldvalues.keySet());
         Collections.sort(fields);
 
         for (String field : fields) {
-            result += tab + tab + field + " = " + fieldvalues.get(field);
-            result += "\n";
+            result.append(tab).append(tab).append(field).append(" = ").append(fieldvalues.get(field));
+            result.append("\n");
         }
 
-        for (String fun : funValues.keySet()) {
-            result += tab + tab + fun + " = " + funValues.get(fun);
-            result += "\n";
+        for (var pair  : funValues.entrySet()) {
+            String fun = pair.getKey();
+            result.append(tab).append(tab).append(fun).append(" = ").append(pair.getValue());
+            result.append("\n");
         }
 
         List<Integer> arrfields = new ArrayList<>(arrayValues.keySet());
         Collections.sort(arrfields);
 
         for (int i : arrfields) {
-            result += tab + tab + "[" + i + "] = " + arrayValues.get(i);
-            result += "\n";
+            result.append(tab).append(tab).append("[").append(i).append("] = ").append(arrayValues.get(i));
+            result.append("\n");
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -293,8 +293,8 @@ public class ObjectVal {
     public boolean equals(Object o) {
         if (o instanceof ObjectVal) {
             ObjectVal ov = (ObjectVal) o;
-            if (ov.name == null) { 
-                return name == null; 
+            if (ov.name == null) {
+                return name == null;
             }
             return ov.name.equals(name);
         }

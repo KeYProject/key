@@ -42,8 +42,8 @@ public class KeYRecoderMapping{
 
     
     public KeYRecoderMapping() {
-	this.map = new LinkedHashMap<Object, Object>();
-	this.revMap = new LinkedHashMap<Object, Object>();
+	this.map = new LinkedHashMap<>();
+	this.revMap = new LinkedHashMap<>();
     }
 
 
@@ -103,10 +103,7 @@ public class KeYRecoderMapping{
     */
     public recoder.ModelElement toRecoder(ModelElement pe) {
         Object res=revMap.get(pe);
-	if (res==null) {
-	    //System.out.println(revMap);
-	}
-        Debug.assertTrue(res!=null, "Model Element not known", pe);	
+        Debug.assertTrue(res!=null, "Model Element not known", pe);
 
         return (recoder.ModelElement)res;
     }

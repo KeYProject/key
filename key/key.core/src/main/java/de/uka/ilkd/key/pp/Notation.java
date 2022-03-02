@@ -13,17 +13,21 @@
 
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link
@@ -33,6 +37,7 @@ import de.uka.ilkd.key.util.Debug;
  * function style, attribute style, etc.
  */
 public abstract class Notation {
+	private static final Logger LOGGER = LoggerFactory.getLogger(Notation.class);
 
     /**
      * The priority of this operator in the given concrete syntax. This is
@@ -504,7 +509,7 @@ public abstract class Notation {
 			.printConstant(t.op().name().toString().replaceAll(
 				"::", "."));
 	    } else {
-		Debug.out("Unknown variable type");
+		LOGGER.debug("Unknown variable type");
 		sp.printConstant(t.op().name().toString());
 	    }
 	}
@@ -617,7 +622,9 @@ public abstract class Notation {
      * The standard concrete syntax for the character literal indicator `C'.
      */
     static final class CharLiteral extends Notation {
-	public CharLiteral() {
+		private static final Logger LOGGER = LoggerFactory.getLogger(CharLiteral.class);
+
+		public CharLiteral() {
 	    super(1000);
 	}
 
@@ -639,11 +646,11 @@ public abstract class Notation {
 		    throw new NumberFormatException(); // overflow!
 
 	    } catch (NumberFormatException ex) {
-		System.out.println("Oops. " + result + " is not of type char");
+		LOGGER.error("Oops. {} is not of type char", result);
 		return null;
 	    }
 
-	    return ("'" + Character.valueOf(charVal)) + "'";
+	    return ("'" + charVal) + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -656,14 +663,117 @@ public abstract class Notation {
 	}
     }
     
+	/**
+     * The standard concrete syntax for the float literal indicator `FP'.
+     */
+    static final class FloatLiteral extends Notation {
 
+        private final static int EXP_MASK = 0x7f80_0000;
+
+        public FloatLiteral() {
+            super(120);
+        }
+
+        public static String printFloatTerm(Term floatTerm) {
+
+            if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
+                return null;
+            }
+
+            try {
+                int bits = extractValue(floatTerm.sub(0));
+                float f = Float.intBitsToFloat(bits);
+                if (Float.isNaN(f)) {
+                    return "floatNaN";
+				} else if (f == Float.POSITIVE_INFINITY) {
+					return "floatInf";
+				} else if (f == Float.NEGATIVE_INFINITY) {
+					return "-floatInf";
+                } else {
+                    return f + "f";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        private static int extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+				int result = digit + 10 * extractValue(t.sub(0));
+				return result;
+            }
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printFloatTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+    }
+
+    /**
+     * The standard concrete syntax for the double literal indicator `DFP'.
+     */
+    static final class DoubleLiteral extends Notation {
+        public DoubleLiteral() {
+            super(120);
+        }
+
+        public static String printDoubleTerm(Term doubleTerm) {
+
+            if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
+                return null;
+            }
+
+            try {
+                long bits = extractValue(doubleTerm.sub(0));
+                double f = Double.longBitsToDouble(bits);
+                if (Double.isNaN(f)) {
+                    return "floatNaN";
+                } else if (f == Double.POSITIVE_INFINITY) {
+					return "doubleInf";
+				} else if (f == Double.NEGATIVE_INFINITY) {
+					return "-doubleInf";
+                } else {
+                    return f + "d";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        private static long extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0L;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+                return digit + 10 * extractValue(t.sub(0));
+            }
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printDoubleTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+    }
   
 
     /**
      * The standard concrete syntax for sequence singletons.
      */
     public static final class SeqSingletonNotation extends Notation {
-        final String lDelimiter, rDelimiter;
+        final String lDelimiter;
+		final String rDelimiter;
 
 	public SeqSingletonNotation(String lDelimiter, String rDelimiter) {
 	    super(130);
@@ -700,7 +810,7 @@ public abstract class Notation {
               term = term.sub(1);
             }
             result = result
-                    + CharLiteral.printCharTerm(term.sub(0)).charAt(1);            
+                    + CharLiteral.printCharTerm(term.sub(0)).charAt(1);
             return (result + "\"");
         }
         

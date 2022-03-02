@@ -77,6 +77,20 @@ public final class RealLDT extends LDT {
         return services.getTermBuilder().func(sk);
     }
 
+//    @Override
+//    public Function getFunctionFor(String op, Services services) {
+//        switch (op) {
+//            case "gt": return getGreaterThan();
+//            case "geq": return getGreaterOrEquals();
+//            case "lt": return getLessThan();
+//            case "leq": return getLessOrEquals();
+//            case "div": return getDivIEEE();
+//            case "mul": return getMulIEEE();
+//            case "add": return getAddIEEE();
+//            case "sub": return getSubIEEE();
+//        }
+//        return null;
+//    }
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
@@ -105,6 +119,6 @@ public final class RealLDT extends LDT {
 	    return PrimitiveType.JAVA_REAL;
 	} else {
 	    return null;
-	}
+        }
     }
 }

@@ -114,17 +114,29 @@ public class MasterHandler {
     }
 
     /**
-     * Create a new handler.
+     * Create a new handler with the default set of smt handlers.
      *
      * @param services non-null services
      * @param settings settings from the proof for the property settings.
      * @throws IOException
      */
     public MasterHandler(Services services, SMTSettings settings) throws IOException {
+        this(services, settings, null);
+    }
+
+    /**
+     * Create a new handler with a custom set of smt handlers.
+     *
+     * @param services non-null services
+     * @param settings settings from the proof for the property settings.
+     * @throws IOException
+     */
+    public MasterHandler(Services services, SMTSettings settings, List<SMTHandler> smtHandlers) throws IOException {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, this);
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, smtHandlers, this);
     }
+
 
     /**
      * Translate a single term to an SMTLib S-Expression.

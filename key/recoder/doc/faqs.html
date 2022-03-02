@@ -1,0 +1,118 @@
+<HTML><HEAD><TITLE>RECODER FAQs</TITLE>
+<LINK REL=stylesheet TYPE="text/css" HREF="recoder.css">
+</HEAD><BODY>
+
+<DIV ALIGN="right"><A HREF="../index.html">Home</A></DIV>
+
+<H1>RECODER FAQs</H1>
+
+<A NAME="troubles"></A>
+<H2>Troubleshooting</H2>
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>My compiler seems to have problems with <CODE>SourceElement.Position</CODE></EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>Compilers that work correctly are <CODE>jikes</CODE> or <CODE>javac</CODE>.
+You might also want to help your compiler by providing (redundant)
+<CODE>public static</CODE> modifiers in front of the member class declaration
+(IBM Visual Age), or the fully qualified name if the name resolution fails
+(Inprise JBuilder).
+</DD>
+</DL>
+
+<HR NOSHADE>
+
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>There are lots of deprecation warnings during compilation.</EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>Usually, compilers will not report deprecation warnings. You can
+safely ignore them; we use the <CODE>@deprecated</CODE> tag to mark
+unfinished, "risky" methods that custom applications should avoid.
+These methods will be removed or refined in later versions.
+</DD>
+</DL>
+
+<HR NOSHADE>
+
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>RECODER does not seem to find a file which is in the search path?!</EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>The file name might be expanded into an absolute path. Currently, the
+    repositories handle relative file names only. Simply add the system root
+        to your search path (<CODE>"/."</CODE> for Unix systems).
+</DD>
+</DL>
+
+<!--
+<HR NOSHADE>
+
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>The pretty printer shifts my comments in certain cases - why?</EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>This is a technical problem. Comments are usually skipped in
+    common parsers, so we had to assign them later on. To do so, we need
+    a syntactical hook to attach comments to. However, the parser does not
+    represent all implicit terminal tokens such as ",", ";", or "}".
+    Hence comments are shifted somewhat as they are attached at the following
+    explicit token. You can observe such effects at the end of member or
+    statement blocks, especially with commented-out regions in otherwise
+    empty statements.    
+    <BR>
+    Since any fix for that problem requires some grave changes to the parser,
+    do not expect to see that fix soon.
+</DD>
+</DL>
+-->
+
+<A NAME="design"></A>
+<H2>Design Questions</H2>
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>Why did you introduce that many lists?</EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>Java did not provide parameterized (generic/template) types at time of development 
+    and we felt the need to provide type safe containers in public interfaces.
+    The pattern applied here provides us with a workaround.</DD>
+</DL>
+
+<HR NOSHADE>
+
+<DL COMPACT>
+<DT><EM>Q:</EM></DT>
+<DD><EM>Why are the java.util.Collection classes not used for Lists, Sets and so on?</EM></DD>
+<P></P>
+<DT><EM>A:</EM></DT>
+<DD>Two reasons: First, at the time of writing, there was no recommendable
+    JDK available for the primary development platform Linux, so we had to
+    remain compatible with JDK 1.1. Second, our implementations require
+    significantly less memory and are - for most objects - faster than the 
+    standard implementations. Unfortunately, the Collection interfaces are not
+    trivial to support by now, so no attempt was made.
+    This is partly due to the underlaying implementation; for instance,
+    iteration over entry pairs for instance would never become very 
+    efficient as we use a different layout internally. Lists are clearly
+    not really compatible, even though one could attempt to make
+    ObjectMutableList a subtype of java.util.List.
+</DD>
+</DL>
+
+<!--
+Q: Why do several program elements have multiple parent fields?
+A: This expresses the different roles an element can play, or the
+   different contexts it can be embedded within. A method reference,
+   for instance, can be part of an object access path, a part of an
+   expression, or used as a statement. It is sometimes important to
+   know this role, so we encoded them in separate fields unless the roles
+   could be separated by the type of the parent.
+-->
+
+
+</BODY></HTML>

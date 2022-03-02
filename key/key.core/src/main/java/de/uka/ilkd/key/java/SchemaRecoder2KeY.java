@@ -26,13 +26,17 @@ import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaRecoder2KeY.class);
 
     /** the namespace containing the program schema variables allowed here */
     protected Namespace<SchemaVariable> svns;
@@ -45,7 +49,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             new LinkedHashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
-    private static SchemaCrossReferenceServiceConfiguration schemaServConf =
+    private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
             new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
@@ -147,20 +151,18 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
                 br.close();
             }
         } catch (recoder.ParserException e) {
-            Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
+            LOGGER.debug("readSchemaJavaBlock(Reader,CompilationUnit)"
                     + " caused the " + "exception:\n", e);
-            Debug.out(e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
                     + "\n **** END ****\n failed. Thrown Exception:"
-                    + e.toString(), e);
+                    + e, e);
         } catch (IOException ioe) {
-            Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
-                    + " caused the IO exception:\n", ioe);
-            Debug.out(ioe);
+            LOGGER.debug("readSchemaJavaBlock(Reader,CompilationUnit)"
+                    + " caused the IO exception:", ioe);
             throw new ConvertException(
                     "IO Error when parsing: \n **** BEGIN ****\n " + block
                     + "\n **** END ****\n failed. Thrown IOException:"
-                    + ioe.toString(), ioe);
+                    + ioe, ioe);
         } 
         
         embedClass(embedMethod(embedBlock(bl), context), context);

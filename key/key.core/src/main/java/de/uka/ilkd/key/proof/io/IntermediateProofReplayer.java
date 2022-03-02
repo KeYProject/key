@@ -90,7 +90,7 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -101,6 +101,9 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This class is responsible for generating a KeY proof from an intermediate
@@ -123,6 +126,8 @@ public class IntermediateProofReplayer {
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntermediateProofReplayer.class);
+
 
     /** The problem loader, for reporting errors */
     private final AbstractProblemLoader loader;
@@ -472,11 +477,11 @@ public class IntermediateProofReplayer {
      *            The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate
      *         representation.
-     * @throws TacletConstructionException
+     * @throws TacletAppConstructionException
      *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal) throws TacletConstructionException {
+            Goal currGoal) throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -502,7 +507,7 @@ public class IntermediateProofReplayer {
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
-                throw (TacletConstructionException)new TacletConstructionException(
+                throw (TacletAppConstructionException)new TacletAppConstructionException(
                     "Wrong position information: " + pos).initCause(e);
             }
         }
@@ -524,6 +529,25 @@ public class IntermediateProofReplayer {
                     nss.programVariables(), nss.functions());
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
                 new SequentFormula(term)));
+        }
+
+        if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
+            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
+                    tacletName);
+            // try to find instantiations automatically
+            ImmutableList<TacletApp> instApps = ourApp
+                    .findIfFormulaInstantiations(seq, services);
+            if (instApps.size() != 1) {
+                // none or not a unique result
+                throw new TacletAppConstructionException(
+                        "\nCould not apply " + tacletName +
+                        "\nUnknown instantiations for \\assumes. " +
+                        instApps.size()  + " candidates.\n" +
+                        "Perhaps the rule's definition has been changed in KeY.");
+            }
+
+            TacletApp newApp = instApps.head();
+            ifFormulaList = newApp.ifFormulaInstantiations();
         }
 
         // TODO: In certain cases, the below method call returns null and
@@ -613,7 +637,7 @@ public class IntermediateProofReplayer {
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
-                SMTSettings settings = new SMTSettings(
+                DefaultSMTSettings settings = new DefaultSMTSettings(
                     proof.getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     proof.getSettings().getNewSMTSettings(),
@@ -790,7 +814,6 @@ public class IntermediateProofReplayer {
                                 .instantiateAbstractDomain(ph.first,
                                     applicablePredicates, latticeType, services)
                                 .fromString(abstrElemStr, services);
-
                         final Named pv = services.getNamespaces()
                                 .programVariables().lookup(ph.second);
 
@@ -912,8 +935,7 @@ public class IntermediateProofReplayer {
             if (sv == null) {
                 // throw new IllegalStateException(
                 // varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
-                System.err.println(varname + " from " + app.rule().name()
-                        + " is not in uninsts");
+                LOGGER.error("{} from {} is not in uninsts", varname, app.rule().name());
                 continue;
             }
             final String value = s.substring(eq + 1, s.length());
@@ -1075,14 +1097,14 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletConstructionException extends Exception {
+    static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
-        TacletConstructionException(String s) {
+        TacletAppConstructionException(String s) {
             super(s);
         }
 
-        TacletConstructionException(Throwable cause) {
+        TacletAppConstructionException(Throwable cause) {
             super(cause);
         }
     }

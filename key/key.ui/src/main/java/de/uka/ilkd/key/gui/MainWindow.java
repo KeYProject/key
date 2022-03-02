@@ -52,13 +52,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnull;
 
 import javax.swing.*;
@@ -87,6 +90,9 @@ public final class MainWindow extends JFrame {
     private static final long serialVersionUID = 5853419918923902636L;
     private static final String PARA =
             "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
+
     private static MainWindow instance = null;
     /**
      * Search bar for Sequent Views.
@@ -331,9 +337,9 @@ public final class MainWindow extends JFrame {
 
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
-            System.err.println("Please use the --auto option to start KeY in batch mode.");
-            System.err.println("Use the --help option for more command line options.");
+            LOGGER.error("Error: KeY started in graphical mode, but no graphical environment present.");
+            LOGGER.error("Please use the --auto option to start KeY in batch mode.");
+            LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
         }
         if (instance == null) {
@@ -410,6 +416,8 @@ public final class MainWindow extends JFrame {
      */
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
+        // Not sure if this is needed.
+        // Automode stopped is always fired next and sets it as well (does not cause a duplicate listener).
         result.addKeYSelectionListener(proofListener);
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
@@ -789,7 +797,7 @@ public final class MainWindow extends JFrame {
                 vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).
                         isSelected());
                 // TODO: inform that this requires a restart
-                System.out.println("Info: Look and feel changed for next start of KeY.");
+                LOGGER.warn("Info: Look and feel changed for next start of KeY.");
             }
         });
 //        view.add(laf); // uncomment this line to include the option in the menu
@@ -1052,16 +1060,24 @@ public final class MainWindow extends JFrame {
 
         final SequentView newSequentView;
 
+        // if this is set we can skip calls to printSequent, since it is invoked in setSequentView immediately anyways
+        final boolean isPrintRunImmediately = SwingUtilities.isEventDispatchThread();
         if (getMediator().getSelectedProof() == null) {
             newSequentView = emptySequent;
         } else {
             Goal goal = getMediator().getSelectedGoal();
             if (goal != null && !goal.node().isClosed()) {
                 currentGoalView.setPrinter(goal);
-                currentGoalView.printSequent();
+
+                if (!isPrintRunImmediately) {
+                    currentGoalView.printSequent();
+                }
                 newSequentView = currentGoalView;
             } else {
                 newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                if (!isPrintRunImmediately) {
+                    newSequentView.printSequent();
+                }
             }
         }
 
@@ -1069,11 +1085,12 @@ public final class MainWindow extends JFrame {
             @Override
             public void run() {
                 mainFrame.setContent(newSequentView);
+                // always does printSequent if on the event thread
                 sequentViewSearchBar.setSequentView(newSequentView);
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (isPrintRunImmediately) {
             sequentUpdater.run();
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1486,7 +1503,7 @@ public final class MainWindow extends JFrame {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             if (doNotReenable == null) {
                 // bug #1105 occurred
-                Debug.out("toolbar enabled w/o prior disable");
+                LOGGER.debug("toolbar enabled w/o prior disable");
                 return;
             }
 
@@ -1567,7 +1584,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("Main: initialize with new proof");
+            LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
                 proof.getSettings().getStrategySettings().removeSettingsListener(this);
@@ -1587,7 +1604,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStarted(ProofEvent e) {
-            Debug.log4jWarn("Automode started", MainWindow.class.getName());
+            LOGGER.info("Automode started");
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -1599,14 +1616,12 @@ public final class MainWindow extends JFrame {
         @Override
         public synchronized void autoModeStopped(ProofEvent e) {
             if (Debug.ENABLE_DEBUG) {
-                Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
-                Debug.log4jDebug("From " + Debug.stackTrace(),
-                        MainWindow.class.getName());
+                LOGGER.info("Automode stopped");
             }
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
-            getMediator().addKeYSelectionListener(proofListener);
+            getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
         /**
@@ -1686,7 +1701,7 @@ public final class MainWindow extends JFrame {
                 @Override
                 public void run() {
 
-                    SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+                    DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                             proof.getSettings().getNewSMTSettings(), proof);
                     SolverLauncher launcher = new SolverLauncher(settings);

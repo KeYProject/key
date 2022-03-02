@@ -37,9 +37,12 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import org.key_project.util.lookup.Lookup;
 
-public class Node {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -92,6 +95,10 @@ public class Node {
     private ImmutableList<RenamingTable> renamings;
 
     private String cachedName = null;
+
+    @Nullable
+    private Lookup userData =null;
+
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or
@@ -181,12 +188,8 @@ public class Node {
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
             SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
-            ImmutableSet<URI> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
-
             this.nodeInfo = new NodeInfo(this);
-
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
-            this.nodeInfo.addRelevantFiles(oldRelevantFiles);
         } else {
             this.nodeInfo = new NodeInfo(this);
         }
@@ -359,7 +362,6 @@ public class Node {
         newChild.siblingNr = children.size();
         children.add(newChild);
         newChild.parent = this;
-        newChild.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         proof().fireProofExpanded(this);
     }
 
@@ -373,7 +375,6 @@ public class Node {
         for (int i = 0; i < newChildren.length; i++) {
             newChildren[i].siblingNr = i + size;
             newChildren[i].parent = this;
-            newChildren[i].nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         }
 
         Collections.addAll(children, newChildren);
@@ -749,4 +750,55 @@ public class Node {
         return childrenIterator();
     }
 
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> T lookup(Class<T> service) {
+        try {
+            if (userData == null) {
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @Nonnull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
+    }
 }

@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.core;
 
+import java.util.Collection;
 import java.util.EventObject;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
@@ -66,6 +68,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.lookup.Lookup;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface
@@ -362,6 +365,18 @@ public class KeYMediator {
     }
 
     /**
+     * adds a listener to the KeYSelectionModel, so that the listener will be
+     * informed if the proof or node the user has selected changed
+     *
+     * adds the listener only if it not already registered
+     *
+     * @param listener the KeYSelectionListener to add
+     */
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+        keySelectionModel.addKeYSelectionListenerChecked(listener);
+    }
+
+    /**
      * removes a listener from the KeYSelectionModel
      *
      * @param listener the KeYSelectionListener to be removed
@@ -607,8 +622,64 @@ public class KeYMediator {
         return inAutoMode;
     }
 
+    @Nullable
+    private Lookup userData;
+
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @Nonnull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
+    }
+
+
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-        private boolean pruningInProcess;
+       private boolean pruningInProcess;
 
         @Override
         public void proofClosed(ProofTreeEvent e) {
@@ -632,6 +703,7 @@ public class KeYMediator {
                     }
                 }
             });
+            OneStepSimplifier.refreshOSS(e.getSource());
             pruningInProcess = false;
         }
 
