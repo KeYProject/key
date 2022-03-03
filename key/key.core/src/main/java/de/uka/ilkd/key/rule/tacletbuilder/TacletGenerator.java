@@ -469,7 +469,7 @@ public class TacletGenerator {
             final VariableSV targetSV = SchemaVariableFactory.createVariableSV(
                     new Name(target.sort().name().toString().substring(0, 1)),
                     target.sort());
-            Term targetSVReachable = null;
+            Term targetSVReachable = TB.tt();
             for(SchemaVariable heapSV : heapSVs) {
                  tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
                  final Term tReach = TB.reachableValue(TB.var(heapSV), TB.var(targetSV),

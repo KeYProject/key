@@ -241,7 +241,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if(selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
-        Term created = null;
+        Term created = tb.tt();
         for(LocationVariable heap : heaps) {
             if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
                 continue;

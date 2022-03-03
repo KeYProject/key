@@ -361,10 +361,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private static Term saveBeforeHeaps(final Map<Term, Term> heapToBefore,
                                         final TermBuilder tb) {
-        Term saveBeforeHeaps = null;
+        Term saveBeforeHeaps = tb.skip();
         for (Term heap : heapToBefore.keySet()) {
             final Term bu = tb.elementary(heapToBefore.get(heap), heap);
             if (saveBeforeHeaps == null) {
+                // since initialised with skip, probably not needed
                 saveBeforeHeaps = bu;
             } else {
                 saveBeforeHeaps = tb.parallel(saveBeforeHeaps, bu);
@@ -1143,7 +1144,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term representsFromContract = null;
         for (FunctionalOperationContract fop : lookupContracts) {
             representsFromContract =
-                    fop.getRepresentsAxiom(heaps.get(0), selfVar,
+                    fop.getRepresentsAxiom(heaps.isEmpty() ? null : heaps.get(0), selfVar,
                                            paramVars, resultVar,
                                            atPreVars, proofServices);
             if (representsFromContract != null) {

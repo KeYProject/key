@@ -1253,6 +1253,15 @@ public class JMLSpecFactory {
         Map<LocationVariable, Term> axioms
                 = generateRepresentsAxioms(progVars, clauses, originalBehavior);
 
+        if(pm.getStateCount() == 0) {
+            for (Term axiom : axioms.values()) {
+                if(usesHeap(axiom)) {
+                    // to do: find location
+                    throw new SLTranslationException("Model method is no_state, but uses heap");
+                }
+            }
+        }
+
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
         result = result.union(createInformationFlowContracts(clauses, pm, progVars));
@@ -1261,6 +1270,14 @@ public class JMLSpecFactory {
         result = result.union(createDependencyOperationContract(pm, progVars, clauses));
 
         return result;
+    }
+
+
+    private boolean usesHeap(Term axiom) {
+        if (axiom.op() == services.getTypeConverter().getHeapLDT().getHeap()) {
+            return true;
+        }
+        return axiom.subs().stream().anyMatch(this::usesHeap);
     }
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(

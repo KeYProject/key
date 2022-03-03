@@ -247,7 +247,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             Map<Term, Term> heapToAtPre,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
-        Term frameTerm = null;
+        Term frameTerm = tb.tt();
         for(LocationVariable heap : modHeaps) {
             final Term ft;
             if(!getContract().hasModifiesClause(heap)) {
