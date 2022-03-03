@@ -1256,8 +1256,9 @@ public class JMLSpecFactory {
         if(pm.getStateCount() == 0) {
             for (Term axiom : axioms.values()) {
                 if(usesHeap(axiom)) {
-                    // to do: find location
-                    throw new SLTranslationException("Model method is no_state, but uses heap");
+                    // to do: find location in file
+                    var loc = pm.getPositionInfo();
+                    throw new SLTranslationException("Model method " + pm.name() + " is no_state, but uses heap:\n" + axiom, loc.getURI().toString(), loc.getStartPosition());
                 }
             }
         }
