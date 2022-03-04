@@ -235,18 +235,17 @@ public final class Main {
         LOGGER.debug("OS: {}", System.getProperty("java.os"));
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
-        LOGGER.debug("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Available processors:  " + rt.availableProcessors());
+        LOGGER.debug("Total memory: {} MB", (rt.totalMemory() / 1048576.0));
+        LOGGER.debug("Maximum memory:  {} MB" , (rt.maxMemory() / 1048576.0));
+        LOGGER.debug("Free memory: {} MB", (rt.freeMemory() / 1048576.0));
+        LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
-            for (int i = 0; i < fileArguments.size(); i++) {
-                File f = fileArguments.get(i);
+            for (File f : fileArguments) {
                 ui.loadProblem(f);
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
@@ -502,11 +501,7 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
-        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
-        } catch (IOException e) {
-            //LOGGER.log(Level.INFO, e.getMessage(), e);
-        }*/
+        LOGGER.info("Experimental Features: {}", state);
     }
 
     public static boolean isExperimentalMode() {
@@ -517,7 +512,7 @@ public final class Main {
      * Print a header text on to the console.
      */
     private static void printHeader() {
-        LOGGER.info("KeY Version " + KeYConstants.VERSION);
+        LOGGER.info("KeY Version {}", KeYConstants.VERSION);
         LOGGER.info(KeYConstants.COPYRIGHT);
         LOGGER.info("KeY is protected by the GNU General Public License");
     }

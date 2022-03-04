@@ -12,9 +12,11 @@
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
         </encoder>
+        <!--
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
+        -->
     </appender>
 
     <root level="debug">

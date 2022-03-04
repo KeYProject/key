@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.core;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.filter.ThresholdFilter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,21 +28,27 @@ public class Log {
     public static void configureLogging(int verbosity) {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
+        var filter = new ThresholdFilter();
+        consoleAppender.addFilter(filter);
         switch (verbosity) {
             case Verbosity.TRACE:
-                root.setLevel(Level.TRACE);
+                filter.setLevel("TRACE");
                 break;
             case Verbosity.DEBUG:
-                root.setLevel(Level.DEBUG);
+                filter.setLevel("DEBUG");
                 break;
             case Verbosity.INFO:
-                root.setLevel(Level.INFO);
+                filter.setLevel("INFO");
                 break;
             case Verbosity.NORMAL:
-                root.setLevel(Level.ERROR);
+                filter.setLevel("ERROR");
                 break;
             case Verbosity.SILENT:
-                root.setLevel(Level.OFF);
+                filter.setLevel("OFF");
+                break;
+            default:
+                filter.setLevel("WARN");
                 break;
         }
     }
