@@ -20,10 +20,12 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class KeYRecoderMapping{
+    public static final Logger LOGGER = LoggerFactory.getLogger(KeYRecoderMapping.class);
 
 
     /** have special classes been parsed in */
@@ -40,10 +42,10 @@ public class KeYRecoderMapping{
     /** a pseudo super class for all arrays used to declare length */
     private KeYJavaType superArrayType=null;
 
-    
+
     public KeYRecoderMapping() {
-	this.map = new LinkedHashMap<>();
-	this.revMap = new LinkedHashMap<>();
+	this.map = new LinkedHashMap<>(4096);
+	this.revMap = new LinkedHashMap<>(4096);
     }
 
 
@@ -110,22 +112,25 @@ public class KeYRecoderMapping{
 
     public void put(Object rec, Object key) {
 	Object formerValue = map.put(rec, key);
-	Debug.assertTrue(formerValue == null, 
+	Debug.assertTrue(formerValue == null,
 			 "keyrecodermapping: duplicate registration of type:", key);
 	revMap.put(key, rec);
+        LOGGER.warn("Size of rec2key: {} entries", map.size());
     }
 
     public boolean mapped(Object rec) {
 	return map.containsKey(rec);
     }
-    
+
 
     public Set<Object> elemsKeY() {
-	return revMap.keySet();
+        LOGGER.error("Size of rec2key: {} entries", map.size());
+
+        return revMap.keySet();
     }
 
     public Set<Object> elemsRec() {
-	return map.keySet();
+        return map.keySet();
     }
 
     public void setSuperArrayType(KeYJavaType superArrayType) {
@@ -136,7 +141,7 @@ public class KeYRecoderMapping{
         return this.superArrayType;
     }
 
-    
+
     @SuppressWarnings("unchecked")
     public KeYRecoderMapping copy() {
 	return new KeYRecoderMapping((HashMap<Object, Object>)map.clone(),
@@ -150,7 +155,7 @@ public class KeYRecoderMapping{
      * some 'java.lang' classes. These are parsed in using method
      * parseSpecial of {@link Recoder2KeY}. To avoid multiple readings
      * this method indicates whether the special have been parsed in or
-     * not. 
+     * not.
      * @return true if special classes have been parsed in
      */
     public boolean parsedSpecial() {
@@ -158,9 +163,9 @@ public class KeYRecoderMapping{
     }
 
     public int size(){
-	return map.size();
+        return map.size();
     }
-    
+
 
     /**
      * As long as we do not support lemmata we need the source code of
