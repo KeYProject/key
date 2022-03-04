@@ -33,6 +33,7 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 public class KeYProgModelInfo {
@@ -137,9 +138,10 @@ public class KeYProgModelInfo {
         return result;
     }
 
+    @Nonnull
     private List<recoder.abstraction.Type> getRecoderTypes(ImmutableList<? extends Type> types) {
         if (types == null) {
-            return null;
+            return Collections.emptyList();
         }
         final ArrayList<recoder.abstraction.Type> tl
                 = new ArrayList<>(types.size());
@@ -224,7 +226,7 @@ public class KeYProgModelInfo {
         return rt.getFullName();
     }
 
-    public recoder.abstraction.Type getType(TypeReference tr) {
+    private recoder.abstraction.Type getType(TypeReference tr) {
         recoder.abstraction.Type result;
         if (tr instanceof TypeRef) {
             result = (recoder.abstraction.Type)
@@ -394,7 +396,7 @@ public class KeYProgModelInfo {
      * @param signature the statical type signature of a callee.
      */
 
-    public ImmutableList<Method> getMethods(KeYJavaType ct, String m,
+    private ImmutableList<Method> getMethods(KeYJavaType ct, String m,
                                             ImmutableList<Type> signature, KeYJavaType context) {
         List<recoder.abstraction.Method> rml =
                 getRecoderMethods(ct, m, signature, context);
@@ -879,7 +881,7 @@ public class KeYProgModelInfo {
         return false;
     }
 
-    public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
+    private void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
         Map<String, IProgramMethod> map = implicits.get(t);
         if (map == null) {
             map = new LinkedHashMap<>();

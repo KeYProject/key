@@ -11,7 +11,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.util.Debug;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +21,12 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Facade for the JavaParser.
+ * <p>
+ * This class allows you to configure a classpath, and source path.
+ * To parse Java source files, to process them in the Java2Java pipeline
+ * and to have a proper symbol resolution.
+ *
  * @author Alexander Weigl
  * @version 1 (19.02.22)
  */
@@ -50,8 +55,8 @@ public class JavaService {
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();
-            config.setSymbolResolver(getSymbolResolver());
         }
+        config.setSymbolResolver(getSymbolResolver());
         return config;
     }
 

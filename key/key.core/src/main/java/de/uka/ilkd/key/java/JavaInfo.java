@@ -30,11 +30,10 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
+
+import java.util.*;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
