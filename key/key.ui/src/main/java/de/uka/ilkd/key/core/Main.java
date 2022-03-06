@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -44,8 +45,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import recoder.ParserException;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -53,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * The main entry point for KeY
@@ -91,8 +93,6 @@ public final class Main {
     private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    //    deprecated
-//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -125,7 +125,7 @@ public final class Main {
     /**
      * Level of verbosity for command line outputs.
      */
-    private static byte verbosity = Verbosity.NORMAL;
+    private static Verbosity verbosity = Verbosity.NORMAL;
 
     private static String examplesDir = null;
 
@@ -236,7 +236,7 @@ public final class Main {
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
         LOGGER.debug("Total memory: {} MB", (rt.totalMemory() / 1048576.0));
-        LOGGER.debug("Maximum memory:  {} MB" , (rt.maxMemory() / 1048576.0));
+        LOGGER.debug("Maximum memory:  {} MB", (rt.maxMemory() / 1048576.0));
         LOGGER.debug("Free memory: {} MB", (rt.freeMemory() / 1048576.0));
         LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
@@ -273,7 +273,8 @@ public final class Main {
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
+        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps " +
+                "to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addOption(NO_PRUNING_CLOSED, null,
                 "disables pruning and goal back in closed branches (saves memory)");
@@ -290,18 +291,25 @@ public final class Main {
         cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
-        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
+        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms " +
+                "(default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
-        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
+        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets " +
+                "(options always with prefix --jr) needs the path to the rule file as argument");
         cl.addText("\n", true);
-        cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.", false);
-        cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.", false);
+        cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.",
+                false);
+        cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.",
+                false);
         cl.addText("\n", true);
-        cl.addOption(JMAX_RULES, "<number>", "maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
+        cl.addOption(JMAX_RULES, "<number>", "maximum number of rule application to perform " +
+                "(default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
         cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
+        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms " +
+                "(default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
         cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
-        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
+        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs " +
+                "(then stored to path given by " + JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
         return cl;
@@ -314,9 +322,7 @@ public final class Main {
      */
     public static void evaluateOptions(CommandLine cl) {
         if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Running in experimental mode ...");
-            }
+            LOGGER.info("Running in experimental mode ...");
             setEnabledExperimentalFeatures(true);
         } else {
             setEnabledExperimentalFeatures(false);
@@ -325,7 +331,8 @@ public final class Main {
 
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
-                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.DEBUG);
+                var v = cl.getInteger(VERBOSITY, Verbosity.DEBUG.ordinal());
+                verbosity = Verbosity.values()[v];
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -334,19 +341,14 @@ public final class Main {
             }
         }
 
-        if (verbosity > Verbosity.SILENT) {
-            printHeader();
-        }
+        printHeader();
 
         if (cl.isSet(SHOW_PROPERTIES)) {
-            try {
-                java.util.Properties props = System.getProperties();
-                for (Object o : props.keySet()) {
-                    LOGGER.info("" + o + "=\"" + props.get(o) + "\"");
-                }
-            } finally {
-                System.exit(0);
+            java.util.Properties props = System.getProperties();
+            for (var o : props.entrySet()) {
+                LOGGER.info("{} = {}", o.getKey(), o.getValue());
             }
+            System.exit(0);
         }
 
         if (cl.isSet(AUTO)) {
@@ -383,20 +385,13 @@ public final class Main {
         }
 
         if (cl.isSet(TIMEOUT)) {
-            if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("Timeout is set");
-            }
+            LOGGER.info("Timeout is set");
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.DEBUG) {
-                    LOGGER.info("Timeout is: " + timeout + " ms");
-                }
+                LOGGER.info("Timeout is: {} ms", timeout);
             } catch (CommandLineException e) {
-                if (Debug.ENABLE_DEBUG) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn(e.getMessage());
+                LOGGER.error("Could not parse the command line option {}", TIMEOUT, e);
             }
 
             if (timeout < -1) {
@@ -410,32 +405,14 @@ public final class Main {
             examplesDir = cl.getString(EXAMPLES, null);
         }
 
-        if (verbosity > Verbosity.SILENT) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("Running in debug mode");
-            }
+        LOGGER.info("DEBUG mode is {}", Debug.ENABLE_DEBUG ? "on" : "off");
+        LOGGER.info("Assertions are {}", Debug.ENABLE_ASSERTION ? "on" : "off");
 
-            if (Debug.ENABLE_ASSERTION) {
-                LOGGER.info("Using assertions");
-            } else {
-                LOGGER.info("Not using assertions");
-            }
-        }
-
-        if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Running in experimental mode ...");
-            }
-            setEnabledExperimentalFeatures(true);
-        } else {
-            setEnabledExperimentalFeatures(false);
-        }
+        setEnabledExperimentalFeatures(cl.isSet(EXPERIMENTAL));
 
         if (cl.isSet(RIFL)) {
             riflFileName = new File(cl.getString(RIFL, null));
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("[RIFL] Loading RIFL specification from " + riflFileName);
-            }
+            LOGGER.info("[RIFL] Loading RIFL specification from {}", riflFileName);
         }
 
         if (cl.isSet(LAST)) {
@@ -530,21 +507,9 @@ public final class Main {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread t, Throwable e) {
-                    if (verbosity > Verbosity.SILENT) {
-                        LOGGER.error("Auto mode was terminated by an exception:", e);
-                        if (verbosity >= Verbosity.TRACE) {
-                            e.printStackTrace();
-                        }
-                        final String msg = e.getMessage();
-                        if (msg != null) {
-                            LOGGER.info(msg);
-                        }
-                    }
-                    System.exit(-1);
-                }
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                LOGGER.error("Auto mode was terminated by an exception:", e);
+                System.exit(-1);
             });
             if (fileArguments.isEmpty()) {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
@@ -552,8 +517,6 @@ public final class Main {
 
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
-            updateSplashScreen();
-
             /* explicitly enable pruning in closed branches for interactive mode
              * (if not manually disabled) */
             GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
@@ -569,7 +532,7 @@ public final class Main {
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
-                        LOGGER.info("File does not exist anymore: " + mostRecentFile.toString());
+                        LOGGER.info("File does not exist anymore: {}", mostRecentFile);
                     }
                 }
             }
@@ -590,33 +553,15 @@ public final class Main {
         }
     }
 
-    private static void updateSplashScreen() {
-        try {
-            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) {
-                return;
-                // insert customization code here
-                // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
-            }
-        } catch (Exception e) {
-        }
-    }
-
     private static void evaluateLemmataOptions(CommandLine options) {
 
-        LemmataAutoModeOptions opt;
         try {
-
-            opt = new LemmataAutoModeOptions(options, KeYConstants.INTERNAL_VERSION,
+            LemmataAutoModeOptions opt = new LemmataAutoModeOptions(options, KeYConstants.INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
-            LemmataHandler handler = new LemmataHandler(opt,
-                    AbstractProfile.getDefaultProfile());
+            LemmataHandler handler = new LemmataHandler(opt, AbstractProfile.getDefaultProfile());
             handler.start();
-
-        } catch (Exception e) {
-            if (Debug.ENABLE_DEBUG) {
-                e.printStackTrace();
-            }
+        } catch (IOException | ProofInputException e) {
+            LOGGER.error("Exception occured during the evaluation of lemmata options", e);
             printUsageAndExit(false, e.getMessage(), -2);
         }
 
@@ -661,7 +606,7 @@ public final class Main {
      * Currently only performs RIFL to JML transformation.
      */
     private static List<File> preProcessInput(List<File> filesOnStartup) {
-        List<File> result = new ArrayList<File>();
+        List<File> result = new ArrayList<>();
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
@@ -670,26 +615,16 @@ public final class Main {
             }
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
-//            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             try {
                 RIFLTransformer transformer = new RIFLTransformer();
                 transformer.doTransform(riflFileName, fileNameOnStartUp,
                         RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
-                if (verbosity > Verbosity.SILENT) {
-                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
-                }
+                LOGGER.info("[RIFL] Writing transformed Java files to {} ...", fileNameOnStartUp);
                 return transformer.getProblemFiles();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (ParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (ParserConfigurationException | SAXException | ParserException | IOException e) {
+                LOGGER.error("Exception occurred during pre-processing RIFL input", e);
             }
-
             return result;
         }
         // nothing to do, pass the original files
@@ -726,8 +661,7 @@ public final class Main {
      *
      * @param keyDesktop The new {@link KeYDesktop} to use.
      */
-    public static void setKeyDesktop(KeYDesktop keyDesktop) {
-        assert keyDesktop != null;
-        Main.keyDesktop = keyDesktop;
+    public static void setKeyDesktop(@Nonnull KeYDesktop keyDesktop) {
+        Main.keyDesktop = Objects.requireNonNull(keyDesktop);
     }
 }

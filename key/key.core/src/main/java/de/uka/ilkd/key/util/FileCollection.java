@@ -15,6 +15,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
@@ -105,7 +106,15 @@ public interface FileCollection {
          * @throws NoSuchElementException if the previous call to step returned false.
          */
         public DataLocation getCurrentDataLocation() throws NoSuchElementException;
-        
+
+        /**
+         *
+         * @return
+         * @throws NoSuchElementException
+         */
+        public Path getCurrentLocation() throws NoSuchElementException;
+
+
         /**
          * return the type of the structure that is iterated. Must return the
          * same value for any call

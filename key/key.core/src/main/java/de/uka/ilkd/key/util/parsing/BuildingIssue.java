@@ -1,22 +1,31 @@
 package de.uka.ilkd.key.util.parsing;
 
+import de.uka.ilkd.key.parser.Location;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 
-public class BuildingIssue {
+import javax.annotation.Nullable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+public class BuildingIssue implements HasLocation {
     private final String message;
     private final int lineNumber;
     private final int posInLine;
     private final int startOffset;
     private final int endOffset;
-    private final @Nullable Throwable cause;
+
+    @Nullable
+    private final Throwable cause;
+    @Nullable
     private final boolean isWarning;
+
+    private final URI location;
 
     public BuildingIssue(String message, @Nullable Throwable cause,
                          boolean isWarning,
-                         int lineNumber, int posInLine, int startOffset, int endOffset) {
+                         int lineNumber, int posInLine, int startOffset, int endOffset, URI location) {
         this.message = message;
         this.lineNumber = lineNumber;
         this.posInLine = posInLine;
@@ -24,6 +33,7 @@ public class BuildingIssue {
         this.endOffset = endOffset;
         this.cause = cause;
         this.isWarning = isWarning;
+        this.location = location;
     }
 
 
@@ -38,9 +48,19 @@ public class BuildingIssue {
             int posInLine = token.getCharPositionInLine();
             int startOffset = token.getStartIndex();
             int endOffset = token.getStopIndex();
-            return new BuildingIssue(message, cause, false, lineNumber, posInLine, startOffset, endOffset);
+            var location = toUri(token.getTokenSource().getSourceName());
+            return new BuildingIssue(message, cause, false, lineNumber, posInLine, startOffset, endOffset, location);
         }
-        return new BuildingIssue(message, cause, false, -1, -1, -1, -1);
+        return new BuildingIssue(message, cause, false, -1, -1, -1, -1, null);
+    }
+
+    private static URI toUri(String sourceName) {
+        try {
+            return new URI(sourceName);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static BuildingIssue createWarning(String message,
@@ -54,9 +74,10 @@ public class BuildingIssue {
             int posInLine = token.getCharPositionInLine();
             int startOffset = token.getStartIndex();
             int endOffset = token.getStopIndex();
-            return new BuildingIssue(message, cause, true, lineNumber, posInLine, startOffset, endOffset);
+            var location = toUri(token.getTokenSource().getSourceName());
+            return new BuildingIssue(message, cause, true, lineNumber, posInLine, startOffset, endOffset, location);
         }
-        return new BuildingIssue(message, cause, true, -1, -1, -1, -1);
+        return new BuildingIssue(message, cause, true, -1, -1, -1, -1, null);
     }
 
 
@@ -74,5 +95,11 @@ public class BuildingIssue {
 
     public int getEndOffset() {
         return endOffset;
+    }
+
+    @Nullable
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        return new Location(location.toURL(), lineNumber, posInLine);
     }
 }

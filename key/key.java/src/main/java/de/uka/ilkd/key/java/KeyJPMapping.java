@@ -1,19 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java;
 
-
+import com.github.javaparser.ast.Node;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
@@ -21,12 +8,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
-
-public class KeYRecoderMapping {
-    public static final Logger LOGGER = LoggerFactory.getLogger(KeYRecoderMapping.class);
-
+/**
+ * @author Alexander Weigl
+ * @version 1 (05.03.22)
+ */
+public class KeyJPMapping {
+    public static final Logger LOGGER = LoggerFactory.getLogger(KeyJPMapping.class);
 
     /**
      * have special classes been parsed in
@@ -37,12 +27,12 @@ public class KeYRecoderMapping {
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
-    private HashMap<Object, Object> map;
+    private final HashMap<Node, ModelElement> map;
 
     /**
      * maps a KeY programelement to the Recoder-equivalent
      */
-    private HashMap<Object, Object> revMap;
+    private final Map<ModelElement, Node> revMap;
 
     /**
      * a pseudo super class for all arrays used to declare length
@@ -50,7 +40,7 @@ public class KeYRecoderMapping {
     private KeYJavaType superArrayType = null;
 
 
-    public KeYRecoderMapping() {
+    public KeyJPMapping() {
         this.map = new LinkedHashMap<>(4096);
         this.revMap = new LinkedHashMap<>(4096);
     }
@@ -65,9 +55,9 @@ public class KeYRecoderMapping {
      * @param revMap        the reverse map (KeY->Recoder)
      * @param parsedSpecial boolean indicating if the special classes have been parsed in
      */
-    KeYRecoderMapping(HashMap<Object, Object> map, HashMap<Object, Object> revMap,
-                      KeYJavaType superArrayType,
-                      boolean parsedSpecial) {
+    KeyJPMapping(HashMap<Node, ModelElement> map, Map<ModelElement, Node> revMap,
+                 KeYJavaType superArrayType,
+                 boolean parsedSpecial) {
         this.map = map;
         this.revMap = revMap;
         this.superArrayType = superArrayType;
@@ -75,22 +65,12 @@ public class KeYRecoderMapping {
     }
 
     /**
-     * returns a matching ProgramElement (KeY) to a given
-     * ProgramElement (Recoder)
-     *
-     * @param pe a recoder.java.ProgramElement
-     */
-    public ProgramElement toKeY(recoder.java.ProgramElement pe) {
-        return (ProgramElement) map.get(pe);
-    }
-
-    /**
      * returns a matching ModelElement (KeY) to a given recoder.ModelElement
      *
      * @param pe a recoder.ModelElement
      */
-    public ModelElement toKeY(recoder.ModelElement pe) {
-        return (ModelElement) map.get(pe);
+    public ModelElement toKeY(Node pe) {
+        return map.get(pe);
     }
 
 
@@ -101,10 +81,10 @@ public class KeYRecoderMapping {
      *
      * @param pe a JavaProgramElement
      */
-    public recoder.java.ProgramElement toRecoder(ProgramElement pe) {
-        Object res = revMap.get(pe);
+    public Node toRecoder(ProgramElement pe) {
+        Node res = revMap.get(pe);
         Debug.assertTrue(res != null, "Program Element not known", pe);
-        return (recoder.java.ProgramElement) res;
+        return res;
     }
 
 
@@ -115,14 +95,14 @@ public class KeYRecoderMapping {
      *
      * @param pe a ModelElement
      */
-    public recoder.ModelElement toRecoder(ModelElement pe) {
-        Object res = revMap.get(pe);
+    public Node toRecoder(ModelElement pe) {
+        Node res = revMap.get(pe);
         Debug.assertTrue(res != null, "Model Element not known", pe);
 
-        return (recoder.ModelElement) res;
+        return res;
     }
 
-    public void put(Object rec, Object key) {
+    public void put(Node rec, ModelElement key) {
         Object formerValue = map.put(rec, key);
         Debug.assertTrue(formerValue == null,
                 "keyrecodermapping: duplicate registration of type:", key);
@@ -135,13 +115,12 @@ public class KeYRecoderMapping {
     }
 
 
-    public Set<Object> elemsKeY() {
+    public Set<ModelElement> elemsKeY() {
         LOGGER.error("Size of rec2key: {} entries", map.size());
-
         return revMap.keySet();
     }
 
-    public Set<Object> elemsRec() {
+    public Set<Node> elemsRec() {
         return map.keySet();
     }
 
@@ -153,13 +132,8 @@ public class KeYRecoderMapping {
         return this.superArrayType;
     }
 
-
-    @SuppressWarnings("unchecked")
-    public KeYRecoderMapping copy() {
-        return new KeYRecoderMapping((HashMap<Object, Object>) map.clone(),
-                (HashMap<Object, Object>) revMap.clone(),
-                superArrayType,
-                parsedSpecial);
+    public KeyJPMapping copy() {
+        return new KeyJPMapping(new HashMap<>(map), new HashMap<>(revMap), superArrayType, parsedSpecial);
     }
 
     /**
@@ -193,5 +167,4 @@ public class KeYRecoderMapping {
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;
     }
-
 }

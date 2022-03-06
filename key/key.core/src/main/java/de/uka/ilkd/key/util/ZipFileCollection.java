@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -133,6 +134,17 @@ public class ZipFileCollection implements FileCollection {
                 e.printStackTrace();
             }
             return SpecDataLocation.UNKNOWN_LOCATION;       // fallback
+        }
+
+        @Override
+        public Path getCurrentLocation()  {
+            try {
+                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                return Path.of(uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
     

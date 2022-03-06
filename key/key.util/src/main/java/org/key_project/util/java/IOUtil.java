@@ -874,7 +874,7 @@ public final class IOUtil {
     }
 
 
-    private static Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
+    public static final Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
 
     /**
      * Tries to open a stream with the given file name.

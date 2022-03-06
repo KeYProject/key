@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -181,6 +182,11 @@ public class DirectoryFileCollection implements FileCollection {
 
         public DataLocation getCurrentDataLocation() {
             return new DataFileLocation(currentFile);
+        }
+
+        @Override
+        public Path getCurrentLocation() throws NoSuchElementException {
+            return currentFile.toPath();
         }
     }
 

@@ -24,27 +24,24 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
-public class PackageSpecification
- extends JavaNonTerminalProgramElement
- implements PackageReferenceContainer {
-
-
+public class PackageSpecification extends JavaNonTerminalProgramElement implements PackageReferenceContainer {
     /**
      *  Reference.
      */
-
     protected final PackageReference reference;
 
     /**
      * Package specification.
      * @param children an ExtList with children
      */
-
     public PackageSpecification(ExtList children) {
-	super(children);
-	reference=children.get(PackageReference.class);
+        super(children);
+        reference=children.get(PackageReference.class);
     }
 
+    public PackageSpecification(PackageReference reference) {
+        this.reference = reference;
+    }
 
     public SourceElement getLastElement() {
         return reference;
