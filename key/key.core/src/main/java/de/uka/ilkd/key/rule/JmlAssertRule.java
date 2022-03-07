@@ -55,7 +55,7 @@ public final class JmlAssertRule implements BuiltInRule {
     /**
      * The name of this rule
      */
-    private static final Name NAME = new Name("JML assert");
+    private static final Name NAME = new Name("JML assert/assume");
 
     //Only one instance of this class is needed and should be there
     private JmlAssertRule() { }
@@ -157,6 +157,11 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public String displayName() {
+        return NAME.toString();
+    }
+
+    @Override
+    public String toString() {
         return NAME.toString();
     }
 }
