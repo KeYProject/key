@@ -13,95 +13,90 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Declaration;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.modifier.*;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Declaration;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.declaration.modifier.Abstract;
-import de.uka.ilkd.key.java.declaration.modifier.Final;
-import de.uka.ilkd.key.java.declaration.modifier.Ghost;
-import de.uka.ilkd.key.java.declaration.modifier.Model;
-import de.uka.ilkd.key.java.declaration.modifier.Native;
-import de.uka.ilkd.key.java.declaration.modifier.NoState;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
-import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
-import de.uka.ilkd.key.java.declaration.modifier.Synchronized;
-import de.uka.ilkd.key.java.declaration.modifier.Transient;
-import de.uka.ilkd.key.java.declaration.modifier.TwoState;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.declaration.modifier.Volatile;
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *  Java declaration.
+ * Java declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
- 			              implements Declaration {
+        implements Declaration {
 
     /**
      * Modifiers.
-     * caches the wrapper for the modifiers. The wrapper is needed to get access
-     * to the array without hurting immutabilitiy */
+     *
+     * Caches the wrapper for the modifiers. The wrapper is needed to get access
+     * to the array without hurting immutability.
+     */
+    @Nonnull
     protected final ImmutableArray<Modifier> modArray;
 
-    
+    public JavaDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray) {
+        super(pi, comments);
+        this.modArray = modArray;
+    }
+
     /**
-     *      Java declaration.
+     * Java declaration.
      */
     public JavaDeclaration() {
-	modArray = null;
+        this(null, null, new ImmutableArray<>());
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-	modArray = new ImmutableArray<Modifier>(mods);
+        this(null, null, new ImmutableArray<>(mods));
     }
 
-    
+
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-	modArray = mods;
+        this(null, null, mods);
     }
 
-    
+
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes. May
-     * include: several Modifier (taken as modifiers of the declaration), 
-     * a Comment
-     */     
+     *                 include: several Modifier (taken as modifiers of the declaration),
+     *                 a Comment
+     */
     public JavaDeclaration(ExtList children) {
-	super(children);
-	modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
+        super(children);
+        modArray = new ImmutableArray<>(children.collect(Modifier.class));
     }
 
 
     /**
-     *      Get modifiers.
-     *      @return the modifier array wrapper.
+     * Get modifiers.
+     *
+     * @return the modifier array wrapper.
      */
     public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 
-    
+
     /**
-     *      Returns a Public, Protected, or Private Modifier, if there
-     *      is one, null otherwise. A return value of null can usually be
-     *      interpreted as package visibility.
+     * Returns a Public, Protected, or Private Modifier, if there
+     * is one, null otherwise. A return value of null can usually be
+     * interpreted as package visibility.
      */
     public VisibilityModifier getVisibilityModifier() {
-        if (modArray == null) {
-            return null;
-        }
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
             Modifier m = modArray.get(i);
             if (m instanceof VisibilityModifier) {
-                return (VisibilityModifier)m;
+                return (VisibilityModifier) m;
             }
         }
         return null;
@@ -109,7 +104,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
 
 
     private boolean containsModifier(Class<?> type) {
-        int s = (modArray == null) ? 0 : modArray.size();
+        int s = modArray.size();
         for (int i = 0; i < s; i += 1) {
             if (type.isInstance(modArray.get(i))) {
                 return true;
@@ -118,7 +113,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return false;
     }
 
-    
+
     /**
      * Test whether the declaration is abstract.
      */
@@ -126,7 +121,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Abstract.class);
     }
 
-    
+
     /**
      * Test whether the declaration is private.
      */
@@ -134,7 +129,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Private.class);
     }
 
-    
+
     /**
      * Test whether the declaration is protected.
      */
@@ -142,7 +137,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Protected.class);
     }
 
-    
+
     /**
      * Test whether the declaration is public.
      */
@@ -150,7 +145,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Public.class);
     }
 
-    
+
     /**
      * Test whether the declaration is static.
      */
@@ -158,7 +153,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Static.class);
     }
 
-    
+
     /**
      * Test whether the declaration is transient.
      */
@@ -166,7 +161,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Transient.class);
     }
 
-    
+
     /**
      * Test whether the declaration is model (the jml modifier is meant).
      */
@@ -178,11 +173,15 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Get the state count of the declaration
      */
     protected int getStateCount() {
-        if(containsModifier(TwoState.class)) { return 2; }
-        if(containsModifier(NoState.class)) { return 0; }
+        if (containsModifier(TwoState.class)) {
+            return 2;
+        }
+        if (containsModifier(NoState.class)) {
+            return 0;
+        }
         return 1;
     }
-   
+
     /**
      * Test whether the declaration is ghost (the jml modifier is meant).
      */
@@ -190,7 +189,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Ghost.class);
     }
 
-    
+
     /**
      * Test whether the declaration is volatile.
      */
@@ -198,7 +197,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Volatile.class);
     }
 
-    
+
     /**
      * Test whether the declaration is strictfp.
      */
@@ -206,7 +205,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(StrictFp.class);
     }
 
-    
+
     /**
      * Test whether the declaration is final.
      */
@@ -214,7 +213,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Final.class);
     }
 
-    
+
     /**
      * Test whether the declaration is native.
      */
@@ -222,7 +221,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Native.class);
     }
 
-    
+
     /**
      * Test whether the declaration is synchronized.
      */

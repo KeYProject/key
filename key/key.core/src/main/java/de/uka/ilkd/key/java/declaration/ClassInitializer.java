@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
 
 
 public class ClassInitializer extends JavaDeclaration implements MemberDeclaration, StatementContainer {
@@ -161,6 +162,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
         return modArray != null && modArray.size()!=0;
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return body;
     }

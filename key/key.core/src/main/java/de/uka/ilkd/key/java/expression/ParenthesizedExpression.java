@@ -12,58 +12,66 @@
 //
 
 package de.uka.ilkd.key.java.expression;
-import java.io.IOException;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-/** Redundant Parentheses. Modelled as a special "identity" unary "infix"
- *  operator. */
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.List;
 
-public class ParenthesizedExpression extends Operator 					     
-    implements ExpressionStatement, ReferencePrefix {
+/**
+ * Redundant Parentheses. Modelled as a special "identity" unary "infix"
+ * operator.
+ */
+
+public class ParenthesizedExpression extends Operator
+        implements ExpressionStatement, ReferencePrefix {
+
+    public ParenthesizedExpression(PositionInfo pi, List<Comment> comments, @Nonnull Expression child) {
+        super(pi, comments, new ImmutableArray<>(child));
+    }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * In this case the order of the children is IMPORTANT. 
-     * 	May contain:
-     * 		several of Expression (should be one, the first is taken 
-     *                         as parenthesized expression), 
-     * 		Comments
+     *                 In this case the order of the children is IMPORTANT.
+     *                 May contain:
+     *                 several of Expression (should be one, the first is taken
+     *                 as parenthesized expression),
+     *                 Comments
      */
     public ParenthesizedExpression(ExtList children) {
-	super(children);
+        super(children);
     }
 
-    public ParenthesizedExpression(Expression child) {
-	super(child);
+    public ParenthesizedExpression(@Nonnull Expression child) {
+        this(null, null,child);
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         return (children != null) ? children.size() : 0;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (children != null) {
@@ -73,44 +81,51 @@ public class ParenthesizedExpression extends Operator
     }
 
     /**
-     *      Get arity.
-     *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
     public int getArity() {
         return 1;
     }
 
     /**
-     *      Get precedence.
-     *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
     public int getPrecedence() {
         return 0;
     }
 
     /**
-     *      Get notation.
-     *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
     public int getNotation() {
         return INFIX;
-	/* Only unary infix operator;) */
+        /* Only unary infix operator;) */
     }
 
+    @Nonnull
     public SourceElement getFirstElement() {
         return this;
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return this;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnParenthesizedExpression(this);
+        v.performActionOnParenthesizedExpression(this);
     }
 
     public void prettyPrint(PrettyPrinter w) throws IOException {
@@ -120,18 +135,19 @@ public class ParenthesizedExpression extends Operator
     /**
      * We do not have a prefix, so fake it!
      * This way we implement ReferencePrefix
+     *
      * @author VK
      */
     public ReferencePrefix getReferencePrefix() {
-	return null;
+        return null;
     }
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
+        return this;
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return getExpressionAt(0).getKeYJavaType(javaServ, ec);
+        return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }
 
 

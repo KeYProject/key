@@ -13,22 +13,26 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
-/**
- *  Pre increment.
- */
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class PreIncrement extends Assignment {
-
+    public PreIncrement(PositionInfo pi, List<Comment> comments, @Nonnull Expression lhs) {
+        super(pi, comments, lhs);
+    }
 
     /**
-     *      Pre increment.
-     *      @param children an ExtList with all children of this node
+     * Pre increment.
+     *
+     * @param children an ExtList with all children of this node
      */
 
     public PreIncrement(ExtList children) {
@@ -37,17 +41,19 @@ public class PreIncrement extends Assignment {
 
 
     /**
-     *      Get arity.
-     *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
         return 1;
     }
-    
+
     /**
-     *      Get precedence.
-     *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -55,20 +61,23 @@ public class PreIncrement extends Assignment {
     }
 
     /**
-     *      Get notation.
-     *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return PREFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnPreIncrement(this);
+        v.performActionOnPreIncrement(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

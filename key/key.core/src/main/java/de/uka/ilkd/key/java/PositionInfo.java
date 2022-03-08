@@ -13,31 +13,43 @@
 
 package de.uka.ilkd.key.java;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.nio.file.Paths;
 
 /**
- * represents a group of three Positions: relativePosition,
- * startPosition, endPosition
- *
+ * This class represents a group of three positions: the relative, start and end position.
+ * <p>
  * 2019-09-10 Wolfram Pfeifer: work with URIs instead of Strings -> more robust, more general
  */
 public class PositionInfo {
-    /** Unknown URI (enables us to always have a non-null value for fileURI) */
+    /**
+     * Unknown URI (enables us to always have a non-null value for fileURI)
+     */
     public static final URI UNKNOWN_URI = URI.create("UNKNOWN://unknown");
 
-    /** PositionInfo with undefined positions. */
+    /**
+     * PositionInfo with undefined positions.
+     */
     public static final PositionInfo UNDEFINED = new PositionInfo();
 
     /**
      * TODO: What is the purpose of this? To which position is this one relative?
      */
+    @Nonnull
     private final Position relPos;
 
-    /** The start position. */
+    /**
+     * The start position.
+     */
+    @Nonnull
     private final Position startPos;
 
-    /** The end position. */
+    /**
+     * The end position.
+     */
+    @Nonnull
     private final Position endPos;
 
     /**
@@ -61,11 +73,12 @@ public class PositionInfo {
 
     /**
      * Creates a new PositionInfo without resource information but only with positions.
-     * @param relPos the relative position
+     *
+     * @param relPos   the relative position
      * @param startPos the start position
-     * @param endPos the end position
+     * @param endPos   the end position
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos) {
+    public PositionInfo(@Nonnull Position relPos, @Nonnull Position startPos, @Nonnull Position endPos) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -74,12 +87,14 @@ public class PositionInfo {
 
     /**
      * Creates a new PositionInfo without the given resource information.
-     * @param relPos the relative position
+     *
+     * @param relPos   the relative position
      * @param startPos the start position
-     * @param endPos the end position
-     * @param fileURI the resource the PositionInfo refers to
+     * @param endPos   the end position
+     * @param fileURI  the resource the PositionInfo refers to
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos, URI fileURI) {
+    public PositionInfo(@Nonnull Position relPos, @Nonnull Position startPos, @Nonnull Position endPos,
+                        @Nullable URI fileURI) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -90,8 +105,10 @@ public class PositionInfo {
         }
     }
 
-    /** this violates immutability, but the method is only called
+    /**
+     * this violates immutability, but the method is only called
      * right after the object is created...
+     *
      * @param parent the parent class of this PositionInfo
      */
     void setParentClassURI(URI parent) {
@@ -101,9 +118,10 @@ public class PositionInfo {
     /**
      * Returns the path of the parent file the PositionInfo refers to
      * (the class the statement originates from).
-     * @deprecated This method should no longer be used, as PositionInfo can now be used with
-     *          resources other than files. Use {@link #getParentClassURI()} instead.
+     *
      * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
+     * @deprecated This method should no longer be used, as PositionInfo can now be used with
+     * resources other than files. Use {@link #getParentClassURI()} instead.
      */
     @Deprecated         // only kept for compatibility reasons
     public String getParentClass() {
@@ -115,9 +133,10 @@ public class PositionInfo {
 
     /**
      * Returns the path of the file the PositionInfo refers to.
+     *
+     * @return the filename as a string if fileURI uses the "file" protocol or null otherwise
      * @deprecated This method should no longer be used, as PositionInfo can now be used with
      * resources other than files. Use {@link #getURI()} instead.
-     * @return the filename as a string if fileURI uses the "file" protocol or null otherwise
      */
     @Deprecated         // only kept for compatibility reasons
     public String getFileName() {
@@ -150,6 +169,7 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos.
      * The file informations have to match, otherwise null is returned.
+     *
      * @param p1 the first PositionInfo
      * @param p2 the second PositionInfo
      * @return a new PositionInfo starting at the minimum of the two start positions and
@@ -175,7 +195,7 @@ public class PositionInfo {
         Position start;
         Position end;
         if (p1.startPos != Position.UNDEFINED && !p1.startPos.isNegative()
-                &&  p1.startPos.compareTo(p2.startPos) < 0) {
+                && p1.startPos.compareTo(p2.startPos) < 0) {
             start = p1.startPos;
         } else {
             start = p2.startPos;
@@ -192,6 +212,7 @@ public class PositionInfo {
 
     /**
      * Checks if start and end position are both defined and in valid range.
+     *
      * @return true iff start and end are valid
      */
     public boolean startEndValid() {
@@ -205,7 +226,7 @@ public class PositionInfo {
             return "UNDEFINED";
         } else {
             return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " rel. Pos: " + relPos
-                + " start Pos: " + startPos + " end Pos: " + endPos);
+                    + " start Pos: " + startPos + " end Pos: " + endPos);
         }
     }
 

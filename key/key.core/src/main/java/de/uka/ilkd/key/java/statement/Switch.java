@@ -13,101 +13,68 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.TypeScope;
-import de.uka.ilkd.key.java.VariableScope;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.util.List;
 
-/**
- *  Switch.
- */
+public final class Switch extends BranchStatement implements ExpressionContainer, VariableScope, TypeScope {
+    private final Expression expression;
+    private final ImmutableArray<Branch> branches;
 
-public class Switch extends BranchStatement
-    implements ExpressionContainer,
-    VariableScope, TypeScope {
-
-    /**
- *      Branches.
-     */
-
-    protected final ImmutableArray<Branch> branches;
-
-    /**
- *      Expression.
-     */
-
-    protected final Expression expression;
-
-
-
-    /**
- *      Switch.
-     */
-
-    public Switch() {
-	this.branches=null;
-        this.expression=null;
+    public Switch(PositionInfo pi, List<Comment> comments, Expression expression, ImmutableArray<Branch> branches) {
+        super(pi, comments);
+        this.branches = branches;
+        this.expression = expression;
     }
 
     /**
- *      Switch.
- *      @param e an expression.
+     * Switch.
+     *
+     * @param e        an expression.
+     * @param branches a branch array
      */
-
-    public Switch(Expression e) {
-	this.branches=null;
-        this.expression=e;
-    }
-
-    /**
- *      Switch.
- *      @param e an expression.
- *      @param branches a branch array
-     */
-
     public Switch(Expression e, Branch[] branches) {
-	this.branches=new ImmutableArray<Branch>(branches);
-        this.expression=e;
+        this(null, null, e, new ImmutableArray<>(branches));
     }
 
     /**
- *      Switch.
- *      @param children a list with all children
+     * Switch.
+     *
+     * @param children a list with all children
      */
 
     public Switch(ExtList children) {
         super(children);
-	this.expression = children.get(Expression.class);
-	this.branches=new ImmutableArray<Branch>(children.collect(Branch.class)); 
+        this.expression = children.get(Expression.class);
+        this.branches = new ImmutableArray<>(children.collect(Branch.class));
     }
 
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
         if (expression != null) result++;
-        if (branches   != null) result += branches.size();
+        if (branches != null) result += branches.size();
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
@@ -121,8 +88,9 @@ public class Switch extends BranchStatement
     }
 
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -146,8 +114,9 @@ public class Switch extends BranchStatement
     }
 
     /**
- *      Get expression.
- *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
 
     public Expression getExpression() {
@@ -156,8 +125,9 @@ public class Switch extends BranchStatement
 
 
     /**
- *      Get the number of branches in this container.
- *      @return the number of branches.
+     * Get the number of branches in this container.
+     *
+     * @return the number of branches.
      */
 
     public int getBranchCount() {
@@ -185,15 +155,17 @@ public class Switch extends BranchStatement
      * @return the array wrapper of the branches
      */
     public ImmutableArray<Branch> getBranchList() {
-	return branches;
+        return branches;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnSwitch(this);
+        v.performActionOnSwitch(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

@@ -11,47 +11,47 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * This class encapsulates updates of a for loop
- */
-
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.util.List;
 
-public class ForUpdates extends JavaNonTerminalProgramElement
-    implements ExpressionContainer, IForUpdates{
+/**
+ * This class encapsulates updates of a for loop
+ */
+public class ForUpdates extends JavaNonTerminalProgramElement implements ExpressionContainer, IForUpdates {
+    private final ImmutableArray<Expression> updates;
 
-    ImmutableArray<Expression> updates;
+    public ForUpdates(PositionInfo pi, List<Comment> comments, ImmutableArray<Expression> updates) {
+        super(pi, comments);
+        this.updates = updates;
+    }
 
     public ForUpdates(ImmutableArray<Expression> exprarr) {
-	updates = exprarr;
+        this(null, null, exprarr);
     }
 
     public ForUpdates(ExtList ups, PositionInfo pos) {
         super(pos);
-	Expression[] exps = new Expression[ups.size()];	
-	for (int i = 0; i < exps.length; i++) {
-	    exps[i] = (Expression)ups.get(i);
-	}
-	updates = new ImmutableArray<Expression>(exps);
+        Expression[] exps = new Expression[ups.size()];
+        for (int i = 0; i < exps.length; i++) {
+            exps[i] = (Expression) ups.get(i);
+        }
+        updates = new ImmutableArray<>(exps);
     }
-    
+
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     public int getExpressionCount() {
-	return updates.size();
+        return updates.size();
     }
 
     /*
@@ -63,27 +63,27 @@ public class ForUpdates extends JavaNonTerminalProgramElement
       of bounds.
     */
     public Expression getExpressionAt(int index) {
-	return updates.get(index);
+        return updates.get(index);
     }
 
     public int size() {
-	return getExpressionCount();
+        return getExpressionCount();
     }
 
     public ImmutableArray<Expression> getUpdates() {
-	return updates;
+        return updates;
     }
-    
+
     public void visit(Visitor v) {
-	v.performActionOnForUpdates(this);
+        v.performActionOnForUpdates(this);
     }
 
     public int getChildCount() {
-	return getExpressionCount();
+        return getExpressionCount();
     }
 
     public ProgramElement getChildAt(int index) {
-	return getExpressionAt(index);
+        return getExpressionAt(index);
     }
 
 }

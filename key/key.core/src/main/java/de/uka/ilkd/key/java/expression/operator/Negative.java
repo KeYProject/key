@@ -13,28 +13,28 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-
-/**
- *  Negative.
- */
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class Negative extends Operator {
+    public Negative(PositionInfo pi, List<Comment> comments, @Nonnull Expression child) {
+        super(pi, comments, new ImmutableArray<>(child));
+    }
 
     /**
-     *      Negative.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Negative.
+     *
+     * @param children an ExtList with all children of this node
+     *                 the first children in list will be the one on the left
+     *                 side, the second the one on the  right side.
      */
 
     public Negative(ExtList children) {
@@ -43,21 +43,22 @@ public class Negative extends Operator {
 
 
     public Negative(Expression expr) {
-	super(expr);
+        super(expr);
     }
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
-
     public int getArity() {
         return 1;
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -65,8 +66,9 @@ public class Negative extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
@@ -74,22 +76,25 @@ public class Negative extends Operator {
     }
 
     /**
- *        Checks if this operator is left or right associative. Ordinary
- *        unary operators are right associative.
- *        @return <CODE>true</CODE>, if the operator is left associative,
- *        <CODE>false</CODE> otherwise.
+     * Checks if this operator is left or right associative. Ordinary
+     * unary operators are right associative.
+     *
+     * @return <CODE>true</CODE>, if the operator is left associative,
+     * <CODE>false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnNegative(this);
+        v.performActionOnNegative(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -97,8 +102,8 @@ public class Negative extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().
-	    getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
+        return services.getTypeConverter().
+                getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
 
 }

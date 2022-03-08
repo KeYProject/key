@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A "\Continue" parameter declaration of a ccatch clause.
@@ -27,7 +27,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class CcatchContinueParameterDeclaration
         extends CcatchNonstandardParameterDeclaration {
 
+    public CcatchContinueParameterDeclaration(PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
+    }
+
     public CcatchContinueParameterDeclaration(ExtList children) {
+        super(null, null);
     }
 
     @Override

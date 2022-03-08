@@ -13,42 +13,45 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-/**
- *  Positive.
- */
+import javax.annotation.Nonnull;
+import java.util.List;
+
 
 public class Positive extends Operator {
-
-
-    /**
-     *      Positive.
-     *      @param expr the Expression 
-     */
-    public Positive(Expression expr) {
-        super(expr);
+    public Positive(PositionInfo pi, List<Comment> comments, @Nonnull Expression child) {
+        super(pi, comments, new ImmutableArray<>(child));
     }
 
     /**
-     *      Positive.
-     *      @param children an ExtList with all children of this node
+     * Positive.
+     *
+     * @param expr the Expression
+     */
+    public Positive(@Nonnull Expression expr) {
+        this(null, null, expr);
+    }
+
+    /**
+     * Positive.
+     *
+     * @param children an ExtList with all children of this node
      */
     public Positive(ExtList children) {
         super(children);
     }
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -56,8 +59,9 @@ public class Positive extends Operator {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -65,8 +69,9 @@ public class Positive extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
@@ -74,22 +79,25 @@ public class Positive extends Operator {
     }
 
     /**
- *        Checks if this operator is left or right associative. Ordinary
- *        unary operators are right associative.
- *        @return <CODE>true</CODE>, if the operator is left associative,
- *        <CODE>false</CODE> otherwise.
+     * Checks if this operator is left or right associative. Ordinary
+     * unary operators are right associative.
+     *
+     * @return <CODE>true</CODE>, if the operator is left associative,
+     * <CODE>false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnPositive(this);
+        v.performActionOnPositive(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -97,8 +105,8 @@ public class Positive extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().
-	    getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
+        return services.getTypeConverter().
+                getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
 
 }

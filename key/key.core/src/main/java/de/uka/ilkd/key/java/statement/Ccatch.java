@@ -13,109 +13,80 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import java.util.Optional;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.CcatchNonstandardParameterDeclaration;
-import de.uka.ilkd.key.java.ParameterContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
-/**
- * Ccatch.
- *
- */
-public class Ccatch extends BranchImp
-        implements ParameterContainer, VariableScope {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
-    /**
-     * Parameter.
-     */
-    protected final Optional<ParameterDeclaration> parameter;
+public final class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
+    @Nullable
+    private final ParameterDeclaration parameter;
 
-    private Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
+    @Nullable
+    private final CcatchNonstandardParameterDeclaration nonStdParameter;
 
-    /**
-     * Body.
-     */
-    protected final StatementBlock body;
+    private final StatementBlock body;
 
-    /**
-     * Ccatch.
-     */
-    public Ccatch() {
-        super();
-        parameter = Optional.empty();
-        body = null;
+    public Ccatch(PositionInfo pi, List<Comment> comments, @Nullable ParameterDeclaration parameter,
+                  @Nullable CcatchNonstandardParameterDeclaration nonStdParameter, StatementBlock body) {
+        super(pi, comments);
+        this.parameter = parameter;
+        this.nonStdParameter = nonStdParameter;
+        this.body = body;
     }
 
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
-        super();
-        this.body = body;
-        parameter = Optional.of(e);
-        nonStdParameter = Optional.empty();
+        this(null, null, e, null, body);
     }
 
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
-    public Ccatch(CcatchNonstandardParameterDeclaration e,
-            StatementBlock body) {
-        super();
-        this.body = body;
-        parameter = Optional.empty();
-        nonStdParameter = Optional.of(e);
+    public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
+        this(null, null, null, e, body);
+
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children
-     *            the children of this AST element as KeY classes. May contain:
-     *            Comments, a ParameterDeclaration (declaring the catched
-     *            exceptions) a StatementBlock (as the action to do when
-     *            catching)
+     * @param children the children of this AST element as KeY classes. May contain:
+     *                 Comments, a ParameterDeclaration (declaring the catched
+     *                 exceptions) a StatementBlock (as the action to do when
+     *                 catching)
      */
     public Ccatch(ExtList children) {
         super(children);
-        parameter = Optional
-                .ofNullable(children.get(ParameterDeclaration.class));
-        nonStdParameter = Optional.ofNullable(
-            children.get(CcatchNonstandardParameterDeclaration.class));
+        parameter = children.get(ParameterDeclaration.class);
+        nonStdParameter = children.get(CcatchNonstandardParameterDeclaration.class);
         body = children.get(StatementBlock.class);
     }
 
+    @Nonnull
     @Override
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }
 
     public boolean hasParameterDeclaration() {
-        return parameter.isPresent();
+        return parameter != null;
     }
 
     public boolean hasNonStdParameterDeclaration() {
-        return nonStdParameter.isPresent();
+        return nonStdParameter != null;
     }
 
     /**
@@ -139,22 +110,20 @@ public class Ccatch extends BranchImp
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
             if (index == 0)
-                return parameter.get();
+                return parameter;
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
             if (index == 0)
-                return nonStdParameter.get();
+                return nonStdParameter;
             index--;
         }
         if (body != null) {
@@ -208,18 +177,14 @@ public class Ccatch extends BranchImp
      * Return the parameter declaration at the specified index in this node's
      * "virtual" parameter declaration array.
      *
-     * @param index
-     *            an index for a parameter declaration.
-     *
+     * @param index an index for a parameter declaration.
      * @return the parameter declaration with the given index.
-     *
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
         if (hasParameterDeclaration() && index == 0) {
-            return parameter.get();
+            return parameter;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -228,18 +193,14 @@ public class Ccatch extends BranchImp
      * Return the non-standard parameter declaration at the specified index in
      * this node's "virtual" parameter declaration array.
      *
-     * @param index
-     *            an index for a parameter declaration.
-     *
+     * @param index an index for a parameter declaration.
      * @return the parameter declaration with the given index.
-     *
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(
             int index) {
         if (hasNonStdParameterDeclaration() && index == 0) {
-            return nonStdParameter.get();
+            return nonStdParameter;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -259,7 +220,7 @@ public class Ccatch extends BranchImp
      * @return the parameter declaration.
      */
     public ParameterDeclaration getParameterDeclaration() {
-        return parameter.orElse(null);
+        return parameter;
     }
 
     /**
@@ -268,15 +229,14 @@ public class Ccatch extends BranchImp
      * @return the parameter declaration.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
-        return nonStdParameter.orElse(null);
+        return nonStdParameter;
     }
 
     /**
      * calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
      *
-     * @param v
-     *            the Visitor
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {

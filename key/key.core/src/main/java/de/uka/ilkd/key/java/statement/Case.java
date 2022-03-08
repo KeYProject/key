@@ -13,95 +13,90 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
- *  Case.
- * 
+ * Case.
  */
-public class Case extends BranchImp implements ExpressionContainer {
+public final class Case extends BranchImp implements ExpressionContainer {
+    @Nonnull
+    private final Expression expression;
 
-    /**
-     *      Expression.
-     */
-    protected final Expression expression;
+    @Nonnull
+    private final ImmutableArray<Statement> body;
 
-    /**
-     *      Body.
-     */
-    protected final ImmutableArray<Statement> body;
 
-    /**
-     *      Case.
-     */
-    public Case() {
-	this.expression=null;
-	this.body=null;
+    public Case(PositionInfo pi, List<Comment> comments, @Nonnull Expression expression,
+                @Nonnull ImmutableArray<Statement> body) {
+        super(pi, comments);
+        this.expression = expression;
+        this.body = body;
     }
 
     /**
-     *      Case.
-     *      @param e an expression.
+     * Case.
+     *
+     * @param e an expression.
      */
     public Case(Expression e) {
-	this.expression=e;
-	this.body=null;
+        this(null, null, e, new ImmutableArray<>());
     }
 
     /**
-     *      Case.
-     *      @param e an expression.
-     *      @param body a statement mutable list.
+     * Case.
+     *
+     * @param e    an expression.
+     * @param body a statement mutable list.
      */
     public Case(Expression e, Statement[] body) {
-	this.body=new ImmutableArray<Statement>(body);
-        this.expression=e;
+        this(null, null, e, new ImmutableArray<>(body));
     }
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: Comments
-     *              a Statement (as the statement following case)
-     * Must NOT contain: an Expression indicating the condition of the case
-     * as there are classes that are Expression and Statement, so they might
-     * get mixed up. Use the second parameter of this constructor for the
-     * expression.
-     * @param expr the expression of the case
-     */ 
+     *                 May contain: Comments
+     *                 a Statement (as the statement following case)
+     *                 Must NOT contain: an Expression indicating the condition of the case
+     *                 as there are classes that are Expression and Statement, so they might
+     *                 get mixed up. Use the second parameter of this constructor for the
+     *                 expression.
+     * @param expr     the expression of the case
+     */
     public Case(ExtList children, Expression expr, PositionInfo pos) {
-	super(children, pos);
-	this.expression=expr;
-	this.body=new ImmutableArray<Statement>(children.collect(Statement.class)); 
+        super(children, pos);
+        this.expression = expr;
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         int result = 0;
         if (expression != null) result++;
-        if (body       != null) result += body.size();
+        if (body != null) result += body.size();
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
@@ -119,8 +114,9 @@ public class Case extends BranchImp implements ExpressionContainer {
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -143,8 +139,9 @@ public class Case extends BranchImp implements ExpressionContainer {
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
     public int getStatementCount() {
         return (body != null) ? body.size() : 0;
@@ -166,27 +163,30 @@ public class Case extends BranchImp implements ExpressionContainer {
     }
 
     /**
-     *      Get expression.
-     *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
     public Expression getExpression() {
         return expression;
     }
 
     /**
-     *      The body may be empty (null), to define a fall-through.
-     *      Attaching an {@link EmptyStatement} would create a single ";".
+     * The body may be empty (null), to define a fall-through.
+     * Attaching an {@link EmptyStatement} would create a single ";".
      */
     public ImmutableArray<Statement> getBody() {
         return body;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnCase(this);
+        v.performActionOnCase(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

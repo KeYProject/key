@@ -13,121 +13,103 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-/**
- *  Array reference.
- *  @author <TT>AutoDoc</TT>
- */
-
-public class ArrayReference extends JavaNonTerminalProgramElement
- implements Reference, Expression, ReferencePrefix, ReferenceSuffix,
-    ExpressionContainer, TypeReferenceContainer {
+import javax.annotation.Nonnull;
+import java.util.List;
 
 
-    /**
-     *      Access path.
-     */
-    protected final ReferencePrefix prefix;
- 
+public final class ArrayReference extends JavaNonTerminalProgramElement
+        implements Reference, Expression, ReferencePrefix, ReferenceSuffix,
+        ExpressionContainer, TypeReferenceContainer {
 
-    /**
-     Inits.
-     */
-    protected final ImmutableArray<Expression> inits; 
+    private final ReferencePrefix prefix;
+    private final ImmutableArray<Expression> inits;
 
- 
-    /**
-     *      Array reference.
-     */
-    public ArrayReference() {
-	prefix = null;
-	this.inits=null;
+    public ArrayReference(PositionInfo pi, List<Comment> comments, ReferencePrefix prefix,
+                          ImmutableArray<Expression> inits) {
+        super(pi, comments);
+        this.prefix = prefix;
+        this.inits = inits;
     }
 
     /**
-     *      Array reference.
-     *      @param accessPath a reference prefix.
-     *      @param initializers an expression array.
+     * Array reference.
+     *
+     * @param accessPath   a reference prefix.
+     * @param initializers an expression array.
      */
-    public ArrayReference(ReferencePrefix accessPath, 
-			  Expression[] initializers) {
-        this.prefix = accessPath;
-	this.inits  = new ImmutableArray<Expression>(initializers);
+    public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
+        this(null, null, accessPath, new ImmutableArray<>(initializers));
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes.
-     *  May contain:
-     * 	several of Expression (as initializers of the array),
-     * 	Comments.
-     *  MUST NOT CONTAIN: the ReferencePrefix for the accessPath because
-     *    Expression and ReferencePrefix might not be disjunct.
-     * @param accessPath a ReferencePrefix of the array reference. 
-     */ 
+     *
+     * @param children   the children of this AST element as KeY classes.
+     *                   May contain:
+     *                   several of Expression (as initializers of the array),
+     *                   Comments.
+     *                   MUST NOT CONTAIN: the ReferencePrefix for the accessPath because
+     *                   Expression and ReferencePrefix might not be disjunct.
+     * @param accessPath a ReferencePrefix of the array reference.
+     */
     public ArrayReference(ExtList children, ReferencePrefix accessPath, PositionInfo pi) {
-	super(children, pi);
-	Expression[] e = children.collect(Expression.class);
-	if(e.length>1){
-	    Expression[] e1 = new Expression[e.length-1];
-        System.arraycopy(e, 0, e1, 0, e1.length);
-	    this.prefix=new ArrayReference(e1, accessPath);
-	    e1= new Expression[1];
-	    e1[0]=e[e.length-1];
-	    this.inits=new ImmutableArray<Expression>(e1);
-	}else{
-	    this.prefix=accessPath;
-	    this.inits=new ImmutableArray<Expression>(e);
-	}
+        super(children, pi);
+        Expression[] e = children.collect(Expression.class);
+        if (e.length > 1) {
+            Expression[] e1 = new Expression[e.length - 1];
+            System.arraycopy(e, 0, e1, 0, e1.length);
+            this.prefix = new ArrayReference(e1, accessPath);
+            e1 = new Expression[1];
+            e1[0] = e[e.length - 1];
+            this.inits = new ImmutableArray<>(e1);
+        } else {
+            this.prefix = accessPath;
+            this.inits = new ImmutableArray<>(e);
+        }
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes.
-     *  May contain:
-     * 	several of Expression (as initializers of the array),
-     * 	Comments.
-     *  MUST NOT CONTAIN: the ReferencePrefix for the accessPath because
-     *    Expression and ReferencePrefix might not be disjunct.
-     * @param accessPath a ReferencePrefix of the array reference. 
-     */ 
+     *
+     * @param children   the children of this AST element as KeY classes.
+     *                   May contain:
+     *                   several of Expression (as initializers of the array),
+     *                   Comments.
+     *                   MUST NOT CONTAIN: the ReferencePrefix for the accessPath because
+     *                   Expression and ReferencePrefix might not be disjunct.
+     * @param accessPath a ReferencePrefix of the array reference.
+     */
     public ArrayReference(ExtList children, ReferencePrefix accessPath) {
-	this(children, accessPath, 
-	     children.get(PositionInfo.class));
+        this(children, accessPath, children.get(PositionInfo.class));
     }
 
     private ArrayReference(Expression[] e, ReferencePrefix accessPath) {
-	Expression[] e1 = new Expression[e.length-1];
-	if(e.length>1){
-        System.arraycopy(e, 0, e1, 0, e1.length);
-	    this.prefix=new ArrayReference(e1, accessPath);
-	    e1[0]=e[e.length-1];
-	    this.inits=new ImmutableArray<Expression>(e1);
-	}else{
-	    this.prefix=accessPath;
-	    this.inits=new ImmutableArray<Expression>(e);
-	}
+        super((PositionInfo) null, null);
+        Expression[] e1 = new Expression[e.length - 1];
+        if (e.length > 1) {
+            System.arraycopy(e, 0, e1, 0, e1.length);
+            this.prefix = new ArrayReference(e1, accessPath);
+            e1[0] = e[e.length - 1];
+            this.inits = new ImmutableArray<>(e1);
+        } else {
+            this.prefix = accessPath;
+            this.inits = new ImmutableArray<>(e);
+        }
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
+    @Override
     public int getExpressionCount() {
         int c = 0;
         if (prefix instanceof Expression) c += 1;
@@ -144,9 +126,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement
       of bounds.
     */
 
+    @Override
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression) {
-            if (index == 0) return (Expression)prefix;
+            if (index == 0) return (Expression) prefix;
             index--;
         }
         if (inits != null) {
@@ -156,9 +139,11 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
+    @Override
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
@@ -172,41 +157,48 @@ public class ArrayReference extends JavaNonTerminalProgramElement
       of bounds.
     */
 
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
 
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
         int result = 0;
         if (prefix != null) result++;
-        if (inits      != null) result += inits.size();
+        if (inits != null) result += inits.size();
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) return prefix;
@@ -219,42 +211,46 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Get dimension expressions.
-     *      @return the expression array wrapper.
+     * Get dimension expressions.
+     *
+     * @return the expression array wrapper.
      */
     public ImmutableArray<Expression> getDimensionExpressions() {
         return inits;
     }
 
+    @Override
+    @Nonnull
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
+        return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnArrayReference(this);
+        v.performActionOnArrayReference(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printArrayReference(this);
     }
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
-    }
-
+    @Override
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	final KeYJavaType arrayType = services.getTypeConverter().
-	    getKeYJavaType((Expression)getChildAt(0), ec);
-	return ((ArrayDeclaration)arrayType.getJavaType()).
-	    getBaseType().getKeYJavaType();
+        final KeYJavaType arrayType = services.getTypeConverter().
+                getKeYJavaType((Expression) getChildAt(0), ec);
+        return ((ArrayDeclaration) arrayType.getJavaType()).
+                getBaseType().getKeYJavaType();
     }
 }

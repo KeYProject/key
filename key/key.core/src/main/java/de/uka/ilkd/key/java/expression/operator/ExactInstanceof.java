@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  Instanceof.
  *  @author <TT>AutoDoc</TT>
@@ -58,6 +60,7 @@ public class ExactInstanceof extends TypeOperator {
         return result;
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return typeReference;
     }

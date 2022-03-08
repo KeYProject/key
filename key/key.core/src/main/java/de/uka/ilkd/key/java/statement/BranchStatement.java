@@ -13,35 +13,39 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import java.util.List;
 
 /**
- *  Branch statement.
- *  @author AL
- *  @author <TT>AutoDoc</TT>
+ * Branch statement.
+ *
+ * @author AL
+ * @author <TT>AutoDoc</TT>
  */
 
 public abstract class BranchStatement extends JavaStatement implements NonTerminalProgramElement {
-
-    public BranchStatement() {
-	
+    public BranchStatement(PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
     }
-
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: Comments
-     */ 
+     *                 May contain: Comments
+     */
     public BranchStatement(ExtList children) {
-	super(children);
+        super(children);
     }
 
     /**
-     *      Get the number of branches in this container.
-     *      @return the number of branches.
+     * Get the number of branches in this container.
+     *
+     * @return the number of branches.
      */
 
     public abstract int getBranchCount();

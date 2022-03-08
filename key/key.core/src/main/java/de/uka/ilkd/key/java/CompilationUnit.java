@@ -14,153 +14,173 @@
 package de.uka.ilkd.key.java;
 
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+
 /**
- *    A node representing a single source file containing
- *    {@link TypeDeclaration}s and an optional {@link PackageSpecification}
- *    and an optional set of {@link Import}s. In Java, any source file
- *    may contain at most one public class type definition.
- *    This class is taken from COMPOST and changed so that it can be
- *    used as an immutable class
+ * A node representing a single source file containing
+ * {@link TypeDeclaration}s and an optional {@link PackageSpecification}
+ * and an optional set of {@link Import}s. In Java, any source file
+ * may contain at most one public class type definition.
+ * This class is taken from COMPOST and changed so that it can be
+ * used as an immutable class
  */
 
-public class CompilationUnit extends JavaNonTerminalProgramElement implements TypeDeclarationContainer, TypeScope {
+public final class CompilationUnit extends JavaNonTerminalProgramElement
+        implements TypeDeclarationContainer, TypeScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompilationUnit.class);
 
     /**
      * Package spec.
      */
-
-    protected final PackageSpecification packageSpec;
+    @Nullable
+    private final PackageSpecification packageSpec;
 
     /**
      * Imports.
      */
-
-    protected final ImmutableArray<Import> imports;
+    @Nonnull
+    private final ImmutableArray<Import> imports;
 
     /**
      * Type declarations.
      */
-    protected final ImmutableArray<TypeDeclaration> typeDeclarations;
+    @Nonnull
+    private final ImmutableArray<TypeDeclaration> typeDeclarations;
 
-    /** creates a compilation unit 
-     * @param packageSpec a PackageSpecification (pck of this CU)
-     * @param imports an array of Import (all it imports)
-     * @param typeDeclarations an array of TypeDeclaration (the 
-     * type declared in it)
+    /**
+     * creates a compilation unit
+     *
+     * @param packageSpec      a PackageSpecification (pck of this CU)
+     * @param imports          an array of Import (all it imports)
+     * @param typeDeclarations an array of TypeDeclaration (the
+     *                         type declared in it)
      */
-    public CompilationUnit(PackageSpecification packageSpec, Import[]
-			   imports,
-			   TypeDeclaration[] typeDeclarations)
-    { 
-	this.packageSpec=packageSpec;
-	this.imports=new ImmutableArray<Import>(imports);
-	this.typeDeclarations=new ImmutableArray<TypeDeclaration>(typeDeclarations);
+    public CompilationUnit(PackageSpecification packageSpec, Import[] imports, TypeDeclaration[] typeDeclarations) {
+        this(null, Collections.emptyList(), packageSpec,
+                new ImmutableArray<>(imports), new ImmutableArray<>(typeDeclarations));
     }
 
+    public CompilationUnit(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
+                           @Nullable PackageSpecification packageSpec,
+                           @Nonnull ImmutableArray<Import> imports,
+                           @Nonnull ImmutableArray<TypeDeclaration> typeDeclarations) {
+        super(pi, comments);
+        this.packageSpec = packageSpec;
+        this.imports = imports;
+        this.typeDeclarations = typeDeclarations;
+    }
 
-    /** creates a compilation unit 
+    /**
+     * creates a compilation unit
+     *
      * @param children list with the children of this unit
      */
     public CompilationUnit(ExtList children) {
-	super(children);
-	packageSpec=children.get(PackageSpecification.class); 
-	this.imports=new ImmutableArray<Import>(children.collect(Import.class));
-	this.typeDeclarations=new
-	    ImmutableArray<TypeDeclaration>(children.collect(TypeDeclaration.class)); 
+        super(children);
+        packageSpec = children.get(PackageSpecification.class);
+        this.imports = new ImmutableArray<>(children.collect(Import.class));
+        this.typeDeclarations = new
+                ImmutableArray<>(children.collect(TypeDeclaration.class));
     }
-    
 
+
+    @Override
+    @Nonnull
     public SourceElement getFirstElement() {
         return (getChildCount() > 0) ? getChildAt(0).getFirstElement() : this;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       return (getChildCount() > 0) ? getChildAt(0).getFirstElementIncludingBlocks() : this;
+        return (getChildCount() > 0) ? getChildAt(0).getFirstElementIncludingBlocks() : this;
     }
 
+    @Override
+    @Nonnull
     public SourceElement getLastElement() {
         return
-	    typeDeclarations.get(typeDeclarations.size()-1);
+                typeDeclarations.get(typeDeclarations.size() - 1);
     }
 
     /**
-     *     Get name of the unit. The name is empty if no data location is set;
-     *     otherwise, the name of the current data location is returned.
-     *      @return the name of this compilation unit.
-     *    
+     * Get name of the unit. The name is empty if no data location is set;
+     * otherwise, the name of the current data location is returned.
+     *
+     * @return the name of this compilation unit.
      */
     public String getName() {
         return ""; //(location == null) ? "" : location.toString();
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
+    @Override
     public int getChildCount() {
         int result = 0;
-        if (packageSpec      != null) result++;
-        if (imports      != null) result += imports.size();
-        if (typeDeclarations != null) result += typeDeclarations.size();
+        if (packageSpec != null) result++;
+        result += imports.size();
+        result += typeDeclarations.size();
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
+    @Override
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
             if (index == 0) return packageSpec;
             index--;
         }
-        if (imports != null) {
-            len = imports.size();
-            if (len > index) {
-                return imports.get(index);
-            }
-            index -= len;
+        len = imports.size();
+        if (len > index) {
+            return imports.get(index);
         }
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        index -= len;
+        return typeDeclarations.get(index);
     }
 
     /**
- *      Get imports.
- *      @return the wrapped import array.
+     * Get imports.
+     *
+     * @return the wrapped import array.
      */
 
+    @Nonnull
     public ImmutableArray<Import> getImports() {
         return imports;
     }
 
 
     /**
- *      Get package specification.
- *      @return the package specification.
+     * Get package specification.
+     *
+     * @return the package specification.
      */
 
     public PackageSpecification getPackageSpecification() {
@@ -169,13 +189,14 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
 
     /**
- *      Get the number of type declarations in this container.
- *      @return the number of type declarations.
+     * Get the number of type declarations in this container.
+     *
+     * @return the number of type declarations.
      */
 
+    @Override
     public int getTypeDeclarationCount() {
-        return (typeDeclarations != null) ?
-	    typeDeclarations.size() : 0; 
+        return typeDeclarations.size();
     }
 
     /*
@@ -187,16 +208,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
       of bounds.
     */
 
+    @Override
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);         
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        return typeDeclarations.get(index);
     }
 
     /**
-     *      Get declarations.
-     *      @return the wrapped array of type declarations .
+     * Get declarations.
+     *
+     * @return the wrapped array of type declarations .
      */
     public ImmutableArray<TypeDeclaration> getDeclarations() {
         return typeDeclarations;
@@ -205,13 +225,13 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     /**
      * Gets the primary type declaration of the compilation unit.
      * The primary declaration is the first declaration of the unit,
-     * or the single public declaration. If there is no unambiguous primary 
+     * or the single public declaration. If there is no unambiguous primary
      * declaration, this method returns <CODE>null</CODE>.
      */
 
     public TypeDeclaration getPrimaryTypeDeclaration() {
         TypeDeclaration res = null;
-	int s = typeDeclarations.size();
+        int s = typeDeclarations.size();
         for (int i = 0; i < s; i += 1) {
             TypeDeclaration t = typeDeclarations.get(i);
             if (t.isPublic()) {
@@ -230,29 +250,36 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
         return res;
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printCompilationUnit(this);
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnCompilationUnit(this);
+        v.performActionOnCompilationUnit(this);
     }
 
 
-    /** toString */
+    /**
+     * toString
+     */
+    @Override
     public String toString() {
-	StringWriter sw = new StringWriter();
-	try {
-	    PrettyPrinter pp=new PrettyPrinter(sw);
-	    pp.setIndentationLevel(3);
-	    prettyPrint(pp);
-	} catch (IOException e) {
-	    LOGGER.error("Pretty printing of compilation unit failed", e);
-	}
-	return sw.toString();
+        StringWriter sw = new StringWriter();
+        try {
+            PrettyPrinter pp = new PrettyPrinter(sw);
+            pp.setIndentationLevel(3);
+            prettyPrint(pp);
+        } catch (IOException e) {
+            LOGGER.error("Pretty printing of compilation unit failed", e);
+        }
+        return sw.toString();
     }
 }

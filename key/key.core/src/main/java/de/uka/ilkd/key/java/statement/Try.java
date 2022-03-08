@@ -13,65 +13,52 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-/**
- *  Try.
- *  @author <TT>AutoDoc</TT>
- */
-public class Try extends BranchStatement 
-    implements StatementContainer, ProgramPrefix {
-    
-    /**
-     * Body.
-     */
+import javax.annotation.Nonnull;
+import java.util.List;
+
+public class Try extends BranchStatement implements StatementContainer, ProgramPrefix {
 
     private final StatementBlock body;
-
-    /**
- *      Branches.
-     */
-
     private final ImmutableArray<Branch> branches;
-
     private final MethodFrame innerMostMethodFrame;
-
     private final int prefixLength;
-    
-    /**
- *      Try.
- *      @param body a statement block.
-     */
+
+    public Try(PositionInfo pi, List<Comment> comments, StatementBlock body, ImmutableArray<Branch> branches,
+               MethodFrame innerMostMethodFrame, int prefixLength) {
+        super(pi, comments);
+        this.body = body;
+        this.branches = branches;
+        this.innerMostMethodFrame = innerMostMethodFrame;
+        this.prefixLength = prefixLength;
+    }
 
     public Try(StatementBlock body) {
-        this.body           = body;
-        this.branches       = null;
+        super(null, null);
+        this.body = body;
+        this.branches = null;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
- *      Try.
- *      @param body a statement block.
- *      @param branches a branch array.
+     * Try.
+     *
+     * @param body     a statement block.
+     * @param branches a branch array.
      */
 
     public Try(StatementBlock body, Branch[] branches) {
-        this.body           = body;
-        this.branches       = new ImmutableArray<Branch>(branches);
+        super(null, null);
+        this.body = body;
+        this.branches = new ImmutableArray<Branch>(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -79,29 +66,31 @@ public class Try extends BranchStatement
     }
 
     /**
- *      Try.
- *      @param body a statement block.
- *      @param branches a branch array.
+     * Try.
+     *
+     * @param body     a statement block.
+     * @param branches a branch array.
      */
 
     public Try(StatementBlock body, ImmutableArray<Branch> branches) {
-        this.body=body;
+        super(null, null);
+        this.body = body;
         this.branches = branches;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-
     }
 
     /**
- *      Try.
- *      @param children a list with all children
+     * Try.
+     *
+     * @param children a list with all children
      */
 
     public Try(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches=new
+        this.branches = new
                 ImmutableArray<Branch>(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -122,13 +111,13 @@ public class Try extends BranchStatement
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
-    
+
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
-            this;
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() :
+                this;
     }
-    
+
     @Override
     public int getPrefixLength() {
         return prefixLength;
@@ -142,38 +131,42 @@ public class Try extends BranchStatement
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
-    }    
+    }
 
-    
+
+    @Nonnull
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
 
 
+    @Nonnull
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (body     != null) result++;
+        if (body != null) result++;
         if (branches != null) result += branches.size();
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
@@ -187,8 +180,9 @@ public class Try extends BranchStatement
     }
 
     /**
- *      Get body.
- *      @return the statement block.
+     * Get body.
+     *
+     * @return the statement block.
      */
 
     public StatementBlock getBody() {
@@ -196,8 +190,9 @@ public class Try extends BranchStatement
     }
 
     /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -221,8 +216,9 @@ public class Try extends BranchStatement
     }
 
     /**
- *      Get the number of branches in this container.
- *      @return the number of branches.
+     * Get the number of branches in this container.
+     *
+     * @return the number of branches.
      */
 
     public int getBranchCount() {
@@ -230,13 +226,14 @@ public class Try extends BranchStatement
     }
 
     /**
-      Return the branch at the specified index in this node's
-      "virtual" branch array.
-      @param index an index for a branch.
-      @return the branch with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the branch at the specified index in this node's
+     * "virtual" branch array.
+     *
+     * @param index an index for a branch.
+     * @return the branch with the given index.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds.
+     */
 
     public Branch getBranchAt(int index) {
         if (branches != null) {
@@ -245,19 +242,23 @@ public class Try extends BranchStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** Return the branch array wrapper
+    /**
+     * Return the branch array wrapper
+     *
      * @return the array wrapper of the branches
      */
     public ImmutableArray<Branch> getBranchList() {
-	return branches;
+        return branches;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnTry(this);
+        v.performActionOnTry(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -265,6 +266,6 @@ public class Try extends BranchStatement
     }
 
     public PosInProgram getFirstActiveChildPos() {
-        return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO_ZERO;            
+        return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO_ZERO;
     }
 }

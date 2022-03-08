@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -23,64 +22,80 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
- *  Type operator.
- *  @author <TT>AutoDoc</TT>
+ * Type operator.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public abstract class TypeOperator extends Operator implements TypeReferenceContainer {
 
     /**
-     *      Type reference.
+     * Type reference.
      */
+    @Nonnull
     protected final TypeReference typeReference;
 
+    public TypeOperator(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Expression> children,
+                        TypeReference typeReference) {
+        super(pi, comments, children);
+        this.typeReference = typeReference;
+    }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * 	May contain:
-     *          a TypeReference (the referred type)
-     * 		2 of Expression (the first Expression as left hand
-     * 			side, the second as right hand side), 
-     * 		Comments
+     *                 May contain:
+     *                 a TypeReference (the referred type)
+     *                 2 of Expression (the first Expression as left hand
+     *                 side, the second as right hand side),
+     *                 Comments
      */
     public TypeOperator(ExtList children) {
-	super(children);
-	typeReference=children.get(TypeReference.class);
+        super(children);
+        typeReference = children.get(TypeReference.class);
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * 	May contain:
-     *          a TypeReference (the referred type)
-     * 		2 of Expression (the first Expression as left hand
-     * 			side, the second as right hand side), 
-     * 		Comments
+     *                 May contain:
+     *                 a TypeReference (the referred type)
+     *                 2 of Expression (the first Expression as left hand
+     *                 side, the second as right hand side),
+     *                 Comments
      */
     public TypeOperator(ExtList children, PositionInfo pi) {
-	super(children);
-	typeReference=children.get(TypeReference.class);
+        super(children);
+        typeReference = children.get(TypeReference.class);
     }
-    
+
     public TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
-        typeReference=typeref;
+        typeReference = typeref;
     }
 
     public TypeOperator(Expression[] arguments, TypeReference typeref) {
         super(arguments);
-        typeReference=typeref;
+        typeReference = typeref;
     }
 
-    public TypeOperator(){
-	typeReference=null;
+    public TypeOperator() {
+        typeReference = null;
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
     public int getTypeReferenceCount() {
         return (typeReference != null) ? 1 : 0;
@@ -103,22 +118,22 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     }
 
     /**
-     *      Get type reference.
-     *      @return the type reference.
+     * Get type reference.
+     *
+     * @return the type reference.
      */
     public TypeReference getTypeReference() {
         return typeReference;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, 
-				      ExecutionContext ec) {
-	return getKeYJavaType(javaServ);
+    public KeYJavaType getKeYJavaType(Services javaServ,
+                                      ExecutionContext ec) {
+        return getKeYJavaType(javaServ);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return getTypeReference().getKeYJavaType();
+        return getTypeReference().getKeYJavaType();
     }
-
 
 
 }

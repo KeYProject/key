@@ -11,52 +11,51 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * This class encapsulates initializers of a for loop
- */
-
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.util.List;
 
-public class LoopInit extends JavaNonTerminalProgramElement
-    implements StatementContainer, ILoopInit{
+/**
+ * This class encapsulates initializers of a for loop
+ */
+public final class LoopInit extends JavaNonTerminalProgramElement implements StatementContainer, ILoopInit {
+    private final ImmutableArray<LoopInitializer> inits;
 
-    ImmutableArray<LoopInitializer> inits;
+    public LoopInit(PositionInfo pi, List<Comment> comments, ImmutableArray<LoopInitializer> inits) {
+        super(pi, comments);
+        this.inits = inits;
+    }
 
     public LoopInit(ImmutableArray<LoopInitializer> exprarr) {
-	inits = exprarr;
+        this(null, null, exprarr);
     }
 
     public LoopInit(LoopInitializer[] exprarr) {
-	inits = new ImmutableArray<LoopInitializer>(exprarr);
+        this(new ImmutableArray<>(exprarr));
     }
 
     public LoopInit(ExtList ups, PositionInfo pos) {
         super(pos);
-	final LoopInitializer[] exps = new LoopInitializer[ups.size()];	
-	for (int i=0; i<exps.length; i++) {
-	    exps[i] = (LoopInitializer)ups.get(i);
-	}
-	inits = new ImmutableArray<LoopInitializer>(exps);
+        final LoopInitializer[] exps = new LoopInitializer[ups.size()];
+        for (int i = 0; i < exps.length; i++) {
+            exps[i] = (LoopInitializer) ups.get(i);
+        }
+        inits = new ImmutableArray<>(exps);
     }
-    
+
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
     public int getStatementCount() {
-	return inits.size();
+        return inits.size();
     }
 
     /*
@@ -68,27 +67,27 @@ public class LoopInit extends JavaNonTerminalProgramElement
       of bounds.
     */
     public Statement getStatementAt(int index) {
-	return inits.get(index);
+        return inits.get(index);
     }
 
     public int size() {
-	return getStatementCount();
+        return getStatementCount();
     }
 
     public ImmutableArray<LoopInitializer> getInits() {
-	return inits;
+        return inits;
     }
-    
+
     public void visit(Visitor v) {
-	v.performActionOnLoopInit(this);
+        v.performActionOnLoopInit(this);
     }
 
     public int getChildCount() {
-	return getStatementCount();
+        return getStatementCount();
     }
 
     public ProgramElement getChildAt(int index) {
-	return getStatementAt(index);
+        return getStatementAt(index);
     }
 
 }

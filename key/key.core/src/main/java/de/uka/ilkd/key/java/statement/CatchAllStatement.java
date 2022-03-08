@@ -13,105 +13,111 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import org.key_project.util.ExtList;
 
+import java.util.List;
 
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
-			       implements Statement, 
-			                  NonTerminalProgramElement, 
-//			                  Desugarable, 
-			                  StatementContainer {
-    private StatementBlock body;
-    private LocationVariable param;
+        implements Statement, NonTerminalProgramElement, StatementContainer {
+
+    private final StatementBlock body;
+    private final LocationVariable param;
+
+    public CatchAllStatement(PositionInfo pi, List<Comment> comments, StatementBlock body, LocationVariable param) {
+        super(pi, comments);
+        this.body = body;
+        this.param = param;
+    }
 
     public CatchAllStatement(StatementBlock body, LocationVariable param) {
-	this.body = body;
-	this.param = param;
+        this(null, null, body, param);
     }
-    
-    
+
     public CatchAllStatement(ExtList children) {
-    	super(children); // for comments
-    	this.body = children.get(StatementBlock.class);
-    	this.param = children.get(LocationVariable.class);
+        super(children); // for comments
+        this.body = children.get(StatementBlock.class);
+        this.param = children.get(LocationVariable.class);
     }
-    
-    
+
+
     public Statement getBody() {
-	return body;
+        return body;
     }
-    
+
 
     public LocationVariable getParam() {
-	return param;
+        return param;
     }
 
-    
+
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
-	int i=0;
-	if (body != null) i++;
-	if (param != null) i++;
-	return i;
+        int i = 0;
+        if (body != null) i++;
+        if (param != null) i++;
+        return i;
     }
 
-    
+
+    @Override
     public Statement getStatementAt(int i) {
         return body;
     }
-    
-    
+
+
+    @Override
     public int getStatementCount() {
         return 1;
     }
-    
-    
+
+
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array.
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array.
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
-	if (index == 0) {
-	    return param;
-	}
-	if (index==1) {
-	    return body;
-	}	
- 	throw new ArrayIndexOutOfBoundsException();
+        if (index == 0) {
+            return param;
+        }
+        if (index == 1) {
+            return body;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
-    
-  
-    /** calls the corresponding method of a visitor in order to
+
+
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnCatchAllStatement(this);
+        v.performActionOnCatchAllStatement(this);
     }
-    
 
+
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-	p.printCatchAllStatement(this);
+        p.printCatchAllStatement(this);
     }
-    
+
 
 //    public Object desugar() {	
 //        IProgramVariable pv = getParameterDeclaration()

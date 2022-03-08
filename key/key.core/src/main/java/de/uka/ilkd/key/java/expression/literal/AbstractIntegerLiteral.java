@@ -13,27 +13,29 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * This class is a superclass for integer literals (Int, Long, Char).
  * It provides a getValue() method to receive the actual value of the literal as well as
  * getValueString() to get a String representation. Subclasses of this class perform range checks at
  * creation time. This means once a literal is created it is certainly valid.
+ *
  * @author Wolfram Pfeifer
  */
 public abstract class AbstractIntegerLiteral extends Literal {
-
-    /**
-     * Empty default constructor.
-     */
-    protected AbstractIntegerLiteral() {
+    public AbstractIntegerLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
+        super(pi, comments);
     }
 
     /**
@@ -46,15 +48,13 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     /**
-     *
      * @return the actual value of the literal as a long
      */
     public abstract long getValue();
 
     /**
-     *
      * @return the actual value of the literal converted to a decimal String. If the literal
-     *         represents a negative value, the first character is a '-' sign.
+     * represents a negative value, the first character is a '-' sign.
      */
     public abstract String getValueString();
 
@@ -68,7 +68,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
         if (!(o.getClass() == this.getClass())) {
             return false;
         }
-        return ((AbstractIntegerLiteral)o).getValue() == getValue();
+        return ((AbstractIntegerLiteral) o).getValue() == getValue();
     }
 
     @Override
@@ -92,6 +92,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
      * This method does <b>not</b> check if the literal is actually valid, it just checks the
      * prefix indicating the base of the literal. The base prefix is found even if the String
      * contains a preceding sign ('+' or '-').
+     *
      * @param literalStr the given String to check
      * @return true iff the String represents a decimal literal, which means it does neither have
      * a hexadecimal ("0x"), binary ("0b"), nor octal ("0") prefix. Note that the literal "0" is

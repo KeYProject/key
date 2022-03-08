@@ -13,24 +13,18 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.java.*;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
+import java.util.List;
 
 public class ExecutionContext
 extends JavaNonTerminalProgramElement 
 implements IExecutionContext, Reference {
-
-    /**
-     * the class context 
-     */
     protected final TypeReference classContext;
-
     /**
      * the reference to the active object
      */
@@ -39,7 +33,15 @@ implements IExecutionContext, Reference {
     /**
      * the currently active method
      */
-    private IProgramMethod methodContext;
+    private final IProgramMethod methodContext;
+
+    public ExecutionContext(PositionInfo pi, List<Comment> comments, TypeReference classContext,
+                            ReferencePrefix runtimeInstance, IProgramMethod methodContext) {
+        super(pi, comments);
+        this.classContext = classContext;
+        this.runtimeInstance = runtimeInstance;
+        this.methodContext = methodContext;
+    }
 
     /**
      * creates an execution context reference
@@ -49,11 +51,8 @@ implements IExecutionContext, Reference {
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
-    public ExecutionContext(TypeReference classContext, 
-                    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
-        this.classContext = classContext;
-        this.methodContext = methodContext;
-        this.runtimeInstance = runtimeInstance;
+    public ExecutionContext(TypeReference classContext, IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
+        this(null, null, classContext, runtimeInstance, methodContext);
     }
 
     /**
@@ -62,6 +61,7 @@ implements IExecutionContext, Reference {
      * context
      */
     public ExecutionContext(ExtList children) {
+        super(children);
         this.classContext = children.get(TypeReference.class);	
         children.remove(this.classContext);
         this.methodContext = children.get(IProgramMethod.class);

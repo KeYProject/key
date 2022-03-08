@@ -13,30 +13,30 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.ExtList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
-                               implements  NameReference, Expression,
-                               ReferencePrefix {
+        implements NameReference, Expression, ReferencePrefix {
+    @Nullable
+    private final ProgramVariable variable;
 
-    protected final ProgramVariable variable;
+    public VariableReference(PositionInfo pi, List<Comment> comments, ProgramVariable variable) {
+        super(pi, comments);
+        this.variable = variable;
+    }
 
     protected VariableReference() {
-        variable = null;
+        this(null, null, null);
     }
 
     public VariableReference(ExtList children) {
@@ -45,17 +45,17 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
     public VariableReference(ProgramVariable variable, PositionInfo pi) {
-	super(pi);
-	this.variable = variable;
+        super(pi);
+        this.variable = variable;
     }
 
     public VariableReference(ProgramVariable variable) {
-	this(variable, PositionInfo.UNDEFINED);
+        this(variable, PositionInfo.UNDEFINED);
     }
 
 
-    public ProgramElementName getProgramElementName(){
-	return (ProgramElementName) variable.name();
+    public ProgramElementName getProgramElementName() {
+        return (ProgramElementName) variable.name();
     }
 
     public int getChildCount() {
@@ -65,10 +65,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual"
      * child array
+     *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *  of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
@@ -79,8 +80,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public ProgramElementName getIdentifier(){
-	return (ProgramElementName) variable.name();
+    public ProgramElementName getIdentifier() {
+        return (ProgramElementName) variable.name();
     }
 
 
@@ -93,41 +94,44 @@ public class VariableReference extends JavaNonTerminalProgramElement
         return variable;
     }
 
+    @Nonnull
     public SourceElement getFirstElement() {
         return variable;
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-	variable.prettyPrint(p);
+        variable.prettyPrint(p);
     }
 
     /**
      * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnVariableReference(this);
+        v.performActionOnVariableReference(this);
     }
 
     /**
      * We do not have a prefix, so fake it!
      * This way we implement ReferencePrefix
+     *
      * @author VK
      */
     public ReferencePrefix getReferencePrefix() {
-	return null;
+        return null;
     }
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
+        return this;
     }
 
     /**
      * Gets the KeY java type.
      *
      * @param javaServ the java services
-     * @param ec the execution context
+     * @param ec       the execution context
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
@@ -136,10 +140,10 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return getKeYJavaType();
+        return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType() {
-	return variable != null? variable.getKeYJavaType() : null;
+        return variable != null ? variable.getKeYJavaType() : null;
     }
 }

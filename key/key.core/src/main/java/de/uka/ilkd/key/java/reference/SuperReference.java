@@ -13,59 +13,56 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
-/**
- *  Super reference.
- *  
- */
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
-public class SuperReference extends JavaNonTerminalProgramElement
-                            implements Reference, Expression, ReferencePrefix, 
-                            ReferenceSuffix, ExpressionContainer, 
-                            TypeReferenceContainer {
+public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression, ReferencePrefix,
+        ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
-     *      Access path.
+     * Access path.
      */
+    @Nullable
     private final ReferencePrefix prefix;
 
 
-    /**
-     *      Super reference.
-     */
+    public SuperReference(PositionInfo pi, List<Comment> comments, ReferencePrefix prefix) {
+        super(pi, comments);
+        this.prefix = prefix;
+    }
+
     public SuperReference() {
-        prefix = null;
+        this(null, null, null);
     }
 
     /**
-     *      Super reference.
-     *      @param accessPath a reference expression.
+     * Super reference.
+     *
+     * @param accessPath a reference expression.
      */
     public SuperReference(ReferencePrefix accessPath) {
-        this.prefix = accessPath;
+        this(null, null, accessPath);
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     */ 
+     */
     public SuperReference(ExtList children) {
-	prefix =children.get(ReferencePrefix.class);
+        super(children);
+        prefix = children.get(ReferencePrefix.class);
     }
 
 
+    @Override
+    @Nonnull
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();
     }
@@ -76,44 +73,52 @@ public class SuperReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
 
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
-	int count = 0;
-	if (prefix != null) count++;
+        int count = 0;
+        if (prefix != null) count++;
         return count;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) return prefix;
-        } 
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
+    @Override
     public int getExpressionCount() {
         return (prefix instanceof Expression) ? 1 : 0;
     }
@@ -127,18 +132,21 @@ public class SuperReference extends JavaNonTerminalProgramElement
       of bounds.
     */
 
+    @Override
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression && index == 0) {
-            return (Expression)prefix;
+            return (Expression) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
+    @Override
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
@@ -152,35 +160,37 @@ public class SuperReference extends JavaNonTerminalProgramElement
       of bounds.
     */
 
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if ((prefix instanceof TypeReference) && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSuperReference(this);
+        v.performActionOnSuperReference(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSuperReference(this);
     }
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
-    }
-
     /**
-     * returns the KeYJavaType 
+     * returns the KeYJavaType
      */
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getSuperclass
-	    (ec.getTypeReference().getKeYJavaType());
+        return javaServ.getJavaInfo().getSuperclass
+                (ec.getTypeReference().getKeYJavaType());
     }
 
 }

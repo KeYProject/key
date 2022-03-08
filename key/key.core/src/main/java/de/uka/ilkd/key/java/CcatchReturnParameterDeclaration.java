@@ -13,21 +13,25 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A "\Return" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchReturnParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameterDeclaration {
+
+    public CcatchReturnParameterDeclaration(PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
+    }
 
     public CcatchReturnParameterDeclaration(ExtList children) {
+        super(null, null);
     }
 
     @Override

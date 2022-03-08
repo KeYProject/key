@@ -13,66 +13,73 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.ProgramElement;
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
- *  Expression jump statement.
- *  @author <TT>AutoDoc</TT>
+ * Expression jump statement.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public abstract class ExpressionJumpStatement extends JumpStatement implements ExpressionContainer {
+    @Nonnull
+    private final Expression expression;
 
-    /**
-     *      Expression.
-     */
-
-    protected final Expression expression;
+    public ExpressionJumpStatement(PositionInfo pi, List<Comment> comments, @Nonnull Expression expression) {
+        super(pi, comments);
+        this.expression = expression;
+    }
 
     /**
      * Expression jump statement.
      * May contain: 	an Expression (as expression of the
-     * 			ExpressionJumpStatement), 
-     * 		Comments
+     * ExpressionJumpStatement),
+     * Comments
      */
     public ExpressionJumpStatement(ExtList children) {
-	super(children);
-	expression=children.get(Expression.class);	
+        super(children);
+        expression = children.get(Expression.class);
     }
 
     /**
-     *      Expression jump statement.
+     * Expression jump statement.
      */
+    @Deprecated
     public ExpressionJumpStatement() {
-	expression=null;
+        this(null, null, null);
     }
 
     /**
-     *      Expression jump statement.
-     * @param expr an Expression used to jump 
+     * Expression jump statement.
+     *
+     * @param expr an Expression used to jump
      */
     public ExpressionJumpStatement(Expression expr) {
-	expression=expr;
+        this(null, null, expr);
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     public int getExpressionCount() {
         return (expression != null) ? 1 : 0;
     }
 
     /**
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the expression at the specified index in this node's
+     * "virtual" expression array.
+     *
+     * @param index an index for an expression.
+     * @return the expression with the given index.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds.
+     */
     public Expression getExpressionAt(int index) {
         if (expression != null && index == 0) {
             return expression;
@@ -81,16 +88,18 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     }
 
     /**
-     *      Get expression.
-     *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
     public Expression getExpression() {
         return expression;
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         return (expression != null) ? 1 : 0;
@@ -99,10 +108,11 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Returns the child at the specified index in this node's "virtual"
      * child array
-     *  @param index an index into this node's "virtual" child array
-     *  @return the program element at the given position
-     *  @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *             of bounds
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {

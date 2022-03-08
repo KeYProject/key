@@ -13,21 +13,25 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.visitor.Visitor;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A "\Continue *" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchContinueWildcardParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchContinueWildcardParameterDeclaration extends CcatchNonstandardParameterDeclaration {
+
+    public CcatchContinueWildcardParameterDeclaration(PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
+    }
 
     public CcatchContinueWildcardParameterDeclaration(ExtList children) {
+        super(null, null);
     }
 
     @Override

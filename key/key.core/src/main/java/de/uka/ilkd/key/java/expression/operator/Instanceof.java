@@ -13,34 +13,38 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *  Instanceof.
- *  @author <TT>AutoDoc</TT>
+ * Instanceof.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class Instanceof extends TypeOperator {
 
+    public Instanceof(PositionInfo pi, List<Comment> comments,
+                      @Nonnull Expression child, TypeReference typeReference) {
+        super(pi, comments, new ImmutableArray<>(child), typeReference);
+    }
 
     /**
-     *      Instanceof.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the expression on the left
-     *      side, the second the one on the  right side a type reference.
+     * Instanceof.
+     *
+     * @param children an ExtList with all children of this node
+     *                 the first children in list will be the expression on the left
+     *                 side, the second the one on the  right side a type reference.
      */
-
     public Instanceof(ExtList children) {
         super(children);
         assert getChildCount() == 2 : "not 2 children but " + getChildCount();
@@ -53,9 +57,10 @@ public class Instanceof extends TypeOperator {
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
@@ -64,18 +69,20 @@ public class Instanceof extends TypeOperator {
         return result;
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return typeReference;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         int len;
@@ -93,8 +100,9 @@ public class Instanceof extends TypeOperator {
     }
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -102,8 +110,9 @@ public class Instanceof extends TypeOperator {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -111,20 +120,23 @@ public class Instanceof extends TypeOperator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return POSTFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnInstanceof(this);
+        v.performActionOnInstanceof(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -132,11 +144,11 @@ public class Instanceof extends TypeOperator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return getKeYJavaType(javaServ);
+        return getKeYJavaType(javaServ);
     }
 
 }

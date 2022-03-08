@@ -13,79 +13,68 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.MatchConditions;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
- *  TypeReferences reference {@link recoder.abstraction.Type}s by name.
- *  A TypeReference can refer to an outer or inner type and hence can also
- *  be a {@link MemberReference}, but does not have to.
- *  A TypeReference can also occur as part of a reference path and
- *  as a prefix for types, too. As a possible suffix for types, it can
- *  have other TypeReferences as a prefix, playing the role of a
- *  {@link TypeReferenceContainer}.
+ * TypeReferences reference {@link recoder.abstraction.Type}s by name.
+ * A TypeReference can refer to an outer or inner type and hence can also
+ * be a {@link MemberReference}, but does not have to.
+ * A TypeReference can also occur as part of a reference path and
+ * as a prefix for types, too. As a possible suffix for types, it can
+ * have other TypeReferences as a prefix, playing the role of a
+ * {@link TypeReferenceContainer}.
  */
 
-public abstract class TypeReferenceImp
- extends JavaNonTerminalProgramElement
- implements TypeReference {
+public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement implements TypeReference {
 
+    protected final ReferencePrefix prefix;
+    protected final int dimensions;
+    protected final ProgramElementName name;
 
-    /**
-     *      Prefix.
-     */
-    protected ReferencePrefix prefix;
-
-    /**
-     *      Dimensions.
-     */
-    protected int dimensions;
-
-    /**
-     *      Name.
-     */
-    protected ProgramElementName name;
-
+    public TypeReferenceImp(PositionInfo pi, List<Comment> comments, ReferencePrefix prefix,
+                            int dimensions, ProgramElementName name) {
+        super(pi, comments);
+        this.prefix = prefix;
+        this.dimensions = dimensions;
+        this.name = name;
+    }
 
     /**
      * Constructor for the transformation of RECODER ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: 
-     * 	a ReferencePrefix (as prefix of the type reference)
-     *  a ProgramElementName (as name for the type reference)
-     *  Comments
-     * @param dim the dimension of this type
+     *                 May contain:
+     *                 a ReferencePrefix (as prefix of the type reference)
+     *                 a ProgramElementName (as name for the type reference)
+     *                 Comments
+     * @param dim      the dimension of this type
      */
     public TypeReferenceImp(ExtList children, int dim) {
-	super(children);
-	prefix = children.get(ReferencePrefix.class);
-	name = children.get(ProgramElementName.class);
-	dimensions = dim;
+        super(children);
+        prefix = children.get(ReferencePrefix.class);
+        name = children.get(ProgramElementName.class);
+        dimensions = dim;
     }
 
 
-    public TypeReferenceImp(ProgramElementName name) {	
-	this(name, 0, null);
+    public TypeReferenceImp(ProgramElementName name) {
+        this(name, 0, null);
     }
 
-    public TypeReferenceImp(ProgramElementName name, 
-			    int dimension, 
-			    ReferencePrefix prefix) {
-	this.name = name;
-	this.dimensions = dimension;
-	this.prefix = prefix;
+    public TypeReferenceImp(ProgramElementName name, int dimension, ReferencePrefix prefix) {
+        this(null, null, prefix, dimension, name);
     }
 
 
+    @Override
+    @Nonnull
     public SourceElement getFirstElement() {
         return (prefix == null) ? name : prefix.getFirstElement();
     }
@@ -96,24 +85,28 @@ public abstract class TypeReferenceImp
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
         int result = 0;
         if (prefix != null) result++;
-        if (name   != null) result++;
+        if (name != null) result++;
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) return prefix;
@@ -126,9 +119,11 @@ public abstract class TypeReferenceImp
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
+    @Override
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
@@ -141,17 +136,20 @@ public abstract class TypeReferenceImp
       @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
       of bounds.
     */
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
+    @Override
     public int getExpressionCount() {
         return (prefix instanceof Expression) ? 1 : 0;
     }
@@ -164,77 +162,91 @@ public abstract class TypeReferenceImp
       @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
       of bounds.
     */
+    @Override
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression && index == 0) {
-            return (Expression)prefix;
+            return (Expression) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
     /**
-     *      Get the package reference.
-     *      @return the package reference.
+     * Get the package reference.
+     *
+     * @return the package reference.
      */
+    @Override
     public PackageReference getPackageReference() {
-        return (prefix instanceof PackageReference) 
-	    ? (PackageReference)prefix : null;
+        return (prefix instanceof PackageReference)
+                ? (PackageReference) prefix : null;
     }
-    
+
     /**
-     *      Get dimensions.
-     *      @return the int value.
+     * Get dimensions.
+     *
+     * @return the int value.
      */
+    @Override
     public int getDimensions() {
         return dimensions;
     }
 
     /**
-     *      Get name.
-     *      @return the string.
+     * Get name.
+     *
+     * @return the string.
      */
+    @Override
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
 
-    public abstract KeYJavaType getKeYJavaType();
-
     /**
-     *      Get identifier.
-     *      @return the identifier.
+     * Get identifier.
+     *
+     * @return the identifier.
      */
 
+    @Override
     public ProgramElementName getProgramElementName() {
         return name;
     }
 
-    
-    /** calls the corresponding method of a visitor in order to
+
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnTypeReference(this);
+        v.performActionOnTypeReference(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printTypeReference(this);
     }
 
 
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        final ProgramElement pe = source.getSource(); 
-        if (!(pe instanceof TypeReference) || ((TypeReference)pe).getDimensions() != getDimensions()) {
+        final ProgramElement pe = source.getSource();
+        if (!(pe instanceof TypeReference) || ((TypeReference) pe).getDimensions() != getDimensions()) {
             return null;
-        } 
-        
+        }
+
         return super.match(source, matchCond);
     }
 }

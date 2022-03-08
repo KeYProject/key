@@ -14,66 +14,69 @@
 package de.uka.ilkd.key.java.statement;
 
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.NameReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
 /**
- *  Label jump statement.
- * 
+ * Label jump statement.
  */
 
 public abstract class LabelJumpStatement extends JumpStatement implements NameReference {
 
     /**
-     *      Name.
+     * Name.
      */
+    @Nullable
+    private final Label name;
 
-    protected final Label name;
-
-    /**
-     *      Label jump statement.
-     */
-
-    public LabelJumpStatement() {
-	name=null;
+    public LabelJumpStatement(PositionInfo pi, List<Comment> comments, Label name) {
+        super(pi, comments);
+        this.name = name;
     }
 
+
     /**
-     *      Label jump statement.    
+     * Label jump statement.
+     *
      * @param label the Label of this jump statement
      */
 
     public LabelJumpStatement(Label label) {
-	super();
-	name=label;
-
+        this(null, null, label);
     }
-    
-   /**
+
+    /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
      */
     public LabelJumpStatement(ExtList children) {
-	super(children);
-	name=children.get(Label.class);
+        super(children);
+        name = children.get(Label.class);
     }
 
 
-
     /**
-     *      Get name.
-     *      @return the string.
+     * Get name.
+     *
+     * @return the string.
      */
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
 
     /**
-     *      Get Label.
-     *      @return the Label label
+     * Get Label.
+     *
+     * @return the Label label
      */
 
     public Label getLabel() {
@@ -82,31 +85,34 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
 
 
     /**
-     *      Get identifier.
-     *      @return the identifier.
+     * Get identifier.
+     *
+     * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-	if ((name instanceof ProgramElementName) || (name==null)) {
-	    return (ProgramElementName) name;
-	}
-	return null;
+        if ((name instanceof ProgramElementName) || (name == null)) {
+            return (ProgramElementName) name;
+        }
+        return null;
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         return (name != null) ? 1 : 0;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {

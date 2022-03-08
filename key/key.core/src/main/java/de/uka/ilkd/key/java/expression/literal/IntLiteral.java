@@ -13,17 +13,22 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
- *  Int literal.
- *  @author <TT>AutoDoc</TT>
+ * Int literal.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class IntLiteral extends AbstractIntegerLiteral {
@@ -39,18 +44,31 @@ public class IntLiteral extends AbstractIntegerLiteral {
      */
     private final String valueStr;
 
+
     /**
      * The actual value of the literal.
      */
     private final int value;
 
+    public IntLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments, int value) {
+        super(pi, comments);
+        this.value = value;
+        this.valueStr = "" + value;
+    }
+
+    public IntLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments, String valueStr) {
+        super(pi, comments);
+        this.valueStr = valueStr;
+        value = parseFromString(valueStr);
+    }
+
     /**
      * Creates a new IntLiteral representing the given int.
+     *
      * @param value the int value represented by the literal
      */
     public IntLiteral(int value) {
-        this.value = value;
-        this.valueStr = ("" + value).intern();
+        this(null, null, value);
     }
 
     /**
@@ -61,22 +79,21 @@ public class IntLiteral extends AbstractIntegerLiteral {
      *
      * @param valStr the String that contains the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *                               literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     * http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public IntLiteral(String valStr) {
-        this.value = parseFromString(valStr);
-        this.valueStr = Integer.toString(value).intern();
+        this(null, null, parseFromString(valStr));
     }
 
     /**
      * Constructor for Recoder2KeY transformation.
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
-     * @param valStr the value of the literal
+     * @param valStr   the value of the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *                               literal or represents a value out of int range
      */
     public IntLiteral(ExtList children, String valStr) {
         super(children);
@@ -121,11 +138,11 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * @param sourceStr the String containing the value
      * @return the parsed value as a long
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *                               literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     * http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
-    protected int parseFromString(final String sourceStr) throws NumberFormatException {
+    protected static int parseFromString(final String sourceStr) throws NumberFormatException {
 
         String valStr = sourceStr;
         int radix = 10;
@@ -193,6 +210,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
 
         /* perform the actual conversion (two's complement for bin, oct and hex!) of the
          * BigInteger to a String containing the real (checked valid) value of the literal */
-        return (int)val;    // the cast does the two's complement conversion
+        return (int) val;    // the cast does the two's complement conversion
     }
 }

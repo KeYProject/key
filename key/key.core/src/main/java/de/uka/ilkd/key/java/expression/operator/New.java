@@ -30,6 +30,8 @@ import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  The object allocation operator.
  *  There are two variants for New:
@@ -109,7 +111,8 @@ public class New extends TypeOperator
     }
     
     
-    @Override    
+    @Nonnull
+    @Override
     public SourceElement getFirstElement() {
         return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
@@ -120,7 +123,8 @@ public class New extends TypeOperator
     }
 
     
-    @Override    
+    @Nonnull
+    @Override
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }

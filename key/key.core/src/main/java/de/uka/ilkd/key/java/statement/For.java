@@ -27,6 +27,8 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  For.
  *  
@@ -78,6 +80,7 @@ public class For extends LoopStatement implements VariableScope {
 	      children);
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }

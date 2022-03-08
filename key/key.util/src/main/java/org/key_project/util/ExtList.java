@@ -14,13 +14,20 @@
 package org.key_project.util;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
  * extends java.util.LinkedList in order to collect elements
- * according to their type
+ * according to their type.
+ *
+ * @deprecated This class provides a bad coding style of exploiting reflection in the construction of KeY-Java-AST.
+ * Will be removed.
  */
+@Deprecated
 public class ExtList extends ArrayList<Object> {
     public ExtList() {
         super();
@@ -60,6 +67,17 @@ public class ExtList extends ArrayList<Object> {
         }
         return toArray(cl, colls);
     }
+
+    public <T> List<T> collectList(Class<T> cl) {
+        List<T> colls = new ArrayList<>(size());
+        for (Object next : this) {
+            if (cl.isInstance(next) && (next != null)) {
+                colls.add((T) next);
+            }
+        }
+        return colls;
+    }
+
 
     /**
      * returns first element in list of type cl

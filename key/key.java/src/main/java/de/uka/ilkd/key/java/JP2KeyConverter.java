@@ -12,6 +12,7 @@ import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -24,11 +25,14 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -107,98 +111,109 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(AssignExpr n, Void arg) {
-        var children = visitChildren(n);
+        var target = (Expression) n.getTarget().accept(this, arg);
+        var expr = (Expression) n.getValue().accept(this, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         switch (n.getOperator()) {
             case ASSIGN:
-                return new CopyAssignment(children);
+                return new CopyAssignment(pi, c, target, expr);
             case PLUS:
-                return new PlusAssignment(children);
+                return new PlusAssignment(pi, c, target, expr);
             case MINUS:
-                return new MinusAssignment(children);
+                return new MinusAssignment(pi, c, target, expr);
             case MULTIPLY:
-                return new TimesAssignment(children);
+                return new TimesAssignment(pi, c, target, expr);
             case DIVIDE:
-                return new DivideAssignment(children);
+                return new DivideAssignment(pi, c, target, expr);
             case BINARY_AND:
-                return new BinaryAndAssignment(children);
+                return new BinaryAndAssignment(pi, c, target, expr);
             case BINARY_OR:
-                return new BinaryOrAssignment(children);
+                return new BinaryOrAssignment(pi, c, target, expr);
             case XOR:
-                return new BinaryXOrAssignment(children);
+                return new BinaryXOrAssignment(pi, c, target, expr);
             case REMAINDER:
-                return new ModuloAssignment(children);
+                return new ModuloAssignment(pi, c, target, expr);
             case LEFT_SHIFT:
-                return new ShiftLeftAssignment(children);
+                return new ShiftLeftAssignment(pi, c, target, expr);
             case SIGNED_RIGHT_SHIFT:
-                return new UnsignedShiftRightAssignment(children);
+                return new UnsignedShiftRightAssignment(pi, c, target, expr);
             case UNSIGNED_RIGHT_SHIFT:
-                return new ShiftRightAssignment(children);
+                return new ShiftRightAssignment(pi, c, target, expr);
         }
         return null;
     }
 
     @Override
     public ModelElement visit(BinaryExpr n, Void arg) {
-        var children = visitChildren(n);
+        var lhs = (Expression) n.getLeft().accept(this, arg);
+        var rhs = (Expression) n.getRight().accept(this, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         switch (n.getOperator()) {
             case OR:
-                return new LogicalOr(children);
+                return new LogicalOr(pi, c, lhs, rhs);
             case AND:
-                return new LogicalAnd(children);
+                return new LogicalAnd(pi, c, lhs, rhs);
             case BINARY_OR:
-                return new BinaryOr(children);
+                return new BinaryOr(pi, c, lhs, rhs);
             case BINARY_AND:
-                return new BinaryAnd(children);
+                return new BinaryAnd(pi, c, lhs, rhs);
             case XOR:
-                return new BinaryXOr(children);
+                return new BinaryXOr(pi, c, lhs, rhs);
             case EQUALS:
-                return new Equals(children);
+                return new Equals(pi, c, lhs, rhs);
             case NOT_EQUALS:
-                return new NotEquals(children);
+                return new NotEquals(pi, c, lhs, rhs);
             case LESS:
-                return new LessThan(children);
+                return new LessThan(pi, c, lhs, rhs);
             case GREATER:
-                return new GreaterThan(children);
+                return new GreaterThan(pi, c, lhs, rhs);
             case LESS_EQUALS:
-                return new LessOrEquals(children);
+                return new LessOrEquals(pi, c, lhs, rhs);
             case GREATER_EQUALS:
-                return new GreaterOrEquals(children);
+                return new GreaterOrEquals(pi, c, lhs, rhs);
             case LEFT_SHIFT:
-                return new ShiftLeft(children);
+                return new ShiftLeft(pi, c, lhs, rhs);
             case SIGNED_RIGHT_SHIFT:
-                return new ShiftRight(children);
+                return new ShiftRight(pi, c, lhs, rhs);
             case UNSIGNED_RIGHT_SHIFT:
-                return new UnsignedShiftRight(children);
+                return new UnsignedShiftRight(pi, c, lhs, rhs);
             case PLUS:
-                return new Plus(children);
+                return new Plus(pi, c, lhs, rhs);
             case MINUS:
-                return new Minus(children);
+                return new Minus(pi, c, lhs, rhs);
             case MULTIPLY:
-                return new Times(children);
+                return new Times(pi, c, lhs, rhs);
             case DIVIDE:
-                return new Divide(children);
+                return new Divide(pi, c, lhs, rhs);
             case REMAINDER:
-                return new Modulo(children);
+                return new Modulo(pi, c, lhs, rhs);
         }
         return null;
     }
 
     @Override
     public ModelElement visit(BlockStmt n, Void arg) {
-        var children = visitChildren(n);
-        return new StatementBlock(children);
+        var body = map(n.getStatements());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new StatementBlock(pi, c, body, 0, null);
     }
 
     @Override
     public ModelElement visit(BooleanLiteralExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new BooleanLiteral(children, n.getValue());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new BooleanLiteral(pi, c, n.getValue());
     }
 
     @Override
     public ModelElement visit(BreakStmt n, Void arg) {
-        var children = visitChildren(n);
-        return new Break(children);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var name = n.getLabel();
+        return new Break(pi, c, name);
     }
 
     @Override
@@ -215,8 +230,9 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(CharLiteralExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new CharLiteral(children, n.getValue());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new CharLiteral(pi, c, n.getValue().charAt(0));
     }
 
     @Override
@@ -227,7 +243,8 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(ClassOrInterfaceDeclaration n, Void arg) {
-        var seq = visitChildren(n);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         ProgramElementName fullName = new ProgramElementName(n.getNameAsString());
         boolean isLibrary = false; //TODO weigl
         if (n.isInterface()) {
@@ -237,7 +254,7 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
         }
     }
 
-    private ExtList visitChildren(Node node) {
+    /*private ExtList visitChildren(Node node) {
         ExtList seq = new ExtList(node.getChildNodes().size());
         for (Node childNode : node.getChildNodes()) {
             var element = childNode.accept(this, null);
@@ -247,13 +264,13 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
         }
         seq.add(createPositionInfo(node));
         return seq;
-    }
+    }*/
 
 
-    private ModelElement accept(Node check) {
+    private <T extends ModelElement> T accept(Node check) {
         var a = check.accept(this, null);
         mapping.put(check, a);
-        return a;
+        return (T) a;
     }
 
     private PositionInfo createPositionInfo(Node node) {
@@ -277,13 +294,23 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(com.github.javaparser.ast.CompilationUnit n, Void arg) {
-        return new CompilationUnit((PackageSpecification) accepto(n.getPackageDeclaration()),
-                accepta(n.getImports()), accepta(n.getTypes()));
+        return new CompilationUnit(
+                createPositionInfo(n), createComments(n),
+                (PackageSpecification) accepto(n.getPackageDeclaration()),
+                map(n.getImports()),
+                map(n.getTypes()));
     }
 
-    private <T> T[] accepta(NodeList<? extends Visitable> nodes) {
-        return (T[]) nodes.stream().map(it -> (T) it.accept(this, null)).toArray();
+    private List<Comment> createComments(Node n) {
+        //TODO weigl
+        return Collections.emptyList();
     }
+
+    private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
+        var seq = nodes.stream().map(it -> (T) it.accept(this, null)).collect(Collectors.toList());
+        return new ImmutableArray<>(seq);
+    }
+
 
     @Nullable
     private ModelElement accepto(Optional<? extends Visitable> node) {
@@ -293,46 +320,65 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(ConditionalExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new Conditional(children);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new Conditional(pi, c,
+                accept(n.getCondition()),
+                accept(n.getThenExpr()),
+                accept(n.getElseExpr()));
     }
 
     @Override
     public ModelElement visit(ConstructorDeclaration n, Void arg) {
         boolean parentIsInterface = false;
-        var children = visitChildren(n);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         return new de.uka.ilkd.key.java.declaration.ConstructorDeclaration(children, parentIsInterface);
     }
 
     @Override
     public ModelElement visit(ContinueStmt n, Void arg) {
-        var children = visitChildren(n);
-        return new Continue(children);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Label name = nameToLabel(n.getLabel());
+        return new Continue(pi, c, name);
+    }
+
+    private Label nameToLabel(Optional<SimpleName> label) {
+        if (label.isPresent()) {
+        }
+        return null;
     }
 
     @Override
     public ModelElement visit(DoStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         var guard = accept(n.getCondition());
         var body = accept(n.getBody());
-        return new Do((Expression) guard, (Statement) body, createPositionInfo(n));
+        return new Do(pi, c, new Guard((Expression) guard), (Statement) body);
     }
 
     @Override
     public ModelElement visit(DoubleLiteralExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new DoubleLiteral(children, n.getValue());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new DoubleLiteral(pi, c, n.getValue());
     }
 
     @Override
     public ModelElement visit(EmptyStmt n, Void arg) {
-        var children = visitChildren(n);
-        return new EmptyStatement(children);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new EmptyStatement(pi, c);
     }
 
     @Override
     public ModelElement visit(EnclosedExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new ParenthesizedExpression(children);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var expr = accept(n.getInner());
+        return new ParenthesizedExpression(pi, c, (Expression) expr);
     }
 
     @Override
@@ -354,7 +400,8 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(ExpressionStmt n, Void arg) {
-        var seq = visitChildren(n);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         return (ModelElement) seq.get(0);
     }
 
@@ -365,24 +412,41 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(FieldDeclaration n, Void arg) {
-        var children = visitChildren(n);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         boolean parentIsInferface = false;
-        return new de.uka.ilkd.key.java.declaration.FieldDeclaration(children, parentIsInferface);
+        var modArray = visitModifiers(n.getModifiers());
+        TypeReference type = accept(n.getVariables().get(0).getType());
+        ImmutableArray<FieldSpecification> fieldSpecs = n.getVariables();
+        return new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type, parentIsInferface, fieldSpecs);
+    }
+
+    private ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> visitModifiers(NodeList<Modifier> modifiers) {
     }
 
     @Override
     public ModelElement visit(ForEachStmt n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new EnhancedFor(pi, c, )
     }
 
     @Override
     public ModelElement visit(ForStmt n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new EnhancedFor(pi, c, )
     }
 
     @Override
     public ModelElement visit(IfStmt n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Statement t = (StatementBlock) accept(n.getThenStmt());
+        Statement e = (StatementBlock) accepto(n.getElseStmt());
+        return new If(pi, c, (Expression) accept(n.getCondition()),
+                new Then(e),
+                e != null ? new Else(e) : null);
     }
 
     @Override
@@ -392,13 +456,18 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(InstanceOfExpr n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var lhs = (Expression) accept(n.getExpression());
+        var type = (TypeReference) accept(n.getType());
+        return new Instanceof(pi, c, lhs, type);
     }
 
     @Override
     public ModelElement visit(IntegerLiteralExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new IntLiteral(children, n.getValue());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new IntLiteral(pi, c, n.getValue());
     }
 
     @Override
@@ -416,7 +485,9 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(LongLiteralExpr n, Void arg) {
-        return new LongLiteral(n.getValue());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new LongLiteral(pi, c, n.getValue());
     }
 
     @Override
@@ -453,7 +524,9 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(NullLiteralExpr n, Void arg) {
-        return NullLiteral.NULL;
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new NullLiteral(pi, c);
     }
 
     @Override
@@ -545,17 +618,25 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
 
     @Override
     public ModelElement visit(SwitchStmt n, Void arg) {
-        return new Switch(visitChildren(n));
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var expr = null;//TODO
+        var branches = map(n.getEntries());
+        return new Switch(pi, c, expr, branches);
     }
 
     @Override
     public ModelElement visit(SynchronizedStmt n, Void arg) {
-        return new Synchronized(visitChildren(n));
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new SynchronizedBlock(pi, c, accept(n.getExpression()), accept(n.getBody()),
+                null, 0);
     }
 
     @Override
     public ModelElement visit(ThisExpr n, Void arg) {
-        return new ThisReference(visitChildren(n));
+        n.getTypeName();//TODO
+        return new ThisReference(createPositionInfo(n), createComments(n), null);
     }
 
     @Override

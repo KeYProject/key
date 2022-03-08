@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.key_project.util.ExtList;
 
@@ -29,7 +30,13 @@ public class CcatchBreakLabelParameterDeclaration
 
     private final Label label;
 
+    public CcatchBreakLabelParameterDeclaration(PositionInfo pi, List<Comment> comments, Label label) {
+        super(pi, comments);
+        this.label = label;
+    }
+
     public CcatchBreakLabelParameterDeclaration(ExtList children) {
+        super(null, null);
         label = children.get(Label.class);
     }
 

@@ -24,6 +24,8 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  * The new enhanced form of a for-loop.
  * 
@@ -78,6 +80,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see de.uka.ilkd.key.java.statement.For#getLastElement()
      * @see de.uka.ilkd.key.java.JavaSourceElement#getLastElement()
      */
+    @Nonnull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }

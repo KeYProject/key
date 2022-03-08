@@ -13,104 +13,86 @@
 
 package de.uka.ilkd.key.java.expression;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *    Operator base class.
- *    @author AL
-*/
+ * Operator base class.
+ *
+ * @author AL
+ */
 
 public abstract class Operator extends JavaNonTerminalProgramElement
-    implements Expression, ExpressionContainer {
-
-
+        implements Expression, ExpressionContainer {
     /**
-     *      Children.
+     * Relative positioning of the operator.
      */
-    protected final ImmutableArray<Expression> children;
-
-
-    /**
-     *      Relative positioning of the operator.
-     */
-
     public static final int PREFIX = 0;
     public static final int INFIX = 1;
     public static final int POSTFIX = 2;
 
-    public Operator() {
-	this.children = null;
-    }
 
     /**
-     Operator.
-     @param lhs an expression.
-     @param rhs an expression.
+     * Children.
      */
-    public Operator(Expression lhs, Expression rhs) {
-	this.children=new ImmutableArray<Expression>(lhs, rhs);
+    @Nonnull
+    protected final ImmutableArray<Expression> children;
+
+    public Operator(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Expression> children) {
+        super(pi, comments);
+        this.children = children;
     }
+
+    public Operator() {
+        this(null, null, new ImmutableArray<>());
+    }
+
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes.
-     * In this case the order of the children is IMPORTANT. 
-     * 	May contain:
-     * 		2 of Expression (the first Expression as left hand
-     * 			side, the second as right hand side), 
-     * 		Comments
      *
+     * @param children the children of this AST element as KeY classes.
+     *                 In this case the order of the children is IMPORTANT.
+     *                 May contain:
+     *                 2 of Expression (the first Expression as left hand
+     *                 side, the second as right hand side),
+     *                 Comments
      */
     public Operator(ExtList children) {
         super(children);
-	this.children =
-	    new ImmutableArray<Expression>
-	    (children.collect(Expression.class)); 
+        this.children = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     /**
      * Operator.
-     * @param unaryChild an expression.
-     */
-
-    public Operator(Expression unaryChild) {
-	this.children = new ImmutableArray<Expression>(unaryChild);
-    }
-
-    /**
-     * Operator.
+     *
      * @param arguments an array of expression.
      */
-
-    public Operator(Expression[] arguments) {
-	this.children = new ImmutableArray<Expression>(arguments);
+    public Operator(Expression... arguments) {
+        this(null, null, new ImmutableArray<>(arguments));
     }
 
-
-    /** 
-     * getArity() == getASTchildren().size() 
+    /**
+     * getArity() == getASTchildren().size()
      */
     public abstract int getArity();
 
-    /** 0 is the "highest" precedence (obtained by parantheses),
-     *  13 the "lowest". 
+    /**
+     * 0 is the "highest" precedence (obtained by parantheses),
+     * 13 the "lowest".
      */
 
     public abstract int getPrecedence();
 
     /**
-     *    @return true, if a has a higher priority (a lower precendence value)
-     *      than b.
+     * @return true, if a has a higher priority (a lower precendence value)
+     * than b.
      */
 
     public static boolean precedes(Operator a, Operator b) {
@@ -118,87 +100,90 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      @return INFIX, PREFIX, or POSTFIX.
+     * @return INFIX, PREFIX, or POSTFIX.
      */
     public abstract int getNotation();
 
     /**
-     *  Checks if this operator is left or right associative. The associativity
-     *  defines the order in which the arguments are evaluated (left-to-right
-     *  or right-to-left). The default is left associative. Unary operators,
-     *  assignments and conditionals are right associative.
-     *  @return <CODE>true</CODE>, if the operator is left associative,
-     *   <CODE>false</CODE> otherwise.
+     * Checks if this operator is left or right associative. The associativity
+     * defines the order in which the arguments are evaluated (left-to-right
+     * or right-to-left). The default is left associative. Unary operators,
+     * assignments and conditionals are right associative.
+     *
+     * @return <CODE>true</CODE>, if the operator is left associative,
+     * <CODE>false</CODE> otherwise.
      */
     public boolean isLeftAssociative() {
         return true;
     }
 
+    @Nonnull
     public SourceElement getFirstElement() {
         switch (getNotation()) {
-        case INFIX:
-        case POSTFIX:
-            return children.get(0).getFirstElement();
-        case PREFIX:
-        default:
-            return this;
+            case INFIX:
+            case POSTFIX:
+                return children.get(0).getFirstElement();
+            case PREFIX:
+            default:
+                return this;
         }
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       switch (getNotation()) {
-       case INFIX:
-       case POSTFIX:
-           return children.get(0).getFirstElementIncludingBlocks();
-       case PREFIX:
-       default:
-           return this;
-       }
+        switch (getNotation()) {
+            case INFIX:
+            case POSTFIX:
+                return children.get(0).getFirstElementIncludingBlocks();
+            case PREFIX:
+            default:
+                return this;
+        }
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         switch (getNotation()) {
-        case INFIX:
-        case PREFIX:
-            return children.get(getArity() - 1).getLastElement();
+            case INFIX:
+            case PREFIX:
+                return children.get(getArity() - 1).getLastElement();
             case POSTFIX:
-        default:
-            return this;
+            default:
+                return this;
         }
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
 
     public int getChildCount() {
-        return (children != null) ? children.size() : 0;
+        return children.size();
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        return children.get(index);
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
-        return (children != null) ? children.size() : 0;
+        return children.size();
     }
     
     /*
@@ -211,30 +196,30 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     */
 
     public Expression getExpressionAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        return children.get(index);
     }
 
-    /** return arguments */
+    /**
+     * return arguments
+     */
     public ImmutableArray<Expression> getArguments() {
-	return children;
+        return children;
     }
 
     // has to be changed
     public boolean isToBeParenthesized() {
-	return false;
-    }
-    
-    /** overriden from JavaProgramElement. 
-     */
-    public String reuseSignature(Services services, ExecutionContext ec) {
-       return super.reuseSignature(services, ec)+"("+
-          services.getTypeConverter().getKeYJavaType(this, ec).getName()+")";
+        return false;
     }
 
-    public abstract KeYJavaType getKeYJavaType(Services javaServ, 
-					       ExecutionContext ec);
+    /**
+     * overriden from JavaProgramElement.
+     */
+    public String reuseSignature(Services services, ExecutionContext ec) {
+        return super.reuseSignature(services, ec) + "(" +
+                services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
+    }
+
+    public abstract KeYJavaType getKeYJavaType(Services javaServ,
+                                               ExecutionContext ec);
 
 }

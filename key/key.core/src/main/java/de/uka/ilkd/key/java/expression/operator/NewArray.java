@@ -27,6 +27,8 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  The array allocation operator.
  *  There are two variants for NewArray:
@@ -103,6 +105,7 @@ public class NewArray extends TypeOperator
 	assert dimensions > 0;
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         if (arrayInitializer != null) {
             return arrayInitializer;

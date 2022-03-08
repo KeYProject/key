@@ -13,71 +13,82 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.Constructor;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 
 /**
- *  The getTypeReference method returns null - constructors do not have
- *  explicite return types.  A constructor declaration contains its own
- *  name even though it must match the class name: the name occurs as
- *  syntactical element and hence must be represented.
- *  taken from COMPOST and changed to achieve an immutable structure
+ * The getTypeReference method returns null - constructors do not have
+ * explicite return types.  A constructor declaration contains its own
+ * name even though it must match the class name: the name occurs as
+ * syntactical element and hence must be represented.
+ * taken from COMPOST and changed to achieve an immutable structure
  */
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
+    public ConstructorDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray, TypeReference returnType, Comment[] voidComments, ProgramElementName name, ImmutableArray<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
+        super(pi, comments, modArray, returnType, voidComments, name, parameters, exceptions, body, parentIsInterfaceDeclaration);
+    }
 
     /**
      * Constructor declaration.
-     * @parm children an ExtList with the children. May
-     * include: 
-     * 	a TypeReference (as a reference to the return type), 
-     * 	a de.uka.ilkd.key.logic.ProgramElementName (as Name of the
-     * 		method),
-     * 	several ParameterDeclaration (as parameters of the declared
-     * 		method), 
-     * 	a StatementBlock (as body of the declared method), 
-     * 	several Modifier (taken as modifiers of the declaration), 
-     * 	a Comment
+     *
      * @param parentIsInterfaceDeclaration a boolean set true iff
-     * parent is an InterfaceDeclaration      
+     *                                     parent is an InterfaceDeclaration
+     * @parm children an ExtList with the children. May
+     * include:
+     * a TypeReference (as a reference to the return type),
+     * a de.uka.ilkd.key.logic.ProgramElementName (as Name of the
+     * method),
+     * several ParameterDeclaration (as parameters of the declared
+     * method),
+     * a StatementBlock (as body of the declared method),
+     * several Modifier (taken as modifiers of the declaration),
+     * a Comment
      */
     public ConstructorDeclaration(ExtList children,
-				  boolean parentIsInterfaceDeclaration) {
-	super(children, parentIsInterfaceDeclaration, null);	
+                                  boolean parentIsInterfaceDeclaration) {
+        super(children, parentIsInterfaceDeclaration, null);
     }
 
-    
+
     /**
      * Constructor declaration.
-     * @param modifiers a modifier array.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.     
-     * @param body a statement block.
+     *
+     * @param modifiers                    a modifier array.
+     * @param name                         an identifier.
+     * @param parameters                   a parameter declaration mutable list.
+     * @param exceptions                   a throws.
+     * @param body                         a statement block.
      * @param parentIsInterfaceDeclaration a boolean set true iff
-     * parent is an InterfaceDeclaration 
+     *                                     parent is an InterfaceDeclaration
      */
     @Deprecated
-    public ConstructorDeclaration(Modifier[] modifiers, 
-	    			  ProgramElementName name,
-				  ParameterDeclaration[] parameters, 
-				  Throws exceptions, 
-				  StatementBlock body, 
-				  boolean parentIsInterfaceDeclaration) { 
-	super(modifiers, 
-	      null, 
-	      name,
-	      parameters, 
-	      exceptions, 
-	      body, 
-	      parentIsInterfaceDeclaration);
+    public ConstructorDeclaration(Modifier[] modifiers,
+                                  ProgramElementName name,
+                                  ParameterDeclaration[] parameters,
+                                  Throws exceptions,
+                                  StatementBlock body,
+                                  boolean parentIsInterfaceDeclaration) {
+        super(modifiers,
+                null,
+                name,
+                parameters,
+                exceptions,
+                body,
+                parentIsInterfaceDeclaration);
     }
 
-    
+
     /**
      * Constructors are never abstract.
      */
@@ -86,7 +97,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
+
     /**
      * Constructors are never final.
      */
@@ -95,7 +106,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
+
     /**
      * Constructors are never native.
      */
@@ -104,7 +115,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
+
     /**
      * Constructors are never static.
      */
@@ -113,7 +124,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
+
     /**
      * Constructors are never strictfp.
      */
@@ -122,7 +133,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
+
     /**
      * Constructors are never synchronized.
      */
@@ -132,8 +143,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     }
 
 
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnConstructorDeclaration(this);
+        v.performActionOnConstructorDeclaration(this);
     }
 }

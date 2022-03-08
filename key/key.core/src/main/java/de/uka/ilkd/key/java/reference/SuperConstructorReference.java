@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  Super constructor reference.
  */
@@ -122,7 +124,8 @@ public class SuperConstructorReference extends SpecialConstructorReference
     }
 
     
-    @Override    
+    @Nonnull
+    @Override
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();
     }

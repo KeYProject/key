@@ -13,70 +13,70 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *  Inheritance specification.
- *  @author <TT>AutoDoc</TT>
+ * Inheritance specification.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public abstract class InheritanceSpecification
- extends JavaNonTerminalProgramElement
- implements TypeReferenceContainer {
-
-    /**
- *      Supertypes.
-     */
+        extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
     protected final ImmutableArray<TypeReference> supertypes;
 
-
-    /**
- *      Inheritance specification.
-     */
+    public InheritanceSpecification(PositionInfo pi, List<Comment> comments, ImmutableArray<TypeReference> supertypes) {
+        super(pi, comments);
+        this.supertypes = supertypes;
+    }
 
     public InheritanceSpecification() {
-	this.supertypes=null;
+        this(null, null, null);
     }
 
     /**
- *      Inheritance specification.
- *      @param supertype a type reference.
+     * Inheritance specification.
+     *
+     * @param supertype a type reference.
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-	this.supertypes = new ImmutableArray<TypeReference>(supertype);
+        this(null, null, new ImmutableArray<>(supertype));
     }
 
     /**
-     *      Inheritance specification.
-     *      @param supertypes a type reference mutable list.
+     * Inheritance specification.
+     *
+     * @param supertypes a type reference mutable list.
      */
 
     public InheritanceSpecification(TypeReference[] supertypes) {
-	this.supertypes=new ImmutableArray<TypeReference>(supertypes);
+        this(null, null, new ImmutableArray<>(supertypes));
     }
 
     /**
-     *  Inheritance specification.
-     *  @param children the ExtList may include: a Comment
-     * 	several TypeReference (as references to the supertypes)
-     * 	a Comment
+     * Inheritance specification.
+     *
+     * @param children the ExtList may include: a Comment
+     *                 several TypeReference (as references to the supertypes)
+     *                 a Comment
      */
     protected InheritanceSpecification(ExtList children) {
         super(children);
-	this.supertypes=new
-	    ImmutableArray<TypeReference>(children.collect(TypeReference.class)); 
+        this.supertypes = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
 
+    @Override
+    @Nonnull
     public SourceElement getLastElement() {
         if (supertypes == null) {
             return this;
@@ -86,10 +86,12 @@ public abstract class InheritanceSpecification
 
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
+    @Override
     public int getChildCount() {
         int result = 0;
         if (supertypes != null) result += supertypes.size();
@@ -97,14 +99,16 @@ public abstract class InheritanceSpecification
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
+    @Override
     public ProgramElement getChildAt(int index) {
         if (supertypes != null) {
             return supertypes.get(index);
@@ -113,8 +117,9 @@ public abstract class InheritanceSpecification
     }
 
     /**
- *      Get supertypes.
- *      @return the type reference array wrapper.
+     * Get supertypes.
+     *
+     * @return the type reference array wrapper.
      */
 
     public ImmutableArray<TypeReference> getSupertypes() {
@@ -122,10 +127,12 @@ public abstract class InheritanceSpecification
     }
 
     /**
- *      Get the number of type references in this container.
- *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
 
+    @Override
     public int getTypeReferenceCount() {
         return (supertypes != null) ? supertypes.size() : 0;
     }
@@ -139,6 +146,7 @@ public abstract class InheritanceSpecification
       of bounds.
     */
 
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if (supertypes != null) {
             return supertypes.get(index);

@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
@@ -33,7 +33,13 @@ public class CcatchReturnValParameterDeclaration extends
 
     private final ParameterDeclaration delegate;
 
+    public CcatchReturnValParameterDeclaration(PositionInfo pi, List<Comment> comments, ParameterDeclaration delegate) {
+        super(pi, comments);
+        this.delegate = delegate;
+    }
+
     public CcatchReturnValParameterDeclaration(ExtList children) {
+        super(null, null);
         delegate = children.get(ParameterDeclaration.class);
     }
 
@@ -63,11 +69,9 @@ public class CcatchReturnValParameterDeclaration extends
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {

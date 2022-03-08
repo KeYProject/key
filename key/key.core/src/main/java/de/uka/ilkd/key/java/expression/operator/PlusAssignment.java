@@ -13,34 +13,42 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *  Addition or string concatenation assignment "+=".
+ * Addition or string concatenation assignment "+=".
  */
 
 public class PlusAssignment extends Assignment {
-
+    public PlusAssignment(PositionInfo pi, List<Comment> comments, @Nonnull Expression lhs, @Nonnull Expression rhs) {
+        super(pi, comments, lhs, rhs);
+    }
 
     /**
-     *      Plus assignment.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Plus assignment.
+     *
+     * @param children an ExtList with all children of this node
+     *                 the first children in list will be the one on the left
+     *                 side, the second the one on the  right side.
      */
-
     public PlusAssignment(ExtList children) {
-	super(children);
+        super(children);
     }
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -48,8 +56,9 @@ public class PlusAssignment extends Assignment {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -57,20 +66,23 @@ public class PlusAssignment extends Assignment {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnPlusAssignment(this);
+        v.performActionOnPlusAssignment(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

@@ -13,19 +13,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
@@ -36,78 +24,77 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
-/**
- *  Method reference.
- *  @author <TT>AutoDoc</TT>
- */
+import javax.annotation.Nonnull;
+import java.util.List;
+
 public class MethodReference extends JavaNonTerminalProgramElement
-                             implements MethodOrConstructorReference,
-                             MemberReference, ReferencePrefix, 
-                             ReferenceSuffix, ExpressionStatement, 
-                             TypeReferenceContainer, NameReference {
- 
+        implements MethodOrConstructorReference,
+        MemberReference, ReferencePrefix,
+        ReferenceSuffix, ExpressionStatement,
+        TypeReferenceContainer, NameReference {
+
     /**
-       Access path.
-    */
+     * Access path.
+     */
     protected final ReferencePrefix prefix;
-    
-    /**
-     *      Name.
-     */
     protected final MethodName name;
-    
-    /**
-     *      Arguments.
-     */
     protected final ImmutableArray<? extends Expression> arguments;
-    
-    public MethodReference(ExtList args, MethodName n, 
-                   ReferencePrefix p, PositionInfo pos) {
+
+    public MethodReference(PositionInfo pi, List<Comment> comments, ReferencePrefix prefix,
+                           MethodName name, ImmutableArray<? extends Expression> arguments) {
+        super(pi, comments);
+        this.prefix = prefix;
+        this.name = name;
+        this.arguments = arguments;
+    }
+
+    public MethodReference(ExtList args, MethodName n, ReferencePrefix p, PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = new ImmutableArray<Expression>(args.collect(Expression.class));       
+        this.arguments = new ImmutableArray<>(args.collect(Expression.class));
     }
-    
-    public MethodReference(ImmutableArray<? extends Expression> args, MethodName n, 
-            ReferencePrefix p) {
+
+    public MethodReference(ImmutableArray<? extends Expression> args, MethodName n, ReferencePrefix p) {
+        this(null, null, p, n, args);
+        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
+        checkArguments();
+    }
+
+    public MethodReference(ImmutableArray<Expression> args, MethodName n,
+                           ReferencePrefix p, PositionInfo pos) {
+        super(pos);
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = args;        
-	checkArguments();
-    }
-    
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-			   ReferencePrefix p, PositionInfo pos) {
-	super(pos);
-	this.prefix=p;
-	name = n;
-	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-	this.arguments=args;        
-	checkArguments();
+        this.arguments = args;
+        checkArguments();
     }
 
-   public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
-	this(new ImmutableArray<Expression>(children.collect(Expression.class)),
-	     n, p, children.get(PositionInfo.class));
+    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
+        this(new ImmutableArray<>(children.collect(Expression.class)),
+                n, p, children.get(PositionInfo.class));
     }
 
-     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos, String scope) {
-	this(new ImmutableArray<Expression>(children.collect(Expression.class)),
-	     n, p, pos);
+    public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos, String scope) {
+        this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
-    protected void checkArguments(){
-	ImmutableArray<? extends Expression> args = getArguments();
-	for(Expression arg:args){
-	    if(arg==null) 
-		throw new NullPointerException();
-	}
+    protected void checkArguments() {
+        ImmutableArray<? extends Expression> args = getArguments();
+        for (Expression arg : args) {
+            if (arg == null)
+                throw new NullPointerException();
+        }
     }
-    
+
+    @Nonnull
     public SourceElement getFirstElement() {
         return (prefix == null) ? getChildAt(0).getFirstElement() : prefix.getFirstElement();
     }
@@ -119,34 +106,37 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
     @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
-    
+
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
 
     public int getChildCount() {
         int result = 0;
-        if (prefix     != null) result++;
-        if (name       != null) result++;
-        if (arguments  != null) result += arguments.size();
+        if (prefix != null) result++;
+        if (name != null) result++;
+        if (arguments != null) result += arguments.size();
         return result;
     }
-    
+
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
@@ -158,20 +148,20 @@ public class MethodReference extends JavaNonTerminalProgramElement
             index--;
         }
         if (arguments != null) {
-	    return arguments.get(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
-    
-    
+
 
     /*
       Return the type reference at the specified index in this node's
@@ -183,15 +173,16 @@ public class MethodReference extends JavaNonTerminalProgramElement
     */
     public TypeReference getTypeReferenceAt(int index) {
         if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     public int getExpressionCount() {
         int result = 0;
@@ -213,7 +204,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression) {
             if (index == 0) {
-                return (Expression)prefix;
+                return (Expression) prefix;
             }
             index -= 1;
         }
@@ -224,28 +215,31 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Get name.
-     *      @return the string.
+     * Get name.
+     *
+     * @return the string.
      */
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
 
     /**
-     *      Get identifier.
-     *      @return the identifier.
+     * Get identifier.
+     *
+     * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-	if (name instanceof ProgramElementName) {
-	    return (ProgramElementName) name; 	
-	} else if (name instanceof SchemaVariable) {
-	    return (((ProgramSV)name).getProgramElementName());
-	} else return null;
+        if (name instanceof ProgramElementName) {
+            return (ProgramElementName) name;
+        } else if (name instanceof SchemaVariable) {
+            return (((ProgramSV) name).getProgramElementName());
+        } else return null;
     }
 
     /**
-     *      Get arguments.
-     *      @return the expression array wrapper.
+     * Get arguments.
+     *
+     * @return the expression array wrapper.
      */
     @Override
     public ImmutableArray<? extends Expression> getArguments() {
@@ -253,8 +247,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Gets index-th argument    
-     *      @return the expression 
+     * Gets index-th argument
+     *
+     * @return the expression
      */
     public Expression getArgumentAt(int index) {
         if (arguments != null) {
@@ -268,50 +263,50 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * method
      */
     public ImmutableList<KeYJavaType> getMethodSignature(Services services,
-						ExecutionContext ec) {
-	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
-	if (arguments != null) {
+                                                         ExecutionContext ec) {
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
+        if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
-	    for (int i = arguments.size()-1; i>=0; i--) {		
+            for (int i = arguments.size() - 1; i >= 0; i--) {
                 signature = signature.prepend
-                    (typeConverter.getKeYJavaType(getArgumentAt(i), ec));
-	    }
-	}
-	return signature;
+                        (typeConverter.getKeYJavaType(getArgumentAt(i), ec));
+            }
+        }
+        return signature;
     }
-    
+
     /**
      * returns the static KeYJavaType of the methods prefix
      */
-    public KeYJavaType determineStaticPrefixType(Services services, 
+    public KeYJavaType determineStaticPrefixType(Services services,
                                                  ExecutionContext ec) {
-	KeYJavaType prefixType;
+        KeYJavaType prefixType;
         if (prefix == null) {
-	    prefixType = ec.getTypeReference().getKeYJavaType();
-	} else {
-	    if (prefix instanceof Expression) {
-	        prefixType = ((Expression)prefix).getKeYJavaType(services, ec);
-	    } else {
-	        prefixType = ((TypeReference)prefix).getKeYJavaType();
-	    }
-	}
-        return prefixType;        
+            prefixType = ec.getTypeReference().getKeYJavaType();
+        } else {
+            if (prefix instanceof Expression) {
+                prefixType = ((Expression) prefix).getKeYJavaType(services, ec);
+            } else {
+                prefixType = ((TypeReference) prefix).getKeYJavaType();
+            }
+        }
+        return prefixType;
     }
-    
-    public IProgramMethod method(Services services, 
-            			KeYJavaType refPrefixType, 
-            			ExecutionContext ec) {	
+
+    public IProgramMethod method(Services services,
+                                 KeYJavaType refPrefixType,
+                                 ExecutionContext ec) {
         ProgramVariable inst = services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
-        IProgramMethod pm = method(services, refPrefixType, 
+        IProgramMethod pm = method(services, refPrefixType,
                 getMethodSignature(services, ec),
                 ec.getTypeReference().getKeYJavaType());
-        while(inst!=null && pm==null){
+        while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
-            pm = method(services, classType, 
+            pm = method(services, classType,
                     getMethodSignature(services, ec),
                     classType);
-            if(pm!=null){
+            if (pm != null) {
                 return pm;
             }
             inst = services.getJavaInfo().getAttribute(
@@ -319,65 +314,66 @@ public class MethodReference extends JavaNonTerminalProgramElement
         }
         return pm;
     }
-    
+
     /**
-     * 
-     * @param services the Services class offering access to metamodel 
-     * information
-     * @param classType the KeYJavaType where to start looking for the 
-     * declared method
+     * @param services  the Services class offering access to metamodel
+     *                  information
+     * @param classType the KeYJavaType where to start looking for the
+     *                  declared method
      * @param signature the IList<KeYJavaType> of the arguments types
-     * @param context the KeYJavaType from where the method is called  
+     * @param context   the KeYJavaType from where the method is called
      * @return the found program method
      */
     public IProgramMethod method
-    	(Services services, KeYJavaType classType, 
-    	        ImmutableList<KeYJavaType> signature, 
-    	        KeYJavaType context) {
-        final String methodName = name.toString();        
-        IProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
+    (Services services, KeYJavaType classType,
+     ImmutableList<KeYJavaType> signature,
+     KeYJavaType context) {
+        final String methodName = name.toString();
+        IProgramMethod pm = services.getJavaInfo().getProgramMethod(classType,
                 methodName, signature, context);
-	return pm;
+        return pm;
     }
-    
+
     public boolean implicit() {
-	return getProgramElementName().toString().charAt(0)=='<';
+        return getProgramElementName().toString().charAt(0) == '<';
     }
 
     public MethodName getMethodName() {
-	return name;
+        return name;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnMethodReference(this);
+        v.performActionOnMethodReference(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printMethodReference(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, 
-				      ExecutionContext ec) {
-	IProgramMethod meth = method(services, 
-	        determineStaticPrefixType(services, ec), ec);
-	if(meth == null){
-	    return ec.getTypeReference().getKeYJavaType();
-	}
-	return meth.getReturnType();
-		      
+    public KeYJavaType getKeYJavaType(Services services,
+                                      ExecutionContext ec) {
+        IProgramMethod meth = method(services,
+                determineStaticPrefixType(services, ec), ec);
+        if (meth == null) {
+            return ec.getTypeReference().getKeYJavaType();
+        }
+        return meth.getReturnType();
+
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {	
-	return getKeYJavaType();
+    public KeYJavaType getKeYJavaType(Services javaServ) {
+        return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType() {
-	Debug.fail("");
-	return null;
+        Debug.fail("");
+        return null;
     }
 
 }

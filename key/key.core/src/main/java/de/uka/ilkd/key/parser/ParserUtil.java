@@ -22,7 +22,7 @@ public final class ParserUtil {
         //weigl: I hope I catch them all.
         if (expr instanceof VariableReference
                 || expr instanceof ThisReference
-                || expr instanceof ArrayReference
+                //|| expr instanceof ArrayReference
                 || expr instanceof ArrayLengthReference
                 || expr instanceof UncollatedReferenceQualifier
                 || expr instanceof SuperReference) {

@@ -13,28 +13,30 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
- *  Logical and.
+ * Logical and.
  */
 
-public class LogicalAnd extends Operator {
-
+public class LogicalAnd extends BinaryOperator {
+    public LogicalAnd(PositionInfo pi, List<Comment> comments, @Nonnull Expression lhs, @Nonnull Expression rhs) {
+        super(pi, comments, lhs, rhs);
+    }
 
     /**
-     *      Logical and.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Logical and.
+     *
+     * @param children an ExtList with all children of this node
+     *                 the first children in list will be the one on the left
+     *                 side, the second the one on the  right side.
      */
 
     public LogicalAnd(ExtList children) {
@@ -42,42 +44,36 @@ public class LogicalAnd extends Operator {
     }
 
     public LogicalAnd(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+        super(lhs, rhs);
     }
 
 
     /**
-     *      Get arity.
-     *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
-    public int getArity() {
-        return 2;
-    }
-
-    /**
-     *      Get precedence.
-     *      @return the int value.
-     */
-
     public int getPrecedence() {
         return 10;
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
-
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLogicalAnd(this);
+        v.performActionOnLogicalAnd(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -85,7 +81,7 @@ public class LogicalAnd extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().getBooleanType();
+        return services.getTypeConverter().getBooleanType();
     }
 
 }

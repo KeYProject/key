@@ -35,6 +35,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 /**
  * Type declaration.
  * taken from COMPOST and changed to achieve an immutable structure
@@ -127,6 +129,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	     fullName, isLibrary);
     }
 
+    @Nonnull
     public SourceElement getFirstElement() {
         if (modArray != null && (modArray.size()>0)) {
             return modArray.get(0);
@@ -135,6 +138,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         }
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         // end of member block
         return this;

@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+
 /**
  *  While.
  */
@@ -67,6 +69,7 @@ public class While extends LoopStatement {
         super(guard, body, pos);	
     }
 
+    @Nonnull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }

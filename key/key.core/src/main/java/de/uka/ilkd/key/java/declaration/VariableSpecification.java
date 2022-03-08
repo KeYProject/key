@@ -25,6 +25,8 @@ import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 
 /**
  * Variable specification that defines a variable name. This is a part of a
@@ -242,11 +244,13 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         return getName();
     }
 
+    @Nonnull
     @Override
     public SourceElement getFirstElement() {
         return var;
     }
 
+    @Nonnull
     @Override
     public SourceElement getLastElement() {
         if (initializer != null) {

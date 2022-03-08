@@ -13,115 +13,111 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
-/**
- *  Throws.
- *  @author <TT>AutoDoc</TT>
- */
+import javax.annotation.Nonnull;
+import java.util.List;
 
-public class Throws extends JavaNonTerminalProgramElement
- implements TypeReferenceContainer {
-
+public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
     /**
-     *      Exceptions.
+     * Exceptions.
      */
+    @Nonnull
     protected final ImmutableArray<TypeReference> exceptions;
 
-    /**
-     *      Throws.
-     */
-    public Throws() {
-	this.exceptions=null;
+    public Throws(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<TypeReference> exceptions) {
+        super(pi, comments);
+        this.exceptions = exceptions;
     }
 
     /**
-     *      Throws.
-     *      @param exception a type reference.
+     * Throws.
+     *
+     * @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-	this.exceptions=new ImmutableArray<TypeReference>(exception); 
+        this(null, null, new ImmutableArray<>(exception));
     }
 
     /**
-     *      Throws.
-     *      @param list a type reference array.
+     * Throws.
+     *
+     * @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-	this.exceptions = new ImmutableArray<TypeReference>(list); 
+        this(null, null, new ImmutableArray<>(list));
     }
-
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * 	May contain:
-     * 		several of TypeReference (as references to thrown exceptions), 
-     * 		Comments
+     *                 May contain:
+     *                 several of TypeReference (as references to thrown exceptions),
+     *                 Comments
      */
     public Throws(ExtList children) {
-	super(children);
-	this.exceptions=new
-	    ImmutableArray<TypeReference>(children.collect(TypeReference.class));  
+        super(children);
+        this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
+    @Override
+    @Nonnull
     public SourceElement getLastElement() {
-        if (exceptions == null) {
-            return this;
-        }
         return exceptions.get(exceptions.size() - 1);
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null) result += exceptions.size();
+        result += exceptions.size();
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        return exceptions.get(index);
     }
-    
+
     /**
-     *      Get exceptions.
-     *      @return the type reference mutable list.
+     * Get exceptions.
+     *
+     * @return the type reference mutable list.
      */
+    @Nonnull
     public ImmutableArray<TypeReference> getExceptions() {
         return exceptions;
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
+    @Override
     public int getTypeReferenceCount() {
-        return (exceptions != null) ? exceptions.size() : 0;
+        return exceptions.size();
     }
 
     /*
@@ -132,23 +128,25 @@ public class Throws extends JavaNonTerminalProgramElement
       @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
       of bounds.
     */
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
+        return exceptions.get(index);
     }
 
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnThrows(this);
+        v.performActionOnThrows(this);
     }
 
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printThrows(this);
     }

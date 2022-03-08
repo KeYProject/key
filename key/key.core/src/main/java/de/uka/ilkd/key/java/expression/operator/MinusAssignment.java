@@ -13,17 +13,26 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
  *  Minus assignment.
  */
 
 public class MinusAssignment extends Assignment {
+    public MinusAssignment(PositionInfo pi, List<Comment> comments, @Nonnull Expression lhs, @Nonnull Expression rhs) {
+        super(pi, comments, lhs, rhs);
+    }
 
     /**
      *      Minus assignment.

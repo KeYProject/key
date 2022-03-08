@@ -11,50 +11,55 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * This class encapsulates a guard for a loop
- */
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import javax.annotation.Nonnull;
+import java.util.List;
 
-public class Guard extends JavaNonTerminalProgramElement 
-    implements IGuard {
+/**
+ * This class encapsulates a guard for a loop
+ */
+public final class Guard extends JavaNonTerminalProgramElement implements IGuard {
+    @Nonnull
+    private final Expression expr;
 
-    Expression expr;
+    public Guard(PositionInfo pi, List<Comment> comments, Expression expr) {
+        super(pi, comments);
+        this.expr = expr;
+    }
 
     public Guard(Expression expression) {
-	expr=expression;
+        this(null, null, expression);
     }
 
     public Guard(ExtList children) {
-	expr=children.get(Expression.class);
+        super(children);
+        expr = children.get(Expression.class);
     }
 
     public Expression getExpression() {
-	return expr;
+        return expr;
     }
 
     public void visit(Visitor v) {
-	v.performActionOnGuard(this);
+        v.performActionOnGuard(this);
     }
 
     public int getChildCount() {
-	return (expr!=null) ? 1 : 0;
+        return 1;
     }
 
     public ProgramElement getChildAt(int index) {
-	if (index==0) return expr;
-	return null;
+        if (index == 0) return expr;
+        return null;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return expr.toString();
     }
 }

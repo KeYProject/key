@@ -13,81 +13,81 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReferenceInfix;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
- *  Import.
- * 
+ * Import.
  */
-public class Import extends JavaNonTerminalProgramElement
- implements TypeReferenceContainer, PackageReferenceContainer {
+public final class Import extends JavaNonTerminalProgramElement
+        implements TypeReferenceContainer, PackageReferenceContainer {
 
     /**
-     *        Multi import flag.
+     * Multi import flag.
      */
-
-    protected final boolean isMultiImport;
+    private final boolean isMultiImport;
 
 
     /**
-     *      Type reference infix.
+     * Type reference infix.
      */
-    protected final TypeReferenceInfix reference;
-    
+    @Nonnull
+    private final TypeReferenceInfix reference;
+
+    public Import(PositionInfo pi, List<Comment> comments, boolean isMultiImport,
+                  @Nonnull TypeReferenceInfix reference) {
+        super(pi, comments);
+        this.isMultiImport = isMultiImport;
+        this.reference = reference;
+    }
+
     /**
      * children may contain: TypeReference (for import), a Comment
-     * @param isMultiImport indicates whether the import contains multiple 
-     * imports
+     *
+     * @param isMultiImport indicates whether the import contains multiple
+     *                      imports
      */
+    @Deprecated
     public Import(ExtList children, boolean isMultiImport) {
-	super(children);
-	reference=children.get(TypeReferenceInfix.class);
-	this.isMultiImport=isMultiImport;
-    }
-
-
-    /**
-     *      Import.
-     */
-    public Import() {
-	isMultiImport=false;
-	reference=null;
+        super(children);
+        reference = children.get(TypeReferenceInfix.class);
+        this.isMultiImport = isMultiImport;
     }
 
     /**
-     *      Import.
-     *      @param t a type reference.
-     *      @param multi indicates the wildcard.
+     * Import.
+     *
+     * @param t     a type reference.
+     * @param multi indicates the wildcard.
      */
     public Import(TypeReference t, boolean multi) {
-        reference=t;
-        isMultiImport=multi;
+        this(null, null, multi, t);
     }
 
     /**
-     *      Import.
-     *      @param t a package reference.
+     * Import.
+     *
+     * @param t a package reference.
      */
-
     public Import(PackageReference t) {
-       reference=t;
-       isMultiImport=true;
+        this(null, null, true, t);
     }
 
+    @Override
+    @Nonnull
     public SourceElement getLastElement() {
         return reference;
     }
 
     /**
-     *        Checks if this import is a multi type import, also known as
-     *        type-on-demand import.
-     *        @return the kind of this import.
+     * Checks if this import is a multi type import, also known as
+     * type-on-demand import.
+     *
+     * @return the kind of this import.
      */
 
     public boolean isMultiImport() {
@@ -95,35 +95,39 @@ public class Import extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
+    @Override
     public int getChildCount() {
         int result = 0;
-        if (reference != null) result++;
+        result++;
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
-        if (reference != null) {
-            if (index == 0) return reference;
-        }
+        if (index == 0) return reference;
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
 
+    @Override
     public int getTypeReferenceCount() {
         return (reference instanceof TypeReference) ? 1 : 0;
     }
@@ -137,51 +141,59 @@ public class Import extends JavaNonTerminalProgramElement
       of bounds.
     */
 
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if (reference instanceof TypeReference && index == 0) {
-            return (TypeReference)reference;
+            return (TypeReference) reference;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *        Returns the type reference of this import, if there is one.
-     *        @return the reference of this import statement.
-    */
+     * Returns the type reference of this import, if there is one.
+     *
+     * @return the reference of this import statement.
+     */
 
     public TypeReference getTypeReference() {
-        return (reference instanceof TypeReference) 
-	    ? (TypeReference)reference : null;
+        return (reference instanceof TypeReference)
+                ? (TypeReference) reference : null;
     }
 
     /**
-     *        Returns the package reference of this import, if there is one.
-     *        @return the reference of this import statement.
-    */
-
+     * Returns the package reference of this import, if there is one.
+     *
+     * @return the reference of this import statement.
+     */
+    @Override
     public PackageReference getPackageReference() {
-        return (reference instanceof PackageReference) ? 
-	    (PackageReference)reference : null;
+        return (reference instanceof PackageReference) ?
+                (PackageReference) reference : null;
     }
 
     /**
-     *        Returns the reference of this import, either a
-     *        type or a package reference.
-     *        @return the reference of this import statement.
-    */
-
+     * Returns the reference of this import, either a
+     * type or a package reference.
+     *
+     * @return the reference of this import statement.
+     */
+    @Nonnull
     public TypeReferenceInfix getReference() {
         return reference;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnImport(this);
+        v.performActionOnImport(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printImport(this);
     }
