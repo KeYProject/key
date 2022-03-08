@@ -9,22 +9,13 @@ import recoder.java.StatementContainer;
 
 /**
  * Default implementation for non-terminal Java statements.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public abstract class JavaStatement extends JavaNonTerminalProgramElement implements Statement {
-
-    /**
-     * Parent.
-     */
-
     protected StatementContainer parent;
 
     /**
      * Java statement.
      */
-
     public JavaStatement() {
         // nothing to do
     }

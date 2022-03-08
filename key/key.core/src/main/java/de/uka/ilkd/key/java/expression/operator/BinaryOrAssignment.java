@@ -13,12 +13,23 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+
 public class BinaryOrAssignment extends Assignment {
+    public BinaryOrAssignment(PositionInfo pi, List<Comment> comments,
+                              @Nonnull Expression lhs, @Nonnull Expression rhs) {
+        super(pi, comments, lhs, rhs);
+    }
+
     /**
      * Binary or assignment.
      *
@@ -26,7 +37,6 @@ public class BinaryOrAssignment extends Assignment {
      *                 the first children in list will be the one on the left
      *                 side, the second the one on the right side.
      */
-
     public BinaryOrAssignment(ExtList children) {
         super(children);
     }

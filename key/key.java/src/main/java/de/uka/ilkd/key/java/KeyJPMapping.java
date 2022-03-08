@@ -27,12 +27,12 @@ public class KeyJPMapping {
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
-    private final HashMap<Node, ModelElement> map;
+    private final HashMap<Node, Object> map;
 
     /**
      * maps a KeY programelement to the Recoder-equivalent
      */
-    private final Map<ModelElement, Node> revMap;
+    private final Map<Object, Node> revMap;
 
     /**
      * a pseudo super class for all arrays used to declare length
@@ -55,7 +55,7 @@ public class KeyJPMapping {
      * @param revMap        the reverse map (KeY->Recoder)
      * @param parsedSpecial boolean indicating if the special classes have been parsed in
      */
-    KeyJPMapping(HashMap<Node, ModelElement> map, Map<ModelElement, Node> revMap,
+    KeyJPMapping(HashMap<Node, Object> map, Map<Object, Node> revMap,
                  KeYJavaType superArrayType,
                  boolean parsedSpecial) {
         this.map = map;
@@ -69,7 +69,7 @@ public class KeyJPMapping {
      *
      * @param pe a recoder.ModelElement
      */
-    public ModelElement toKeY(Node pe) {
+    public Object toKeY(Node pe) {
         return map.get(pe);
     }
 
@@ -95,14 +95,14 @@ public class KeyJPMapping {
      *
      * @param pe a ModelElement
      */
-    public Node toRecoder(ModelElement pe) {
+    public Node toRecoder(Object pe) {
         Node res = revMap.get(pe);
         Debug.assertTrue(res != null, "Model Element not known", pe);
 
         return res;
     }
 
-    public void put(Node rec, ModelElement key) {
+    public void put(Node rec, Object key) {
         Object formerValue = map.put(rec, key);
         Debug.assertTrue(formerValue == null,
                 "keyrecodermapping: duplicate registration of type:", key);
@@ -115,7 +115,7 @@ public class KeyJPMapping {
     }
 
 
-    public Set<ModelElement> elemsKeY() {
+    public Set<Object> elemsKeY() {
         LOGGER.error("Size of rec2key: {} entries", map.size());
         return revMap.keySet();
     }

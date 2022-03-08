@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.java;
 
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.*;
@@ -11,28 +15,37 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import com.github.javaparser.resolution.types.ResolvedArrayType;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
 
 /**
  * @author Alexander Weigl
@@ -41,10 +54,12 @@ import java.util.stream.Collectors;
 public class JP2KeyConverter {
     private final Services services;
     private final KeyJPMapping mapping;
+    private final Namespace<SchemaVariable> schemaVariables;
 
-    public JP2KeyConverter(Services services, KeyJPMapping mapping) {
+    public JP2KeyConverter(Services services, KeyJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = mapping;
+        this.schemaVariables = schemaVariables;
     }
 
     public CompilationUnit processCompilationUnit(com.github.javaparser.ast.CompilationUnit cu) {
@@ -52,67 +67,80 @@ public class JP2KeyConverter {
     }
 
     public Object process(Node block) {
-        return block.accept(new JP2KeyVisitor(mapping), null);
+        return block.accept(new JP2KeyVisitor(services, mapping, schemaVariables), null);
     }
 }
 
-class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
+class JP2KeyVisitor extends GenericVisitorAdapter<Object, Void> {
+    private final Services services;
     private final KeyJPMapping mapping;
+    private final Namespace<SchemaVariable> svns;
+    private Map<String, KeYJavaType> types = new TreeMap<>();
 
-    JP2KeyVisitor(KeyJPMapping mapping) {
+    JP2KeyVisitor(Services services, KeyJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
+        this.services = services;
         this.mapping = mapping;
+        svns = schemaVariables;
     }
 
-    private void reportUnsupportedElement(Node n) {
+    private void reportError(Node n, String message) {
         var line = n.getRange().map(it -> it.begin).map(it -> it.line).orElse(-1);
         var posInLine = n.getRange().map(it -> it.begin).map(it -> it.column).orElse(-1);
         var loc = n.findCompilationUnit()
                 .flatMap(it -> it.getStorage()).map(it -> it.getPath().toUri()).orElse(null);
         BuildingIssue problem =
-                new BuildingIssue("Unsupported element detected given by Java Parser: "
-                        + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy",
+                new BuildingIssue(message,
                         null, false, line, posInLine, -1, -1, loc);
         throw new BuildingExceptions(Collections.singletonList(problem));
     }
 
-    @Override
-    public ModelElement visit(AnnotationDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+    private void reportUnsupportedElement(Node n) {
+        reportError(n, "Unsupported element detected given by Java Parser: "
+                + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy");
     }
 
     @Override
-    public ModelElement visit(AnnotationMemberDeclaration n, Void arg) {
-        return super.visit(n, arg);
+    public Object visit(ArrayAccessExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Expression expr = accept(n.getIndex());
+        Expression prefix = accept(n.getName());
+        //TODO weigl how to express (new int[0])[0] in Java-KeY-AST?
+        return new ArrayReference(pi, c, (ReferencePrefix) prefix,
+                new ImmutableArray<>(expr));
     }
 
     @Override
-    public ModelElement visit(ArrayAccessExpr n, Void arg) {
-        return super.visit(n, arg);
+    public Object visit(ArrayCreationExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ImmutableArray<Expression> children = map(n.getLevels());
+        TypeReference type = accept(n.getElementType());
+        ArrayInitializer ai = accepto(n.getInitializer());
+        var rtype = n.calculateResolvedType();
+        return new NewArray(pi, c, children, type, getKeyJavaType(rtype), 0/*TODO*/, ai);
     }
 
     @Override
-    public ModelElement visit(ArrayCreationExpr n, Void arg) {
-        return super.visit(n, arg);
+    public Object visit(ArrayInitializerExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ImmutableArray<Expression> children = map(n.getValues());
+        var rtype = n.calculateResolvedType();
+        return new ArrayInitializer(pi, c, children, getKeyJavaType(rtype));
     }
 
     @Override
-    public ModelElement visit(ArrayInitializerExpr n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(AssertStmt n, Void arg) {
-        Expression cond = (Expression) accept(n.getCheck());
-        Expression message = (Expression) accepto(n.getMessage());
+    public Object visit(AssertStmt n, Void arg) {
+        Expression cond = accept(n.getCheck());
+        Expression message = accepto(n.getMessage());
         return new Assert(cond, message, createPositionInfo(n));
     }
 
-
     @Override
-    public ModelElement visit(AssignExpr n, Void arg) {
-        var target = (Expression) n.getTarget().accept(this, arg);
-        var expr = (Expression) n.getValue().accept(this, arg);
+    public Object visit(AssignExpr n, Void arg) {
+        Expression target = accept(n.getTarget());
+        Expression expr = accept(n.getValue());
         var pi = createPositionInfo(n);
         var c = createComments(n);
         switch (n.getOperator()) {
@@ -145,7 +173,7 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(BinaryExpr n, Void arg) {
+    public Object visit(BinaryExpr n, Void arg) {
         var lhs = (Expression) n.getLeft().accept(this, arg);
         var rhs = (Expression) n.getRight().accept(this, arg);
         var pi = createPositionInfo(n);
@@ -194,63 +222,74 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(BlockStmt n, Void arg) {
-        var body = map(n.getStatements());
+    public Object visit(BlockStmt n, Void arg) {
+        ImmutableArray<Statement> body = map(n.getStatements());
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new StatementBlock(pi, c, body, 0, null);
     }
 
     @Override
-    public ModelElement visit(BooleanLiteralExpr n, Void arg) {
+    public Object visit(BooleanLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new BooleanLiteral(pi, c, n.getValue());
     }
 
     @Override
-    public ModelElement visit(BreakStmt n, Void arg) {
+    public Object visit(BreakStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var name = n.getLabel();
+        var name = simpleNameToLabel(n.getLabel());
         return new Break(pi, c, name);
     }
 
     @Override
-    public ModelElement visit(CastExpr n, Void arg) {
-        var children = visitChildren(n);
-        return new TypeCast(children);
+    public Object visit(CastExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new TypeCast(pi, c, accept(n.getExpression()), accept(n.getType()));
     }
 
     @Override
-    public ModelElement visit(CatchClause n, Void arg) {
-        var children = visitChildren(n);
-        return new Catch(children);
+    public Object visit(CatchClause n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ParameterDeclaration param = accept(n.getParameter());
+        return new Catch(pi, c, param, accept(n.getBody()));
     }
 
     @Override
-    public ModelElement visit(CharLiteralExpr n, Void arg) {
+    public Object visit(CharLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new CharLiteral(pi, c, n.getValue().charAt(0));
     }
 
-    @Override
-    public ModelElement visit(ClassExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return null;
-    }
 
     @Override
-    public ModelElement visit(ClassOrInterfaceDeclaration n, Void arg) {
+    public Object visit(ClassOrInterfaceDeclaration n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        ProgramElementName fullName = new ProgramElementName(n.getNameAsString());
+        ProgramElementName name = new ProgramElementName(n.getNameAsString());
+        ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
         boolean isLibrary = false; //TODO weigl
+        ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
+        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
+        boolean parentIsInterface = false;
+
+        ImmutableArray<TypeReference> e = map(n.getExtendedTypes());
+        ImmutableArray<TypeReference> i = map(n.getImplementedTypes());
+        Extends extending = new Extends(e);
+        Implements implementing = new Implements(e);
+
         if (n.isInterface()) {
-            return new InterfaceDeclaration(seq, fullName, isLibrary);
+            return new InterfaceDeclaration(
+                    pi, c, modArray, name, fullName, members,
+                    parentIsInterface, isLibrary, extending);
         } else {
-            return new ClassDeclaration(seq, fullName, isLibrary, n.isInnerClass(), false, n.isLocalClassDeclaration());
+            return new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
+                    isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(), false);
         }
     }
 
@@ -267,7 +306,7 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }*/
 
 
-    private <T extends ModelElement> T accept(Node check) {
+    private <T extends Object> T accept(Node check) {
         var a = check.accept(this, null);
         mapping.put(check, a);
         return (T) a;
@@ -288,15 +327,15 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(ClassOrInterfaceType n, Void arg) {
+    public Object visit(ClassOrInterfaceType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(com.github.javaparser.ast.CompilationUnit n, Void arg) {
+    public Object visit(com.github.javaparser.ast.CompilationUnit n, Void arg) {
         return new CompilationUnit(
                 createPositionInfo(n), createComments(n),
-                (PackageSpecification) accepto(n.getPackageDeclaration()),
+                accepto(n.getPackageDeclaration()),
                 map(n.getImports()),
                 map(n.getTypes()));
     }
@@ -311,15 +350,14 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
         return new ImmutableArray<>(seq);
     }
 
-
     @Nullable
-    private ModelElement accepto(Optional<? extends Visitable> node) {
+    private <R> R accepto(Optional<? extends Node> node) {
         if (node.isEmpty()) return null;
-        return node.get().accept(this, null);
+        return accept(node.get());
     }
 
     @Override
-    public ModelElement visit(ConditionalExpr n, Void arg) {
+    public Object visit(ConditionalExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new Conditional(pi, c,
@@ -329,29 +367,40 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(ConstructorDeclaration n, Void arg) {
+    public Object visit(ConstructorDeclaration n, Void arg) {
         boolean parentIsInterface = false;
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new de.uka.ilkd.key.java.declaration.ConstructorDeclaration(children, parentIsInterface);
+        ImmutableArray<TypeReference> exc = map(n.getThrownExceptions());
+        Throws thr = exc.isEmpty() ? null : new Throws(null, null, exc);
+        return new de.uka.ilkd.key.java.declaration.ConstructorDeclaration(pi, c,
+                map(n.getModifiers()),
+                null,
+                null,
+                new ProgramElementName(n.getNameAsString()),
+                map(n.getParameters()),
+                thr,
+                accept(n.getBody()), false);
     }
 
     @Override
-    public ModelElement visit(ContinueStmt n, Void arg) {
+    public Object visit(ContinueStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        Label name = nameToLabel(n.getLabel());
+        Label name = simpleNameToLabel(n.getLabel());
         return new Continue(pi, c, name);
     }
 
-    private Label nameToLabel(Optional<SimpleName> label) {
-        if (label.isPresent()) {
-        }
-        return null;
+    private Label nameToLabel(Optional<Name> label) {
+        return label.map(name -> new ProgramElementName(name.asString())).orElse(null);
+    }
+
+    private Label simpleNameToLabel(Optional<SimpleName> label) {
+        return label.map(name -> new ProgramElementName(name.asString())).orElse(null);
     }
 
     @Override
-    public ModelElement visit(DoStmt n, Void arg) {
+    public Object visit(DoStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         var guard = accept(n.getCondition());
@@ -360,102 +409,164 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(DoubleLiteralExpr n, Void arg) {
+    public Object visit(DoubleLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new DoubleLiteral(pi, c, n.getValue());
     }
 
     @Override
-    public ModelElement visit(EmptyStmt n, Void arg) {
+    public Object visit(EmptyStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new EmptyStatement(pi, c);
     }
 
     @Override
-    public ModelElement visit(EnclosedExpr n, Void arg) {
+    public Object visit(EnclosedExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         var expr = accept(n.getInner());
         return new ParenthesizedExpression(pi, c, (Expression) expr);
     }
 
+
     @Override
-    public ModelElement visit(EnumConstantDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
+    public Object visit(ExplicitConstructorInvocationStmt n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(EnumDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ExplicitConstructorInvocationStmt n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ExpressionStmt n, Void arg) {
+    public Object visit(ExpressionStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return (ModelElement) seq.get(0);
+        return accept(n.getExpression());
     }
 
     @Override
-    public ModelElement visit(FieldAccessExpr n, Void arg) {
-        return super.visit(n, arg);
+    public Object visit(FieldAccessExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var rtype = n.calculateResolvedType();
+        var kjt = getKeyJavaType(rtype);
+
+        ProgramVariable variable = new LocationVariable(
+                new ProgramElementName(n.getNameAsString()), kjt);
+        ReferencePrefix prefix = accept(n.getScope());
+        return new FieldReference(pi, c, variable, prefix);
+    }
+
+    private KeYJavaType getKeyJavaType(ResolvedType rtype) {
+        if (rtype.isVoid()) {
+            return KeYJavaType.VOID_TYPE;
+        }
+
+        if (rtype.isPrimitive()) {
+            ResolvedPrimitiveType ptype = rtype.asPrimitive();
+            switch (ptype) {
+                case BYTE:
+                    break;
+                case SHORT:
+                    break;
+                case CHAR:
+                    break;
+                case INT:
+                    break;
+                case LONG:
+                    break;
+                case BOOLEAN:
+                    break;
+                case FLOAT:
+                    break;
+                case DOUBLE:
+                    break;
+            }
+        }
+
+        if (types.containsKey(rtype.describe())) {
+            return types.get(rtype.describe());
+        }
+
+        if (rtype.isReferenceType()) {
+            var t = createKeyJavaType(rtype.asReferenceType());
+            types.put(rtype.describe(), t);
+        }
+
+        if (rtype.isArray()) {
+            var t = createKeyJavaType(rtype.asArrayType());
+            types.put(rtype.describe(), t);
+        }
+
+        if (rtype.isNull()) {
+
+        }
+        return new KeYJavaType();
+    }
+
+    private KeYJavaType createKeyJavaType(ResolvedArrayType asArrayType) {
+        var rbase = asArrayType.getComponentType();
+        //TypeReference baseType = getKeyJavaType(rbase).getJavaType();
+        //ArrayDeclaration ad = new ArrayDeclaration(null, baseType, null/*TODO*/);
+        //TODO weigl how to create a proper type?
+        return new KeYJavaType();
+    }
+
+    private KeYJavaType createKeyJavaType(ResolvedReferenceType rtype) {
+        var sort = services.getNamespaces().sorts().lookup(rtype.getQualifiedName());
+        //TODO weigl how to create a proper type?
+        de.uka.ilkd.key.java.abstraction.Type type = null;
+        return new KeYJavaType(type, sort);
     }
 
     @Override
-    public ModelElement visit(FieldDeclaration n, Void arg) {
+    public Object visit(FieldDeclaration n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         boolean parentIsInferface = false;
-        var modArray = visitModifiers(n.getModifiers());
+        ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
         TypeReference type = accept(n.getVariables().get(0).getType());
-        ImmutableArray<FieldSpecification> fieldSpecs = n.getVariables();
+        ImmutableArray<FieldSpecification> fieldSpecs = map(n.getVariables());
         return new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type, parentIsInferface, fieldSpecs);
     }
 
-    private ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> visitModifiers(NodeList<Modifier> modifiers) {
+    @Override
+    public Object visit(ForEachStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ILoopInit init = accept(n.getVariable());
+        Guard guard = new Guard(null, null, accept(n.getIterable()));
+        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()));
     }
 
     @Override
-    public ModelElement visit(ForEachStmt n, Void arg) {
+    public Object visit(ForStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new EnhancedFor(pi, c, )
+        ImmutableArray<LoopInitializer> inits = map(n.getInitialization());
+        ImmutableArray<Expression> update = map(n.getUpdate());
+        Guard guard = new Guard(pi, null, accepto(n.getCompare()));
+        final var loopInit = new LoopInit(inits);
+        return new For(pi, c, loopInit, new ForUpdates(update), guard, accept(n.getBody()));
     }
 
     @Override
-    public ModelElement visit(ForStmt n, Void arg) {
+    public Object visit(IfStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new EnhancedFor(pi, c, )
-    }
-
-    @Override
-    public ModelElement visit(IfStmt n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
-        Statement t = (StatementBlock) accept(n.getThenStmt());
-        Statement e = (StatementBlock) accepto(n.getElseStmt());
-        return new If(pi, c, (Expression) accept(n.getCondition()),
-                new Then(e),
+        Statement t = accept(n.getThenStmt());
+        Statement e = accepto(n.getElseStmt());
+        return new If(pi, c, accept(n.getCondition()),
+                new Then(t),
                 e != null ? new Else(e) : null);
     }
 
     @Override
-    public ModelElement visit(InitializerDeclaration n, Void arg) {
+    public Object visit(InitializerDeclaration n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(InstanceOfExpr n, Void arg) {
+    public Object visit(InstanceOfExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         var lhs = (Expression) accept(n.getExpression());
@@ -464,78 +575,83 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(IntegerLiteralExpr n, Void arg) {
+    public Object visit(IntegerLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new IntLiteral(pi, c, n.getValue());
     }
 
     @Override
-    public ModelElement visit(JavadocComment n, Void arg) {
-        reportUnsupportedElement(n);
-        return null;
-    }
-
-    @Override
-    public ModelElement visit(LabeledStmt n, Void arg) {
+    public Object visit(LabeledStmt n, Void arg) {
         var id = accept(n.getLabel());
         var stmt = accept(n.getStatement());
         return new LabeledStatement((Label) id, (Statement) stmt, createPositionInfo(n));
     }
 
     @Override
-    public ModelElement visit(LongLiteralExpr n, Void arg) {
+    public Object visit(LongLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new LongLiteral(pi, c, n.getValue());
     }
 
     @Override
-    public ModelElement visit(MarkerAnnotationExpr n, Void arg) {
-        reportUnsupportedElement(n);
+    public Object visit(MethodCallExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ReferencePrefix prefix = accepto(n.getScope());
+        MethodName name = new ProgramElementName(n.getNameAsString());
+        ImmutableArray<Expression> args = map(n.getArguments());
+        return new MethodReference(pi, c, prefix, name, args);
+    }
+
+    @Override
+    public Object visit(MethodDeclaration n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+
+        ImmutableArray<TypeReference> t = map(n.getThrownExceptions());
+        var thr = t.isEmpty() ? null : new Throws(null, null, t);
+        boolean parentIsInterface = false;
+        return new de.uka.ilkd.key.java.declaration.MethodDeclaration(
+                pi, c, map(n.getModifiers()),
+                accept(n.getType()),
+                null,
+                new ProgramElementName(n.getNameAsString()),
+                map(n.getParameters()),
+                thr,
+                accepto(n.getBody()),
+                parentIsInterface);
+    }
+
+    @Override
+    public Object visit(NameExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ResolvedType rtype = n.calculateResolvedType();
+        //TODO weigl find declaraton with n.resolve()
+        return new LocationVariable(new ProgramElementName(n.getNameAsString()), getKeyJavaType(rtype));
+    }
+
+    @Override
+    public Object visit(NormalAnnotationExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(MemberValuePair n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(MethodCallExpr n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(MethodDeclaration n, Void arg) {
-        return new de.uka.ilkd.key.java.declaration.MethodDeclaration(visitChildren(n), false, new Comment[0]);
-    }
-
-    @Override
-    public ModelElement visit(NameExpr n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(NormalAnnotationExpr n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(NullLiteralExpr n, Void arg) {
+    public Object visit(NullLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new NullLiteral(pi, c);
     }
 
     @Override
-    public ModelElement visit(ObjectCreationExpr n, Void arg) {
+    public Object visit(ObjectCreationExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(PackageDeclaration n, Void arg) {
+    public Object visit(PackageDeclaration n, Void arg) {
         if (n.getAnnotations().isNonEmpty()) reportUnsupportedElement(n);
 
         ProgramElementName name = translateName(n.getName());
@@ -548,67 +664,67 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(Parameter n, Void arg) {
+    public Object visit(Parameter n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(PrimitiveType n, Void arg) {
+    public Object visit(PrimitiveType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(Name n, Void arg) {
+    public Object visit(Name n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(SimpleName n, Void arg) {
+    public Object visit(SimpleName n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(ArrayType n, Void arg) {
+    public Object visit(ArrayType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(ArrayCreationLevel n, Void arg) {
+    public Object visit(ArrayCreationLevel n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(IntersectionType n, Void arg) {
+    public Object visit(IntersectionType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(UnionType n, Void arg) {
+    public Object visit(UnionType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(ReturnStmt n, Void arg) {
+    public Object visit(ReturnStmt n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(SingleMemberAnnotationExpr n, Void arg) {
+    public Object visit(SingleMemberAnnotationExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(StringLiteralExpr n, Void arg) {
+    public Object visit(StringLiteralExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(SuperExpr n, Void arg) {
+    public Object visit(SuperExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(SwitchEntry n, Void arg) {
+    public Object visit(SwitchEntry n, Void arg) {
         n.getLabels();
         n.getStatements();
         n.getType();
@@ -617,16 +733,16 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(SwitchStmt n, Void arg) {
+    public Object visit(SwitchStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var expr = null;//TODO
-        var branches = map(n.getEntries());
+        Expression expr = null; //TODO
+        ImmutableArray<Branch> branches = map(n.getEntries());
         return new Switch(pi, c, expr, branches);
     }
 
     @Override
-    public ModelElement visit(SynchronizedStmt n, Void arg) {
+    public Object visit(SynchronizedStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new SynchronizedBlock(pi, c, accept(n.getExpression()), accept(n.getBody()),
@@ -634,114 +750,89 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
     }
 
     @Override
-    public ModelElement visit(ThisExpr n, Void arg) {
+    public Object visit(ThisExpr n, Void arg) {
         n.getTypeName();//TODO
         return new ThisReference(createPositionInfo(n), createComments(n), null);
     }
 
     @Override
-    public ModelElement visit(ThrowStmt n, Void arg) {
+    public Object visit(ThrowStmt n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(TryStmt n, Void arg) {
-        return new Try(visitChildren(n));
+    public Object visit(TryStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        StatementBlock body = accept(n.getTryBlock());
+        ImmutableArray<Branch> branches = map(n.getCatchClauses());
+        //TODO weigl add finally clauses to branches
+        return new Try(pi, c, body, branches, null, 0);
     }
 
-    @Override
-    public ModelElement visit(LocalClassDeclarationStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
 
     @Override
-    public ModelElement visit(LocalRecordDeclarationStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(TypeParameter n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(UnaryExpr n, Void arg) {
-        var c = visitChildren(n);
+    public Object visit(UnaryExpr n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Expression child = accept(n.getExpression());
         switch (n.getOperator()) {
             case PLUS:
-                return new Positive(c);
+                return new Positive(pi, c, child);
             case MINUS:
-                return new Negative(c);
+                return new Negative(pi, c, child);
             case PREFIX_INCREMENT:
-                return new PreIncrement(c);
+                return new PreIncrement(pi, c, child);
             case PREFIX_DECREMENT:
-                return new PreDecrement(c);
+                return new PreDecrement(pi, c, child);
             case LOGICAL_COMPLEMENT:
-                return new LogicalNot(c);
+                return new LogicalNot(pi, c, child);
             case BITWISE_COMPLEMENT:
-                return new BinaryNot(c);
+                return new BinaryNot(pi, c, child);
             case POSTFIX_INCREMENT:
-                return new PostIncrement(c);
+                return new PostIncrement(pi, c, child);
             case POSTFIX_DECREMENT:
-                return new PostDecrement(c);
+                return new PostDecrement(pi, c, child);
         }
         return null;
     }
 
     @Override
-    public ModelElement visit(UnknownType n, Void arg) {
+    public Object visit(UnknownType n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(VariableDeclarationExpr n, Void arg) {
+    public Object visit(VariableDeclarationExpr n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(VariableDeclarator n, Void arg) {
+    public Object visit(VariableDeclarator n, Void arg) {
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(VoidType n, Void arg) {
+    public Object visit(VoidType n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         return null; /*TODO*/
     }
 
     @Override
-    public ModelElement visit(WhileStmt n, Void arg) {
-        return new While(/*TODO*/);
+    public Object visit(WhileStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Guard guard = new Guard((Expression) accept(n.getCondition()));
+        Statement body = accept(n.getBody());
+        return new While(pi, c, guard, body);
     }
 
     @Override
-    public ModelElement visit(WildcardType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
+    public Object visit(ImportDeclaration n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
 
-    @Override
-    public ModelElement visit(LambdaExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(MethodReferenceExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(TypeExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ImportDeclaration n, Void arg) {
         if (n.isStatic()) {
             reportUnsupportedElement(n);
         }
@@ -755,285 +846,614 @@ class JP2KeyVisitor extends GenericVisitorAdapter<ModelElement, Void> {
         }
     }
 
-
     @Override
-    public ModelElement visit(ModuleDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ModuleRequiresDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ModuleExportsDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ModuleProvidesDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ModuleUsesDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ModuleOpensDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(UnparsableStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(ReceiverParameter n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(VarType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(Modifier n, Void arg) {
-        ExtList children = visitChildren(n);
+    public Object visit(Modifier n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         var k = n.getKeyword();
         switch (k) {
             case DEFAULT:
                 reportUnsupportedElement(n);
                 break;
             case PUBLIC:
-                return new Public(children);
+                return new Public(/*pi, c*/);
             case PROTECTED:
-                return new Protected(children);
+                return new Protected(/*pi, c*/);
             case PRIVATE:
-                return new Private(children);
+                return new Private(/*pi, c*/);
             case ABSTRACT:
-                return new Abstract(children);
+                return new Abstract(/*pi, c*/);
             case STATIC:
-                return new Static(children);
+                return new Static(/*pi, c*/);
             case FINAL:
-                return new Final(children);
+                return new Final(/*pi, c*/);
             case TRANSIENT:
-                return new Transient(children);
+                return new Transient(/*pi, c*/);
             case VOLATILE:
-                return new Volatile(children);
+                return new Volatile(/*pi, c*/);
             case SYNCHRONIZED:
-                return new Synchronized(children);
+                return new Synchronized(/*pi, c*/);
             case NATIVE:
-                return new Native(children);
+                return new Native(/*pi, c*/);
             case STRICTFP:
-                return new StrictFp(children);
+                return new StrictFp(/*pi, c*/);
             case TRANSITIVE:
                 reportUnsupportedElement(n);
                 break;
             case GHOST:
-                return new Ghost(children);
+                return new Ghost(/*pi, c*/);
             case MODEL:
-                return new Model(children);
+                return new Model(/*pi, c*/);
             case TWO_STATE:
-                return new TwoState(children);
+                return new TwoState(/*pi, c*/);
             case NO_STATE:
-                return new NoState(children);
+                return new NoState(/*pi, c*/);
+        }
+        return null;
+    }
+
+
+    //region ccatch
+    @Override
+    public Object visit(KeyCcatchBreak n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        if (n.getLabel().isPresent()) {
+            var label = nameToLabel(n.getLabel());
+            return new CcatchBreakLabelParameterDeclaration(pi, c, label);
+        }
+        if (n.getBlock().isPresent()) {
+            return new CcatchBreakParameterDeclaration(pi, c);
+        }
+        return new CcatchBreakWildcardParameterDeclaration(pi, c);
+    }
+
+    @Override
+    public Object visit(KeyCcatchContinue n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        if (n.getLabel().isPresent()) {
+            var label = nameToLabel(n.getLabel());
+            return new CcatchContinueLabelParameterDeclaration(pi, c, label);
+        }
+        if (n.getBlock().isPresent()) {
+            return new CcatchContinueParameterDeclaration(pi, c);
+        }
+        return new CcatchContinueWildcardParameterDeclaration(pi, c);
+    }
+
+    @Override
+    public Object visit(KeyCcatchParameter n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        //TODO
+        return null;
+    }
+
+    @Override
+    public Object visit(KeyCcatchReturn n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        if (n.getParameter().isPresent()) {
+            ParameterDeclaration delegate = null;
+            return new CcatchReturnValParameterDeclaration(pi, c, delegate);
+        }
+        return new CcatchReturnParameterDeclaration(pi, c);
+    }
+
+    @Override
+    public Object visit(KeyCatchAllStatement n, Void arg) {
+        //TODO
+        return super.visit(n, arg);
+    }
+    //endregion
+
+    @Override
+    public Object visit(KeyEscapeExpression n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+
+        final var PREFIX = "\\dl_DEFAULT_VALUE_";
+        final var DEFVALUE = "@defaultValue(";
+        String name = n.getCallee().asString();
+
+        if (name.startsWith(PREFIX)) { // handle default value resolution
+            String sortName = name.substring(PREFIX.length()).trim();
+            Sort sort = services.getNamespaces().sorts().lookup(sortName);
+            if (sort == null) {
+                reportError(n, format("Requested to find the default value of an unknown sort '%s'.", sortName));
+            }
+
+            var doc = sort.getDocumentation();
+
+            if (doc == null) {
+                reportError(n,
+                        format("Requested to find the default value for the sort '%s', " +
+                                        "which does not have a documentary comment. The sort is defined at %s. "
+                                , sortName, sort.getOrigin()));
+            }
+
+            int pos = doc.indexOf(DEFVALUE);
+            if (pos >= 0) {
+                int start = doc.indexOf('(', pos) + 1;
+                int closing = doc.indexOf(')', pos);
+
+                if (closing < 0) {
+                    throw new ConvertException(
+                            format("Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
+                                    sortName, sort.getOrigin()));
+                }
+
+                // set this as the function name, as the user had written \dl_XXX
+                name = doc.substring(start, closing);
+            } else {
+                throw new ConvertException(
+                        format("Could not infer the default value for the given sort '%s'. " +
+                                        "The sort found was as '%s' and the sort's documentation is '%s'. " +
+                                        "Did you forget @defaultValue(XXX) in the documentation? Line/Col: %s",
+                                sortName, sort, doc, null));
+            }
+        }
+
+        Function named = services.getNamespaces().functions().lookup(new de.uka.ilkd.key.logic.Name(name));
+
+        if (named == null) {
+            reportError(n, format("In an embedded DL expression, %s is not a known DL function name.", name));
+        }
+
+        if (n.getArguments().isPresent()) {
+            ImmutableArray<Expression> args = map(n.getArguments().get());
+            return new DLEmbeddedExpression(pi, c, named, args);
+        }
+        return new DLEmbeddedExpression(pi, c, named, new ImmutableArray<>());
+    }
+
+    @Override
+    public Object visit(KeyExecStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        StatementBlock body = accept(n.getExecBlock());
+        ImmutableArray<Branch> branches = map(n.getBranches());
+        return new Exec(pi, c, body, branches, null, 0);
+    }
+
+    @Override
+    public Object visit(KeyExecutionContext n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        TypeReference classContext = accept(n.getContext());
+        ReferencePrefix runtimeInstance = accepto(n.getInstance());
+        IProgramMethod methodContext = accept(n.getSignature());
+        return new ExecutionContext(pi, c, classContext, runtimeInstance, methodContext);
+    }
+
+    @Override
+    public Object visit(KeyLoopScopeBlock n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        StatementBlock body = accept(n.getBlock());
+        IProgramVariable indexPV = accept(n.getIndexPV());
+        return new LoopScopeBlock(pi, c, indexPV, body, null, 0);
+    }
+
+    @Override
+    public Object visit(KeyMergePointStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        IProgramVariable ident = accept(n.getExpr());
+        return new MergePointStatement(pi, c, ident);
+    }
+
+    @Override
+    public Object visit(KeyMethodBodyStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        IProgramVariable resultVar = accept(n.getExpr());
+        TypeReference bodySource = accept(n.getSource());
+        MethodReference methodReference = null;//TODO missing?
+        IProgramMethod method = null;
+        return new MethodBodyStatement(pi, c, resultVar, bodySource, methodReference, method);
+    }
+
+    @Override
+    public Object visit(KeyMethodCallStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        IProgramVariable resultVar = null;
+        StatementBlock body = null;
+        IExecutionContext execContext = null;
+        PosInProgram firstActiveChildPos = null;
+        //TODO weigl
+        return new MethodFrame(pi, c, resultVar, body, execContext, firstActiveChildPos,
+                0, null);
+    }
+
+    @Override
+    public Object visit(KeyMethodSignature n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        //TODO weigl unclear
+        return null;
+    }
+
+    @Override
+    public Object visit(KeyTransactionStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new TransactionStatement(pi, c, n.getType().ordinal());
+    }
+
+    @Override
+    public Object visit(KeyContextStatementBlock n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        IExecutionContext execContext = accepto(n.getContext());
+        ImmutableArray<? extends Statement> body = map(n.getStatements());
+        //TODO weigl prefixLength constants
+        return new ContextStatementBlock(pi, c, body, 0, null, execContext, 0);
+    }
+
+
+    @Override
+    public Object visit(KeyExpressionSV n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return super.visit(n, arg);
+    }
+
+
+    @Override
+    public Object visit(KeyMetaConstructExpression n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        String mcName = n.getText();
+        Expression child = accept(n.getChild());
+        switch (mcName) {
+            case "#create-object":
+                return new CreateObject(child);
+            case "#isstatic":
+                return new IsStatic(child);
+            case "#length-reference":
+                return new ArrayLength(child);
+            default:
+                reportError(n, "Program meta construct " + mcName + " unknown.");
+        }
+        return null;
+    }
+
+
+    @Override
+    public Object visit(KeyMetaConstruct n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        String mcName = n.getKind();
+        final ImmutableArray<SchemaVariable> labels = map(n.getSchemas());
+        switch (mcName) {
+            case "#switch-to-if":
+                return new SwitchToIf(labels.get(0));
+            case "#unwind-loop": {
+                return new UnwindLoop(labels.get(0), labels.get(1), accept(n.getChild()));
+            }
+            case "#unpack":
+                return new Unpack(accept(n.getChild()));
+            case "#forInitUnfoldTransformer":
+                return new ForInitUnfoldTransformer((ProgramSV) labels.get(0));
+            case "#for-to-while": {
+                return new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
+            }
+            case "#enhancedfor-elim": {
+                EnhancedFor efor = accept(n.getChild());
+                if (efor == null) {
+                    reportError(n, "#enhancedfor-elim requires an enhanced for loop as argument");
+                }
+                ProgramSV execSV = null;
+                for (var programSV : labels) {
+                    if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                        execSV = (ProgramSV) programSV;
+                        break;
+                    }
+                }
+                return new EnhancedForElimination(execSV, efor);
+            }
+            case "#do-break":
+                return new DoBreak(accept(n.getChild()));
+            case "#expand-method-body":
+                return new ExpandMethodBody(labels.get(0));
+            case "#method-call": {
+                ProgramSV execSV = null;
+                ProgramSV returnSV = null;
+                for (int i = 0; i < labels.size(); i++) {
+                    final var sv = labels.get(i);
+                    if (sv.sort() == ProgramSVSort.VARIABLE) {
+                        returnSV = (ProgramSV) sv;
+                    }
+                    if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                        execSV = (ProgramSV) sv;
+                    }
+                }
+                return new MethodCall(execSV, returnSV, accept(n.getChild()));
+            }
+            case "#evaluate-arguments":
+                return new EvaluateArgs(accept(n.getChild()));
+            case "#constructor-call":
+                return new ConstructorCall(labels.get(0), accept(n.getChild()));
+            case "#special-constructor-call":
+                return new SpecialConstructorCall(accept(n.getChild()));
+            case "#post-work":
+                return new PostWork(labels.get(0));
+            case "#static-initialisation":
+                return new StaticInitialisation(accept(n.getChild()));
+            case "#resolve-multiple-var-decl":
+                return new MultipleVarDecl(labels.get(0));
+            case "#array-post-declaration":
+                return new ArrayPostDecl(labels.get(0));
+            case "#init-array-creation":
+                return new InitArrayCreation(labels.get(0), accept(n.getChild()));
+            case "#reattachLoopInvariant":
+                return new ReattachLoopInvariant(accept(n.getChild()));
+            default:
+                reportError(n, "Program meta construct " + n.getKind() + " unknown.");
         }
         return null;
     }
 
     @Override
-    public ModelElement visit(SwitchExpr n, Void arg) {
+    public Object visit(KeyMetaConstructType n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Expression child = accept(n.getExpr());
+        if ("#typeof".equals(n.getKind())) {
+            return new TypeOf(child);
+        } else {
+            reportError(n, "Program meta construct " + n.getKind() + " unknown.");
+            return null;
+        }
+    }
+
+
+    @Override
+    public Object visit(KeyPassiveExpression n, Void arg) {
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new PassiveExpression(pi, c, accept(n.getExpr()));
+    }
+
+    //region Unsupported AST Classes
+    @Override
+    public Object visit(LocalClassDeclarationStmt n, Void arg) {
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(YieldStmt n, Void arg) {
+    public Object visit(LocalRecordDeclarationStmt n, Void arg) {
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(TextBlockLiteralExpr n, Void arg) {
+    public Object visit(TypeParameter n, Void arg) {
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(PatternExpr n, Void arg) {
+    public Object visit(AnnotationDeclaration n, Void arg) {
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(RecordDeclaration n, Void arg) {
+    public Object visit(AnnotationMemberDeclaration n, Void arg) {
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(CompactConstructorDeclaration n, Void arg) {
+    public Object visit(ClassExpr n, Void arg) {
         reportUnsupportedElement(n);
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyCcatchBreak n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyCcatchContinue n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyCcatchParameter n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyCcatchReturn n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyCatchAllStatement n, Void arg) {
-        return super.visit(n, arg);
-    }
-
-    @Override
-    public ModelElement visit(KeyEscapeExpression n, Void arg) {
-        //return new EscapeExpression(visitChildren(n));
         return null;
     }
 
     @Override
-    public ModelElement visit(KeyExecStatement n, Void arg) {
-        return new Exec(visitChildren(n));
-    }
-
-    @Override
-    public ModelElement visit(KeyExecutionContext n, Void arg) {
-        return new ExecutionContext(visitChildren(n));
-    }
-
-    @Override
-    public ModelElement visit(KeyLoopScopeBlock n, Void arg) {
-        return new LoopScopeBlock(visitChildren(n));
-    }
-
-    @Override
-    public ModelElement visit(KeyMergePointStatement n, Void arg) {
+    public Object visit(EnumConstantDeclaration n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMethodBodyStatement n, Void arg) {
+    public Object visit(EnumDeclaration n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMethodCallStatement n, Void arg) {
+    public Object visit(JavadocComment n, Void arg) {
+        reportUnsupportedElement(n);
+        return null;
+    }
+
+
+    @Override
+    public Object visit(MarkerAnnotationExpr n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMethodSignature n, Void arg) {
+    public Object visit(MemberValuePair n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyRangeExpression n, Void arg) {
+    public Object visit(WildcardType n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyTransactionStatement n, Void arg) {
-        return new TransactionStatement(n.getType().ordinal());
-    }
-
-    @Override
-    public ModelElement visit(KeyContextStatementBlock n, Void arg) {
+    public Object visit(LambdaExpr n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyExecCtxtSV n, Void arg) {
+    public Object visit(MethodReferenceExpr n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyExpressionSV n, Void arg) {
+    public Object visit(TypeExpr n, Void arg) {
+        reportUnsupportedElement(n);
+        return super.visit(n, arg);
+    }
+
+
+    @Override
+    public Object visit(ModuleDeclaration n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyJumpLabelSV n, Void arg) {
+    public Object visit(ModuleRequiresDirective n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMetaConstructExpression n, Void arg) {
+    public Object visit(ModuleExportsDirective n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMetaConstruct n, Void arg) {
+    public Object visit(ModuleProvidesDirective n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMetaConstructType n, Void arg) {
+    public Object visit(ModuleUsesDirective n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyMethodSignatureSV n, Void arg) {
+    public Object visit(ModuleOpensDirective n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyPassiveExpression n, Void arg) {
-        return new PassiveExpression(visitChildren(n));
-    }
-
-    @Override
-    public ModelElement visit(KeyProgramVariableSV n, Void arg) {
+    public Object visit(UnparsableStmt n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyStatementSV n, Void arg) {
+    public Object visit(ReceiverParameter n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyTypeSV n, Void arg) {
+    public Object visit(VarType n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyCcatchSV n, Void arg) {
+    public Object visit(SwitchExpr n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
-    public ModelElement visit(KeyExecutionContextSV n, Void arg) {
+    public Object visit(YieldStmt n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
+    }
+
+    @Override
+    public Object visit(TextBlockLiteralExpr n, Void arg) {
+        reportUnsupportedElement(n);
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Object visit(PatternExpr n, Void arg) {
+        reportUnsupportedElement(n);
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Object visit(RecordDeclaration n, Void arg) {
+        reportUnsupportedElement(n);
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Object visit(CompactConstructorDeclaration n, Void arg) {
+        reportUnsupportedElement(n);
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Object visit(KeyRangeExpression n, Void arg) {
+        reportUnsupportedElement(n);
+        return null;
+    }
+    //endregion
+
+    @Override
+    public SchemaVariable visit(KeyMethodSignatureSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyProgramVariableSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyStatementSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyTypeSV n, Void arg) {
+        return lookupSchemaVariable(n.getName());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyCcatchSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyExecutionContextSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyExecCtxtSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    @Override
+    public SchemaVariable visit(KeyJumpLabelSV n, Void arg) {
+        return lookupSchemaVariable(n.getText());
+    }
+
+    private SchemaVariable lookupSchemaVariable(String name) {
+        SchemaVariable n = svns.lookup(new de.uka.ilkd.key.logic.Name(name));
+        if (n != null) {
+            return n;
+        } else {
+            throw new IllegalArgumentException("Schema variable not declared: " + name);
+        }
     }
 }

@@ -16,31 +16,25 @@ package de.uka.ilkd.key.java.declaration.modifier;
 import org.key_project.util.ExtList;
 
 
-/**
- *  Private.
- *  @author <TT>AutoDoc</TT>
- */
-
 public class Private extends VisibilityModifier {
 
-    /**
-     *      Private.
-     */
-
-    public Private() {}
+    public Private() {
+    }
 
     /**
-     *      Private
+     * Private
+     *
      * @param children list of children. May contain: Comments
      */
     public Private(ExtList children) {
-	super (children);
+        super(children);
     }
 
 
     /**
-     *      Get symbol.
-     *      @return the string.
+     * Get symbol.
+     *
+     * @return the string.
      */
     protected String getSymbol() {
         return "private";

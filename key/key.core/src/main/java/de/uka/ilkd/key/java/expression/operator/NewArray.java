@@ -13,96 +13,88 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
- *  The array allocation operator.
- *  There are two variants for NewArray:
- *  <OL>
- *  <LI>Ordinary array construction
- *  <BR><tt>new XYZ[d<sub>1</sub>]...[d<sub>n</sub>]</tt>
- *  <LI>Initialized array construction
- *  <BR><tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }</tt>
- *  </OL>
- *  Contrary to an ordinary New, a NewArray is no ConstructorReference (since
- *  all ArrayType constructors are predefined) and is not used as a Statement
- *  (since there are no side-effects in the constructor). No access path is
- *  required for new, since there is no inner class problem.
- *  <P>
- *  NewArray has either a list of dimension length expressions, or
- *  a single ArrayInitializer.
+ * The array allocation operator.
+ * There are two variants for NewArray:
+ * <OL>
+ * <LI>Ordinary array construction
+ * <BR><tt>new XYZ[d<sub>1</sub>]...[d<sub>n</sub>]</tt>
+ * <LI>Initialized array construction
+ * <BR><tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }</tt>
+ * </OL>
+ * Contrary to an ordinary New, a NewArray is no ConstructorReference (since
+ * all ArrayType constructors are predefined) and is not used as a Statement
+ * (since there are no side-effects in the constructor). No access path is
+ * required for new, since there is no inner class problem.
+ * <p>
+ * NewArray has either a list of dimension length expressions, or
+ * a single ArrayInitializer.
  */
 
-public class NewArray extends TypeOperator
- implements Reference, ReferencePrefix {
-
-    /**
-     *      Dimensions.
-     */
-
-    protected final int dimensions;
-
-    
-    /**
-     *      Array initializer.
-     */
-
-    protected final ArrayInitializer arrayInitializer;
-
-    /**
-     * the key java type of this array
-     */
+public final class NewArray extends TypeOperator
+        implements Reference, ReferencePrefix {
+    @Nonnull
     private final KeYJavaType keyJavaType;
+    private final int dimensions;
+    @Nullable
+    private final ArrayInitializer arrayInitializer;
 
-
-    /**
-     *      New array.
-     *      @param children an ExtList with the children of this node 
-     * (remove the ArrayInitializer out of the list).
-     * @param init the arrayInitializer 
-     * @param dimensions an int value.
-     */
-
-    public NewArray(ExtList children, KeYJavaType keyJavaType, 
-		    ArrayInitializer init, int dimensions) {
-	super(children);
-	this.arrayInitializer = init;
-        this.dimensions  = dimensions;
-	this.keyJavaType = keyJavaType;
-	assert dimensions > 0;	
+    public NewArray(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Expression> children, TypeReference typeReference, @Nonnull KeYJavaType keyJavaType, int dimensions, @Nullable ArrayInitializer arrayInitializer) {
+        super(pi, comments, children, typeReference);
+        this.keyJavaType = keyJavaType;
+        this.dimensions = dimensions;
+        this.arrayInitializer = arrayInitializer;
     }
-    
-    
+
     /**
-     *      New array.
-     *      @param arguments an array of expressions describing the
-     *        dimensions 
-     * @param typeRef a reference to the arraytype
-     * @param init the arrayInitializer 
+     * New array.
+     *
+     * @param children   an ExtList with the children of this node
+     *                   (remove the ArrayInitializer out of the list).
+     * @param init       the arrayInitializer
      * @param dimensions an int value.
      */
-    public NewArray(Expression[] arguments, TypeReference typeRef, 
-		    KeYJavaType keyJavaType, ArrayInitializer init, 
-		    int dimensions) {
-	super(arguments, typeRef);
-	this.arrayInitializer = init;
-        this.dimensions  = dimensions;
-	this.keyJavaType = keyJavaType;
-	assert dimensions > 0;
+
+    public NewArray(ExtList children, KeYJavaType keyJavaType,
+                    ArrayInitializer init, int dimensions) {
+        super(children);
+        this.arrayInitializer = init;
+        this.dimensions = dimensions;
+        this.keyJavaType = keyJavaType;
+        assert dimensions > 0;
+    }
+
+
+    /**
+     * New array.
+     *
+     * @param arguments  an array of expressions describing the
+     *                   dimensions
+     * @param typeRef    a reference to the arraytype
+     * @param init       the arrayInitializer
+     * @param dimensions an int value.
+     */
+    public NewArray(Expression[] arguments, TypeReference typeRef,
+                    KeYJavaType keyJavaType, ArrayInitializer init,
+                    int dimensions) {
+        super(arguments, typeRef);
+        this.arrayInitializer = init;
+        this.dimensions = dimensions;
+        this.keyJavaType = keyJavaType;
+        assert dimensions > 0;
     }
 
     @Nonnull
@@ -112,10 +104,11 @@ public class NewArray extends TypeOperator
         }
         return this;
     }
-    
+
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -123,8 +116,9 @@ public class NewArray extends TypeOperator
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -132,8 +126,9 @@ public class NewArray extends TypeOperator
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
@@ -142,8 +137,9 @@ public class NewArray extends TypeOperator
 
 
     /**
- *      Get dimensions.
- *      @return the int value.
+     * Get dimensions.
+     *
+     * @return the int value.
      */
 
     public int getDimensions() {
@@ -151,8 +147,9 @@ public class NewArray extends TypeOperator
     }
 
     /**
- *      Get array initializer.
- *      @return the array initializer.
+     * Get array initializer.
+     *
+     * @return the array initializer.
      */
 
     public ArrayInitializer getArrayInitializer() {
@@ -160,26 +157,28 @@ public class NewArray extends TypeOperator
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference    != null) result++;
-        if (children         != null) result += children.size();
+        if (typeReference != null) result++;
+        if (children != null) result += children.size();
         if (arrayInitializer != null) result++;
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         int len;
@@ -201,13 +200,14 @@ public class NewArray extends TypeOperator
     }
 
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
         int result = 0;
-        if (children         != null) result += children.size();
+        if (children != null) result += children.size();
         if (arrayInitializer != null) result++;
         return result;
     }
@@ -236,12 +236,14 @@ public class NewArray extends TypeOperator
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnNewArray(this);
+        v.performActionOnNewArray(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -251,21 +253,22 @@ public class NewArray extends TypeOperator
     /**
      * We do not have a prefix, so fake it!
      * This way we implement ReferencePrefix
+     *
      * @author VK
      */
     public ReferencePrefix getReferencePrefix() {
-	return null;
+        return null;
     }
 
     /**
      * same as getKeYJavaType()
      */
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return getKeYJavaType();
+        return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType() {
-	return keyJavaType;
+        return keyJavaType;
     }
-    
+
 }

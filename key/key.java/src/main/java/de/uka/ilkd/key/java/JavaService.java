@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.*;
@@ -63,6 +64,7 @@ import java.util.stream.Stream;
  */
 public class JavaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
+    private Namespace<SchemaVariable> schemaVariables;
 
     /**
      * the File object that describes the directory from which the internal
@@ -969,7 +971,7 @@ public class JavaService {
     public JavaService(Services services, Collection<Path> sourcePaths) {
         this.services = services;
         this.sourcePaths = new ArrayList<>(sourcePaths);
-        converter = new JP2KeyConverter(services, mapping);
+        converter = new JP2KeyConverter(services, mapping, schemaVariables);
         typeConverter = new JP2KeyTypeConverter(services);
         programFactory = new JavaParserFactory(this);
         compilationUnitOfVirtualClasses = null;

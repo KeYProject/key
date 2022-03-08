@@ -13,61 +13,54 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The new enhanced form of a for-loop.
- * 
+ * <p>
  * for(Type var : exp) Statement
- * 
+ * <p>
  * LoopStatement.inits is initialized with "Type var" LoopStatement.guard is
  * initialized with "exp" LoopStatement.body with "statement"
- * 
+ *
  * @author mulbrich
  */
 public class EnhancedFor extends LoopStatement implements VariableScope {
-
-    /**
-     * create empty for loop.
-     */
-    public EnhancedFor() {
+    private EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
+                        IForUpdates updates, IGuard guard, Statement body) {
+        super(pi, comments, inits, updates, guard, body);
     }
+
+    public EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
+                       IGuard guard, Statement body) {
+        super(pi, comments, inits, null, guard, body);
+    }
+
 
     /**
      * Used for the Recoder2KeY transformation.
-     * 
-     * @param init
-     *            the initializers - here a single VariableDeclaration. may not be null.
-     * @param guard
-     *            a guard - here an expression of type Iterable. may not be null.
-     * @param statement
-     *            the statement of the loop
-     * @param comments
-     *            collected comments
-     * @param info
-     *            position
+     *
+     * @param init      the initializers - here a single VariableDeclaration. may not be null.
+     * @param guard     a guard - here an expression of type Iterable. may not be null.
+     * @param statement the statement of the loop
+     * @param comments  collected comments
+     * @param info      position
      */
-    public EnhancedFor(LoopInit init, Guard guard, Statement statement,
-            ExtList comments, PositionInfo info) {
-        super(init, guard, null, statement, comments, info);
-        assert init != null;
-        assert guard != null;
+    public EnhancedFor(@Nonnull LoopInit init, @Nonnull Guard guard, @Nonnull Statement statement,
+                       ExtList comments, PositionInfo info) {
+        this(info, null, init, null, guard, statement);
     }
 
     /**
      * Used by the {@link CreatingASTVisitor}.
-     * 
+     *
      * @param children a list of parameters
      */
     public EnhancedFor(ExtList children) {
@@ -80,6 +73,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see de.uka.ilkd.key.java.statement.For#getLastElement()
      * @see de.uka.ilkd.key.java.JavaSourceElement#getLastElement()
      */
+    @Override
     @Nonnull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
@@ -89,26 +83,30 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see de.uka.ilkd.key.java.statement.For#isCheckedBeforeIteration
      * @see recoder.java.statement.LoopStatement#isCheckedBeforeIteration()
      */
+    @Override
     public boolean isCheckedBeforeIteration() {
         // TODO (?)
         return true;
     }
 
+    @Override
     public void visit(Visitor v) {
         v.performActionOnEnhancedFor(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printEnhancedFor(this);
     }
-    
+
     /**
      * get the local variable declaration of the enhanced for-loop
      * <code>for(type var : exp)</code> gives <code>type var</code>.
+     *
      * @return the local variable declaration.
      */
     public LocalVariableDeclaration getVariableDeclaration() {
-        return (LocalVariableDeclaration)getInitializers().get(0);
+        return (LocalVariableDeclaration) getInitializers().get(0);
     }
 
 }

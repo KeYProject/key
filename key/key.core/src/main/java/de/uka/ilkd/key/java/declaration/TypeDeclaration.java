@@ -13,125 +13,127 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeScope;
-import de.uka.ilkd.key.java.VariableScope;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * Type declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 public abstract class TypeDeclaration extends JavaDeclaration
- implements NamedProgramElement, MemberDeclaration,
-    TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
+        implements NamedProgramElement, MemberDeclaration,
+        TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TypeDeclaration.class);
+
     protected final ProgramElementName name;
-
     protected final ProgramElementName fullName;
-
     protected final ImmutableArray<MemberDeclaration> members;
-
     protected final boolean parentIsInterfaceDeclaration;
-
     protected final boolean isLibrary;
 
 
+    public TypeDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray,
+                           ProgramElementName name, ProgramElementName fullName,
+                           ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
+                           boolean isLibrary) {
+        super(pi, comments, modArray);
+        this.name = name;
+        this.fullName = fullName;
+        this.members = members;
+        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.isLibrary = isLibrary;
+    }
+
+    @Deprecated
     public TypeDeclaration() {
-	this.name = null;
-	this.fullName = null;
-	this.members = null;
-	this.parentIsInterfaceDeclaration = false;
-	this.isLibrary = false;
+        this.name = null;
+        this.fullName = null;
+        this.members = null;
+        this.parentIsInterfaceDeclaration = false;
+        this.isLibrary = false;
     }
 
     /**
      * Type declaration.
-     * @param mods a modifier array.
-     * @param name ProgramElementName of the type
+     *
+     * @param mods    a modifier array.
+     * @param name    ProgramElementName of the type
      * @param members an array containing the memberdeclarations of
-     * this type
+     *                this type
      */
     public TypeDeclaration(Modifier[] mods,
-	    		   ProgramElementName name,
-			   ProgramElementName fullName,
-			   MemberDeclaration[] members,
-			   boolean parentIsInterfaceDeclaration,
-			   boolean isLibrary) {
-	super(mods);
-	this.name    = name;
-	this.fullName = fullName;
-	this.members = new ImmutableArray<>(members);
-	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
-	this.isLibrary = isLibrary;
+                           ProgramElementName name,
+                           ProgramElementName fullName,
+                           MemberDeclaration[] members,
+                           boolean parentIsInterfaceDeclaration,
+                           boolean isLibrary) {
+        super(mods);
+        this.name = name;
+        this.fullName = fullName;
+        this.members = new ImmutableArray<>(members);
+        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.isLibrary = isLibrary;
     }
 
     /**
      * @param children an ExtList of children.
-     * @param name the ProgramElementName of the type
-     * May contain:
-     *   several MemberDeclaration (as members of the type),
-     *   a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *   several Modifier (as modifiers of the type decl),
-     *   Comments
+     * @param name     the ProgramElementName of the type
+     *                 May contain:
+     *                 several MemberDeclaration (as members of the type),
+     *                 a parentIsInterfaceDeclaration (indicating if parent is interface),
+     *                 several Modifier (as modifiers of the type decl),
+     *                 Comments
      */
     public TypeDeclaration(ExtList children,
-	    		   ProgramElementName name,
-			   ProgramElementName fullName,
-			   boolean isLibrary) {
-	super(children);
-	this.name = name;
-	this.fullName = fullName;
-	this.members = new ImmutableArray<>(children.collect(MemberDeclaration.class));
-	ParentIsInterfaceDeclaration piid=children.get(ParentIsInterfaceDeclaration.class);
-	if (piid!=null) {
-	    this.parentIsInterfaceDeclaration =(piid).getValue();
-	} else {
-	    this.parentIsInterfaceDeclaration =false;
-	}
-	this.isLibrary = isLibrary;
+                           ProgramElementName name,
+                           ProgramElementName fullName,
+                           boolean isLibrary) {
+        super(children);
+        this.name = name;
+        this.fullName = fullName;
+        this.members = new ImmutableArray<>(children.collect(MemberDeclaration.class));
+        ParentIsInterfaceDeclaration piid = children.get(ParentIsInterfaceDeclaration.class);
+        if (piid != null) {
+            this.parentIsInterfaceDeclaration = (piid).getValue();
+        } else {
+            this.parentIsInterfaceDeclaration = false;
+        }
+        this.isLibrary = isLibrary;
     }
 
     /**
      * @param children an ExtList of children.
-     * May contain:
-     *   a ProgramElementName (as name),
-     *   several MemberDeclaration (as members of the type),
-     *   a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *   several Modifier (as modifiers of the type decl),
-     *   Comments
+     *                 May contain:
+     *                 a ProgramElementName (as name),
+     *                 several MemberDeclaration (as members of the type),
+     *                 a parentIsInterfaceDeclaration (indicating if parent is interface),
+     *                 several Modifier (as modifiers of the type decl),
+     *                 Comments
      */
     public TypeDeclaration(ExtList children,
-	    		   ProgramElementName fullName,
-			   boolean isLibrary) {
-	this(children,
-	     children.get(ProgramElementName.class),
-	     fullName, isLibrary);
+                           ProgramElementName fullName,
+                           boolean isLibrary) {
+        this(children,
+                children.get(ProgramElementName.class),
+                fullName, isLibrary);
     }
 
     @Nonnull
     public SourceElement getFirstElement() {
-        if (modArray != null && (modArray.size()>0)) {
+        if (modArray != null && (modArray.size() > 0)) {
             return modArray.get(0);
         } else {
             return this;
@@ -146,29 +148,32 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /**
      * Get name.
+     *
      * @return the string.
      */
     public final String getName() {
         return (name == null) ? ((fullName == null) ? null : fullName.toString())
-	: name.toString();
+                : name.toString();
     }
 
     public String getFullName() {
-	return (fullName == null) ? getName() : fullName.toString();
+        return (fullName == null) ? getName() : fullName.toString();
     }
 
     /**
      * returns the default value of the given type
      * according to JLS 4.5.5
+     *
      * @return the default value of the given type
      * according to JLS 4.5.5
      */
     public Literal getDefaultValue() {
-	return NullLiteral.NULL;
+        return NullLiteral.NULL;
     }
 
     /**
      * Get ProgramElementName.
+     *
      * @return the ProgramElementName.
      */
     public ProgramElementName getProgramElementName() {
@@ -178,6 +183,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /**
      * Get members.
+     *
      * @return the member declaration array.
      */
     public ImmutableArray<MemberDeclaration> getMembers() {
@@ -185,14 +191,15 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     public boolean isLibraryClass() {
-	return isLibrary;
+        return isLibrary;
     }
 
-    /** TO BE IMPLEMENTED
+    /**
+     * TO BE IMPLEMENTED
      */
     public de.uka.ilkd.key.java.abstraction.Package getPackage(Services s) {
-       LOGGER.error("Method in class TypeDeclaration not implemented." );
-       return null;
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
     }
 
     /**
@@ -204,15 +211,15 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<ClassType> getAllSupertypes(Services services) {
-	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
     }
 
     /**
      * TO BE IMPLEMENTED
      */
     public ImmutableList<Field> getFields(Services services) {
-        LOGGER.error("Method in class TypeDeclaration not implemented." );
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
 
@@ -237,46 +244,52 @@ public abstract class TypeDeclaration extends JavaDeclaration
         return result;
     }
 
-    /** TO BE IMPLEMENTED
+    /**
+     * TO BE IMPLEMENTED
      */
     public ImmutableList<Method> getMethods(Services services) {
-	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
-    }
-
-
-    /** TO BE IMPLEMENTED
-     */
-    public ImmutableList<Method> getAllMethods(Services services) {
-	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
-    }
-
-    /** TO BE IMPLEMENTED
-     */
-    public ImmutableList<Constructor> getConstructors(Services services) {
-      	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
-    }
-
-    /** TO BE IMPLEMENTED
-     */
-    public ImmutableList<ClassType> getTypes(Services services) {
-	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
-    }
-
-    /** TO BE IMPLEMENTED
-     */
-    public ImmutableList<ClassType> getAllTypes(Services services) {
-	LOGGER.error("Method in class TypeDeclaration not implemented." );
-	return null;
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
     }
 
 
     /**
-     *      Get the number of type declarations in this container.
-     *      @return the number of type declarations.
+     * TO BE IMPLEMENTED
+     */
+    public ImmutableList<Method> getAllMethods(Services services) {
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
+    }
+
+    /**
+     * TO BE IMPLEMENTED
+     */
+    public ImmutableList<Constructor> getConstructors(Services services) {
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
+    }
+
+    /**
+     * TO BE IMPLEMENTED
+     */
+    public ImmutableList<ClassType> getTypes(Services services) {
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
+    }
+
+    /**
+     * TO BE IMPLEMENTED
+     */
+    public ImmutableList<ClassType> getAllTypes(Services services) {
+        LOGGER.error("Method in class TypeDeclaration not implemented.");
+        return null;
+    }
+
+
+    /**
+     * Get the number of type declarations in this container.
+     *
+     * @return the number of type declarations.
      */
     public int getTypeDeclarationCount() {
         int count = 0;
@@ -306,7 +319,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
                 MemberDeclaration md = members.get(i);
                 if (md instanceof TypeDeclaration) {
                     if (index == 0) {
-                        return (TypeDeclaration)md;
+                        return (TypeDeclaration) md;
                     }
                     index -= 1;
                 }
@@ -364,9 +377,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
         return super.isAbstract();
     }
 
-    public boolean equals(Object o){
-        if (o instanceof TypeDeclaration){
-            return ((TypeDeclaration)o).fullName.equals(fullName);
+    public boolean equals(Object o) {
+        if (o instanceof TypeDeclaration) {
+            return ((TypeDeclaration) o).fullName.equals(fullName);
         } else return false;
     }
 }

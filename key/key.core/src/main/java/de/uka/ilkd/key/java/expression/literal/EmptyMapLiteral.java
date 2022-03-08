@@ -12,10 +12,7 @@
 // 
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -23,16 +20,19 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.logic.Name;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 public class EmptyMapLiteral extends Literal {
+    public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral(null, null);
 
-    public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral();
-
-    private EmptyMapLiteral() {
+    public EmptyMapLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
+        super(pi, comments);
     }
 
     @Override
     public boolean equalsModRenaming(SourceElement o,
-            NameAbstractionTable nat) {
+                                     NameAbstractionTable nat) {
         return o == this;
     }
 
