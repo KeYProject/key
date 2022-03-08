@@ -281,7 +281,7 @@ class JP2KeyVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<TypeReference> e = map(n.getExtendedTypes());
         ImmutableArray<TypeReference> i = map(n.getImplementedTypes());
         Extends extending = new Extends(e);
-        Implements implementing = new Implements(e);
+        Implements implementing = new Implements(i);
 
         if (n.isInterface()) {
             return new InterfaceDeclaration(
