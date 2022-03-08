@@ -97,6 +97,7 @@ public class AstFactory {
     public static Expression call(TypeExpr typeExpr, String name, NodeList<Expression> arguments) {
         return new MethodCallExpr(typeExpr, name, arguments);
     }
+
     public static ExpressionStmt calls(String name) {
         return new ExpressionStmt(call(name));
     }
@@ -123,11 +124,17 @@ public class AstFactory {
     }
 
     public static <T extends Node> T mark(T node) {
-        var caller = Arrays.stream(Thread.currentThread().getStackTrace())
-                .filter(it -> !it.getClassName().contains("AstFactory"))
-                .findFirst().get();
+        final var stackTrace = Thread.currentThread().getStackTrace();
+        StackTraceElement cur, next = null;
+        for (int i = 0; i < stackTrace.length - 1; i++) {
+            cur = stackTrace[i];
+            next = stackTrace[i + 1];
+            if (cur.getClassName().equals(AstFactory.class.getName()) &&
+                    !next.getClassName().equals(AstFactory.class.getName()))
+                break;
+        }
         node.setLineComment(
-                String.format("Created by %s:%d", caller.getFileName(), caller.getLineNumber())
+                String.format("Created by %s:%d", next.getFileName(), next.getLineNumber())
         );
         return node;
     }

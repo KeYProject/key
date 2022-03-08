@@ -1027,7 +1027,6 @@ public class JavaService {
             if (useSystemClassLoaderInResolution) {
                 ct.add(new ReflectionTypeSolver(true));
             }
-
             typeSolver = ct;
         }
         return typeSolver;

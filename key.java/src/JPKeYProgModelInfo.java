@@ -8,6 +8,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.declarations.*;
+import com.github.javaparser.resolution.logic.MethodResolutionCapability;
 import com.github.javaparser.resolution.logic.MethodResolutionLogic;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
@@ -709,9 +710,8 @@ public class JPKeYProgModelInfo {
     }
 
 
-    private ImmutableList<KeYJavaType> recFindImplementations(recoder.abstraction.ClassType ct, String name, List<recoder.abstraction.Type> signature, ImmutableList<KeYJavaType> result) {
-        recoder.service.CrossReferenceSourceInfo si = getServConf().getCrossReferenceSourceInfo();
-
+    private ImmutableList<KeYJavaType> recFindImplementations(TypeDeclaration ct,
+                                                              String name, List<Type> signature, ImmutableList<KeYJavaType> result) {
         if (declaresApplicableMethods(ct, name, signature)) {
             KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
             if (r == null) {
@@ -734,19 +734,9 @@ public class JPKeYProgModelInfo {
     }
 
 
-    private boolean declaresApplicableMethods(recoder.abstraction.ClassType ct, String name, List<recoder.abstraction.Type> signature) {
-        recoder.service.CrossReferenceSourceInfo si = getServConf().getCrossReferenceSourceInfo();
-
-        List<recoder.abstraction.Method> list = si.getMethods(ct);
-        int s = list.size();
-        int i = 0;
-        while (i < s) {
-            recoder.abstraction.Method m = list.get(i);
-            if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature()) && si.isVisibleFor(m, ct) && !m.isAbstract())
-                return true;
-            else i++;
-        }
-        return false;
+    private boolean declaresApplicableMethods(MethodResolutionCapability ct, String name, List<ResolvedType> signature) {
+        var method = ct.solveMethod(name, signature, false);
+        return method.isSolved();
     }
 
     private boolean isDeclaringInterface(recoder.abstraction.ClassType ct, String name, List<recoder.abstraction.Type> signature) {

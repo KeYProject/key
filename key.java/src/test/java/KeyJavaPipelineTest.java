@@ -39,6 +39,7 @@ class KeyJavaPipelineTest {
     public KeYJavaPipeline createPipelineTest(Path testFolder) throws IOException {
         Services services = new Services(JavaProfile.getDefaultProfile());
         var js = new JavaService(services, Collections.singleton(testFolder));
+        js.setUseSystemClassLoaderInResolution(true); //java.lang.Object is required for most things
         var inputFolder = testFolder.resolve("input");
         final var jp = js.createJavaParser();
         var files = Files.list(inputFolder);
