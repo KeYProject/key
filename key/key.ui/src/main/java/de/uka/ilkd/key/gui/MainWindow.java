@@ -55,9 +55,11 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.st.SolverTypes;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 import org.slf4j.Logger;
@@ -928,6 +930,9 @@ public final class MainWindow extends JFrame {
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
                 getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
+        // Z3 Counterexample Solver should not be in the dropdown menu as there is a separate button for it.
+        solverUnions = solverUnions.stream().filter(u -> !u.getTypes().contains(SolverTypes.Z3_CE_SOLVER))
+                .collect(Collectors.toList());
 
         if (solverUnions == null || solverUnions.isEmpty()) {
             updateDPSelectionMenu();
@@ -1741,8 +1746,13 @@ public final class MainWindow extends JFrame {
 
     private final class SMTInvokeMultipleAction extends SMTInvokeAction {
 
-        SolverTypeCollection solverUnion;
-        Collection<SolverTypeCollection> possibleSolvers;
+        private final SolverTypeCollection solverUnion;
+        private final Collection<SolverTypeCollection> possibleSolvers;
+        private static final String CHECK_ALL = "Check All";
+        private static final String UNCHECK_ALL = "Uncheck All";
+        private static final String START = "Start Solvers";
+        private static final String CANCEL = "Cancel";
+
 
         public SMTInvokeMultipleAction(Collection<SolverTypeCollection> solverUnions) {
             super(SolverTypeCollection.EMPTY_COLLECTION);
@@ -1770,10 +1780,15 @@ public final class MainWindow extends JFrame {
             choiceDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             choiceDialog.setLocationByPlatform(true);
             JPanel solverChoice = new JPanel();
+            solverChoice.setLayout(new GridLayout(possibleSolvers.size(), 1));
             List<UnionCheckBox> choiceOptions = new LinkedList<>();
-            JButton start = new JButton("Start Solvers");
+            JButton checkAll = new JButton(CHECK_ALL);
+            // Change behaviour of checkAll to unchecking all if all solvers are checked
+            boolean checkAllSolvers = true;
+            checkAll.setEnabled(true);
+            JButton start = new JButton(START);
             start.setEnabled(false);
-            JButton cancel = new JButton("Cancel");
+            JButton cancel = new JButton(CANCEL);
             cancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -1787,17 +1802,30 @@ public final class MainWindow extends JFrame {
                     choiceDialog.dispose();
                 }
             });
+            checkAll.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    boolean checkedValue = checkAll.getText().equals(CHECK_ALL);
+                    for (UnionCheckBox checkBox: choiceOptions) {
+                        checkBox.setSelected(checkedValue);
+                    }
+                }
+            });
 
             for (SolverTypeCollection union: possibleSolvers){
                 UnionCheckBox chooseUnion = new UnionCheckBox(union);
                 chooseUnion.addChangeListener(new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
+                        // Enable start button iff at least one solver is checked
                         if (createSolverTypeCollection(choiceOptions).equals(SolverTypeCollection.EMPTY_COLLECTION)) {
                             start.setEnabled(false);
                             return;
                         }
                         start.setEnabled(true);
+                        checkAll.setText((choiceOptions.stream().filter(u -> u.isSelected())
+                                .collect(Collectors.toList()).size() <= choiceOptions.size()/2)
+                                ? CHECK_ALL : UNCHECK_ALL);
                     }
                 });
                 choiceOptions.add(chooseUnion);
@@ -1806,13 +1834,16 @@ public final class MainWindow extends JFrame {
 
             JPanel buttonPanel = new JPanel();
             buttonPanel.add(start);
+            buttonPanel.add(checkAll);
             buttonPanel.add(cancel);
-            buttonPanel.setMinimumSize(new Dimension(600, 100));
-            solverChoice.setMinimumSize(new Dimension(600, 100));
+            buttonPanel.setMinimumSize(new Dimension(400, 200));
+            solverChoice.setMinimumSize(new Dimension(400, 200));
 
-            choiceDialog.add(solverChoice, BorderLayout.NORTH);
+            choiceDialog.add(solverChoice);
             choiceDialog.add(buttonPanel, BorderLayout.SOUTH);
-            choiceDialog.setMinimumSize(new Dimension(600, 200));
+            solverChoice.revalidate();
+            buttonPanel.revalidate();
+            choiceDialog.setMinimumSize(new Dimension(400, 400));
             choiceDialog.setTitle("Choose Multiple Solvers");
             choiceDialog.setEnabled(true);
             choiceDialog.setVisible(true);
