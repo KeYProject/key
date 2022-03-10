@@ -121,6 +121,9 @@ public class SolverPropertiesLoader {
         // default solver command, timeout, parameters, version parameter, solver info (some string)
         command = SettingsConverter.readRawString(props, COMMAND, DEFAULT_COMMAND);
         timeout = SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT);
+        if (timeout < -1) {
+            timeout = -1;
+        }
         params = SettingsConverter.readRawString(props, PARAMS, DEFAULT_PARAMS);
         version = SettingsConverter.readRawString(props, VERSION, DEFAULT_VERSION);
         minVersion = SettingsConverter.readRawString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);

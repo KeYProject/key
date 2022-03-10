@@ -1,7 +1,8 @@
 params=-in -smt2
 timeout=-1
 name=Z3_FP
-info=Z3 solver by Microsoft, using only floating point SMT handlers.
+info=Z3 solver by Microsoft, using only floating point SMT handlers,\
+ i.e. translating only floating point formulas.
 command=z3
 version=-version
 minVersion=Z3 version 4.4.1

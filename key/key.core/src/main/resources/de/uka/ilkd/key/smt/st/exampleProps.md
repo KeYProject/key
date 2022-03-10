@@ -9,7 +9,9 @@ For the solver to be usable, add the file's name to *defaultSolvers.txt*.
 The solver's name. 
 Should be unique amongst all used solver properties files, otherwise it is renamed throughout the solver loading process.
 If no name is given, the solver will be called "SMT Solver" or a unique version of that (depending on the other solvers' names).
-**name=Z3**
+```properties
+name=Z3
+```
 
 Arbitrary information about the specified solver.
 **info=Some text.**
@@ -38,6 +40,11 @@ The default solver process timeout as a long value. If the property is not set, 
 The current timeout can later be changed by the user in the settings.
 **timeout=-1**
 
+The fully specified class name of the SMTTranslator class used by the solver at hand.
+Currently possible values for TRANSLATOR_CLASS:
+SmtLib2Translator (legacy solvers), ModularSMTLib2Translator
+**translatorClass=de.uka.ilkd.key.smt.TRANSLATOR_CLASS**
+
 The SMTHandlers used by this solver. 
 If the property is not specified, it is an empty list by default which leads to all handlers being used.
 Note that this property currently only takes effect if the ModularSMTLib2Translator class is used.
@@ -51,11 +58,6 @@ If the property is not specified, it is an empty list by default leading to defa
 All the used handlers handle the options on their own.
 **handlerOptions=option1,\
 	...**
-
-The fully specified class name of the SMTTranslator class used by the solver at hand. 
-Currently possible values for TRANSLATOR_CLASS:
-SmtLib2Translator (legacy solvers), ModularSMTLib2Translator
-**translatorClass=de.uka.ilkd.key.smt.TRANSLATOR_CLASS**
 
 The message handler (see SolverSocket.MessageHandler) used by the solver socket for communication with this solver.
 Currently possible values: DEFAULT (as is used by Z3), CVC4, CVC5, Z3CE
