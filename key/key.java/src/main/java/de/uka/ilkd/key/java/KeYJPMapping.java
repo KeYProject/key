@@ -15,8 +15,8 @@ import java.util.Set;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
-public class KeyJPMapping {
-    public static final Logger LOGGER = LoggerFactory.getLogger(KeyJPMapping.class);
+public class KeYJPMapping {
+    public static final Logger LOGGER = LoggerFactory.getLogger(KeYJPMapping.class);
 
     /**
      * have special classes been parsed in
@@ -40,7 +40,7 @@ public class KeyJPMapping {
     private KeYJavaType superArrayType = null;
 
 
-    public KeyJPMapping() {
+    public KeYJPMapping() {
         this.map = new LinkedHashMap<>(4096);
         this.revMap = new LinkedHashMap<>(4096);
     }
@@ -55,7 +55,7 @@ public class KeyJPMapping {
      * @param revMap        the reverse map (KeY->Recoder)
      * @param parsedSpecial boolean indicating if the special classes have been parsed in
      */
-    KeyJPMapping(HashMap<Node, Object> map, Map<Object, Node> revMap,
+    KeYJPMapping(HashMap<Node, Object> map, Map<Object, Node> revMap,
                  KeYJavaType superArrayType,
                  boolean parsedSpecial) {
         this.map = map;
@@ -132,8 +132,8 @@ public class KeyJPMapping {
         return this.superArrayType;
     }
 
-    public KeyJPMapping copy() {
-        return new KeyJPMapping(new HashMap<>(map), new HashMap<>(revMap), superArrayType, parsedSpecial);
+    public KeYJPMapping copy() {
+        return new KeYJPMapping(new HashMap<>(map), new HashMap<>(revMap), superArrayType, parsedSpecial);
     }
 
     /**

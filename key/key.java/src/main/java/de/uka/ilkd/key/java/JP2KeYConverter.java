@@ -51,12 +51,12 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
-public class JP2KeyConverter {
+public class JP2KeYConverter {
     private final Services services;
-    private final KeyJPMapping mapping;
+    private final KeYJPMapping mapping;
     private final Namespace<SchemaVariable> schemaVariables;
 
-    public JP2KeyConverter(Services services, KeyJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
+    public JP2KeYConverter(Services services, KeYJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = mapping;
         this.schemaVariables = schemaVariables;
@@ -67,17 +67,17 @@ public class JP2KeyConverter {
     }
 
     public Object process(Node block) {
-        return block.accept(new JP2KeyVisitor(services, mapping, schemaVariables), null);
+        return block.accept(new JP2KeYVisitor(services, mapping, schemaVariables), null);
     }
 }
 
-class JP2KeyVisitor extends GenericVisitorAdapter<Object, Void> {
+class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final Services services;
-    private final KeyJPMapping mapping;
+    private final KeYJPMapping mapping;
     private final Namespace<SchemaVariable> svns;
     private Map<String, KeYJavaType> types = new TreeMap<>();
 
-    JP2KeyVisitor(Services services, KeyJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
+    JP2KeYVisitor(Services services, KeYJPMapping mapping, Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = mapping;
         svns = schemaVariables;

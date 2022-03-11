@@ -11,7 +11,7 @@ import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.truth.Truth;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.transformations.KeyJavaPipeline;
+import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * @version 1 (19.02.22)
  */
 class KeyJavaPipelineTest {
-    public KeyJavaPipeline createPipelineTest(Path testFolder) throws IOException {
+    public KeYJavaPipeline createPipelineTest(Path testFolder) throws IOException {
         Services services = new Services(JavaProfile.getDefaultProfile());
         var js = new JavaService(services, Collections.singleton(testFolder));
         var inputFolder = testFolder.resolve("input");
@@ -59,8 +59,8 @@ class KeyJavaPipelineTest {
             }
         });
         var tservices = new TransformationPipelineServices(js, new TransformationPipelineServices.TransformerCache(cu));
-        var kjp = KeyJavaPipeline.createDefault(tservices);
-        var kjp2 = new KeyJavaPipeline(tservices);
+        var kjp = KeYJavaPipeline.createDefault(tservices);
+        var kjp2 = new KeYJavaPipeline(tservices);
         var cnt = 0;
         for (JavaTransformer step : kjp.getSteps()) {
             kjp2.add(step);

@@ -12,11 +12,11 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (11/7/21)
  */
-public class KeyJavaPipeline {
+public class KeYJavaPipeline {
     private final TransformationPipelineServices pipelineServices;
     private final List<JavaTransformer> steps = new LinkedList<>();
 
-    public KeyJavaPipeline(TransformationPipelineServices pipelineServices) {
+    public KeYJavaPipeline(TransformationPipelineServices pipelineServices) {
         this.pipelineServices = pipelineServices;
     }
 
@@ -28,8 +28,8 @@ public class KeyJavaPipeline {
         return steps;
     }
 
-    public static KeyJavaPipeline createDefault(TransformationPipelineServices pipelineServices) {
-        KeyJavaPipeline p = new KeyJavaPipeline(pipelineServices);
+    public static KeYJavaPipeline createDefault(TransformationPipelineServices pipelineServices) {
+        KeYJavaPipeline p = new KeYJavaPipeline(pipelineServices);
         //new EnumClassBuilder(pipelineServices),
         p.add(new JMLTransformer(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));

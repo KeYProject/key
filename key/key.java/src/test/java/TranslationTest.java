@@ -4,8 +4,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JP2KeyConverter;
-import de.uka.ilkd.key.java.KeyJPMapping;
+import de.uka.ilkd.key.java.JP2KeYConverter;
+import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -19,8 +19,8 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  * @version 1 (08.03.22)
  */
 class TranslationTest {
-    private final JP2KeyConverter converter = new JP2KeyConverter(new Services(JavaProfile.getDefaultProfile()),
-            new KeyJPMapping(), new Namespace<>());
+    private final JP2KeYConverter converter = new JP2KeYConverter(new Services(JavaProfile.getDefaultProfile()),
+            new KeYJPMapping(), new Namespace<>());
 
     private final CompilationUnit cu
             = StaticJavaParser.parse("public class A { Object a; String s; {} }");

@@ -21,7 +21,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.transformations.KeyJavaPipeline;
+import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -80,7 +80,7 @@ public class JavaService {
      * <p>
      * It is used for syntactical structures and types.
      */
-    private final KeyJPMapping mapping = new KeyJPMapping();
+    private final KeYJPMapping mapping = new KeYJPMapping();
 
     /**
      * Counter used to enumerate the anonymous implicit classes used in parsing of Java Fragments
@@ -96,13 +96,13 @@ public class JavaService {
     /**
      * the object that handles the transformation from recoder AST to KeY AST
      */
-    private final JP2KeyConverter converter;
+    private final JP2KeYConverter converter;
 
     /**
      * the object that handles the transformation from recoder types to KeY
      * types
      */
-    private final JP2KeyTypeConverter typeConverter;
+    private final JP2KeYTypeConverter typeConverter;
 
     /**
      * The list of dynamical created {@link CompilationUnit}s
@@ -123,7 +123,7 @@ public class JavaService {
      *
      * @return not null
      */
-    public JP2KeyConverter getConverter() {
+    public JP2KeYConverter getConverter() {
         return converter;
     }
 
@@ -132,7 +132,7 @@ public class JavaService {
      *
      * @return not null
      */
-    public JP2KeyTypeConverter getTypeConverter() {
+    public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
     }
 
@@ -154,7 +154,7 @@ public class JavaService {
         return parsingLibs;
     }
 
-    public KeyJPMapping rec2key() {
+    public KeYJPMapping rec2key() {
         return mapping;
     }
 
@@ -616,7 +616,7 @@ public class JavaService {
      */
 
     protected void transformModel(List<CompilationUnit> cUnits) {
-        KeyJavaPipeline pipeline = KeyJavaPipeline.createDefault(createPipelineServices(cUnits));
+        KeYJavaPipeline pipeline = KeYJavaPipeline.createDefault(createPipelineServices(cUnits));
         pipeline.apply();
     }
 
@@ -971,8 +971,8 @@ public class JavaService {
     public JavaService(Services services, Collection<Path> sourcePaths) {
         this.services = services;
         this.sourcePaths = new ArrayList<>(sourcePaths);
-        converter = new JP2KeyConverter(services, mapping, schemaVariables);
-        typeConverter = new JP2KeyTypeConverter(services);
+        converter = new JP2KeYConverter(services, mapping, schemaVariables);
+        typeConverter = new JP2KeYTypeConverter(services);
         programFactory = new JavaParserFactory(this);
         compilationUnitOfVirtualClasses = null;
     }
