@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.ReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -80,7 +81,7 @@ public class JmlAssert extends JavaStatement {
      */
     public String getConditionText() {
         if (cond != null) {
-            return cond.toString();
+            return LogicPrinter.quickPrintTerm(cond, null);
         }
         // this will lose whitespace, so e.g. \forall will not be printed correctly
         // but normally the term form should get printed.
