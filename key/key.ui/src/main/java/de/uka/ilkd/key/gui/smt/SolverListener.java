@@ -298,7 +298,8 @@ public class SolverListener implements SolverLauncherListener {
 
 
                 progressDialog = new ProgressDialog(
-                                progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
+                                progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,
+                        smtproblems.size()*solverTypes.size(), new String[] {}, titles);
          
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -318,6 +319,7 @@ public class SolverListener implements SolverLauncherListener {
                                 return problem;
                         }
                 }
+                // This case will be entered if the columns or rows of the ProgressDialog table are moved!
                 return null;
         }
 
