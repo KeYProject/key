@@ -1,7 +1,7 @@
 params=--interactive -m --lang smt2
 timeout=-1
 name=CVC5
-info=CVC5 solver
+info=CVC5 solver (https://cvc5.github.io/).
 command=cvc5
 version=--version
 messageHandler=CVC5

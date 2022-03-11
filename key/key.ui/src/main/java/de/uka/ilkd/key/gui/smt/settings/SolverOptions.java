@@ -20,6 +20,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String INFO_SOLVER_PARAMETERS = "infoSolverParameters";
     private static final String INFO_SOLVER_COMMAND = "infoSolverCommand";
     private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
+    private static final String INFO_SOLVER_INFO = "SOLVER_INFO";
     private static final String[] solverSupportText = {
             BUNDLE.getString("SOLVER_SUPPORTED"),
             BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
@@ -36,6 +37,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
+    private final JTextField solverInfo;
     private final JSpinner solverTimeout;
 
     public SolverOptions(SolverType solverType) {
@@ -44,6 +46,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         setHeaderText("SMT Solver: " + getDescription());
 
         solverName = createSolverName();
+        solverInfo = createSolverInformation();
         solverInstalled = createSolverInstalled();
         solverCommand = createSolverCommand();
         solverTimeout = createSolverTimeout();
@@ -77,6 +80,16 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
+    private JTextField createSolverInformation() {
+        String info = solverType.getInfo();
+        if (info != null && !info.equals("")) {
+            JTextField solverInfo = addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            solverInfo.setEditable(false);
+            return solverInfo;
+        }
+        return null;
+    }
+
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
@@ -92,7 +105,6 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         addTitledComponent("Timeout", jsp, BUNDLE.getString(INFO_SOLVER_TIMEOUT));
         return jsp;
     }
-
 
     protected JButton createCheckSupportButton() {
         JButton checkForSupportButton = new JButton("Check for support");

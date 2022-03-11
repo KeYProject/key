@@ -1,7 +1,7 @@
 params=+stdin
 timeout=-1
 name=Princess
-info=Princess solver by Philipp Rümmer, see http://www.philipp.ruemmer.org/princess.shtml.
+info=Princess solver by Philipp Ruemmer (http://www.philipp.ruemmer.org/princess.shtml).
 command=princess
 version=+version
 minVersion=2021-11-15

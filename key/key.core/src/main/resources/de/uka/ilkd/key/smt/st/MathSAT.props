@@ -1,6 +1,6 @@
 timeout=-1
 name=MathSAT
-info=The MathSAT 5 SMT solver
+info=
 command=mathsat
 version=-version
 translatorClass=de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator
