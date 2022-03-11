@@ -21,6 +21,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 import org.key_project.util.java.StringUtil;
@@ -90,15 +91,15 @@ public class InformationWindow extends JDialog {
 		this.setTitle(title);
 		initModel(solver);
 		for(Information el : information){
-	  getTabbedPane().addTab(el.title, newTab(el)); 
-       }
-       
-       setSize(600, 500); 
-       this.getContentPane().add(getTabbedPane());
-       this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
-       this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-       this.setLocationByPlatform(true);
-       this.setVisible(true);
+			getTabbedPane().addTab(el.title, newTab(el));
+		}
+
+		setSize(600, 500);
+		this.getContentPane().add(getTabbedPane());
+		this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setLocationByPlatform(true);
+		this.setVisible(true);
    }
    
    private void initModel(SMTSolver solver){
@@ -140,7 +141,7 @@ public class InformationWindow extends JDialog {
    private Component newTab(Information information){
 	    final JTextArea lines = new JTextArea("1");
 	    final JTextArea content = new JTextArea();
-		 
+		content.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
 		lines.setBackground(Color.LIGHT_GRAY);
 		lines.setEditable(false);
 		content.setEditable(false);
