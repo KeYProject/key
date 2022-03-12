@@ -7,8 +7,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.ReplacementMap;
+import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.ExtList;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -108,16 +110,17 @@ public class JmlAssert extends JavaStatement {
      * @param services services
      */
     public Term getCond(final Term self, final Services services) {
+        final TermFactory termFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
         if (self != null) {
-            final TermFactory termFactory = services.getTermFactory();
-            final ReplacementMap<Term, Term> replacementMap =
-                    new ReplacementMap.NoIrrelevantLabelsReplacementMap<>(termFactory);
-            replacementMap.put(services.getTermBuilder().var(vars.selfVar), self);
-            final OpReplacer replacer = new OpReplacer(
-                    replacementMap, termFactory, services.getProof());
-            return replacer.replace(cond);
+            replacementMap.replaceSelf(vars.selfVar, self, services);
         }
-        return cond;
+        replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, vars.atPres, services);
+        replacementMap.replaceRemembranceLocalVariables(vars.atBeforeVars, vars.atBefores,
+                services);
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, termFactory, services.getProof());
+        return replacer.replace(cond);
     }
 
 
@@ -189,5 +192,21 @@ public class JmlAssert extends JavaStatement {
 
     public ProgramVariableCollection getVars() {
         return vars;
+    }
+
+    /**
+     * updates this statement with prestate renaming
+     * @param atPres prestate renaming
+     * @param services services
+     */
+    public void updateVars(final Map<LocationVariable, Term> atPres, final Services services) {
+        final TermFactory termFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+        replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, termFactory, services.getProof());
+        cond = replacer.replace(cond);
+        vars.atPres = atPres;
+
     }
 }
