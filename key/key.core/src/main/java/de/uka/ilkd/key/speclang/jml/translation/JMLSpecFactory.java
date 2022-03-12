@@ -1445,10 +1445,27 @@ public class JMLSpecFactory {
      * @param pm the enclosing method
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
-        final AuxiliaryContract.Variables variables = new AuxiliaryContract.VariablesCreator(
-                        jmlAssert, Collections.emptyList(), pm, services)
-                .create();
-        final ProgramVariableCollection pv = createProgramVariables(pm, jmlAssert, variables);
+        final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            atPreVars.put(heap, tb.heapAtPreVar(heap + AT_PRE, heap.sort(), true));
+        }
+        final ImmutableList<LocationVariable> parameters = pm.collectParameters();
+        for (LocationVariable parameter : parameters) {
+            atPreVars.put(parameter, tb.locationVariable(parameter + AT_PRE,
+                    parameter.getKeYJavaType(), true));
+        }
+        final ImmutableList<ProgramVariable> paramVars =
+                append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
+        final ProgramVariableCollection pv = new ProgramVariableCollection(
+                tb.selfVar(pm, pm.getContainerType(), false),
+                paramVars,
+                tb.resultVar(pm, false),
+                tb.excVar(pm, false),
+                atPreVars,
+                termify(atPreVars),
+                Collections.emptyMap(), // should be the pre-state of the enclosing contract
+                Collections.emptyMap()  // ignore for now
+        );
         jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 
