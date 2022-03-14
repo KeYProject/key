@@ -16,8 +16,12 @@ public class TermReplacementMap extends ReplacementMap<Term> {
     }
 
     public void replaceHeap(final Term newHeap, final Services services) {
-        assert newHeap != null;
-        assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
+        if (newHeap == null) {
+            throw new IllegalArgumentException("newHeap can't be null");
+        }
+        if (!newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+            throw new IllegalArgumentException("newHeap has to be a heap");
+        }
         put(services.getTermBuilder().getBaseHeap(), newHeap);
     }
 

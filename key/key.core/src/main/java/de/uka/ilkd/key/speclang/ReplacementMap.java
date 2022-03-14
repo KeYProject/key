@@ -31,10 +31,11 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      * @param newSelf  the new self variable.
      * @param services services.
      */
-    public void replaceSelf(final ProgramVariable oldSelf, final S newSelf,
-                            TermServices services) {
+    public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services) {
         if (newSelf != null) {
-            assert newSelf.sort().extendsTrans(oldSelf.sort());
+            if (!newSelf.sort().extendsTrans(oldSelf.sort())) {
+                throw new IllegalArgumentException("new self variable has to be compatible");
+            }
             put(convert(oldSelf, services), newSelf);
         }
     }
@@ -49,7 +50,9 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
                              final Map<Label, S> newFlags, TermServices services) {
         if (newFlags != null) {
-            assert newFlags.size() == oldFlags.size();
+            if (newFlags.size() != oldFlags.size()) {
+                throw new IllegalArgumentException("flags have to have the same size");
+            }
             for (Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
                 replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()), services);
             }
@@ -66,7 +69,9 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
                                 TermServices services) {
         if (newVariable != null) {
-            assert oldVariable.sort().equals(newVariable.sort());
+            if (!oldVariable.sort().equals(newVariable.sort())) {
+                throw new IllegalArgumentException("variables have to have the same sort");
+            }
             put(convert(oldVariable, services), newVariable);
         }
     }
@@ -111,10 +116,12 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
             final Map<LocationVariable, ? extends S> newRemembranceLocalVariables,
             final TermServices services) {
         if (newRemembranceLocalVariables != null) {
-            for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
+            for (final Entry<LocationVariable, LocationVariable> entry
+                    : oldRemembranceLocalVariables.entrySet()) {
+                LocationVariable localVariable = entry.getKey();
                 if (newRemembranceLocalVariables.get(localVariable) != null) {
                     LocationVariable oldRemembranceLocalVariable
-                            = oldRemembranceLocalVariables.get(localVariable);
+                            = entry.getValue();
                     S newRemembranceLocalVariable
                             = newRemembranceLocalVariables.get(localVariable);
                     assert oldRemembranceLocalVariable.sort()

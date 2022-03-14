@@ -204,6 +204,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         @Override
         protected void doDefaultAction(final SourceElement node) {
+            // ignore
         }
 
         @Override
@@ -219,9 +220,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         @Override
         public void performActionOnMergeContract(final MergeContract spec) {
-            assert (spec instanceof UnparameterizedMergeContract
-                    || spec instanceof PredicateAbstractionMergeContract)
-                    : "Unsupported kind of merge contract: " + spec.getClass().getSimpleName();
+            if ((!(spec instanceof UnparameterizedMergeContract)
+                    && !(spec instanceof PredicateAbstractionMergeContract)))
+                throw new AssertionError("Unsupported kind of merge contract: "
+                        + spec.getClass().getSimpleName());
 
             if (spec instanceof PredicateAbstractionMergeContract) {
                 final MergePointStatement mps = spec.getMergePointStatement();
