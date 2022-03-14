@@ -16,10 +16,16 @@ import java.util.Map;
  * A map from some type to the same type.
  *
  * @param <S> the key and value type.
+ *
+ * @author lanzinger
  */
 public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
         extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
+    /**
+     * constructs a replacement map with the given term factory
+     * @param tf a term factory
+     */
     public ReplacementMap(TermFactory tf) {
         super(tf);
     }
