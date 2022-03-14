@@ -167,6 +167,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
          */
         private final String methodName;
         /**
+         * The Term for {@code this} of the methodframe.
+         */
+        private final Term selfTerm;
+        /**
          * A TermBuilder
          */
         private final TermBuilder tb;
@@ -192,6 +196,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                         final Services services, final TermBuilder tb) {
             super(frame, services);
             this.frame = frame;
+            selfTerm = MiscTools.getSelfTerm(frame, services);
             this.methodName = frame.getProgramMethod().getName();
             this.tb = tb;
             this.atPreUpdate = tb.skip();
@@ -240,7 +245,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         @Override
         public void performActionOnLoopInvariant(final LoopSpecification spec) {
             addNeededVariables(spec.getInternalAtPres().keySet());
-            Term self = spec.getInternalSelfTerm();
+            Term self = selfTerm;
+            if (spec.getInternalSelfTerm() == null) {
+                self = null;
+            }
             final Term newVariant = spec.getVariant(self, atPres, services);
             Map<LocationVariable, Term> newMods = new LinkedHashMap<>();
             Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs
