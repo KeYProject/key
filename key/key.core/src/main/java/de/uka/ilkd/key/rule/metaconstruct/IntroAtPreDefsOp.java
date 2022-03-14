@@ -252,6 +252,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             addNeededVariables(spec.getInternalAtPres().keySet());
             Term self = selfTerm;
             if (spec.getInternalSelfTerm() == null) {
+                // we're calling a static method from an instance context
                 self = null;
             }
             final Term newVariant = spec.getVariant(self, atPres, services);
