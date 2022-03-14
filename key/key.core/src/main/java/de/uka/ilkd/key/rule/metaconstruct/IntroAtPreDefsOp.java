@@ -121,6 +121,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
                 final AuxiliaryContract.Variables variables = contract.getPlaceholderVariables();
+                updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars, services);
+                /*
                 final AuxiliaryContract.Variables newVariables
                         = new AuxiliaryContract.Variables(variables.self,
                         variables.breakFlags, variables.continueFlags, variables.returnFlag,
@@ -153,6 +155,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newPreconditions, newFreePreconditions,
                         newPostconditions, newFreePostconditions,
                         newModifiesClauses, services);
+                 */
             }
         }
     }
@@ -335,7 +338,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
 
         private void performActionOnAuxContract(final AuxiliaryContract contract,
-                                               final JavaStatement statement) {
+                                                final JavaStatement statement) {
             final AuxiliaryContract.Variables variables
                     = contract.getPlaceholderVariables();
             addNeededVariables(variables.outerRemembranceVariables.keySet());
@@ -346,50 +349,46 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             // why does the saved heap get removed here?
             atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
-            final AuxiliaryContract.Variables newVariables
-                    = new AuxiliaryContract.Variables(variables.self,
-                    variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                    variables.result, variables.exception, variables.remembranceHeaps,
-                    variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
-                    services);
-            final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
-            final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
-            final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
-            final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
-            final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
-
-            for (LocationVariable heap :
-                    services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                    continue;
-                }
-
-                newPreconditions.put(heap,
-                        contract.getPrecondition(heap, newVariables, services));
-                newFreePreconditions.put(heap,
-                        contract.getFreePrecondition(heap, newVariables, services));
-                newPostconditions.put(heap,
-                        contract.getPostcondition(heap, newVariables, services));
-                newFreePostconditions.put(heap,
-                        contract.getFreePostcondition(heap, newVariables, services));
-                newModifiesClauses.put(heap,
-                        contract.getModifiesClause(heap, newVariables.self, services));
-            }
-            updateBlockOrLoopContract(statement, contract, newVariables,
-                    newPreconditions, newFreePreconditions,
-                    newPostconditions, newFreePostconditions,
-                    newModifiesClauses, services);
+            updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars, services);
         }
     }
 
-    private static void updateBlockOrLoopContract(JavaStatement statement,
-            AuxiliaryContract contract,
-            final AuxiliaryContract.Variables newVariables,
-            final Map<LocationVariable, Term> newPreconditions,
-            final Map<LocationVariable, Term> newFreePreconditions,
-            final Map<LocationVariable, Term> newPostconditions,
-            final Map<LocationVariable, Term> newFreePostconditions,
-            final Map<LocationVariable, Term> newModifiesClauses, Services services) {
+    private static void updateAuxiliaryContract(final AuxiliaryContract contract,
+                                                final JavaStatement statement,
+                                                final AuxiliaryContract.Variables variables,
+                                                final Map<LocationVariable, LocationVariable> nonHeapVars,
+                                                final Map<LocationVariable, LocationVariable> atPreHeapVars,
+                                                final Services services) {
+        final AuxiliaryContract.Variables newVariables
+                = new AuxiliaryContract.Variables(variables.self,
+                variables.breakFlags, variables.continueFlags, variables.returnFlag,
+                variables.result, variables.exception, variables.remembranceHeaps,
+                variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
+                services);
+        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
+
+        for (LocationVariable heap :
+                services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            // why does the saved heap just get ignored here?
+            if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                continue;
+            }
+
+            newPreconditions.put(heap,
+                    contract.getPrecondition(heap, newVariables, services));
+            newFreePreconditions.put(heap,
+                    contract.getFreePrecondition(heap, newVariables, services));
+            newPostconditions.put(heap,
+                    contract.getPostcondition(heap, newVariables, services));
+            newFreePostconditions.put(heap,
+                    contract.getFreePostcondition(heap, newVariables, services));
+            newModifiesClauses.put(heap,
+                    contract.getModifiesClause(heap, newVariables.self, services));
+        }
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract
                     = ((BlockContract) contract).update((StatementBlock) statement,
