@@ -122,40 +122,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 final AuxiliaryContract.Variables variables = contract.getPlaceholderVariables();
                 updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars, services);
-                /*
-                final AuxiliaryContract.Variables newVariables
-                        = new AuxiliaryContract.Variables(variables.self,
-                        variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                        variables.result, variables.exception, variables.remembranceHeaps,
-                        variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
-                        services);
-                final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
-                final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
-                final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
-                final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
-                final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
-
-                for (LocationVariable heap :
-                        services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                        continue;
-                    }
-                    newPreconditions.put(heap,
-                            contract.getPrecondition(heap, newVariables, services));
-                    newFreePreconditions.put(heap,
-                            contract.getFreePrecondition(heap, newVariables, services));
-                    newPostconditions.put(heap,
-                            contract.getPostcondition(heap, newVariables, services));
-                    newFreePostconditions.put(heap,
-                            contract.getFreePostcondition(heap, newVariables, services));
-                    newModifiesClauses.put(heap,
-                            contract.getModifiesClause(heap, newVariables.self, services));
-                }
-                updateBlockOrLoopContract(statement, contract, newVariables,
-                        newPreconditions, newFreePreconditions,
-                        newPostconditions, newFreePostconditions,
-                        newModifiesClauses, services);
-                 */
             }
         }
     }
