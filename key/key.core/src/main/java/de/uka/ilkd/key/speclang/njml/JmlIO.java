@@ -18,6 +18,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -249,6 +250,24 @@ public class JmlIO {
     public Term translateTerm(ParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term t = translateTerm(expr);
         return attachTermLabel(t, type);
+    }
+
+    /**
+     * Interpret the given parse tree as a boolean JML expression in the current context.
+     * This is for cases where {@link #translateTerm(LabeledParserRuleContext)} would
+     * in some cases give a Term of sort formula and in some cases of sort boolean.
+     * Label is attached.
+     *
+     * @param condition a parse tree of a boolean JML expression
+     * @return a formula of the given parse tree
+     * @see #translateTerm(LabeledParserRuleContext)
+     */
+    public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
+        Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
+        if (!condition.second.isEmpty()) {
+            return services.getTermBuilder().addLabel(term, new ImmutableArray<>(condition.second));
+        }
+        return term;
     }
 
     /**

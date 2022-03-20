@@ -135,6 +135,7 @@ public final class PartialInvAxiom extends ClassAxiom {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         for (int i = 0; i < 2; i++) {
+            // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
                                                     + (target.isStatic()? "static ": "")
@@ -174,7 +175,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                 services);
             result = result.union(taclets);
 
-            //EQ taclet only for non-static invariants
+            //EQ taclet (with i==1) only for non-static invariants
             if (target.isStatic()) {
                 break;
             }

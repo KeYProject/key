@@ -13,30 +13,22 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -49,7 +41,17 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -291,6 +293,20 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
+    private void transformJmlAsserts(final IProgramMethod pm) {
+        Services services = initConfig.getServices();
+        JMLSpecFactory jsf = new JMLSpecFactory(services);
+        JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {
+            @Override
+            protected void doAction(final ProgramElement node) {
+                if (node instanceof JmlAssert) {
+                    jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                }
+            }
+        };
+        walker.start();
+    }
+
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
@@ -343,6 +359,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
+                transformJmlAsserts(pm);
             }
 
             //constructor contracts
@@ -366,7 +383,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         warnings = warnings.union(jmlWarnings);
         return warnings;
     }
-
 
 
     //-------------------------------------------------------------------------

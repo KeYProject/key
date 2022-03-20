@@ -12,6 +12,7 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.*;
@@ -62,6 +63,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     protected void walk(ProgramElement node) {
+        if (node instanceof JmlAssert) {
+            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
+        }
         super.walk(node);
         if(node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
@@ -90,7 +94,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
     }
-
 
     /**
      * the action that is performed just before leaving the node the last time
@@ -965,4 +968,13 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionOnJmlAssert(JmlAssert x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnJmlAssertCondition(final Term cond) {
+        // empty
+    }
 }

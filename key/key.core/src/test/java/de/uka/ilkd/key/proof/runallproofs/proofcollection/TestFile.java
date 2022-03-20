@@ -173,8 +173,21 @@ public class TestFile implements Serializable {
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
+            ReplayResult replayResult;
 
-            ReplayResult replayResult = env.getReplayResult();
+            if (testProperty == TestProperty.NOTLOADABLE) {
+                try {
+                    replayResult = env.getReplayResult();
+                } catch (Throwable t) {
+                    LOGGER.info("... success: loading failed");
+                    return getRunAllProofsTestResult(true);
+                }
+                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
+                LOGGER.info("... success: loading failed");
+                return getRunAllProofsTestResult(true);
+            }
+
+            replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {
@@ -194,10 +207,10 @@ public class TestFile implements Serializable {
 
             autoMode(env, loadedProof, script);
 
-            success = (testProperty == TestProperty.PROVABLE) == loadedProof
-                    .closed();
+            boolean closed = loadedProof.closed();
+            success = (testProperty == TestProperty.PROVABLE) == closed;
             if (verbose) {
-                LOGGER.info("... finished proof: " + (success ? "closed." : "open goal(s)"));
+                LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
             }
 
             // Write statistics.

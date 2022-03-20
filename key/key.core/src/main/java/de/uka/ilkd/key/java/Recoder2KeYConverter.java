@@ -992,6 +992,16 @@ public class Recoder2KeYConverter {
              (LocationVariable) callConvert(cas.getVariable()));
     }
 
+    /**
+     * convert a recorder JML assert statment into a KeY JML assert statement.
+     *
+     * @param ja the statement to convert
+     * @return the converted statement
+     */
+    public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
+        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja));
+    }
+
     // ------------------- declaration ---------------------
 
     /** convert a recoder ClassDeclaration to a KeY ClassDeclaration */
