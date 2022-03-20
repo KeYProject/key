@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.tacletbuilder;
+package de.uka.ilkd.key.rule.tacletbuilder.branchlabel;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentChangeInfo;

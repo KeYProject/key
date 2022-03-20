@@ -19,6 +19,8 @@ import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunction;
+import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunctions;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -379,7 +381,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         String name = accept(ctx.plainname);
         BranchNamingFunction fn = null;
         if (name != null) {
-            fn = BranchingNamingFunctions.find(name);
+            fn = BranchNamingFunctions.find(name);
         }
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
