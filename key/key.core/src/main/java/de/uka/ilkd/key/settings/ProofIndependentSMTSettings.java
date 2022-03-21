@@ -20,6 +20,7 @@ import de.uka.ilkd.key.smt.st.SolverTypes;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 
@@ -263,7 +264,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
         solverTypes.addAll(nonLegacyTypes);
         nonLegacyTypes.removeAll(legacyTypes);
-        for (SolverType type: nonLegacyTypes) {
+        // Z3_CE solver should not be a usable solver union or part of any as it is treated separately.
+        for (SolverType type: nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
+                .collect(Collectors.toList())) {
             solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 

@@ -930,9 +930,6 @@ public final class MainWindow extends JFrame {
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
                 getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
-        // Z3 Counterexample Solver should not be in the dropdown menu as there is a separate button for it.
-        solverUnions = solverUnions.stream().filter(u -> !u.getTypes().contains(SolverTypes.Z3_CE_SOLVER))
-                .collect(Collectors.toList());
 
         if (solverUnions == null || solverUnions.isEmpty()) {
             updateDPSelectionMenu();

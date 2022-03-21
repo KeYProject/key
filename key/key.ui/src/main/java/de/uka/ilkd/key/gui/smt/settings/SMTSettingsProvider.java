@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -72,7 +74,10 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         } else {
             getChildren().add(new TranslationOptions());
         }
-        for (SolverType options : solverTypes) {
+        // Only add options for those solvers that are actually theoretically available according to the settings.
+        for (SolverType options : solverTypes.stream().filter(
+                t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
+                .collect(Collectors.toList())) {
             getChildren().add(new SolverOptions(options));
         }
     }
