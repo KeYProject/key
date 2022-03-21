@@ -1,0 +1,20 @@
+name=vampire
+command=vampire
+params=--input_syntax smtlib2
+minVersion=Vampire 4.4.0
+version=--version
+handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
+de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
+de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\
+de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler,\
+de.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler,\
+de.uka.ilkd.key.smt.newsmt2.IntegerOpHandler,\
+de.uka.ilkd.key.smt.newsmt2.InstanceOfHandler,\
+de.uka.ilkd.key.smt.newsmt2.CastHandler,\
+de.uka.ilkd.key.smt.newsmt2.SumProdHandler,\
+de.uka.ilkd.key.smt.newsmt2.UpdateHandler,\
+de.uka.ilkd.key.smt.newsmt2.FieldConstantHandler,\
+de.uka.ilkd.key.smt.newsmt2.FloatHandler,\
+de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler,\
+de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler,\
+de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler
