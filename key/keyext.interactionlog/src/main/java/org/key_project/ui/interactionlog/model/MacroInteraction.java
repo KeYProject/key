@@ -45,10 +45,10 @@ public final class MacroInteraction extends NodeInteraction {
         super(node);
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
-        this.info = info.toString();
+        this.info = info == null ? "" : info.toString();
 
         ImmutableList<Goal> openGoals =
-                info.getProof() != null ?
+                info != null && info.getProof() != null ?
                         info.getProof().openGoals() : ImmutableSLList.<Goal>nil();
         this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
         this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
