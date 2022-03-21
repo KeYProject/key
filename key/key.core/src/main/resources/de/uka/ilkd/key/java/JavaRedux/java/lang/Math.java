@@ -38,6 +38,18 @@ public final class Math {
         return (a <= 0.0F) ? 0.0F - a : a;
     }
 
+    public static double min(int a, int b) {
+        return (a <= b) ? a : b;
+    }
+
+    public static float max(float a, float b) {
+        return (a <= b) ? a : b;
+    }
+
+    public static double min(double a, double b) {
+        return (a <= b) ? a : b;
+    }
+
     public static double max(double a, double b) {
         if (a != a)
             return a;

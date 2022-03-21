@@ -4,6 +4,12 @@ public final class String extends java.lang.Object implements java.io.Serializab
 {
    // public final static java.util.Comparator CASE_INSENSITIVE_ORDER;
 
+   /*@ normal_behavior
+       ensures \result == \dl_seqLen(\dl_strContent(this));
+    */
+   public /*@pure*/ int length();
+
+
    /*@
    public normal_behavior
       requires true;
@@ -93,7 +99,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 
    /*@
    public normal_behavior
-      requires charIdx >= 0 && charIdx < \dl_seqLen(\dl_strContent(this));
+      requires charIdx >= 0 && charIdx < \dl_strContent(this).length;
       ensures \result==(int) \dl_strContent(this)[charIdx];
       assignable \strictly_nothing;
    also
@@ -424,6 +430,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
      @ determines \result[*] \by \dl_strContent(this);
      @*/
    public char[] toCharArray();
+
    public static java.lang.String format(java.lang.String arg0, java.lang.Object[] arg1);
 // public static java.lang.String format(java.util.Locale arg0, java.lang.String arg1, java.lang.Object[] arg2);
 
@@ -564,7 +571,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public java.lang.String intern();
 
 
-   /*@
+   /* @
    public normal_behavior
      requires other != null && other instanceof java.lang.String;
      ensures (\forall int i; 0<=i<\dl_strContent(a).length && i<\dl_strContent(b).length;
@@ -576,7 +583,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public exceptional_behavior
       requires other == null;
       signals (java.lang.NullPointerException) true;
-      assignable \strictly_nothing;
+      assignable \nothing;
     */
    public int compareTo(java.lang.Object other);
 }
