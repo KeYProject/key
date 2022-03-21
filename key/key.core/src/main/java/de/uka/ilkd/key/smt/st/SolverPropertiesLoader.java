@@ -177,7 +177,8 @@ public class SolverPropertiesLoader {
             try {
                 solverProp.load(propsFile);
                 props.add(solverProp);
-            } catch (IOException e) {
+            } catch (Exception e) {
+                // If loading the file does not succeed for any reason, just continue with the next.
                 continue;
             }
         }
