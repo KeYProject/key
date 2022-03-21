@@ -308,6 +308,7 @@ jmlprimary
   | seqdefterm                                                                        #pignore4
   | oldexpression                                                                     #pignore5
   | beforeexpression                                                                  #pignore6
+  | atexpression                                                                      #pignore6b
   | transactionUpdated                                                                #pignore7
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
@@ -380,6 +381,7 @@ quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
+atexpression: AT LPAREN exp=expression COMMA label=expression RPAREN;
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;

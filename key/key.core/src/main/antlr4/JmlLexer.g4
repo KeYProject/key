@@ -205,6 +205,7 @@ SIGNALS_ONLY: 'signals_only';*/
 /* JML keywords prefixed with a backslash */
 ALLFIELDS: '\\all_fields';  //KeY extension, not official JML
 ALLOBJECTS: '\\all_objects';  //KeY extension, not official JML
+AT: '\\at';
 BACKUP: '\\backup';  //KeY extension, not official JML
 BEFORE: '\\before';  //KeY extension, not official JML
 BIGINT: '\\bigint';

@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -827,7 +828,11 @@ public class Recoder2KeYConverter {
         }
 
 
-        Function named = namespaceSet.functions().lookup(new Name(name));
+        AbstractSortedOperator named = namespaceSet.functions().lookup(new Name(name));
+        if(named == null) {
+            // This is a bit hacky. But actually, ... this entire jml embedding is one.
+            named = (ProgramVariable)namespaceSet.programVariables().lookup(new Name(name));
+        }
 
         if(named == null) {
             // TODO provide position information?!
