@@ -1748,8 +1748,8 @@ public final class MainWindow extends JFrame {
 
         private final SolverTypeCollection solverUnion;
         private final Collection<SolverTypeCollection> possibleSolvers;
-        private static final String CHECK_ALL = "Check All";
-        private static final String UNCHECK_ALL = "Uncheck All";
+        private static final String SELECT_ALL = "Select All";
+        private static final String DESELECT_ALL = "Deselect All";
         private static final String START = "Start Solvers";
         private static final String CANCEL = "Cancel";
 
@@ -1779,13 +1779,9 @@ public final class MainWindow extends JFrame {
             JDialog choiceDialog = new JDialog(mainWindow);
             choiceDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             choiceDialog.setLocationByPlatform(true);
-            JPanel solverChoice = new JPanel();
-            solverChoice.setLayout(new GridLayout(possibleSolvers.size(), 1));
+            // available solver unions
             List<UnionCheckBox> choiceOptions = new LinkedList<>();
-            JButton checkAll = new JButton(CHECK_ALL);
-            // Change behaviour of checkAll to unchecking all if all solvers are checked
-            boolean checkAllSolvers = true;
-            checkAll.setEnabled(true);
+
             JButton start = new JButton(START);
             start.setEnabled(false);
             JButton cancel = new JButton(CANCEL);
@@ -1802,18 +1798,45 @@ public final class MainWindow extends JFrame {
                     choiceDialog.dispose();
                 }
             });
-            checkAll.addActionListener(new ActionListener() {
+
+
+            JPanel choicePanel = new JPanel();
+            choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.Y_AXIS));
+
+            JRadioButton selectAll = new JRadioButton(SELECT_ALL);
+            selectAll.setFocusPainted(false);
+            // Change behaviour of checkAll to unchecking all if all solvers are checked
+            selectAll.setEnabled(true);
+            selectAll.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    boolean checkedValue = checkAll.getText().equals(CHECK_ALL);
+                    boolean checkedValue = selectAll.getText().equals(SELECT_ALL);
                     for (UnionCheckBox checkBox: choiceOptions) {
                         checkBox.setSelected(checkedValue);
                     }
+                    selectAll.setSelected(false);
                 }
             });
 
+            Box selectAllBox = Box.createVerticalBox();
+            selectAllBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            selectAllBox.add(selectAll);
+            choicePanel.add(selectAllBox);
+
+            Box separatorBox = Box.createVerticalBox();
+            separatorBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            separatorBox.add(new JSeparator());
+            choicePanel.add(separatorBox);
+
+            Box choiceBox = Box.createVerticalBox();
+            choiceBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            choicePanel.add(choiceBox);
+
+            choicePanel.add(Box.createVerticalGlue());
+
             for (SolverTypeCollection union: possibleSolvers){
                 UnionCheckBox chooseUnion = new UnionCheckBox(union);
+                chooseUnion.setFocusPainted(false);
                 chooseUnion.addChangeListener(new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
@@ -1823,28 +1846,31 @@ public final class MainWindow extends JFrame {
                             return;
                         }
                         start.setEnabled(true);
-                        checkAll.setText((choiceOptions.stream().filter(u -> u.isSelected())
+                        selectAll.setText((choiceOptions.stream().filter(u -> u.isSelected())
                                 .collect(Collectors.toList()).size() <= choiceOptions.size()/2)
-                                ? CHECK_ALL : UNCHECK_ALL);
+                                ? SELECT_ALL : DESELECT_ALL);
                     }
                 });
                 choiceOptions.add(chooseUnion);
-                solverChoice.add(chooseUnion);
+                chooseUnion.setSelected(true);
+                choiceBox.add(chooseUnion);
             }
 
-            JPanel buttonPanel = new JPanel();
+            JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
             buttonPanel.add(start);
-            buttonPanel.add(checkAll);
             buttonPanel.add(cancel);
-            buttonPanel.setMinimumSize(new Dimension(400, 200));
-            solverChoice.setMinimumSize(new Dimension(400, 200));
 
-            choiceDialog.add(solverChoice);
-            choiceDialog.add(buttonPanel, BorderLayout.SOUTH);
-            solverChoice.revalidate();
-            buttonPanel.revalidate();
-            choiceDialog.setMinimumSize(new Dimension(400, 400));
+            JPanel panel = new JPanel(new BorderLayout(5, 20));
+            panel.add(choicePanel, BorderLayout.CENTER);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+            choiceDialog.setContentPane(panel);
             choiceDialog.setTitle("Choose Multiple Solvers");
+            choiceDialog.pack();
+            int titleWidth = SwingUtilities.computeStringWidth(
+                    new JLabel().getFontMetrics(UIManager.getDefaults().getFont("Label.font")),
+                    choiceDialog.getTitle());
+            choiceDialog.setSize(new Dimension(titleWidth + choiceDialog.getWidth(),
+                    choiceDialog.getHeight()));
             choiceDialog.setEnabled(true);
             choiceDialog.setVisible(true);
         }
