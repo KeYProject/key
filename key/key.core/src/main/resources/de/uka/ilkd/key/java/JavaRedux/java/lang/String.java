@@ -571,13 +571,16 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public java.lang.String intern();
 
 
-   /* @
+   /*@
    public normal_behavior
      requires other != null && other instanceof java.lang.String;
-     ensures (\forall int i; 0<=i<\dl_strContent(a).length && i<\dl_strContent(b).length;
-        \dl_strContent(a)[i] = \dl_strContent(b)[i]) ?
-              \result == \dl_strContent(a).length - \dl_strContent(b).length :
-              (\forall int i; 0<=i<\result; a[i] == b[i]) && \result != 0 && \result == b[i]-a[i];
+     ensures
+         (\forall int i; 0 <= i < \dl_strContent(this).length
+                         && i<\dl_strContent(other).length;
+           \dl_strContent(this)[i] == \dl_strContent(other)[i])
+         ? \result == \dl_strContent(this).length - \dl_strContent(other).length
+         : (\exists int j; (\forall int i; 0 <= i < j; \dl_strContent(this)[i] == \dl_strContent(other)[i])
+                           && \result != 0 && \result == (int) \dl_strContent(other)[j] - (int)\dl_strContent(this)[j]);
       assignable \strictly_nothing;
    also
    public exceptional_behavior
@@ -585,5 +588,12 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \nothing;
     */
-   public int compareTo(java.lang.Object other);
+   public int compareTo(java.lang.String other);
+
+   public int compareTo(java.lang.Object other) {
+      if(other instanceof String) {
+         return compareTo((String) other);
+      }
+      throw new java.lang.IllegalArgumentException("No string given.");
+   }
 }
