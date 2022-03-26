@@ -60,6 +60,16 @@ public class TacletBuilderManipulators {
         }
     };
 
+    public static final AbstractConditionBuilder MAY_USE_CONTRACT = new AbstractConditionBuilder("mayUseContract") {
+        @Override
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            if(parameters.size() != 1) {
+                throw new IllegalArgumentException("Expecting a single parameter, not " + parameters);
+            }
+            return new MayUseMethodContractCondition(parameters.get(0));
+        }
+    };
+
     /**
      *
      */

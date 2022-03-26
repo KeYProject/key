@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ContractOrderManager.ContractMode;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -1301,6 +1302,7 @@ public final class SpecificationRepository {
                                     ? fop.getMby(selfVar, paramVars, services)
                                     : null;
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
+                                    fop,
                                     "Contract axiom for " + pm.getName()
                                             + " in " + kjt.getName(),
                                     pm, kjt, new Private(), preFromContract,

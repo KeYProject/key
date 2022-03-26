@@ -48,8 +48,10 @@ public final class ContractAxiom extends ClassAxiom {
     private final ProgramVariable originalResultVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final Map<LocationVariable,ProgramVariable> atPreVars;
+    private final FunctionalOperationContract contract;
 
-    public ContractAxiom(String name,
+    public ContractAxiom(FunctionalOperationContract contract,
+                         String name,
                          IObserverFunction target,
                          KeYJavaType kjt,
                          VisibilityModifier visibility,
@@ -60,10 +62,11 @@ public final class ContractAxiom extends ClassAxiom {
                          ProgramVariable selfVar,
                          ProgramVariable resultVar,
                          ImmutableList<ProgramVariable> paramVars) {
-        this(name,null,target,kjt,visibility,pre,post,mby,atPreVars,selfVar,resultVar,paramVars);
+        this(contract, name,null,target,kjt,visibility,pre,post,mby,atPreVars,selfVar,resultVar,paramVars);
     }
 
-    public ContractAxiom(String name,
+    public ContractAxiom(FunctionalOperationContract contract,
+            String name,
             String displayName,
             IObserverFunction target,
                 KeYJavaType kjt,
@@ -73,6 +76,7 @@ public final class ContractAxiom extends ClassAxiom {
                 Term originalMby,
                 Map<LocationVariable,ProgramVariable> atPreVars,
                 ProgramVariable selfVar, ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
+        this.contract = contract;
 
         assert name != null;
         assert kjt != null;
@@ -96,7 +100,7 @@ public final class ContractAxiom extends ClassAxiom {
 
     @Override
     public ContractAxiom map(UnaryOperator<Term> op, Services services) {
-        return new ContractAxiom(
+        return new ContractAxiom(contract,
                 name, displayName, target, kjt, visibility,
                 op.apply(originalPre), op.apply(originalPost), op.apply(originalMby),
                 atPreVars, originalSelfVar, originalResultVar, originalParamVars);
@@ -124,6 +128,7 @@ public final class ContractAxiom extends ClassAxiom {
                                                originalParamVars,
                                                toLimit,
                                                satisfiabilityGuard,
+                contract.getName(),
                                                services);
     }
 

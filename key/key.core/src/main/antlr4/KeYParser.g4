@@ -626,7 +626,7 @@ varexp
 :
   negate=NOT_?
   varexpId
-  (LBRACKET  parameter+=IDENT (COMMA parameter+=IDENT)* RBRACKET)?
+  (LBRACKET  parameter+=(IDENT|STRING_LITERAL) (COMMA parameter+=IDENT)* RBRACKET)?
   (LPAREN varexp_argument (COMMA varexp_argument)* RPAREN)?
 ;
 

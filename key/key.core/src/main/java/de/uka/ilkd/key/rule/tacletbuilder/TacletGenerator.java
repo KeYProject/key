@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.rule.conditions.MayUseMethodContractCondition;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -398,7 +399,7 @@ public class TacletGenerator {
 
         if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
-                    selfSV, paramSVs, schemaRepresents, tacletBuilder);
+                    selfSV, paramSVs, schemaRepresents, tacletBuilder, name);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());        
         //return
@@ -410,7 +411,7 @@ public class TacletGenerator {
             IObserverFunction target, TermServices services,
             List<SchemaVariable> heapSVs, final SchemaVariable selfSV, ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
-            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
+            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder, Name name) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
               target, services, heapSVs, selfSV, paramSVs, schemaRepresents,
               tacletBuilder);
@@ -511,6 +512,7 @@ public class TacletGenerator {
             ImmutableList<ProgramVariable> originalParamVars,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             boolean satisfiabilityGuard,
+            String contractName,
             TermServices services) {
 
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
@@ -614,6 +616,7 @@ public class TacletGenerator {
             }
             // tacletBuilder.addVarsNotFreeIn(boundSV, resultSV);
         }
+        tacletBuilder.addVariableCondition(new MayUseMethodContractCondition(contractName));
 
         tacletBuilder.setFind(find);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);

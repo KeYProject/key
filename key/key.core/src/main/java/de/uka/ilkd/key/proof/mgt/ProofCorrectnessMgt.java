@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.mgt.ContractOrderManager.ContractMode;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -98,12 +99,24 @@ public final class ProofCorrectnessMgt {
      */
     public boolean isContractApplicable(Contract contract) {
         //get the contract which is being verified in our current proof
+
 	final ContractPO po = specRepos.getContractPOForProof(proof);
         if(po == null) {
             return true;
         }
         final Contract originalContract = po.getContract();
         
+        if (ContractOrderManager.isEnabled()) {
+            ContractMode mode = ContractOrderManager.getInstance().mayUse(originalContract, contract);
+            switch (mode) {
+                case FORBIDDEN: return false;
+                case WITH_MEASURED_BY: return contract.hasMby();
+                case UNRESTRICTED: return true;
+            }
+            throw new Error("unreachable");
+        }
+
+
         //get initial contracts
 	ImmutableSet<Contract> contractsToBeApplied
 		= specRepos.splitContract(contract);
