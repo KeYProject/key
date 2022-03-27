@@ -18,6 +18,7 @@ public class ContractOrderManager {
     public enum ContractMode { WITH_MEASURED_BY, UNRESTRICTED, FORBIDDEN }
 
     private final Map<String, Integer> map;
+    private final int defaultLevel;
 
     public static boolean isEnabled() {
         return FILENAME != null;
@@ -46,6 +47,17 @@ public class ContractOrderManager {
             }
         }
         this.map = result;
+        this.defaultLevel = level + 1;
+    }
+
+    private int getLevel(String contract) {
+        // Could be replaced by getOrDefault, keeping the debug output for now
+        Integer level = map.get(contract);
+        if (level == null) {
+            System.out.println("Contract " + contract + " w/o level, using highest level");
+            level = this.defaultLevel;
+        }
+        return level;
     }
 
     public ContractMode mayUse(Contract user, Contract used) {
@@ -61,18 +73,10 @@ public class ContractOrderManager {
             return ContractMode.FORBIDDEN;
         }
 
-        Integer levelUser = map.get(nameUser);
-        if (levelUser == null) {
-            System.out.println("Contract " + nameUser + " w/o level");
-            return ContractMode.FORBIDDEN;
-        }
-        Integer levelUsed = map.get(nameUsed);
-        if (levelUsed == null) {
-            System.out.println("Contract " + nameUsed + " w/o level");
-            return ContractMode.FORBIDDEN;
-        }
+        int levelUser = getLevel(nameUser);
+        int levelUsed = getLevel(nameUsed);
 
-        if (levelUser < levelUsed) {
+        if (levelUser > levelUsed) {
             return ContractMode.UNRESTRICTED;
         }
 
