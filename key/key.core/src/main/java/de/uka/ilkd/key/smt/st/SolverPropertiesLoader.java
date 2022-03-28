@@ -2,10 +2,11 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.AbstractSMTTranslator;
 import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.reflection.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -17,9 +18,10 @@ import java.util.stream.Collectors;
  */
 public class SolverPropertiesLoader {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
+
     private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
     private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(2);
-
 
     /**
      * String used to split list properties such as the delimiter list or the handler list.
@@ -87,6 +89,7 @@ public class SolverPropertiesLoader {
             for (Properties solverProp : loadSolvers()) {
                 SolverType createdType = makeSolver(solverProp);
                 SOLVERS.add(createdType);
+                // If the solver is a legacy solver (only available in experimental mode), add it to the separate list:
                 if (SettingsConverter.read(solverProp, LEGACY, false)) {
                     LEGACY_SOLVERS.add(createdType);
                 }
@@ -161,7 +164,6 @@ public class SolverPropertiesLoader {
      * Loads the solvers that are specified in .props files in the directory
      * {@link PathConfig#getSmtSolverPropertiesDirectory()} into Properties objects and returns them.
      */
-    // TODO How to load multiple files from the resources folder at once WITHOUT knowing their name?
     private static Collection<Properties> loadSolvers() {
         InputStream stream = SolverPropertiesLoader.class.getResourceAsStream("defaultSolvers.txt");
         Collection<Properties> props = new ArrayList<>();
@@ -179,7 +181,7 @@ public class SolverPropertiesLoader {
                 props.add(solverProp);
             } catch (Exception e) {
                 // If loading the file does not succeed for any reason, just continue with the next.
-                continue;
+                LOGGER.warn("Solver file " + fileName + " could not be loaded.");
             }
         }
         return props;

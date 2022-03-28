@@ -5,5 +5,4 @@ Z3_legacy.props
 CVC4.props
 CVC4_legacy.props
 CVC5.props
-MathSAT.props
 Princess.props
