@@ -167,9 +167,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         this.listener = listener;
         this.services = services;
         this.type = myType;
-        // TODO Why not just call type.getSocket(query)?
+        // Why not just call type.getSocket(query) here?
         this.socket = SolverSocket.createSocket(type, query);
-        processLauncher = myType.getLauncher(solverCommunication);
+        processLauncher = new ExternalProcessLauncher(solverCommunication, myType.getDelimiters());
     }
 
     /**

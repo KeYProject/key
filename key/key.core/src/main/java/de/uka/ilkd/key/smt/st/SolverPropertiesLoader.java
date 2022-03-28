@@ -26,32 +26,32 @@ public class SolverPropertiesLoader {
     /**
      * String used to split list properties such as the delimiter list or the handler list.
      */
-    private static String SPLIT = ",";
+    private static String split = ",";
 
-    private static String DEFAULT_NAME = "SMT Solver";
-    private static String DEFAULT_COMMAND = "";
-    private static String DEFAULT_PARAMS = "";
-    private static String DEFAULT_INFO = "An SMT solver.";
-    private static String DEFAULT_VERSION = "";
-    private static String DEFAULT_MINIMUM_VERSION = "";
-    private static String NAME = "name";
-    private static String COMMAND = "command";
-    private static String PARAMS = "params";
-    private static String VERSION = "version";
-    private static String DELIMITERS = "delimiters";
-    private static String INFO = "info";
-    private static String TIMEOUT = "timeout";
-    private static String MINIMUM_VERSION = "minVersion";
-    private static String LEGACY = "legacy";
-    private static String SOCKET_MESSAGEHANDLER = "messageHandler";
-    private static String SMTLIB_TRANSLATOR= "translatorClass";
-    private static String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
-    private static String DEFAULT = "DEFAULT";
-    private static String HANDLER_NAMES = "handlers";
-    private static String HANDLER_OPTIONS = "handlerOptions";
-    private static String PREAMBLE_FILE = "preamble";
-    private static String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
-    private static long DEFAULT_TIMEOUT = -1;
+    private static String defaultName = "SMT Solver";
+    private static String defaultCommand = "";
+    private static String defaultParams = "";
+    private static String defaultInfo = "An SMT solver.";
+    private static String defaultVersion = "";
+    private static String defaultMinimumVersion = "";
+    private static String name = "name";
+    private static String command = "command";
+    private static String params = "params";
+    private static String version = "version";
+    private static String delimiters = "delimiters";
+    private static String info = "info";
+    private static String timeout = "timeout";
+    private static String minVersion = "minVersion";
+    private static String legacy = "legacy";
+    private static String socketMessageHandler = "messageHandler";
+    private static String smtlibTranslator = "translatorClass";
+    private static String defaultTranslator = "ModularSMTLib2Translator";
+    private static String defaultString = "DEFAULT";
+    private static String handlerNames = "handlers";
+    private static String handlerOptions = "handlerOptions";
+    private static String preambleFile = "preamble";
+    private static String[] defaultDelimiters = new String[] {"\n", "\r"};
+    private static long defaultTimeout = -1;
 
     /**
      * If a props file does not contain a solver name or two files have the same name,
@@ -61,10 +61,9 @@ public class SolverPropertiesLoader {
     private static Map<String, Integer> nameCounters = new HashMap<>();
 
     private static String uniqueName(String name) {
-        Integer counter = nameCounters.get(name);
+        Integer counter = nameCounters.computeIfAbsent(name, n -> 0);
         // if name has not been used yet, use it and set counter to 0
-        if (counter == null) {
-            nameCounters.put(name, 0);
+        if (counter == 0) {
             return name;
         }
         // if name was already used, use <name>_<counter> as name and increase counter afterwards
@@ -90,7 +89,7 @@ public class SolverPropertiesLoader {
                 SolverType createdType = makeSolver(solverProp);
                 SOLVERS.add(createdType);
                 // If the solver is a legacy solver (only available in experimental mode), add it to the separate list:
-                if (SettingsConverter.read(solverProp, LEGACY, false)) {
+                if (SettingsConverter.read(solverProp, legacy, false)) {
                     LEGACY_SOLVERS.add(createdType);
                 }
             }
@@ -119,30 +118,30 @@ public class SolverPropertiesLoader {
         // Read props file to create a SolverTypeImplementation object:
 
         // the solver's name has to be unique
-        name = uniqueName(SettingsConverter.readRawString(props, NAME, DEFAULT_NAME));
+        name = uniqueName(SettingsConverter.readRawString(props, SolverPropertiesLoader.name, defaultName));
 
         // default solver command, timeout, parameters, version parameter, solver info (some string)
-        command = SettingsConverter.readRawString(props, COMMAND, DEFAULT_COMMAND);
-        timeout = SettingsConverter.read(props, TIMEOUT, DEFAULT_TIMEOUT);
+        command = SettingsConverter.readRawString(props, SolverPropertiesLoader.command, defaultCommand);
+        timeout = SettingsConverter.read(props, SolverPropertiesLoader.timeout, defaultTimeout);
         if (timeout < -1) {
             timeout = -1;
         }
-        params = SettingsConverter.readRawString(props, PARAMS, DEFAULT_PARAMS);
-        version = SettingsConverter.readRawString(props, VERSION, DEFAULT_VERSION);
-        minVersion = SettingsConverter.readRawString(props, MINIMUM_VERSION, DEFAULT_MINIMUM_VERSION);
-        info = SettingsConverter.readRawString(props, INFO, DEFAULT_INFO);
+        params = SettingsConverter.readRawString(props, SolverPropertiesLoader.params, defaultParams);
+        version = SettingsConverter.readRawString(props, SolverPropertiesLoader.version, defaultVersion);
+        minVersion = SettingsConverter.readRawString(props, SolverPropertiesLoader.minVersion, defaultMinimumVersion);
+        info = SettingsConverter.readRawString(props, SolverPropertiesLoader.info, defaultInfo);
 
         // the communication socket used for communication with the created solver
         // (class SolverCommunicationSocket)
-        messageHandler = SettingsConverter.readRawString(props, SOCKET_MESSAGEHANDLER, DEFAULT);
+        messageHandler = SettingsConverter.readRawString(props, socketMessageHandler, defaultString);
         handler = SolverSocket.MessageHandler.valueOf(messageHandler);
 
         // the message delimiters used by the created solver in its stdout
-        delimiters = SettingsConverter.readRawStringList(props, DELIMITERS, SPLIT, DEFAULT_DELIMITERS);
+        delimiters = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.delimiters, split, defaultDelimiters);
 
         // the smt translator (class SMTTranslator) used by the created solver
         try {
-            String className = SettingsConverter.readRawString(props, SMTLIB_TRANSLATOR, DEFAULT_TRANSLATOR);
+            String className = SettingsConverter.readRawString(props, smtlibTranslator, defaultTranslator);
             translatorClass = ClassLoaderUtil.getClassforName(className);
         } catch (ClassNotFoundException e) {
             translatorClass = ModularSMTLib2Translator.class;
@@ -150,11 +149,11 @@ public class SolverPropertiesLoader {
 
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
-        handlerNames = SettingsConverter.readRawStringList(props, HANDLER_NAMES, SPLIT, new String[0]);
-        handlerOptions = SettingsConverter.readRawStringList(props, HANDLER_OPTIONS, SPLIT, new String[0]);
+        handlerNames = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.handlerNames, split, new String[0]);
+        handlerOptions = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.handlerOptions, split, new String[0]);
 
         // the solver specific preamble, may be null
-        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+        preamble = SettingsConverter.readFile(props, preambleFile, null);
         return new SolverTypeImplementation(name, info, params, command, version,
                 minVersion, timeout, delimiters, translatorClass,
                 handlerNames, handlerOptions, handler, preamble);
@@ -181,7 +180,7 @@ public class SolverPropertiesLoader {
                 props.add(solverProp);
             } catch (Exception e) {
                 // If loading the file does not succeed for any reason, just continue with the next.
-                LOGGER.warn("Solver file " + fileName + " could not be loaded.");
+                LOGGER.warn(String.format("Solver file %s could not be loaded.", fileName));
             }
         }
         return props;

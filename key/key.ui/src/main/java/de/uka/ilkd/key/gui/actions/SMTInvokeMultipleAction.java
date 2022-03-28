@@ -5,11 +5,8 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +29,10 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
 
     @Override
     public boolean isEnabled() {
-        boolean b = possibleSolvers.size() > 1
+        return possibleSolvers.size() > 1
                 && mediator != null
                 && mediator.getSelectedProof() != null
                 && !mediator.getSelectedProof().closed();
-        return b;
     }
 
     @Override
@@ -55,19 +51,11 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         JButton start = new JButton(START);
         start.setEnabled(false);
         JButton cancel = new JButton(CANCEL);
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                choiceDialog.dispose();
-            }
-        });
-        start.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        cancel.addActionListener(actionEvent -> choiceDialog.dispose());
+        start.addActionListener(actionEvent ->  {
                 new SMTInvokeAction(createSolverTypeCollection(choiceOptions), mainWindow).actionPerformed(e);
                 choiceDialog.dispose();
-            }
-        });
+            });
 
 
         JPanel choicePanel = new JPanel();
@@ -77,16 +65,13 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         selectAll.setFocusPainted(false);
         // Change behaviour of checkAll to unchecking all if all solvers are checked
         selectAll.setEnabled(true);
-        selectAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        selectAll.addActionListener(changeEvent -> {
                 boolean checkedValue = selectAll.getText().equals(SELECT_ALL);
                 for (UnionCheckBox checkBox: choiceOptions) {
                     checkBox.setSelected(checkedValue);
                 }
                 selectAll.setSelected(false);
-            }
-        });
+            });
 
         Box choiceBox = Box.createVerticalBox();
         choiceBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -97,20 +82,17 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         for (SolverTypeCollection union: possibleSolvers){
             UnionCheckBox chooseUnion = new UnionCheckBox(union);
             chooseUnion.setFocusPainted(false);
-            chooseUnion.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
+            chooseUnion.addChangeListener(changeEvent -> {
                     // Enable start button iff at least one solver is checked
                     if (createSolverTypeCollection(choiceOptions).equals(SolverTypeCollection.EMPTY_COLLECTION)) {
                         start.setEnabled(false);
                         return;
                     }
                     start.setEnabled(true);
-                    selectAll.setText((choiceOptions.stream().filter(u -> u.isSelected())
+                    selectAll.setText((choiceOptions.stream().filter(AbstractButton::isSelected)
                             .collect(Collectors.toList()).size() <= choiceOptions.size()/2)
                             ? SELECT_ALL : DESELECT_ALL);
-                }
-            });
+                });
             choiceOptions.add(chooseUnion);
             chooseUnion.setSelected(true);
             choiceBox.add(chooseUnion);
@@ -138,10 +120,10 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
     private SolverTypeCollection createSolverTypeCollection(Collection<UnionCheckBox> checkBoxes) {
         Set<SolverType> types = new HashSet<>();
         StringBuilder builder = new StringBuilder();
-        for (UnionCheckBox box: checkBoxes.stream().filter(c -> c.isSelected()).collect(Collectors.toList())) {
+        for (UnionCheckBox box: checkBoxes.stream().filter(AbstractButton::isSelected).collect(Collectors.toList())) {
             types.addAll(box.getUnion().getTypes());
         }
-        if (types.size() < 1) {
+        if (types.isEmpty()) {
             return SolverTypeCollection.EMPTY_COLLECTION;
         }
         for (SolverType type: types) {

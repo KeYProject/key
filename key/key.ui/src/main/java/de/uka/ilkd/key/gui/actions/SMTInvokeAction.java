@@ -40,11 +40,10 @@ public class SMTInvokeAction extends MainWindowAction {
 
     @Override
     public boolean isEnabled() {
-        boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
+        return super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
                 && mediator != null
                 && mediator.getSelectedProof() != null
                 && !mediator.getSelectedProof().closed();
-        return b;
     }
 
     @Override
@@ -55,20 +54,17 @@ public class SMTInvokeAction extends MainWindowAction {
         }
         final Proof proof = mediator.getSelectedProof();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
+        Thread thread = new Thread(() -> {
 
-                DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-                SolverLauncher launcher = new SolverLauncher(settings);
-                launcher.addListener(new SolverListener(settings, proof));
-                launcher.launch(solverUnion.getTypes(),
-                        SMTProblem.createSMTProblems(proof),
-                        proof.getServices());
+            DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(), proof);
+            SolverLauncher launcher = new SolverLauncher(settings);
+            launcher.addListener(new SolverListener(settings, proof));
+            launcher.launch(solverUnion.getTypes(),
+                    SMTProblem.createSMTProblems(proof),
+                    proof.getServices());
 
-            }
         }, "SMTRunner");
         thread.start();
 

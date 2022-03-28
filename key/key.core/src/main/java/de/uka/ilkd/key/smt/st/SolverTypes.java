@@ -2,8 +2,6 @@ package de.uka.ilkd.key.smt.st;
 
 import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Facade for the management of {@link SolverType}.
@@ -23,25 +21,9 @@ public class SolverTypes {
     }
 
     /**
-     * Tries to find a solver type instance of the given clazz.
-     *
-     * @param clazz the class of the solver type
-     * @param <T>   the solver type
-     * @return an instance of {@code T} or null if no such solver type was loaded.
-     */
-    @SuppressWarnings("unchecked")
-    // TODO This won't work if ModifiableSolverType is used :/
-/*	@Nullable
-    public static <T extends SolverType> T get(Class<T> clazz) {
-        return (T) getSolverTypes().stream().filter(it -> it.getClass().equals(clazz))
-                .findFirst().orElse(null);
-    } */
-
-
-    /**
-     * Loads the known {@link SolverLoader} solver loaders via {@link ServiceLoader}.
-     * These loaders are then used to load the known {@link SolverType} solver types.
-     * Result is cached.
+     * Loads and returns the available solver types using the {@link SolverPropertiesLoader}.
+     * The returned SolverType objects don't change (singletons).
+     * @return  the available solver types, including legacy solvers
      */
     @Nonnull
     public static Collection<SolverType> getSolverTypes() {
@@ -53,6 +35,10 @@ public class SolverTypes {
         return new ArrayList<>(SOLVERS);
     }
 
+    /**
+     * Returns the available legacy solver types according to the {@link SolverPropertiesLoader}.
+     * @return the available legacy solver types
+     */
     @Nonnull
     public static Collection<SolverType> getLegacySolvers() {
         if (SOLVERS.isEmpty()) {
@@ -61,6 +47,9 @@ public class SolverTypes {
         return new ArrayList<>(LEGACY_SOLVERS);
     }
 
+    /**
+     * Z3 counterexample solver.
+     */
     public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
                     .equals(SolverTypeImplementation.class) && it.getName()
                     .equals("Z3_CE"))

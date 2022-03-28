@@ -118,7 +118,7 @@ public interface SolverType {
     /**
      * Returns the current version that is installed, if it has already been checked, otherwise null.
      */
-    String getVersion();
+    String getInstalledVersion();
 
     /**
      * Retrieve the version string without check for support.
@@ -150,7 +150,5 @@ public interface SolverType {
     @Nonnull
     SolverSocket getSocket(ModelExtractor query);
 
-    @Nonnull
-    ExternalProcessLauncher getLauncher(SolverCommunication communication);
 }
 
