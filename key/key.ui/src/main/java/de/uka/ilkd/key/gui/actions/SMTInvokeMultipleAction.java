@@ -7,23 +7,50 @@ import de.uka.ilkd.key.smt.st.SolverType;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Opens a dialog to choose multiple available SMT solvers to run at the same time.
+ *
+ * @author alicia
+ */
 public final class SMTInvokeMultipleAction extends SMTInvokeAction {
 
-    private final SolverTypeCollection solverUnion;
-    private final Collection<SolverTypeCollection> possibleSolvers;
+    /**
+     * Button label.
+     */
     private static final String SELECT_ALL = "Select All";
-    private static final String DESELECT_ALL = "Deselect All";
+    /**
+     * Button label.
+     */
     private static final String START = "Start Solvers";
+    /**
+     * Button label.
+     */
     private static final String CANCEL = "Cancel";
 
+    /**
+     * This action does not have a predefined solver type collection, so the empty one is set.
+     */
+    private final SolverTypeCollection solverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+    /**
+     * The possible solvers/solver collections that can be chosen to run at the same time.
+     */
+    private final Collection<SolverTypeCollection> possibleSolvers;
 
-    public SMTInvokeMultipleAction(Collection<SolverTypeCollection> solverUnions, MainWindow mainWindow) {
+
+    /**
+     * Create a new action that lets the user choose multiple of the given solver unions
+     * to run at the same time.
+     *
+     * @param solverUnions the runnable solver unions
+     * @param mainWindow the {@link MainWindow} this action belongs to
+     */
+    public SMTInvokeMultipleAction(Collection<SolverTypeCollection> solverUnions,
+                                   MainWindow mainWindow) {
         super(SolverTypeCollection.EMPTY_COLLECTION, mainWindow);
-        this.solverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         this.possibleSolvers = solverUnions;
     }
 
@@ -52,26 +79,28 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         start.setEnabled(false);
         JButton cancel = new JButton(CANCEL);
         cancel.addActionListener(actionEvent -> choiceDialog.dispose());
-        start.addActionListener(actionEvent ->  {
-                new SMTInvokeAction(createSolverTypeCollection(choiceOptions), mainWindow).actionPerformed(e);
-                choiceDialog.dispose();
-            });
+        start.addActionListener(actionEvent -> {
+            new SMTInvokeAction(createSolverTypeCollection(choiceOptions), mainWindow)
+                    .actionPerformed(e);
+            choiceDialog.dispose();
+        });
 
 
         JPanel choicePanel = new JPanel();
         choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.Y_AXIS));
 
-        JRadioButton selectAll = new JRadioButton(SELECT_ALL);
+        JCheckBox selectAll = new JCheckBox(SELECT_ALL);
         selectAll.setFocusPainted(false);
         // Change behaviour of checkAll to unchecking all if all solvers are checked
         selectAll.setEnabled(true);
         selectAll.addActionListener(changeEvent -> {
-                boolean checkedValue = selectAll.getText().equals(SELECT_ALL);
-                for (UnionCheckBox checkBox: choiceOptions) {
-                    checkBox.setSelected(checkedValue);
-                }
-                selectAll.setSelected(false);
-            });
+            if (!selectAll.isSelected()) {
+                selectAll.setSelected(true);
+            }
+            for (UnionCheckBox checkBox: choiceOptions) {
+                checkBox.setSelected(true);
+            }
+        });
 
         Box choiceBox = Box.createVerticalBox();
         choiceBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -79,20 +108,20 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         choiceBox.add(selectAll);
         choiceBox.add(new JSeparator());
 
-        for (SolverTypeCollection union: possibleSolvers){
+        for (SolverTypeCollection union: possibleSolvers) {
             UnionCheckBox chooseUnion = new UnionCheckBox(union);
             chooseUnion.setFocusPainted(false);
             chooseUnion.addChangeListener(changeEvent -> {
-                    // Enable start button iff at least one solver is checked
-                    if (createSolverTypeCollection(choiceOptions).equals(SolverTypeCollection.EMPTY_COLLECTION)) {
-                        start.setEnabled(false);
-                        return;
-                    }
-                    start.setEnabled(true);
-                    selectAll.setText((choiceOptions.stream().filter(AbstractButton::isSelected)
-                            .collect(Collectors.toList()).size() <= choiceOptions.size()/2)
-                            ? SELECT_ALL : DESELECT_ALL);
-                });
+                // Enable start button iff at least one solver is checked
+                if (createSolverTypeCollection(choiceOptions).equals(
+                        SolverTypeCollection.EMPTY_COLLECTION)) {
+                    start.setEnabled(false);
+                    return;
+                }
+                start.setEnabled(true);
+                selectAll.setSelected((choiceOptions.stream().filter(u -> !u.isSelected())
+                        .collect(Collectors.toList()).isEmpty()));
+            });
             choiceOptions.add(chooseUnion);
             chooseUnion.setSelected(true);
             choiceBox.add(chooseUnion);
@@ -120,7 +149,8 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
     private SolverTypeCollection createSolverTypeCollection(Collection<UnionCheckBox> checkBoxes) {
         Set<SolverType> types = new HashSet<>();
         StringBuilder builder = new StringBuilder();
-        for (UnionCheckBox box: checkBoxes.stream().filter(AbstractButton::isSelected).collect(Collectors.toList())) {
+        for (UnionCheckBox box: checkBoxes.stream().filter(AbstractButton::isSelected)
+                .collect(Collectors.toList())) {
             types.addAll(box.getUnion().getTypes());
         }
         if (types.isEmpty()) {
@@ -129,7 +159,7 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         for (SolverType type: types) {
             builder.append(type.getName() + ", ");
         }
-        builder.delete(builder.length()-2, builder.length());
+        builder.delete(builder.length() - 2, builder.length());
         return new SolverTypeCollection(builder.toString(), types.size(), types);
     }
 
@@ -152,9 +182,15 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         return Objects.hashCode(possibleSolvers);
     }
 
-    private class UnionCheckBox extends JCheckBox {
+    /**
+     * A checkbox linked to a SolverTypeCollection.
+     */
+    private final class UnionCheckBox extends JCheckBox {
 
-        private SolverTypeCollection union;
+        /**
+         * The solver union associated with the checkbox at hand.
+         */
+        private final SolverTypeCollection union;
 
         private UnionCheckBox(SolverTypeCollection union) {
             super(union.name());
