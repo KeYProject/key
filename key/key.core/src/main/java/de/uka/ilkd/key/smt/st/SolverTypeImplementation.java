@@ -159,7 +159,6 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Override
     public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services) {
-        // TODO Make this modifiable? (similar to SMTTranslator)
         return new SMTSolverImplementation(problem, listener, services, this);
     }
 
@@ -233,7 +232,6 @@ public final class SolverTypeImplementation implements SolverType {
         return defaultTimeout;
     }
 
-    // TODO services is never used
     @Override
     public SMTTranslator createTranslator(Services services) {
         Constructor<?>[] constructors = translatorClass.getConstructors();
@@ -263,7 +261,7 @@ public final class SolverTypeImplementation implements SolverType {
         return Arrays.copyOf(delimiters, delimiters.length);
     }
 
-    // TODO How to make this modifiable?
+    // TODO Make this modifiable?
     @Override
     public String modifyProblem(String problem) {
         return problem;
@@ -284,7 +282,6 @@ public final class SolverTypeImplementation implements SolverType {
         return installedVersion;
     }
 
-    // TODO Fuse this with getVersion()
     @Override
     public String getRawVersion() {
         if (isInstalled(true)) {

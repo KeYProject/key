@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
 
 
 /**
- * This interface is used for modeling different solvers. It provides methods that encode information
- * about the concrete solver:
+ * This interface is used for modeling different solvers. It provides methods that encode
+ * information about the concrete solver:
  * - name
  * - command for starting the solver
  * - parameters
@@ -51,7 +51,8 @@ public interface SolverType {
     boolean isInstalled(boolean recheck);
 
     /**
-     * Some specific information about the solver which can be presented. <code>null</code> means no information.
+     * Some specific information about the solver which can be presented. <code>null</code> means
+     * no information.
      */
     String getInfo();
 
@@ -69,8 +70,8 @@ public interface SolverType {
 
 
     /**
-     * the command for starting the solver. For example "z3" if it is registered in the PATH variable,
-     * otherwise "ABSOLUTE_PATH/z3"
+     * the command for starting the solver. For example "z3" if it is registered in
+     * the PATH variable, otherwise "ABSOLUTE_PATH/z3"
      */
     String getSolverCommand();
 
@@ -94,13 +95,14 @@ public interface SolverType {
     SMTTranslator createTranslator(Services services);
 
     /**
-     * The delimiters of the messages that are sent from the solver to KeY. For example, it could be "\n"
+     * The delimiters of the messages that are sent from the solver to KeY. For example,
+     * it could be "\n"
      */
     String[] getDelimiters();
 
     /**
-     * Directly before the problem description is sent to the solver one can modify the problem string by using
-     * this method.
+     * Directly before the problem description is sent to the solver one can modify the problem
+     * string by using this method.
      */
     String modifyProblem(String problem);
 
@@ -116,7 +118,8 @@ public interface SolverType {
     String getMinimumSupportedVersion();
 
     /**
-     * Returns the current version that is installed, if it has already been checked, otherwise null.
+     * Returns the current version that is installed, if it has already been checked,
+     * otherwise null.
      */
     String getInstalledVersion();
 

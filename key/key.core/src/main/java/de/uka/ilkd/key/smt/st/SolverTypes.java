@@ -12,8 +12,19 @@ import java.util.*;
  * @author Alexander Weigl
  * @version 1 (9/29/21)
  */
-public class SolverTypes {
-    private static final Collection<SolverType> SOLVERS = new ArrayList<>(1);
+public final class SolverTypes {
+
+    /**
+     * All available solver types, including legacy solvers.
+     * The objects in this map are identically returned
+     * whenever {@link #getSolverTypes()} is called.
+     */
+    private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
+    /**
+     * The available legacy solvers out of the {@link #SOLVERS} list.
+     * The objects in this map are identically returned
+     * whenever {@link #getLegacySolvers()} is called.
+     */
     private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(1);
 
     private SolverTypes() {
@@ -50,7 +61,8 @@ public class SolverTypes {
     /**
      * Z3 counterexample solver.
      */
-    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(it -> it.getClass()
+    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream()
+                    .filter(it -> it.getClass()
                     .equals(SolverTypeImplementation.class) && it.getName()
                     .equals("Z3_CE"))
             .findFirst().orElse(null);

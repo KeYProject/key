@@ -30,19 +30,34 @@ import java.util.List;
  * @author Mattias Ulbrich
  */
 public class ModularSMTLib2Translator implements SMTTranslator {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
+    /**
+     * The smt preamble prepended to smt problems that are created with this translator.
+     */
     private final String preamble;
+    /**
+     * The fully classified class names of the SMTHandlers used by this translator.
+     */
     private final String[] handlerNames;
+    /**
+     * Arbitrary String options for the SMTHandlers used by this translator.
+     */
     private final String[] handlerOptions;
 
     /**
-     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the default values.
-     * @param preamble
-     * @param handlerOptions
-     * @param handlerNames
+     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of
+     * the default values.
+     * @param preamble the preamble to be prepended to smt problems created with this translator
+     * @param handlerOptions arbitrary String options for the SMTHandlers used by this translator
+     * @param handlerNames fully classified class names of the SMTHandlers to be used by this
+     *                     translator
      */
-    public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions, @Nullable String preamble) {
+    public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
+                                    @Nullable String preamble) {
         if (preamble == null) {
             this.preamble = SMTHandlerServices.getInstance().getPreamble();
         } else {

@@ -122,13 +122,15 @@ public class MasterHandler {
      * @param settings settings from the proof for the property settings.
      * @param handlerNames fully qualified class names of the handlers to use.
      *                     If empty, all available handlers are used.
-     * @throws IOException
+     * @throws IOException if the handlers cannot be loaded
      */
-    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames, String[] handlerOptions)
+    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames,
+                         String[] handlerOptions)
         throws IOException {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
+                handlerOptions, this);
     }
 
     /**

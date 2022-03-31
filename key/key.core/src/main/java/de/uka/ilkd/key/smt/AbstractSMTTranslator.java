@@ -68,7 +68,7 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 public abstract class AbstractSMTTranslator implements SMTTranslator {
         private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
-        private int nameCounter =0;
+        private int nameCounter = 0;
 
         /** The string used as standard sort for translations */
         private final StringBuilder standardSort = new StringBuilder("u");
@@ -172,7 +172,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** Formulae made of taclets, used for assumptions. */
         private TacletSetTranslation tacletSetTranslation = null;
 
-        private Collection<Throwable> exceptionsForTacletTranslation= new LinkedList<>();
+        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
         /**
          * Assumptions made of taclets - the translation of
@@ -208,7 +208,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add one variable for each sort
                 for (Sort s : this.usedRealSort.keySet()) {
-                   if(!s.equals(Sort.FORMULA)){
+                   if(!s.equals(Sort.FORMULA)) {
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
                         this.addFunction(l, new ArrayList<>(), s, services);
@@ -977,10 +977,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private ArrayList<StringBuilder> buildAssumptionsForSorts(Services services){
         	ArrayList<StringBuilder> result = new ArrayList<>();
         	if(this.isMultiSorted()){
-         		for(Sort sort : usedRealSort.keySet()){
+         		for(Sort sort : usedRealSort.keySet()) {
 
          		//Do not add Assumptions for Boolean or integer sorts
-                    if(!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA ){
+                    if(!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA) {
              			Term var = createLogicalVar(services, "x", sort);
              			StringBuilder sVar = translateVariable(var.op());
             			//StringBuilder var = this.makeUnique(new StringBuilder("x"));
@@ -2990,7 +2990,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                		StringBuilder term = translateComment(1,tf.getTaclet().displayName()+":\n");
+                                		StringBuilder term = translateComment(1,tf.getTaclet().displayName() + ":\n");
 
                                         term.append(translateTerm(
                                                         subterm, vector,
@@ -3012,7 +3012,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
 
-        protected StringBuilder translateComment(int newLines, String comment){
+        protected StringBuilder translateComment(int newLines, String comment) {
         	return new StringBuilder();
         }
 

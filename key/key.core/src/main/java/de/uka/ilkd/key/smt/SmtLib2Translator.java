@@ -96,10 +96,12 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * This constructor only exists to have uniform constructors for both the modular and
      * the legacy translation.
      * @param handlerNames not used by this translator!
-     * @param preamble also not used
+     * @param handlerOptions also not used by this translator
+     * @param preamble also also not used
      */
     @SuppressWarnings("unused")     // can be called via reflection
-    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions, @Nullable String preamble){
+    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
+                             @Nullable String preamble) {
     }
 
     @Override
@@ -163,7 +165,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
         //add the assumptions
-        ArrayList<StringBuilder> AssumptionsToRemove = new ArrayList<>();
+        ArrayList<StringBuilder> assumptionsToRemove = new ArrayList<>();
         StringBuilder assump = new StringBuilder();
         boolean needsAnd = assumptions.size() > 1;
 
@@ -173,7 +175,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             if (block.getStart() <= block.getEnd()) {
                 assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()]).append("\n");
                 for (int i = block.getStart(); i <= block.getEnd(); i++) {
-                    AssumptionsToRemove.add(assumptions.get(i));
+                    assumptionsToRemove.add(assumptions.get(i));
                     assump.append(assumptions.get(i));
                     assump.append("\n");
                 }
@@ -181,7 +183,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         }
 
 
-        assumptions.removeAll(AssumptionsToRemove);
+        assumptions.removeAll(assumptionsToRemove);
 
 
         if (!assumptions.isEmpty()) {

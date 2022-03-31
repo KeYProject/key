@@ -272,6 +272,8 @@ public class SolverPropertiesLoader {
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+
+        // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version,
                 minVersion, timeout, delimiters, translatorClass,
                 handlerNames, handlerOptions, handler, preamble);
@@ -299,7 +301,7 @@ public class SolverPropertiesLoader {
                 solverProp.load(propsFile);
                 props.add(solverProp);
             } catch (Exception e) {
-                // If loading the file does not succeed for any reason, just continue with the next.
+                // if loading the file does not work for any reason, create a warning and continue
                 LOGGER.warn(String.format("Solver file %s could not be loaded.", fileName));
             }
         }

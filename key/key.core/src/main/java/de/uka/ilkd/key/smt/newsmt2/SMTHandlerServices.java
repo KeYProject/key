@@ -106,7 +106,7 @@ public class SMTHandlerServices {
     }
 
     /**
-     * Loadd all handlers specified as arguments. Load the snippets that belong
+     * Load all handlers specified as arguments. Load the snippets that belong
      * to these instances. This can be used if a translation does not want to
      * use the standard array of handlers.
      *
@@ -131,7 +131,8 @@ public class SMTHandlerServices {
                 className = PACKAGE_PREFIX + className;
             }
             try {
-                SMTHandler smtHandler = (SMTHandler) Class.forName(className).getConstructor().newInstance();
+                SMTHandler smtHandler = (SMTHandler) Class.forName(className)
+                        .getConstructor().newInstance();
                 result.add(smtHandler);
             } catch (Exception e) {
                 throw new IOException("Cannot instantiate SMTHandler " + className, e);
@@ -151,16 +152,20 @@ public class SMTHandlerServices {
 
     /**
      * Get a copy of freshly created {@link SMTHandler}s by cloning the reference
-     * handlers. They can be used to translate problems to smt
+     * handlers. They can be used to translate problems to smt.
      *
      * @param services passed on to the handlers for initialisation
+     * @param handlerNames the SMTHandlers to be used
+     *                     If this is empty or null, all existing handlers will be used.
+     * @param handlerOptions arbitrary String options for the SMTHandlers
      * @param mh passed on to the handlers for initialisation
      * @return a freshly created list of freshly created handlers
      * @throws IOException if the resources cannot be read
      */
 
     public List<SMTHandler> getFreshHandlers(Services services, @Nullable String[] handlerNames,
-                                             String[] handlerOptions, MasterHandler mh) throws IOException {
+                                             String[] handlerOptions, MasterHandler mh)
+            throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
