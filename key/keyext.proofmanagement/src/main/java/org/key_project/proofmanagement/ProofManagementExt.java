@@ -27,9 +27,7 @@ public class ProofManagementExt implements
     @Override
     public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
 
-        return Arrays.asList(new CheckAction(),
-                             new MergeAction(),
-                             new BundleAction());
+        return Arrays.asList(new CheckAction());
     }
 
     private static class CheckAction extends KeyAction {
@@ -52,6 +50,8 @@ public class ProofManagementExt implements
         }
     }
 
+    // TODO: not yet implemented
+    /*
     private static class MergeAction extends KeyAction {
         private MergeAction() {
             putValue(NAME, "Merge proof bundles ...");
@@ -64,7 +64,10 @@ public class ProofManagementExt implements
 
         }
     }
+     */
 
+    // TODO: not yet implemented
+    /*
     private static class BundleAction extends KeyAction {
         private BundleAction() {
             putValue(NAME, "Create proof bundle from directory ...");
@@ -77,6 +80,7 @@ public class ProofManagementExt implements
 
         }
     }
+     */
 
     public static void main(String[] args) {
         JDialog checkConfigDialog = new CheckConfigDialog(null, "Check configuration", true);
