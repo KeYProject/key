@@ -42,7 +42,9 @@ public final class ContractAxiom extends ClassAxiom {
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
     private final Term originalPre;
+    private final Term originalFreePre;
     private final Term originalPost;
+    private final Term originalFreePost;
     private final Term originalMby;
     private final ProgramVariable originalSelfVar;
     private final ProgramVariable originalResultVar;
@@ -56,13 +58,15 @@ public final class ContractAxiom extends ClassAxiom {
                          KeYJavaType kjt,
                          VisibilityModifier visibility,
                          Term pre,
+                         Term freePre,
                          Term post,
+                         Term freePost,
                          Term mby,
                          Map<LocationVariable,ProgramVariable> atPreVars,
                          ProgramVariable selfVar,
                          ProgramVariable resultVar,
                          ImmutableList<ProgramVariable> paramVars) {
-        this(contract, name,null,target,kjt,visibility,pre,post,mby,atPreVars,selfVar,resultVar,paramVars);
+        this(contract, name,null,target,kjt,visibility,pre,freePre,post,freePost,mby,atPreVars,selfVar,resultVar,paramVars);
     }
 
     public ContractAxiom(FunctionalOperationContract contract,
@@ -72,7 +76,9 @@ public final class ContractAxiom extends ClassAxiom {
                 KeYJavaType kjt,
                 VisibilityModifier visibility,
                 Term originalPre,
+                Term originalFreePre,
                 Term originalPost,
+                Term originalFreePost,
                 Term originalMby,
                 Map<LocationVariable,ProgramVariable> atPreVars,
                 ProgramVariable selfVar, ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
@@ -89,7 +95,9 @@ public final class ContractAxiom extends ClassAxiom {
         this.kjt = kjt;
         this.visibility = visibility;
         this.originalPre = originalPre;
+        this.originalFreePre = originalFreePre;
         this.originalPost = originalPost;
+        this.originalFreePost = originalFreePost;
         this.originalMby = originalMby;
         this.originalSelfVar = selfVar;
         this.originalResultVar = resultVar;
@@ -102,7 +110,9 @@ public final class ContractAxiom extends ClassAxiom {
     public ContractAxiom map(UnaryOperator<Term> op, Services services) {
         return new ContractAxiom(contract,
                 name, displayName, target, kjt, visibility,
-                op.apply(originalPre), op.apply(originalPost), op.apply(originalMby),
+                op.apply(originalPre), op.apply(originalFreePre),
+                op.apply(originalPost), op.apply(originalFreePost),
+                op.apply(originalMby),
                 atPreVars, originalSelfVar, originalResultVar, originalParamVars);
     }
 
@@ -117,7 +127,9 @@ public final class ContractAxiom extends ClassAxiom {
         TacletGenerator TG = TacletGenerator.getInstance();
         return TG.generateContractAxiomTaclets(tacletName,
                                                originalPre,
+                                               originalFreePre,
                                                originalPost,
+                                               originalFreePost,
                                                originalMby,
                                                kjt,
                                                target,
@@ -151,7 +163,8 @@ public final class ContractAxiom extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        return MiscTools.collectObservers(originalPre).union(MiscTools.collectObservers(originalPost));
+        return MiscTools.collectObservers(originalPre).union(MiscTools.collectObservers(originalPost))
+                .union(MiscTools.collectObservers(originalFreePre)).union(MiscTools.collectObservers(originalFreePost));
     }
 
     @Override

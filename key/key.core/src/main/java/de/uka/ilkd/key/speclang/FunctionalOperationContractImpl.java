@@ -1362,6 +1362,28 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     };
 
     @Override
+    public Term getFreePost(List<LocationVariable> heapContext,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
+        Term result = null;
+        for (LocationVariable heap : heapContext) {
+            final Term p = getFreePost(heap, selfVar, paramVars, resultVar, excVar, atPreVars,
+                    services);
+            if (result == null) {
+                result = p;
+            } else {
+                result = tb.and(result, p);
+            }
+        }
+        return result;
+
+    }
+    
+    @Override
     public Term getRepresentsAxiom(LocationVariable heap,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
