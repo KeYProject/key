@@ -54,7 +54,7 @@ public class ContractOrderManager {
         // Could be replaced by getOrDefault, keeping the debug output for now
         Integer level = map.get(contract);
         if (level == null) {
-            System.out.println("Contract " + contract + " w/o level, using highest level");
+//            System.out.println("Contract " + contract + " w/o level, using highest level");
             level = this.defaultLevel;
         }
         return level;

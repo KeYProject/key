@@ -1301,8 +1301,10 @@ public final class SpecificationRepository {
                         Term freePostFromContract = fop.getFreePost(heaps, selfVar,
                                 paramVars, resultVar, null, atPreVars,
                                 services);
-                        if (preFromContract != null && postFromContract != null
-                                && postFromContract != tb.tt()) {
+                        if (preFromContract != null && (
+                                (postFromContract != null && postFromContract != tb.tt()) ||
+                                (freePostFromContract != null && freePostFromContract != tb.tt()))
+                        ) {
                             Term mbyFromContract = fop.hasMby()
                                     ? fop.getMby(selfVar, paramVars, services)
                                     : null;
