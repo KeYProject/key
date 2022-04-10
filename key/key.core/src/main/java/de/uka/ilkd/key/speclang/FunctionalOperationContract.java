@@ -132,6 +132,14 @@ public interface FunctionalOperationContract extends OperationContract {
                             Map<LocationVariable, Term> atPres,
                             Services services);
 
+    Term getFreePost(List<LocationVariable> heapContext,
+                     ProgramVariable selfVar,
+                     ImmutableList<ProgramVariable> paramVars,
+                     ProgramVariable resultVar,
+                     ProgramVariable excVar,
+                     Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                     Services services);
+
     /**
       * Returns the model method definition for model method contracts
       */
