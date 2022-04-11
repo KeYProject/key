@@ -40,6 +40,9 @@ public class ContractOrderManager {
         int level = 0;
         Map<String, Integer> result = new HashMap<>();
         for (String line : Files.readAllLines(Paths.get(FILENAME))) {
+            if (line.startsWith("#")) {
+                continue;
+            }
             if (line.isEmpty()) {
                 level++;
             } else {
