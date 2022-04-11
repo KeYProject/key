@@ -105,9 +105,10 @@ public final class ProofCorrectnessMgt {
             return true;
         }
         final Contract originalContract = po.getContract();
-        
-        if (ContractOrderManager.isEnabled()) {
-            ContractMode mode = ContractOrderManager.getInstance().mayUse(originalContract, contract);
+
+		var com = ContractOrderManager.tryGetInstance();
+        if (com != null) {
+            ContractMode mode = com.mayUse(originalContract, contract);
             switch (mode) {
                 case FORBIDDEN: return false;
                 case WITH_MEASURED_BY: return contract.hasMby();

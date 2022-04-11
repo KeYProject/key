@@ -3,7 +3,10 @@ package de.uka.ilkd.key.proof.mgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -11,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ContractOrderManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContractOrderManager.class);
+
     public static final String KEY_CONTRACT_ORDER = "key.contractOrder";
     public static final String FILENAME = System.getProperty(KEY_CONTRACT_ORDER);
     private static ContractOrderManager theInstance;
@@ -20,17 +25,22 @@ public class ContractOrderManager {
     private final Map<String, Integer> map;
     private final int defaultLevel;
 
-    public static boolean isEnabled() {
-        return FILENAME != null;
-    }
+    private static boolean fileChecked = false;
 
-    public static ContractOrderManager getInstance() {
-        assert isEnabled();
-        if(theInstance == null) {
-            try {
-                theInstance = new ContractOrderManager();
-            } catch (IOException e) {
-                e.printStackTrace();
+    @Nullable
+    public static ContractOrderManager tryGetInstance() {
+        if(theInstance == null && !fileChecked) {
+            fileChecked = true;
+            if (FILENAME != null) {
+                LOGGER.info("Loading contract order from " + Paths.get(FILENAME).toAbsolutePath());
+                try {
+                    theInstance = new ContractOrderManager();
+                    LOGGER.info("Enabled contract order with " + theInstance.map.size() + " contracts");
+                } catch (IOException e) {
+                    LOGGER.warn("Failed to load contract order", e);
+                }
+            } else {
+                LOGGER.warn("Contract order filename is null");
             }
         }
         return theInstance;
@@ -57,7 +67,7 @@ public class ContractOrderManager {
         // Could be replaced by getOrDefault, keeping the debug output for now
         Integer level = map.get(contract);
         if (level == null) {
-//            System.out.println("Contract " + contract + " w/o level, using highest level");
+            System.err.println("Contract " + contract + " w/o level, using highest level");
             level = this.defaultLevel;
         }
         return level;
@@ -66,13 +76,13 @@ public class ContractOrderManager {
     public ContractMode mayUse(Contract user, Contract used) {
         String nameUser = getName(user);
         if (nameUser == null) {
-            System.out.println("Contract 'user' without name: " + user);
+            System.err.println("Contract 'user' without name: " + user);
             return ContractMode.FORBIDDEN;
         }
 
         String nameUsed = getName(used);
         if (nameUsed == null) {
-            System.out.println("Contract 'used' without name: " + used);
+            System.err.println("Contract 'used' without name: " + used);
             return ContractMode.FORBIDDEN;
         }
 

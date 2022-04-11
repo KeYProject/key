@@ -50,9 +50,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static de.uka.ilkd.key.proof.mgt.ContractOrderManager.FILENAME;
 
 /**
  * The main entry point for KeY
@@ -409,6 +414,12 @@ public final class Main {
 
         if (cl.isSet(EXAMPLES)) {
             examplesDir = cl.getString(EXAMPLES, null);
+        }
+
+        LOGGER.info("Contract order file: " + FILENAME);
+        if (FILENAME != null) {
+            var path = Paths.get(FILENAME).toAbsolutePath();
+            LOGGER.info("Contract order file resolved: " + path + ", exists: " + Files.exists(path));
         }
 
         if (verbosity > Verbosity.SILENT) {

@@ -45,7 +45,6 @@ public final class MayUseMethodContractCondition extends VariableConditionAdapte
         this.parameter = parameter;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var,
                          SVSubstitute subst,
@@ -54,10 +53,10 @@ public final class MayUseMethodContractCondition extends VariableConditionAdapte
 
         Contract contract = services.getSpecificationRepository().getContractByName(parameter);
 
-        if (!ContractOrderManager.isEnabled()) {
+        var com = ContractOrderManager.tryGetInstance();
+        if (com == null) {
             return services.getProof().mgt().isContractApplicable(contract);
         } else {
-            ContractOrderManager com = ContractOrderManager.getInstance();
             Contract user = services.getSpecificationRepository().getContractPOForProof(services.getProof()).getContract();
             switch (com.mayUse(user, contract)) {
                 case FORBIDDEN: return false;
