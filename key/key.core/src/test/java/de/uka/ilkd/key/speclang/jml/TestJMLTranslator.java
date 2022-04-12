@@ -57,7 +57,7 @@ public class TestJMLTranslator {
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", services.getTypeConverter().getHeapLDT().getHeap().sort(),
+            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre",
                     false)));
         }
         jmlIO = new JmlIO().services(services).classType(testClassType).selfVar(buildSelfVarAsProgVar());

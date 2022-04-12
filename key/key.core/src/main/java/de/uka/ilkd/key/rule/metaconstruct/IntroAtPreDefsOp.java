@@ -121,7 +121,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
                 final AuxiliaryContract.Variables variables = contract.getPlaceholderVariables();
-                updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars, services);
+                updateAuxiliaryContract(contract, statement, variables,
+                        nonHeapVars, atPreHeapVars, services);
             }
         }
     }
@@ -190,9 +191,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         @Override
         public void performActionOnMergeContract(final MergeContract spec) {
             if ((!(spec instanceof UnparameterizedMergeContract)
-                    && !(spec instanceof PredicateAbstractionMergeContract)))
+                    && !(spec instanceof PredicateAbstractionMergeContract))) {
                 throw new AssertionError("Unsupported kind of merge contract: "
                         + spec.getClass().getSimpleName());
+            }
 
             if (spec instanceof PredicateAbstractionMergeContract) {
                 final MergePointStatement mps = spec.getMergePointStatement();
@@ -291,7 +293,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 if (atPres.containsKey(var)) {
                     continue;
                 }
-                final LocationVariable l = tb.heapAtPreVar(var.name() + "Before_" + methodName,
+                final LocationVariable l = tb.locationVariable(var.name() + "Before_" + methodName,
                         var.sort(), true);
                 services.getNamespaces().programVariables().addSafely(l);
 
@@ -316,16 +318,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             // why does the saved heap get removed here?
             atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
-            updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars, services);
+            updateAuxiliaryContract(contract, statement, variables,
+                    nonHeapVars, atPreHeapVars, services);
         }
     }
 
     private static void updateAuxiliaryContract(final AuxiliaryContract contract,
-                                                final JavaStatement statement,
-                                                final AuxiliaryContract.Variables variables,
-                                                final Map<LocationVariable, LocationVariable> nonHeapVars,
-                                                final Map<LocationVariable, LocationVariable> atPreHeapVars,
-                                                final Services services) {
+                                    final JavaStatement statement,
+                                    final AuxiliaryContract.Variables variables,
+                                    final Map<LocationVariable, LocationVariable> nonHeapVars,
+                                    final Map<LocationVariable, LocationVariable> atPreHeapVars,
+                                    final Services services) {
         final AuxiliaryContract.Variables newVariables
                 = new AuxiliaryContract.Variables(variables.self,
                 variables.breakFlags, variables.continueFlags, variables.returnFlag,

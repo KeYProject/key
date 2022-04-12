@@ -102,11 +102,10 @@ public class JMLSpecFactory {
             final ImmutableList<LocationVariable> allHeaps, final TermBuilder tb) {
         Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
         for (LocationVariable heap : allHeaps) {
-            atPres.put(heap, tb.var(tb.heapAtPreVar(heap + AT_PRE, heap.sort(), false)));
+            atPres.put(heap, tb.var(tb.atPreVar(heap.toString(), heap.sort(), false)));
         }
         for (LocationVariable param : paramVars) {
-            // TODO rename heapAtPreVar
-            atPres.put(param, tb.var(tb.heapAtPreVar(param + AT_PRE, param.sort(), false)));
+            atPres.put(param, tb.var(tb.atPreVar(param.toString(), param.sort(), false)));
         }
         return atPres;
     }
@@ -345,7 +344,7 @@ public class JMLSpecFactory {
         progVar.atPreVars = new LinkedHashMap<>();
         progVar.atPres = new LinkedHashMap<>();
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            LocationVariable lv = tb.heapAtPreVar(h + AT_PRE, h.sort(), false);
+            LocationVariable lv = tb.atPreVar(h.toString(), h.sort(), false);
             progVar.atPreVars.put(h, lv);
             progVar.atPres.put(h, tb.var(lv));
         }
@@ -1305,10 +1304,10 @@ public class JMLSpecFactory {
             final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
             final ImmutableList<LocationVariable> allHeaps
                     = services.getTypeConverter().getHeapLDT().getAllHeaps();
-            final String atPrePrefix = AT_PRE;
-            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.heapAtPreVar(heap + atPrePrefix, heap.sort(), false))));
+            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.atPreVar(heap.toString(),
+                    heap.sort(), false))));
             params.forEach(param -> atPres.put(param,
-                    tb.var(tb.heapAtPreVar(param + atPrePrefix, param.sort(), false))));
+                    tb.var(tb.atPreVar(param.toString(), param.sort(), false))));
 
             final MergeParamsSpec specs = jmlIo
                     .clear()
@@ -1447,11 +1446,11 @@ public class JMLSpecFactory {
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
         final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            atPreVars.put(heap, tb.heapAtPreVar(heap + AT_PRE, heap.sort(), true));
+            atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
         }
         final ImmutableList<LocationVariable> parameters = pm.collectParameters();
         for (LocationVariable parameter : parameters) {
-            atPreVars.put(parameter, tb.locationVariable(parameter + AT_PRE,
+            atPreVars.put(parameter, tb.atPreVar(parameter.toString(),
                     parameter.getKeYJavaType(), true));
         }
         final ImmutableList<ProgramVariable> paramVars =

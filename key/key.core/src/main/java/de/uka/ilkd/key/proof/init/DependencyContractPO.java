@@ -180,7 +180,7 @@ public final class DependencyContractPO extends AbstractPO
           }
           heaps.add(h);
           LocationVariable preVar = twoState ?
-                tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
+                tb.atPreVar(h.name().toString(), h.sort(), true)
                 : null ;
                 if(preVar != null) { register(preVar, proofServices); heaps.add(preVar); }
                 preHeapVars.put(h, preVar);
