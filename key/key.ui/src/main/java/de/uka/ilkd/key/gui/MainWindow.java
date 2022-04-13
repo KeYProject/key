@@ -1091,7 +1091,16 @@ public final class MainWindow extends JFrame {
         };
 
         if (isPrintRunImmediately) {
-            sequentUpdater.run();
+            try {
+                sequentUpdater.run();
+            } catch(RuntimeException ex) {
+                // This is a quickfix for some situations where exceptions
+                // in the UI update would corrupt the entire proof state
+                // such that the entire app needs to be closed. Just print
+                // the exception and pretend everything was good. (Like would
+                // happen when incoked on the event queue.
+                ex.printStackTrace();
+            }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
         }
