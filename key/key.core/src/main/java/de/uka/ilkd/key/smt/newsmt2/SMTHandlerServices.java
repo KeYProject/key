@@ -2,10 +2,13 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import org.key_project.util.Streams;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +25,8 @@ import java.util.stream.Collectors;
  */
 public class SMTHandlerServices {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTHandlerServices.class);
+
     /** The name of the package where this class resides. Used for
      * prefixing when loading handlers.
      */
@@ -32,7 +37,7 @@ public class SMTHandlerServices {
     private static SMTHandlerServices theInstance;
 
     /** The list of instantiated available handlers */
-    private List<SMTHandler> handlers;
+    private List<SMTHandler> handlers = new ArrayList<>();
 
     /** A map from handler to their smt2 snippets */
     private final Map<SMTHandler, Properties> snippetMap = new IdentityHashMap<>();
@@ -61,101 +66,81 @@ public class SMTHandlerServices {
     }
 
     /**
-     * Get a list of all handlers available in the system.
+     * Load the original SMTHandler instances (from the snippetMap) of all handlers
+     * specified as arguments.
+     * Add fresh handlers to the snippetMap and load the snippets that belong to these instances
+     * if that has not happened yet for any object of a given handler class.
      *
-     * <b>Do not use this list directly, but
-     * use {@link #getFreshHandlers(Services, String[], String[], MasterHandler)}</b>
-     * if you intend to initialise them and run them.
-     *
-     * @return always the same list of {@link SMTHandler}s, not null
-     * @throws IOException if the resources cannot be read
-     */
-    public List<SMTHandler> getOriginalHandlers() throws IOException {
-        if(handlers != null) {
-            return handlers;
-        }
-
-        synchronized (theCreationLock) {
-            // Make sure that there is at most one invocation of makeHandlers,
-            // and that everyone waits for the result.
-            if(handlers != null) {
-                return handlers;
-            }
-            this.handlers = makeHandlers();
-            return this.handlers;
-        }
-    }
-
-    /**
-     * Load all handlers using a service loader. Load the snippets that belong
-     * to them.
-     * @return an unmodifiable view on a freshly created list
-     * @throws IOException if the resources cannot be read
-     */
-    private List<SMTHandler> makeHandlers() throws IOException {
-        List<SMTHandler> result = new ArrayList<>();
-        for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            Properties handlerSnippets = loadSnippets(smtHandler.getClass());
-            if (handlerSnippets != null) {
-                snippetMap.put(smtHandler,  handlerSnippets);
-            }
-            smtProperties.addAll(smtHandler.getProperties());
-            result.add(smtHandler);
-        }
-        return Collections.unmodifiableList(result);
-    }
-
-    /**
-     * Load all handlers specified as arguments. Load the snippets that belong
-     * to these instances. This can be used if a translation does not want to
-     * use the standard array of handlers.
-     *
-     * <strong>Caution: Do not call this method too often since it adds to the
+     * <strong>Caution: Do not call this method too often since it may add to the
      * static map of instances to snippets.</strong>
      *
      * It would be a good idea to call this method (at most) once for each
-     * solver type with a custom array of handlers.
+     * solver type with a custom array of handler names.
      *
-     * The strings in the argument can either be fully qualified class names
-     * or class names package. In the latter case the prefix for this package
-     * here will be added.
+     * @param handlerNames a non-null list of non-null strings with class names (s. above)
      *
-     * @param classNames a non-null list of non-null strings with classnames (s. above)
+     * @return a fresh collection containing only the original SMTHandlers from the
+     *              snippetMap's key set that match the given handler names.
+     *              The collection's order matches that of the names as well.
      *
-     * @return a fresh array of freshly created handlers.
      */
-    public List<SMTHandler> makeHandlers(Collection<String> classNames) throws IOException {
-        List<SMTHandler> result = new ArrayList<>();
-        for (String className : classNames) {
-            if (!className.contains(".")) {
-                className = PACKAGE_PREFIX + className;
-            }
+    private Collection<SMTHandler> getOriginalHandlers(String[] handlerNames) throws IOException {
+        Collection<SMTHandler> result = new LinkedList<>();
+        for (String name : handlerNames) {
             try {
-                SMTHandler smtHandler = (SMTHandler) Class.forName(className)
-                        .getConstructor().newInstance();
-                result.add(smtHandler);
-            } catch (Exception e) {
-                throw new IOException("Cannot instantiate SMTHandler " + className, e);
+                Class<SMTHandler> handlerClass = (Class<SMTHandler>) Class.forName(name);
+                if (findHandler(handlerClass, result)) {
+                    continue;
+                }
+                synchronized (theCreationLock) {
+                    // Make sure that each handler is added to the handler list at most once
+                    // and that everyone waits for the result.
+                    if (findHandler(handlerClass, result)) {
+                        continue;
+                    }
+                    SMTHandler handler = handlerClass.getConstructor().newInstance();
+                    handlers.add(handler);
+                    result.add(handler);
+                    Properties handlerSnippets = loadSnippets(handlerClass);
+                    if (handlerSnippets != null) {
+                        snippetMap.put(handler, handlerSnippets);
+                    }
+                    smtProperties.addAll(handler.getProperties());
+                }
+            } catch (ClassNotFoundException e) {
+                LOGGER.warn("Could not load SMTHandler:" + System.lineSeparator()
+                        + e.getMessage());
+                continue;
+            } catch (NoSuchMethodException | InvocationTargetException
+                    | InstantiationException | IllegalAccessException e) {
+                LOGGER.warn("Could not create SMTHandler:" + System.lineSeparator()
+                        + e.getMessage());
+                continue;
             }
         }
-
-        for (SMTHandler smtHandler : result) {
-            Properties handlerSnippets = loadSnippets(smtHandler.getClass());
-            if (handlerSnippets != null) {
-                snippetMap.put(smtHandler,  handlerSnippets);
-            }
-            smtProperties.addAll(smtHandler.getProperties());
-        }
-
+        // TODO make sure that the order of handlers in result is the same as the order
+        //  of their names in the name array
         return result;
+    }
+
+    private boolean findHandler(Class<SMTHandler> clazz, Collection<SMTHandler> result) {
+        Optional<SMTHandler> handler = handlers.stream()
+                .filter(h -> h.getClass().equals(clazz)).findFirst();
+        if (handler.isPresent()) {
+            if (!result.contains(handler)) {
+                result.add(handler.get());
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
      * Get a copy of freshly created {@link SMTHandler}s by cloning the reference
-     * handlers. They can be used to translate problems to smt.
+     * handlers. They can be used to translate problems to SMT.
      *
      * @param services passed on to the handlers for initialisation
-     * @param handlerNames the SMTHandlers to be used
+     * @param handlerNames the fully classified class names of the SMTHandlers to be used
      *                     If this is empty or null, all existing handlers will be used.
      * @param handlerOptions arbitrary String options for the SMTHandlers
      * @param mh passed on to the handlers for initialisation
@@ -169,21 +154,11 @@ public class SMTHandlerServices {
 
         List<SMTHandler> result = new ArrayList<>();
 
-        List<SMTHandler> usedHandlers =
-                (handlerNames == null || handlerNames.length == 0)
-                        ? getOriginalHandlers()
-                        : getOriginalHandlers().stream()
-                        .filter(h -> Arrays.stream(handlerNames)
-                        .anyMatch(s -> h.getClass()
-                                .getName()
-                                .equals(s)))
-                        .collect(Collectors.toList());
-
-        for (SMTHandler originalHandler : usedHandlers) {
+        for (SMTHandler handler : getOriginalHandlers(handlerNames)) {
             try {
-                SMTHandler copy = originalHandler.getClass().getConstructor().newInstance();
-                copy.setOptions(handlerOptions);
-                copy.init(mh, services, snippetMap.get(originalHandler));
+                // TODO SMTHandler#copy() would be nice(?)
+                SMTHandler copy = handler.getClass().getConstructor().newInstance();
+                copy.init(mh, services, snippetMap.get(handler), handlerOptions);
                 result.add(copy);
             } catch (Exception e) {
                 throw new IOException(e);
@@ -257,7 +232,7 @@ public class SMTHandlerServices {
      */
     public Collection<SMTHandlerProperty<?>> getSMTProperties() throws IOException {
         // trigger the translation ...
-        getOriginalHandlers();
+        //getOriginalHandlers();
         return Collections.unmodifiableCollection(smtProperties);
     }
 }

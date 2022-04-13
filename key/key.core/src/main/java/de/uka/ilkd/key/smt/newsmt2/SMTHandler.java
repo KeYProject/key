@@ -67,9 +67,11 @@ public interface SMTHandler {
      *                 this handler
      * @param handlerSnippets the snippets loaded for this handler, null if no
      *                        snippet property file is available for this handler
+     * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
-    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets)
+    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+              String[] handlerOptions)
             throws IOException;
 
     /**
@@ -132,19 +134,4 @@ public interface SMTHandler {
         return Collections.emptyList();
     }
 
-    /**
-     * Set options of the handler, e.g. shut off if-then-else terms.
-     * By default, options are ignored.
-     * @param options an array of arbitrary option Strings that each SMTHandler handles on its own.
-     */
-    default void setOptions(String[] options) { }
-
-    /**
-     * Not all options impact all SMTHandlers.
-     *
-     * @return the options set for the SMTHandler at hand that have an impact on it.
-     */
-    default String[] getOptions() {
-        return new String[] {};
-    }
 }

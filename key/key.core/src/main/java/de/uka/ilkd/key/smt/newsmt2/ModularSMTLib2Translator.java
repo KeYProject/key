@@ -22,9 +22,9 @@ import java.util.List;
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
  * language for modern SMT solvers.
  *
- * It aims to be modular and therefore easily extendable. Special handlers are used for different
- * terms. New handlers need to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in
- * the /key/key.core/src/main/resources/META-INF/services/ directory.
+ * It aims to be modular and therefore easily extendable.
+ * Special {@link SMTHandler}s are used for different terms. The class names of the desired
+ * handlers have to be given to the constructor.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
