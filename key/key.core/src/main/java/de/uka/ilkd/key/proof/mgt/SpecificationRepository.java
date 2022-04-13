@@ -1292,19 +1292,28 @@ public final class SpecificationRepository {
                         }
                         Term preFromContract = fop.getPre(heaps, selfVar,
                                 paramVars, atPreVars, services);
+                        Term freePreFromContract = fop.getFreePre(heaps, selfVar,
+                                paramVars, atPreVars, services);
                         Term postFromContract = fop.getPost(heaps, selfVar,
                                 paramVars, resultVar, null, atPreVars,
                                 services);
-                        if (preFromContract != null && postFromContract != null
-                                && postFromContract != tb.tt()) {
+                        Term freePostFromContract = fop.getFreePost(heaps, selfVar,
+                                paramVars, resultVar, null, atPreVars,
+                                services);
+                        if (preFromContract != null && (
+                                (postFromContract != null && postFromContract != tb.tt()) ||
+                                        (freePostFromContract != null && freePostFromContract != tb.tt()))
+                        ) {
                             Term mbyFromContract = fop.hasMby()
                                     ? fop.getMby(selfVar, paramVars, services)
                                     : null;
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
                                     "Contract axiom for " + pm.getName()
                                             + " in " + kjt.getName(),
-                                    pm, kjt, new Private(), preFromContract,
-                                    postFromContract, mbyFromContract,
+                                    pm, kjt, new Private(),
+                                    preFromContract, freePreFromContract,
+                                    postFromContract, freePostFromContract,
+                                    mbyFromContract,
                                     atPreVars, selfVar, resultVar, paramVars);
                             result = result.add(modelMethodContractAxiom);
                         }
