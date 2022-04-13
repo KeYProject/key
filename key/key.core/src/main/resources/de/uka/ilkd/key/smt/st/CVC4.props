@@ -5,7 +5,7 @@ info=CVC4 solver (https://cvc4.github.io/index.html).
 command=cvc4
 version=--version
 delimiters=CVC4>
-messageHandler=CVC4
+socketClass=de.uka.ilkd.key.smt.communication.CVC4Socket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\

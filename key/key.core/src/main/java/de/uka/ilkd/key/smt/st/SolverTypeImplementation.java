@@ -2,8 +2,11 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.SolverSocket;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,12 +19,12 @@ import java.util.Arrays;
  * Final SolverType implementation that uses building blocks for the various methods.
  * This can be used to modify a ModifiableSolverType object using .props files only,
  * for example (see {@link SolverPropertiesLoader}).
- * <p>
+ *
  * The building blocks that can be modified on creation are:
  * - The various String parameters such as default command, params and the name
  * - The solver type's default timeout
  * - The message delimiters used by solver processes of the created solver type
- * - The {@link SolverSocket.MessageHandler} used to interpret messages by solver processes of the
+ * - The {@link AbstractSolverSocket} used to interpret messages by solver processes of the
  *      created type
  * - The {@link SMTTranslator} used to translate messages for processes of the created solver type
  * - The {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by the translator
@@ -31,6 +34,8 @@ import java.util.Arrays;
  * @author alicia
  */
 public final class SolverTypeImplementation implements SolverType {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolverTypeImplementation.class);
 
     /**
      * The default values of this solver type object, final and private as they should not be
@@ -71,10 +76,10 @@ public final class SolverTypeImplementation implements SolverType {
     private final String[] handlerNames;
     private final String[] handlerOptions;
     /**
-     * The {@link SolverSocket.MessageHandler} used by
-     * the {@link SolverSocket} created with {@link #getSocket(ModelExtractor)}.
+     * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
+     * to be created with {@link #getSocket(ModelExtractor)}.
      */
-    private final SolverSocket.MessageHandler msgHandler;
+    private final Class<?> solverSocketClass;
     /**
      * The class of the {@link SMTTranslator} to be created with
      * {@link #createTranslator(Services)}.
@@ -106,8 +111,8 @@ public final class SolverTypeImplementation implements SolverType {
      * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to
      *                     be used by the {@link SMTTranslator} created by this solver type
      * @param handlerOptions arbitrary String options used by the SMTHandlers
-     * @param messageHandler the {@link SolverSocket.MessageHandler}
-     *                         used by the solver type at hand
+     * @param solverSocketClass the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
+     *                          class used by the solver type at hand
      * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */
     public SolverTypeImplementation(String name, String info, String defaultParams,
@@ -116,7 +121,7 @@ public final class SolverTypeImplementation implements SolverType {
                                     long defaultTimeout, String[] delimiters,
                                     Class<?> translatorClass,
                                     String[] handlerNames, String[] handlerOptions,
-                                    SolverSocket.MessageHandler messageHandler, String preamble) {
+                                    Class<?> solverSocketClass, String preamble) {
         this.name = name;
         this.info = info;
         this.defaultParams = defaultParams;
@@ -132,7 +137,7 @@ public final class SolverTypeImplementation implements SolverType {
         // copy the array so that it cannot accidentally be manipulated from the outside
         this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
         this.handlerOptions = Arrays.copyOf(handlerOptions, handlerOptions.length);
-        msgHandler = messageHandler;
+        this.solverSocketClass = solverSocketClass;
         this.preamble = preamble;
     }
 
@@ -236,23 +241,18 @@ public final class SolverTypeImplementation implements SolverType {
     public SMTTranslator createTranslator(Services services) {
         Constructor<?>[] constructors = translatorClass.getConstructors();
         SMTTranslator smtTranslator = null;
-        boolean instantiated = false;
-        for (int i = 0; i < constructors.length; i++) {
-            try {
-                smtTranslator = (SMTTranslator) constructors[i]
-                        .newInstance(handlerNames, handlerOptions, preamble);
-                instantiated = true;
-                break;
-            } catch (IllegalArgumentException | ClassCastException | InstantiationException
-                    | IllegalAccessException | InvocationTargetException e) {
-                instantiated = false;
-            }
-        }
-        // default fallback option
-        if (!instantiated) {
+        try {
+            return (SMTTranslator) translatorClass
+                    .getDeclaredConstructor(String[].class, String[].class, String.class)
+                    .newInstance(handlerNames, handlerOptions, preamble);
+        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
+                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.error(
+                    "Using default ModularSMTLib2Translator for SMT translation due to exception:"
+                            + System.lineSeparator()
+                            + e.getMessage());
             return new ModularSMTLib2Translator();
         }
-        return smtTranslator;
     }
 
     @Override
@@ -325,8 +325,19 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Nonnull
     @Override
-    public SolverSocket getSocket(ModelExtractor query) {
-        return new SolverSocket(name, query, msgHandler);
+    public AbstractSolverSocket getSocket(ModelExtractor query) {
+        try {
+            return (AbstractSolverSocket) solverSocketClass
+                    .getDeclaredConstructor(String.class, ModelExtractor.class)
+                    .newInstance(name, query);
+        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
+                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.error(
+                    "Using default Z3Socket for solver communication due to exception:"
+                            + System.lineSeparator()
+                            + e.getMessage());
+            return new Z3Socket(name, query);
+        }
     }
 
 }

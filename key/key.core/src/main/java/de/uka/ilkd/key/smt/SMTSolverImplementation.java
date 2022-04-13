@@ -18,8 +18,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
-import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.st.SolverType;
@@ -62,7 +62,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * external solver process
      */
     private final @Nonnull
-    SolverSocket socket;
+    AbstractSolverSocket socket;
 
     /**
      * the ModelExtractor used to generate counterexamples (only used for CE solver type)
@@ -168,7 +168,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         this.services = services;
         this.type = myType;
         // Why not just call type.getSocket(query) here?
-        this.socket = SolverSocket.createSocket(type, query);
+        this.socket = AbstractSolverSocket.createSocket(type, query);
         processLauncher = new ExternalProcessLauncher(solverCommunication, myType.getDelimiters());
     }
 
@@ -434,7 +434,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     @Override
-    public SolverSocket getSocket() {
+    public AbstractSolverSocket getSocket() {
         return socket;
     }
 

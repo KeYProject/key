@@ -15,9 +15,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
-import de.uka.ilkd.key.smt.communication.SolverSocket;
-import de.uka.ilkd.key.smt.communication.SolverCommunication;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 
 import javax.annotation.Nonnull;
 
@@ -151,7 +149,7 @@ public interface SolverType {
      * @return the newly created socket
      */
     @Nonnull
-    SolverSocket getSocket(ModelExtractor query);
+    AbstractSolverSocket getSocket(ModelExtractor query);
 
 }
 

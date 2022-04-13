@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.SolverSocket;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.slf4j.Logger;
@@ -70,13 +70,13 @@ public class SolverPropertiesLoader {
      * The default {@link de.uka.ilkd.key.smt.SMTTranslator}, if none is given in the .props file:
      * {@link ModularSMTLib2Translator}.
      */
-    private static final String DEFAULT_TRANSLATOR = "ModularSMTLib2Translator";
+    private static final String DEFAULT_TRANSLATOR = "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
-     * The default {@link de.uka.ilkd.key.smt.communication.SolverSocket.MessageHandler},
+     * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket},
      * if none is given in the .props file:
-     * {@link de.uka.ilkd.key.smt.communication.SolverSocket.MessageHandler#DEFAULT}.
+     * {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String DEFAULT_MESSAGE_HANDLER = "DEFAULT";
+    private static final String DEFAULT_MESSAGE_HANDLER = "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
@@ -125,12 +125,13 @@ public class SolverPropertiesLoader {
     private static final String LEGACY = "legacy";
     /**
      * The .props key for the solver's
-     * {@link de.uka.ilkd.key.smt.communication.SolverSocket.MessageHandler}.
-     * Default handler is {@link SolverSocket.MessageHandler#DEFAULT}.
+     * {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}.
+     * Default socket is {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String MESSAGE_HANDLER = "messageHandler";
+    private static final String SOLVER_SOCKET_CLASS = "socketClass";
     /**
      * The .props key for the solver's {@link de.uka.ilkd.key.smt.SMTTranslator}.
+     * Default translator is {@link ModularSMTLib2Translator}.
      */
     private static final String TRANSLATOR_CLASS = "translatorClass";
     /**
@@ -213,11 +214,10 @@ public class SolverPropertiesLoader {
         String params;
         String version;
         String info;
-        String messageHandler;
         String preamble;
         String minVersion;
         long timeout;
-        SolverSocket.MessageHandler handler;
+        Class<?> solverSocketClass;
         Class<?> translatorClass;
         String[] handlerNames;
         String[] handlerOptions;
@@ -244,11 +244,15 @@ public class SolverPropertiesLoader {
                 DEFAULT_MINIMUM_VERSION);
         info = SettingsConverter.readRawString(props, SolverPropertiesLoader.INFO, DEFAULT_INFO);
 
-        // the communication socket used for communication with the created solver
-        // (class SolverCommunicationSocket)
-        messageHandler = SettingsConverter.readRawString(props, MESSAGE_HANDLER,
-                DEFAULT_MESSAGE_HANDLER);
-        handler = SolverSocket.MessageHandler.valueOf(messageHandler);
+        // the solver socket used for communication with the created solver
+        try {
+            String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
+                    DEFAULT_TRANSLATOR);
+            solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
+        } catch (ClassNotFoundException e) {
+            solverSocketClass = Z3Socket.class;
+        }
+
 
         // the message DELIMITERS used by the created solver in its stdout
         delimiters = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.DELIMITERS,
@@ -256,9 +260,9 @@ public class SolverPropertiesLoader {
 
         // the smt translator (class SMTTranslator) used by the created solver
         try {
-            String className = SettingsConverter.readRawString(props, TRANSLATOR_CLASS,
+            String translatorClassName = SettingsConverter.readRawString(props, TRANSLATOR_CLASS,
                     DEFAULT_TRANSLATOR);
-            translatorClass = ClassLoaderUtil.getClassforName(className);
+            translatorClass = ClassLoaderUtil.getClassforName(translatorClassName);
         } catch (ClassNotFoundException e) {
             translatorClass = ModularSMTLib2Translator.class;
         }
@@ -274,9 +278,9 @@ public class SolverPropertiesLoader {
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
 
         // create the solver type
-        return new SolverTypeImplementation(name, info, params, command, version,
-                minVersion, timeout, delimiters, translatorClass,
-                handlerNames, handlerOptions, handler, preamble);
+        return new SolverTypeImplementation(name, info, params, command, version, minVersion,
+                timeout, delimiters, translatorClass, handlerNames, handlerOptions,
+                solverSocketClass, preamble);
     }
 
     /**

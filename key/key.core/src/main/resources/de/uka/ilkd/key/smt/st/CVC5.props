@@ -4,7 +4,7 @@ name=CVC5
 info=CVC5 solver (https://cvc5.github.io/).
 command=cvc5
 version=--version
-messageHandler=CVC5
+socketClass=de.uka.ilkd.key.smt.communication.CVC5Socket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\
