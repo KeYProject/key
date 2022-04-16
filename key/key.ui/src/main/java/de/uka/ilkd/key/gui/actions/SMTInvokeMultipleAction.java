@@ -130,12 +130,11 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         selectAll.setFocusPainted(false);
         // Change behaviour of checkAll to unchecking all if all solvers are checked
         selectAll.setEnabled(true);
+        selectAll.setSelected(true);
         selectAll.addActionListener(changeEvent -> {
-            if (!selectAll.isSelected()) {
-                selectAll.setSelected(true);
-            }
+            boolean isSelected = selectAll.isSelected();
             for (UnionCheckBox checkBox: choiceOptions) {
-                checkBox.setSelected(true);
+                checkBox.setSelected(isSelected);
             }
         });
 
@@ -153,11 +152,16 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
                 if (createSolverTypeCollection(choiceOptions).equals(
                         SolverTypeCollection.EMPTY_COLLECTION)) {
                     start.setEnabled(false);
+                    if (selectAll.isSelected()) {
+                        selectAll.setSelected(false);
+                    }
                     return;
                 }
                 start.setEnabled(true);
-                selectAll.setSelected((choiceOptions.stream().filter(u -> !u.isSelected())
-                        .collect(Collectors.toList()).isEmpty()));
+                long count = choiceOptions.stream().filter(AbstractButton::isSelected).count();
+                if (count == choiceOptions.size() && !selectAll.isSelected()) {
+                    selectAll.setSelected(true);
+                }
             });
             choiceOptions.add(chooseUnion);
             chooseUnion.setSelected(true);
