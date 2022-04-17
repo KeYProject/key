@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,13 +35,12 @@ public class ExprTest {
     public void parseAndVisit(String expr) throws IOException {
         Assumptions.assumeFalse(expr.startsWith("#"));
         KeyIO io = getIo();
-        try {
-            Term actual = io.parseExpression(expr);
-            assertNotNull(actual);
-            LOGGER.info("Term: {}", actual);
-        } catch (BuildingException e) {
-            DebugKeyLexer.debug(expr);
-        }
+        @Nonnull Term actual = io.parseExpression(expr);
+        assertNotNull(actual);
+        LOGGER.info("Actual Term: {}", actual);
+
+        LOGGER.warn("Actual Term: {}",
+                LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
     }
 
     private KeyIO getIo() throws IOException {
