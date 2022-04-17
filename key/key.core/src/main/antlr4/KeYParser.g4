@@ -46,6 +46,7 @@ decls
     | schema_var_decls
     | pred_decls
     | func_decls
+    | adt_decls
     | transform_decls
     | ruleset_decls
     | contracts             // for problems
@@ -251,6 +252,25 @@ func_decl
   SEMI
 ;
 
+/**
+ \datatypes {
+    List = Nil | Cons(any, List);
+ }
+ */
+adt_decl
+:
+  doc=DOC_COMMENT? (UNIQUE)?
+  name=funcpred_name
+  EQUAL
+  adt_constructor (OR adt_constructor)*
+;
+
+adt_constructor
+:
+    doc=DOC_COMMENT? funcpred_name                                      #adt_constructor_base
+  | doc=DOC_COMMENT? funcpred_name LPAREN sortId (COMMA sortId)* RPAREN #adt_constructor_recursion
+;
+
 functionMetaData
 :
     INFIX LPAREN op=(PLUS|STAR|SLASH|MINUS|EXP|PERCENT|LESS|LESSEQUAL|GREATER|GREATEREQUAL|LGUILLEMETS) RPAREN
@@ -260,14 +280,14 @@ functionMetaData
 ;
 
 func_decls
-    :
-        FUNCTIONS
-        LBRACE
-        (
-            func_decl
-        ) *
-        RBRACE
-    ;
+:
+    FUNCTIONS LBRACE (func_decl)* RBRACE
+;
+
+adt_decls
+:
+  DATATYPES LBRACE adt_decl* RBRACE
+;
 
 
 // like arg_sorts but admits also the keyword "\formula"
