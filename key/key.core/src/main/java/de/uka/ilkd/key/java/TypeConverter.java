@@ -124,10 +124,6 @@ public final class TypeConverter {
         return (CharListLDT) getLDT(CharListLDT.NAME);
     }
 
-    public Collection<LDT> getLDTs() {
-        return LDTs.values();
-    }
-
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
