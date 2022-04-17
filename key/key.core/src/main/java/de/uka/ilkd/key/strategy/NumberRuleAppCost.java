@@ -17,6 +17,8 @@ import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
 
+import javax.annotation.Nonnull;
+
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
@@ -58,6 +60,18 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
+    @Nonnull
+    @Override
+    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+        if (cost instanceof TopRuleAppCost) {
+            return cost.mul(this);
+        }
+        if (cost instanceof NumberRuleAppCost) {
+            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+            return create(getValue() * numberRuleAppCost.getValue());
+        }
+        throw new IllegalArgumentException();
+    }
 
     @Override
     public int compareTo(RuleAppCost o) {

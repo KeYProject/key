@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy;
 
+import javax.annotation.Nonnull;
+
 /**
  * Singleton implementation of the <code>RuleAppCost</code> interface, which
  * denotes a maximum cost (rule applications with this cost can't be afforded
@@ -22,7 +24,7 @@ public class TopRuleAppCost implements RuleAppCost {
 
     private TopRuleAppCost () {}
 
-    public int compareTo(RuleAppCost o) {
+    public int compareTo(@Nonnull RuleAppCost o) {
 	if ( o instanceof TopRuleAppCost )
 	    return 0;
 	return 1;
@@ -34,13 +36,32 @@ public class TopRuleAppCost implements RuleAppCost {
         }
         return false;
     }
-    
+
     public int hashCode() {
         return 91879827;
     }
-    
-    public final RuleAppCost add (RuleAppCost cost2) {
+
+    /**
+     * TOP costs cannot be further increased!
+     * @param cost2 the other costs
+     * @return this instance
+     */
+    public final RuleAppCost add(@Nonnull RuleAppCost cost2) {
         return INSTANCE;
+    }
+
+    /**
+     * Multiply the TOP costs with given cost.
+     * TOP times any other costs results into TOP cost.
+     *
+     * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
+     * @param cost - non-null {@link RuleAppCost}
+     * @return this instance
+     */
+    @Nonnull
+    @Override
+    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+        return this;
     }
 
     public String toString () {
