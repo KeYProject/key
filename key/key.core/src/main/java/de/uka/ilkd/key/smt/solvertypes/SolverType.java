@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt.st;
+package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;

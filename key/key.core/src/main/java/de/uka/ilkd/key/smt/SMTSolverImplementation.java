@@ -22,8 +22,8 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import javax.annotation.Nonnull;

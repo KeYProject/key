@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.smt.st;
+package de.uka.ilkd.key.smt.solvertypes;
 
 import javax.annotation.Nonnull;
 import java.util.*;

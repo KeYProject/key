@@ -49,9 +49,8 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
@@ -193,7 +192,7 @@ public class SolverListener implements SolverLauncherListener {
                 }
             }
         }
-        
+
 
         public SolverListener(DefaultSMTSettings settings, Proof smtProof) {
                 this.settings = settings;
@@ -247,8 +246,8 @@ public class SolverListener implements SolverLauncherListener {
             }
 
         }
-        
-        private void showInformation(InternSMTProblem problem){	
+
+        private void showInformation(InternSMTProblem problem){
         	    new InformationWindow(
                         progressDialog, problem.solver,problem.information,
                         "Information for "+ problem.toString());
@@ -261,7 +260,7 @@ public class SolverListener implements SolverLauncherListener {
                 progressModel = new ProgressModel();
 
                 String[] captions = new String[smtProblems.size()];
-               
+
                 int i = 0;
                 for (SMTProblem problem : smtproblems) {
                         captions[i] = problem.getName();
@@ -300,7 +299,7 @@ public class SolverListener implements SolverLauncherListener {
                 progressDialog = new ProgressDialog(
                                 progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,
                         smtproblems.size()*solverTypes.size(), new String[] {}, titles);
-         
+
                 SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -310,8 +309,8 @@ public class SolverListener implements SolverLauncherListener {
                 });
 
         }
-        
-       
+
+
 
 		private InternSMTProblem getProblem(int col,int row){
                 for(InternSMTProblem problem : problems){
@@ -343,7 +342,7 @@ public class SolverListener implements SolverLauncherListener {
                         final Collection<SolverType> solverTypes,
                         final SolverLauncher launcher) {
                 prepareDialog(smtproblems, solverTypes, launcher);
-               
+
                 setProgressText(0);
                 timer.schedule(new TimerTask() {
                         @Override
@@ -375,7 +374,7 @@ public class SolverListener implements SolverLauncherListener {
                 return Math.max((float) temp / 10.0f, 0);
         }
 
- 
+
 
         private boolean refreshProgessOfProblem(InternSMTProblem problem) {
                 SolverState state = problem.solver.getState();
@@ -406,17 +405,17 @@ public class SolverListener implements SolverLauncherListener {
                 float remainingTime = calculateRemainingTime(problem);
                 progressModel.setText(Float.toString(remainingTime) + " sec.", problem.getSolverIndex(),problem.getProblemIndex());
         }
-        
+
         private void setProgressText(int value){
                 JProgressBar bar = progressDialog.getProgressBar();
                 if(bar.getMaximum() == 1){
                         bar.setString(value == 0 ? "Processing...": "Finished.");
-                        bar.setStringPainted(true); 
+                        bar.setStringPainted(true);
                 }else{
                         bar.setString("Processed " + value + " of " + bar.getMaximum() + " problems.");
                         bar.setStringPainted(true);
                 }
-                        
+
         }
 
         private void stopped(InternSMTProblem problem) {
@@ -424,7 +423,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 int x = problem.getSolverIndex();
                 int y = problem.getProblemIndex();
-                
+
                 if(!problemProcessed[x][y]){
                         finishedCounter++;
                         progressDialog.setProgress(finishedCounter);
@@ -433,20 +432,20 @@ public class SolverListener implements SolverLauncherListener {
                         setProgressText(finishedCounter);
                         problemProcessed[x][y] = true;
                 }
-    
+
                 if (problem.solver.wasInterrupted()) {
                         interrupted(problem);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-        
+
                         successfullyStopped(problem,x,y);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-   
+
                         unsuccessfullyStopped(problem,x,y);
                 } else {
-                 
+
                         unknownStopped(x,y);
                 }
-           
+
         }
 
         private void interrupted(InternSMTProblem problem) {
@@ -459,8 +458,8 @@ public class SolverListener implements SolverLauncherListener {
                         progressModel.setProgress(0,x,y);
                         progressModel.setTextColor(RED.get(),x,y);
                         progressModel.setText("Exception!",x,y);
-               
-            
+
+
 
                         break;
                 case NoInterruption:
@@ -468,9 +467,9 @@ public class SolverListener implements SolverLauncherListener {
                                         "This position should not be reachable!");
 
                 case Timeout:
-                        progressModel.setProgress(0, x,y);                        
+                        progressModel.setProgress(0, x,y);
                         progressModel.setText("Timeout.",x,y);
-        
+
                         break;
                 case User:
                         progressModel.setText("Interrupted by user.",x,y);
@@ -552,9 +551,9 @@ public class SolverListener implements SolverLauncherListener {
         private void storeSMTTranslation(SMTSolver solver, Goal goal,
                         String problemString) {
                 String path = settings.getPathForSMTTranslation();
-                
+
                 String fileName = goal.proof().name()+"_"+goal.getTime()+"_"+solver.name()+".smt";
-                path = path+File.separator+fileName;              
+                path = path+File.separator+fileName;
                 path = finalizePath(path, solver, goal);
                 storeToFile(problemString, path);
 
@@ -591,7 +590,7 @@ public class SolverListener implements SolverLauncherListener {
                 return path;
         }
 
-		
+
       public static String computeSolverTypeWarningMessage(SolverType type) {
          StringBuffer message = new StringBuffer();
          message.append("You are using a version of "+type.getName()+
@@ -600,15 +599,15 @@ public class SolverListener implements SolverLauncherListener {
          message.append(type.getMinimumSupportedVersion());
          return message.toString();
       }
-		
+
 		private class ProgressDialogListenerImpl implements ProgressDialogListener {
-            
-			
-			
+
+
+
             private SolverLauncher launcher;
             private boolean counterexample;
-            
-            
+
+
 
 			public ProgressDialogListenerImpl(SolverLauncher launcher,
 					boolean counterexample) {
@@ -621,19 +620,19 @@ public class SolverListener implements SolverLauncherListener {
             public void infoButtonClicked(int column, int row) {
                     InternSMTProblem problem = getProblem(column, row);
                     showInformation(problem);
-                    
+
             }
-            
+
             @Override
             public void stopButtonClicked() {
-               
-                    stopEvent(launcher); 
+
+                    stopEvent(launcher);
             }
-            
+
             @Override
             public void applyButtonClicked() {
                     applyEvent(launcher);
-                    
+
             }
 
             @Override
@@ -643,7 +642,7 @@ public class SolverListener implements SolverLauncherListener {
                     if(counterexample && smtProof != null){
                         smtProof.dispose();
                     }
-                    
+
             }
 
             @Override
@@ -658,7 +657,7 @@ public class SolverListener implements SolverLauncherListener {
                               null,
                               null);
               	  }else if(obj instanceof InternSMTProblem){
-            		  showInformation((InternSMTProblem)obj);   
+            		  showInformation((InternSMTProblem)obj);
             	  }
             }
     };

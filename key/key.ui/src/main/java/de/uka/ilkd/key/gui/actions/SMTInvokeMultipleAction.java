@@ -2,7 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -133,7 +133,9 @@ public final class SMTInvokeMultipleAction extends SMTInvokeAction {
         selectAll.setSelected(true);
         selectAll.addActionListener(changeEvent -> {
             boolean isSelected = selectAll.isSelected();
-            for (UnionCheckBox checkBox: choiceOptions) {
+            for (UnionCheckBox checkBox: choiceOptions.stream()
+                    .filter(b -> b.isSelected() != isSelected)
+                    .collect(Collectors.toList())) {
                 checkBox.setSelected(isSelected);
             }
         });

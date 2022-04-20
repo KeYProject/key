@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.smt.st;
+package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
@@ -27,6 +27,11 @@ public class SolverPropertiesLoader {
      * Logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
+
+    /**
+     * Path to the file containing the names of the SMT properties files to be loaded.
+     */
+    private static final String SOLVER_LIST_FILE = "solvers.txt";
 
     /**
      * The solvers loaded by this loader.
@@ -247,7 +252,7 @@ public class SolverPropertiesLoader {
         // the solver socket used for communication with the created solver
         try {
             String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
-                    DEFAULT_TRANSLATOR);
+                    DEFAULT_MESSAGE_HANDLER);
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
             solverSocketClass = Z3Socket.class;
@@ -290,7 +295,7 @@ public class SolverPropertiesLoader {
      */
     private static Collection<Properties> loadSolvers() {
         InputStream stream = SolverPropertiesLoader.class
-                .getResourceAsStream("defaultSolvers.txt");
+                .getResourceAsStream(SOLVER_LIST_FILE);
         Collection<Properties> props = new ArrayList<>();
         // return an empty list if no defaultSolvers file was read
         if (stream == null) {

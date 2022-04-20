@@ -16,7 +16,7 @@ package de.uka.ilkd.key.gui.smt;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.java.StringUtil;
 
 import javax.swing.*;

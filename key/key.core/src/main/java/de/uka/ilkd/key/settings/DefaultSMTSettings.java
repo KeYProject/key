@@ -17,7 +17,7 @@ package de.uka.ilkd.key.settings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 import java.io.File;

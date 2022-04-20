@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.Collection;
 
@@ -21,7 +21,7 @@ import java.util.Collection;
  * This interface can be used to observe a launcher.
  * */
 public interface SolverLauncherListener {
-	
+
     public void launcherStopped(SolverLauncher launcher,
 	    Collection<SMTSolver> finishedSolvers);
 

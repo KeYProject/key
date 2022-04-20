@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
 
 import java.io.IOException;

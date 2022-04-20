@@ -1,8 +1,8 @@
 # Add new SMT solver types as .props files
 
 This is an examplary solver properties file. 
-To add a solver, specify a *.props* file following this example or the existing files and add it to the *key.core\src\main\resources\de\uka\ilkd\key\smt\st* directory. 
-For the solver to be usable, add the file's name to *defaultSolvers.txt*.
+To add a solver, specify a *.props* file following this example or the existing files and add it to the *key.core\src\main\resources\de\uka\ilkd\key\smt\solvertypes* directory. 
+For the solver to be usable, add the file's name to *solvers.txt* in that directory.
 
 ## Specifiable properties
 
@@ -37,8 +37,13 @@ If the property is not specified, it is an empty String "". Note that this canno
 version=--version
 ```
 
-The minimum supported version of this solver. By default, this is an empty String. 
-Note that different versions are compared to this minimum version lexicographically - if that comparison is not possible, you may have to override the SolverTypeImplementation class.
+The minimum supported version of this solver. By default, this is an empty String.
+Note that the actual version is only compared to the minimum version lexicographically.
+This is a temporary solution as it may lead to weird behaviour, for example shorter 
+Strings will be before longer Strings and 1.14.1 will be before 1.8.10 even though they have the same length.
+
+If that lexicographical comparison is not possible, you may have to 
+modify the SolverTypeImplementation class and change SolverPropertiesLoader accordingly.
 ```properties
 minVersion=0.0.0
 ```

@@ -8,9 +8,8 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 
 import javax.swing.*;

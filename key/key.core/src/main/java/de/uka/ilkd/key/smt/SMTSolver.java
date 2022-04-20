@@ -16,7 +16,7 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 /**

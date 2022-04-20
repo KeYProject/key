@@ -14,11 +14,9 @@
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 

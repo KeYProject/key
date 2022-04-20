@@ -6,8 +6,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -36,7 +36,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	private final Services services;
 
 	private Goal goal;
-	
+
 	private int count;
 
 
@@ -47,7 +47,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 
 	public ModelGenerator(Goal s, int target, Services services) {
-		this.goal = s;	
+		this.goal = s;
 		this.services = services;
 		this.target = target;
 		models = new LinkedList<Model>();
@@ -64,7 +64,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		SolverType solver = SolverTypes.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(goal);
 		launcher.addListener(this);
-		launcher.launch(problem, services, solver);		
+		launcher.launch(problem, services, solver);
 	}
 	/**
 	 * Creates a SolverLauncher with the appropriate settings.
@@ -73,7 +73,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	private SolverLauncher prepareLauncher(){
 		final TestGenerationSettings settings = TestGenerationSettings.getInstance();
 		final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
-		
+
 
 		piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
 		final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
@@ -87,15 +87,15 @@ public class ModelGenerator implements SolverLauncherListener{
 	@Override
     public void launcherStopped(SolverLauncher launcher,
             Collection<SMTSolver> finishedSolvers) {
-		
-		for(SMTSolver solver : finishedSolvers){			
+
+		for(SMTSolver solver : finishedSolvers){
 			SMTSolverResult result = solver.getFinalResult();
 			if(result.isValid().equals(SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) && models.size() < target){
 				Model model = solver.getSocket().getQuery().getModel();
 				models.add(model);
 				addModelToTerm(model);
-				
-				
+
+
 				if(models.size() >= target){
 					finish();
 				}
@@ -106,8 +106,8 @@ public class ModelGenerator implements SolverLauncherListener{
 			}
 			else{
 				finish();
-			}			
-		}	    
+			}
+		}
 
 	}
 
@@ -117,7 +117,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * Changes the term such that when evaluated again with z3 another model will be generated.
 	 * If we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ... are integer constants we change the term t to the following form:
 	 * t & !(c1=v1 & c2 = v2 & ...)
-	 * 
+	 *
 	 * @param m the model
 	 * @return true if the term has been changed
 	 */
@@ -132,7 +132,7 @@ public class ModelGenerator implements SolverLauncherListener{
 			if(sort!=null && sort.getId().equals(SMTObjTranslator.BINT_SORT)){
 				String val = m.getConstants().get(c);
 				int value = Integer.parseInt(val);
-				ProgramVariable v = (ProgramVariable)variables.lookup(c);				
+				ProgramVariable v = (ProgramVariable)variables.lookup(c);
 				Term termConst = tb.var(v);
 				Term termVal = tb.zTerm(value);
 				Term termEquals = tb.equals(termConst, termVal);
@@ -143,8 +143,8 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		if(!tmodel.equals(tb.tt())){
 			Term notTerm = tb.not(tmodel);
-			SequentFormula sf = new SequentFormula(notTerm);			
-			goal.addFormula(sf, true, true);		
+			SequentFormula sf = new SequentFormula(notTerm);
+			goal.addFormula(sf, true, true);
 			return true;
 		}
 		return false;

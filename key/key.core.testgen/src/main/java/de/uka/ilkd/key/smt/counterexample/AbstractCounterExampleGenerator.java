@@ -9,7 +9,6 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
@@ -17,9 +16,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +45,7 @@ public abstract class AbstractCounterExampleGenerator {
    public static boolean isSolverAvailable() {
       return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
    }
-   
+
    /**
     * Searches a counter example for the given {@link Sequent}.
     * @param ui The {@link UserInterfaceControl} to use.
@@ -55,13 +53,13 @@ public abstract class AbstractCounterExampleGenerator {
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @throws ProofInputException Occurred Exception.
     */
-   public void searchCounterExample(UserInterfaceControl ui, 
-                                    Proof oldProof, 
+   public void searchCounterExample(UserInterfaceControl ui,
+                                    Proof oldProof,
                                     Sequent oldSequent) throws ProofInputException {
       if (!isSolverAvailable()) {
          throw new IllegalStateException("Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
       }
-      
+
       final Proof proof = createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
@@ -93,9 +91,9 @@ public abstract class AbstractCounterExampleGenerator {
               SMTProblem.createSMTProblems(proof),
               proof.getServices());
 
-      
+
    }
-   
+
    /**
     * Creates a new {@link Proof}.
     * @param ui The {@link UserInterfaceControl} to use.
@@ -105,14 +103,14 @@ public abstract class AbstractCounterExampleGenerator {
     * @return The created {@link Proof}.
     * @throws ProofInputException Ocurred Exception
     */
-   protected abstract Proof createProof(UserInterfaceControl ui, 
-                                        Proof oldProof, 
+   protected abstract Proof createProof(UserInterfaceControl ui,
+                                        Proof oldProof,
                                         Sequent oldSequent,
                                         String proofName) throws ProofInputException;
 
-   
+
    /**
-    * Creates the {@link Sequent} for the new {@link Proof} created by 
+    * Creates the {@link Sequent} for the new {@link Proof} created by
     * {@link #createProof(KeYMediator, Proof, Sequent)}.
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @return The new {@link Sequent}.
@@ -120,14 +118,14 @@ public abstract class AbstractCounterExampleGenerator {
    protected Sequent createNewSequent(Sequent oldSequent) {
       return Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
    }
-   
+
    /**
     * This method is called after the {@link SemanticsBlastingMacro} has been executed.
     * @param ui The {@link UserInterfaceControl} to use.
     */
    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
    }
-   
+
    /**
     * Creates the {@link SolverLauncherListener} which handles the results
     * of the launched SMT solver.

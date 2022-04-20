@@ -4,7 +4,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.io.File;
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
     public boolean useExplicitTypeHierarchy() {
 	return false;
     }
-    
+
     @Override
     public boolean useBuiltInUniqueness() {
          return false;

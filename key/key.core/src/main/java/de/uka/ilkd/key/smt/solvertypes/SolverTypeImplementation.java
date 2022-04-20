@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.smt.st;
+package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -247,7 +247,7 @@ public final class SolverTypeImplementation implements SolverType {
                     .newInstance(handlerNames, handlerOptions, preamble);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.error(
+            LOGGER.warn(
                     "Using default ModularSMTLib2Translator for SMT translation due to exception:"
                             + System.lineSeparator()
                             + e.getMessage());
@@ -301,6 +301,13 @@ public final class SolverTypeImplementation implements SolverType {
 
     /**
      * Note that the actual version is only compared to the minimum version lexicographically.
+     * This is a temporary solution as it may lead to weird behaviour, for example shorter
+     * Strings will be before longer Strings and 1.14.1 will be before 1.8.10 even though they have the same length.
+     *
+     * If that lexicographical comparison is not possible, you may have to
+     * modify the SolverTypeImplementation class and change SolverPropertiesLoader accordingly.
+     *
+     * TODO Find better solution
      */
     @Override
     public boolean checkForSupport() {
@@ -332,7 +339,7 @@ public final class SolverTypeImplementation implements SolverType {
                     .newInstance(name, query);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.error(
+            LOGGER.warn(
                     "Using default Z3Socket for solver communication due to exception:"
                             + System.lineSeparator()
                             + e.getMessage());
