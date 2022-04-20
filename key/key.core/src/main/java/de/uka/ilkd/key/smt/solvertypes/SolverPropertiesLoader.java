@@ -311,7 +311,7 @@ public class SolverPropertiesLoader {
                 props.add(solverProp);
             } catch (Exception e) {
                 // if loading the file does not work for any reason, create a warning and continue
-                LOGGER.warn(String.format("Solver file %s could not be loaded.", fileName));
+                LOGGER.error(String.format("Solver file %s could not be loaded.", fileName));
             }
         }
         return props;

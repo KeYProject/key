@@ -67,13 +67,17 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
+        // Load all available solver types in the system according to SolverTypes.
         Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
         if (!Main.isExperimentalMode()) {
             solverTypes.removeAll(SolverTypes.getLegacySolvers());
         } else {
             getChildren().add(new TranslationOptions());
         }
-        // Only add options for those solvers that are actually theoretically available according to the settings.
+        /* Only add options for those solvers that are actually theoretically available
+        according to the settings. Note that these aren't necessarily all the types
+        provided by SolverTypes, depending on the implementation of the
+        ProofIndependentSettings. */
         for (SolverType options : solverTypes.stream().filter(
                 t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
                 .collect(Collectors.toList())) {

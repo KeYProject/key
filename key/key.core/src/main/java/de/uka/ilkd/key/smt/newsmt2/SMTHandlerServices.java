@@ -1,16 +1,20 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -27,20 +31,20 @@ public class SMTHandlerServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTHandlerServices.class);
 
-    /** The name of the package where this class resides. Used for
-     * prefixing when loading handlers.
-     */
-    private static final String PACKAGE_PREFIX =
-            SMTHandlerServices.class.getPackageName() + ".";
+    private static final String DEFAULT_HANDLERS = "defaultHandlers.txt";
 
     /** Singleton instance */
     private static SMTHandlerServices theInstance;
 
-    /** The list of instantiated available handlers */
-    private List<SMTHandler> handlers = new ArrayList<>();
-
     /** A map from handler to their smt2 snippets */
-    private final Map<SMTHandler, Properties> snippetMap = new IdentityHashMap<>();
+    /* Before removing the ServiceLoader from #getOriginalHandlers,
+    an IdentityHashMap was used here. Since the removal of the ServiceLoader leads
+    to snippetMap being modified even after creation, concurrent modification by different
+    solver threads becomes possible. Hence, either every access to snippetMap needs to
+    be synchronized or it needs to be a ConcurrentHashMap - which is not an IdentityHashMap
+    anymore. This should not be a problem as the SMTHandlers don't override equals().
+     */
+    private final Map<SMTHandler, Properties> snippetMap = new ConcurrentHashMap<>();
 
     // preamble is volatile since sonarcube tells me the synchronisation scheme
     // for loading would be broken otherwise. (MU 2021)
@@ -48,7 +52,7 @@ public class SMTHandlerServices {
     private volatile String preamble;
 
     /** lock for synchronisation */
-    private final Object theCreationLock = new Object();
+    private final Object handlerModificationLock = new Object();
 
     /** A collection of the properties */
     private List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
@@ -66,7 +70,7 @@ public class SMTHandlerServices {
     }
 
     /**
-     * Load the original SMTHandler instances (from the snippetMap) of all handlers
+     * Load the original/template SMTHandler instances (from the snippetMap) of all handlers
      * specified as arguments.
      * Add fresh handlers to the snippetMap and load the snippets that belong to these instances
      * if that has not happened yet for any object of a given handler class.
@@ -84,7 +88,14 @@ public class SMTHandlerServices {
      *              The collection's order matches that of the names as well.
      *
      */
-    private Collection<SMTHandler> getOriginalHandlers(String[] handlerNames) throws IOException {
+    public Collection<SMTHandler> getTemplateHandlers(String[] handlerNames) throws IOException {
+        // If handlerNames is empty, use default handlerNames list.
+        if (handlerNames.length == 0) {
+            InputStream stream = SolverPropertiesLoader.class
+                    .getResourceAsStream(DEFAULT_HANDLERS);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            handlerNames = reader.lines().collect(Collectors.toList()).toArray(new String[0]);
+        }
         Collection<SMTHandler> result = new LinkedList<>();
         for (String name : handlerNames) {
             try {
@@ -92,14 +103,15 @@ public class SMTHandlerServices {
                 if (findHandler(handlerClass, result)) {
                     continue;
                 }
-                synchronized (theCreationLock) {
-                    // Make sure that each handler is added to the handler list at most once
-                    // and that everyone waits for the result.
+                synchronized (handlerModificationLock) {
+                    /* Make sure that each handler is added to the template handlers
+                    (keyset of snippetMap) at most once and that every thread waits for the result.
+                    Also, every search access on smtProperties should be
+                    synchronized in order to avoid concurrent modification. */
                     if (findHandler(handlerClass, result)) {
                         continue;
                     }
                     SMTHandler handler = handlerClass.getConstructor().newInstance();
-                    handlers.add(handler);
                     result.add(handler);
                     Properties handlerSnippets = loadSnippets(handlerClass);
                     if (handlerSnippets != null) {
@@ -110,12 +122,10 @@ public class SMTHandlerServices {
             } catch (ClassNotFoundException e) {
                 LOGGER.warn("Could not load SMTHandler:" + System.lineSeparator()
                         + e.getMessage());
-                continue;
             } catch (NoSuchMethodException | InvocationTargetException
                     | InstantiationException | IllegalAccessException e) {
                 LOGGER.warn("Could not create SMTHandler:" + System.lineSeparator()
                         + e.getMessage());
-                continue;
             }
         }
         // TODO make sure that the order of handlers in result is the same as the order
@@ -123,11 +133,15 @@ public class SMTHandlerServices {
         return result;
     }
 
+    // Search for a handler of the given class in the snippetMap and if it exists, add it to
+    // the result collection.
     private boolean findHandler(Class<SMTHandler> clazz, Collection<SMTHandler> result) {
-        Optional<SMTHandler> handler = handlers.stream()
-                .filter(h -> h.getClass().equals(clazz)).findFirst();
+        Optional<SMTHandler> handler = snippetMap.keySet()
+                .stream()
+                .filter(h -> h.getClass().equals(clazz))
+                .findFirst();
         if (handler.isPresent()) {
-            if (!result.contains(handler)) {
+            if (!result.contains(handler.get())) {
                 result.add(handler.get());
             }
             return true;
@@ -148,16 +162,24 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, @Nullable String[] handlerNames,
+    public List<SMTHandler> getFreshHandlers(Services services, @Nonnull String[] handlerNames,
                                              String[] handlerOptions, MasterHandler mh)
             throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
-        for (SMTHandler handler : getOriginalHandlers(handlerNames)) {
+        // Possibly problematic: snippetMap may be modified by another thread while calling snippetMap.get(handler)
+        // -> concurrent modification?
+        for (SMTHandler handler : getTemplateHandlers(handlerNames)) {
+            // After getOriginalHandlers(handlerNames), snippets for all handlers are
             try {
-                // TODO SMTHandler#copy() would be nice(?)
                 SMTHandler copy = handler.getClass().getConstructor().newInstance();
+                /* Either use that synchronized block or make snippetMap a ConcurrentHashMap:
+                Properties snippet;
+                synchronized (handlerModificationLock) {
+                    // Avoid concurrent modification of the snippetMap while accessing it.
+                    snippet = snippetMap.get(handler);
+                }*/
                 copy.init(mh, services, snippetMap.get(handler), handlerOptions);
                 result.add(copy);
             } catch (Exception e) {
@@ -201,7 +223,7 @@ public class SMTHandlerServices {
     public String getPreamble() {
         try {
             if (preamble == null) {
-                synchronized (theCreationLock) {
+                synchronized (handlerModificationLock) {
                     if(preamble == null) {
                         // make sure this is only ever read once and everyone
                         // waits for it.
@@ -225,14 +247,20 @@ public class SMTHandlerServices {
     }
 
     /**
-     * Get the list of all {@link SMTHandlerProperty}s known in the system
+     * Get the list of all {@link SMTHandlerProperty}s currently known in the system
      *
      * @return an unmodifiable view on the smt properties, not null
      * @throws IOException if resources cannot be read
      */
     public Collection<SMTHandlerProperty<?>> getSMTProperties() throws IOException {
-        // trigger the translation ...
-        //getOriginalHandlers();
-        return Collections.unmodifiableCollection(smtProperties);
+        List<SMTHandlerProperty<?>> properties;
+        // Load default handlers and their properties.
+        getTemplateHandlers(new String[0]);
+        synchronized (handlerModificationLock) {
+            // Avoid concurrent modification of smtProperties in #getOriginalHandlers()
+            // while accessing it.
+            properties = Collections.unmodifiableList(smtProperties);
+        }
+        return properties;
     }
 }

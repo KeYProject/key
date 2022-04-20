@@ -90,7 +90,7 @@ public interface SolverType {
     /**
      * The translator to be used. So far each solver supports only one format.
      */
-    SMTTranslator createTranslator(Services services);
+    SMTTranslator createTranslator();
 
     /**
      * The delimiters of the messages that are sent from the solver to KeY. For example,

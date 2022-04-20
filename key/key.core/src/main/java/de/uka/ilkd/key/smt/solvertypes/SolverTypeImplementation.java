@@ -91,6 +91,8 @@ public final class SolverTypeImplementation implements SolverType {
     @Nullable
     private final String preamble;
 
+    private final SMTTranslator translator;
+
     /**
      * Instantiate the solver type object with all its default values.
      * The changeable values such as {@link #command} and {@link #params}
@@ -139,6 +141,21 @@ public final class SolverTypeImplementation implements SolverType {
         this.handlerOptions = Arrays.copyOf(handlerOptions, handlerOptions.length);
         this.solverSocketClass = solverSocketClass;
         this.preamble = preamble;
+        this.translator = makeTranslator();
+    }
+
+    private SMTTranslator makeTranslator() {
+        try {
+            return (SMTTranslator) translatorClass
+                    .getDeclaredConstructor(String[].class, String[].class, String.class)
+                    .newInstance(handlerNames, handlerOptions, preamble);
+        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
+                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.warn(String.format(
+                    "Using default ModularSMTLib2Translator for SMT translation due to" +
+                            " exception: %n %s", e.getMessage()));
+            return new ModularSMTLib2Translator();
+        }
     }
 
     public static boolean isInstalled(String cmd) {
@@ -238,21 +255,8 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public SMTTranslator createTranslator(Services services) {
-        Constructor<?>[] constructors = translatorClass.getConstructors();
-        SMTTranslator smtTranslator = null;
-        try {
-            return (SMTTranslator) translatorClass
-                    .getDeclaredConstructor(String[].class, String[].class, String.class)
-                    .newInstance(handlerNames, handlerOptions, preamble);
-        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
-                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.warn(
-                    "Using default ModularSMTLib2Translator for SMT translation due to exception:"
-                            + System.lineSeparator()
-                            + e.getMessage());
-            return new ModularSMTLib2Translator();
-        }
+    public SMTTranslator createTranslator() {
+        return translator;
     }
 
     @Override

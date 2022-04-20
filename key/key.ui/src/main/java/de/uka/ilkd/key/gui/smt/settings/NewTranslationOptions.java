@@ -28,7 +28,7 @@ import java.util.Collection;
  */
 class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
-    public NewTranslationOptions() {
+    public  NewTranslationOptions() {
         setHeaderText(getDescription());
         makeComponents();
     }

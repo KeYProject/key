@@ -354,7 +354,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             tacletTranslation = null;
 
         } else {
-            SMTTranslator trans = getType().createTranslator(services);
+            SMTTranslator trans = getType().createTranslator();
             problemString = indent(trans.translateProblem(sequent, services, smtSettings)
                     .toString());
             if (trans instanceof AbstractSMTTranslator) {
