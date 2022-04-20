@@ -76,8 +76,8 @@ public abstract class TacletLoader {
     public abstract ProofOblInput getTacletFile(Proof proof);
 
     /**
-     * When proving existing system taclets, all rules which occurred prior to
-     * the desired taclet need to be elminated from the set of available taclets
+     * When proving existing system taclets, all rules which occurred AFTER to
+     * the desired taclet need to be eliminated from the set of available taclets
      * to avoid circular proofs.
      * 
      * This method removes all taclets in initConfig's taclet database from
