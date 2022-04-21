@@ -307,6 +307,7 @@ public class TermBuilder {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         } else {
+            name += "_" + pm.getName();
             if (makeNameUnique) {
                 name = newName(name);
             }
