@@ -224,6 +224,8 @@ public final class MainWindow extends JFrame {
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
 
+    private ComplexButton multipleSmtComponent;
+
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
@@ -590,9 +592,12 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
+        createMultipleSolvers();
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
+        toolBar.addSeparator();
+        toolBar.add(multipleSmtComponent.getActionComponent());
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
@@ -601,6 +606,13 @@ public final class MainWindow extends JFrame {
         //toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
+    }
+
+    private void createMultipleSolvers() {
+        multipleSmtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
+        multipleSmtComponent.setEmptyItem("Multiple Solvers",
+                "<html>Run multiple SMT solvers at the same time.</html>");
+        multipleSmtComponent.setPrefix("");
     }
 
     private ComplexButton createSMTComponent() {
@@ -933,6 +945,7 @@ public final class MainWindow extends JFrame {
 
     private void updateDPSelectionMenu() {
         smtComponent.setItems(null);
+        multipleSmtComponent.setItems(null);
     }
 
     private SMTInvokeAction findAction(SMTInvokeAction[] actions, SolverTypeCollection union) {
@@ -946,7 +959,7 @@ public final class MainWindow extends JFrame {
 
     private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions) {
         int size = unions.size();
-        SMTInvokeAction actions[] = new SMTInvokeAction[size > 1 ? size + 1 : size];
+        SMTInvokeAction actions[] = new SMTInvokeAction[size];
 
         int i = 0;
         for (SolverTypeCollection union : unions) {
@@ -955,11 +968,15 @@ public final class MainWindow extends JFrame {
             i++;
         }
 
-        if (size > 1) {
-            actions[size] = new SMTInvokeMultipleAction(unions, this);
-        }
-
         smtComponent.setItems(actions);
+
+        if (size > 1) {
+            SMTInvokeMultipleAction action = new SMTInvokeMultipleAction(unions, this);
+            multipleSmtComponent.setItems(new SMTInvokeMultipleAction[] {action});
+            multipleSmtComponent.setSelectedItem(action);
+        } else {
+            multipleSmtComponent.setItems(null);
+        }
 
         SolverTypeCollection active = ProofIndependentSettings
                 .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
@@ -1646,6 +1663,7 @@ public final class MainWindow extends JFrame {
 
         private void enable(boolean b) {
             smtComponent.setEnabled(b);
+            multipleSmtComponent.setEnabled(b && smtComponent.getItemAmount() > 1);
         }
 
         @Override
