@@ -261,8 +261,9 @@ adt_decl
 :
   doc=DOC_COMMENT? (UNIQUE)?
   name=funcpred_name
-  EQUAL
+  EQUALS
   adt_constructor (OR adt_constructor)*
+  SEMI
 ;
 
 adt_constructor
