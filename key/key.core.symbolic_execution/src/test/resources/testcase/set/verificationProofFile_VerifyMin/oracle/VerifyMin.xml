@@ -106,8 +106,8 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="result" isArrayIndex="false">
-                     <value name="result {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <variable name="result_min" isArrayIndex="false">
+                     <value name="result_min {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
@@ -120,8 +120,8 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="result" isArrayIndex="false">
-                        <value name="result {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="result_min" isArrayIndex="false">
+                        <value name="result_min {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
@@ -212,8 +212,8 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="result" isArrayIndex="false">
-                     <value name="result {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <variable name="result_min" isArrayIndex="false">
+                     <value name="result_min {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
@@ -226,8 +226,8 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="result" isArrayIndex="false">
-                        <value name="result {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="result_min" isArrayIndex="false">
+                        <value name="result_min {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>

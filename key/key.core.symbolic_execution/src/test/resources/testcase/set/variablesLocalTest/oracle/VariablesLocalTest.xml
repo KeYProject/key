@@ -82,7 +82,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                     <statement name="return result;" pathCondition="true" pathConditionChanged="false">
                         <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
@@ -99,8 +99,8 @@
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="result_1" isArrayIndex="false">
-                           <value name="result_1 {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="result" isArrayIndex="false">
+                           <value name="result {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of self.sum(a_1,b_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
