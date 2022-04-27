@@ -45,7 +45,8 @@ public class HeapContext {
   public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, TermServices services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
-       final LocationVariable atPreVar = services.getTermBuilder().heapAtPreVar(heap.name()+contextName, heap.sort(), true);
+       final LocationVariable atPreVar = services.getTermBuilder().locationVariable(
+                heap.name() + contextName, heap.sort(), true);
        result.put(heap, atPreVar);
     }
     return result;

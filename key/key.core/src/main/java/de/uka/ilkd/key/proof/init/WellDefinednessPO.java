@@ -126,7 +126,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
-              services.getTermBuilder().heapAtPreVar(heap.name()+"AtPre", heap.sort(), true);
+              services.getTermBuilder().atPreVar(heap.name().toString(), heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
