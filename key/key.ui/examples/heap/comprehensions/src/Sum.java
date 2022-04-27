@@ -10,7 +10,7 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures result == (\bsum int i; 0; a.length; a[i]);
+      @ ensures \result == (\bsum int i; 0; a.length; a[i]);
       @*/
     public static int sum0(int[] a) {
         int s = 0;
@@ -27,7 +27,7 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures result == (\bsum int i; 0; a.length; a[i]);
+      @ ensures \result == (\bsum int i; 0; a.length; a[i]);
       @*/
     public static int sum1(int[] a) {
         int s = 0;
@@ -45,7 +45,7 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures result == (\sum int i; 0<=i  && i<a.length; a[i]);
+      @ ensures \result == (\sum int i; 0<=i  && i<a.length; a[i]);
       @*/
     public static int sum2(int[] a) {
         int s = 0;
@@ -62,7 +62,7 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures result == (\sum int i; 0<=i  && i<a.length; a[i]);
+      @ ensures \result == (\sum int i; 0<=i  && i<a.length; a[i]);
       @*/
     public static int sum3(int[] a) {
         int s = 0;
