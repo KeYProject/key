@@ -65,6 +65,18 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
         this.handlerNames = handlerNames;
         this.handlerOptions = handlerOptions;
+        /* Make sure to load the needed handlers once so that their smt
+        properties are loaded as well. This is needed so that the properties
+        already exist before first translating anything as they may have settings
+        that should be visible beforehand (see {@link SMTSettingsProvider).
+        Also, loading them once before the first translation may save runtime for
+        that first translation.
+        */
+        try {
+            SMTHandlerServices.getInstance().getTemplateHandlers(handlerNames);
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+        }
     }
 
     /**

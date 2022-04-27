@@ -72,7 +72,7 @@ public class TestZ3 extends TestSMTSolver {
        return type;
     }
 
-    //These testcases are z3 specific, because other solver don't support integer division.
+    //These testcases are z3 specific, because other solvers don't support integer division.
     @Test
     public void testDiv1() throws Exception {
         assertTrue(correctResult(testFile + "div1.key", true));

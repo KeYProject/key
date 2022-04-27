@@ -64,11 +64,14 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         seqBoundField = createSeqBoundField();
         solverSupportCheck = createSolverSupportCheck();
 
+        // Load all available solver types in the system according to SolverTypes.
+        // Note that this should happen before creating the NewTranslationOptions, otherwise
+        // the SMT translation options used by the solvers' handlers won't be added to the menu.
+        Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
+
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
-        // Load all available solver types in the system according to SolverTypes.
-        Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
         if (!Main.isExperimentalMode()) {
             solverTypes.removeAll(SolverTypes.getLegacySolvers());
         } else {

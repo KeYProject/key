@@ -81,6 +81,8 @@ public class SMTHandlerServices {
      * It would be a good idea to call this method (at most) once for each
      * solver type with a custom array of handler names.
      *
+     * An empty handlerNames list leads to the usage of the handlers defined by defaultHandlers.txt.
+     *
      * @param handlerNames a non-null list of non-null strings with class names (s. above)
      *
      * @return a fresh collection containing only the original SMTHandlers from the
@@ -247,7 +249,9 @@ public class SMTHandlerServices {
     }
 
     /**
-     * Get the list of all {@link SMTHandlerProperty}s currently known in the system
+     * Get the list of all {@link SMTHandlerProperty}s *currently* known in the system.
+     * Note that new smt properties may be added after calling the method so that it has
+     * to be called again.
      *
      * @return an unmodifiable view on the smt properties, not null
      * @throws IOException if resources cannot be read
@@ -255,7 +259,7 @@ public class SMTHandlerServices {
     public Collection<SMTHandlerProperty<?>> getSMTProperties() throws IOException {
         List<SMTHandlerProperty<?>> properties;
         // Load default handlers and their properties.
-        getTemplateHandlers(new String[0]);
+        //getTemplateHandlers(new String[0]);
         synchronized (handlerModificationLock) {
             // Avoid concurrent modification of smtProperties in #getOriginalHandlers()
             // while accessing it.
