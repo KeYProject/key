@@ -79,7 +79,31 @@ task generateSMTListings {
     }
 }
 
+task generateSolverPropsList {
+    def pack = "de/uka/ilkd/key/smt/solvertypes"
+    def resourcesDir = "${project.projectDir}/src/main/resources"
+    def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
+    // ${project.buildDir}
+    doLast {
+        def list = []
+        def dir = new File("$outputDir/$pack/")
+        dir.eachFileRecurse ({file ->
+            if (file.name.endsWith(".props")) {
+                list.add(file.name)
+            } })
+        if (!file("$outputDir/$pack/solvers.txt").exists()) {
+            String files = ''
+            for (String propsFile : list) {
+                files += propsFile + System.lineSeparator()
+            }
+            new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
+                listSolvers.write files}
+        }
+    }
+}
+
 classes.dependsOn << generateSMTListings
+classes.dependsOn << generateSolverPropsList
 
 
 tasks.withType(Test) {
