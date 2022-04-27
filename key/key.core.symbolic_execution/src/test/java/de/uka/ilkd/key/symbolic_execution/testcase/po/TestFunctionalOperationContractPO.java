@@ -43,7 +43,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
       doTest("/set/existingContractTest/test/ExistingContractTest.java",
              "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
              "/set/existingContractTest/oracle/ExistingContractTest.xml",
-             "{result=self.doubleValue(_value)@ExistingContractTest; }");
+             "{result_doubleValue=self.doubleValue(_value)@ExistingContractTest; }");
    }
    
    /**

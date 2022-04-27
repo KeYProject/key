@@ -17,16 +17,13 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
@@ -939,186 +936,6 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             }
         }
         return posts;
-    }
-
-    /**
-     * A map from some type to the same type.
-     *
-     * @param <S>
-     *            the key and value type.
-     */
-    private abstract static class ReplacementMap<S extends Sorted & SVSubstitute>
-        extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
-
-        public ReplacementMap(TermFactory tf) {
-            super(tf);
-        }
-
-        /**
-         * Adds a mapping for the self variable.
-         *
-         * @param oldSelf
-         *            the old self variable.
-         * @param newSelf
-         *            the new self variable.
-         * @param services
-         *            services.
-         */
-        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf,
-                TermServices services) {
-            if (newSelf != null) {
-                assert newSelf.sort().extendsTrans(oldSelf.sort());
-                put(convert(oldSelf, services), newSelf);
-            }
-        }
-
-        /**
-         * Adds a mapping for every flag.
-         *
-         * @param oldFlags
-         *            old flags.
-         * @param newFlags
-         *            new flags.
-         * @param services
-         *            services.
-         */
-        public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
-                final Map<Label, S> newFlags, TermServices services) {
-            if (newFlags != null) {
-                assert newFlags.size() == oldFlags.size();
-                for (Map.Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
-                    replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()), services);
-                }
-            }
-        }
-
-        /**
-         * Adds a mapping for a variable.
-         *
-         * @param oldVariable
-         *            old variable.
-         * @param newVariable
-         *            new variable.
-         * @param services
-         *            services.
-         */
-        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
-                TermServices services) {
-            if (newVariable != null) {
-                assert oldVariable.sort().equals(newVariable.sort());
-                put(convert(oldVariable, services), newVariable);
-            }
-        }
-
-        /**
-         * Adds mappings for the remembrance heaps.
-         *
-         * @param oldRemembranceHeaps
-         *            old remembrance heaps.
-         * @param newRemembranceHeaps
-         *            new remembrance heaps.
-         * @param services
-         *            services.
-         */
-        public void replaceRemembranceHeaps(
-                final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
-                final Map<LocationVariable, ? extends S> newRemembranceHeaps,
-                final Services services) {
-            if (newRemembranceHeaps != null) {
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
-                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                        continue;
-                    }
-
-                    if (oldRemembranceHeaps.get(heap) != null) {
-                        final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
-                        final S newRemembranceHeap = newRemembranceHeaps.get(heap);
-                        assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
-                        put(convert(oldRemembranceHeap, services), newRemembranceHeap);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Adds mappings for the remembrance variables.
-         *
-         * @param oldRemembranceLocalVariables
-         *            old remembrance variables.
-         * @param newRemembranceLocalVariables
-         *            new remembrance variables.
-         * @param services
-         *            services
-         */
-        public void replaceRemembranceLocalVariables(
-                final Map<LocationVariable, LocationVariable> oldRemembranceLocalVariables,
-                final Map<LocationVariable, ? extends S> newRemembranceLocalVariables,
-                final TermServices services) {
-            if (newRemembranceLocalVariables != null) {
-                for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
-                    if (newRemembranceLocalVariables.get(localVariable) != null) {
-                        LocationVariable oldRemembranceLocalVariable
-                                = oldRemembranceLocalVariables.get(localVariable);
-                        S newRemembranceLocalVariable
-                                = newRemembranceLocalVariables.get(localVariable);
-                        assert oldRemembranceLocalVariable.sort()
-                                .equals(newRemembranceLocalVariable.sort());
-                        put(convert(oldRemembranceLocalVariable, services),
-                                newRemembranceLocalVariable);
-                    }
-                }
-            }
-        }
-
-        /**
-         *
-         * @param variable
-         *            a variable.
-         * @param services
-         *            services.
-         * @return a conversion of the specified variable to the type {@code S}.
-         */
-        protected abstract S convert(ProgramVariable variable, TermServices services);
-
-    }
-
-    /**
-     * A replacement map for variables.
-     */
-    private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
-
-        public VariableReplacementMap(TermFactory tf) {
-            super(tf);
-        }
-
-        @Override
-        protected ProgramVariable convert(ProgramVariable variable, TermServices services) {
-            return variable;
-        }
-
-    }
-
-    /**
-     * A replacement map for terms.
-     */
-    private static class TermReplacementMap extends ReplacementMap<Term> {
-
-        public TermReplacementMap(TermFactory tf) {
-            super(tf);
-        }
-
-        public void replaceHeap(final Term newHeap, final Services services) {
-            assert newHeap != null;
-            assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
-            put(services.getTermBuilder().getBaseHeap(), newHeap);
-        }
-
-        @Override
-        protected Term convert(ProgramVariable variable, TermServices services) {
-            return services.getTermBuilder().var(variable);
-        }
-
     }
 
     /**
