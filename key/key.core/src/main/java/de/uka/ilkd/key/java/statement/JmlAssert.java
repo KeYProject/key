@@ -42,31 +42,40 @@ public class JmlAssert extends JavaStatement {
      * the program variables used to create the Term form of the condition
      */
     private ProgramVariableCollection vars;
+    /**
+     * services (needed for pretty printing)
+     */
+    private Services services;
 
     /**
      *
      * @param kind assert or assume
      * @param condition the condition of this statement
      * @param positionInfo the position information for this statement
+     * @param services needed for pretty printing (not pretty when null)
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind,
                      LabeledParserRuleContext condition,
-                     PositionInfo positionInfo) {
+                     PositionInfo positionInfo,
+                     Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
+        this.services = services;
     }
 
     /**
      *
      * @param children the children of this element
+     * @param services needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(ExtList children) {
+    public JmlAssert(ExtList children, Services services) {
         super(children);
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);
         this.cond = children.get(Term.class);
         this.vars = children.get(ProgramVariableCollection.class);
+        this.services = services;
         if ((cond == null) == (condition == null)) {
             throw new IllegalArgumentException("exactly one of cond and condition has to be null");
         }
@@ -81,7 +90,7 @@ public class JmlAssert extends JavaStatement {
      */
     public String getConditionText() {
         if (cond != null) {
-            return LogicPrinter.quickPrintTerm(cond, null);
+            return LogicPrinter.quickPrintTerm(cond, services);
         }
         // this will lose whitespace, so e.g. \forall will not be printed correctly
         // but normally the term form should get printed.
