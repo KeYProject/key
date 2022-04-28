@@ -3241,7 +3241,7 @@ public class PrettyPrinter {
         printHeader(jmlAssert);
         writeInternalIndentation(jmlAssert);
 
-        final String kind = jmlAssert.getKind().name();
+        final String kind = jmlAssert.getKind().name().toLowerCase();
 
         markStart(0, jmlAssert);
 
