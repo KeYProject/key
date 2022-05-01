@@ -53,6 +53,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 import org.slf4j.Logger;
@@ -69,8 +70,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @HelpInfo()
@@ -220,11 +223,12 @@ public final class MainWindow extends JFrame {
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
     private ComplexButton smtComponent;
+    private ChangeListener selectAllListener;
+    private JCheckBoxMenuItem selectAll;
+    private JSeparator separator;
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
-
-    private ComplexButton multipleSmtComponent;
 
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
@@ -592,12 +596,9 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
-        createMultipleSolvers();
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        toolBar.addSeparator();
-        toolBar.add(multipleSmtComponent.getActionComponent());
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
@@ -608,31 +609,47 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private void createMultipleSolvers() {
-        multipleSmtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
-        multipleSmtComponent.setEmptyItem("Multiple Solvers",
-                "<html>Run multiple SMT solvers at the same time.</html>");
-        multipleSmtComponent.setPrefix("");
-    }
-
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
-        smtComponent.setEmptyItem("No solver available",
+        String noneAvailableText = "No solver available";
+        String noneAvailableTip =
                 "<html>No SMT solver is applicable for KeY.<br>" +
-                        "<br>If a solver is installed on your system," +
-                        "<br>please configure the KeY-System accordingly:\n" +
-                        "<br>Options | SMT Solvers</html>");
+                "<br>If a solver is installed on your system," +
+                "<br>please configure the KeY-System accordingly:" +
+                System.lineSeparator() +
+                "<br>Options | SMT Solvers</html>";
+        smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
 
         smtComponent.setPrefix("Run ");
 
         smtComponent.addListener(e -> {
             ComplexButton but = (ComplexButton) e.getSource();
-            if (but.getSelectedItem() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
+            if (but.getAction() instanceof SMTInvokeAction) {
+                SMTInvokeAction action = (SMTInvokeAction) but.getAction();
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                         .setActiveSolverUnion(action.getSolverUnion());
             }
         });
+
+        smtComponent.addListener(c -> {
+            if (smtComponent.getAction() instanceof SMTInvokeAction) {
+                SMTInvokeAction action = (SMTInvokeAction) smtComponent.getAction();
+                if (action.getSolverUnion().equals(SolverTypeCollection.EMPTY_COLLECTION)) {
+                    smtComponent.setEmptyItem("SMT", "Choose at least one SMT solver to run");
+                    smtComponent.setSelectedItem(smtComponent.getEmptyItem());
+                    smtComponent.getSelectionComponent().setEnabled(true);
+                } else {
+                    smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
+                    smtComponent.getActionComponent().setEnabled(true);
+                }
+            }
+        });
+
+        selectAll = new JCheckBoxMenuItem("Select All");
+        selectAll.setToolTipText("(De)select all menu items by (un)checking this");
+        selectAll.setFocusPainted(false);
+        selectAll.setEnabled(true);
+        separator = new JSeparator();
 
         updateSMTSelectMenu();
         mediator.addKeYSelectionListener(new DPEnableControl());
@@ -944,17 +961,7 @@ public final class MainWindow extends JFrame {
     }
 
     private void updateDPSelectionMenu() {
-        smtComponent.setItems(null);
-        multipleSmtComponent.setItems(null);
-    }
-
-    private SMTInvokeAction findAction(SMTInvokeAction[] actions, SolverTypeCollection union) {
-        for (SMTInvokeAction action : actions) {
-            if (action.getSolverUnion().equals(union)) {
-                return action;
-            }
-        }
-        return null;
+        smtComponent.setItems(null, actions -> null, 0);
     }
 
     private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions) {
@@ -963,39 +970,78 @@ public final class MainWindow extends JFrame {
 
         int i = 0;
         for (SolverTypeCollection union : unions) {
-
-            actions[i] = new SMTInvokeAction(union, this);
+            SMTInvokeAction action = new SMTInvokeAction(union, this);
+            actions[i] = action;
             i++;
         }
 
-        smtComponent.setItems(actions);
+        MainWindow mainWindow = this;
 
-        if (size > 1) {
-            SMTInvokeMultipleAction action = new SMTInvokeMultipleAction(unions, this);
-            multipleSmtComponent.setItems(new SMTInvokeMultipleAction[] {action});
-            multipleSmtComponent.setSelectedItem(action);
-        } else {
-            multipleSmtComponent.setItems(null);
-        }
-
-        SolverTypeCollection active = ProofIndependentSettings
-                .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
-
-        SMTInvokeAction activeAction = findAction(actions, active);
-
-        boolean found = activeAction != null;
-        if (!found) {
-            Object item = smtComponent.getTopItem();
-            if (item instanceof SMTInvokeAction) {
-                active = ((SMTInvokeAction) item).getSolverUnion();
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                        .setActiveSolverUnion(active);
-            } else {
-                activeAction = null;
+        Function<Action[], Action> collapseChoice = new Function<Action[], Action>() {
+            @Override
+            public Action apply(Action[] actions) {
+                Set<SolverType> types = new HashSet<>();
+                StringBuilder builder = new StringBuilder();
+                for (Action action : actions) {
+                    // Ignore all none SMTInvokeActions
+                    if (action instanceof SMTInvokeAction) {
+                        types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
+                    }
+                }
+                for (SolverType type: types) {
+                    builder.append(type.getName() + ", ");
+                }
+                if (!types.isEmpty()) {
+                    builder.delete(builder.length() - 2, builder.length());
+                }
+                SolverTypeCollection chosenSolvers;
+                if (types.isEmpty()) {
+                    chosenSolvers = SolverTypeCollection.EMPTY_COLLECTION;
+                } else {
+                    chosenSolvers
+                            = new SolverTypeCollection(builder.toString(), types.size(), types);
+                }
+                SMTInvokeAction chosenAction = new SMTInvokeAction(chosenSolvers, mainWindow);
+                return chosenAction;
             }
+        };
 
+        smtComponent.setItems(actions, collapseChoice, actions.length);
+
+        if (actions.length > 1) {
+            smtComponent.removeListener(selectAllListener);
+            smtComponent.addComponent(separator);
+            smtComponent.addComponent(selectAll);
+            selectAll.setAction(new AbstractAction() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        if (selectAll.isSelected()) {
+                                            smtComponent.selectMaxNumber();
+                                        } else {
+                                            smtComponent.deselectAll();
+                                        }
+                                        smtComponent.getMenu().setVisible(true);
+                                    }
+                                });
+            selectAll.setText("Select All");
+            selectAllListener = new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    if (smtComponent.getSelectedItems().length == actions.length
+                            && !selectAll.isSelected()) {
+                        selectAll.setSelected(true);
+                    } else if (smtComponent.getSelectedItems().length == 0
+                            && selectAll.isSelected()) {
+                        selectAll.setSelected(false);
+                    }
+                }
+            };
+            smtComponent.addListener(selectAllListener);
+        } else {
+            smtComponent.removeComponent(selectAll);
+            smtComponent.removeComponent(separator);
         }
-        smtComponent.setSelectedItem(activeAction);
+
     }
 
     @SuppressWarnings("unused")
@@ -1663,7 +1709,6 @@ public final class MainWindow extends JFrame {
 
         private void enable(boolean b) {
             smtComponent.setEnabled(b);
-            multipleSmtComponent.setEnabled(b && smtComponent.getItemAmount() > 1);
         }
 
         @Override
