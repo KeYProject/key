@@ -62,7 +62,8 @@ public interface SMTHandler {
      * translation.
      *
      *
-     * @param masterHandler
+     * @param masterHandler the MasterHandler coordinating the other handlers
+     *                      (including the one at hand)
      * @param services the non-null services object which is relevant for
      *                 this handler
      * @param handlerSnippets the snippets loaded for this handler, null if no

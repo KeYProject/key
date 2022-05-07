@@ -325,7 +325,8 @@ public final class SolverTypeImplementation implements SolverType {
     /**
      * Note that the actual version is only compared to the minimum version lexicographically.
      * This is a temporary solution as it may lead to weird behaviour, for example shorter
-     * Strings will be before longer Strings and 1.14.1 will be before 1.8.10 even though they have the same length.
+     * Strings will be before longer Strings and 1.14.1 will be before 1.8.10 even though
+     * they have the same length.
      *
      * If that lexicographical comparison is not possible, you may have to
      * modify the SolverTypeImplementation class and change SolverPropertiesLoader accordingly.

@@ -31,10 +31,12 @@ public class SolverPropertiesLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
 
     /**
-     * Path to the file containing the names of the SMT properties files to be loaded.
-     * Package path is needed to potentially load the same file from multiple projects/jars.
+     * Name of the file containing the names of the SMT properties files to be loaded.
      */
     private static final String SOLVER_LIST_FILE = "solvers.txt";
+    /**
+     * Package path of the solvers.txt file.
+     */
     private static final String PACKAGE_PATH = "de/uka/ilkd/key/smt/solvertypes/";
 
     /**
@@ -79,13 +81,15 @@ public class SolverPropertiesLoader {
      * The default {@link de.uka.ilkd.key.smt.SMTTranslator}, if none is given in the .props file:
      * {@link ModularSMTLib2Translator}.
      */
-    private static final String DEFAULT_TRANSLATOR = "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
+    private static final String DEFAULT_TRANSLATOR
+            = "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket},
      * if none is given in the .props file:
      * {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String DEFAULT_MESSAGE_HANDLER = "de.uka.ilkd.key.smt.communication.Z3Socket";
+    private static final String DEFAULT_MESSAGE_HANDLER
+            = "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
@@ -321,6 +325,8 @@ public class SolverPropertiesLoader {
                             solverProp.load(propsFile);
                             props.add(solverProp);
                         } catch (Exception e) {
+                            // every possible exception should be caught as loading the files
+                            // should not break key
                             // if loading the props file does not work for any reason,
                             // create a warning and continue
                             LOGGER.error(String.format("Solver file %s could not be loaded.",

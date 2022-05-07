@@ -158,11 +158,10 @@ public final class MainWindow extends JFrame {
             new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
-    JCheckBoxMenuItem saveSMTFile;
     /**
      *
      */
-    private CControl dockControl = new CControl(this);
+    private final CControl dockControl = new CControl(this);
     /**
      * the first toolbar
      */
@@ -234,6 +233,34 @@ public final class MainWindow extends JFrame {
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
 
+    /* A function collapsing multiple SMTInvokeActions into one that starts a union
+    of all solver types contained in any of the input actions. None-SMTInvokeActions
+    in the input are ignored. */
+    private final Function<Action[], Action> collapseChoice = a -> {
+        Set<SolverType> types = new HashSet<>();
+        StringBuilder builder = new StringBuilder();
+        for (Action action : a) {
+            // Ignore all none-SMTInvokeActions
+            if (action instanceof SMTInvokeAction) {
+                types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
+            }
+        }
+        for (SolverType type : types) {
+            builder.append(type.getName() + ", ");
+        }
+        if (!types.isEmpty()) {
+            builder.delete(builder.length() - 2, builder.length());
+        }
+        SolverTypeCollection chosenSolvers;
+        if (types.isEmpty()) {
+            chosenSolvers = SolverTypeCollection.EMPTY_COLLECTION;
+        } else {
+            chosenSolvers
+                    = new SolverTypeCollection(builder.toString(), types.size(), types);
+        }
+        return new SMTInvokeAction(chosenSolvers, this);
+    };
+
     /**
      * set to true if the view of the current goal should not be updated
      */
@@ -303,7 +330,7 @@ public final class MainWindow extends JFrame {
             Class<?> appClass = Class.forName("java.awt.Taskbar");
             Method getTaskbar = appClass.getMethod("getTaskbar");
             Method setIconImage = appClass.getMethod("setIconImage", Image.class);
-            Object taskbar = getTaskbar.invoke(null);//static method
+            Object taskbar = getTaskbar.invoke(null); //static method
             setIconImage.invoke(taskbar, image);
             return true;
         } catch (ClassNotFoundException | NoSuchMethodException
@@ -325,7 +352,8 @@ public final class MainWindow extends JFrame {
             Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
             setDockIconImage.invoke(application, IconFactory.keyLogo());
             return true;
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+        } catch (NoSuchMethodException | SecurityException
+                | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | ClassNotFoundException ignored) {
             return false;
         }
@@ -337,7 +365,8 @@ public final class MainWindow extends JFrame {
 
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
-            LOGGER.error("Error: KeY started in graphical mode, but no graphical environment present.");
+            LOGGER.error("Error: KeY started in graphical mode, " +
+                    "but no graphical environment present.");
             LOGGER.error("Please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
@@ -360,7 +389,8 @@ public final class MainWindow extends JFrame {
      * to do some cleanup only if a {@link MainWindow} instance exists.</b>
      * </p>
      *
-     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()},
+     * {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
      */
     public static boolean hasInstance() {
         return instance != null;
@@ -615,10 +645,10 @@ public final class MainWindow extends JFrame {
         String noneAvailableText = "No solver available";
         String noneAvailableTip =
                 "<html>No SMT solver is applicable for KeY.<br>" +
-                "<br>If a solver is installed on your system," +
-                "<br>please configure the KeY-System accordingly:" +
-                System.lineSeparator() +
-                "<br>Options | SMT Solvers</html>";
+                        "<br>If a solver is installed on your system," +
+                        "<br>please configure the KeY-System accordingly:" +
+                        System.lineSeparator() +
+                        "<br>Options | SMT Solvers</html>";
         smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
 
         // Prepend "Run" to the currently selected action in the smtComponent
@@ -805,7 +835,7 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if(Main.isExperimentalMode()) {
+        if (Main.isExperimentalMode()) {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
             submenu.add(runAllProofsAction);
         }
@@ -930,10 +960,9 @@ public final class MainWindow extends JFrame {
         options.setMnemonic(KeyEvent.VK_O);
 
         options.add(SettingsManager.getInstance().getActionShowSettings(this));
-
         options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
-//	options.add(setupSpeclangMenu()); // legacy since only JML supported
+        // options.add(setupSpeclangMenu()); // legacy since only JML supported
         options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
@@ -981,7 +1010,7 @@ public final class MainWindow extends JFrame {
 
     private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions) {
         int size = unions.size();
-        SMTInvokeAction actions[] = new SMTInvokeAction[size];
+        SMTInvokeAction[] actions = new SMTInvokeAction[size];
 
         // create SMTInvokeActions for the given solver unions.
         int i = 0;
@@ -990,40 +1019,6 @@ public final class MainWindow extends JFrame {
             actions[i] = action;
             i++;
         }
-
-        MainWindow mainWindow = this;
-
-        /* A function collapsing multiple SMTInvokeActions into one that starts a union
-        of all solver types contained in any of the input actions. None-SMTInvokeActions
-        in the input are ignored. */
-        Function<Action[], Action> collapseChoice = new Function<Action[], Action>() {
-            @Override
-            public Action apply(Action[] actions) {
-                Set<SolverType> types = new HashSet<>();
-                StringBuilder builder = new StringBuilder();
-                for (Action action : actions) {
-                    // Ignore all none-SMTInvokeActions
-                    if (action instanceof SMTInvokeAction) {
-                        types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
-                    }
-                }
-                for (SolverType type: types) {
-                    builder.append(type.getName() + ", ");
-                }
-                if (!types.isEmpty()) {
-                    builder.delete(builder.length() - 2, builder.length());
-                }
-                SolverTypeCollection chosenSolvers;
-                if (types.isEmpty()) {
-                    chosenSolvers = SolverTypeCollection.EMPTY_COLLECTION;
-                } else {
-                    chosenSolvers
-                            = new SolverTypeCollection(builder.toString(), types.size(), types);
-                }
-                SMTInvokeAction chosenAction = new SMTInvokeAction(chosenSolvers, mainWindow);
-                return chosenAction;
-            }
-        };
 
         // Set the new selection items of the smtComponent.
         smtComponent.setItems(actions, collapseChoice, actions.length);
@@ -1036,16 +1031,17 @@ public final class MainWindow extends JFrame {
             }
             smtComponent.addComponent(separator);
             smtComponent.addComponent(selectAll);
-            selectAll.setAction(new AbstractAction() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        if (selectAll.isSelected()) {
-                                            smtComponent.selectMaxNumber();
-                                        } else {
-                                            smtComponent.deselectAll();
-                                        }
-                                    }
-                                });
+            selectAll.setAction(
+                    new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (selectAll.isSelected()) {
+                                smtComponent.selectMaxNumber();
+                            } else {
+                                smtComponent.deselectAll();
+                            }
+                        }
+                    });
             /* Set this stuff anew because for some reason it is not displayed anymore
             after setting the action? */
             selectAll.setText("Select All");
@@ -1185,7 +1181,7 @@ public final class MainWindow extends JFrame {
         if (isPrintRunImmediately) {
             try {
                 sequentUpdater.run();
-            } catch(RuntimeException ex) {
+            } catch (RuntimeException ex) {
                 // This is a quickfix for some situations where exceptions
                 // in the UI update would corrupt the entire proof state
                 // such that the entire app needs to be closed. Just print
