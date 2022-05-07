@@ -1,9 +1,0 @@
-nope.props
-Z3.props
-Z3_CE.props
-Z3_FloatingPoint.props
-Z3_legacy.props
-CVC4.props
-CVC4_legacy.props
-CVC5.props
-Princess.props
