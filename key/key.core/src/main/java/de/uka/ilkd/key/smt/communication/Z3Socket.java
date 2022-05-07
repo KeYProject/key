@@ -65,4 +65,9 @@ public class Z3Socket extends AbstractSolverSocket {
         }
     }
 
+    @Override
+    public AbstractSolverSocket copy() {
+        return new Z3Socket(getName(), getQuery());
+    }
+
 }

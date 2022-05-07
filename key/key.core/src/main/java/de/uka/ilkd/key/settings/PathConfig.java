@@ -82,8 +82,6 @@ public class PathConfig {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.smtSolverPropertiesDirectory = getKeyConfigDir() + File.separator
-                + "smtSolverProperties" + File.separator;
     }
 
     /**
@@ -102,12 +100,4 @@ public class PathConfig {
         return proofIndependentSettings;
     }
 
-    /**
-     * Returns the path to the directory used for storing SMT solver properties.
-     * See {@link ProofIndependentSMTSettings} and {@link SolverPropertiesLoader} for usage.
-     * @return The path to the directory.
-     */
-    public static String getSmtSolverPropertiesDirectory() {
-        return smtSolverPropertiesDirectory;
-    }
 }

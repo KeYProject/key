@@ -69,6 +69,10 @@ public abstract class AbstractSolverSocket {
         public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg)
                 throws IOException;
 
+        public String modifyProblem(String problem) {
+            return problem;
+        }
+
         /**
          * Creates a new solver socket that can handle the communication for the given solver type.
          * @param type the SolverType to create the socket for
@@ -80,4 +84,6 @@ public abstract class AbstractSolverSocket {
         AbstractSolverSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
             return type.getSocket(query);
         }
+
+        public abstract AbstractSolverSocket copy();
 }

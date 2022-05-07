@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
@@ -82,7 +81,7 @@ public final class SolverTypeImplementation implements SolverType {
     private final Class<?> solverSocketClass;
     /**
      * The class of the {@link SMTTranslator} to be created with
-     * {@link #createTranslator(Services)}.
+     * {@link #createTranslator()}.
      */
     private final Class<?> translatorClass;
     /**
@@ -91,6 +90,11 @@ public final class SolverTypeImplementation implements SolverType {
     @Nullable
     private final String preamble;
 
+    /**
+     * Used for creation of new sockets as well as modifying problem Strings.
+     * Should not be returned to outside classes.
+     */
+    private final AbstractSolverSocket solverSocket;
     private final SMTTranslator translator;
 
     /**
@@ -142,6 +146,22 @@ public final class SolverTypeImplementation implements SolverType {
         this.solverSocketClass = solverSocketClass;
         this.preamble = preamble;
         this.translator = makeTranslator();
+        this.solverSocket = makeSocket();
+    }
+
+    private AbstractSolverSocket makeSocket() {
+        try {
+            return (AbstractSolverSocket) solverSocketClass
+                    .getDeclaredConstructor(String.class, ModelExtractor.class)
+                    .newInstance(name, null);
+        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
+                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.warn(
+                    "Using default Z3Socket for solver communication due to exception:"
+                            + System.lineSeparator()
+                            + e.getMessage());
+            return new Z3Socket(name, null);
+        }
     }
 
     private SMTTranslator makeTranslator() {
@@ -278,10 +298,9 @@ public final class SolverTypeImplementation implements SolverType {
         return Arrays.copyOf(delimiters, delimiters.length);
     }
 
-    // TODO Make this modifiable?
     @Override
     public String modifyProblem(String problem) {
-        return problem;
+        return solverSocket.modifyProblem(problem);
     }
 
     @Override
@@ -357,18 +376,9 @@ public final class SolverTypeImplementation implements SolverType {
     @Nonnull
     @Override
     public AbstractSolverSocket getSocket(ModelExtractor query) {
-        try {
-            return (AbstractSolverSocket) solverSocketClass
-                    .getDeclaredConstructor(String.class, ModelExtractor.class)
-                    .newInstance(name, query);
-        } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
-                | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.warn(
-                    "Using default Z3Socket for solver communication due to exception:"
-                            + System.lineSeparator()
-                            + e.getMessage());
-            return new Z3Socket(name, query);
-        }
+        AbstractSolverSocket socket = solverSocket.copy();
+        socket.setQuery(query);
+        return socket;
     }
 
 }

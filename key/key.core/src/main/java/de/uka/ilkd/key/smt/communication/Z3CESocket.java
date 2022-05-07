@@ -78,4 +78,9 @@ public class Z3CESocket extends AbstractSolverSocket {
         }
     }
 
+    @Override
+    public AbstractSolverSocket copy() {
+        return new Z3CESocket(getName(), getQuery());
+    }
+
 }

@@ -51,4 +51,9 @@ public class CVC5Socket extends AbstractSolverSocket {
         }
     }
 
+    @Override
+    public AbstractSolverSocket copy() {
+        return new CVC5Socket(getName(), getQuery());
+    }
+
 }
