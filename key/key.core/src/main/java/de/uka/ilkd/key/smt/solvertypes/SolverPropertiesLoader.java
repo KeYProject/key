@@ -297,9 +297,8 @@ public class SolverPropertiesLoader {
     }
 
     /**
-     * Loads the solvers that are specified in .props files in the directory
-     * {@link PathConfig#getSmtSolverPropertiesDirectory()} into Properties
-     * objects and returns them.
+     * Loads the solvers that are specified in .props files in
+     * resource packages named "de/uka/ilkd/key/smt/solvertypes".
      */
     private static Collection<Properties> loadSolvers() {
         Collection<Properties> completePropsList = new ArrayList<>();
@@ -329,7 +328,7 @@ public class SolverPropertiesLoader {
                             // should not break key
                             // if loading the props file does not work for any reason,
                             // create a warning and continue
-                            LOGGER.error(String.format("Solver file %s could not be loaded.",
+                            LOGGER.warn(String.format("Solver file %s could not be loaded.",
                                     fileName));
                         }
                     }
