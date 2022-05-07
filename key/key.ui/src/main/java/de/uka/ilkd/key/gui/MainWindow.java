@@ -611,6 +611,7 @@ public final class MainWindow extends JFrame {
 
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
+        // Configure the smtComponent's empty item (this is selected if no solvers are available):
         String noneAvailableText = "No solver available";
         String noneAvailableTip =
                 "<html>No SMT solver is applicable for KeY.<br>" +
@@ -620,8 +621,12 @@ public final class MainWindow extends JFrame {
                 "<br>Options | SMT Solvers</html>";
         smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
 
+        // Prepend "Run" to the currently selected action in the smtComponent
         smtComponent.setPrefix("Run ");
 
+        /* Add a ChangeListener to the smtComponent that sets the active solver union of
+        the settings to the currently selected one (if the selected action is an SMTInvokeAction).
+        */
         smtComponent.addListener(e -> {
             ComplexButton but = (ComplexButton) e.getSource();
             if (but.getAction() instanceof SMTInvokeAction) {
@@ -631,9 +636,15 @@ public final class MainWindow extends JFrame {
             }
         });
 
+        /* Add a ChangeListener to the smtComponent that checks whether the selected SMTInvokeAction
+        would invoke the empty solver collection (<-> no solvers are selected, but there are solvers
+        available) and if so, changes the empty item to not display "No solver available" and keeps
+        the selection component activated.
+         */
         smtComponent.addListener(c -> {
             if (smtComponent.getAction() instanceof SMTInvokeAction) {
                 SMTInvokeAction action = (SMTInvokeAction) smtComponent.getAction();
+                // Only change the empty item as long as the empty collection is selected.
                 if (action.getSolverUnion().equals(SolverTypeCollection.EMPTY_COLLECTION)) {
                     smtComponent.setEmptyItem("SMT", "Choose at least one SMT solver to run");
                     smtComponent.setSelectedItem(smtComponent.getEmptyItem());
@@ -645,12 +656,14 @@ public final class MainWindow extends JFrame {
             }
         });
 
+        // The selectAll button of the dropdown menu, this can be reused instead of creating
+        // it anew every time.
         selectAll = new JCheckBoxMenuItem("Select All");
-        selectAll.setToolTipText("(De)select all menu items by (un)checking this");
         selectAll.setFocusPainted(false);
         selectAll.setEnabled(true);
         separator = new JSeparator();
 
+        // Update the smtComponent with the currently (on start) available SMT solvers.
         updateSMTSelectMenu();
         mediator.addKeYSelectionListener(new DPEnableControl());
         return smtComponent;
@@ -945,8 +958,8 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * update the selection menu for Decisionprocedures.
-     * Remove those, that are not installed anymore, add those, that got installed.
+     * update the selection menu for decision procedures using SMT solvers.
+     * Remove those SMT solvers, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
@@ -961,6 +974,8 @@ public final class MainWindow extends JFrame {
     }
 
     private void updateDPSelectionMenu() {
+        /* No solvers available -> this leads to the empty item of the smtComponent being set.
+        Thus, the smtComponent will be deactivated until solvers become available. */
         smtComponent.setItems(null, actions -> null, 0);
     }
 
@@ -968,6 +983,7 @@ public final class MainWindow extends JFrame {
         int size = unions.size();
         SMTInvokeAction actions[] = new SMTInvokeAction[size];
 
+        // create SMTInvokeActions for the given solver unions.
         int i = 0;
         for (SolverTypeCollection union : unions) {
             SMTInvokeAction action = new SMTInvokeAction(union, this);
@@ -977,13 +993,16 @@ public final class MainWindow extends JFrame {
 
         MainWindow mainWindow = this;
 
+        /* A function collapsing multiple SMTInvokeActions into one that starts a union
+        of all solver types contained in any of the input actions. None-SMTInvokeActions
+        in the input are ignored. */
         Function<Action[], Action> collapseChoice = new Function<Action[], Action>() {
             @Override
             public Action apply(Action[] actions) {
                 Set<SolverType> types = new HashSet<>();
                 StringBuilder builder = new StringBuilder();
                 for (Action action : actions) {
-                    // Ignore all none SMTInvokeActions
+                    // Ignore all none-SMTInvokeActions
                     if (action instanceof SMTInvokeAction) {
                         types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
                     }
@@ -1006,10 +1025,15 @@ public final class MainWindow extends JFrame {
             }
         };
 
+        // Set the new selection items of the smtComponent.
         smtComponent.setItems(actions, collapseChoice, actions.length);
 
+        // If more than one action can be selected, add the selectAll-button.
         if (actions.length > 1) {
-            smtComponent.removeListener(selectAllListener);
+            // The old selection listener is not needed anymore.
+            if (selectAllListener != null) {
+                smtComponent.removeListener(selectAllListener);
+            }
             smtComponent.addComponent(separator);
             smtComponent.addComponent(selectAll);
             selectAll.setAction(new AbstractAction() {
@@ -1020,10 +1044,16 @@ public final class MainWindow extends JFrame {
                                         } else {
                                             smtComponent.deselectAll();
                                         }
-                                        smtComponent.getMenu().setVisible(true);
                                     }
                                 });
+            /* Set this stuff anew because for some reason it is not displayed anymore
+            after setting the action? */
             selectAll.setText("Select All");
+            selectAll.setToolTipText("(De)select all menu items by (un)checking this");
+            // Don't close the smtComponent's menu when clicking selectAll
+            selectAll.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
+            // The new selection listener checking whether all the current items or none of them
+            // are selected and changing the selection status of selectAll accordingly.
             selectAllListener = new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
@@ -1038,6 +1068,7 @@ public final class MainWindow extends JFrame {
             };
             smtComponent.addListener(selectAllListener);
         } else {
+            // If only one action is available, the selectAll button is not needed.
             smtComponent.removeComponent(selectAll);
             smtComponent.removeComponent(separator);
         }

@@ -15,9 +15,7 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -33,23 +31,30 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 public class ComplexButton {
 
-
-
+	// The dropdown opening button.
     private JButton selectionComponent;
+	// The action starting button.
     private JButton actionComponent;
+	// The actions that can be selected.
     private Action [] items;
+	/* The function used to map some selected actions to the one that is to be executed.
+	This is only used if more than one item can be selected at the same time.
+	If only one action can be selected, the function that will be used is just the identity. */
 	private Function<Action[], Action> flattenChoice;
+	// The maximum amount of actions that can be selected at the same time.
 	private int maxChoiceAmount;
-	private Set<Action> selectedItems = new HashSet<>();
+	// The menu items of the popup menu opened by the selection button.
 	private List<JMenuItem> menuItems = new ArrayList<>();
-	// An action that does nothing.
+	// The currently selected action items.
+	private Set<Action> selectedItems = new HashSet<>();
+	// An action that does nothing. This is selected if items is empty.
     private EmptyAction emptyItem = new EmptyAction();
+	// The currently executed action when clicking the action button.
     private Action executedAction = emptyItem;
+	// A prefix prepended to every String displayed in the action component.
     private String prefix = "";
     private int iconSize;
     private Collection<ChangeListener> listeners = new LinkedList<ChangeListener>();
-
-    private int oldWidth;
 
     private JPopupMenu menu ;
 
@@ -217,14 +222,14 @@ public class ComplexButton {
 		return actionComponent;
     }
 
-    public JPopupMenu getMenu(){
+    protected JPopupMenu getMenu(){
 		if(menu == null){
 			menu = createNewMenu();
 		}
 		return menu;
     }
 
-    JPopupMenu createNewMenu(){
+    protected JPopupMenu createNewMenu(){
 		components.clear();
 		menu = new JPopupMenu();
 		return menu;
@@ -239,7 +244,7 @@ public class ComplexButton {
 	 * @param flatten the function used to collapse multiple selected actions into one for the
 	 *                action component
 	 * @param maxChoice the maximum amount of actions that can be selected,
-	 *                  this is assumed to be at least 1
+	 *                  this is assumed to be at least 1 (otherwise it is changed to be 1)
 	 */
     public void setItems(Action[] it, Function<Action[], Action> flatten, int maxChoice) {
 		items = it;
@@ -247,6 +252,7 @@ public class ComplexButton {
 		  items = new Action[0];
 		}
 		flattenChoice = flatten;
+		// make maxChoiceAmount at least 1
 		maxChoiceAmount = Math.max(1, maxChoice);
 		if (items.length <= 1) {
 			maxChoiceAmount = 1;
@@ -262,10 +268,10 @@ public class ComplexButton {
 			}
 			menuItem.setEnabled(true);
 			menuItem.setText(item.toString());
+			menuItem.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
 			menuItems.add(menuItem);
 		}
 		refreshSelectionItems(menuItems);
-		oldWidth = getMenu().getPreferredSize().width;
         if(items.length == 0){
             setSelectedItem(emptyItem);
             setEnabled(false);
@@ -366,8 +372,12 @@ public class ComplexButton {
 
     }
 
+	// CheckBox menu item that has an assigned action which is selected on single click and
+	// performed + selected on double click.
 	public class MyJCheckBoxMenuItem extends JCheckBoxMenuItem {
 
+		/* The associated action, this is performed when double-clicking the menu item
+		and selected when single-clicking it. */
 		private final Action doubleClickAction;
 
 		public MyJCheckBoxMenuItem(Action action) {
@@ -376,15 +386,21 @@ public class ComplexButton {
 			super.setAction(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					/* The selection status will be changed after a click before the action
+					is performed, so at this point, if the item was not selected before, it is now.
+					Hence, there may be too many selected items.
+					 */
 					if (getSelectedItems().length > maxChoiceAmount) {
+						/* If the selection cannot happen, set the selection status to false again
+						and change nothing else. */
 						menuItem.setSelected(false);
 					} else {
+						// Call this to invoke the update stuff in the overridden #setSelected()
 						menuItem.setSelected(menuItem.isSelected());
 					}
-					// Don't close the popup menu after checking or unchecking some checkbox
-					getMenu().setVisible(true);
 				}
 			});
+			// tooltip of the menu item:
 			setToolTipText("On double click: " + action.getValue(Action.SHORT_DESCRIPTION));
 			doubleClickAction = action;
 		}
@@ -397,6 +413,7 @@ public class ComplexButton {
 				selectedItems.remove(this.getAction());
 			}
 			super.setSelected(b);
+			// Update the action button's selected action.
 			setSelectedItem(flattenChoice.apply(getSelectedItems()));
 		}
 
@@ -414,7 +431,6 @@ public class ComplexButton {
 				return;
 			}
 			super.processMouseEvent(e);
-			//getMenu().setVisible(false);
 		}
 
 
@@ -426,17 +442,24 @@ public class ComplexButton {
 
 		public MyJMenuItem(Action item) {
 			super();
+			/* If an action is performed on the menu item, the only thing that should happen
+			is setting the currently selected action to this one */
 			super.setAction(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					setSelectedItem(item);
 				}
 			});
+			/* This has to come after the super#setAction call because that will call getAction()
+			and assume getAction() to change its return value after setting the action.
+			Otherwise that will lead to a stack overflow. */
 			this.action = item;
 		}
 
 		@Override
 		public Action getAction() {
+			/* If the item's action is accessed, it will return the action it represents instead
+			of the one that is executed when an action is performed on the item. */
 			return action;
 		}
 	}
