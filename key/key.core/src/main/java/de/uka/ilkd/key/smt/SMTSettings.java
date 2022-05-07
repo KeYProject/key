@@ -92,7 +92,7 @@ public interface SMTSettings {
     boolean useAssumptionsForBigSmallIntegers();
 
     /**
-     * @return Returns the logic used by solvers using SMT-Lib-Format
+     * @return Returns the logic used by solvers using SMT-LIB-Format
      */
     String getLogic();
 

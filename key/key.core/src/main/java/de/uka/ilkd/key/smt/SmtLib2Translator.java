@@ -114,7 +114,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
                                               ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
                                               SMTSettings settings) {
         StringBuilder result = new StringBuilder();
-        // always set logic now, (hopefully) does no harm with the modern SMT solvers we support
+        /* Always set logic now, (hopefully) does no harm with the modern SMT solvers we support.
+        Note that the logic to be set may be (and is) hardcoded into the
+        SMTSettings#getLogic() method (currently AUFNIRA). */
         //if (getConfig().mentionLogic()) {
             result.append("(set-logic " + settings.getLogic() + " )\n");
         //}

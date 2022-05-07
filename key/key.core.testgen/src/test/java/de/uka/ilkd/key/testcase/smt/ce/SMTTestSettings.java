@@ -91,7 +91,8 @@ public long getMinimumInteger() {
 
 @Override
 public String getLogic() {
-	return "AUFLIA";
+    // Set the logic to the most general one according to the SMT-LIB standard.
+	return "AUFNIRA";
 }
 
 @Override
