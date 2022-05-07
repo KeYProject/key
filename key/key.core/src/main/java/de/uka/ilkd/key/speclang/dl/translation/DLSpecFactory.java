@@ -284,7 +284,8 @@ public final class DLSpecFactory {
 	//heapAtPre variable may be omitted
 	TermBuilder tb = services.getTermBuilder();
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = tb.heapAtPreVar(heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
+	    heapAtPreVar = tb.atPreVar(heapLDT.getHeap().toString(),
+				heapLDT.getHeap().sort(), false);
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);

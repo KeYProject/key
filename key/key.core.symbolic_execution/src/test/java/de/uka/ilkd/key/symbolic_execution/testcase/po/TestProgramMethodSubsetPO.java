@@ -41,7 +41,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 null,
                 new Position(24, 27),
                 new Position(25, 33),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
     }
 
     /**
@@ -116,7 +116,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 "x == 1 && asdf == 2 && this.field == 3",
                 new Position(27, 19),
                 new Position(31, 25),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**
@@ -131,7 +131,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 null,
                 new Position(27, 19),
                 new Position(31, 25),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**

@@ -1179,7 +1179,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result
                     = new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), true));
+                result.put(heap, locationVariable(heap + suffix, heap.sort(), true));
             }
             return result;
         }

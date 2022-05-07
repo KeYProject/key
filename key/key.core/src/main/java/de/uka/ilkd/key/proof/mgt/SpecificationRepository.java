@@ -1236,8 +1236,8 @@ public final class SpecificationRepository {
                             .getModHeaps(services, false);
                     for (LocationVariable heap : heaps) {
                         atPreVars.put(heap,
-                                tb.heapAtPreVar(
-                                        heap.name().toString() + "AtPre",
+                                tb.atPreVar(
+                                        heap.name().toString(),
                                         heap.sort(), false));
                     }
                     ProgramVariable resultVar = tb.resultVar(pm, false);
