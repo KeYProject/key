@@ -158,7 +158,19 @@ public final class SolverTypeImplementation implements SolverType {
         }
     }
 
-    public static boolean isInstalled(String cmd) {
+    /**
+     * Returns false whenever cmd is null or empty, otherwise the environment variables are
+     * checked for the command and if no file with the command's name is found in any of those
+     * paths, the cmd itself is used as the pathname.
+     * If all of these fail, the cmd is also not installed.
+     * @param cmd the command
+     * @return true iff the command is a non-empty String and a file with the command's name or with
+     *          the command as pathname can be found in the file system.
+     */
+    public static boolean isInstalled(@Nullable String cmd) {
+        if (cmd == null || cmd.isEmpty()) {
+            return false;
+        }
         if (checkEnvVariable(cmd)) {
             return true;
         } else {
@@ -167,10 +179,11 @@ public final class SolverTypeImplementation implements SolverType {
         }
     }
 
-    private static boolean checkEnvVariable(String cmd) {
+    private static boolean checkEnvVariable(@Nullable String cmd) {
         String path = System.getenv("PATH");
         String[] res = path.split(File.pathSeparator);
         for (String s : res) {
+            // for empty cmd, this file will always exist
             File file = new File(s + File.separator + cmd);
             if (file.exists()) {
                 return true;
@@ -287,9 +300,15 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public String getRawVersion() {
+    public @Nullable String getRawVersion() {
+        // Don't let the version String be empty because that will lead to the solver run
         if (isInstalled(true)) {
-            return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
+            String version = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),
+                    getVersionParameter());
+            if (version == null) {
+                version = "unknown version";
+            }
+            return version;
         } else {
             return null;
         }

@@ -40,6 +40,16 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverInfo;
     private final JSpinner solverTimeout;
 
+    private static final String versionInfo(String info, String versionString) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(info);
+        builder.append(" ");
+        builder.append("(");
+        builder.append(versionString);
+        builder.append(")");
+        return builder.toString();
+    }
+
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
@@ -138,10 +148,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             final String versionString;
             try {
                 versionString = solverType.getRawVersion();
-                info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+                info = versionInfo(info, versionString);
             } catch (RuntimeException re) {
-                // this case occurs for instance, if there user can see e.g. z3 but has not the permission
-                // to execute the solver
+                // this case occurs for instance if the user can see e.g. z3 but doesn't have
+                // the permission to execute the solver
                 info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
                         (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
             }
@@ -182,7 +192,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         String info = installed ? "yes" : "no";
         if (installed) {
             final String versionString = solverType.getRawVersion();
-            info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            info = versionInfo(info, versionString);
         }
         solverInstalled.setText(info);
     }

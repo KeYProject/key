@@ -18,6 +18,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -125,6 +126,7 @@ public interface SolverType {
      * Retrieve the version string without check for support.
      * Returns null if the solver is not installed.
      */
+    @Nullable
     String getRawVersion();
 
     /**
