@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,8 +32,10 @@ public class SolverPropertiesLoader {
 
     /**
      * Path to the file containing the names of the SMT properties files to be loaded.
+     * Package path is needed to potentially load the same file from multiple projects/jars.
      */
     private static final String SOLVER_LIST_FILE = "solvers.txt";
+    private static final String PACKAGE_PATH = "de/uka/ilkd/key/smt/solvertypes/";
 
     /**
      * The solvers loaded by this loader.
@@ -54,11 +58,11 @@ public class SolverPropertiesLoader {
     /**
      * The default solver COMMAND, if none is given in the .props file.
      */
-    private static final String DEFAULT_COMMAND = "";
+    private static final String DEFAULT_COMMAND = "command";
     /**
      * The default process parameters, if none are given in the .props file.
      */
-    private static final String DEFAULT_PARAMS = "";
+    private static final String DEFAULT_PARAMS = "-parameter";
     /**
      * The default solver description, if none is given in the .props file.
      */
@@ -66,7 +70,7 @@ public class SolverPropertiesLoader {
     /**
      * The default VERSION parameter, if none is given in the .props file.
      */
-    private static final String DEFAULT_VERSION = "";
+    private static final String DEFAULT_VERSION = "-version";
     /**
      * The default minimal expected VERSION, if none is given in the .props file.
      */
@@ -294,27 +298,42 @@ public class SolverPropertiesLoader {
      * objects and returns them.
      */
     private static Collection<Properties> loadSolvers() {
-        InputStream stream = SolverPropertiesLoader.class
-                .getResourceAsStream(SOLVER_LIST_FILE);
-        Collection<Properties> props = new ArrayList<>();
-        // return an empty list if no defaultSolvers file was read
-        if (stream == null) {
-            return props;
-        }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        List<String> propsNames = reader.lines().collect(Collectors.toList());
-        for (String fileName : propsNames) {
-            Properties solverProp = new Properties();
-            InputStream propsFile = SolverPropertiesLoader.class.getResourceAsStream(fileName);
-            try {
-                solverProp.load(propsFile);
-                props.add(solverProp);
-            } catch (Exception e) {
-                // if loading the file does not work for any reason, create a warning and continue
-                LOGGER.error(String.format("Solver file %s could not be loaded.", fileName));
+        Collection<Properties> completePropsList = new ArrayList<>();
+        try {
+            // load single solvers.txt files from the same location everywhere in the classpath
+            for (Iterator<URL> it = SolverPropertiesLoader.class.getClassLoader().getResources(
+                    PACKAGE_PATH + SOLVER_LIST_FILE).asIterator(); it.hasNext();) {
+                URL res = it.next();
+                try (InputStream stream = res.openStream()) {
+                    if (stream == null) {
+                        continue;
+                    }
+                    // load solvers from this single solvers.txt
+                    Collection<Properties> props = new ArrayList<>();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    List<String> propsNames = reader.lines().collect(Collectors.toList());
+                    for (String fileName : propsNames.stream().filter(n -> n.endsWith(".props"))
+                            .collect(Collectors.toList())) {
+                        Properties solverProp = new Properties();
+                        InputStream propsFile = SolverPropertiesLoader.class
+                                .getResourceAsStream(fileName);
+                        try {
+                            solverProp.load(propsFile);
+                            props.add(solverProp);
+                        } catch (Exception e) {
+                            // if loading the props file does not work for any reason,
+                            // create a warning and continue
+                            LOGGER.error(String.format("Solver file %s could not be loaded.",
+                                    fileName));
+                        }
+                    }
+                    completePropsList.addAll(props);
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return props;
+        return completePropsList;
     }
 
 }
