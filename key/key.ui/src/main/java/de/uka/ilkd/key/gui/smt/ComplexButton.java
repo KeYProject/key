@@ -19,14 +19,11 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import ch.qos.logback.core.Layout;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 public class ComplexButton {
@@ -40,7 +37,7 @@ public class ComplexButton {
     /* The function used to map some selected actions to the one that is to be executed.
     This is only used if more than one item can be selected at the same time.
     If only one action can be selected, the function that will be used is just the identity. */
-    private Function<Action[], Action> flattenChoice;
+    private Function<Action[], Action> reduceChoice;
     // The maximum amount of actions that can be selected at the same time.
     private int maxChoiceAmount;
     // The menu items of the popup menu opened by the selection button.
@@ -53,8 +50,12 @@ public class ComplexButton {
     private Action executedAction = emptyItem;
     // A prefix prepended to every String displayed in the action component.
     private String prefix = "";
+    // The size of the selection component's icon.
     private final int iconSize;
-    private final Collection<ChangeListener> listeners = new LinkedList<ChangeListener>();
+    // The components (other than the selection items) of the popup menu.
+    private final List<Component> components = new ArrayList<>();
+
+    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>();
 
     private JPopupMenu menu;
 
@@ -62,12 +63,17 @@ public class ComplexButton {
      * Create a new ComplexButton with a given icon size used to display the selection
      * component's icon.
      *
-     * @param iconSize
+     * @param iconSize the size of the selection component's icon (e.g. down-arrow)
      */
     public ComplexButton(int iconSize) {
         this.iconSize = iconSize;
     }
 
+    /**
+     * Enables or disables the action button (enabling is only possible if the items aren't empty).
+     *
+     * @param b true iff the action button should be enabled
+     */
     public void setEnabled(boolean b) {
         if (items.length == 0) {
             b = false;
@@ -76,10 +82,21 @@ public class ComplexButton {
         //getAction().setEnabled(b);
     }
 
+    /**
+     * Add a ChangeListener to this button that will be notified by #setSelectedItem().
+     * A listener cannot be added more than once (nothing will change if it is already present).
+     *
+     * @param listener the new ChangeListener
+     */
     public void addListener(ChangeListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Remove a previously added ChangeListener from this button.
+     *
+     * @param listener the listener to remove
+     */
     public void removeListener(ChangeListener listener) {
         listeners.remove(listener);
     }
@@ -88,16 +105,24 @@ public class ComplexButton {
     the selection component lets the user choose such an action out of the items.
      */
 
+    /**
+     * @return the selection button (opens the selection dropdown menu)
+     */
     public JComponent getSelectionComponent() {
         return getSelectionButton();
     }
 
+    /**
+     * @return the action button (runs the selected action)
+     */
     public JComponent getActionComponent() {
         return getActionButton();
     }
 
     /**
      * Set the action to be executed by the action component.
+     *
+     * @param action the action to be executed
      */
     public void setAction(Action action) {
         getActionButton().setAction(action);
@@ -117,16 +142,25 @@ public class ComplexButton {
         return selectedItems.toArray(new Action[selectedItems.size()]);
     }
 
+    /**
+     * @return whether the currently executed action is the empty item set by #setEmptyItem()
+     */
     public boolean isEmptyItem() {
         return executedAction == emptyItem;
     }
 
+    /**
+     * @return the currently set empty item
+     */
     public Action getEmptyItem() {
         return emptyItem;
     }
 
     /**
      * Set the information for the empty item.
+     *
+     * @param text the text displayed in the action button when the empty item is executed
+     * @param toolTip the tooltip of the empty item
      */
     public void setEmptyItem(String text, String toolTip) {
         boolean update = isEmptyItem();
@@ -140,12 +174,18 @@ public class ComplexButton {
 
     /**
      * Set the prefix String that will be prepended to all items in the menu.
+     *
+     * @param prefix the new prefix
      */
-    public void setPrefix(String s) {
-        prefix = s;
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
-    void update() {
+    /**
+     * Update the action button so that it executes the selected executedAction.
+     * If only one action can be chosen, make the executedAction the only element of selectedItems.
+     */
+    private void update() {
         setAction(executedAction);
         if (getAction() != null) {
             getAction().putValue(Action.NAME, isEmptyItem() ? executedAction.toString()
@@ -160,6 +200,13 @@ public class ComplexButton {
         }
     }
 
+    /**
+     * Check whether a given action is contained in the actions that can be selected via
+     * the selection component.
+     *
+     * @param item the action to search
+     * @return whether the given item can be selected
+     */
     public boolean contains(Action item) {
         for (Object it : items) {
             if (it.equals(item)) {
@@ -170,6 +217,12 @@ public class ComplexButton {
     }
 
 
+    /**
+     * Set the executedAction to be the given one and update the action button.
+     * Notify the ChangeListeners of this change.
+     *
+     * @param item the new executedAction
+     */
     public void setSelectedItem(Action item) {
         if (item == null) {
             return;
@@ -181,13 +234,16 @@ public class ComplexButton {
         }
     }
 
-    JButton getSelectionButton() {
+    /**
+     * (Create and) return the selection button used by #getSelectionComponent().
+     * @return the selection button
+     */
+    protected JButton getSelectionButton() {
         if (selectionComponent == null) {
             selectionComponent = new JButton();
             selectionComponent.setFocusable(false);
-            selectionComponent.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (items.length == 0) {
+            selectionComponent.addActionListener(e -> {
+                if (items.length == 0) {
                         return;
                     } else {
                         OptionalInt width = Arrays.stream(getMenu().getComponents())
@@ -201,37 +257,37 @@ public class ComplexButton {
                                         .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());
                     }
-                }
-            });
+                });
             selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
         }
         return selectionComponent;
     }
 
-    JButton getActionButton() {
+    /**
+     * (Create and) return the action button used by #getActionComponent().
+     * @return the action button
+     */
+    protected JButton getActionButton() {
         if (actionComponent == null) {
             actionComponent = new JButton();
             //actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
-            actionComponent.addChangeListener(new ChangeListener() {
-
-                public void stateChanged(ChangeEvent arg0) {
+            // Enable the selection button iff the action button is enabled as well.
+            actionComponent.addChangeListener(e -> {
                     getSelectionButton().setEnabled(actionComponent.isEnabled());
-                }
-            });
+                });
         }
         return actionComponent;
     }
 
+    /**
+     * (Create and) return the dropdown popup menu that is opened by the selection component.
+     * @return the popup menu opened by the selection button
+     */
     protected JPopupMenu getMenu() {
         if (menu == null) {
-            menu = createNewMenu();
+            components.clear();
+            menu = new JPopupMenu();
         }
-        return menu;
-    }
-
-    protected JPopupMenu createNewMenu() {
-        components.clear();
-        menu = new JPopupMenu();
         return menu;
     }
 
@@ -241,17 +297,17 @@ public class ComplexButton {
      * action out of all the selected actions.
      *
      * @param it        the selectable actions
-     * @param flatten   the function used to collapse multiple selected actions into one for the
-     *                  action component
+     * @param reduce   the function used to collapse multiple selected actions into one for the
+     *                 action component
      * @param maxChoice the maximum amount of actions that can be selected,
      *                  this is assumed to be at least 1 (otherwise it is changed to be 1)
      */
-    public void setItems(Action[] it, Function<Action[], Action> flatten, int maxChoice) {
+    public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
         items = it;
         if (it == null) {
             items = new Action[0];
         }
-        flattenChoice = flatten;
+        reduceChoice = reduce;
         // make maxChoiceAmount at least 1
         maxChoiceAmount = Math.max(1, maxChoice);
         if (items.length <= 1) {
@@ -286,6 +342,11 @@ public class ComplexButton {
         }
     }
 
+    /**
+     * Set new selection items/actions while keeping all other components of the popup menu.
+     *
+     * @param newMenuItems the new actions that can be selected
+     */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
         for (Component comp : getMenu().getComponents()) {
             getMenu().remove(comp);
@@ -299,14 +360,29 @@ public class ComplexButton {
         getMenu().pack();
     }
 
-    private final List<Component> components = new ArrayList<>();
-
+    /**
+     * Add a component to the popup menu (below the selection items).
+     * @param comp the added component
+     */
     public void addComponent(Component comp) {
         getMenu().add(comp);
         components.add(comp);
         getMenu().pack();
     }
 
+    /**
+     * Remove a component (other than the selection items) from the popup menu.
+     * @param comp the component to remove
+     */
+    public void removeComponent(Component comp) {
+        components.remove(comp);
+        getMenu().remove(comp);
+        getMenu().pack();
+    }
+
+    /**
+     * @return the first action of the items list or the empty item if items is empty.
+     */
     public Action getTopItem() {
         if (items.length > 0) {
             return items[0];
@@ -314,25 +390,27 @@ public class ComplexButton {
         return emptyItem;
     }
 
+    /**
+     * Select the first maxChoiceAmount items of the items list.
+     */
     public void selectMaxNumber() {
         for (int i = 0; i < maxChoiceAmount; i++) {
             menuItems.get(i).setSelected(true);
         }
     }
 
+    /**
+     * Deselect all currently selected items.
+     */
     public void deselectAll() {
         for (JMenuItem item : menuItems) {
             item.setSelected(false);
         }
     }
 
-    public void removeComponent(Component comp) {
-        components.remove(comp);
-        getMenu().remove(comp);
-        getMenu().pack();
-    }
-
-
+    /**
+     * The empty action to be set if items is empty.
+     */
     public class EmptyAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
@@ -349,14 +427,22 @@ public class ComplexButton {
             putValue(Action.SHORT_DESCRIPTION, toolTip);
         }
 
-        public void setToolTip(String t) {
-            toolTip = t;
+        /**
+         * Set the tooltip to be displayed if the empty item is the executedAction.
+         * @param tip the new tooltip
+         */
+        public void setToolTip(String tip) {
+            toolTip = tip;
         }
 
+        /**
+         * @return the tooltip to be displayed if the empty item is the executedAction
+         */
         public String getToolTip() {
             return toolTip;
         }
 
+        @Override
         public String toString() {
             return text;
         }
@@ -366,14 +452,20 @@ public class ComplexButton {
             return false;
         }
 
+        /**
+         * The EmptyAction does nothing.
+         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
 
         }
 
     }
 
-    // CheckBox menu item that has an assigned action which is selected on single click and
-    // performed + selected on double click.
+    /**
+     * CheckBox menu item that has an assigned action which is selected on single click and
+     * performed + selected on double click.
+     */
     public class MyJCheckBoxMenuItem extends JCheckBoxMenuItem {
 
         /* The associated action, this is performed when double-clicking the menu item
@@ -405,6 +497,12 @@ public class ComplexButton {
             doubleClickAction = action;
         }
 
+        /**
+         * If the item is selected, add its corresponding action to the selectedItems,
+         * otherwise remove it.
+         * Set the executedAction to reduceChoice(selectedItems).
+         * @param b true iff this item should be selected
+         */
         @Override
         public void setSelected(boolean b) {
             if (b) {
@@ -414,14 +512,21 @@ public class ComplexButton {
             }
             super.setSelected(b);
             // Update the action button's selected action.
-            setSelectedItem(flattenChoice.apply(getSelectedItems()));
+            setSelectedItem(reduceChoice.apply(getSelectedItems()));
         }
 
+        /**
+         * @return the corresponding action of this item
+         */
         @Override
         public Action getAction() {
             return doubleClickAction;
         }
 
+        /**
+         * On double click, select this item AND execute the corresponding action.
+         * @param e the event that is processed by this item
+         */
         @Override
         protected void processMouseEvent(MouseEvent e) {
             if (e.getClickCount() >= 2) {
@@ -436,7 +541,11 @@ public class ComplexButton {
 
     }
 
-    private class MyJMenuItem extends JMenuItem {
+    /**
+     * MenuItem that has an assigned action which is selected as the executedAction
+     * when clicking on the item.
+     */
+    public class MyJMenuItem extends JMenuItem {
 
         private final Action action;
 
