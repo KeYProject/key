@@ -82,6 +82,14 @@ sonarqube:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
+format:
+  stage: primary
+  image: wadoon/key-test-docker:jdk11
+  allow_failure: true
+  script:
+    - cd key
+    - gradle spotlessCheck
+
 checkstyle:
   stage: primary
   image: wadoon/key-test-docker:jdk11
