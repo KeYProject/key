@@ -1,17 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
-/* tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -52,7 +38,7 @@ public class TestTermTacletAppIndex {
     NoPosTacletApp remove_f;
     NoPosTacletApp remove_ff;
     NoPosTacletApp remove_zero;
-        
+
     private Taclet taclet(String name) {
 	return TacletForTests.getTaclet(name).taclet();
     }
