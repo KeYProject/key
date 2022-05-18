@@ -673,12 +673,16 @@ public final class AuxiliaryContractBuilders {
          *            modifies clauses for the specified heaps.
          * @return an anonymization update for the specified modifies clauses.
          */
-        public Term buildAnonOutUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+        public Term buildAnonOutUpdate(
+                final Map<LocationVariable, Function> anonymisationHeaps,
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses
+                ) {
             return buildAnonOutUpdate(
                     variables.remembranceLocalVariables.keySet(),
                     anonymisationHeaps,
                     modifiesClauses,
+                    freeModifiesClauses,
                     ANON_OUT_PREFIX);
         }
 
@@ -695,11 +699,13 @@ public final class AuxiliaryContractBuilders {
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses) {
             return buildAnonOutUpdate(
                     el,
                     anonymisationHeaps,
                     modifiesClauses,
+                    freeModifiesClauses,
                     ANON_OUT_PREFIX);
         }
 
@@ -719,6 +725,7 @@ public final class AuxiliaryContractBuilders {
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses,
                 final String prefix) {
             return buildAnonOutUpdate(
                     MiscTools.getLocalOuts(el, services).stream()
@@ -727,6 +734,7 @@ public final class AuxiliaryContractBuilders {
                         .collect(Collectors.toSet()),
                     anonymisationHeaps,
                     modifiesClauses,
+                    freeModifiesClauses,
                     prefix);
         }
 
@@ -746,14 +754,18 @@ public final class AuxiliaryContractBuilders {
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
                 final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses,
                 final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
-                final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equalsModIrrelevantTermLabels(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
+                final Term modifiesClause = modifiesClauses.getOrDefault(anonymisationHeap.getKey(), allLocs());
+                final Term freeModifiesClause = freeModifiesClauses.getOrDefault(anonymisationHeap.getKey(), allLocs());
+                final Term mod = intersect(freeModifiesClause, modifiesClause);
+                
+                if (!mod.equalsModIrrelevantTermLabels(strictlyNothing())) {
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), mod,
                             services.getTermBuilder().label(
                                     services.getTermBuilder().func(anonymisationHeap.getValue()),
                                     ParameterlessTermLabel.ANON_HEAP_LABEL));
@@ -962,6 +974,18 @@ public final class AuxiliaryContractBuilders {
             Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
+            }
+            return result;
+        }
+
+        /**
+         *
+         * @return the contract's free modifies clause.
+         */
+        public Map<LocationVariable, Term> buildFreeModifiesClauses() {
+            Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            for (final LocationVariable heap : heaps) {
+                result.put(heap, contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -1602,7 +1626,9 @@ public final class AuxiliaryContractBuilders {
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
                 final Map<LocationVariable, Function> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses,
+                final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms,
@@ -1634,7 +1660,7 @@ public final class AuxiliaryContractBuilders {
                     exceptionParameter, breakFlags, continueFlags);
 
             Term anonOut = new UpdatesBuilder(variables, services)
-                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
+                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses, freeModifiesClauses);
 
             Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
@@ -1650,6 +1676,7 @@ public final class AuxiliaryContractBuilders {
                             contract.getLoop(),
                             anonOutHeaps2,
                             modifiesClauses,
+                            freeModifiesClauses,
                             "init_" + ANON_OUT_PREFIX);
 
             final Term[] posts = createPosts(goal, postconditions, postconditionsNext, terms, tb);

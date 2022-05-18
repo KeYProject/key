@@ -795,6 +795,11 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
 
         /**
+         * assignable_free
+         */
+        ASSIGNABLE_FREE("assignable_free"),
+
+        /**
          * assume
          */
         ASSUME("assume"),

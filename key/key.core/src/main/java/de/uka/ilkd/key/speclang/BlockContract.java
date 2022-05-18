@@ -47,6 +47,7 @@ public interface BlockContract extends AuxiliaryContract {
     * @param newPreconditions the new preconditions.
     * @param newPostconditions the new postconditions.
     * @param newModifiesClauses the new modifies clauses.
+    * @param newFreeModifiesClauses the new free modifies clauses.
     * @param newInfFlowSpecs the new information flow specifications.
     * @param newVariables the new variables.
     * @param newMeasuredBy the new measured-by clause.
@@ -58,6 +59,7 @@ public interface BlockContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
+            Map<LocationVariable, Term> newFreeModifiesClauses,
             final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables,
             Term newMeasuredBy);
 

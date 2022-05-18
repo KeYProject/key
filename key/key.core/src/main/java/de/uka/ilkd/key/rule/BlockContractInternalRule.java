@@ -162,11 +162,14 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final BlockContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate
-                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+                = updatesBuilder.buildAnonOutUpdate(
+                        anonymisationHeaps, modifiesClauses, freeModifiesClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -279,13 +282,15 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses
+                = conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final Term frameCondition
                 = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
-                variables, modifiesClauses, services);
+                variables, modifiesClauses, freeModifiesClauses, services);
 
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), variables,

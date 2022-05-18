@@ -26,6 +26,21 @@ public class FreeConditions {
             ++field;
         }
     }
+    
+    /*@ public normal_behavior
+      @ ensures field == 21; */
+    void blockContract2() {
+        /*@ public normal_behavior
+          @ ensures field == 21; 
+          @ assignable field; */
+        { f = 21; }
+        
+        /*@ public normal_behavior
+          @ ensures true; 
+          @ assignable field;
+          @ assignable_free \nothing; */
+        { f = 42; }
+    }
 
     /*@ public normal_behavior
       @ ensures field == 42;

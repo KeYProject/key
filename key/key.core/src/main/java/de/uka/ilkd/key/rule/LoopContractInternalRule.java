@@ -206,11 +206,12 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     private static Term[] createUpdates(final Instantiation instantiation,
             final List<LocationVariable> heaps, final Map<LocationVariable, Function> anonOutHeaps,
             final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
             final UpdatesBuilder updatesBuilder) {
         final Term contextUpdate = instantiation.update;
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate
-                = updatesBuilder.buildAnonOutUpdate(anonOutHeaps, modifiesClauses);
+                = updatesBuilder.buildAnonOutUpdate(anonOutHeaps, modifiesClauses, freeModifiesClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -300,6 +301,8 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                         services);
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses
+                = conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final Term[] assumptions = createPreconditions(instantiation.self, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
@@ -313,7 +316,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                 heaps, vars[1], modifiesClauses, services);
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(vars[0], services);
         final Term[] updates = createUpdates(instantiation, heaps, anonOutHeaps, modifiesClauses,
-                updatesBuilder);
+                freeModifiesClauses, updatesBuilder);
         final Term nextRemembranceUpdate
                 = new UpdatesBuilder(vars[1], services).buildRemembranceUpdate(heaps);
         final Term context = createContext(heaps, updatesBuilder, instantiation, services);
@@ -329,7 +332,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final ProgramVariable exceptionParameter
                 = createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
-                nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
+                nextRemembranceUpdate, anonOutHeaps, modifiesClauses, freeModifiesClauses,
                 ArrayUtil.add(assumptions, freePrecondition),
                 decreasesCheck,
                 postconditions, postconditionsNext, exceptionParameter,

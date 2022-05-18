@@ -176,13 +176,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasMod, final Map<LocationVariable, Boolean> hasFreeMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, block, labels, method, modality,
                 preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod,
                 functionalContracts);
 
         onBlock = true;
@@ -282,13 +285,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasMod, final Map<LocationVariable, Boolean> hasFreeMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modality,
                 preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod,
                 functionalContracts);
 
         onBlock = false;
@@ -681,6 +687,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 (head == null) ? r.freePostconditions : new HashMap<>();
         Map<LocationVariable, Term> modifies =
                 (head == null) ? r.modifiesClauses : new HashMap<>();
+        Map<LocationVariable, Term> freeModifies =
+                (head == null) ? r.modifiesClauses : new HashMap<>();
 
         if (head != null) {
             Map<Term, Term> preReplacementMap = new HashMap<>();
@@ -714,13 +722,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             for (LocationVariable heap : r.modifiesClauses.keySet()) {
                 modifies.put(heap, preReplacer.replace(r.modifiesClauses.get(heap)));
             }
+            for (LocationVariable heap : r.freeModifiesClauses.keySet()) {
+                freeModifies.put(heap, preReplacer.replace(r.modifiesClauses.get(heap)));
+            }
         }
 
         if (blockContract == null) {
             blockContract = new BlockContractImpl(
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
-                    pre, freePre, r.measuredBy, post, freePost, modifies,
-                r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
+                    pre, freePre, r.measuredBy, post, freePost, modifies, freeModifies,
+                r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod, r.hasFreeMod,
                 getFunctionalContracts());
             ((BlockContractImpl) blockContract).setLoopContract(this);
         }
@@ -809,13 +820,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         Map<LocationVariable, Term> newModifiesClauses =
                 modifiesClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeModifiesClauses =
+                freeModifiesClauses.entrySet().stream().collect(
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
         Term newDecreases = op.apply(decreases);
 
         return update(
                 block,
                 newPreconditions, newFreePreconditions, newPostconditions, newFreePostconditions,
-                newModifiesClauses,
+                newModifiesClauses, newFreeModifiesClauses,
                 infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
                 variables,
                 newMeasuredBy, newDecreases);
@@ -828,6 +842,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
+            final Map<LocationVariable, Term> newFreeModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(
@@ -835,8 +850,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 newPreconditions, newFreePreconditions,
                 newMeasuredBy,
                 newPostconditions, newFreePostconditions,
-                newModifiesClauses,
-                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
+                newModifiesClauses, newFreeModifiesClauses,
+                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, hasFreeMod,
+                newDecreases,
                 getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
@@ -849,15 +865,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
+            final Map<LocationVariable, Term> newFreeModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(
                 baseName, newLoop, labels, method, modality,
                 newPreconditions, newFreePreconditions, newMeasuredBy,
                 newPostconditions, newFreePostconditions,
-                newModifiesClauses,
-                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
-                getFunctionalContracts(), services);
+                newModifiesClauses, newFreeModifiesClauses,
+                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, hasFreeMod,
+                newDecreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -876,6 +893,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     postconditions,
                     freePostconditions,
                     modifiesClauses,
+                    freeModifiesClauses,
                     infFlowSpecs,
                     variables,
                     measuredBy,
@@ -893,6 +911,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             = new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newModifiesClauses
                 = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newFreeModifiesClauses
+            = new LinkedHashMap<LocationVariable, Term>();
 
             final Term newMeasuredBy = replacer.replace(measuredBy);
             final Term newDecreases = replacer.replace(decreases);
@@ -912,6 +932,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                         replacer.replace(getFreePostcondition(heap, services)));
                 newModifiesClauses.put(heap,
                         replacer.replace(getModifiesClause(heap, services)));
+                newFreeModifiesClauses.put(heap,
+                        replacer.replace(getFreeModifiesClause(heap, services)));
             }
             replacedEnhancedForVars =
                     (LoopContractImpl) update(newBlock,
@@ -920,6 +942,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                               newPostconditions,
                                               newFreePostconditions,
                                               newModifiesClauses,
+                                              newFreeModifiesClauses,
                                               infFlowSpecs,
                                               variables,
                                               newMeasuredBy,
@@ -940,8 +963,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(
                 baseName, newBlock, labels, method, modality,
                 preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
+                modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, decreases,
                 getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
@@ -956,8 +979,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(
                 baseName, newLoop, labels, method, modality,
                 preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
+                modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, decreases,
                 getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
@@ -975,8 +998,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(
                 baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, decreases, getFunctionalContracts(), services);
+                modifiesClauses, freeModifiesClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, hasFreeMod, decreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -1065,12 +1088,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> ensuresFree,
                 ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
+                Term signalsOnly, Term diverges,
+                Map<LocationVariable, Term> assignables, Map<LocationVariable, Term> assignablesFree,
+                Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+                Term decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables,
                     requires, requiresFree, measuredBy, ensures, ensuresFree,
                     infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                    diverges, assignables, hasMod, services);
+                    diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
 
             this.decreases = decreases;
         }
@@ -1131,12 +1156,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> ensuresFree,
                 ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
+                Term signalsOnly, Term diverges,
+                Map<LocationVariable, Term> assignables, Map<LocationVariable, Term> assignablesFree,
+                Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+                Term decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables,
                     requires, requiresFree, measuredBy, ensures, ensuresFree,
                     infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                    diverges, assignables, hasMod, services);
+                    diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
 
             this.loop = loop;
             this.decreases = decreases;
@@ -1151,23 +1178,25 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
+                Map<LocationVariable, Term> freeModifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
+                boolean transactionApplicable,
+                Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod) {
             if (block != null) {
                 return new LoopContractImpl(
                         baseName, block, labels, method, modality,
                         preconditions, freePreconditions, measuredBy,
                         postconditions, freePostconditions,
-                        modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod, decreases, null, services);
+                        modifiesClauses, freeModifiesClauses, infFlowSpecs, variables,
+                        transactionApplicable, hasMod, hasFreeMod, decreases, null, services);
             } else {
                 assert loop != null;
                 return new LoopContractImpl(
                         baseName, loop, labels, method, modality,
                         preconditions, freePreconditions,
                         measuredBy, postconditions, freePostconditions,
-                        modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod, decreases, null, services);
+                        modifiesClauses, freeModifiesClauses, infFlowSpecs, variables,
+                        transactionApplicable, hasMod, hasFreeMod, decreases, null, services);
             }
         }
 
@@ -1232,21 +1261,26 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             }
 
             Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<LocationVariable, Boolean>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
+                boolean hfm = false;
 
-                for (int i = 1; i < contracts.length && !hm; i++) {
-                    hm = contracts[i].hasModifiesClause(heap);
+                for (int i = 1; i < contracts.length && !hm && !hfm; i++) {
+                    hm |= contracts[i].hasModifiesClause(heap);
+                    hfm |= contracts[i].hasFreeModifiesClause(heap);
                 }
                 hasMod.put(heap, hm);
+                hasFreeMod.put(heap, hm);
             }
 
             LoopContractImpl result = new LoopContractImpl(baseName, head.getBlock(),
                     head.getLabels(), head.getMethod(), head.getModality(),
                     preconditions, freePreconditions,
                     contracts[0].getMby(), postconditions, freePostconditions,
-                    modifiesClauses, head.getInfFlowSpecs(),
-                    placeholderVariables, head.isTransactionApplicable(), hasMod,
+                    modifiesClauses, freeModifiesClauses, head.getInfFlowSpecs(),
+                    placeholderVariables, head.isTransactionApplicable(),
+                    hasMod, hasFreeMod,
                     contracts[0].getDecreases(), functionalContracts, services);
 
             return result;

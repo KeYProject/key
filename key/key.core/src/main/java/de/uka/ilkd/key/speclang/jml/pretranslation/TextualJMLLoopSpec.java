@@ -40,6 +40,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public enum ClauseHd {
         INFORMATION_FLOW,
         ASSIGNABLE,
+        ASSIGNABLE_FREE,
         INVARIANT,
         INVARIANT_FREE
     }

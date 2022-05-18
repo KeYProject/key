@@ -134,6 +134,16 @@ public interface AuxiliaryContract extends SpecificationElement {
     public boolean hasModifiesClause(LocationVariable heap);
 
     /**
+     * Returns <code>true</code> iff the method (according to the free part of the contract)
+     * does not modify the heap at all, i.e., iff it is "strictly pure."
+     *
+     * @param heap
+     *            the heap to use.
+     * @return whether this contract is strictly pure.
+     */
+    public boolean hasFreeModifiesClause(LocationVariable heap);
+
+    /**
      *
      * @return the {@code self} variable as a term.
      */
@@ -409,6 +419,55 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @return this contract's modifies clause on the specified heap.
      */
     public Term getModifiesClause(LocationVariable heap, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    public Term getFreeModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    public Term getFreeModifiesClause(LocationVariable heapVariable, Term heap, Term self,
+            Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    Term getFreeModifiesClause(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
+     * @param services
+     *            services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    public Term getFreeModifiesClause(LocationVariable heap, Services services);
 
     /**
      *

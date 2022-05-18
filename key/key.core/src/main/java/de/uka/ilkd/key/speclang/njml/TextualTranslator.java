@@ -199,13 +199,15 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
-        final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSIGNABLE);
+        final boolean isFree = ctx.ASSIGNABLE().getText().endsWith("_free");
+        final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, isFree
+                ? OriginTermLabel.SpecType.ASSIGNABLE_FREE : OriginTermLabel.SpecType.ASSIGNABLE);
         for (Name heap : heaps) {
             if (methodContract != null) {
-                methodContract.addClause(ASSIGNABLE, heap, ctx2);
+                methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
             if (loopContract != null) {
-                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, ctx2);
+                loopContract.addClause(isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, ctx2);
             }
         }
         return null;

@@ -229,6 +229,7 @@ public class JMLSpecFactory {
         public Term measuredBy;
         public Term decreases;
         public Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
+        public Map<LocationVariable, Term> assignablesFree = new LinkedHashMap<>();
         public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
         public Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
         public Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
@@ -240,6 +241,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+        public Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
         public void clear() {
@@ -370,6 +372,7 @@ public class JMLSpecFactory {
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             translateAssignable(pm, progVars, heap, savedHeap,
                     textualSpecCase.getAssignable(heap.name()),
+                    textualSpecCase.getAssignableFree(heap.name()),
                     clauses);
             translateRequires(pm, progVars, heap, savedHeap,
                     textualSpecCase.getRequires(heap.name()),
@@ -486,10 +489,14 @@ public class JMLSpecFactory {
 
     private void translateAssignable(IProgramMethod pm, ProgramVariableCollection progVars,
                                      LocationVariable heap, final LocationVariable savedHeap,
-                                     final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
+                                     final ImmutableList<LabeledParserRuleContext> mod,
+                                     final ImmutableList<LabeledParserRuleContext> modFree,
+                                     ContractClauses clauses)
             throws SLTranslationException {
         clauses.hasMod.put(heap,
                 !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod));
+        clauses.hasFreeMod.put(heap,
+                !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, modFree));
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else {
@@ -504,12 +511,34 @@ public class JMLSpecFactory {
                         progVars.paramVars, progVars.atPres, progVars.atBefores, mod));
             }
         }
+        
+        if (heap == savedHeap && modFree.isEmpty()) {
+            clauses.assignablesFree.put(heap, null);
+        } else {
+            final Boolean hasFreeMod = clauses.hasFreeMod.get(heap);
+            if (hasFreeMod == null || !hasFreeMod) {
+                final ImmutableList<LabeledParserRuleContext> assignableFreeNothing = ImmutableSLList
+                        .<LabeledParserRuleContext>nil().append(getAssignableFreeNothing());
+                clauses.assignablesFree.put(heap, translateAssignableFree(pm, progVars.selfVar,
+                        progVars.paramVars, progVars.atPres, progVars.atBefores, assignableFreeNothing));
+            } else {
+                clauses.assignablesFree.put(heap, translateAssignableFree(pm, progVars.selfVar,
+                        progVars.paramVars, progVars.atPres, progVars.atBefores, modFree));
+            }
+        }
     }
 
     @Nonnull
     private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(
                 JmlFacade.parseClause("assignable \\nothing;"),
+                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+    }
+
+    @Nonnull
+    private LabeledParserRuleContext getAssignableFreeNothing() {
+        return new LabeledParserRuleContext(
+                JmlFacade.parseClause("assignable_free \\nothing;"),
                 ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
@@ -775,6 +804,20 @@ public class JMLSpecFactory {
         } else {
             return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
                     originalClauses, SpecType.ASSIGNABLE);
+        }
+    }
+
+    private Term translateAssignableFree(IProgramMethod pm, ProgramVariable selfVar,
+                                     ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
+                                     Map<LocationVariable, Term> atBefores,
+                                     ImmutableList<LabeledParserRuleContext> originalClauses)
+            throws SLTranslationException {
+
+        if (originalClauses.isEmpty()) {
+            return tb.allLocs();
+        } else {
+            return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
+                    originalClauses, SpecType.ASSIGNABLE_FREE);
         }
     }
 
@@ -1383,8 +1426,9 @@ public class JMLSpecFactory {
                 clauses.requires, clauses.requiresFree, clauses.measuredBy,
                 clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, services).create();
+                clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.assignablesFree,
+                clauses.hasMod, clauses.hasFreeMod, services).create();
     }
 
     /**
@@ -1418,8 +1462,9 @@ public class JMLSpecFactory {
                 clauses.requires, clauses.requiresFree, clauses.measuredBy,
                 clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, clauses.decreases, services).create();
+                clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.assignablesFree,
+                clauses.hasMod, clauses.hasFreeMod, clauses.decreases, services).create();
     }
 
     /**
@@ -1452,8 +1497,9 @@ public class JMLSpecFactory {
                 clauses.requires, clauses.requiresFree, clauses.measuredBy,
                 clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, clauses.decreases, services).create();
+                clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.assignablesFree,
+                clauses.hasMod, clauses.hasFreeMod, clauses.decreases, services).create();
     }
 
     /**

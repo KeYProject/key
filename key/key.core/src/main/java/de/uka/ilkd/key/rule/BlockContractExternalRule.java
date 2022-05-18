@@ -156,10 +156,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
             final Services services) {
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses
+                = conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate
-                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses, freeModifiesClauses);
         final Term[] updates = new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
         return updates;
     }

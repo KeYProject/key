@@ -44,6 +44,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
+        return getList(ASSIGNABLE_FREE, toString);
+    }
+
     private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause, @Nonnull Name heap) {
         List<LabeledParserRuleContext> seq = clauses.stream()
                 .filter(it -> it.clauseType.equals(clause))
@@ -101,6 +105,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public enum ClauseHd {
         ACCESSIBLE,
         ASSIGNABLE,
+        ASSIGNABLE_FREE,
         REQUIRES,
         REQUIRES_FREE,
         ENSURES,

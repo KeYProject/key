@@ -97,11 +97,13 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final LoopContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate
-                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses, freeModifiesClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -251,6 +253,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
                         services);
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses
+                = conditionsAndClausesBuilder.buildFreeModifiesClauses();
 
         final Term[] preconditions = createPreconditions(instantiation.self, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
@@ -258,7 +262,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
-                variables, modifiesClauses, services);
+                variables, modifiesClauses, freeModifiesClauses, services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,

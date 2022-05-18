@@ -209,6 +209,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses
+                = conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final Term[] postconditionsNext = createPostconditionsNext(selfTerm, heaps, nextVariables,
                 modifiesClauses, services);
         final Term[] postconditions
@@ -219,7 +221,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 = createGoalConfigurator(selfVar, selfTerm, variables, services, tb);
 
         Term validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
-                modifiesClauses,
+                modifiesClauses, freeModifiesClauses,
                 ArrayUtil.add(assumptions, freePrecondition),
                 decreasesCheck, postconditions, postconditionsNext,
                 wellFormedHeapsCondition, configurator, conditionsAndClausesBuilder, services, tb);
@@ -461,7 +463,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
-            final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses, final Term[] assumptions,
             final Term decreasesCheck, final Term[] postconditions, final Term[] postconditionsNext,
             final Term wellFormedHeapsCondition, final GoalsConfigurator configurator,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
@@ -482,7 +485,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);
 
         Term validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
-                context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
+                context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps,
+                modifiesClauses, freeModifiesClauses,
                 assumptions, decreasesCheck, postconditions, postconditionsNext, exceptionParameter,
                 variables.termify(selfTerm), nextVariables);
 
