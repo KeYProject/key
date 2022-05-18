@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.ProgramElement;

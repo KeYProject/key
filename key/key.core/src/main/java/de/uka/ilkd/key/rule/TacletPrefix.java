@@ -1,17 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
-/** this class contains the prefix for an Taclet according to M.Gieses paper 
+/** this class contains the prefix for an Taclet according to M.Gieses paper
  * "Taclet mit Schemavariablen und lokalen Deklarationen" 
  * It is used as a data container for the set of all variables bound above the
  * appearance of a SchemaVariable v in a Taclet without all those x not free
