@@ -209,6 +209,7 @@ public final class MainWindow extends JFrame {
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
     private ComplexButton smtComponent;
+    private ComplexButton.EmptyAction noSolverSelected;
     private ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
@@ -232,19 +233,15 @@ public final class MainWindow extends JFrame {
                 types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
             }
         }
+        if (types.isEmpty() || a.length == 0) {
+            return noSolverSelected;
+        }
         for (SolverType type : types) {
             builder.append(type.getName() + ", ");
         }
-        if (!types.isEmpty()) {
-            builder.delete(builder.length() - 2, builder.length());
-        }
-        SolverTypeCollection chosenSolvers;
-        if (types.isEmpty()) {
-            chosenSolvers = SolverTypeCollection.EMPTY_COLLECTION;
-        } else {
-            chosenSolvers
+        builder.delete(builder.length() - 2, builder.length());
+        SolverTypeCollection chosenSolvers
                     = new SolverTypeCollection(builder.toString(), types.size(), types);
-        }
         return new SMTInvokeAction(chosenSolvers, this);
     };
 
@@ -628,6 +625,9 @@ public final class MainWindow extends JFrame {
 
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
+        noSolverSelected = new ComplexButton.EmptyAction(true);
+        noSolverSelected.setText("SMT");
+        noSolverSelected.setToolTip("Choose at least one SMT solver to run");
         // Configure the smtComponent's empty item (this is selected if no solvers are available):
         String noneAvailableText = "No solver available";
         String noneAvailableTip =
@@ -653,23 +653,21 @@ public final class MainWindow extends JFrame {
             }
         });
 
-        /* Add a ChangeListener to the smtComponent that checks whether the selected SMTInvokeAction
-        would invoke the empty solver collection (<-> no solvers are selected, but there are solvers
-        available) and if so, changes the empty item to not display "No solver available" and keeps
-        the selection component activated.
+        /* Add a ChangeListener to the smtComponent that checks whether currently no solvers
+        are selected, but solvers are available (<-> noSolverSelected is the selected action,
+        see collapseChoice for that).
          */
         smtComponent.addListener(c -> {
-            if (smtComponent.getAction() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) smtComponent.getAction();
-                // Only change the empty item as long as the empty collection is selected.
-                if (action.getSolverUnion().equals(SolverTypeCollection.EMPTY_COLLECTION)) {
-                    smtComponent.setEmptyItem("SMT", "Choose at least one SMT solver to run");
-                    smtComponent.setSelectedItem(smtComponent.getEmptyItem());
-                    smtComponent.getSelectionComponent().setEnabled(true);
-                } else {
-                    smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
-                    smtComponent.getActionComponent().setEnabled(true);
-                }
+            if (smtComponent.getAction() == noSolverSelected) {
+                // Make sure the tooltip and text are shown.
+                noSolverSelected.putValue(Action.NAME, noSolverSelected.toString());
+                noSolverSelected.putValue(Action.SHORT_DESCRIPTION, noSolverSelected.getToolTip());
+                boolean selectionEnabled = smtComponent.getSelectionComponent().isEnabled();
+                // Disable the action button.
+                smtComponent.setEnabled(false);
+                // Disabling the action button also disables the selection button,
+                // so enable that again (if it was before).
+                smtComponent.getSelectionComponent().setEnabled(selectionEnabled);
             }
         });
 

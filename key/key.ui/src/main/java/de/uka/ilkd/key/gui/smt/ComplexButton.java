@@ -32,7 +32,7 @@ public class ComplexButton {
     // The currently selected action items.
     private final Set<Action> selectedItems = new HashSet<>();
     // An action that does nothing. This is selected if items is empty.
-    private final EmptyAction emptyItem = new EmptyAction();
+    private final EmptyAction emptyItem = new EmptyAction(false);
     // The currently executed action when clicking the action button.
     private Action executedAction = emptyItem;
     // A prefix prepended to every String displayed in the action component.
@@ -229,6 +229,7 @@ public class ComplexButton {
         if (selectionComponent == null) {
             selectionComponent = new JButton();
             selectionComponent.setFocusable(false);
+            selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
             selectionComponent.addActionListener(e -> {
                 if (items.length == 0) {
                         return;
@@ -238,14 +239,15 @@ public class ComplexButton {
                         if (width.isEmpty()) {
                             width = OptionalInt.of(0);
                         }
+                        int newWidth = Math.max(width.getAsInt(),
+                                actionComponent.getWidth() + selectionComponent.getWidth());
                         getMenu().setPopupSize(
-                                width.getAsInt(),
+                                newWidth,
                                 Arrays.stream(getMenu().getComponents())
                                         .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());
                     }
                 });
-            selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
         }
         return selectionComponent;
     }
@@ -317,7 +319,6 @@ public class ComplexButton {
         refreshSelectionItems(menuItems);
         if (items.length == 0) {
             setSelectedItem(emptyItem);
-            setEnabled(false);
             return;
         }
         if (maxChoiceAmount <= 1) {
@@ -398,13 +399,16 @@ public class ComplexButton {
     /**
      * The empty action to be set if items is empty.
      */
-    public class EmptyAction extends AbstractAction {
+    public static class EmptyAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
         private String text;
         private String toolTip;
 
-        public EmptyAction() {
+        private boolean enabled;
+
+        public EmptyAction(boolean enabled) {
+            this.enabled = enabled;
             setText("empty");
         }
 
@@ -436,7 +440,7 @@ public class ComplexButton {
 
         @Override
         public boolean isEnabled() {
-            return false;
+            return enabled;
         }
 
         /**
