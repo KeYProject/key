@@ -108,7 +108,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e.longValue() * 1000L));
+                e -> settings.setTimeout(e.longValue() * 1000));
     }
 
     private JSpinner createIntBoundField() {
@@ -167,7 +167,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField.setValue(this.settings.getLocsetBound());
         objectBoundField.setValue(this.settings.getObjectBound());
         seqBoundField.setValue(this.settings.getSeqBound());
-        timeoutField.setValue(this.settings.getTimeout() / 1000L);
+        timeoutField.setValue(this.settings.getTimeout() / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
     }
 }

@@ -126,7 +126,7 @@ public class SimpleSettingsPanel extends JPanel {
         return field;
     }
 
-    protected <T extends Number & Comparable> JSpinner createNumberTextField(
+    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(
             T min, T max, T step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
@@ -134,9 +134,23 @@ public class SimpleSettingsPanel extends JPanel {
 
     protected JSpinner createNumberTextField(SpinnerModel model,
                                              final @Nullable Validator<Number> validator) {
-        JSpinner field = new JSpinner(model);
-        field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
-        return field;
+        // create a new spinner that delegates background color changes/requests to its TextField
+        JSpinner spinner = new JSpinner(model) {
+            @Override
+            public void setBackground(Color bg) {
+                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor)getEditor();
+                editor.getTextField().setBackground(bg);
+            }
+
+            @Override
+            public Color getBackground() {
+                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor)getEditor();
+                return editor.getTextField().getBackground();
+            }
+        };
+        spinner.setBackground(Color.WHITE);     // without this, the background would be gray ...
+        spinner.addChangeListener(new ValidatorSpinnerAdapter<>(spinner, validator));
+        return spinner;
     }
 
     public static JLabel createHelpLabel(String s) {

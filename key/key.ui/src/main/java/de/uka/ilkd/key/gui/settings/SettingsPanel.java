@@ -257,7 +257,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return field;
     }
 
-    protected <T extends Number & Comparable> JSpinner addNumberField(
+    protected <T extends Number & Comparable<T>> JSpinner addNumberField(
             String title, T min, T max, T step, String info, final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
