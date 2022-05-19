@@ -30,60 +30,134 @@ import java.util.Arrays;
  *      (if {@link ModularSMTLib2Translator} is used)
  * - The preamble file used for translations for the solver type
  *
- * @author alicia
+ * @author Alicia Appelhagen
  */
 public final class SolverTypeImplementation implements SolverType {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverTypeImplementation.class);
 
-    /**
+    /*
      * The default values of this solver type object, final and private as they should not be
      * changed after creation.
      */
-    private final String name;
-    private final String info;
-    private final String defaultParams;
-    private final String defaultCommand;
-    private final String versionCommand;
-    private final String minimumSupportedVersion;
-    private final long defaultTimeout;
-    private final String[] delimiters;
+
     /**
+     * The name of this solver type.
+     */
+    private final String name;
+
+    /**
+     * Arbitrary information for this solver type, shown in the type's settings dialog.
+     */
+    private final String info;
+
+    /**
+     * The default parameters for starting a solver process with this solver type.
+     */
+    private final String defaultParams;
+
+    /**
+     * The default command for starting a solver process with this solver type.
+     */
+    private final String defaultCommand;
+
+    /**
+     * The parameter used to get the version of a solver of this type.
+     */
+    private final String versionParameter;
+
+    /**
+     * The minimum version a solver of this type needs to have to be declared as supported by KeY.
+     */
+    private final String minimumSupportedVersion;
+
+    /**
+     * The default timeout for solver processes of this type.
+     */
+    private final long defaultTimeout;
+
+    /**
+     * The message delimiters used to separate messages in the stdout of processes of this type.
+     */
+    private final String[] delimiters;
+
+    /*
      * The current command line parameters, timeout and command to be used instead of the default
      * values, changeable.
      */
-    private String params;
-    private String command;
-    private long timeout;
+
     /**
+     * The current parameters for starting processes of this type.
+     */
+    private String params;
+
+    /**
+     * The current command for starting processes of this type.
+     */
+    private String command;
+
+    /**
+     * The current timeout of processes of this type.
+     */
+    private long timeout;
+
+    /*
      * Booleans signalling whether the support/installation of the
      * created solver type as an actual program has been checked.
      */
-    private boolean supportHasBeenChecked = false;
-    private boolean isSupportedVersion = false;
-    private boolean installWasChecked = false;
-    private boolean isInstalled = false;
+
     /**
-     * The versionCommand of the solver type at hand, returned by the actual program using the
-     * {@link #versionCommand} cmd parameter.
+     * Has the support of the solver version of solvers(/solver processes) of this type
+     * already been checked?
+     */
+    private boolean supportHasBeenChecked = false;
+
+    /**
+     * Is the version of solvers(/solver processes) of this type supported?
+     */
+    private boolean isSupportedVersion = false;
+
+    /**
+     * Has this solver type already been checked for installation?
+     */
+    private boolean installWasChecked = false;
+
+    /**
+     * True iff the current command is a file.
+     */
+    private boolean isInstalled = false;
+
+    /**
+     * The versionParameter of the solver type at hand, returned by the actual program using the
+     * {@link #versionParameter} cmd parameter.
      */
     private String installedVersion;
+
     /**
      * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the
-     * {@link SMTTranslator} that is created with {@link #createTranslator(Services)}.
+     * {@link SMTTranslator} that is created with {@link #createTranslator()}.
      */
     private final String[] handlerNames;
+
+    /**
+     * Arbitrary options for the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by
+     * this solver type's {@link #translator}
+     * (only takes effect for {@link ModularSMTLib2Translator}).
+     */
     private final String[] handlerOptions;
+
     /**
      * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
      * to be created with {@link #getSocket(ModelExtractor)}.
      */
     private final Class<?> solverSocketClass;
+
     /**
      * The class of the {@link SMTTranslator} to be created with
      * {@link #createTranslator()}.
      */
     private final Class<?> translatorClass;
+
     /**
      * The preamble String for the created {@link SMTTranslator}, may be null.
      */
@@ -95,6 +169,10 @@ public final class SolverTypeImplementation implements SolverType {
      * Should not be returned to outside classes.
      */
     private final AbstractSolverSocket solverSocket;
+
+    /**
+     * The SMTTranslator used to translate problems for this solver type.
+     */
     private final SMTTranslator translator;
 
     /**
@@ -107,9 +185,9 @@ public final class SolverTypeImplementation implements SolverType {
      *                      program
      * @param defaultCommand the default command line COMMAND used to start the actual solver
      *                       program
-     * @param versionCommand the command line parameter used to get the versionCommand of the
+     * @param versionParameter the command line parameter used to get the versionParameter of the
      *                       actual solver program
-     * @param minimumSupportedVersion the minimum supported versionCommand of the solver type
+     * @param minimumSupportedVersion the minimum supported versionParameter of the solver type
      *                                at hand
      * @param defaultTimeout the default solver timeout for SMT processes using this solver type
      * @param delimiters the message delimiters used by the actual solver program
@@ -122,7 +200,7 @@ public final class SolverTypeImplementation implements SolverType {
      * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */
     public SolverTypeImplementation(String name, String info, String defaultParams,
-                                    String defaultCommand, String versionCommand,
+                                    String defaultCommand, String versionParameter,
                                     String minimumSupportedVersion,
                                     long defaultTimeout, String[] delimiters,
                                     Class<?> translatorClass,
@@ -138,7 +216,7 @@ public final class SolverTypeImplementation implements SolverType {
         this.minimumSupportedVersion = minimumSupportedVersion;
         timeout = defaultTimeout;
         this.delimiters = delimiters;
-        this.versionCommand = versionCommand;
+        this.versionParameter = versionParameter;
         this.translatorClass = translatorClass;
         // copy the array so that it cannot accidentally be manipulated from the outside
         this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
@@ -183,7 +261,8 @@ public final class SolverTypeImplementation implements SolverType {
      * checked for the command and if no file with the command's name is found in any of those
      * paths, the cmd itself is used as the pathname.
      * If all of these fail, the cmd is also not installed.
-     * @param cmd the command
+     *
+     * @param cmd the command whose existence will be checked
      * @return true iff the command is a non-empty String and a file with the command's name or with
      *          the command as pathname can be found in the file system.
      */
@@ -305,7 +384,7 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Override
     public String getVersionParameter() {
-        return versionCommand;
+        return versionParameter;
     }
 
     @Override

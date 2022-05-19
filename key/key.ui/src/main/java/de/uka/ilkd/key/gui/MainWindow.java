@@ -29,7 +29,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.smt.ComplexButton;
+import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
@@ -60,7 +60,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @HelpInfo()
@@ -208,8 +207,8 @@ public final class MainWindow extends JFrame {
      */
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
-    private ComplexButton smtComponent;
-    private ComplexButton.EmptyAction noSolverSelected;
+    private DropdownSelectionButton smtComponent;
+    private DropdownSelectionButton.EmptyAction noSolverSelected;
     private ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
@@ -610,7 +609,7 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
-        ComplexButton comp = createSMTComponent();
+        DropdownSelectionButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
@@ -623,9 +622,14 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private ComplexButton createSMTComponent() {
-        smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
-        noSolverSelected = new ComplexButton.EmptyAction(true);
+    /**
+     * Create the {@link #smtComponent} for selecting SMT solvers.
+     *
+     * @return the {@link #smtComponent}
+     */
+    private DropdownSelectionButton createSMTComponent() {
+        smtComponent = new DropdownSelectionButton(TOOLBAR_ICON_SIZE);
+        noSolverSelected = new DropdownSelectionButton.EmptyAction(true);
         noSolverSelected.setText("SMT");
         noSolverSelected.setToolTip("Choose at least one SMT solver to run");
         // Configure the smtComponent's empty item (this is selected if no solvers are available):
@@ -645,7 +649,7 @@ public final class MainWindow extends JFrame {
         the settings to the currently selected one (if the selected action is an SMTInvokeAction).
         */
         smtComponent.addListener(e -> {
-            ComplexButton but = (ComplexButton) e.getSource();
+            DropdownSelectionButton but = (DropdownSelectionButton) e.getSource();
             if (but.getAction() instanceof SMTInvokeAction) {
                 SMTInvokeAction action = (SMTInvokeAction) but.getAction();
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
@@ -972,7 +976,7 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * update the selection menu for decision procedures using SMT solvers.
+     * Update the selection menu for decision procedures using SMT solvers.
      * Remove those SMT solvers, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {

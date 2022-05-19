@@ -7,7 +7,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
+public final class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings,
+        Cloneable {
 
     private static final String ACTIVE_SOLVER = "[SMTSettings]ActiveSolver";
 
@@ -16,7 +17,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
     private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
 
-    private static final String PATH_FOR_TACLET_TRANSLATION = "[SMTSettings]pathForTacletTranslation";
+    private static final String PATH_FOR_TACLET_TRANSLATION
+            = "[SMTSettings]pathForTacletTranslation";
 
     private static final String SHOW_SMT_RES_DIA = "[SMTSettings]showSMTResDialog";
 
@@ -40,7 +42,66 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     private static final String PROP_TIMEOUT = "[SMTSettings]timeout";
     private static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
 
+    private static final ProofIndependentSMTSettings DEFAULT_DATA
+            = new ProofIndependentSMTSettings();
+
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
+
+    private final Collection<SolverType> solverTypes = new LinkedList<>();
+    private boolean showResultsAfterExecution = false;
+    private boolean storeSMTTranslationToFile = false;
+    private boolean storeTacletTranslationToFile = false;
+
+    private long timeout = 2000;
+    private int maxConcurrentProcesses = 2;
+
+    private ProgressMode modeOfProgressDialog = ProgressMode.USER;
+
+    private String pathForSMTTranslation = "";
+    private String pathForTacletTranslation = "";
+    private String activeSolver = "";
+
+
+    private long intBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private long heapBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+
+    private Collection<SettingsListener> listeners = new LinkedHashSet<>();
+
+    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
+    private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<>();
+
+    private boolean checkForSupport = true;
+
+    private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
+        copy(data);
+    }
+
+    /**
+     * Creates a new ProofIndependentSettings object with the default solvers created by
+     * {@link SolverTypes#getSolverTypes()}.
+     */
+    private ProofIndependentSMTSettings() {
+        // load solver props from standard directory, see PathConfig
+        Collection<SolverType> legacyTypes = SolverTypes.getLegacySolvers();
+        Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
+        solverTypes.addAll(nonLegacyTypes);
+        nonLegacyTypes.removeAll(legacyTypes);
+        // Z3_CE solver should not be a usable solver union or part of any as it is
+        // treated separately.
+        for (SolverType type: nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
+                .collect(Collectors.toList())) {
+            solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
+        }
+
+        // single solvers with legacy translation
+        for (SolverType type: legacyTypes) {
+            legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
+        }
+    }
 
     public boolean isShowResultsAfterExecution() {
         return showResultsAfterExecution;
@@ -158,42 +219,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         USER, CLOSE, CLOSE_FIRST
     }
 
-
-    private final Collection<SolverType> solverTypes = new LinkedList<>();
-    private boolean showResultsAfterExecution = false;
-    private boolean storeSMTTranslationToFile = false;
-    private boolean storeTacletTranslationToFile = false;
-
-    private long timeout = 2000;
-    private int maxConcurrentProcesses = 2;
-
-    private ProgressMode modeOfProgressDialog = ProgressMode.USER;
-
-    private String pathForSMTTranslation = "";
-    private String pathForTacletTranslation = "";
-    private String activeSolver = "";
-
-
-    private long intBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long heapBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-
-    private Collection<SettingsListener> listeners = new LinkedHashSet<>();
-
-    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
-    private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<>();
-
-    private boolean checkForSupport = true;
-
-
-    private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
-        copy(data);
-    }
-
-
     public int getMaxConcurrentProcesses() {
         return maxConcurrentProcesses;
     }
@@ -232,33 +257,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         legacyTranslationSolverUnions.addAll(data.legacyTranslationSolverUnions);
     }
 
-
-    private static final ProofIndependentSMTSettings DEFAULT_DATA = new ProofIndependentSMTSettings();
-
     public static ProofIndependentSMTSettings getDefaultSettingsData() {
         return DEFAULT_DATA.clone();
-    }
-
-    /**
-     * Creates a new ProofIndependentSettings object with the default solvers created by
-     * {@link SolverTypes#getSolverTypes()}.
-     */
-    private ProofIndependentSMTSettings() {
-        // load solver props from standard directory, see PathConfig
-        Collection<SolverType> legacyTypes = SolverTypes.getLegacySolvers();
-        Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
-        solverTypes.addAll(nonLegacyTypes);
-        nonLegacyTypes.removeAll(legacyTypes);
-        // Z3_CE solver should not be a usable solver union or part of any as it is treated separately.
-        for (SolverType type: nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
-                .collect(Collectors.toList())) {
-            solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
-        }
-
-        // single solvers with legacy translation
-        for (SolverType type: legacyTypes) {
-            legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
-        }
     }
 
     public boolean containsSolver(SolverType type) {
@@ -291,12 +291,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
     public void readSettings(Properties props) {
         timeout = SettingsConverter.read(props, KEY_TIMEOUT, timeout);
-        showResultsAfterExecution = SettingsConverter.read(props, SHOW_SMT_RES_DIA, showResultsAfterExecution);
-        pathForSMTTranslation = SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
-        pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
-        modeOfProgressDialog = SettingsConverter.read(props, PROGRESS_DIALOG_MODE, modeOfProgressDialog,
-                ProgressMode.values());
-        maxConcurrentProcesses = SettingsConverter.read(props, MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
+        showResultsAfterExecution = SettingsConverter.read(props, SHOW_SMT_RES_DIA,
+                showResultsAfterExecution);
+        pathForSMTTranslation = SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION,
+                pathForSMTTranslation);
+        pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION,
+                pathForTacletTranslation);
+        modeOfProgressDialog = SettingsConverter.read(props, PROGRESS_DIALOG_MODE,
+                modeOfProgressDialog, ProgressMode.values());
+        maxConcurrentProcesses = SettingsConverter.read(props, MAX_CONCURRENT_PROCESSES,
+                maxConcurrentProcesses);
         checkForSupport = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
         intBound = SettingsConverter.read(props, INT_BOUND, intBound);
         heapBound = SettingsConverter.read(props, HEAP_BOUND, heapBound);
@@ -307,7 +311,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         for (SolverType type : solverTypes) {
             type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(),
                     type.getDefaultSolverTimeout()));
-            type.setSolverParameters(SettingsConverter.read(props, SOLVER_PARAMETERS + type.getName(),
+            type.setSolverParameters(SettingsConverter.read(props, SOLVER_PARAMETERS
+                            + type.getName(),
                     type.getDefaultSolverParameters()));
             type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(),
                     type.getDefaultSolverCommand()));
@@ -330,9 +335,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
 
         for (SolverType type : solverTypes) {
-            SettingsConverter.store(props, PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
-            SettingsConverter.store(props, SOLVER_PARAMETERS + type.getName(), type.getSolverParameters());
-            SettingsConverter.store(props, SOLVER_COMMAND + type.getName(), type.getSolverCommand());
+            SettingsConverter.store(props, PROP_TIMEOUT + type.getName(),
+                    type.getSolverTimeout());
+            SettingsConverter.store(props, SOLVER_PARAMETERS + type.getName(),
+                    type.getSolverParameters());
+            SettingsConverter.store(props, SOLVER_COMMAND + type.getName(),
+                    type.getSolverCommand());
         }
     }
 

@@ -13,46 +13,94 @@ import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-public class ComplexButton {
+/**
+ * A button consisting of an action component (normal button) and
+ * a selection component (dropdown button).
+ *
+ * The selection button opens a dropdown menu that lets the user
+ * select some previously added actions and combines those selected
+ * actions into a resulting one according to some reducing function
+ * ({@link #reduceChoice}).
+ * The resulting action is executed when pressing the action button.
+ *
+ * The selection button's dropdown menu can also contain other components
+ * ({@link #addComponent(Component)}).
+ *
+ * @author Christoph Scheben (2011)
+ * @author Alicia Appelhagen (2022)
+ */
+public class DropdownSelectionButton {
 
-    // The dropdown opening button.
+    /**
+     * The dropdown opening button.
+     */
     private JButton selectionComponent;
-    // The action starting button.
+    /**
+     * The action starting button.
+     */
     private JButton actionComponent;
-    // The actions that can be selected.
+    /**
+     * The actions that can be selected.
+     */
     private Action[] items;
-    /* The function used to map some selected actions to the one that is to be executed.
-    This is only used if more than one item can be selected at the same time.
-    If only one action can be selected, the function that will be used is just the identity. */
+    /**
+     * The function used to map some selected actions to the one that is to be executed.
+     * This is only used if more than one item can be selected at the same time.
+     * If only one action can be selected, the function that will be used is just the identity.
+     */
     private Function<Action[], Action> reduceChoice;
-    // The maximum amount of actions that can be selected at the same time.
+    /**
+     * The maximum amount of actions that can be selected at the same time.
+     */
     private int maxChoiceAmount;
-    // The menu items of the popup menu opened by the selection button.
+    /**
+     * The menu items of the popup menu opened by the selection button.
+     */
     private final List<JMenuItem> menuItems = new ArrayList<>();
-    // The currently selected action items.
+    /**
+     * The currently selected action items.
+     */
     private final Set<Action> selectedItems = new HashSet<>();
-    // An action that does nothing. This is selected if items is empty.
+    /**
+     * An action that does nothing. This is selected if items is empty.
+     */
     private final EmptyAction emptyItem = new EmptyAction(false);
-    // The currently executed action when clicking the action button.
+    /**
+     * The currently executed action when clicking the action button.
+     */
     private Action executedAction = emptyItem;
-    // A prefix prepended to every String displayed in the action component.
+    /**
+     * A prefix prepended to every String displayed in the action component.
+     */
     private String prefix = "";
-    // The size of the selection component's icon.
+    /**
+     * The size of the selection component's icon.
+     */
     private final int iconSize;
-    // The components (other than the selection items) of the popup menu.
+
+    /**
+     * The components (other than the selection items) of the popup menu.
+     */
     private final List<Component> components = new ArrayList<>();
 
+    /**
+     * The ChangeListeners that are notified when the selected item changes
+     * ({@link #setSelectedItem(Action)}).
+     */
     private final Set<ChangeListener> listeners = new HashSet<ChangeListener>();
 
+    /**
+     * The dropdown menu that opens when clicking the selection button.
+     */
     private JPopupMenu menu;
 
     /**
-     * Create a new ComplexButton with a given icon size used to display the selection
+     * Create a new DropdownSelectionButton with a given icon size used to display the selection
      * component's icon.
      *
      * @param iconSize the size of the selection component's icon (e.g. down-arrow)
      */
-    public ComplexButton(int iconSize) {
+    public DropdownSelectionButton(int iconSize) {
         this.iconSize = iconSize;
     }
 
@@ -87,10 +135,6 @@ public class ComplexButton {
     public void removeListener(ChangeListener listener) {
         listeners.remove(listener);
     }
-
-    /* The two components of a ComplexButton: the action component starts the selected action,
-    the selection component lets the user choose such an action out of the items.
-     */
 
     /**
      * @return the selection button (opens the selection dropdown menu)
@@ -223,6 +267,7 @@ public class ComplexButton {
 
     /**
      * (Create and) return the selection button used by #getSelectionComponent().
+     *
      * @return the selection button
      */
     protected JButton getSelectionButton() {
@@ -232,28 +277,29 @@ public class ComplexButton {
             selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
             selectionComponent.addActionListener(e -> {
                 if (items.length == 0) {
-                        return;
-                    } else {
-                        OptionalInt width = Arrays.stream(getMenu().getComponents())
-                                .mapToInt(c -> c.getPreferredSize().width).max();
-                        if (width.isEmpty()) {
-                            width = OptionalInt.of(0);
-                        }
-                        int newWidth = Math.max(width.getAsInt(),
-                                actionComponent.getWidth() + selectionComponent.getWidth());
-                        getMenu().setPopupSize(
-                                newWidth,
-                                Arrays.stream(getMenu().getComponents())
-                                        .mapToInt(c -> c.getPreferredSize().height).sum());
-                        getMenu().show(getActionButton(), 0, getActionButton().getHeight());
+                    return;
+                } else {
+                    OptionalInt width = Arrays.stream(getMenu().getComponents())
+                            .mapToInt(c -> c.getPreferredSize().width).max();
+                    if (width.isEmpty()) {
+                        width = OptionalInt.of(0);
                     }
-                });
+                    int newWidth = Math.max(width.getAsInt(),
+                            actionComponent.getWidth() + selectionComponent.getWidth());
+                    getMenu().setPopupSize(
+                            newWidth,
+                            Arrays.stream(getMenu().getComponents())
+                                    .mapToInt(c -> c.getPreferredSize().height).sum());
+                    getMenu().show(getActionButton(), 0, getActionButton().getHeight());
+                }
+            });
         }
         return selectionComponent;
     }
 
     /**
      * (Create and) return the action button used by #getActionComponent().
+     *
      * @return the action button
      */
     protected JButton getActionButton() {
@@ -261,15 +307,15 @@ public class ComplexButton {
             actionComponent = new JButton();
             //actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
             // Enable the selection button iff the action button is enabled as well.
-            actionComponent.addChangeListener(e -> {
-                    getSelectionButton().setEnabled(actionComponent.isEnabled());
-                });
+            actionComponent.addChangeListener(e ->
+                    getSelectionButton().setEnabled(actionComponent.isEnabled()));
         }
         return actionComponent;
     }
 
     /**
      * (Create and) return the dropdown popup menu that is opened by the selection component.
+     *
      * @return the popup menu opened by the selection button
      */
     protected JPopupMenu getMenu() {
@@ -307,7 +353,7 @@ public class ComplexButton {
         menuItems.clear();
         for (Action item : items) {
             JMenuItem menuItem = maxChoiceAmount > 1
-                    ? new MyJCheckBoxMenuItem(item) : new MyJMenuItem(item);
+                    ? new DoubleClickCheckBoxMenuItem(item) : new SelectionMenuItem(item);
             if (oldSelectedItems.contains(item) && maxChoiceAmount > 1) {
                 menuItem.setSelected(true);
             }
@@ -350,6 +396,7 @@ public class ComplexButton {
 
     /**
      * Add a component to the popup menu (below the selection items).
+     *
      * @param comp the added component
      */
     public void addComponent(Component comp) {
@@ -360,6 +407,7 @@ public class ComplexButton {
 
     /**
      * Remove a component (other than the selection items) from the popup menu.
+     *
      * @param comp the component to remove
      */
     public void removeComponent(Component comp) {
@@ -398,20 +446,47 @@ public class ComplexButton {
 
     /**
      * The empty action to be set if items is empty.
+     * This action does nothing and is either always disabled or always enabled which
+     * causes the action component to be disabled/enabled when selecting such an EmptyAction
+     * via {@link #setSelectedItem(Action)}.
      */
     public static class EmptyAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
+
+        /**
+         * The text that will be displayed in a DropdownSelectionButton's action component when
+         * its {@link #emptyItem} is selected.
+         */
         private String text;
+
+        /**
+         * The tooltip text that will be displayed in a DropdownSelectionButton's action
+         * component when its {@link #emptyItem} is selected.
+         */
         private String toolTip;
 
-        private boolean enabled;
+        /**
+         * True iff action and selection button of the DropdownSelectionButton should stay enabled
+         * when calling {@link #setSelectedItem(Action)} with this EmptyAction as the parameter.
+         */
+        private boolean leaveButtonsEnabled;
 
+        /**
+         *  Create a new EmptyAction with text "empty".
+         *
+         * @param enabled the EmptyAction's {@link #leaveButtonsEnabled} attribute
+         */
         public EmptyAction(boolean enabled) {
-            this.enabled = enabled;
+            leaveButtonsEnabled = enabled;
             setText("empty");
         }
 
+        /**
+         * Set this EmptyAction's {@link #text}.
+         *
+         * @param t the new text
+         */
         public void setText(String t) {
             text = t;
             putValue(Action.NAME, text);
@@ -419,7 +494,8 @@ public class ComplexButton {
         }
 
         /**
-         * Set the tooltip to be displayed if the empty item is the executedAction.
+         * Set this EmptyAction's {@link #toolTip}.
+         *
          * @param tip the new tooltip
          */
         public void setToolTip(String tip) {
@@ -427,12 +503,15 @@ public class ComplexButton {
         }
 
         /**
-         * @return the tooltip to be displayed if the empty item is the executedAction
+         * @return this EmptyItem's {@link #toolTip}
          */
         public String getToolTip() {
             return toolTip;
         }
 
+        /**
+         * @return this EmptyItem's {@link #text}
+         */
         @Override
         public String toString() {
             return text;
@@ -440,7 +519,7 @@ public class ComplexButton {
 
         @Override
         public boolean isEnabled() {
-            return enabled;
+            return leaveButtonsEnabled;
         }
 
         /**
@@ -456,16 +535,25 @@ public class ComplexButton {
     /**
      * CheckBox menu item that has an assigned action which is selected on single click and
      * performed + selected on double click.
+     *
+     * The DropdownSelectionButton's {@link #selectedItems} are updated accordingly.
      */
-    public class MyJCheckBoxMenuItem extends JCheckBoxMenuItem {
+    private final class DoubleClickCheckBoxMenuItem extends JCheckBoxMenuItem {
 
-        /* The associated action, this is performed when double-clicking the menu item
-        and selected when single-clicking it. */
+        /**
+         * The associated action, this is performed when double-clicking the menu item
+         * and selected when single-clicking it.
+         */
         private final Action doubleClickAction;
 
-        public MyJCheckBoxMenuItem(Action action) {
+        /**
+         * Create a new DoubleClickCheckBoxMenuItem.
+         *
+         * @param action the {@link #doubleClickAction} of this menu item
+         */
+        private DoubleClickCheckBoxMenuItem(Action action) {
             super();
-            MyJCheckBoxMenuItem menuItem = this;
+            DoubleClickCheckBoxMenuItem menuItem = this;
             super.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -492,6 +580,7 @@ public class ComplexButton {
          * If the item is selected, add its corresponding action to the selectedItems,
          * otherwise remove it.
          * Set the executedAction to reduceChoice(selectedItems).
+         *
          * @param b true iff this item should be selected
          */
         @Override
@@ -535,12 +624,23 @@ public class ComplexButton {
     /**
      * MenuItem that has an assigned action which is selected as the executedAction
      * when clicking on the item.
+     *
+     * Updates the DropdownSelectionButton's {@link #executedAction} accordingly via
+     * {@link #setSelectedItem(Action)}.
      */
-    public class MyJMenuItem extends JMenuItem {
+    private final class SelectionMenuItem extends JMenuItem {
 
+        /**
+         * The action that is selected when clicking on this menu item.
+         */
         private final Action action;
 
-        public MyJMenuItem(Action item) {
+        /**
+         * Create a new MyJMenuItem.
+         *
+         * @param item the menu item's {@link #action}.
+         */
+        public SelectionMenuItem(Action item) {
             super();
             /* If an action is performed on the menu item, the only thing that should happen
             is setting the currently selected action to this one */
@@ -556,6 +656,12 @@ public class ComplexButton {
             this.action = item;
         }
 
+        /**
+         * The returned action is NOT executed when clicking on this menu item.
+         * The actually executed action is the one returned by {@link super#getAction()}.
+         *
+         * @return the item's associated {@link #action}
+         */
         @Override
         public Action getAction() {
             /* If the item's action is accessed, it will return the action it represents instead

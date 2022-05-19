@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Used to create {@link SolverType} (in the form of {@link SolverTypeImplementation}) objects
  * from .props files.
  *
- * @author alicia
+ * @author Alicia Appelhagen
  */
 public class SolverPropertiesLoader {
 

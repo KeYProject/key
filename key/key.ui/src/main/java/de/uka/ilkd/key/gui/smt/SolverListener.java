@@ -42,7 +42,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
         private ProgressDialog progressDialog;
-       private ProgressModel progressModel ;
+        private ProgressModel progressModel ;
         // Every intern SMT problem refers to one solver
         private Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
         // Every SMT problem refers to many solvers.
@@ -222,10 +222,10 @@ public class SolverListener implements SolverLauncherListener {
             try {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	IBuiltInRuleApp app =
-                        			RuleAppSMT.rule.createApp( null ).
-                        					     setTitle( getTitle(problem) );
-                        	problem.getGoal().apply(app);
+                            IBuiltInRuleApp app =
+                                    RuleAppSMT.rule.createApp( null ).
+                                                 setTitle( getTitle(problem) );
+                            problem.getGoal().apply(app);
                         }
                 }
             } finally {
@@ -235,7 +235,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void showInformation(InternSMTProblem problem){
-        	    new InformationWindow(
+                new InformationWindow(
                         progressDialog, problem.solver,problem.information,
                         "Information for "+ problem.toString());
         }
@@ -299,7 +299,7 @@ public class SolverListener implements SolverLauncherListener {
 
 
 
-		private InternSMTProblem getProblem(int col,int row){
+        private InternSMTProblem getProblem(int col,int row){
                 for(InternSMTProblem problem : problems){
                         if(problem.problemIndex == row && problem.solverIndex == col){
                                 return problem;
@@ -470,10 +470,10 @@ public class SolverListener implements SolverLauncherListener {
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(GREEN.get(),x,y);
                 if(problem.solver.getType()== SolverTypes.Z3_CE_SOLVER){
-                	progressModel.setText("No Counterexample.",x,y);
-        		}
+                    progressModel.setText("No Counterexample.",x,y);
+                }
                 else{
-                	progressModel.setText("Valid" + timeInfo ,x,y);
+                    progressModel.setText("Valid" + timeInfo ,x,y);
                 }
 
 
@@ -587,7 +587,7 @@ public class SolverListener implements SolverLauncherListener {
          return message.toString();
       }
 
-		private class ProgressDialogListenerImpl implements ProgressDialogListener {
+        private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
 
 
@@ -596,14 +596,14 @@ public class SolverListener implements SolverLauncherListener {
 
 
 
-			public ProgressDialogListenerImpl(SolverLauncher launcher,
-					boolean counterexample) {
-				super();
-				this.launcher = launcher;
-				this.counterexample = counterexample;
-			}
+            public ProgressDialogListenerImpl(SolverLauncher launcher,
+                    boolean counterexample) {
+                super();
+                this.launcher = launcher;
+                this.counterexample = counterexample;
+            }
 
-			@Override
+            @Override
             public void infoButtonClicked(int column, int row) {
                     InternSMTProblem problem = getProblem(column, row);
                     showInformation(problem);
@@ -634,8 +634,8 @@ public class SolverListener implements SolverLauncherListener {
 
             @Override
             public void additionalInformationChosen(Object obj) {
-            	  if(obj instanceof String){
-            		  JOptionPane.showOptionDialog(progressDialog,
+                  if(obj instanceof String){
+                      JOptionPane.showOptionDialog(progressDialog,
                               obj,
                               "Warning",
                               JOptionPane.DEFAULT_OPTION,
@@ -643,9 +643,9 @@ public class SolverListener implements SolverLauncherListener {
                               null,
                               null,
                               null);
-              	  }else if(obj instanceof InternSMTProblem){
-            		  showInformation((InternSMTProblem)obj);
-            	  }
+                  }else if(obj instanceof InternSMTProblem){
+                      showInformation((InternSMTProblem)obj);
+                  }
             }
     };
 

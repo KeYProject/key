@@ -19,7 +19,7 @@ import org.key_project.util.java.IOUtil;
  * {@link MainWindow} is opened).
  * </p>
  */
-public class PathConfig {
+public final class PathConfig {
 
     /**
      * The Java system property used to indicate that the
@@ -34,17 +34,20 @@ public class PathConfig {
      */
     public static final String KEY_DIRECTORY_NAME = ".key";
 
-    /** directory where to find the KeY configuration files */
-    private static String keyConfigDir;
-
     /**
      * In which file to store the recent files.
      */
-    public static String recentFileStorage;
+    private static String recentFileStorage;
 
-    public static String proofIndependentSettings;
+    /**
+     * In which file to store the proof-independent settings.
+     */
+    private static String proofIndependentSettings;
 
-    public static String smtSolverPropertiesDirectory;
+    /** directory where to find the KeY configuration files */
+    private static String keyConfigDir;
+
+    private PathConfig() { }
 
     /**
      * Initializes the instance variables with the default settings.
@@ -68,7 +71,8 @@ public class PathConfig {
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
-        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator
+                + "proofIndependentSettings.props";
     }
 
     /**

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * This class provides some infrastructure to the smt translation proceess.
+ * This class provides some infrastructure to the smt translation process.
  *
  * In particular, it collects the preamble and the snippets for the handlers
  * such that they need not be read from disk multiple times.
@@ -26,23 +26,30 @@ import java.util.stream.Collectors;
  * This class is a singleton.
  *
  * @author Mattias Ulbrich
+ * @author Alicia Appelhagen (load handlers from handler names array instead of ServiceLoader)
  */
 public class SMTHandlerServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTHandlerServices.class);
 
+    /**
+     * A .txt file containing a default handler list to load via
+     * {@link #getTemplateHandlers(String[])} if that method's parameter
+     * is an empty handlerNames array.
+     */
     private static final String DEFAULT_HANDLERS = "defaultHandlers.txt";
 
     /** Singleton instance */
     private static SMTHandlerServices theInstance;
 
-    /** A map from handler to their smt2 snippets */
-    /* Before removing the ServiceLoader from #getOriginalHandlers,
-    an IdentityHashMap was used here. Since the removal of the ServiceLoader leads
-    to snippetMap being modified even after creation, concurrent modification by different
-    solver threads becomes possible. Hence, either every access to snippetMap needs to
-    be synchronized or it needs to be a ConcurrentHashMap - which is not an IdentityHashMap
-    anymore. This should not be a problem as the SMTHandlers don't override equals().
+    /** A map from template handler objects to their smt2 snippets.
+     *
+     * Before removing the ServiceLoader from #getOriginalHandlers,
+     * an IdentityHashMap was used here. Since the removal of the ServiceLoader leads
+     * to snippetMap being modified even after creation, concurrent modification by different
+     * solver threads becomes possible. Hence, either every access to snippetMap needs to
+     * be synchronized or it needs to be a ConcurrentHashMap - which is not an IdentityHashMap
+     * anymore. This should not be a problem as the SMTHandlers don't override equals().
      */
     private final Map<SMTHandler, Properties> snippetMap = new ConcurrentHashMap<>();
 
@@ -88,7 +95,7 @@ public class SMTHandlerServices {
      * @return a fresh collection containing only the original SMTHandlers from the
      *              snippetMap's key set that match the given handler names.
      *              The collection's order matches that of the names as well.
-     *
+     * @throws IOException if loading the snippet Properties for a handler class fails
      */
     public Collection<SMTHandler> getTemplateHandlers(String[] handlerNames) throws IOException {
         // If handlerNames is empty, use default handlerNames list.
@@ -170,7 +177,8 @@ public class SMTHandlerServices {
 
         List<SMTHandler> result = new ArrayList<>();
 
-        // Possibly problematic: snippetMap may be modified by another thread while calling snippetMap.get(handler)
+        // Possibly problematic: snippetMap may be modified by another thread while
+        // calling snippetMap.get(handler)
         // -> concurrent modification?
         for (SMTHandler handler : getTemplateHandlers(handlerNames)) {
             // After getOriginalHandlers(handlerNames), snippets for all handlers are

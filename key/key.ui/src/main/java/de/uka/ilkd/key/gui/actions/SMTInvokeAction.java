@@ -15,16 +15,28 @@ import java.awt.event.ActionEvent;
 /**
  * This action is responsible for the invocation of an SMT solver For
  * example the toolbar button is parameterized with an instance of this action
+ *
+ * @author ?
+ * @author Alicia Appelhagen (move from MainWindow to own class)
  */
 public class SMTInvokeAction extends MainWindowAction {
-    /**
-     *
-     */
+
     private static final long serialVersionUID = -8176122007799747342L;
 
-    private final SolverTypeCollection solverUnion;
     protected final KeYMediator mediator;
 
+    /**
+     * The solver types to be run by this action.
+     */
+    private final SolverTypeCollection solverUnion;
+
+    /**
+     * Create a new SMTInvokeAction belonging to the given MainWindow.
+     * The resulting action starts the given solver union.
+     *
+     * @param solverUnion the solvers/solver types to be started by this action
+     * @param mainWindow the main window this action belongs to
+     */
     public SMTInvokeAction(SolverTypeCollection solverUnion, MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
@@ -56,7 +68,8 @@ public class SMTInvokeAction extends MainWindowAction {
 
         Thread thread = new Thread(() -> {
 
-            DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+            DefaultSMTSettings settings = new DefaultSMTSettings(
+                    proof.getSettings().getSMTSettings(),
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     proof.getSettings().getNewSMTSettings(), proof);
             SolverLauncher launcher = new SolverLauncher(settings);
