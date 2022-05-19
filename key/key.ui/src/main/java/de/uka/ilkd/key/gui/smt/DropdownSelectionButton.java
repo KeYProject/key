@@ -87,7 +87,7 @@ public class DropdownSelectionButton {
      * The ChangeListeners that are notified when the selected item changes
      * ({@link #setSelectedItem(Action)}).
      */
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>();
+    private final Set<ChangeListener> listeners = new HashSet<>();
 
     /**
      * The dropdown menu that opens when clicking the selection button.
@@ -114,7 +114,6 @@ public class DropdownSelectionButton {
             b = false;
         }
         getActionButton().setEnabled(b);
-        //getAction().setEnabled(b);
     }
 
     /**
@@ -305,7 +304,7 @@ public class DropdownSelectionButton {
     protected JButton getActionButton() {
         if (actionComponent == null) {
             actionComponent = new JButton();
-            //actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
+            // actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
             // Enable the selection button iff the action button is enabled as well.
             actionComponent.addChangeListener(e ->
                     getSelectionButton().setEnabled(actionComponent.isEnabled()));
@@ -522,12 +521,11 @@ public class DropdownSelectionButton {
             return leaveButtonsEnabled;
         }
 
-        /**
-         * The EmptyAction does nothing.
-         */
         @Override
         public void actionPerformed(ActionEvent arg0) {
-
+            /**
+             * The EmptyAction does nothing.
+             */
         }
 
     }
@@ -544,7 +542,7 @@ public class DropdownSelectionButton {
          * The associated action, this is performed when double-clicking the menu item
          * and selected when single-clicking it.
          */
-        private final Action doubleClickAction;
+        private final transient Action doubleClickAction;
 
         /**
          * Create a new DoubleClickCheckBoxMenuItem.
@@ -633,7 +631,7 @@ public class DropdownSelectionButton {
         /**
          * The action that is selected when clicking on this menu item.
          */
-        private final Action action;
+        private final transient Action action;
 
         /**
          * Create a new MyJMenuItem.

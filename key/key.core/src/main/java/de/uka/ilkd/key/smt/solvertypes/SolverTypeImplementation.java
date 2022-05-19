@@ -235,9 +235,9 @@ public final class SolverTypeImplementation implements SolverType {
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(
-                    "Using default Z3Socket for solver communication due to exception:"
-                            + System.lineSeparator()
-                            + e.getMessage());
+                    String.format(
+                            "Using default Z3Socket for solver communication due to exception:%s%s",
+                            System.lineSeparator(), e.getMessage()));
             return new Z3Socket(name, null);
         }
     }

@@ -117,24 +117,23 @@ public class SMTHandlerServices {
                     (keyset of snippetMap) at most once and that every thread waits for the result.
                     Also, every search access on smtProperties should be
                     synchronized in order to avoid concurrent modification. */
-                    if (findHandler(handlerClass, result)) {
-                        continue;
+                    if (!findHandler(handlerClass, result)) {
+                        SMTHandler handler = handlerClass.getConstructor().newInstance();
+                        result.add(handler);
+                        Properties handlerSnippets = loadSnippets(handlerClass);
+                        if (handlerSnippets != null) {
+                            snippetMap.put(handler, handlerSnippets);
+                        }
+                        smtProperties.addAll(handler.getProperties());
                     }
-                    SMTHandler handler = handlerClass.getConstructor().newInstance();
-                    result.add(handler);
-                    Properties handlerSnippets = loadSnippets(handlerClass);
-                    if (handlerSnippets != null) {
-                        snippetMap.put(handler, handlerSnippets);
-                    }
-                    smtProperties.addAll(handler.getProperties());
                 }
             } catch (ClassNotFoundException e) {
-                LOGGER.warn("Could not load SMTHandler:" + System.lineSeparator()
-                        + e.getMessage());
+                LOGGER.warn(String.format("Could not load SMTHandler:%s%s",
+                        System.lineSeparator(), e.getMessage()));
             } catch (NoSuchMethodException | InvocationTargetException
                     | InstantiationException | IllegalAccessException e) {
-                LOGGER.warn("Could not create SMTHandler:" + System.lineSeparator()
-                        + e.getMessage());
+                LOGGER.warn(String.format("Could not create SMTHandler:%s%s",
+                        System.lineSeparator(), e.getMessage()));
             }
         }
         // TODO make sure that the order of handlers in result is the same as the order

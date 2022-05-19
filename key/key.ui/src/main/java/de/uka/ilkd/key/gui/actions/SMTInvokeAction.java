@@ -23,12 +23,12 @@ public class SMTInvokeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -8176122007799747342L;
 
-    protected final KeYMediator mediator;
+    protected final transient KeYMediator mediator;
 
     /**
      * The solver types to be run by this action.
      */
-    private final SolverTypeCollection solverUnion;
+    private final transient SolverTypeCollection solverUnion;
 
     /**
      * Create a new SMTInvokeAction belonging to the given MainWindow.

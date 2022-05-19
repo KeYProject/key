@@ -31,14 +31,29 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private static final int SOLVER_NOT_SUPPOTED = 1;
     private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
-    private final SolverType solverType;
+    private final transient SolverType solverType;
     private final JTextField solverCommand;
     private final JTextField solverParameters;
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
-    private final JTextField solverInfo;
     private final JSpinner solverTimeout;
+
+    public SolverOptions(SolverType solverType) {
+        this.setName(solverType.getName());
+        this.solverType = solverType;
+        setHeaderText("SMT Solver: " + getDescription());
+
+        solverName = createSolverName();
+        createSolverInformation();
+        solverInstalled = createSolverInstalled();
+        solverCommand = createSolverCommand();
+        solverTimeout = createSolverTimeout();
+        solverParameters = createSolverParameters();
+        solverSupported = createSolverSupported();
+        createDefaultButton();
+        createCheckSupportButton();
+    }
 
     private static final String versionInfo(String info, String versionString) {
         StringBuilder builder = new StringBuilder();
@@ -49,23 +64,6 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         builder.append(")");
         return builder.toString();
     }
-
-    public SolverOptions(SolverType solverType) {
-        this.setName(solverType.getName());
-        this.solverType = solverType;
-        setHeaderText("SMT Solver: " + getDescription());
-
-        solverName = createSolverName();
-        solverInfo = createSolverInformation();
-        solverInstalled = createSolverInstalled();
-        solverCommand = createSolverCommand();
-        solverTimeout = createSolverTimeout();
-        solverParameters = createSolverParameters();
-        solverSupported = createSolverSupported();
-        createDefaultButton();
-        createCheckSupportButton();
-    }
-
 
     protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
@@ -182,7 +180,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (clone.containsSolver(solverType)) {
             solverCommand.setText(clone.getCommand(solverType));
             solverParameters.setText(clone.getParameters(solverType));
-            solverTimeout.setValue((Long) clone.getSolverTimeout(solverType)/1000L);
+            solverTimeout.setValue(clone.getSolverTimeout(solverType)/1000L);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
