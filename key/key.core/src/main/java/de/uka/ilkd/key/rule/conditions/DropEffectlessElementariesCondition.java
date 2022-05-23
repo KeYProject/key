@@ -81,6 +81,10 @@ public final class DropEffectlessElementariesCondition
 	TermProgramVariableCollector collector 
 		= services.getFactory().create(services);
 	target.execPostOrder(collector);
+
+	if (collector.containsNonRigidNonProgramVariableSymbol() && !collector.containsAtMostDepPredAsNonRigid()) {
+			return null;
+	}
 	Set<LocationVariable> varsInTarget = collector.result();
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
 							         varsInTarget, services); 

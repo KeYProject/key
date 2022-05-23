@@ -112,6 +112,10 @@ public final class TypeConverter {
         return (CharListLDT) getLDT(CharListLDT.NAME);
     }
 
+    public DependenciesLDT getDependenciesLDT() {
+        return (DependenciesLDT) getLDT(DependenciesLDT.NAME);
+    }
+
     public Collection<LDT> getLDTs() {
         return LDTs.values();
     }

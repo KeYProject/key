@@ -164,4 +164,7 @@ public class DependenciesLDT extends LDT {
         return null;
     }
 
+    public boolean isDependencePredicate(de.uka.ilkd.key.logic.op.Operator op) {
+        return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker;
+    }
 }
