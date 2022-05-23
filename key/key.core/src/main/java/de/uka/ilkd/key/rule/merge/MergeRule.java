@@ -10,11 +10,9 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitt
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.*;
 
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -74,8 +72,8 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
  * @see MergeIfThenElseAntecedent
  * @see MergeWithLatticeAbstraction
  * @see MergeWithPredicateAbstraction
- * @see de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion
- * @see de.uka.ilkd.key.gui.mergerule.MergePartnerSelectionDialog
+ * see de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion
+ * see de.uka.ilkd.key.gui.mergerule.MergePartnerSelectionDialog
  */
 public class MergeRule implements BuiltInRule {
     public static final MergeRule INSTANCE = new MergeRule();
@@ -300,7 +298,7 @@ public class MergeRule implements BuiltInRule {
 
     /**
      * Merges two SE states (U1,C1,p) and (U2,C2,p) according to the method
-     * {@link MergeRule#mergeValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
+     * (see MergeRule#mergeValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services))
      * . p must be the same in both states, so it is supplied separately.
      * <p>
      * 
@@ -463,6 +461,53 @@ public class MergeRule implements BuiltInRule {
             } // end else of if (proofClosed)
 
         } // end for (LocationVariable v : progVars)
+
+        LinkedList<Term> eventUpdatesState1 = MergeRuleUtils.getEventUpdates(state1.first);
+        LinkedList<Term> eventUpdatesState2 = MergeRuleUtils.getEventUpdates(state2.first);
+
+        boolean switched = false;
+        if (eventUpdatesState1.size() < eventUpdatesState2.size()) {
+            // 	System.out.println("merge events");
+            LinkedList<Term> tmp = eventUpdatesState2;
+            eventUpdatesState2 = eventUpdatesState1;
+            eventUpdatesState1 = tmp;
+            switched = true;
+        }
+
+        while (!eventUpdatesState1.isEmpty()) {
+            final Term evUpd1 = eventUpdatesState1.pop();
+
+            //
+            final Term kind2;
+            final Term locset2;
+            final Term timestamp2;
+            if (!eventUpdatesState2.isEmpty()) {
+                final Term evUpd2 = eventUpdatesState2.pop();
+                if (evUpd1.equals(evUpd2)) {
+                    newElementaryUpdates = newElementaryUpdates.append(evUpd1);
+                    continue;
+                }
+                kind2 = evUpd2.sub(0);
+                locset2 = evUpd2.sub(1);
+                timestamp2 = evUpd2.sub(2);
+            } else {
+                final DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
+                kind2 = tb.func(depLDT.getNothingMarker());
+                locset2 = tb.empty();
+                timestamp2 = tb.zero();
+            }
+
+            final Term kind = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(0),
+                    kind2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
+            final Term locset = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(1),
+                    locset2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
+            final Term timestamp = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(2),
+                    timestamp2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
+
+            newElementaryUpdates = newElementaryUpdates.append(tb.eventUpdate(kind, locset, timestamp));
+
+        }
+
 
         // Construct weakened symbolic state
         Term newSymbolicState = tb.parallel(newElementaryUpdates);
@@ -733,10 +778,6 @@ public class MergeRule implements BuiltInRule {
      *            Current goal to merge.
      * @param pio
      *            Position of update-program counter formula in goal.
-     * @param start
-     *            Node to start the search with.
-     * @param services
-     *            The services object.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(
