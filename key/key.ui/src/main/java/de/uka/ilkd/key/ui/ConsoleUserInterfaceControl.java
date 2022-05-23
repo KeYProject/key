@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -268,17 +269,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public void reportStatus(Object sender, String status, int progress) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{},{})", sender, status, progress);
     }
 
     @Override
     final public void reportStatus(Object sender, String status) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{})", sender, status);
     }
 
     @Override
     final public void resetStatus(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
+        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus({})", sender);
     }
 
     @Override

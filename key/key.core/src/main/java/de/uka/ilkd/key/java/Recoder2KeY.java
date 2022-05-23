@@ -41,6 +41,7 @@ import recoder.service.UnresolvedReferenceException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -468,7 +469,7 @@ public class Recoder2KeY implements JavaReader {
 
             transformModel(cUnits);
         } catch (IOException ioe) {
-            LOGGER.debug("recoder2key: IO Error when reading" + "compilation unit " + cUnitStrings[current], ioe);
+            LOGGER.error("recoder2key: IO Error when readingcompilation unit {}", cUnitStrings[current], ioe);
             reportError("IOError reading java program " + cUnitStrings[current] + ". " +
                     "May be file not found or missing permissions.", ioe);
         } catch (recoder.ParserException pe) {
@@ -1140,7 +1141,7 @@ public class Recoder2KeY implements JavaReader {
                 reportError(e.getMessage(), e);
             }
         } catch (IOException e) {
-            LOGGER.debug("recoder2key: IOException detected in: " + block, e);
+            LOGGER.debug("recoder2key: IOException detected in: {}", block, e);
             block = trim(block, 25);
             reportError("Could not access data stream " + "(e.g. file not found, wrong permissions) "
                             + "when reading " + block + ": " + trim(e.getMessage()),

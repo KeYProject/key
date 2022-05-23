@@ -141,9 +141,9 @@ public class AutoSaver implements ProverTaskListener {
             public void run() {
                 try {
                     new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                    LOGGER.debug("File saved: "+filename);
+                    LOGGER.info("File saved: {}", filename);
                 } catch (IOException e) {
-                    LOGGER.debug("Autosaving file "+filename+" failed.",e);
+                    LOGGER.error("Autosaving file  {} failed.", filename, e);
                 } catch (Exception x) {
                     // really should not happen, but catching prevents worse
                     x.printStackTrace();

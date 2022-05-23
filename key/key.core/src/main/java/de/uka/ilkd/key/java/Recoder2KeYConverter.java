@@ -539,8 +539,8 @@ public class Recoder2KeYConverter {
             if (sb.charAt(sb.length()-1)==',') sb.deleteCharAt(sb.length()-1);
             sb.append(')');
             final String constructorName = sb.toString();
-            LOGGER.debug("recoder2key: invocation of constructor "+constructorName +" failed.", e);
-            Recoder2KeY.reportError("Invocation of the constructor "+constructorName +" failed", e);
+            LOGGER.debug("recoder2key: invocation of constructor {} failed.", constructorName, e);
+            Recoder2KeY.reportError("Invocation of the constructor " + constructorName + " failed", e);
             throw new Error("unreachable"); // this line is not reachable
             // because reportError fails under
             // any circumstances
@@ -561,16 +561,16 @@ public class Recoder2KeYConverter {
         try {
             return Class.forName(className); // Classes are always in this component; ClassLoaderUtil#getClassforName(String) does not need to be used.
         } catch (ClassNotFoundException cnfe) {
-            LOGGER.debug("There is an AST class " +className + " missing at KeY.", cnfe);
+            LOGGER.debug("There is an AST class {} missing at KeY.", className, cnfe);
             throw new ConvertException("Recoder2KeYConverter could not find a conversion from RecodeR "+recoderClass.getClass()+".\n"
                     +"Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
                     +"\nAt least there is no class named "+className+"."
                     ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
-            LOGGER.debug("recoder2key: Failed initializing class.", initErr);
+            LOGGER.error("recoder2key: Failed initializing class.", initErr);
             throw new ConvertException("Failed initializing class.", initErr);
         } catch (LinkageError le) {
-            LOGGER.debug("recoder2key: Linking class failed.", le);
+            LOGGER.error("recoder2key: Linking class failed.", le);
             throw new ConvertException("Linking class failes", le);
         }
     }

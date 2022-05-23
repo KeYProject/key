@@ -571,7 +571,7 @@ public final class IssueDialog extends JDialog {
                     message == null ? exception.toString() : message, resourceLocation, pos, info);
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
-            LOGGER.debug("Creating a Location failed for " + exception, e);
+            LOGGER.debug("Creating a Location failed for {}", exception, e);
         }
         return new PositionedIssueString("Constructing the error message failed!");
     }

@@ -302,14 +302,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Adding {}", listener.getClass());
+            LOGGER.debug("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Removing {}",  listener.getClass());
+            LOGGER.debug("Removing {}",  listener.getClass());
             listenerList.remove(listener);
         }
     }

@@ -29,6 +29,7 @@ public class Log {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
+        consoleAppender.clearAllFilters();
         var filter = new ThresholdFilter();
         consoleAppender.addFilter(filter);
         switch (verbosity) {
@@ -51,5 +52,6 @@ public class Log {
                 filter.setLevel("WARN");
                 break;
         }
+        filter.start();
     }
 }

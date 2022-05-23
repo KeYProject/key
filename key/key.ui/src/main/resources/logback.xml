@@ -12,11 +12,9 @@
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
         </encoder>
-        <!--
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
-        -->
     </appender>
 
     <root level="debug">
@@ -25,7 +23,8 @@
     </root>
 
     <!--
-        A logger for development, also print to CONSOLE
+        A logger for development, also print to CONSOLE. This logger is not restricted by any command line options.
+        You should not use this code on the master branch.
     -->
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

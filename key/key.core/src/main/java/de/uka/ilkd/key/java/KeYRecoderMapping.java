@@ -102,7 +102,7 @@ public class KeYRecoderMapping{
 	Debug.assertTrue(formerValue == null,
 			 "keyrecodermapping: duplicate registration of type:", key);
 	revMap.put(key, rec);
-        LOGGER.warn("Size of rec2key: {} entries", map.size());
+        LOGGER.debug("Size of rec2key: {} entries", map.size());
     }
 
     public boolean mapped(Object rec) {
@@ -111,7 +111,7 @@ public class KeYRecoderMapping{
 
 
     public Set<Object> elemsKeY() {
-        LOGGER.error("Size of rec2key: {} entries", map.size());
+        LOGGER.debug("Size of rec2key: {} entries", map.size());
 
         return revMap.keySet();
     }
