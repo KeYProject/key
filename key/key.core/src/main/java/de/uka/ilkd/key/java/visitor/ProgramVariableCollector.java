@@ -1,22 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -288,5 +276,19 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 .create(services);
         x.execPostOrder(tpvc);
         result.addAll(tpvc.result());
+    }
+
+    @Override
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        TermProgramVariableCollector tpvc = services.getFactory()
+                .create(services);
+        for (Term v: x.getVars().atPres.values()) {
+            v.execPostOrder(tpvc);
+        }
+        for (Term v: x.getVars().atBefores.values()) {
+            v.execPostOrder(tpvc);
+        }
+        result.addAll(tpvc.result());
+
     }
 }

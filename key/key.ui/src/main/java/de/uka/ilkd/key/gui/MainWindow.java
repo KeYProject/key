@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import bibliothek.gui.dock.StackDockStation;
@@ -1091,7 +1078,16 @@ public final class MainWindow extends JFrame {
         };
 
         if (isPrintRunImmediately) {
-            sequentUpdater.run();
+            try {
+                sequentUpdater.run();
+            } catch(RuntimeException ex) {
+                // This is a quickfix for some situations where exceptions
+                // in the UI update would corrupt the entire proof state
+                // such that the entire app needs to be closed. Just print
+                // the exception and pretend everything was good. (Like would
+                // happen when incoked on the event queue.
+                ex.printStackTrace();
+            }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
         }

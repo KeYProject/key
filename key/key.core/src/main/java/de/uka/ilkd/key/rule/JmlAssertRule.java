@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -15,7 +16,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 
@@ -49,16 +50,26 @@ import java.util.Optional;
 public final class JmlAssertRule implements BuiltInRule {
 
     /**
-     * The instance of this rule
+     * The instance for assert statements
      */
-    public static final JmlAssertRule INSTANCE = new JmlAssertRule();
+    public static final JmlAssertRule ASSERT_INSTANCE = new JmlAssertRule(Kind.ASSERT);
+    /**
+     * The instance for assume statements
+     */
+    public static final JmlAssertRule ASSUME_INSTANCE = new JmlAssertRule(Kind.ASSUME);
     /**
      * The name of this rule
      */
-    private static final Name NAME = new Name("JML assert");
+    private final Name name;
+    /**
+     * The kind of the matched jml assert statements (assert/assume)
+     */
+    private final Kind kind;
 
-    //Only one instance of this class is needed and should be there
-    private JmlAssertRule() { }
+    private JmlAssertRule(final Kind kind) {
+        this.kind = kind;
+        this.name = new Name("JML " + kind.name().toLowerCase());
+    }
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
@@ -74,7 +85,9 @@ public final class JmlAssertRule implements BuiltInRule {
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
-        return JavaTools.getActiveStatement(target.javaBlock()) instanceof JmlAssert;
+        final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
+        return activeStatement instanceof JmlAssert
+                && ((JmlAssert) activeStatement).getKind() == kind;
     }
 
     @Override
@@ -117,10 +130,10 @@ public final class JmlAssertRule implements BuiltInRule {
         final Term condition = jmlAssert.getCond(self, services);
 
         final ImmutableList<Goal> result;
-        if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSERT) {
+        if (kind == Kind.ASSERT) {
             result = goal.split(2);
             setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
-        } else if (jmlAssert.getKind() == TextualJMLAssertStatement.Kind.ASSUME) {
+        } else if (kind == Kind.ASSUME) {
             result = goal.split(1);
         } else {
             throw new RuleAbortException(
@@ -152,11 +165,16 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public Name name() {
-        return NAME;
+        return name;
     }
 
     @Override
     public String displayName() {
-        return NAME.toString();
+        return name.toString();
+    }
+
+    @Override
+    public String toString() {
+        return name.toString();
     }
 }

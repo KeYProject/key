@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
@@ -31,6 +18,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -211,10 +199,7 @@ public class TermBuilder {
     public LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique,
                                     String postfix) {
         String name = "self" + postfix;
-        if (makeNameUnique) {
-            name = newName(name);
-        }
-        return new LocationVariable(new ProgramElementName(name), kjt);
+        return locationVariable(name, kjt, makeNameUnique);
     }
 
     /**
@@ -260,11 +245,7 @@ public class TermBuilder {
             } else {
                 name = paramType.getSort().name().toString().charAt(0) + "";
             }
-            if (makeNamesUnique) {
-                name = newName(name);
-            }
-            final LocationVariable paramVar = new LocationVariable(
-                    new ProgramElementName(name), paramType);
+            final LocationVariable paramVar = locationVariable(name, paramType, makeNamesUnique);
             result = result.append(paramVar);
         }
         return result;
@@ -307,11 +288,8 @@ public class TermBuilder {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         } else {
-            if (makeNameUnique) {
-                name = newName(name);
-            }
-            return new LocationVariable(new ProgramElementName(name),
-                    pm.getReturnType());
+            name += "_" + pm.getName();
+            return locationVariable(name, pm.getReturnType(), makeNameUnique);
         }
     }
 
@@ -329,11 +307,9 @@ public class TermBuilder {
      */
     public LocationVariable excVar(String name, IProgramMethod pm,
                                    boolean makeNameUnique) {
-        if (makeNameUnique) {
-            name = newName(name);
-        }
-        return new LocationVariable(new ProgramElementName(name),
-                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
+        return locationVariable(name,
+                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE),
+                makeNameUnique);
     }
 
     /**
@@ -343,21 +319,63 @@ public class TermBuilder {
     public LocationVariable heapAtPreVar(String baseName,
                                          boolean makeNameUnique) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        return heapAtPreVar(baseName, heapLDT.getHeap().sort(), makeNameUnique);
+        return locationVariable(baseName, heapLDT.getHeap().sort(), makeNameUnique);
     }
 
     /**
-     * Creates a program variable for the atPre heap. Take care to register it
+     * Creates a location variable for prestate variables. Take care to register it
      * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
      */
-    public LocationVariable heapAtPreVar(String baseName, Sort sort,
+    public LocationVariable atPreVar(String baseName, Sort sort, boolean makeNameUnique) {
+        return atPreVar(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable atPreVar(String baseName, KeYJavaType kjt, boolean makeNameUnique) {
+        return locationVariable(baseName + "AtPre", kjt, makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, Sort sort, boolean makeNameUnique) {
+        return locationVariable(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
                                          boolean makeNameUnique) {
-        assert sort != null;
         if (makeNameUnique) {
             baseName = newName(baseName);
         }
-        return new LocationVariable(new ProgramElementName(baseName),
-                new KeYJavaType(sort));
+        return new LocationVariable(new ProgramElementName(baseName), kjt);
     }
 
     // -------------------------------------------------------------------------

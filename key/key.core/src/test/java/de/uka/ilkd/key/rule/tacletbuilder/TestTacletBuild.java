@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.*;
@@ -161,7 +148,7 @@ public class TestTacletBuild {
             helper.parseThrowException(new File(testRules + File.separator +
                     "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
-            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:21:2"), "Position of error message is wrong.");
+            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:2"), "Position of error message is wrong.");
             assertTrue(e.getCause().getMessage()
                     .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."), "Cause should be prefix error");
             return;

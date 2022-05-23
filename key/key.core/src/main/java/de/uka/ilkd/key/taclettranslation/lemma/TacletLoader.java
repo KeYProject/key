@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
@@ -76,8 +63,8 @@ public abstract class TacletLoader {
     public abstract ProofOblInput getTacletFile(Proof proof);
 
     /**
-     * When proving existing system taclets, all rules which occurred prior to
-     * the desired taclet need to be elminated from the set of available taclets
+     * When proving existing system taclets, all rules which occurred AFTER to
+     * the desired taclet need to be eliminated from the set of available taclets
      * to avoid circular proofs.
      * 
      * This method removes all taclets in initConfig's taclet database from

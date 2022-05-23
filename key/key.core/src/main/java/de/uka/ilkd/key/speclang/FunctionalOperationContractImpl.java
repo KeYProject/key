@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import static de.uka.ilkd.key.util.Assert.assertEqualSort;
@@ -1361,6 +1348,28 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return result;
     };
 
+    @Override
+    public Term getFreePost(List<LocationVariable> heapContext,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
+        Term result = null;
+        for (LocationVariable heap : heapContext) {
+            final Term p = getFreePost(heap, selfVar, paramVars, resultVar, excVar, atPreVars,
+                    services);
+            if (result == null) {
+                result = p;
+            } else {
+                result = tb.and(result, p);
+            }
+        }
+        return result;
+
+    }
+    
     @Override
     public Term getRepresentsAxiom(LocationVariable heap,
             ProgramVariable selfVar,

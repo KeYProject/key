@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -45,7 +32,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                 "complicatedInnerMethod",
                 "/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
                 null,
-                "{result=self.complicatedInnerMethod(z,a,b,x,o,ac)@my.packageName.TheClass.TheInnerClass; }");
+                "{result_complicatedInnerMethod=self.complicatedInnerMethod(z,a,b,x,o,ac)@my.packageName.TheClass.TheInnerClass; }");
     }
 
     /**
@@ -58,7 +45,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                 "complicatedMethod",
                 "/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
                 "a == 2 && b && x != null && \"Hello\" == x",
-                "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
+                "{result_complicatedMethod=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
     }
 
     /**
@@ -72,7 +59,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                 "complicatedMethod",
                 "/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
                 null,
-                "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
+                "{result_complicatedMethod=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
     }
 
     /**
@@ -86,7 +73,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                 "returnMethod",
                 "/set/methodPOTest/oracle/MethodPOTest_returnMethod_ParamNotNull.xml",
                 "param != null",
-                "{result=MethodPOTest.returnMethod(param)@MethodPOTest; }");
+                "{result_returnMethod=MethodPOTest.returnMethod(param)@MethodPOTest; }");
     }
 
     /**
@@ -100,7 +87,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                 "returnMethod",
                 "/set/methodPOTest/oracle/MethodPOTest_returnMethod.xml",
                 null,
-                "{result=MethodPOTest.returnMethod(param)@MethodPOTest; }");
+                "{result_returnMethod=MethodPOTest.returnMethod(param)@MethodPOTest; }");
     }
 
     /**
