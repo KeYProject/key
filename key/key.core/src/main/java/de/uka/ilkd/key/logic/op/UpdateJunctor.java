@@ -17,18 +17,19 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     
     public static final UpdateJunctor PARALLEL_UPDATE 
     	= new UpdateJunctor(new Name("parallel-upd"), 2);
-    
-    
-    private static Sort[] createUpdateSortArray(int arity) {
-	Sort[] result = new Sort[arity];
-	for(int i = 0; i < arity; i++) {
-	    result[i] = Sort.UPDATE;
+
+	public static final Operator SEQUENTIAL_UPDATE =
+			new UpdateJunctor(new Name("sequential-upd"), 2);
+
+	private static Sort[] createUpdateSortArray(int arity) {
+		Sort[] result = new Sort[arity];
+		for (int i = 0; i < arity; i++) {
+			result[i] = Sort.UPDATE;
+		}
+		return result;
 	}
-	return result;
-    }
-    
-    
+
     private UpdateJunctor(Name name, int arity) {
-	super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
+		super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
     } 
 }

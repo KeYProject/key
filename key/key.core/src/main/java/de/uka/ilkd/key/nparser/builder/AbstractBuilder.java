@@ -37,7 +37,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
      * @param <T>
      * @return
      */
-    public <T> @Nullable T accept(@Nullable RuleContext ctx) {
+    public <T> T accept(@Nullable RuleContext ctx) {
         if (ctx == null) {
             return null;
         }
@@ -73,7 +73,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         for (Object a : obj) parameters.push(a);
     }
 
-    protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
+    protected <T> T accept(@Nullable RuleContext ctx, Object... args) {
         if(parameters == null) parameters = new Stack<>();
         int stackSize = parameters.size();
         push(args);

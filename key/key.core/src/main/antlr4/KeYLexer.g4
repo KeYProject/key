@@ -174,6 +174,15 @@ IFEX   : '\\ifEx';
 THEN : '\\then';
 ELSE : '\\else';
 
+// Dependeces Updates
+EVENTUPDATE:
+    '\\event';
+ANONEVENTUPDATE:
+    '\\anonEvUp';
+INVERSEEVENTUPDATE:
+    '\\invEvUp';
+
+
 // inclusion and stuff, things that (usually) come at the beginning
 // of the file
 INCLUDE:'\\include';

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import antlr.SemanticException;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
@@ -49,7 +50,6 @@ import java.util.stream.Collectors;
  */
 public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
-
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
 
     /**
@@ -148,6 +148,16 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Term visitSequential_update_term(KeYParser.Sequential_update_termContext ctx) {
+        List<Term> t = mapOf(ctx.parallel_term());
+        Term a = t.get(0);
+        for (int i = 1; i < t.size(); i++) {
+            a = getTermFactory().createTerm(UpdateJunctor.SEQUENTIAL_UPDATE, a, t.get(i));
+        }
+        return updateOrigin(a, ctx);
+    }
+
+    @Override
     public Term visitParallel_term(KeYParser.Parallel_termContext ctx) {
         List<Term> t = mapOf(ctx.elementary_update_term());
         Term a = t.get(0);
@@ -163,13 +173,30 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
+    public Term visitElementary_state_update_term(KeYParser.Elementary_state_update_termContext ctx) {
         Term a = accept(ctx.a);
         Term b = accept(ctx.b);
         if (b != null) {
             return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx);
         }
         return updateOrigin(a, ctx);
+    }
+
+    @Override
+    public Term visitElementary_dependency_update_term(KeYParser.Elementary_dependency_update_termContext ctx) {
+        Term depKind = accept(ctx.marker);
+        Term locset  = accept(ctx.locset);
+        Term label   = accept(ctx.timestamp);
+        final TermBuilder tb = getServices().getTermBuilder();
+        if (ctx.EVENTUPDATE() != null) {
+            return updateOrigin(tb.eventUpdate(depKind, locset, label), ctx);
+        } else if (ctx.INVERSEEVENTUPDATE() != null) {
+            return updateOrigin(tb.invEventUpdate(depKind, locset, label), ctx);
+        } else if (ctx.ANONEVENTUPDATE() != null) {
+            // return anon update
+            return updateOrigin(tb.anonEventUpdate(locset, accept(ctx.anonUnique)), ctx);
+        }
+        throw new RuntimeException("Unknown event update type: " + ctx.getText());
     }
 
     @Override

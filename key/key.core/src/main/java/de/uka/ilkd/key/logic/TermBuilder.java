@@ -983,6 +983,22 @@ public class TermBuilder {
         return tf.createTerm(UpdateJunctor.SKIP);
     }
 
+    // dependences updates
+
+    public Term eventUpdate(Term marker, Term locset, Term label) {
+        return tf.createTerm(EventUpdate.SINGLETON, marker, locset, label);
+    }
+
+    public Term anonEventUpdate(Term locset,Term anonUnique) {
+        return tf.createTerm(AnonEventUpdate.SINGLETON, locset, anonUnique);
+    }
+
+    public Term invEventUpdate(Term marker, Term locset, Term label) {
+        return tf.createTerm(InverseEventUpdate.SINGLETON, marker, locset, label);
+    }
+
+    // update connectives
+
     public Term parallel(Term u1, Term u2) {
         if (u1.sort() != Sort.UPDATE) {
             throw new TermCreationException("Not an update: " + u1);
@@ -1056,6 +1072,32 @@ public class TermBuilder {
             return updates.head();
         } else {
             return sequential(updates.head(), sequential(updates.tail()));
+        }
+    }
+
+    public Term seqUpdate(Term u1, Term u2) {
+        return tf.createTerm(UpdateJunctor.SEQUENTIAL_UPDATE, u1, u2);
+    }
+
+    public Term seqUpdate(Term[] updates) {
+        if (updates.length == 0) {
+            return skip();
+        } else {
+            Term result = updates[updates.length - 1];
+            for (int i = updates.length - 2; i >= 0; i++) {
+                result = sequential(updates[i], result);
+            }
+            return result;
+        }
+    }
+
+    public Term seqUpdate(ImmutableList<Term> updates) {
+        if (updates.isEmpty()) {
+            return skip();
+        } else if (updates.size() == 1) {
+            return updates.head();
+        } else {
+            return seqUpdate(updates.head(), seqUpdate(updates.tail()));
         }
     }
 

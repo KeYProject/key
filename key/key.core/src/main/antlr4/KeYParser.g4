@@ -331,10 +331,22 @@ literals:
   | string_literal
 ;
 
-term: parallel_term;
+term: sequential_update_term;
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+sequential_update_term: a=parallel_term (SEMI parallel_term)*;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
-elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
+elementary_update_term:
+    elementary_state_update_term | elementary_dependency_update_term;
+elementary_state_update_term:
+    a=equivalence_term (ASSIGN b=equivalence_term)?;
+elementary_dependency_update_term:
+          (EVENTUPDATE | INVERSEEVENTUPDATE)
+              LPAREN marker=equivalence_term
+                COMMA locset=equivalence_term
+                COMMA timestamp=equivalence_term RPAREN
+        | ANONEVENTUPDATE
+              LPAREN locset=equivalence_term COMMA anonUnique=equivalence_term RPAREN;
+
 equivalence_term: a=implication_term (EQV b+=implication_term)*;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
