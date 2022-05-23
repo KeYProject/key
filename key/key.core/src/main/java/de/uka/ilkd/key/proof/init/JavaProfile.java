@@ -268,7 +268,7 @@ public class JavaProfile extends AbstractProfile {
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {
         if (!perms) {
             if (defaultInstance == null) {
-                defaultInstance = new JavaProfile();
+                defaultInstance = new JavaDepProfile();//new JavaProfile();
             }
             return defaultInstance;
         } else {

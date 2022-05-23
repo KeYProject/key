@@ -73,11 +73,14 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (p == null) {
             assert argSorts != null;
+            boolean isRigid = ctx.NON_RIGID() == null;
             p = new Function(new Name(pred_name),
                     Sort.FORMULA,
                     argSorts.toArray(new Sort[0]),
                     whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    false);
+                    false, false,
+                    isRigid);
+                ;
         }
 
         if (lookup(p.name()) == null) {

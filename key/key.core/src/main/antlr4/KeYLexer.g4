@@ -164,6 +164,12 @@ MAXEXPANDMETHOD : '\\mayExpandMethod';
 STRICT    : '\\strict';
 TYPEOF : '\\typeof';
 INSTANTIATE_GENERIC : '\\instantiateGeneric';
+ONLY_EVENT_UPDATES : '\\onlyEventUpdates';
+ONLY_INVERSE_EVENT_UPDATES : '\\onlyInverseEventUpdates';
+APPLY_EVENT_UPDATE_ON_RIGID: '\\applyEventUpdateOnRigid';
+APPLY_INVERSE_EVENT_UPDATE_ON_RIGID: '\\applyInverseEventUpdateOnRigid';
+NO_EVENT_UPDATE : '\\noEventUpdate';
+NO_INVERSE_EVENT_UPDATE : '\\noInverseEventUpdate';
 
 // Quantifiers, binding, substitution
 FORALL : '\\forall' | '\u2200';
@@ -224,6 +230,7 @@ PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+NON_RIGID : '\\nonRigid';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';

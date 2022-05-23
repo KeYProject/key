@@ -209,6 +209,7 @@ one_schema_modal_op_decl
 pred_decl
 :
   doc=DOC_COMMENT?
+  nonRigid=NON_RIGID?
   pred_name = funcpred_name
   (whereToBind=where_to_bind)?
   argSorts=arg_sorts
@@ -677,6 +678,12 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | GET_VARIANT
   | IS_LABELED
   | ISINSTRICTFP
+  | NO_EVENT_UPDATE
+  | NO_INVERSE_EVENT_UPDATE
+  | ONLY_EVENT_UPDATES
+  | ONLY_INVERSE_EVENT_UPDATES
+  | APPLY_EVENT_UPDATE_ON_RIGID
+  | APPLY_INVERSE_EVENT_UPDATE_ON_RIGID
 ;
 
 varexp_argument

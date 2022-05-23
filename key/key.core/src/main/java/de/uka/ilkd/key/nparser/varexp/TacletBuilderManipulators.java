@@ -246,6 +246,26 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("isObserver", ObserverCondition.class, TSV, TSV);
     public static final AbstractConditionBuilder CONSTANT = new ConstructorBasedBuilder("isConstant", ConstantCondition.class, ASV);
 
+    public static final AbstractConditionBuilder ONLY_EVENT_UPDATES = new ConstructorBasedBuilder("onlyEventUpdates",
+                                                                               OnlyEventUpdates.class,
+                                                                               USV);
+    public static final AbstractConditionBuilder ONLY_INVERSE_EVENT_UPDATES = new ConstructorBasedBuilder("onlyInverseEventUpdates",
+            OnlyInverseEventUpdates.class, USV);
+
+    public static final AbstractConditionBuilder NO_EVENT_UPDATE = new ConstructorBasedBuilder("noEventUpdate",
+            NoEventUpdate.class, USV);
+
+    public static final AbstractConditionBuilder NO_INVERSE_EVENT_UPDATE = new ConstructorBasedBuilder("noInverseEventUpdate",
+            NoInverseEventUpdate.class, USV);
+
+    public static final AbstractConditionBuilder APPLY_EVENT_UPDATE_ON_RIGID =
+            new ConstructorBasedBuilder("applyEventUpdateOnRigid",
+            ApplyEventUpdateOnRigid.class, USV, ASV, ASV);
+
+    public static final AbstractConditionBuilder APPLY_INVERSE_EVENT_UPDATE_ON_RIGID =
+            new ConstructorBasedBuilder("applyInverseEventUpdateOnRigid",
+                    ApplyInverseEventUpdateOnRigid.class, USV, ASV, ASV);
+
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
@@ -320,7 +340,9 @@ public class TacletBuilderManipulators {
                 SAME_OBSERVER, applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE,
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT,
-                IS_IN_STRICTFP
+                IS_IN_STRICTFP,
+                NO_EVENT_UPDATE, NO_INVERSE_EVENT_UPDATE, ONLY_EVENT_UPDATES, ONLY_INVERSE_EVENT_UPDATES,
+                APPLY_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_EVENT_UPDATE_ON_RIGID
         );
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT,
                 GET_INVARIANT, GET_FREE_INVARIANT, GET_VARIANT, IS_LABELED);

@@ -82,6 +82,22 @@ public class Function extends AbstractSortedOperator {
              isSkolemConstant);
     }
 
+    public Function(Name name,
+                    Sort sort,
+                    Sort[] argSorts,
+                    Boolean[] whereToBind,
+                    boolean unique,
+                    boolean isRigid,
+                    boolean isSkolemConstant) {
+        this(name,
+                sort,
+                new ImmutableArray<Sort>(argSorts),
+                whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind),
+                unique,
+                isRigid,
+                isSkolemConstant);
+    }
+
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
