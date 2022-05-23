@@ -83,7 +83,15 @@ public final class ParsingFacade {
     }
 
     private static KeYParser createParser(CharStream stream) {
-        KeYParser p = new KeYParser(new CommonTokenStream(createLexer(stream)));
+        return createParser(createLexer(stream));
+    }
+
+    private static KeYParser createParser(CharStream stream, int line, int charPositionInLine) {
+        return createParser(createLexer(stream, line, charPositionInLine));
+    }
+
+    private static KeYParser createParser(KeYLexer lexer) {
+        KeYParser p = new KeYParser(new CommonTokenStream(lexer));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         return p;
@@ -95,6 +103,13 @@ public final class ParsingFacade {
 
     public static KeYLexer createLexer(CharStream stream) {
         return new KeYLexer(stream);
+    }
+
+    public static KeYLexer createLexer(CharStream stream, int line, int charPositionInLine) {
+        KeYLexer lexer = createLexer(stream);
+        lexer.getInterpreter().setCharPositionInLine(charPositionInLine);
+        lexer.getInterpreter().setLine(line);
+        return lexer;
     }
 
     public static KeyAst.File parseFile(URL url) throws IOException {
@@ -132,6 +147,13 @@ public final class ParsingFacade {
 
     public static KeyAst.Term parseExpression(CharStream stream) {
         KeYParser p = createParser(stream);
+        KeYParser.TermContext term = p.termEOF().term();
+        p.getErrorReporter().throwException();
+        return new KeyAst.Term(term);
+    }
+
+    public static KeyAst.Term parseExpression(CharStream stream, int line, int charPositionInLine) {
+        KeYParser p = createParser(stream, line, charPositionInLine);
         KeYParser.TermContext term = p.termEOF().term();
         p.getErrorReporter().throwException();
         return new KeyAst.Term(term);
@@ -179,4 +201,6 @@ public final class ParsingFacade {
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);//remove leading "/*!" and trailing "*/"
     }
+
+
 }
