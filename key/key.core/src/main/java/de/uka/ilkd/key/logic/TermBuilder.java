@@ -4,12 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -1352,6 +1347,17 @@ public class TermBuilder {
         }
     }
 
+    public Term sub(Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter()
+                .getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        if (t2.equals(zero)) {
+            return t1;
+        } else {
+            return func(integerLDT.getSub(), t1, t2);
+        }
+    }
+
     public Term inByte(Term var) {
         Function f = services.getNamespaces().functions()
                 .lookup(new Name("inByte"));
@@ -2399,4 +2405,66 @@ public class TermBuilder {
             return func(doubleLDT.getEquals(), t1, t2);
         }
     }
+
+    // Dependences
+    public Term noR(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getNoR(), locationSet);
+    }
+
+    public Term noW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getNoW(), locationSet);
+    }
+
+    public Term noRaW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getNoRaW(), locationSet);
+    }
+
+    public Term noWaR(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getNoWaR(), locationSet);
+    }
+
+    public Term noWaW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getNoWaW(), locationSet);
+    }
+
+    public Term relaxedNoR(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedNoR(), locationSet);
+    }
+
+    public Term relaxedNoW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedNoW(), locationSet);
+    }
+
+    public Term relaxedNoRaW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedNoRaW(), locationSet);
+    }
+
+    public Term relaxedNoWaR(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedNoWaR(), locationSet);
+    }
+
+    public Term relaxedNoWaW(Term locationSet) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedNoWaW(), locationSet);
+    }
+
+    public Term rPred(Term locSet, Term counter) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRPred(), locSet, counter);
+    }
+
+    public Term wPred(Term locSet, Term counter) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getWPred(), locSet, counter);
+    }
 }
+
