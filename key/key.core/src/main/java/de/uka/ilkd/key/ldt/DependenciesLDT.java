@@ -15,153 +15,153 @@ import de.uka.ilkd.key.logic.op.Function;
 
 public class DependenciesLDT extends LDT {
 
-	public static final Name NAME = new Name("EventMarker");    
+    public static final Name NAME = new Name("EventMarker");
 
-	private final Function noR;
-	private final Function noW;
-	private final Function noRaW;
-	private final Function noWaR;
-	private final Function noWaW;
-	
-	private final Function relaxedNoR;
-	private final Function relaxedNoW;
-	private final Function relaxedNoRaW;
-	private final Function relaxedNoWaR;
-	private final Function relaxedNoWaW;
-	
-	private final Function rPred;
-	private final Function wPred;
+    private final Function noR;
+    private final Function noW;
+    private final Function noRaW;
+    private final Function noWaR;
+    private final Function noWaW;
 
-	private final Function nothingMarker;
-	private final Function readMarker;
-	private final Function writeMarker;
+    private final Function relaxedNoR;
+    private final Function relaxedNoW;
+    private final Function relaxedNoRaW;
+    private final Function relaxedNoWaR;
+    private final Function relaxedNoWaW;
+
+    private final Function rPred;
+    private final Function wPred;
+
+    private final Function nothingMarker;
+    private final Function readMarker;
+    private final Function writeMarker;
 
 
-	public DependenciesLDT(TermServices services) {
-		super(NAME, services);
-		noR	         = addFunction(services, "noR");
-		noW	         = addFunction(services, "noW");
-		noRaW	         = addFunction(services, "noRaW");
-		noWaR	         = addFunction(services, "noWaR");
-		noWaW	         = addFunction(services, "noWaW");
-		
-		relaxedNoR	         = addFunction(services, "relaxedNoR");
-		relaxedNoW	         = addFunction(services, "relaxedNoW");
-		relaxedNoRaW	         = addFunction(services, "relaxedNoRaW");
-		relaxedNoWaR	         = addFunction(services, "relaxedNoWaR");
-		relaxedNoWaW	         = addFunction(services, "relaxedNoWaW");
-		
-		rPred	         = addFunction(services, "rPred");
-		wPred	         = addFunction(services, "wPred");
-		
-		readMarker  = addFunction(services, "read");
-		writeMarker = addFunction(services, "write");
-		nothingMarker = addFunction(services, "nothing");
-	}
+    public DependenciesLDT(TermServices services) {
+        super(NAME, services);
+        noR = addFunction(services, "noR");
+        noW = addFunction(services, "noW");
+        noRaW = addFunction(services, "noRaW");
+        noWaR = addFunction(services, "noWaR");
+        noWaW = addFunction(services, "noWaW");
 
-	public Function getNoR() {
-		return noR;
-	}
+        relaxedNoR = addFunction(services, "relaxedNoR");
+        relaxedNoW = addFunction(services, "relaxedNoW");
+        relaxedNoRaW = addFunction(services, "relaxedNoRaW");
+        relaxedNoWaR = addFunction(services, "relaxedNoWaR");
+        relaxedNoWaW = addFunction(services, "relaxedNoWaW");
 
-	public Function getNoW() {
-		return noW;
-	}
+        rPred = addFunction(services, "rPred");
+        wPred = addFunction(services, "wPred");
 
-	public Function getNoRaW() {
-		return noRaW;
-	}
+        readMarker = addFunction(services, "read");
+        writeMarker = addFunction(services, "write");
+        nothingMarker = addFunction(services, "nothing");
+    }
 
-	public Function getNoWaR() {
-		return noWaR;
-	}
+    public Function getNoR() {
+        return noR;
+    }
 
-	public Function getNoWaW() {
-		return noWaW;
-	}
-	
-	public Function getRelaxedNoR() {
-		return relaxedNoR;
-	}
+    public Function getNoW() {
+        return noW;
+    }
 
-	public Function getRelaxedNoW() {
-		return relaxedNoW;
-	}
+    public Function getNoRaW() {
+        return noRaW;
+    }
 
-	public Function getRelaxedNoRaW() {
-		return relaxedNoRaW;
-	}
+    public Function getNoWaR() {
+        return noWaR;
+    }
 
-	public Function getRelaxedNoWaR() {
-		return relaxedNoWaR;
-	}
+    public Function getNoWaW() {
+        return noWaW;
+    }
 
-	public Function getRelaxedNoWaW() {
-		return relaxedNoWaW;
-	}
-	
-	public Function getRPred() {
-		return rPred;
-	}
+    public Function getRelaxedNoR() {
+        return relaxedNoR;
+    }
 
-	public Function getWPred() {
-		return wPred;
-	}
+    public Function getRelaxedNoW() {
+        return relaxedNoW;
+    }
 
-	public Function getNothingMarker() {
-		return nothingMarker;
-	}
+    public Function getRelaxedNoRaW() {
+        return relaxedNoRaW;
+    }
 
-	public Function getReadMarker() {
-		return readMarker;
-	}
+    public Function getRelaxedNoWaR() {
+        return relaxedNoWaR;
+    }
 
-	public Function getWriteMarker() {
-		return writeMarker;
-	}
+    public Function getRelaxedNoWaW() {
+        return relaxedNoWaW;
+    }
 
-	@Override
-	public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-		return false;
-	}
+    public Function getRPred() {
+        return rPred;
+    }
 
-	@Override
-	public boolean isResponsible(Operator op, Term left, Term right, Services services, ExecutionContext ec) {
-		return false;
-	}
+    public Function getWPred() {
+        return wPred;
+    }
 
-	@Override
-	public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
-		return false;
-	}
+    public Function getNothingMarker() {
+        return nothingMarker;
+    }
 
-	@Override
-	public Term translateLiteral(Literal lit, Services services) {
-		assert false;
-		return null;
-	}
+    public Function getReadMarker() {
+        return readMarker;
+    }
 
-	@Override
-	public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-		assert false;
-		return null;
-	}
+    public Function getWriteMarker() {
+        return writeMarker;
+    }
 
-	@Override
-	public boolean hasLiteralFunction(Function f) {
-		assert false;
-		return false;
-	}
+    @Override
+    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
+        return false;
+    }
 
-	@Override
-	public Expression translateTerm(Term t, ExtList children, Services services) {
-		assert false;
-		return null;
-	}
+    @Override
+    public boolean isResponsible(Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+        return false;
+    }
 
-	@Override
-	public Type getType(Term t) {
-		assert false;
-		return null;
-	}
+    @Override
+    public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
+        return false;
+    }
+
+    @Override
+    public Term translateLiteral(Literal lit, Services services) {
+        assert false;
+        return null;
+    }
+
+    @Override
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+        assert false;
+        return null;
+    }
+
+    @Override
+    public boolean hasLiteralFunction(Function f) {
+        assert false;
+        return false;
+    }
+
+    @Override
+    public Expression translateTerm(Term t, ExtList children, Services services) {
+        assert false;
+        return null;
+    }
+
+    @Override
+    public Type getType(Term t) {
+        assert false;
+        return null;
+    }
 
 }
