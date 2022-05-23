@@ -256,10 +256,25 @@ public abstract class Notation {
 	    
 	    sp.printParallelUpdate("||", t, 10);
 	}
-    }    
-    
-    
-    /**
+    }
+
+	/**
+	 * The standard concrete syntax for parallel updates
+	 */
+	public static final class SequentialUpdateNotation extends Notation {
+
+		public SequentialUpdateNotation() {
+			super(99);
+		}
+
+		public void print(Term t, LogicPrinter sp) throws IOException {
+			assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
+
+			sp.printSequentialUpdate(";", t, 10);
+		}
+	}
+
+	/**
       * The standard concrete syntax for substitution terms.
       */
     public static final class Subst extends Notation {

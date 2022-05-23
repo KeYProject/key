@@ -1553,13 +1553,13 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass2);
     }
 
-    private void printParallelUpdateHelper(String separator, Term t, int ass) throws IOException {
+    private void printUpdateConnectiveHelper(String separator, UpdateJunctor op, Term t, int ass) throws IOException {
         assert t.arity() == 2;
         startTerm(2);
 
-        if (t.sub(0).op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (t.sub(0).op() == op) {
             markStartSub();
-            printParallelUpdateHelper(separator, t.sub(0), ass);
+            printUpdateConnectiveHelper(separator, UpdateJunctor.PARALLEL_UPDATE, t.sub(0), ass);
             markEndSub();
         } else {
             maybeParens(t.sub(0), ass);
@@ -1567,10 +1567,10 @@ public class LogicPrinter {
 
         layouter.brk(1).print(separator + " ");
 
-        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (t.sub(1).op() == op) {
             markStartSub();
             layouter.print("(");
-            printParallelUpdateHelper(separator, t.sub(1), ass);
+            printUpdateConnectiveHelper(separator, UpdateJunctor.PARALLEL_UPDATE, t.sub(1), ass);
             layouter.print(")");
             markEndSub();
         } else {
@@ -1580,7 +1580,13 @@ public class LogicPrinter {
 
     public void printParallelUpdate(String separator, Term t, int ass) throws IOException {
         layouter.beginC(0);
-        printParallelUpdateHelper(separator, t, ass);
+        printUpdateConnectiveHelper(separator, UpdateJunctor.PARALLEL_UPDATE, t, ass);
+        layouter.end();
+    }
+
+    public void printSequentialUpdate(String separator, Term t, int ass) throws IOException {
+        layouter.beginC(0);
+        printUpdateConnectiveHelper(separator, UpdateJunctor.SEQUENTIAL_UPDATE, t, ass);
         layouter.end();
     }
 

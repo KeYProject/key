@@ -3,7 +3,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-
 /**
  * Class of update junctor operators, i.e., operators connecting
  * a given number of updates to create another update. There
@@ -18,7 +17,7 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     public static final UpdateJunctor PARALLEL_UPDATE 
     	= new UpdateJunctor(new Name("parallel-upd"), 2);
 
-	public static final Operator SEQUENTIAL_UPDATE =
+	public static final UpdateJunctor SEQUENTIAL_UPDATE =
 			new UpdateJunctor(new Name("sequential-upd"), 2);
 
 	private static Sort[] createUpdateSortArray(int arity) {
@@ -31,5 +30,5 @@ public final class UpdateJunctor extends AbstractSortedOperator {
 
     private UpdateJunctor(Name name, int arity) {
 		super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
-    } 
+    }
 }

@@ -186,7 +186,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term visitElementary_dependency_update_term(KeYParser.Elementary_dependency_update_termContext ctx) {
         Term depKind = accept(ctx.marker);
         Term locset  = accept(ctx.locset);
-        Term label   = accept(ctx.timestamp);
+        Term label   = accept(ctx.depLabel);
         final TermBuilder tb = getServices().getTermBuilder();
         if (ctx.EVENTUPDATE() != null) {
             return updateOrigin(tb.eventUpdate(depKind, locset, label), ctx);
