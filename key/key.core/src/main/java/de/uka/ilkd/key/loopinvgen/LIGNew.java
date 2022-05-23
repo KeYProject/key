@@ -74,7 +74,6 @@ public class LIGNew {
 			}
 		}
 
-		
 //		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");

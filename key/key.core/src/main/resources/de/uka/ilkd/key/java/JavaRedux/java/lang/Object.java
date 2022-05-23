@@ -1,8 +1,11 @@
 package java.lang;
 
-public class Object {  
+public class Object {
 
-    
+    // HACK Dependencies example
+    public static int arrayFct(int arg) {}
+
+
     /*@ public normal_behavior
       @   assignable \nothing;
       @   assignable<permissions> \nothing;
