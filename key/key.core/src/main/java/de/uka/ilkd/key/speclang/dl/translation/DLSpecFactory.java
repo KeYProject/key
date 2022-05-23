@@ -333,14 +333,16 @@ public final class DLSpecFactory {
 	               pm,
 	               modality,
 	               pres,
-	               new LinkedHashMap<LocationVariable,Term>(),
+                   new LinkedHashMap<>(),
 	               null,// TODO measured_by in DL contracts not supported yet
 	               posts,
-	               new LinkedHashMap<LocationVariable,Term>(),
+                   new LinkedHashMap<>(),
 	               null, // TODO no model methods in DL contracts
 	               mods,
-	               new LinkedHashMap<ProgramVariable,Term>(),
+                   new LinkedHashMap<>(),
+                   new LinkedHashMap<>(),
 	               hasMod, // TODO strictly pure in DL contracts not supported yet
+                   new LinkedHashMap<>(),
 	               selfVar,
 	               paramVars,
 	               resultVar,

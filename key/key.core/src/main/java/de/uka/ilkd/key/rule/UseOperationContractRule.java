@@ -736,6 +736,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                     contractSelf, contractParams, services);
             mods.put(heap, m);
         }
+        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<LocationVariable, Term>();
+
+        for (LocationVariable heap : heapContext) {
+            final Term m = contract.getFreeMod(heap, tb.var(heap),
+                    contractSelf, contractParams, services);
+            freeMods.put(heap, m);
+        }
 
         final Term mby = contract.hasMby()
                 ? contract.getMby(heapTerms,
@@ -784,11 +791,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon;
-            if (!contract.hasModifiesClause(heap)) {
+            if (!contract.hasModifiesClause(heap) || !contract.hasFreeModifiesClause(heap)) {
                 tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
                         tb.var(heap));
             } else {
-                tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
+                tAnon = createAnonUpdate(heap, inst.pm, tb.intersect(mods.get(heap), freeMods.get(heap)), services);
             }
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonAssumption == null) {

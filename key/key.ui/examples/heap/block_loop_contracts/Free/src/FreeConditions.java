@@ -33,13 +33,13 @@ public class FreeConditions {
         /*@ public normal_behavior
           @ ensures field == 21; 
           @ assignable field; */
-        { f = 21; }
+        { field = 21; }
         
         /*@ public normal_behavior
           @ ensures true; 
           @ assignable field;
           @ assignable_free \nothing; */
-        { f = 42; }
+        { field = 42; }
     }
 
     /*@ public normal_behavior

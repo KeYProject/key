@@ -102,6 +102,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * The original assignable clause terms.
      */
     final Map<LocationVariable, Term> originalMods;
+    final Map<LocationVariable, Term> originalFreeMods;
     final Map<ProgramVariable, Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
@@ -122,6 +123,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @see #hasModifiesClause()
      */
     final Map<LocationVariable, Boolean> hasRealModifiesClause;
+    final Map<LocationVariable, Boolean> hasRealFreeModifiesClause;
 
     /**
      * The term builder.
@@ -179,8 +181,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, Term> freePosts,
             Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods,
+            Map<LocationVariable, Term> freeMods,
             Map<ProgramVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasRealMod,
+            Map<LocationVariable, Boolean> hasRealFreeMod,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
@@ -230,8 +234,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.originalFreePosts = freePosts;
         this.originalAxioms = axioms;
         this.originalMods = mods;
+        this.originalFreeMods = freeMods;
         this.originalDeps = accessibles;
         this.hasRealModifiesClause = hasRealMod;
+        this.hasRealFreeModifiesClause = hasRealFreeMod;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
         this.originalResultVar = resultVar;
@@ -259,6 +265,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newMods = originalMods.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeMods = originalFreeMods.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
@@ -266,8 +274,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return new FunctionalOperationContractImpl(
                 baseName, name, kjt, pm, specifiedIn, modality,
                 newPres, newFreePres, newMby, newPosts, newFreePosts,
-                newAxioms, newMods, newAccessibles,
-                hasRealModifiesClause, originalSelfVar, originalParamVars,
+                newAxioms, newMods, newFreeMods, newAccessibles,
+                hasRealModifiesClause, hasRealFreeModifiesClause,
+                originalSelfVar, originalParamVars,
                 originalResultVar, originalExcVar, originalAtPreVars,
                 newGlobalDefs,
                 id, toBeSaved, transaction, services);
@@ -1479,6 +1488,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
 
+    @Override
+    public Term getFreeMod(LocationVariable heap, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        return getAnyMod(this.originalFreeMods.get(heap), selfVar, paramVars, services);
+    }
+
     private Term getAnyMod(LocationVariable heap, Term mod, Term heapTerm,
             Term selfTerm,
             ImmutableList<Term> paramTerms,
@@ -1515,11 +1531,29 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public boolean hasFreeModifiesClause(LocationVariable heap) {
+        Boolean result = this.hasRealFreeModifiesClause.get(heap);
+        if (result == null) {
+            return false;
+        }
+        return result;
+    }
+
+    @Override
     public Term getMod(LocationVariable heap, Term heapTerm,
             Term selfTerm,
             ImmutableList<Term> paramTerms,
             Services services) {
         return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms,
+                services);
+    }
+
+    @Override
+    public Term getFreeMod(LocationVariable heap, Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services) {
+        return getAnyMod(heap, this.originalFreeMods.get(heap), heapTerm, selfTerm, paramTerms,
                 services);
     }
 
@@ -1699,8 +1733,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 originalFreePosts,
                 originalAxioms,
                 originalMods,
+                originalFreeMods,
                 originalDeps,
                 hasRealModifiesClause,
+                hasRealFreeModifiesClause,
                 originalSelfVar,
                 originalParamVars,
                 originalResultVar,
@@ -1730,8 +1766,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 originalFreePosts,
                 originalAxioms,
                 originalMods,
+                originalFreeMods,
                 originalDeps,
                 hasRealModifiesClause,
+                hasRealFreeModifiesClause,
                 originalSelfVar,
                 originalParamVars,
                 originalResultVar,

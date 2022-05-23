@@ -42,6 +42,14 @@ public interface OperationContract extends Contract {
     public boolean hasModifiesClause(LocationVariable heap);
 
     /**
+     * Returns <code>true</code> iff the method (according to a free clause of the contract) does
+     * not modify the heap at all, i.e., iff it is freely "strictly pure."
+     *
+     * @return whether this contract is freely strictly pure.
+     */
+    public boolean hasFreeModifiesClause(LocationVariable heap);
+
+    /**
      * Returns the modifies clause of the contract.
      *
      * @param heapVar   the heap variable.
@@ -51,6 +59,19 @@ public interface OperationContract extends Contract {
      * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Services services);
+
+    /**
+     * Returns the free modifies clause of the contract.
+     *
+     * @param heapVar   the heap variable.
+     * @param selfVar   the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services  the services object.
+     * @return the free modifies clause.
+     */
+    public Term getFreeMod(LocationVariable heapVar, ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services);
 
@@ -65,6 +86,21 @@ public interface OperationContract extends Contract {
      * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Services services);
+
+    /**
+     * Returns the free modifies clause of the contract.
+     *
+     * @param heapVar    the heap variable
+     * @param heapTerm   the heap variable term.
+     * @param selfTerm   the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services   the services object.
+     * @return the free modifies clause.
+     */
+    public Term getFreeMod(LocationVariable heapVar, Term heapTerm,
                        Term selfTerm,
                        ImmutableList<Term> paramTerms,
                        Services services);

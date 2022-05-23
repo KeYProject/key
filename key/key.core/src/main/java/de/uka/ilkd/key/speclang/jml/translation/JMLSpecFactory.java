@@ -991,14 +991,18 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.assignablesFree,
+                    clauses.accessibles, clauses.hasMod, clauses.hasFreeMod,
+                    progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(tb.tt())) {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.assignablesFree,
+                    clauses.accessibles, clauses.hasMod, clauses.hasFreeMod,
+                    progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -1012,11 +1016,15 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.assignablesFree,
+                    clauses.accessibles, clauses.hasMod, clauses.hasFreeMod,
+                    progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.assignablesFree,
+                    clauses.accessibles, clauses.hasMod, clauses.hasFreeMod,
+                    progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
