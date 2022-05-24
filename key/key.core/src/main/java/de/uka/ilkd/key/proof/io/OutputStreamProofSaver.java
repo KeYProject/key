@@ -858,7 +858,7 @@ public class OutputStreamProofSaver {
                 tb.and(Arrays.stream(seq.antecedent().asList().toArray(new SequentFormula[0])).
                     map(SequentFormula::formula).collect(Collectors.toList()));
         final Term succedent =
-                tb.and(Arrays.stream(seq.succedent().asList().toArray(new SequentFormula[0])).
+                tb.or(Arrays.stream(seq.succedent().asList().toArray(new SequentFormula[0])).
                         map(SequentFormula::formula).collect(Collectors.toList()));
 
         try {
