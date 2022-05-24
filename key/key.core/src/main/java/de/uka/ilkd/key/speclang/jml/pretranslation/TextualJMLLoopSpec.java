@@ -23,8 +23,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
-
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases
@@ -78,12 +76,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
-        return getList(ASSIGNABLE);
-    }
-
-    /*public ImmutableList<LabeledParserRuleContext> getAssignable(String hName) {
         return getList(ClauseHd.ASSIGNABLE);
-    }*/
+    }
 
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
@@ -91,6 +85,18 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
         return getMapInit(ClauseHd.ASSIGNABLE);
+    }
+
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
+        return getList(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
+        return getMap(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
     }
 
 

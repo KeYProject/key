@@ -7,6 +7,7 @@ public class AssignableFree {
     void foo() {
         foo0();
         foo1();
+        foo2();
     }
 
     /*@ public normal_behavior
@@ -21,6 +22,13 @@ public class AssignableFree {
       @ assignable field;
       @ assignable_free \nothing; */
     void foo1() {
+        field = 42;
+    }
+
+    /*@ public normal_behavior
+      @ ensures true; 
+      @ assignable_free \nothing; */
+    void foo2() {
         field = 42;
     }
 }

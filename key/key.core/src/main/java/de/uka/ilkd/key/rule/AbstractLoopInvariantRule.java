@@ -500,7 +500,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param heap
      *            The original heap {@link LocationVariable}.
      * @param mod
-     *            The modifiers term.
+     *            The modifies term.
+     * @param freeMod
+     *            The freemodifies term.
      * @param inv
      *            The loop invariant.
      * @param services
@@ -509,7 +511,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *         update, the loop heap, the base heap, and the anonymized heap.
      */
     protected static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services) {
+            Term mod, Term freeMod, LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -526,11 +528,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
+        Term totalMod = tb.intersect(mod, freeMod);
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(totalMod)) {
             anonUpdate = tb.skip();
         } else {
-            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
+            anonUpdate = tb.anonUpd(heap, totalMod, anonHeapTerm);
         }
 
         return new AnonUpdateData( //
@@ -581,13 +584,20 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         heapContext.forEach(heap -> mods.put(heap,
                         inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
+        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<LocationVariable, Term>();
+        heapContext.forEach(heap -> freeMods.put(heap,
+                        inst.inv.getFreeModifies(heap, inst.selfTerm, atPres, services)));
+
         ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList
                 .<AnonUpdateData> nil();
         for (LocationVariable heap : heapContext) {
             //weigl: prevent NPE
             Term modifiesTerm = mods.get(heap);
             modifiesTerm = modifiesTerm == null ? tb.strictlyNothing() : modifiesTerm;
-            final AnonUpdateData tAnon = createAnonUpdate(heap, modifiesTerm, inst.inv, services);
+            Term freeModifiesTerm = freeMods.get(heap);
+            freeModifiesTerm = freeModifiesTerm == null ? tb.strictlyNothing() : freeModifiesTerm;
+            
+            final AnonUpdateData tAnon = createAnonUpdate(heap, modifiesTerm, freeModifiesTerm, inst.inv, services);
             anonUpdateData = anonUpdateData.append(tAnon);
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);

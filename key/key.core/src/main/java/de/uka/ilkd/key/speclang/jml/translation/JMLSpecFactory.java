@@ -1615,6 +1615,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
+            Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs, LabeledParserRuleContext originalVariant)
             throws SLTranslationException {
         assert pm != null;
@@ -1649,7 +1650,9 @@ public class JMLSpecFactory {
 
         // translateToTerm assignable
         Map<LocationVariable, Term> mods
-                = translateToTermAsssignable(pm, selfVar, atPres, allVars, originalAssignables);
+                = translateToTermAssignable(pm, selfVar, atPres, allVars, originalAssignables, false);
+        Map<LocationVariable, Term> freeMods
+                = translateToTermAssignable(pm, selfVar, atPres, allVars, originalFreeAssignables, true);
 
         // translateToTerm infFlowSpecs
         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs
@@ -1665,7 +1668,8 @@ public class JMLSpecFactory {
         // create loop invariant annotation
         Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
-        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, mods,
+        return new LoopSpecImpl(loop, pm, pm.getContainerType(),
+                invariants, freeInvariants, mods, freeMods,
                 infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
@@ -1709,11 +1713,12 @@ public class JMLSpecFactory {
         return infFlowSpecs;
     }
 
-    private Map<LocationVariable, Term> translateToTermAsssignable(
+    private Map<LocationVariable, Term> translateToTermAssignable(
             IProgramMethod pm,
             ProgramVariable selfVar, Map<LocationVariable, Term> atPres,
             ImmutableList<ProgramVariable> allVars,
-            Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables) {
+            Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
+            boolean free) {
         Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         for (String h : originalAssignables.keySet()) {
             LocationVariable heap
@@ -1735,7 +1740,7 @@ public class JMLSpecFactory {
                             .parameters(allVars)
                             .atPres(atPres)
                             .atBefore(atPres)
-                            .translateTerm(expr, SpecType.ASSIGNABLE);
+                            .translateTerm(expr, free ? SpecType.ASSIGNABLE_FREE : SpecType.ASSIGNABLE);
                     a = tb.union(a, translated);
                 }
             }
@@ -1762,6 +1767,7 @@ public class JMLSpecFactory {
                 textualLoopSpec.getInvariants(),
                 textualLoopSpec.getFreeInvariants(),
                 textualLoopSpec.getAssignablesInit(),
+                textualLoopSpec.getAssignablesFreeInit(),
                 textualLoopSpec.getInfFlowSpecs(),
                 textualLoopSpec.getVariant());
     }

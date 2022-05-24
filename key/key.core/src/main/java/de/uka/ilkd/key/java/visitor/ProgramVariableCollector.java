@@ -150,6 +150,15 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
 
+        // free modifies
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term freeMod = x.getFreeModifies(heap, selfTerm, atPres, services);
+            if (freeMod != null) {
+                freeMod.execPostOrder(tpvc);
+            }
+        }
+
         // information flow (TODO: does this really belong here?)
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {

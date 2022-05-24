@@ -449,6 +449,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 final Term newVariant = spec.getVariant(selfTerm, atPres, services);
                 Map<LocationVariable, Term> newMods = new LinkedHashMap<>();
+                Map<LocationVariable, Term> newFreeMods = new LinkedHashMap<>();
                 Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs
                         = new LinkedHashMap<>();
                 // LocationVariable baseHeap =
@@ -460,34 +461,51 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
                     final Term term = spec.getInternalModifies()
-                            //.get(services.getTypeConverter().getHeapLDT().getHeap());
-                            //weigl: prevent NPE
                             .getOrDefault(services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
-                    if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
-                            && tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
-                        continue;
+                    final Term freeTerm = spec.getInternalFreeModifies()
+                            .getOrDefault(services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
+                    if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
+                            || !tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
+                        final Term m = spec.getModifies(heap, selfTerm, atPres, services);
+                        final ImmutableList<InfFlowSpec> infFlowSpecs
+                                = spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
+                        final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
+                        if (inv != null) {
+                            newInvariants.put(heap, inv);
+                        }
+                        if (m != null) {
+                            newMods.put(heap, m);
+                        }
+                        newInfFlowSpecs.put(heap, infFlowSpecs);
+                        final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
+                        if (freeInv != null) {
+                            newFreeInvariants.put(heap, freeInv);
+                        }
                     }
-                    final Term m = spec.getModifies(heap, selfTerm, atPres, services);
-                    final ImmutableList<InfFlowSpec> infFlowSpecs
-                            = spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                    final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
-                    if (inv != null) {
-                        newInvariants.put(heap, inv);
-                    }
-                    if (m != null) {
-                        newMods.put(heap, m);
-                    }
-                    newInfFlowSpecs.put(heap, infFlowSpecs);
-                    final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
-                    if (freeInv != null) {
-                        newFreeInvariants.put(heap, freeInv);
+                    if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
+                            || !tb.strictlyNothing().equalsModIrrelevantTermLabels(freeTerm)) {
+                        final Term m = spec.getFreeModifies(heap, selfTerm, atPres, services);
+                        final ImmutableList<InfFlowSpec> infFlowSpecs
+                                = spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
+                        final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
+                        if (inv != null) {
+                            newInvariants.put(heap, inv);
+                        }
+                        if (m != null) {
+                            newFreeMods.put(heap, m);
+                        }
+                        newInfFlowSpecs.put(heap, infFlowSpecs);
+                        final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
+                        if (freeInv != null) {
+                            newFreeInvariants.put(heap, freeInv);
+                        }
                     }
                 }
                 ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
                 final LoopSpecification newInv = spec.create(loop, frame.getProgramMethod(),
                         frame.getProgramMethod().getContainerType(), newInvariants,
-                        newFreeInvariants, newMods, newInfFlowSpecs, newVariant, selfTerm,
+                        newFreeInvariants, newMods, newFreeMods, newInfFlowSpecs, newVariant, selfTerm,
                         newLocalIns, newLocalOuts, atPres);
                 services.getSpecificationRepository().addLoopInvariant(newInv);
             }

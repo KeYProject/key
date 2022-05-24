@@ -40,6 +40,11 @@ public class FreeConditions {
           @ assignable field;
           @ assignable_free \nothing; */
         { field = 42; }
+        
+        /*@ public normal_behavior
+          @ ensures true; 
+          @ assignable_free \nothing; */
+        { field = 42; }
     }
 
     /*@ public normal_behavior

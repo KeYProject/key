@@ -89,6 +89,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final List<LocationVariable> heapContext = //
                 HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<>();
         // The call to MiscTools.removeSingletonPVs removes from the assignable clause
         // the program variables which of course should not be part of an anonymizing
         // heap expression. The reason why they're there at all is that for Abstract
@@ -97,23 +98,31 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         // concrete statements (such as loop bodies). (DS, 2019-07-05)
         heapContext.forEach(heap -> mods.put(heap,
                 loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+        heapContext.forEach(heap -> freeMods.put(heap,
+                loopSpec.getFreeModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         Term anonUpdate = tb.skip();
 
         anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getHeap(),
-                anonHeapTerm, mods.get(heapLDT.getHeap()), services));
+                anonHeapTerm,
+                tb.intersect(mods.get(heapLDT.getHeap()), freeMods.get(heapLDT.getHeap())),
+                services));
 
         if (isTransaction) {
             anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getSavedHeap(),
-                    anonHeapTerm, mods.get(heapLDT.getSavedHeap()), services));
+                    anonHeapTerm,
+                    tb.intersect(mods.get(heapLDT.getSavedHeap()), freeMods.get(heapLDT.getSavedHeap())),
+                    services));
         }
 
         if (isPermissions) {
             anonUpdate = tb.parallel(anonUpdate,
-                    createElementaryAnonUpdate(heapLDT.getPermissionHeap(), anonPermissionsHeapTerm,
-                            mods.get(heapLDT.getPermissionHeap()), services));
+                    createElementaryAnonUpdate(heapLDT.getPermissionHeap(),
+                            anonPermissionsHeapTerm,
+                            tb.intersect(mods.get(heapLDT.getPermissionHeap()), freeMods.get(heapLDT.getPermissionHeap())),
+                            services));
         }
 
         return anonUpdate;

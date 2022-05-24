@@ -274,10 +274,11 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     /**
+     * @param freeMods 
      * @return (assumption, anon update, anon heap)
      */    
-    private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
-                                                   LoopSpecification inv, Services services) {
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod, Term freeMod,
+            LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name loopHeapName = new Name(tb.newName(heap+"_After_LOOP"));
@@ -292,11 +293,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
 	// check for strictly pure loops
+    final Term totalMod = tb.intersect(mod, freeMod);
 	final Term anonUpdate;
-	if(tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+	if(tb.strictlyNothing().equalsModIrrelevantTermLabels(totalMod)) {
 	    anonUpdate = tb.skip();
 	} else {
-	    anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
+	    anonUpdate = tb.anonUpd(heap, totalMod, anonHeapTerm);
 	}
 
 	return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
@@ -824,9 +826,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+        final Map<LocationVariable,Term> freeMods = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : heapContext) {
-            final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
-            mods.put(heap, m);
+            mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services));
+            freeMods.put(heap, inst.inv.getFreeModifies(heap, inst.selfTerm, atPres, services));
         }
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
@@ -916,7 +919,10 @@ public final class WhileInvariantRule implements BuiltInRule {
                 ImmutableSLList.<AnonUpdateData>nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon
-            = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
+                = createAnonUpdate(heap,
+                        mods.getOrDefault(heap, tb.allLocs()),
+                        freeMods.getOrDefault(heap, tb.allLocs()),
+                        inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if(anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;

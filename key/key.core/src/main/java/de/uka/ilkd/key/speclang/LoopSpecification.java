@@ -94,6 +94,29 @@ public interface LoopSpecification extends SpecificationElement {
                             Services services);
 
     /**
+     * Returns the free modifies clause.
+     * @param heap the heap variable.
+     * @param selfTerm the self term.
+     * @param atPres the operators used for the pre-heap.
+     * @param services the Services object.
+     * @return The modifies clause as a term.
+     */
+    public Term getFreeModifies(LocationVariable heap, Term selfTerm,
+                            Map<LocationVariable, Term> atPres,
+                            Services services);
+
+    /**
+     * Returns the free modifies clause.
+     * @param selfTerm the self term.
+     * @param atPres the operators used for the pre-heap.
+     * @param services the Services object.
+     * @return The modifies clause as a term.
+     */
+    public Term getFreeModifies(Term selfTerm,
+                            Map<LocationVariable, Term> atPres,
+                            Services services);
+
+    /**
      * Returns the information flow specification clause.
      */
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap);
@@ -160,6 +183,13 @@ public interface LoopSpecification extends SpecificationElement {
      */
     public Map<LocationVariable, Term> getInternalModifies();
 
+    /**
+     * Returns the term internally used for the modifies clause.
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     * @return The map with a modifies clause for each heap location.
+     */
+    public Map<LocationVariable, Term> getInternalFreeModifies();
+
     public Map<LocationVariable,
                ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
 
@@ -170,8 +200,9 @@ public interface LoopSpecification extends SpecificationElement {
      * @param pm the new program method.
      * @param kjt the new KeYJavaType.
      * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
+     * @param freeInvariants the new free loop invariant clauses.
      * @param modifies the new modifies clauses.
+     * @param freeModifies the new free modifies clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant term.
      * @param selfTerm the new self term.
@@ -186,6 +217,7 @@ public interface LoopSpecification extends SpecificationElement {
                                     Map<LocationVariable, Term> invariants,
                                     Map<LocationVariable, Term> freeInvariants,
                                     Map<LocationVariable, Term> modifies,
+                                    Map<LocationVariable, Term> freeModifies,
                                     Map<LocationVariable,
                                         ImmutableList<InfFlowSpec>> infFlowSpecs,
                                     Term variant,
@@ -199,8 +231,9 @@ public interface LoopSpecification extends SpecificationElement {
      * where the arguments given are replaced.
      * @param loop the new loop statement.
      * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
+     * @param freeInvariants the new free loop invariant clauses.
      * @param modifies the new modifies clauses.
+     * @param freeModifies the new free modifies clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant term.
      * @param selfTerm the new self term.
@@ -213,6 +246,7 @@ public interface LoopSpecification extends SpecificationElement {
                                     Map<LocationVariable, Term> invariants,
                                     Map<LocationVariable, Term> freeInvariants,
                                     Map<LocationVariable, Term> modifies,
+                                    Map<LocationVariable, Term> freeModifies,
                                     Map<LocationVariable,
                                         ImmutableList<InfFlowSpec>> infFlowSpecs,
                                     Term variant,
@@ -240,8 +274,9 @@ public interface LoopSpecification extends SpecificationElement {
      * information flow specification elements, and a loop variant,
      * possibly together with (if any) "free" loop invariant clauses.
      * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
+     * @param freeInvariants the new free loop invariant clauses.
      * @param modifies the new modifies clauses.
+     * @param freeModifies the new free modifies clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant.
      * @return The configured loop specification.
@@ -249,6 +284,7 @@ public interface LoopSpecification extends SpecificationElement {
     public LoopSpecification configurate(Map<LocationVariable, Term> invariants,
                                          Map<LocationVariable, Term> freeInvariants,
                                          Map<LocationVariable, Term> modifies,
+                                         Map<LocationVariable, Term> freeModifies,
                                          Map<LocationVariable,
                                                  ImmutableList<InfFlowSpec>> infFlowSpecs,
                                          Term variant);
