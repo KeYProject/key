@@ -564,7 +564,7 @@ public class ContractFactory {
                     // To obtain meaningful results, check for equality ignoring all term labels!
                     if (uniformMod.containsKey(h) && !uniformMod.get(h).equalsModTermLabels(m2)) {
                         uniformMod.remove(h);
-                    } else {
+                    } else if (uniformMod.containsKey(h)) {
                         // merge term labels (in particular origin labels) of both modifies terms
                         uniformMod.put(h, mergeTermLabels(uniformMod.get(h), m2, tb));
                     }
