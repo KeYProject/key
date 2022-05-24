@@ -134,6 +134,7 @@ public class LIGNew {
 //			System.out.println("BEFORE UNWIND");
 
 //			System.out.println(goalsAfterShift);
+//			System.out.println("Goals Before Unwind:" + goalsAfterShift);
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("AFTER UNWIND");
@@ -180,8 +181,6 @@ public class LIGNew {
 		
 		allDepPreds.addAll(allCompPreds);
 		
-		
-
 
 //		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 //		for (Term term : allDepPreds) {

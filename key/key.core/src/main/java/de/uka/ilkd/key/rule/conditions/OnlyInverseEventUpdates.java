@@ -38,7 +38,7 @@ public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 		
 		final Operator op = update.op();
 		
-		if(op instanceof ElementaryUpdate || 
+		if (op instanceof ElementaryUpdate ||
 				op == UpdateJunctor.SKIP ||
 				op == EventUpdate.SINGLETON ||
 				op == AnonEventUpdate.SINGLETON) {

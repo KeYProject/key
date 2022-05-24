@@ -29,7 +29,7 @@ import java.io.IOException;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 40000;
+	private static final int MAX_RULE_APP = 100000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -52,16 +52,12 @@ public class RuleApplication {
 		sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
 		sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
 		sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
-		sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_DELAYED);
-		sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings()
-				.setMaxSteps(MAX_RULE_APP);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
 		ps.getProof().getSettings().getStrategySettings().setTimeout(TIME_OUT);
-		;
 		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setTimeout(TIME_OUT);
 
 		ps.setMaxRuleApplications(MAX_RULE_APP);// Only Change This

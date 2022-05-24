@@ -35,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 40000);
+		this(s, sequent, 100000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -420,16 +420,16 @@ public class SideProof {
 //			System.out.println(" proof could not be closed for " + ps.getProof());
 //			System.out.println(" proof could not be closed for " + seq2prove.succedent());
 //		**		
-		try {
-				new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
-				System.out.println(COUNTER);
-			} catch (IOException e) {
-//				 TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			COUNTER++;
-//		}
-		System.out.println(closed);
+//		try {
+//				new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
+//				System.out.println(COUNTER);
+//			} catch (IOException e) {
+////				 TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			COUNTER++;
+////		}
+//		System.out.println(closed);
 		return closed;
 	}
 static long COUNTER=0;
