@@ -808,6 +808,7 @@ public class ContractFactory {
         Map<LocationVariable, Term> freePosts = new LinkedHashMap<>(t.originalFreePosts.size());
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             hasMod.put(h, false);
+            hasFreeMod.put(h, false);
             Term oriPost = t.originalPosts.get(h);
             Term oriFreePost = t.originalFreePosts.get(h);
             if (oriPost != null) {
