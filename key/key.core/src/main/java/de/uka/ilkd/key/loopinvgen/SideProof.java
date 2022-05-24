@@ -35,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 100000);
+		this(s, sequent, 40000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
