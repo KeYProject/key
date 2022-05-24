@@ -1,19 +1,13 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.loopinvgen.RelaxedShiftUpdateRule;
+import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
@@ -220,6 +214,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
 
+        // Dependencies
+        final Feature shiftUpdateF = shiftUpdateFeature();
+        final Feature relaxedShiftUpdateF = relaxedShiftUpdateFeature();
+
+
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
@@ -228,10 +227,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+                shiftUpdateF, relaxedShiftUpdateF, // dependencies
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
                 ifMatchedF, dispatcher);
+    }
+
+    private Feature shiftUpdateFeature() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(ShiftUpdateRule.SHIFT_RULE);
+        return ConditionalFeature.createConditional(filter, inftyConst());
+    }
+
+    private Feature relaxedShiftUpdateFeature() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(RelaxedShiftUpdateRule.RELAXED_SHIFT_RULE);
+        return ConditionalFeature.createConditional(filter, inftyConst());
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -644,7 +656,63 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
+        setupDependencyPredicateStrategy(d);
+
         return d;
+    }
+
+    private void setupDependencyPredicateStrategy(RuleSetDispatchFeature d) {
+
+        // move lookup of functions to LDT
+        DependenciesLDT depLDT = getServices().getTypeConverter().getDependenciesLDT();
+        final Operator noRaW = depLDT.getNoRaW();
+        final Operator noWaR = depLDT.getNoWaR();
+        final Operator noWaW = depLDT.getNoWaW();;
+        final Operator noR = depLDT.getNoR();;
+        final Operator noW = depLDT.getNoW();;
+
+
+        final TermFeature isDepPredicate = or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
+        bindRuleSet(d, "pull_out_dep_locations",
+                add(applyTF(FocusProjection.create(1), isDepPredicate),
+                        applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
+                        longConst(100)));
+
+        final Operator setMinus = getServices().getTypeConverter().getLocSetLDT().getSetMinus();
+        final ProjectionToTerm findLocSet = sub(FocusProjection.create(0), 0);
+
+/*		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
+				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0)));
+*/
+        TermBuffer assumesLocSet = new TermBuffer();
+        TermBuffer findSubTerms = new TermBuffer();
+        final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
+                let(assumesLocSet, instOfNonStrict("loc1"),
+                        sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
+                                ifZero(applyTF(findSubTerms,op(setMinus)), not(eq(assumesLocSet, sub(findSubTerms,1))), longConst(0)))), longConst(0));
+
+
+//		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
+//				forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
+//						not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
+//
+        bindRuleSet(d, "dep_setMinus", noDoubleMinus);
+
+        bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));//EqNonDuplicateAppFeature
+
+        Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
+
+        bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
+        bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
+        bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
+        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(0)));
+        bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));//-500
+        bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
+
+        //This one is not used anymore:
+        bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-100)));
+
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
