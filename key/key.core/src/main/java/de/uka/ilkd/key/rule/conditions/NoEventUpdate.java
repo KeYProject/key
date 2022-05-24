@@ -46,17 +46,15 @@ public class NoEventUpdate extends VariableConditionAdapter {
 		
 		final Operator op = update.op();
 		
-		if(op instanceof ElementaryUpdate || 
-				op == UpdateJunctor.SKIP) {
+		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == InverseEventUpdate.SINGLETON) {
 			return false;
-		} else if (op==EventUpdate.SINGLETON) {
+		} else if (op==EventUpdate.SINGLETON || op == AnonEventUpdate.SINGLETON) {
 			return true;
-		} else if (op==UpdateJunctor.PARALLEL_UPDATE) {
+		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForEvent(update.sub(0)) || checkForEvent(update.sub(1)));
 		} else if(op == UpdateApplication.UPDATE_APPLICATION) {
 			return checkForEvent(update.sub(1));
 		}
-		
 		Debug.fail("Forgotten update operator", op.getClass());
 		return true;
 	}
