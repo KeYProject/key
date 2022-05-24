@@ -130,7 +130,7 @@ public class OutputStreamProofSaver {
         try (var ps = new PrintWriter(out, true)) {
             final ProofOblInput po = proof.getServices()
                     .getSpecificationRepository().getProofOblInput(proof);
-
+            printer = createLogicPrinter(proof.getServices(), false);
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
 
