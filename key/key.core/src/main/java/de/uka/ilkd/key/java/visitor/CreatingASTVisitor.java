@@ -183,6 +183,35 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         }
     }
 
+    // Bugfix in 2021: This has been made similar to the while case.
+    // (without fully understanding the former)
+    @Override
+    public void performActionOnFor(final For x) {
+        ExtList changeList = stack.peek();
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            PositionInfo pos = changeList
+                    .removeFirstOccurrence(PositionInfo.class);
+            if (!preservesPositionInfo) {
+                pos = PositionInfo.UNDEFINED;
+            }
+            ILoopInit loopInit = changeList.removeFirstOccurrence(ILoopInit.class);
+            Guard g = changeList.removeFirstOccurrence(Guard.class);
+            IForUpdates updates = changeList.removeFirstOccurrence(IForUpdates.class);
+            Statement body = changeList.removeFirstOccurrence(Statement.class);
+
+            For newX = new For(loopInit, g, updates, body);
+            performActionOnLoopInvariant(x, newX);
+            performActionOnLoopContract(x, newX);
+            addChild(newX);
+            changed();
+        } else {
+            doDefaultAction(x);
+            performActionOnLoopInvariant(x, x);
+            performActionOnLoopContract(x, x);
+        }
+    }
+
     // eee
     @Override
     public void performActionOnDo(Do x) {
@@ -479,20 +508,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return new Continue(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnFor(final For x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                For newFor = new For(changeList);
-                performActionOnLoopInvariant((For) pe, newFor);
-                performActionOnLoopContract(x, newFor);
-                return newFor;
             }
         };
         def.doAction(x);
