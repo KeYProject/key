@@ -795,9 +795,10 @@ public final class UseOperationContractRule implements BuiltInRule {
                 tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
                         tb.var(heap));
             } else {
+                Term m = mods.get(heap);
+                Term mf = freeMods.get(heap);
                 tAnon = createAnonUpdate(heap, inst.pm,
-                        tb.intersect(mods.getOrDefault(
-                                heap, tb.allLocs()), freeMods.getOrDefault(heap, tb.allLocs())),
+                        tb.intersect(m != null ? m : tb.allLocs(), mf != null ? mf : tb.allLocs()),
                                 services);
             }
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
