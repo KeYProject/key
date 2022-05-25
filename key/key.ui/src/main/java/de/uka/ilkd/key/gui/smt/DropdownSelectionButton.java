@@ -3,6 +3,8 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -10,6 +12,9 @@ import java.util.function.Function;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.plaf.basic.BasicTreeUI;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -93,6 +98,11 @@ public class DropdownSelectionButton {
      * The dropdown menu that opens when clicking the selection button.
      */
     private JPopupMenu menu;
+
+    /**
+     * True iff the next time the selection button's action is carried out it should open the popup menu.
+     */
+    private boolean buttonShouldOpenMenu = true;
 
     /**
      * Create a new DropdownSelectionButton with a given icon size used to display the selection
@@ -272,26 +282,56 @@ public class DropdownSelectionButton {
     protected JButton getSelectionButton() {
         if (selectionComponent == null) {
             selectionComponent = new JButton();
-            selectionComponent.setFocusable(false);
-            selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
-            selectionComponent.addActionListener(e -> {
-                if (items.length == 0) {
-                    return;
-                } else {
-                    OptionalInt width = Arrays.stream(getMenu().getComponents())
-                            .mapToInt(c -> c.getPreferredSize().width).max();
-                    if (width.isEmpty()) {
-                        width = OptionalInt.of(0);
-                    }
-                    int newWidth = Math.max(width.getAsInt(),
-                            actionComponent.getWidth() + selectionComponent.getWidth());
-                    getMenu().setPopupSize(
-                            newWidth,
-                            Arrays.stream(getMenu().getComponents())
-                                    .mapToInt(c -> c.getPreferredSize().height).sum());
-                    getMenu().show(getActionButton(), 0, getActionButton().getHeight());
+            /* If the mouse is on the button and the button gets pressed (mouse is clicked),
+            the popup menu will close. The button action will only be carried out afterwards,
+            thus opening the popup menu up again - avoid that using the listener and flag:
+            If the mouse enters the button while the menu is visible, clicking the button
+            should not invoke the opening action.
+             */
+            selectionComponent.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    buttonShouldOpenMenu = !getMenu().isVisible();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    buttonShouldOpenMenu = true;
                 }
             });
+            selectionComponent.setAction(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (items.length == 0) {
+                        return;
+                    } else {
+                        if (!buttonShouldOpenMenu) {
+                            // Do nothing if the button should not open the menu.
+                            // If the menu is not visible anymore after clicking the button, change the button'S
+                            // behaviour for the next click (no matter whether the mouse moves).
+                            buttonShouldOpenMenu = !getMenu().isVisible();
+                            return;
+                        }
+                        OptionalInt width = Arrays.stream(getMenu().getComponents())
+                                .mapToInt(c -> c.getPreferredSize().width).max();
+                        if (width.isEmpty()) {
+                            width = OptionalInt.of(0);
+                        }
+                        int newWidth = Math.max(width.getAsInt(),
+                                actionComponent.getWidth() + selectionComponent.getWidth());
+                        getMenu().setPopupSize(
+                                newWidth,
+                                Arrays.stream(getMenu().getComponents())
+                                        .mapToInt(c -> c.getPreferredSize().height).sum());
+                        getMenu().show(getActionButton(), 0, getActionButton().getHeight());
+                        // If the menu is open and the mouse does not leave the button,
+                        // make sure the button still does not reopen the menu after the next click.
+                        buttonShouldOpenMenu = false;
+                    }
+                }
+            });
+            selectionComponent.setFocusable(false);
+            selectionComponent.setIcon(IconFactory.selectDecProcArrow(iconSize));
         }
         return selectionComponent;
     }
@@ -308,12 +348,14 @@ public class DropdownSelectionButton {
             // Enable the selection button iff the action button is enabled as well.
             actionComponent.addChangeListener(e ->
                     getSelectionButton().setEnabled(actionComponent.isEnabled()));
+            actionComponent.setFocusPainted(false);
         }
         return actionComponent;
     }
 
     /**
      * (Create and) return the dropdown popup menu that is opened by the selection component.
+     * Deletes all added components when the menu is null, thus leading a completely fresh and empty menu.
      *
      * @return the popup menu opened by the selection button
      */
@@ -331,8 +373,8 @@ public class DropdownSelectionButton {
      * action out of all the selected actions.
      *
      * @param it        the selectable actions
-     * @param reduce   the function used to collapse multiple selected actions into one for the
-     *                 action component
+     * @param reduce    the function used to collapse multiple selected actions into one for the
+     *                  action component
      * @param maxChoice the maximum amount of actions that can be selected,
      *                  this is assumed to be at least 1 (otherwise it is changed to be 1)
      */
@@ -381,9 +423,11 @@ public class DropdownSelectionButton {
      * @param newMenuItems the new actions that can be selected
      */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
-        for (Component comp : getMenu().getComponents()) {
-            getMenu().remove(comp);
-        }
+        // The menu could also be reused (just clear all its components first), but that leads to
+        // weird behaviour when going from menu items with checkboxes to normal menu items [see #setItems(...)]:
+        // The space where the checkbox would be if the menu item had one is also free for checkbox-less menu items
+        // (rather than that empty space on the left, one would just expect the text to be completely on the left).
+        menu = null;
         for (JMenuItem item : newMenuItems) {
             getMenu().add(item);
         }
@@ -570,7 +614,7 @@ public class DropdownSelectionButton {
                 }
             });
             // tooltip of the menu item:
-            setToolTipText("On double click: " + action.getValue(Action.SHORT_DESCRIPTION));
+            setToolTipText("On double-click: " + action.getValue(Action.SHORT_DESCRIPTION));
             doubleClickAction = action;
         }
 
@@ -602,7 +646,7 @@ public class DropdownSelectionButton {
         }
 
         /**
-         * On double click, select this item AND execute the corresponding action.
+         * On double-click, select this item AND execute the corresponding action.
          * @param e the event that is processed by this item
          */
         @Override
@@ -634,7 +678,7 @@ public class DropdownSelectionButton {
         private final transient Action action;
 
         /**
-         * Create a new MyJMenuItem.
+         * Create a new SelectionMenuItem.
          *
          * @param item the menu item's {@link #action}.
          */
