@@ -155,8 +155,8 @@ public class SideProof {
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
-		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
-		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempAnteToAdd = new HashSet<>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<>();
 		int size;
 
 		do {

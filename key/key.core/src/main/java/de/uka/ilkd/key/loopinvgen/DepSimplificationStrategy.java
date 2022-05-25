@@ -28,7 +28,7 @@ public class DepSimplificationStrategy extends JavaCardDLStrategy {
         bindRuleSet(d, "dep_pred_known", inftyConst());//+100
         bindRuleSet(d, "dep_pred_known_2", inftyConst());//+100
         bindRuleSet(d, "dep_pred_known_2b", inftyConst());
-        //bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));//-500
+        bindRuleSet(d, "dep_pred_known_3", inftyConst());//add(noDoubleMinus,longConst(-500)));//-500
         bindRuleSet(d, "saturate_dep_locset_relations_def", inftyConst());//add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
 
         return add(d, global);
