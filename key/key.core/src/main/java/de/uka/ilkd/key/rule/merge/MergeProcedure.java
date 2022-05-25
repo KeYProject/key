@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
- * @see MergeWithSignLattice
+ * @see de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction
  */
 public abstract class MergeProcedure {
 

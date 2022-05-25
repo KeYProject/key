@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -130,7 +131,6 @@ public class OutputStreamProofSaver {
             final ProofOblInput po = proof.getServices()
                     .getSpecificationRepository().getProofOblInput(proof);
             printer = createLogicPrinter(proof.getServices(), false);
-
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
 
@@ -201,8 +201,7 @@ public class OutputStreamProofSaver {
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
-                ps.println(printer.result());
+                ps.println(printSequentAsFormula(problemSeq, proof.getServices()));
                 ps.println("}\n");
             }
 
@@ -848,6 +847,28 @@ public class OutputStreamProofSaver {
             // try to String by chance
             return new StringBuffer(val.toString());
         }
+    }
+
+    private static StringBuffer printSequentAsFormula(Sequent seq, Services services) {
+        final LogicPrinter printer = createLogicPrinter(services,
+                services == null);
+
+        final TermBuilder tb = services.getTermBuilder();
+        final Term antecedent =
+                tb.and(Arrays.stream(seq.antecedent().asList().toArray(new SequentFormula[0])).
+                    map(SequentFormula::formula).collect(Collectors.toList()));
+        final Term succedent =
+                tb.or(Arrays.stream(seq.succedent().asList().toArray(new SequentFormula[0])).
+                        map(SequentFormula::formula).collect(Collectors.toList()));
+
+        try {
+            printer.printTerm(tb.imp(antecedent, succedent));
+        } catch(IOException e) {
+            e.printStackTrace();
+            return new StringBuffer("ERROR" + seq.toString());
+        }
+
+        return printer.result();
     }
 
     private static StringBuffer printSequent(Sequent val, Services services) {

@@ -2,14 +2,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.InverseEventUpdate;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -45,18 +38,20 @@ public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 		
 		final Operator op = update.op();
 		
-		if(op instanceof ElementaryUpdate || 
-				op == UpdateJunctor.SKIP) {
+		if (op instanceof ElementaryUpdate ||
+				op == UpdateJunctor.SKIP ||
+				op == EventUpdate.SINGLETON ||
+				op == AnonEventUpdate.SINGLETON) {
 			return false;
 		} else if (op==InverseEventUpdate.SINGLETON) {
 			return true;
-		} else if (op==UpdateJunctor.PARALLEL_UPDATE) {
+		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForInverseEvent(update.sub(0)) && checkForInverseEvent(update.sub(1)));
-		} else if(op == UpdateApplication.UPDATE_APPLICATION) {
+		} else if (op == UpdateApplication.UPDATE_APPLICATION) {
 			return checkForInverseEvent(update.sub(1));
 		}
-		
 		Debug.fail("Forgotten update operator", op.getClass());
+
 		return false;
 	}
 	

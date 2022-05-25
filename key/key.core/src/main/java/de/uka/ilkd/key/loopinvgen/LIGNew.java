@@ -131,11 +131,17 @@ public class LIGNew {
 			oldDepPreds.addAll(allDepPreds);
 			oldCompPreds.addAll(allCompPreds);
 
+//			System.out.println("BEFORE UNWIND");
+
+//			System.out.println(goalsAfterShift);
+//			System.out.println("Goals Before Unwind:" + goalsAfterShift);
+
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-//			System.out.println("UNWIND");
+//			System.out.println("AFTER UNWIND");
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
+
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
@@ -146,6 +152,8 @@ public class LIGNew {
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
+
+
 			PredicateRefinementNew3 pr = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
 					allCompPreds, index, itrNumber);
 			refinedPreds = pr.predicateCheckAndRefine();
@@ -173,8 +181,6 @@ public class LIGNew {
 		
 		allDepPreds.addAll(allCompPreds);
 		
-		
-
 
 //		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 //		for (Term term : allDepPreds) {

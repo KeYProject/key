@@ -51,7 +51,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
-	
+
 	if(!xInst.op().isRigid() || xInst.op().arity() == 0) {
 	    return null;
 	}

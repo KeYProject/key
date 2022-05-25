@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyIO;
 import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -42,17 +43,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
@@ -187,6 +177,31 @@ public class MergeRuleUtils {
     }
 
     /**
+     * Returns all event updates of a parallel update.
+     *
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getEventUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+            // do nothing
+        } else if (u.op() instanceof EventUpdate) {
+            result.add(u);
+        } else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getEventUpdates(sub));
+            }
+        } else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
+    }
+
+    /**
      * @param u
      *            The update (in normal form) to extract program locations from.
      * @return All program locations (left sides) in the given update.
@@ -200,6 +215,8 @@ public class MergeRuleUtils {
                     .add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
             return result;
 
+        } else if (u.op() instanceof EventUpdate) {
+            return DefaultImmutableSet.nil();
         } else if (u.op() instanceof UpdateJunctor) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
@@ -227,6 +244,8 @@ public class MergeRuleUtils {
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
+        } else if (u.op() instanceof EventUpdate) {
+            // do nothing
         } else if (u.op() instanceof UpdateJunctor) {
             for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
@@ -641,7 +660,7 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Checks if an update is of the form { x := v || ... || z := q}.
+     * Checks if an update is of the form { x := v || ... || z := q || \event() ...}.
      *
      * @param u
      *            Update to check.
@@ -649,6 +668,8 @@ public class MergeRuleUtils {
      */
     public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
+            return true;
+        }  else if (u.op() instanceof EventUpdate) {
             return true;
         } else if (u.op() instanceof UpdateJunctor) {
             boolean result = true;
@@ -900,8 +921,7 @@ public class MergeRuleUtils {
      * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
      *
-     * @see #simplify(Proof, Term)
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
+     * @see #simplify(Proof, Term, int)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
             boolean countDisjunctions, int timeout) {
@@ -954,7 +974,7 @@ public class MergeRuleUtils {
      *            First element to check equality (mod renaming) for.
      * @param se2
      *            Second element to check equality (mod renaming) for.
-     * @param goal
+     * @param node
      *            The goal of the current branch (for getting branch-unique
      *            names).
      * @param services
@@ -1017,7 +1037,7 @@ public class MergeRuleUtils {
      *            Second path condition to merge.
      * @param services
      *            The services object.
-     * @param timeout
+     * @param simplificationTimeout
      *            Time in milliseconds after which the side proof is aborted.
      * @return A path condition that is equivalent to the disjunction of the two
      *         supplied formulae, but possibly simpler.
@@ -1193,14 +1213,14 @@ public class MergeRuleUtils {
      * different branches declaring local variables.
      * <p>
      *
-     * @param goal
-     *            Current goal.
+     * @param node
+     *            Current node.
      * @param pio
      *            Position of update-program counter formula in goal.
      * @param services
      *            The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
+     * @see #sequentToSETriple(Node, PosInOccurrence, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node,
             PosInOccurrence pio, Services services) {
@@ -1227,7 +1247,7 @@ public class MergeRuleUtils {
      * nodes are then of course potentially different from their predecessors
      * concerning the involved local variable symbols.
      *
-     * @param goal
+     * @param node
      *            Current goal.
      * @param pio
      *            Position of update-program counter formula in goal.
@@ -1423,7 +1443,7 @@ public class MergeRuleUtils {
      *
      * @param input
      *            Input to parse.
-     * @param Services
+     * @param services
      *            The services object.
      * @return A pair of parsed sort and name for the placeholder.
      * @throws NameAlreadyBoundException
@@ -1448,7 +1468,7 @@ public class MergeRuleUtils {
      * @param registerInNamespaces
      *            Flag to indicate whether the parsed placeholder should be
      *            registered in the namespaces.
-     * @param Services
+     * @param services
      *            The services object.
      * @return A pair of parsed sort and name for the placeholder.
      * @throws NameAlreadyBoundException
@@ -1822,7 +1842,7 @@ public class MergeRuleUtils {
 
     /**
      * Simplifies the given {@link Term} in a side proof with splits. This code
-     * has been copied from {@link SymbolicExecutionUtil} and only been slightly
+     * has been copied from {link SymbolicExecutionUtil} and only been slightly
      * modified (to allow for splitting the proof).
      *
      * @param parentProof
@@ -1835,7 +1855,6 @@ public class MergeRuleUtils {
      * @throws ProofInputException
      *             Occurred Exception.
      *
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
@@ -1895,12 +1914,12 @@ public class MergeRuleUtils {
 
     /**
      * Tells whether a name is unique in the passed list of global variables.
+     * see VariableNamer#isUniqueInGlobals(String, Iterable<IProgramVariable>)
      *
      * @param name
      *            The name to check uniqueness for.
      * @param globals
      *            The global variables for the givan branch.
-     * @see VariableNamer#isUniqueInGlobals(String, Globals)
      */
     private static boolean isUniqueInGlobals(String name,
             Iterable<IProgramVariable> globals) {
@@ -2225,7 +2244,7 @@ public class MergeRuleUtils {
     /**
      * Map for renaming variables to their branch-unique names. Putting things
      * into this map has absolutely no effect; the get method just relies on the
-     * {@link LocationVariable#getBranchUniqueName()} method of the respective
+     * (see LocationVariable#getBranchUniqueName()) method of the respective
      * location variable. Therefore, this map is also a singleton object.
      *
      * @author Dominic Scheurer

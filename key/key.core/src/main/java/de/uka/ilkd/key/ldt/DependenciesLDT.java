@@ -23,6 +23,12 @@ public class DependenciesLDT extends LDT {
     private final Function noWaR;
     private final Function noWaW;
 
+    private final Function noWAtHistory;
+    private final Function noRAtHistory;
+    private final Function noRaWAtHistory;
+    private final Function noWaRAtHistory;
+    private final Function noWaWAtHistory;
+
     private final Function relaxedNoR;
     private final Function relaxedNoW;
     private final Function relaxedNoRaW;
@@ -44,6 +50,12 @@ public class DependenciesLDT extends LDT {
         noRaW = addFunction(services, "noRaW");
         noWaR = addFunction(services, "noWaR");
         noWaW = addFunction(services, "noWaW");
+
+        noWAtHistory = addFunction(services, "noWAtHistory");
+        noRAtHistory = addFunction(services, "noRAtHistory");
+        noRaWAtHistory = addFunction(services, "noRaWAtHistory");
+        noWaRAtHistory = addFunction(services, "noWaRAtHistory");
+        noWaWAtHistory = addFunction(services, "noWaWAtHistory");
 
         relaxedNoR = addFunction(services, "relaxedNoR");
         relaxedNoW = addFunction(services, "relaxedNoW");

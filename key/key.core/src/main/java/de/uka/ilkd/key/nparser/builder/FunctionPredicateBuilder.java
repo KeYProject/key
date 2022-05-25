@@ -78,8 +78,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     Sort.FORMULA,
                     argSorts.toArray(new Sort[0]),
                     whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    false, false,
-                    isRigid);
+                    false, isRigid,
+                    false);
                 ;
         }
 

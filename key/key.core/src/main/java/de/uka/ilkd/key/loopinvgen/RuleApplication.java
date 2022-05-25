@@ -23,6 +23,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import java.io.File;
+import java.io.IOException;
+
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
@@ -53,10 +56,8 @@ public class RuleApplication {
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings()
-				.setMaxSteps(MAX_RULE_APP);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
 		ps.getProof().getSettings().getStrategySettings().setTimeout(TIME_OUT);
-		;
 		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setTimeout(TIME_OUT);
 
 		ps.setMaxRuleApplications(MAX_RULE_APP);// Only Change This
@@ -238,7 +239,13 @@ public class RuleApplication {
 			ImmutableList<Goal> goals = currentGoal.apply(app);
 
 			ApplyStrategyInfo info = ps.start(goals);
-
+//			try {
+//			System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//
+//			new ProofSaver(ps.getProof(), new File("/Users/bubel/tmp/testAfterSEAfterShift.key")).save();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 //			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
 //			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
 //			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
