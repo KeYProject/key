@@ -29,11 +29,11 @@ public class SideProof {
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
-	private int maxRuleApp;
+	private final int maxRuleApp;
 
 	// cache
 	// the key of the cache is a set, i.e., the order of the terms is not of relevance
-	class CacheKey {
+	static class CacheKey {
 		final Term t1;
 		final Term t2;
 
@@ -62,7 +62,15 @@ public class SideProof {
 			return t1.hashCode() + t2.hashCode();
 		}
 	}
-	private static LRUCache<CacheKey, Sequent> cache = new LRUCache(100);
+	static class CacheValue {
+		Sequent seq;
+		int hitCount;
+
+		public CacheValue(Sequent seq) {
+			this.seq = seq;
+		}
+	}
+	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
 
 	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
@@ -99,10 +107,10 @@ public class SideProof {
 
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-		if (!closed) {
+//		if (!closed) {
 //			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
 //			System.out.println(loc1 + " is NOT subset of " + loc2);
-		}
+//		}
 		return closed;
 	}
 
@@ -131,13 +139,31 @@ public class SideProof {
 	 */
 	private Sequent prepareSideProof(Term ts1, Term ts2) {
 		final CacheKey key = new CacheKey(ts1, ts2);
-		Sequent sideSeq = cache.get(key);
+		CacheValue value= cache.get(key);
 
-		if (sideSeq != null) {
+		Sequent sideSeq;
+		if (value != null) {
+			value.hitCount++;
+			sideSeq = value.seq;
+			if (value.hitCount == 2) {
+				// if the seq is request at least twice we perform some simplifications to
+				// avoid repetitions
+				try {
+					ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, services);
+					if (info.getProof().openGoals().size() != 1) {
+						throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
+					}
+					sideSeq = info.getProof().openGoals().head().sequent();
+				} catch (ProofInputException e) {
+					e.printStackTrace();
+				}
+				value.seq = sideSeq;
+			}
+
 			return sideSeq;
 		}
 		sideSeq = Sequent.EMPTY_SEQUENT;
-		Set<Term> locSetVars = new HashSet<Term>();
+		Set<Term> locSetVars = new HashSet<>();
 
 		if (ts1.subs().isEmpty()) {
 			locSetVars.addAll(collectProgramAndLogicVariables(ts1));
@@ -154,7 +180,7 @@ public class SideProof {
 			}
 		}
 
-		Set<Term> anteFmlVars = new HashSet<Term>();
+		Set<Term> anteFmlVars;
 		Set<SequentFormula> tempAnteToAdd = new HashSet<>();
 		Set<SequentFormula> tempSuccToAdd = new HashSet<>();
 		int size;
@@ -174,7 +200,7 @@ public class SideProof {
 				}
 			}
 
-			Set<Term> succFmlVars = new HashSet<Term>();
+			Set<Term> succFmlVars;
 			for (SequentFormula sfSucc : seq.succedent()) {
 				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
 				for (Term tfv : succFmlVars) {
@@ -189,17 +215,7 @@ public class SideProof {
 			}
 		} while (size != locSetVars.size());
 
-		try {
-			ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, services);
-			if (info.getProof().openGoals().size() != 1) {
-				throw new ProofInputException("simplification of sequent failed. Open goals "+info.getProof().openGoals().size());
-			}
-			sideSeq = info.getProof().openGoals().head().sequent();
-		} catch (ProofInputException e) {
-			e.printStackTrace();
-		}
-
-		cache.put(key, sideSeq);
+		cache.put(key, new CacheValue(sideSeq));
 		return sideSeq;
 	}
 
@@ -232,22 +248,9 @@ public class SideProof {
 	}
 
 	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove, int maxRuleApp, boolean simplifyOnly, Services services) throws ProofInputException {
-		TermBuilder tb = services.getTermBuilder();
+		//		System.out.println("isProvable: " + seq2prove);
 
 		final ProofStarter ps = new ProofStarter(false);
-//		System.out.println("isProvable: " + seq2prove);
-
-//		Term antec = tb.tt();
-//		for (SequentFormula sf : seq2prove.antecedent()) {
-//			antec = tb.and(antec, sf.formula());
-//		}
-//
-//		Term succ = tb.ff();
-//		for (SequentFormula sf : seq2prove.succedent()) {
-//			succ = tb.or(succ, sf.formula());
-//		}
-//
-//		seq2prove = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antec, succ)), false, true).sequent();
 
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
 
@@ -256,11 +259,12 @@ public class SideProof {
 		StrategyProperties sp = null;
 		
 		if (simplifyOnly) {
-			ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> defaults = ps.getProof().getActiveStrategyFactory().getSettingsDefinition().getFurtherDefaults();
+			var defaults =
+					ps.getProof().getActiveStrategyFactory().getSettingsDefinition().getFurtherDefaults();
 			//Simplification
-			for (var t : defaults) {
-				if (t.first.equals("Simplification")) {
-					sp = ((IDefaultStrategyPropertiesFactory)t.third).createDefaultStrategyProperties();
+			for (var el : defaults) {
+				if (el.first.equals("Simplification")) {
+					sp = el.third.createDefaultStrategyProperties();
 					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
 					break;
 				}
@@ -280,8 +284,7 @@ public class SideProof {
 
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
-		final ApplyStrategyInfo info = ps.start();
-		return info;
+		return ps.start();
 	}
 
 	protected boolean isProvable(Sequent seq2prove, Services services) {
@@ -331,7 +334,7 @@ static long COUNTER=0;
 //	}
 
 	private Set<Term> collectProgramAndLogicVariables(Term term) {
-		Set<Term> res = new HashSet<Term>();
+		Set<Term> res = new HashSet<>();
 		if (!term.containsJavaBlockRecursive()) {
 			if (term.op() instanceof ProgramVariable) {
 				res.add(term);
