@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashSet;
@@ -36,14 +38,43 @@ public class PredicateRefinementNew3 {
 		services = s;
 		depPredicates = depPredList;
 		compPredicates = compPredList;
-		seq = sequent;
-		sProof = new SideProof(services, seq);
 		depLDT = services.getTypeConverter().getDependenciesLDT();
 		locsetLDT = services.getTypeConverter().getLocSetLDT();
 		tb = services.getTermBuilder();
 		index = i;
 		intLDT = services.getTypeConverter().getIntegerLDT();
 		itrNumber = itr;
+		//seq = filter(sequent);
+		seq=simplify(filter(sequent));
+		sProof = new SideProof(services, seq);
+	}
+
+	private Sequent simplify(Sequent sequent) {
+		try {
+			ApplyStrategyInfo info = SideProof.isProvableHelper(sequent, 1000, true, services);
+			if (info.getProof().openGoals().size() != 1) {
+				throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
+			}
+			sequent = info.getProof().openGoals().head().sequent();
+		} catch (ProofInputException e) {
+			e.printStackTrace();
+		}
+		return sequent;
+	}
+
+	private Sequent filter(Sequent originalSequent) {
+		Sequent sequent = Sequent.EMPTY_SEQUENT;
+
+		for (SequentFormula sequentFormula : originalSequent.antecedent()) {
+			sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+		}
+
+		for (SequentFormula sequentFormula : originalSequent.succedent()) {
+			if (!sequentFormula.formula().containsJavaBlockRecursive()) {
+				sequent = sequent.addFormula(sequentFormula, false, false).sequent();
+			}
+		}
+		return sequent;
 	}
 
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
@@ -122,19 +153,10 @@ public class PredicateRefinementNew3 {
 	private boolean sequentImpliesPredicate(Term pred) {
 //		**		
 		System.out.println("sequentImpliesPredicate is called for: "+pred);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
-		for (SequentFormula sequentFormula : seq.antecedent()) {
-			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
-		}
-
-		for (SequentFormula sequentFormula : seq.succedent()) {
-			if (!sequentFormula.formula().containsJavaBlockRecursive()) {
-				sideSeq = sideSeq.addFormula(sequentFormula, false, false).sequent();
-			}
-		}
+		Sequent sideSeq = seq.addFormula(new SequentFormula(pred), false, true).sequent();
 
 //		System.out.println("is Provable called for: " +  pred);
-		final boolean provable = sProof.isProvable(sideSeq, services);
+		final boolean provable = SideProof.isProvable(sideSeq, 100000, services);
 //		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
 //				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
 //				|| pred.op() == Equality.EQUALS)) {//

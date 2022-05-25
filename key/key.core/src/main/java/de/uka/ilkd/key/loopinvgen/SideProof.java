@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +18,11 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+import de.uka.ilkd.key.util.Triple;
+import org.key_project.util.LRUCache;
 
 public class SideProof {
 
@@ -26,6 +30,39 @@ public class SideProof {
 	private final TermBuilder tb;
 	private final Sequent seq;
 	private int maxRuleApp;
+
+	// cache
+	// the key of the cache is a set, i.e., the order of the terms is not of relevance
+	class CacheKey {
+		final Term t1;
+		final Term t2;
+
+		public CacheKey(Term t1, Term t2) {
+			this.t1 = t1;
+			this.t2 = t2;
+		}
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CacheKey sPair = (CacheKey) o;
+			if (!t1.equals(sPair.t1)) {
+				if (!t1.equals(sPair.t2)) {
+					return false;
+				} else {
+					return t2.equals(sPair.t1);
+				}
+			} else {
+				return t2.equals(sPair.t2);
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return t1.hashCode() + t2.hashCode();
+		}
+	}
+	private static LRUCache<CacheKey, Sequent> cache = new LRUCache(100);
 
 	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
@@ -41,9 +78,9 @@ public class SideProof {
 	boolean proofEquality(Term loc1, Term loc2) {
 //		System.out.println("proofEquality");
 		Term fml = tb.equals(loc1, loc2);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+		Sequent sideSeq = prepareSideProof(loc1, loc2);
+		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		sideSeq = prepareSideProof(loc1, loc2, sideSeq);
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
 //		if (closed) {
@@ -57,9 +94,9 @@ public class SideProof {
 	boolean proofSubSet(Term loc1, Term loc2) {
 //		System.out.println("proofSubSet");
 		Term fml = tb.subset(loc1, loc2);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+		Sequent sideSeq = prepareSideProof(loc1, loc2);
+		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		sideSeq = prepareSideProof(loc1, loc2, sideSeq);
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
 		if (!closed) {
@@ -72,10 +109,9 @@ public class SideProof {
 	boolean proofLT(Term ts1, Term ts2) {
 //		System.out.println("proofLT");
 		Term fml = tb.lt(ts1, ts2);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+		Sequent sideSeq = prepareSideProof(ts1, ts2);
+		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 //		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
-
-		sideSeq = prepareSideProof(ts1, ts2, sideSeq);
 
 		boolean closed = isProvable(sideSeq, services);
 //		if (closed) {
@@ -87,7 +123,20 @@ public class SideProof {
 		return closed;
 	}
 
-	private Sequent prepareSideProof(Term ts1, Term ts2, Sequent sideSeq) {
+	/**
+	 * initializes the sequent for the side proof depending on the terms t1 and ts2
+	 * @param ts1 Term used to initialize the sequent
+	 * @param ts2 Term used to initialize the sequent
+	 * @return the initialized sequent
+	 */
+	private Sequent prepareSideProof(Term ts1, Term ts2) {
+		final CacheKey key = new CacheKey(ts1, ts2);
+		Sequent sideSeq = cache.get(key);
+
+		if (sideSeq != null) {
+			return sideSeq;
+		}
+		sideSeq = Sequent.EMPTY_SEQUENT;
 		Set<Term> locSetVars = new HashSet<Term>();
 
 		if (ts1.subs().isEmpty()) {
@@ -139,18 +188,30 @@ public class SideProof {
 				}
 			}
 		} while (size != locSetVars.size());
+
+		try {
+			ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, services);
+			if (info.getProof().openGoals().size() != 1) {
+				throw new ProofInputException("simplification of sequent failed. Open goals "+info.getProof().openGoals().size());
+			}
+			sideSeq = info.getProof().openGoals().head().sequent();
+		} catch (ProofInputException e) {
+			e.printStackTrace();
+		}
+
+		cache.put(key, sideSeq);
 		return sideSeq;
 	}
 
 	boolean proofLEQ(Term ts1, Term ts2) {
 //		System.out.println("proofLEQ");
 		Term fml = tb.leq(ts1, ts2);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
 //		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
-		sideSeq = prepareSideProof(ts1, ts2, sideSeq);
+		Sequent sideSeq = prepareSideProof(ts1, ts2);
+		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		boolean closed = isProvable(sideSeq, services);
+		boolean closed = isProvable(sideSeq, maxRuleApp, services);
 //		if (closed) {
 //			System.out.println("Less than: " + sideSeq);
 //			System.out.println(
@@ -163,56 +224,81 @@ public class SideProof {
 	
 	boolean proofNonEmptyIntersection(Term ts1, Term ts2) {
 //		System.err.println("proofNonEmptyIntersection");
-		Term fml_1 = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml_1), false, true).sequent();
+		Term fml = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
+		Sequent sideSeq = prepareSideProof(ts1, ts2);
+		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		sideSeq = prepareSideProof(ts1, ts2, sideSeq);
+		return isProvable(sideSeq, maxRuleApp, services);
+	}
 
-		return isProvable(sideSeq, services);
+	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove, int maxRuleApp, boolean simplifyOnly, Services services) throws ProofInputException {
+		TermBuilder tb = services.getTermBuilder();
+
+		final ProofStarter ps = new ProofStarter(false);
+//		System.out.println("isProvable: " + seq2prove);
+
+//		Term antec = tb.tt();
+//		for (SequentFormula sf : seq2prove.antecedent()) {
+//			antec = tb.and(antec, sf.formula());
+//		}
+//
+//		Term succ = tb.ff();
+//		for (SequentFormula sf : seq2prove.succedent()) {
+//			succ = tb.or(succ, sf.formula());
+//		}
+//
+//		seq2prove = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antec, succ)), false, true).sequent();
+
+		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+
+		ps.init(seq2prove, env, "IsInRange Proof");
+
+		StrategyProperties sp = null;
+		
+		if (simplifyOnly) {
+			ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> defaults = ps.getProof().getActiveStrategyFactory().getSettingsDefinition().getFurtherDefaults();
+			//Simplification
+			for (var t : defaults) {
+				if (t.first.equals("Simplification")) {
+					sp = ((IDefaultStrategyPropertiesFactory)t.third).createDefaultStrategyProperties();
+					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
+					break;
+				}
+			}
+		}
+
+		if (sp == null) {
+			sp = ps.getProof().getActiveStrategyFactory().getSettingsDefinition()
+					.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+		}
+
+//		System.out.println("strategy prop. " + sp);
+
+		ps.setStrategyProperties(sp);
+
+		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+
+		ps.setMaxRuleApplications(maxRuleApp);
+		ps.setTimeout(-1);
+		final ApplyStrategyInfo info = ps.start();
+		return info;
 	}
 
 	protected boolean isProvable(Sequent seq2prove, Services services) {
-		final ProofStarter ps = new ProofStarter(false);
-//		System.out.println("isProvable: " + seq2prove);
-		
-		Term antec = tb.tt();
-		for (SequentFormula sf : seq2prove.antecedent()) {
-			antec = tb.and(antec, sf.formula());
-		}
-		
-		Term succ = tb.ff();
-		for (SequentFormula sf : seq2prove.succedent()) {
-			succ = tb.or(succ, sf.formula());
-		}
-		
-		seq2prove = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antec, succ)), false, true).sequent();
-		
-		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+		return isProvable(seq2prove, maxRuleApp, services);
+	}
 
+	public static boolean isProvable(Sequent seq2prove, int maxRuleApp, Services services) {
+		ApplyStrategyInfo info;
 		try {
-			ps.init(seq2prove, env, "IsInRange Proof");
+			info = isProvableHelper(seq2prove, maxRuleApp, false, services);
 		} catch (ProofInputException pie) {
 			pie.printStackTrace();
 			return false;
 		}
-
-		final StrategyProperties sp = ps.getProof().getActiveStrategyFactory().getSettingsDefinition()
-				.getDefaultPropertiesFactory().createDefaultStrategyProperties();
-		
-		ps.setStrategyProperties(sp);
-		
-		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		
-		ps.setMaxRuleApplications(maxRuleApp);
-		ps.setTimeout(-1);
-//		System.out.println("strategy prop. " + sp);
-
-		
-		
-		final ApplyStrategyInfo info = ps.start();
 //		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-		
-		
+
+
 //		System.out.println("rules: "+ ps.getProof().getStatistics());
 //		if (!info.getProof().closed()) {
 //			System.out.println("Open Goals: " + info.getProof().openGoals());
@@ -220,13 +306,14 @@ public class SideProof {
 //System.out.println("==>" + info.getAppliedRuleApps());
 
 		boolean closed = info.getProof().closed();
+
 //		if(!closed) {
 //			System.out.println(info.reason() + " CO" + COUNTER);
 //			System.out.println(" proof could not be closed for " + ps.getProof());
 //			System.out.println(" proof could not be closed for " + seq2prove.succedent());
 //		**		
 		try {
-				new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
+				new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
 				System.out.println(COUNTER);
 			} catch (IOException e) {
 //				 TODO Auto-generated catch block
@@ -237,6 +324,7 @@ public class SideProof {
 		System.out.println(closed);
 		return closed;
 	}
+
 static long COUNTER=0;
 //	Term expr2term(Expression expr) {
 //		return this.services.getTypeConverter().convertToLogicElement(expr);

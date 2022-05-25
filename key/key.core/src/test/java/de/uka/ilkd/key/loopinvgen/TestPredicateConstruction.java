@@ -19,8 +19,6 @@ public class TestPredicateConstruction {
 	private final Services services;
 	private final KeyIO io;
 
-//	private String pathToTestKeYFile = "C:\\Users\\Asma\\git\\LIG_3\\key\\key\\key.core\\src\\de\\uka\\ilkd\\key\\loopinvgen\\test.key";
-
 	TestPredicateConstruction() {
 		URL urlToTestFile = KeYResourceManager.getManager().getResourceFile(this, "test.key");
 		services = HelperClassParsingTests.createServices(new File(urlToTestFile.getFile()));
@@ -29,7 +27,6 @@ public class TestPredicateConstruction {
 		tf = tb.tf();
 		io = new KeyIO(services, nss);
 	}
-
 
 	public Term parseProblem(String s) {
 		try {
@@ -744,8 +741,8 @@ public class TestPredicateConstruction {
 //		tpc.condition();//Precise Result
 //		tpc.conditionDifferentNumberOfEvents();//Precise Result
 //		tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
-//		tpc.withFunc();
-		tpc.withoutFunc();
+		tpc.withFunc();
+//		tpc.withoutFunc();
 //		tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
