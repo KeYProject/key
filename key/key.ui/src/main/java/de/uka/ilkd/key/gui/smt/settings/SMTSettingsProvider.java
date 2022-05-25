@@ -96,34 +96,34 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createLocSetBoundField() {
         return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setLocsetBound(e));
+                e -> settings.setLocsetBound(e.longValue()));
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.setMaxConcurrentProcesses(e));
+                e -> settings.setMaxConcurrentProcesses(e.intValue()));
     }
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e * 1000L));
+                e -> settings.setTimeout(e.longValue() * 1000));
     }
 
     private JSpinner createIntBoundField() {
         return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setIntBound(e));
+                e -> settings.setIntBound(e.longValue()));
     }
 
     private JSpinner createSeqBoundField() {
         return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setSeqBound(e));
+                e -> settings.setSeqBound(e.longValue()));
     }
 
     private JSpinner createObjectBoundField() {
         return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setObjectBound(e));
+                e -> settings.setObjectBound(e.longValue()));
     }
 
     private JComboBox<String> getProgressModeBox() {
@@ -167,7 +167,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField.setValue(this.settings.getLocsetBound());
         objectBoundField.setValue(this.settings.getObjectBound());
         seqBoundField.setValue(this.settings.getSeqBound());
-        timeoutField.setValue(((float) this.settings.getTimeout() / 1000));
+        timeoutField.setValue(this.settings.getTimeout() / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
     }
 }
