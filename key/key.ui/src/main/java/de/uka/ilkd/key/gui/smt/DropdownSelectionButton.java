@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -12,9 +10,6 @@ import java.util.function.Function;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.plaf.basic.BasicTreeUI;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -100,7 +95,8 @@ public class DropdownSelectionButton {
     private JPopupMenu menu;
 
     /**
-     * True iff the next time the selection button's action is carried out it should open the popup menu.
+     * True iff the next time the selection button's action is carried out it should open the popup
+     * menu.
      */
     private boolean buttonShouldOpenMenu = true;
 
@@ -302,13 +298,12 @@ public class DropdownSelectionButton {
             selectionComponent.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (items.length == 0) {
-                        return;
-                    } else {
+                    if (items.length > 0) {
                         if (!buttonShouldOpenMenu) {
-                            // Do nothing if the button should not open the menu.
-                            // If the menu is not visible anymore after clicking the button, change the button'S
-                            // behaviour for the next click (no matter whether the mouse moves).
+                            /* Do nothing if the button should not open the menu.
+                            If the menu is not visible anymore after clicking the button,
+                            change the button's behaviour for the next click
+                            (no matter whether the mouse moves). */
                             buttonShouldOpenMenu = !getMenu().isVisible();
                             return;
                         }
@@ -355,7 +350,8 @@ public class DropdownSelectionButton {
 
     /**
      * (Create and) return the dropdown popup menu that is opened by the selection component.
-     * Deletes all added components when the menu is null, thus leading a completely fresh and empty menu.
+     * Deletes all added components when the menu is null, thus leading a completely fresh and
+     * empty menu.
      *
      * @return the popup menu opened by the selection button
      */
@@ -423,10 +419,12 @@ public class DropdownSelectionButton {
      * @param newMenuItems the new actions that can be selected
      */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
-        // The menu could also be reused (just clear all its components first), but that leads to
-        // weird behaviour when going from menu items with checkboxes to normal menu items [see #setItems(...)]:
-        // The space where the checkbox would be if the menu item had one is also free for checkbox-less menu items
-        // (rather than that empty space on the left, one would just expect the text to be completely on the left).
+        /* The menu could also be reused (just clear all its components first), but that leads to
+        weird behaviour when going from menu items with checkboxes to normal menu items
+        [see #setItems(...)]:
+        The space where the checkbox would be if the menu item had one is also free for
+        checkbox-less menu items (rather than that empty space on the left,
+        one would just expect the text to be completely on the left). */
         menu = null;
         for (JMenuItem item : newMenuItems) {
             getMenu().add(item);
