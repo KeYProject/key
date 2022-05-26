@@ -20,7 +20,6 @@ public class LIGNested  extends AbstractLoopInvariantGenerator  {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
-
 		
 		for (SequentFormula sf : seq.antecedent()) {
 			if (!sf.formula().containsJavaBlockRecursive() && isComparisonOperator(sf.formula())) {
@@ -123,7 +122,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator  {
 
 		allDepPreds.addAll(allCompPreds);
 		PredicateSetCompression compressor =
-				new PredicateSetCompression(services, currentGoal.sequent(), allDepPreds, false);
+				new PredicateSetCompression(allDepPreds, currentGoal.sequent(), false, services);
 
 		allDepPreds = compressor.compress();
 

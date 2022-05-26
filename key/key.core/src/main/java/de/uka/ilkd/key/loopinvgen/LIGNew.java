@@ -13,7 +13,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 	public LIGNew(Sequent sequent, Services services) {
 		super(sequent, services);
 	}
-	
+
 	@Override
 	public LoopInvariantGenerationResult generate() {
 
@@ -119,7 +119,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		allDepPreds.addAll(allCompPreds);
 
 		final PredicateSetCompression compressor =
-				new PredicateSetCompression(services, currentGoal.sequent(), allDepPreds, false);
+				new PredicateSetCompression(allDepPreds, currentGoal.sequent(), false, services);
 		allDepPreds = compressor.compress();
 
 		return new LoopInvariantGenerationResult(allDepPreds, itrNumber);

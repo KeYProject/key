@@ -27,7 +27,7 @@ public class PredicateSetCompression {
 	private final boolean ailias;
 	private Set<Term> allPreds;
 
-	public PredicateSetCompression(Services services, Sequent seq, Set<Term> preds, boolean ailiasing) {
+	public PredicateSetCompression(Set<Term> preds, Sequent seq, boolean ailiasing, Services services) {
 		tb = services.getTermBuilder();
 //		currentIdxF = currentIndexFormula;
 		depLDT = services.getTypeConverter().getDependenciesLDT();
