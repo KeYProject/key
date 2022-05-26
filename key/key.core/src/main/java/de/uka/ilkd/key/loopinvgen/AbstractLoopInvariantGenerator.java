@@ -195,5 +195,5 @@ public abstract class AbstractLoopInvariantGenerator {
         return isComparison;
     }
 
-    public abstract void generate();
+    public abstract LoopInvariantGenerationResult generate();
 }

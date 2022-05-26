@@ -15,7 +15,8 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 	}
 	
 	@Override
-	public void generate() {
+	public LoopInvariantGenerationResult generate() {
+
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
@@ -31,7 +32,6 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 			}
 		}
 
-//		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");
 //		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
@@ -116,31 +116,13 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 //			System.out.println("Dep Preds: " + allDepPreds);
 		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
-//		System.out.println("===========Terminated===========");
-//		System.out.println("Number of iterations at the end: " + itrNumber);
-//		System.out.println("LIG is the conjunction of: ");
-//		for (Term term : allDepPreds) {
-//			System.out.println(term);
-//		}
-//		for (Term term : allCompPreds) {
-//			System.out.println(term);
-//		}
-//		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
-		
 		allDepPreds.addAll(allCompPreds);
 
-//		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
-//		for (Term term : allDepPreds) {
-//			System.out.println(term);
-//		}
+		final PredicateSetCompression compressor =
+				new PredicateSetCompression(services, currentGoal.sequent(), allDepPreds, false);
+		allDepPreds = compressor.compress();
 
-		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
-		allDepPreds = plcDep.compression();
-		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
-		for (Term term : allDepPreds) {
-				System.out.println(term);
-		}
-		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
+		return new LoopInvariantGenerationResult(allDepPreds, itrNumber);
 	}
 
 }

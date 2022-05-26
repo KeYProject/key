@@ -51,7 +51,7 @@ public class TestPredicateConstruction {
 		}
 	}
 
-	public void shiftArrayToLeft() {////////////////////DONE!
+	public LoopInvariantGenerationResult shiftArrayToLeft() {////////////////////DONE!
 
 		Term succFormula;
 
@@ -64,7 +64,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
@@ -80,7 +80,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		try {
@@ -93,14 +93,14 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
-		LIGNew curNew = new LIGNew(seq, services);
-		curNew.generate();
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
-	public void shiftArrayToLeftWithBreak() {
+	public LoopInvariantGenerationResult shiftArrayToLeftWithBreak() {
 
 		Term succFormula;
 
@@ -116,7 +116,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
@@ -132,7 +132,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		try {
@@ -145,15 +145,14 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
-		LIGNew curNew = new LIGNew(seq, services);
-		curNew.generate();
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
-	
-	public void withFunc() {////////////////////DONE!
+	public LoopInvariantGenerationResult withFunc() {////////////////////DONE!
 
 		Term succFormula;
 
@@ -167,7 +166,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
@@ -183,7 +182,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		try {
@@ -196,27 +195,27 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
-		LIGNew cur = new LIGNew(seq, services);
-		cur.generate();
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
-	public void withoutFunc() {////////////////////DONE!
+	public LoopInvariantGenerationResult withoutFunc() {////////////////////DONE!
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = a[i]+1;" + "			i++;}"
+			succFormula =
+					parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = a[i]+1;" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
@@ -232,7 +231,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		try {
@@ -245,15 +244,14 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
-		LIGNew cur = new LIGNew(seq, services);
-		cur.generate();
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
-	
-	public void stencil() {
+	public LoopInvariantGenerationResult stencil() {
 
 		Term succFormula;
 
@@ -267,7 +265,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
@@ -283,7 +281,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		try {
@@ -296,11 +294,11 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		
-		LIGNew curNew = new LIGNew(seq, services);
-		curNew.generate();
+
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 //
 //	public void shiftArrayToLeftWithAiliasing() {
@@ -314,7 +312,7 @@ public class TestPredicateConstruction {
 //				System.out.println(e.getCause().getMessage());
 //			}
 //			e.printStackTrace();
-//			return;
+//			return null;
 //		}
 //		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 //
@@ -330,7 +328,7 @@ public class TestPredicateConstruction {
 //				System.out.println(e.getCause().getMessage());
 //			}
 //			e.printStackTrace();
-//			return;
+//			return null;
 //		}
 //		
 //		try {
@@ -343,7 +341,7 @@ public class TestPredicateConstruction {
 //				System.out.println(e.getCause().getMessage());
 //			}
 //			e.printStackTrace();
-//			return;
+//			return null;
 //		}
 //		
 //		LIGNew curNew = new LIGNew(services, seq);
@@ -362,7 +360,7 @@ public class TestPredicateConstruction {
 //				System.out.println(e.getCause().getMessage());
 //			}
 //			e.printStackTrace();
-//			return;
+//			return null;
 //		}
 //		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 //
@@ -377,14 +375,14 @@ public class TestPredicateConstruction {
 //				System.out.println(e.getCause().getMessage());
 //			}
 //			e.printStackTrace();
-//			return;
+//			return null;
 //		}
 //		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
 //		cur.mainAlg();
 //	}
 //
 //	
-	public void condition() {//////////////DONE!
+	public LoopInvariantGenerationResult condition() {//////////////DONE!
 		Term formula;
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		
@@ -408,7 +406,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		MergePointInline inlineMergePoints = new MergePointInline(formula.sub(1).javaBlock().program(), false, services);
@@ -440,13 +438,13 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		LIGNew cur = new LIGNew(seq, services);
-		cur.generate();
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
-	public void conditionDifferentNumberOfEvents() {/////////////DONE!
+	public LoopInvariantGenerationResult conditionDifferentNumberOfEvents() {/////////////DONE!
 
 		Term formula;
 
@@ -471,7 +469,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		MergePointInline inlineMergePoints = new MergePointInline(formula.sub(1).javaBlock().program(), false, services);
@@ -505,7 +503,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		try {
 			for (String fml : arrRight) {
@@ -518,15 +516,14 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
-
-		LIGNew curNew = new LIGNew(seq, services);
-		curNew.generate();
-	
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
-	public void conditionWithDifferentEvents() {
+
+	public LoopInvariantGenerationResult conditionWithDifferentEvents() {
 
 		Term formula;
 
@@ -551,7 +548,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		MergePointInline inlineMergePoints = new MergePointInline(formula.sub(1).javaBlock().program(), false, services);
@@ -570,7 +567,6 @@ public class TestPredicateConstruction {
 		
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
-		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
 		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length>10" };
 		String[] arrRight = {"a=null" };
@@ -585,7 +581,7 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		try {
 			for (String fml : arrRight) {
@@ -598,10 +594,11 @@ public class TestPredicateConstruction {
 				System.out.println(e.getCause().getMessage());
 			}
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		LIGNew curNew = new LIGNew(seq, services);
-		curNew.generate();
+
+		final LIGNew cur = new LIGNew(seq, services);
+		return cur.generate();
 	}
 
 //
@@ -731,14 +728,16 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-//		tpc.shiftArrayToLeft();//Precise Result
-//		tpc.shiftArrayToLeftWithBreak();//Precise Result
-//		tpc.condition();//Precise Result
-//		tpc.conditionDifferentNumberOfEvents();//Precise Result
-//		tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
-//		tpc.withFunc();
-		tpc.withoutFunc();
-//		tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+		LoopInvariantGenerationResult result;
+//		result = tpc.shiftArrayToLeft();//Precise Result
+//		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
+//		result = tpc.condition();//Precise Result
+//		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
+//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+//		result = tpc.withFunc();
+		result = tpc.withoutFunc();
+//		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}
