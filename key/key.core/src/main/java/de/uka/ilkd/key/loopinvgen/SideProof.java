@@ -21,53 +21,11 @@ import java.util.Set;
 
 public class SideProof {
 
+	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
 	private final int maxRuleApp;
-
-
-	// cache
-	// the key of the cache is a set, i.e., the order of the terms is not of relevance
-	static class CacheKey {
-		final Term t1;
-		final Term t2;
-
-		public CacheKey(Term t1, Term t2) {
-			this.t1 = t1;
-			this.t2 = t2;
-		}
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			CacheKey sPair = (CacheKey) o;
-			if (!t1.equals(sPair.t1)) {
-				if (!t1.equals(sPair.t2)) {
-					return false;
-				} else {
-					return t2.equals(sPair.t1);
-				}
-			} else {
-				return t2.equals(sPair.t2);
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			return t1.hashCode() + t2.hashCode();
-		}
-	}
-	static class CacheValue {
-		Sequent seq;
-		int hitCount;
-
-		public CacheValue(Sequent seq) {
-			this.seq = seq;
-		}
-	}
-	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
-
 	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
 		tb = services.getTermBuilder();
@@ -77,6 +35,106 @@ public class SideProof {
 
 	public SideProof(Services s, Sequent sequent) {
 		this(s, sequent, 100000);
+	}
+
+	/**
+	 * simplifies the given sequent
+	 * @param sequent the Sequent to simplify
+	 * @return the simplified sequent
+	 */
+	public static Sequent simplifySequent(Sequent sequent, Services services) {
+		try {
+			ApplyStrategyInfo info = isProvableHelper(sequent, 1000,
+					true, false, services);
+			if (info.getProof().openGoals().size() != 1) {
+				throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
+			}
+			sequent = info.getProof().openGoals().head().sequent();
+		} catch (ProofInputException e) {
+			e.printStackTrace();
+		}
+		return sequent;
+	}
+
+	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
+													 int maxRuleApp, boolean simplifyOnly,
+													 boolean stopAtFirstUncloseableGoal,
+													 Services services) throws ProofInputException {
+		//		System.out.println("isProvable: " + seq2prove);
+
+		final ProofStarter ps = new ProofStarter(false);
+		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+		ps.init(seq2prove, env, "IsInRange Proof");
+
+		StrategyProperties sp = null;
+		final StrategySettingsDefinition strategySettingsDef = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
+		if (simplifyOnly) {
+			//Simplification
+			for (var el : strategySettingsDef.getFurtherDefaults()) {
+				if (el.first.equals("Simplification")) {
+					sp = el.third.createDefaultStrategyProperties();
+					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
+					break;
+				}
+			}
+		}
+		if (sp == null) {
+			sp = strategySettingsDef.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+		}
+
+		if (stopAtFirstUncloseableGoal) {
+			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
+		} else {
+			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+		}
+//		System.out.println("strategy prop. " + sp);
+
+		ps.setStrategyProperties(sp);
+		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+		ps.setMaxRuleApplications(maxRuleApp);
+		ps.setTimeout(-1);
+
+		return ps.start();
+	}
+
+	static long COUNTER=0; // only used for saving - unique filenames
+	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,
+									 boolean stopAtFirstUncloseableGoal,
+									 Services services) {
+		ApplyStrategyInfo info;
+		try {
+			info = isProvableHelper(seq2prove, maxRuleApp, false, stopAtFirstUncloseableGoal, services);
+		} catch (ProofInputException pie) {
+			pie.printStackTrace();
+			return false;
+		}
+//		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+
+
+//		System.out.println("rules: "+ ps.getProof().getStatistics());
+//		if (!info.getProof().closed()) {
+//			System.out.println("Open Goals: " + info.getProof().openGoals());
+//		}
+//System.out.println("==>" + info.getAppliedRuleApps());
+
+		boolean closed = info.getProof().closed();
+
+//		if(!closed) {
+//			System.out.println(info.reason() + " CO" + COUNTER);
+//			System.out.println(" proof could not be closed for " + ps.getProof());
+//			System.out.println(" proof could not be closed for " + seq2prove);
+//		**
+		try {
+				new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
+				System.out.println(COUNTER);
+			} catch (IOException e) {
+//				 TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			COUNTER++;
+//		}
+		System.out.println(closed);
+		return closed;
 	}
 
 	public boolean proofEquality(Term left, Term right) {
@@ -189,114 +247,9 @@ public class SideProof {
 		return sideSeq;
 	}
 
-	/**
-	 * simplifies the given sequent
-	 * @param sequent the Sequent to simplify
-	 * @return the simplified sequent
-	 */
-	public static Sequent simplifySequent(Sequent sequent, Services services) {
-		try {
-			ApplyStrategyInfo info = isProvableHelper(sequent, 1000,
-					true, false, services);
-			if (info.getProof().openGoals().size() != 1) {
-				throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
-			}
-			sequent = info.getProof().openGoals().head().sequent();
-		} catch (ProofInputException e) {
-			e.printStackTrace();
-		}
-		return sequent;
-	}
-
-
-	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
-													 int maxRuleApp, boolean simplifyOnly,
-													 boolean stopAtFirstUncloseableGoal,
-													 Services services) throws ProofInputException {
-		//		System.out.println("isProvable: " + seq2prove);
-
-		final ProofStarter ps = new ProofStarter(false);
-		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
-		ps.init(seq2prove, env, "IsInRange Proof");
-
-		StrategyProperties sp = null;
-		final StrategySettingsDefinition strategySettingsDef = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
-		if (simplifyOnly) {
-			//Simplification
-			for (var el : strategySettingsDef.getFurtherDefaults()) {
-				if (el.first.equals("Simplification")) {
-					sp = el.third.createDefaultStrategyProperties();
-					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
-					break;
-				}
-			}
-		}
-		if (sp == null) {
-			sp = strategySettingsDef.getDefaultPropertiesFactory().createDefaultStrategyProperties();
-		}
-
-		if (stopAtFirstUncloseableGoal) {
-			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
-		} else {
-			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-		}
-//		System.out.println("strategy prop. " + sp);
-
-		ps.setStrategyProperties(sp);
-		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.setMaxRuleApplications(maxRuleApp);
-		ps.setTimeout(-1);
-
-		return ps.start();
-	}
-
 	protected boolean isProvable(Sequent seq2prove, Services services) {
 		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
-
-	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,
-									 boolean stopAtFirstUncloseableGoal,
-									 Services services) {
-		ApplyStrategyInfo info;
-		try {
-			info = isProvableHelper(seq2prove, maxRuleApp, false, stopAtFirstUncloseableGoal, services);
-		} catch (ProofInputException pie) {
-			pie.printStackTrace();
-			return false;
-		}
-//		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-
-
-//		System.out.println("rules: "+ ps.getProof().getStatistics());
-//		if (!info.getProof().closed()) {
-//			System.out.println("Open Goals: " + info.getProof().openGoals());
-//		}
-//System.out.println("==>" + info.getAppliedRuleApps());
-
-		boolean closed = info.getProof().closed();
-
-//		if(!closed) {
-//			System.out.println(info.reason() + " CO" + COUNTER);
-//			System.out.println(" proof could not be closed for " + ps.getProof());
-//			System.out.println(" proof could not be closed for " + seq2prove);
-//		**		
-		try {
-				new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
-				System.out.println(COUNTER);
-			} catch (IOException e) {
-//				 TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			COUNTER++;
-//		}
-		System.out.println(closed);
-		return closed;
-	}
-
-static long COUNTER=0;
-//	Term expr2term(Expression expr) {
-//		return this.services.getTypeConverter().convertToLogicElement(expr);
-//	}
 
 	private Set<Term> collectProgramAndLogicVariables(Term term) {
 		Set<Term> res = new HashSet<>();
@@ -312,6 +265,50 @@ static long COUNTER=0;
 					res.addAll(collectProgramAndLogicVariables(sub));
 		}
 		return res;
+	}
+
+	// cache
+	// the key of the cache is a set, i.e., the order of the terms is not of relevance
+	static class CacheKey {
+		final Term t1;
+		final Term t2;
+
+		public CacheKey(Term t1, Term t2) {
+			this.t1 = t1;
+			this.t2 = t2;
+		}
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CacheKey sPair = (CacheKey) o;
+			if (!t1.equals(sPair.t1)) {
+				if (!t1.equals(sPair.t2)) {
+					return false;
+				} else {
+					return t2.equals(sPair.t1);
+				}
+			} else {
+				return t2.equals(sPair.t2);
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return t1.hashCode() + t2.hashCode();
+		}
+	}
+//	Term expr2term(Expression expr) {
+//		return this.services.getTypeConverter().convertToLogicElement(expr);
+//	}
+
+	static class CacheValue {
+		Sequent seq;
+		int hitCount;
+
+		public CacheValue(Sequent seq) {
+			this.seq = seq;
+		}
 	}
 }
 
