@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.util.LRUCache;
@@ -80,51 +82,45 @@ public class SideProof {
 		this(s, sequent, 100000);
 	}
 
-	boolean proofEquality(Term loc1, Term loc2) {
-//		System.out.println("proofEquality");
-		Term fml = tb.equals(loc1, loc2);
-		Sequent sideSeq = prepareSideProof(loc1, loc2);
+	public boolean proofEquality(Term left, Term right) {
+		Term fml = tb.equals(left, right);
+		Sequent sideSeq = prepareSideProof(left, right);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-//		if (closed) {
-//			System.out.println("Equlity: "+sideSeq);
-//			System.out.println(loc1 + " is NOT equal to " + loc2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
-//			System.out.println("the original seq: "+ seq);
-//		}
 		return closed;
 	}
 
-	boolean proofSubSet(Term loc1, Term loc2) {
-//		System.out.println("proofSubSet");
-		Term fml = tb.subset(loc1, loc2);
-		Sequent sideSeq = prepareSideProof(loc1, loc2);
+	public boolean proofNonEmptyIntersection(Term left, Term right) {
+		Term fml = tb.not(tb.equals(tb.intersect(left, right), tb.empty()));
+		Sequent sideSeq = prepareSideProof(left, right);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-
-		boolean closed = isProvable(sideSeq, services);
+		boolean closed = isProvable(sideSeq, maxRuleApp, true, services);
 		// true: Holds, false: Unknown
-//		if (!closed) {
-//			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
-//			System.out.println(loc1 + " is NOT subset of " + loc2);
-//		}
 		return closed;
 	}
 
-	boolean proofLT(Term ts1, Term ts2) {
-//		System.out.println("proofLT");
-		Term fml = tb.lt(ts1, ts2);
+	public boolean proofSubSet(Term left, Term right) {
+		Function pred = services.getTypeConverter().getLocSetLDT().getSubset();
+		return prove(pred, left, right);
+	}
+
+	public boolean proofLT(Term left, Term right) {
+		Function pred = services.getTypeConverter().getIntegerLDT().getLessThan();
+		return prove(pred, left, right);
+	}
+
+	public boolean proofLEQ(Term left, Term right) {
+		Function pred = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
+		return prove(pred, left, right);
+	}
+
+	private boolean prove(Function pred, Term ts1, Term ts2) {
+		Term fml = tb.func(pred, ts1, ts2);
 		Sequent sideSeq = prepareSideProof(ts1, ts2);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
-
 		boolean closed = isProvable(sideSeq, services);
-//		if (closed) {
-//			System.out.println("Less than: " + sideSeq);
-//			System.out.println(
-//					ts1 + " is NOT less than " + ts2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
-//			System.out.println("the original seq: " + seq);
-//		}
+		// true: Holds, false: Unknown
 		return closed;
 	}
 
@@ -156,7 +152,6 @@ public class SideProof {
 				}
 				value.seq = sideSeq;
 			}
-
 			return sideSeq;
 		}
 		sideSeq = Sequent.EMPTY_SEQUENT;
@@ -216,33 +211,6 @@ public class SideProof {
 		return sideSeq;
 	}
 
-	boolean proofLEQ(Term ts1, Term ts2) {
-//		System.out.println("proofLEQ");
-		Term fml = tb.leq(ts1, ts2);
-//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
-
-		Sequent sideSeq = prepareSideProof(ts1, ts2);
-		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-
-		boolean closed = isProvable(sideSeq, maxRuleApp, true, services);
-//		if (closed) {
-//			System.out.println("Less than: " + sideSeq);
-//			System.out.println(
-//					ts1 + " is NOT less than " + ts2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
-//			System.out.println("the original seq: " + seq);
-//		}
-		return closed;
-	}
-
-	
-	boolean proofNonEmptyIntersection(Term ts1, Term ts2) {
-//		System.err.println("proofNonEmptyIntersection");
-		Term fml = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
-		Sequent sideSeq = prepareSideProof(ts1, ts2);
-		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-
-		return isProvable(sideSeq, maxRuleApp, true, services);
-	}
 
 	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
 													 int maxRuleApp, boolean simplifyOnly,
@@ -251,18 +219,14 @@ public class SideProof {
 		//		System.out.println("isProvable: " + seq2prove);
 
 		final ProofStarter ps = new ProofStarter(false);
-
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
-
 		ps.init(seq2prove, env, "IsInRange Proof");
 
 		StrategyProperties sp = null;
-		
+		final StrategySettingsDefinition strategySettingsDef = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
 		if (simplifyOnly) {
-			var defaults =
-					ps.getProof().getActiveStrategyFactory().getSettingsDefinition().getFurtherDefaults();
 			//Simplification
-			for (var el : defaults) {
+			for (var el : strategySettingsDef.getFurtherDefaults()) {
 				if (el.first.equals("Simplification")) {
 					sp = el.third.createDefaultStrategyProperties();
 					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
@@ -270,10 +234,8 @@ public class SideProof {
 				}
 			}
 		}
-
 		if (sp == null) {
-			sp = ps.getProof().getActiveStrategyFactory().getSettingsDefinition()
-					.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+			sp = strategySettingsDef.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		}
 
 		if (stopAtFirstUncloseableGoal) {
@@ -284,11 +246,10 @@ public class SideProof {
 //		System.out.println("strategy prop. " + sp);
 
 		ps.setStrategyProperties(sp);
-
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
+
 		return ps.start();
 	}
 
@@ -355,8 +316,5 @@ static long COUNTER=0;
 		}
 		return res;
 	}
-
-//	public void setMaxStep(int i) {
-//		maxRuleApp = i;
-//	}
 }
+
