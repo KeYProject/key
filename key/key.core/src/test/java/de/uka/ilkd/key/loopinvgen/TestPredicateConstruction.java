@@ -97,7 +97,7 @@ public class TestPredicateConstruction {
 		}
 
 		LIGNew curNew = new LIGNew(seq, services);
-		curNew.mainAlg();
+		curNew.generate();
 	}
 
 	public void shiftArrayToLeftWithBreak() {
@@ -149,7 +149,7 @@ public class TestPredicateConstruction {
 		}
 
 		LIGNew curNew = new LIGNew(seq, services);
-		curNew.mainAlg();
+		curNew.generate();
 	}
 
 	
@@ -200,7 +200,7 @@ public class TestPredicateConstruction {
 		}
 
 		LIGNew cur = new LIGNew(seq, services);
-		cur.mainAlg();
+		cur.generate();
 	}
 
 	public void withoutFunc() {////////////////////DONE!
@@ -249,7 +249,7 @@ public class TestPredicateConstruction {
 		}
 
 		LIGNew cur = new LIGNew(seq, services);
-		cur.mainAlg();
+		cur.generate();
 	}
 
 	
@@ -300,7 +300,7 @@ public class TestPredicateConstruction {
 		}
 		
 		LIGNew curNew = new LIGNew(seq, services);
-		curNew.mainAlg();
+		curNew.generate();
 	}
 //
 //	public void shiftArrayToLeftWithAiliasing() {
@@ -443,7 +443,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 		LIGNew cur = new LIGNew(seq, services);
-		cur.mainAlg();
+		cur.generate();
 	}
 
 	public void conditionDifferentNumberOfEvents() {/////////////DONE!
@@ -523,7 +523,7 @@ public class TestPredicateConstruction {
 
 
 		LIGNew curNew = new LIGNew(seq, services);
-		curNew.mainAlg();
+		curNew.generate();
 	
 	}
 	public void conditionWithDifferentEvents() {
@@ -601,7 +601,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 		LIGNew curNew = new LIGNew(seq, services);
-		curNew.mainAlg();
+		curNew.generate();
 	}
 
 //

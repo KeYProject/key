@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractLoopInvariantGenerator {
+public abstract class AbstractLoopInvariantGenerator {
     protected final Sequent seq;
     protected final Services services;
     protected final TermBuilder tb;
@@ -194,4 +194,6 @@ public class AbstractLoopInvariantGenerator {
                 pred.op() == Equality.EQUALS;
         return isComparison;
     }
+
+    public abstract void generate();
 }

@@ -14,7 +14,8 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		super(sequent, services);
 	}
 	
-	public void mainAlg() {
+	@Override
+	public void generate() {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);

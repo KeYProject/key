@@ -16,7 +16,7 @@ public class LIGRelaxed extends AbstractLoopInvariantGenerator {
 		super(sequent, services);
 	}
 	
-	public void mainAlg() {
+	public void generate() {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
