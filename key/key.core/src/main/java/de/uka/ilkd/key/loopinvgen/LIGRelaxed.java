@@ -110,8 +110,8 @@ public class LIGRelaxed {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefinementNew3 pr0 = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
-				allCompPreds, index, itrNumber);
+		PredicateRefinementNew3 pr0 = new PredicateRefinementNew3(currentGoal.sequent(), allDepPreds, allCompPreds,
+				index, itrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.predicateCheckAndRefine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
 		allDepPreds = refinedPreds.first;
@@ -147,8 +147,8 @@ public class LIGRelaxed {
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
-			PredicateRefinementNew3 pr = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
-					allCompPreds, index, itrNumber);
+			PredicateRefinementNew3 pr = new PredicateRefinementNew3(currentGoal.sequent(), allDepPreds, allCompPreds,
+					index, itrNumber, services);
 			refinedPreds = pr.predicateCheckAndRefine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;

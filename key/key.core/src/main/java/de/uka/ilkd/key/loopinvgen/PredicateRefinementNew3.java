@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -21,9 +22,9 @@ public class PredicateRefinementNew3 {
 	public Set<Term> refinedCompList;
 	public Set<Term> refinedDepList;
 
-	private final Sequent seq;
 	private Set<Term> depPredicates;
 	private Set<Term> compPredicates;
+	private final Sequent sequent;
 	private final Services services;
 	private final SideProof sProof;
 	private final DependenciesLDT depLDT;
@@ -33,19 +34,22 @@ public class PredicateRefinementNew3 {
 	private final IntegerLDT intLDT;
 	private final int itrNumber;
 
-	public PredicateRefinementNew3(Services s, Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term i,
-			int itr) {
-		services = s;
-		depPredicates = depPredList;
-		compPredicates = compPredList;
-		depLDT = services.getTypeConverter().getDependenciesLDT();
-		locsetLDT = services.getTypeConverter().getLocSetLDT();
-		tb = services.getTermBuilder();
-		index = i;
-		intLDT = services.getTypeConverter().getIntegerLDT();
-		itrNumber = itr;
-		seq=simplify(filter(sequent));
-		sProof = new SideProof(services, seq);
+	public PredicateRefinementNew3(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList,
+								   Term index, int iteration, Services services) {
+		this.services = services;
+		this.tb = services.getTermBuilder();
+		final TypeConverter typeConverter = services.getTypeConverter();
+		this.intLDT = typeConverter.getIntegerLDT();
+		this.depLDT = typeConverter.getDependenciesLDT();
+		this.locsetLDT = typeConverter.getLocSetLDT();
+
+		this.depPredicates  = depPredList;
+		this.compPredicates = compPredList;
+		this.index = index;
+		this.itrNumber = iteration;
+
+		this.sequent = simplify(filter(sequent));
+		this.sProof = new SideProof(services, this.sequent);
 	}
 
 	private Sequent simplify(Sequent sequent) {
@@ -79,7 +83,6 @@ public class PredicateRefinementNew3 {
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//	**				
 			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
@@ -94,7 +97,6 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for (Term dp : depPredicates) {
 				if (predicateImpliedBypredicate(w, dp)) {
-//					**		
 					System.out.println("IMPLIED " + w + " by " + dp);
 					break;
 				}
@@ -148,7 +150,7 @@ public class PredicateRefinementNew3 {
 	private boolean sequentImpliesPredicate(Term pred) {
 //		**		
 		System.out.println("sequentImpliesPredicate is called for: "+pred);
-		Sequent sideSeq = seq.addFormula(new SequentFormula(pred), false, true).sequent();
+		Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
 
 //		System.out.println("is Provable called for: " +  pred);
 		final boolean provable = SideProof.isProvable(sideSeq, 100000, true, services);
