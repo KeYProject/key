@@ -22,7 +22,7 @@ public class DepSimplificationStrategy extends JavaCardDLStrategy {
 
         bindRuleSet(d, "dep_replace_known", inftyConst());//EqNonDuplicateAppFeature
 
-        Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
+        //Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", inftyConst());//longConst(0));
         bindRuleSet(d, "dep_pred_known", inftyConst());//+100

@@ -125,8 +125,8 @@ public class LIGNew {
 //			**		
 			System.out.println("Iteration Number: " + itrNumber);
 
-			oldDepPreds.removeAll(oldDepPreds);
-			oldCompPreds.removeAll(oldCompPreds);
+			oldDepPreds.clear();
+			oldCompPreds.clear();;
 
 			oldDepPreds.addAll(allDepPreds);
 			oldCompPreds.addAll(allCompPreds);
@@ -199,10 +199,12 @@ public class LIGNew {
 
 	private Goal abstractGoal(Goal currentGoal) {
 //		System.out.println("Goal: " + currentGoal);
+
 		for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
 			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
 			currentGoal.removeFormula(p);
 		}
+
 		for(SequentFormula cgsf:currentGoal.sequent().succedent()) {
 			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), false);
 			if(!cgsf.formula().containsJavaBlockRecursive()) {

@@ -672,7 +672,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Operator noW = depLDT.getNoW();;
 
 
-        final TermFeature isDepPredicate = or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
+        final TermFeature isDepPredicate =
+                or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
         bindRuleSet(d, "pull_out_dep_locations",
                 add(applyTF(FocusProjection.create(1), isDepPredicate),
                         applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
@@ -689,7 +690,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
                 let(assumesLocSet, instOfNonStrict("loc1"),
                         sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
-                                ifZero(applyTF(findSubTerms,op(setMinus)), not(eq(assumesLocSet, sub(findSubTerms,1))), longConst(0)))), longConst(0));
+                                ifZero(applyTF(findSubTerms,op(setMinus)),
+                                        not(eq(assumesLocSet, sub(findSubTerms,1))),
+                                        longConst(0)))), longConst(0));
 
 
 //		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
