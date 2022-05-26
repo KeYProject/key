@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -18,11 +13,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.LRUCache;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SideProof {
 
@@ -149,7 +146,7 @@ public class SideProof {
 				// if the seq is request at least twice we perform some simplifications to
 				// avoid repetitions
 				try {
-					ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, services);
+					ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, false, services);
 					if (info.getProof().openGoals().size() != 1) {
 						throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
 					}
@@ -227,7 +224,7 @@ public class SideProof {
 		Sequent sideSeq = prepareSideProof(ts1, ts2);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		boolean closed = isProvable(sideSeq, maxRuleApp, services);
+		boolean closed = isProvable(sideSeq, maxRuleApp, true, services);
 //		if (closed) {
 //			System.out.println("Less than: " + sideSeq);
 //			System.out.println(
@@ -244,10 +241,13 @@ public class SideProof {
 		Sequent sideSeq = prepareSideProof(ts1, ts2);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 
-		return isProvable(sideSeq, maxRuleApp, services);
+		return isProvable(sideSeq, maxRuleApp, true, services);
 	}
 
-	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove, int maxRuleApp, boolean simplifyOnly, Services services) throws ProofInputException {
+	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
+													 int maxRuleApp, boolean simplifyOnly,
+													 boolean stopAtFirstUncloseableGoal,
+													 Services services) throws ProofInputException {
 		//		System.out.println("isProvable: " + seq2prove);
 
 		final ProofStarter ps = new ProofStarter(false);
@@ -276,6 +276,11 @@ public class SideProof {
 					.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		}
 
+		if (stopAtFirstUncloseableGoal) {
+			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
+		} else {
+			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+		}
 //		System.out.println("strategy prop. " + sp);
 
 		ps.setStrategyProperties(sp);
@@ -288,13 +293,15 @@ public class SideProof {
 	}
 
 	protected boolean isProvable(Sequent seq2prove, Services services) {
-		return isProvable(seq2prove, maxRuleApp, services);
+		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
 
-	public static boolean isProvable(Sequent seq2prove, int maxRuleApp, Services services) {
+	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,
+									 boolean stopAtFirstUncloseableGoal,
+									 Services services) {
 		ApplyStrategyInfo info;
 		try {
-			info = isProvableHelper(seq2prove, maxRuleApp, false, services);
+			info = isProvableHelper(seq2prove, maxRuleApp, false, stopAtFirstUncloseableGoal, services);
 		} catch (ProofInputException pie) {
 			pie.printStackTrace();
 			return false;

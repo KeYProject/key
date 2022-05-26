@@ -51,7 +51,7 @@ public class PredicateRefinementNew3 {
 
 	private Sequent simplify(Sequent sequent) {
 		try {
-			ApplyStrategyInfo info = SideProof.isProvableHelper(sequent, 1000, true, services);
+			ApplyStrategyInfo info = SideProof.isProvableHelper(sequent, 1000, true, false, services);
 			if (info.getProof().openGoals().size() != 1) {
 				throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
 			}
@@ -127,7 +127,7 @@ public class PredicateRefinementNew3 {
 				compPredicates.add(w);
 			}
 		}
-		return new Pair<Set<Term>, Set<Term>>(depPredicates, compPredicates);
+		return new Pair<>(depPredicates, compPredicates);
 	}
 
 	private boolean predicateImpliedBypredicate(Term dp1, Term dp2) {
@@ -156,7 +156,7 @@ public class PredicateRefinementNew3 {
 		Sequent sideSeq = seq.addFormula(new SequentFormula(pred), false, true).sequent();
 
 //		System.out.println("is Provable called for: " +  pred);
-		final boolean provable = SideProof.isProvable(sideSeq, 100000, services);
+		final boolean provable = SideProof.isProvable(sideSeq, 100000, true, services);
 //		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
 //				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
 //				|| pred.op() == Equality.EQUALS)) {//
