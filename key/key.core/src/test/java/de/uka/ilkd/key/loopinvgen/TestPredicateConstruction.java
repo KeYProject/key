@@ -96,12 +96,11 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult shiftArrayToLeftWithBreak() {
-
 		Term succFormula;
 
 		try {
@@ -148,8 +147,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult withFunc() {////////////////////DONE!
@@ -198,8 +197,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult withoutFunc() {////////////////////DONE!
@@ -247,8 +246,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult stencil() {
@@ -297,8 +296,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 //
 //	public void shiftArrayToLeftWithAiliasing() {
@@ -377,8 +376,8 @@ public class TestPredicateConstruction {
 //			e.printStackTrace();
 //			return null;
 //		}
-//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-//		cur.mainAlg();
+//		LIGMultipleArrays loopInvGenerator = new LIGMultipleArrays(services, seq);
+//		loopInvGenerator.mainAlg();
 //	}
 //
 //	
@@ -440,8 +439,8 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return null;
 		}
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult conditionDifferentNumberOfEvents() {/////////////DONE!
@@ -519,8 +518,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 	public LoopInvariantGenerationResult conditionWithDifferentEvents() {
@@ -597,8 +596,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew cur = new LIGNew(seq, services);
-		return cur.generate();
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+		return loopInvGenerator.generate();
 	}
 
 //
@@ -639,8 +638,8 @@ public class TestPredicateConstruction {
 //			e.printStackTrace();
 //			return;
 //		}
-//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-//		cur.mainAlg();
+//		LIGMultipleArrays loopInvGenerator = new LIGMultipleArrays(services, seq);
+//		loopInvGenerator.mainAlg();
 //	}
 //
 //	
@@ -680,8 +679,8 @@ public class TestPredicateConstruction {
 //			e.printStackTrace();
 //			return;
 //		}
-//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-//		cur.mainAlg();
+//		LIGMultipleArrays loopInvGenerator = new LIGMultipleArrays(services, seq);
+//		loopInvGenerator.mainAlg();
 //	}
 //
 //	
@@ -720,8 +719,8 @@ public class TestPredicateConstruction {
 //			e.printStackTrace();
 //			return;
 //		}
-////		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-////		cur.mainAlg();
+////		LIGMultipleArrays loopInvGenerator = new LIGMultipleArrays(services, seq);
+////		loopInvGenerator.mainAlg();
 //	}
 
 	
@@ -729,13 +728,13 @@ public class TestPredicateConstruction {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
 		LoopInvariantGenerationResult result;
-//		result = tpc.shiftArrayToLeft();//Precise Result
+		result = tpc.shiftArrayToLeft();//Precise Result
 //		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
 //		result = tpc.condition();//Precise Result
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
 //		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 //		result = tpc.withFunc();
-		result = tpc.withoutFunc();
+//		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 		System.out.println(result);
 		long end = System.currentTimeMillis();
