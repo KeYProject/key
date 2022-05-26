@@ -656,6 +656,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
+        setupLocset(d);
         setupDependencyPredicateStrategy(d);
 
         return d;
@@ -1058,6 +1059,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean normalSplitting() {
         return StrategyProperties.SPLITTING_NORMAL.equals(strategyProperties
                 .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY));
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////
+    //
+    // Application of locset rules
+    //
+    // //////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////
+    private  void setupLocset(RuleSetDispatchFeature d) {
+        bindRuleSet(d, "locset_expand_setMinus", 100);
     }
 
     // //////////////////////////////////////////////////////////////////////////
