@@ -22,10 +22,10 @@ public class PredicateRefinementNew3 {
 	public Set<Term> refinedDepList;
 
 	private final Sequent seq;
-	private Set<Term> depPredicates = new HashSet<>();
-	private Set<Term> compPredicates = new HashSet<>();
+	private Set<Term> depPredicates;
+	private Set<Term> compPredicates;
 	private final Services services;
-	private SideProof sProof;
+	private final SideProof sProof;
 	private final DependenciesLDT depLDT;
 	private final LocSetLDT locsetLDT;
 	private final TermBuilder tb;
@@ -44,7 +44,6 @@ public class PredicateRefinementNew3 {
 		index = i;
 		intLDT = services.getTypeConverter().getIntegerLDT();
 		itrNumber = itr;
-		//seq = filter(sequent);
 		seq=simplify(filter(sequent));
 		sProof = new SideProof(services, seq);
 	}
@@ -135,16 +134,12 @@ public class PredicateRefinementNew3 {
 			return true;
 		} else if (dp2.op().equals(depLDT.getNoR())) {
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
-				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-					return true;
-				}
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		} else if (dp2.op().equals(depLDT.getNoW())) {
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
 					|| dp1.op().equals(depLDT.getNoWaW())) {
-				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-					return true;
-				}
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		}
 		return false;
@@ -219,12 +214,12 @@ public class PredicateRefinementNew3 {
 	private Set<Term> weakenBySubSetOLD(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
-		Term lowSingleton = null;
-		Term highSingleton = null;
-		Term subLoc = null;
+		Term lowSingleton;
+		Term highSingleton;
+		Term subLoc;
 
 //		Term opOnSubLocs = null;
-		if (!locSet.equals(locsetLDT.getEmpty()) && locSet != null && locSet.op().equals(locsetLDT.getArrayRange())) {
+		if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
 			final Term low = locSet.sub(1);
 			final Term newLow = tb.add(low, tb.one());
@@ -269,12 +264,12 @@ public class PredicateRefinementNew3 {
 	private Set<Term> weakenBySubSet(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
-		Term lowSingleton = null;
-		Term highSingleton = null;
+		Term lowSingleton;
+		Term highSingleton;
 		Term subLoc = null;
 
 //		Term opOnSubLocs = null;
-		if (!locSet.equals(locsetLDT.getEmpty()) && locSet != null && locSet.op().equals(locsetLDT.getArrayRange())) {
+		if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
 			final Term low = locSet.sub(1);
 			final Term newLow = tb.add(low, tb.one());
@@ -401,8 +396,8 @@ public class PredicateRefinementNew3 {
 			Term array = locSet.sub(0);
 			Term low = locSet.sub(1);
 			Term high = locSet.sub(2);
-			Term lowToI = null;
-			Term iToHigh = null;
+			Term lowToI;
+			Term iToHigh;
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
 			if (!sProof.proofEquality(low, index)) {
 				if (!sProof.proofEquality(index, high)) {
@@ -450,13 +445,13 @@ public class PredicateRefinementNew3 {
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
-		Set<Term> result = new HashSet<>();
+		Set<Term> result = compPredWeakeningByPredicates(pred);
 //		result.addAll(compPredWeakenByIndex(pred));
 //		System.out.println("Weakening by Predicate for: " + pred);
-		result.addAll(compPredWeakeningByPredicates(pred));
 //		System.out.println("Weakening by Heuristics for: " + pred);
-		if (itrNumber < 1)
+		if (itrNumber < 1) {
 			result.addAll(compPredWeakeningByHeuristics(pred));
+		}
 		return result;
 	}
 

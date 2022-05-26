@@ -1,50 +1,47 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class PredicateListCompressionNew {
 	private final DependenciesLDT depLDT;
-	private final Services services;
 	private final TermBuilder tb;
-	private final Sequent seq;
 //	private final SequentFormula currentIdxF;
 	private final IntegerLDT intLDT;
-	private final Set<Operator> CompOps = new HashSet<>();
-	private final Function lt, leq, gt, geq;
-	private SideProof sProof;
-	private final boolean ailias;
-	private Set<Term> allPreds = new HashSet<>();
-	private LocSetLDT locSetLDT;
+	private final LocSetLDT locSetLDT;
 
-	public PredicateListCompressionNew(Services s, Sequent sequent, Set<Term> preds, boolean ailiasing) {
-		services = s;
+	private Set<Operator> comparisonPredicateSymbols = new HashSet<>();
+	private final Function lt, leq, gt, geq;
+	private final SideProof sProof;
+	private final boolean ailias;
+	private Set<Term> allPreds;
+
+	public PredicateListCompressionNew(Services services, Sequent seq, Set<Term> preds, boolean ailiasing) {
 		tb = services.getTermBuilder();
-		seq = sequent;
 //		currentIdxF = currentIndexFormula;
 		depLDT = services.getTypeConverter().getDependenciesLDT();
-
 		intLDT = services.getTypeConverter().getIntegerLDT();
+
 		lt = intLDT.getLessThan();
-		CompOps.add(lt);
+		comparisonPredicateSymbols.add(lt);
 		leq = intLDT.getLessOrEquals();
-		CompOps.add(leq);
+		comparisonPredicateSymbols.add(leq);
 		gt = intLDT.getGreaterThan();
-		CompOps.add(gt);
+		comparisonPredicateSymbols.add(gt);
 		geq = intLDT.getGreaterOrEquals();
-		CompOps.add(geq);
+		comparisonPredicateSymbols.add(geq);
+
 		sProof = new SideProof(services, seq, 75000);
 		ailias = ailiasing;
 		allPreds = preds;
@@ -116,7 +113,7 @@ public class PredicateListCompressionNew {
 		fDepPredList.addAll(toAdd);
 		fDepPredList.removeAll(toDelete);
 		
-		toDelete.removeAll(toDelete);
+		toDelete.clear();
 		if (ailias) {
 			for (Term depPred1 : fDepPredList) {
 				for (Term depPred2 : fDepPredList) {

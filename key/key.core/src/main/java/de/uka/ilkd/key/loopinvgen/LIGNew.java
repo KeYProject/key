@@ -1,38 +1,21 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class LIGNew {
 
@@ -49,9 +32,7 @@ public class LIGNew {
 	private final IntegerLDT intLDT;
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
-//		System.out.println(seq);
 		ruleApp = new RuleApplication(s, seq);
-//		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
 		tb = services.getTermBuilder();
 		intLDT = services.getTypeConverter().getIntegerLDT();
@@ -126,13 +107,12 @@ public class LIGNew {
 			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.clear();
-			oldCompPreds.clear();;
+			oldCompPreds.clear();
 
 			oldDepPreds.addAll(allDepPreds);
 			oldCompPreds.addAll(allCompPreds);
 
 //			System.out.println("BEFORE UNWIND");
-
 //			System.out.println(goalsAfterShift);
 //			System.out.println("Goals Before Unwind:" + goalsAfterShift);
 
@@ -141,18 +121,16 @@ public class LIGNew {
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
-
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
 //			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("Current Goal: " + currentGoal);
 
+//			System.out.println("Current Goal: " + currentGoal);
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
-
 
 			PredicateRefinementNew3 pr = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
 					allCompPreds, index, itrNumber);
@@ -164,7 +142,6 @@ public class LIGNew {
 			for (Goal g : goalsAfterShift) {
 				g = abstractGoal(g);
 			}
-
 //			System.out.println("Dep Preds: " + allDepPreds);
 		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
@@ -180,14 +157,12 @@ public class LIGNew {
 //		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
 		
 		allDepPreds.addAll(allCompPreds);
-		
 
 //		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 //		for (Term term : allDepPreds) {
 //			System.out.println(term);
 //		}
-		
-		
+
 		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
 		allDepPreds = plcDep.compression();
 		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
@@ -199,7 +174,6 @@ public class LIGNew {
 
 	private Goal abstractGoal(Goal currentGoal) {
 //		System.out.println("Goal: " + currentGoal);
-
 		for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
 			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
 			currentGoal.removeFormula(p);
@@ -211,10 +185,12 @@ public class LIGNew {
 				currentGoal.removeFormula(p);
 			}
 		}
+
 		for (Term cp : allCompPreds) {
 			currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
 		}
+
 		for (Term cp : allDepPreds) {
 			currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
@@ -238,8 +214,8 @@ public class LIGNew {
 
 	void getIndexAndHigh(Sequent seq) {
 		Expression high = null, index = null;
-		for (SequentFormula sf : seq.succedent()) {
-			Term formula = skipUpdates(sf.formula());
+		for (final SequentFormula sf : seq.succedent()) {
+			final Term formula = skipUpdates(sf.formula());
 			if (formula.op() == Modality.DIA) {
 				ProgramElement pe = formula.javaBlock().program();
 				Statement activePE;
@@ -249,7 +225,7 @@ public class LIGNew {
 					activePE = (Statement) pe.getFirstElement();
 				}
 				if (activePE instanceof While) {
-					Expression expr = (Expression) ((While) activePE).getGuardExpression();
+					final Expression expr = ((While) activePE).getGuardExpression();
 					if (expr instanceof GreaterOrEquals || expr instanceof GreaterThan) {
 						high = ((ComparativeOperator) expr).getExpressionAt(0);
 						index = ((ComparativeOperator) expr).getExpressionAt(1);
@@ -268,7 +244,7 @@ public class LIGNew {
 	void getLoopGuard(Sequent seq) {
 		Term guard = null;
 		for (SequentFormula sf : seq.succedent()) {
-			Term formula = skipUpdates(sf.formula());
+			final Term formula = skipUpdates(sf.formula());
 			if (formula.op() == Modality.DIA) {
 				ProgramElement pe = formula.javaBlock().program();
 				Statement activePE;
@@ -278,19 +254,17 @@ public class LIGNew {
 					activePE = (Statement) pe.getFirstElement();
 				}
 				if (activePE instanceof While) {
-					Expression expr = (Expression) ((While) activePE).getGuardExpression();
+					final Expression expr = ((While) activePE).getGuardExpression();
+					final Term left = expr2term(((ComparativeOperator) expr).getExpressionAt(0));
+					final Term right = expr2term(((ComparativeOperator) expr).getExpressionAt(1));
 					if (expr instanceof GreaterOrEquals) {
-						guard = tb.geq(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
-								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+						guard = tb.geq(left, right);
 					} else if (expr instanceof GreaterThan) {
-						guard = tb.gt(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
-								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+						guard = tb.gt(left, right);
 					} else if (expr instanceof LessOrEquals) {
-						guard = tb.leq(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
-								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+						guard = tb.leq(left, right);
 					} else if (expr instanceof LessThan) {
-						guard = tb.lt(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
-								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+						guard = tb.lt(left,	right);
 					}
 
 				}
@@ -300,7 +274,7 @@ public class LIGNew {
 		this.guard = guard;
 	}
 
-	Term expr2term(Expression expr) {
+	private Term expr2term(Expression expr) {
 		return this.services.getTypeConverter().convertToLogicElement(expr);
 	}
 
@@ -346,16 +320,12 @@ public class LIGNew {
 	}
 
 	private boolean isComparisonOperator(Term pred) {
-		boolean isComparison;
-		if (pred.op() == intLDT.getLessThan() ||
-			pred.op() == intLDT.getGreaterThan() || 
-		    pred.op() == intLDT.getLessOrEquals() ||
-		    pred.op() == intLDT.getGreaterOrEquals() || 
-		    pred.op() == Equality.EQUALS) {		
-			isComparison = true;
-		} else {
-			isComparison = false;
-		}
+		final boolean isComparison =
+				pred.op() == intLDT.getLessThan() ||
+				pred.op() == intLDT.getGreaterThan() ||
+				pred.op() == intLDT.getLessOrEquals() ||
+				pred.op() == intLDT.getGreaterOrEquals() ||
+				pred.op() == Equality.EQUALS;
 		return isComparison;
 	}
 	
