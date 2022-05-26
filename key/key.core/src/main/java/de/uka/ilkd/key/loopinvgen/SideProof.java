@@ -27,6 +27,7 @@ public class SideProof {
 	private final Sequent seq;
 	private final int maxRuleApp;
 
+
 	// cache
 	// the key of the cache is a set, i.e., the order of the terms is not of relevance
 	static class CacheKey {
@@ -135,14 +136,14 @@ public class SideProof {
 			if (value.hitCount == 2) {
 				// if the seq is request at least twice we perform some simplifications to
 				// avoid repetitions
-				value.seq = simplifySequent(value.seq);
+				value.seq = simplifySequent(value.seq, services);
 			}
 			return value.seq;
 		}
 
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT;
-		Set<Term> locSetVars = new HashSet<>();
 
+		Set<Term> locSetVars = new HashSet<>();
 		locSetVars.addAll(collectProgramAndLogicVariables(ts1));
 		locSetVars.addAll(collectProgramAndLogicVariables(ts2));
 
@@ -189,18 +190,23 @@ public class SideProof {
 		return sideSeq;
 	}
 
-	private Sequent simplifySequent(Sequent sideSeq) {
+	/**
+	 * simplifies the given sequent
+	 * @param sequent the Sequent to simplify
+	 * @return the simplified sequent
+	 */
+	public static Sequent simplifySequent(Sequent sequent, Services services) {
 		try {
-			ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000,
+			ApplyStrategyInfo info = isProvableHelper(sequent, 1000,
 					true, false, services);
 			if (info.getProof().openGoals().size() != 1) {
 				throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
 			}
-			sideSeq = info.getProof().openGoals().head().sequent();
+			sequent = info.getProof().openGoals().head().sequent();
 		} catch (ProofInputException e) {
 			e.printStackTrace();
 		}
-		return sideSeq;
+		return sequent;
 	}
 
 
