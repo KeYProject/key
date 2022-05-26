@@ -298,10 +298,6 @@ public class SideProof {
 			return t1.hashCode() + t2.hashCode();
 		}
 	}
-//	Term expr2term(Expression expr) {
-//		return this.services.getTypeConverter().convertToLogicElement(expr);
-//	}
-
 	static class CacheValue {
 		Sequent seq;
 		int hitCount;
