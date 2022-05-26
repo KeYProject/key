@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -19,7 +20,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Provides means to perform side proofs required by the loop invariant generator.
+ * Such a side proof is need for instance to check whether a set of formulas implies
+ * that for the values of two arithmetic terms t1 and t2 the ordering t1 < t2 holds.
+ */
 public class SideProof {
+
+	//0: off, 1: save proof files and print short proof info, 2: verbose output
+	private static final int DEBUG_VERBOSITY = 1;
 
 	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
 	private final Services services;
@@ -61,17 +70,16 @@ public class SideProof {
 													 int maxRuleApp, boolean simplifyOnly,
 													 boolean stopAtFirstUncloseableGoal,
 													 Services services) throws ProofInputException {
-		//		System.out.println("isProvable: " + seq2prove);
-
 		final ProofStarter ps = new ProofStarter(false);
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
 		ps.init(seq2prove, env, "IsInRange Proof");
 
 		StrategyProperties sp = null;
-		final StrategySettingsDefinition strategySettingsDef = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
+		final StrategySettingsDefinition strategyDefinition = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
+
 		if (simplifyOnly) {
 			//Simplification
-			for (var el : strategySettingsDef.getFurtherDefaults()) {
+			for (var el : strategyDefinition.getFurtherDefaults()) {
 				if (el.first.equals("Simplification")) {
 					sp = el.third.createDefaultStrategyProperties();
 					ps.setStrategy(new DepSimplificationStrategy(ps.getProof(), sp));
@@ -80,7 +88,7 @@ public class SideProof {
 			}
 		}
 		if (sp == null) {
-			sp = strategySettingsDef.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+			sp = strategyDefinition.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		}
 
 		if (stopAtFirstUncloseableGoal) {
@@ -88,7 +96,6 @@ public class SideProof {
 		} else {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
 		}
-//		System.out.println("strategy prop. " + sp);
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
@@ -99,6 +106,28 @@ public class SideProof {
 	}
 
 	static long COUNTER=0; // only used for saving - unique filenames
+	private static void printDebugAndSaveProof(ApplyStrategyInfo info) {
+		if (DEBUG_VERBOSITY == 0) return;
+		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+
+		if (DEBUG_VERBOSITY > 1) {
+			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+			System.out.println("Rules: " + info.getProof().getStatistics());
+			if (!info.getProof().closed()) {
+				System.out.println("Open Goals: " + info.getProof().openGoals());
+			}
+			System.out.println("Applied rules:" + info.getAppliedRuleApps());
+		}
+
+		try {
+			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
+			System.out.println(COUNTER);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		COUNTER++;
+	}
+
 	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,
 									 boolean stopAtFirstUncloseableGoal,
 									 Services services) {
@@ -109,32 +138,11 @@ public class SideProof {
 			pie.printStackTrace();
 			return false;
 		}
-//		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-
-
-//		System.out.println("rules: "+ ps.getProof().getStatistics());
-//		if (!info.getProof().closed()) {
-//			System.out.println("Open Goals: " + info.getProof().openGoals());
-//		}
-//System.out.println("==>" + info.getAppliedRuleApps());
 
 		boolean closed = info.getProof().closed();
 
-//		if(!closed) {
-//			System.out.println(info.reason() + " CO" + COUNTER);
-//			System.out.println(" proof could not be closed for " + ps.getProof());
-//			System.out.println(" proof could not be closed for " + seq2prove);
-//		**
-		try {
-				new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();
-				System.out.println(COUNTER);
-			} catch (IOException e) {
-//				 TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			COUNTER++;
-//		}
-		System.out.println(closed);
+		if (DEBUG_VERBOSITY > 0) printDebugAndSaveProof(info);
+
 		return closed;
 	}
 
