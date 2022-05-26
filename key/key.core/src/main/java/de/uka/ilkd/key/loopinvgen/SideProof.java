@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -133,81 +130,76 @@ public class SideProof {
 	private Sequent prepareSideProof(Term ts1, Term ts2) {
 		final CacheKey key = new CacheKey(ts1, ts2);
 		CacheValue value= cache.get(key);
-
-		Sequent sideSeq;
 		if (value != null) {
 			value.hitCount++;
-			sideSeq = value.seq;
 			if (value.hitCount == 2) {
 				// if the seq is request at least twice we perform some simplifications to
 				// avoid repetitions
-				try {
-					ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000, true, false, services);
-					if (info.getProof().openGoals().size() != 1) {
-						throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
-					}
-					sideSeq = info.getProof().openGoals().head().sequent();
-				} catch (ProofInputException e) {
-					e.printStackTrace();
-				}
-				value.seq = sideSeq;
+				value.seq = simplifySequent(value.seq);
 			}
-			return sideSeq;
+			return value.seq;
 		}
-		sideSeq = Sequent.EMPTY_SEQUENT;
+
+		Sequent sideSeq = Sequent.EMPTY_SEQUENT;
 		Set<Term> locSetVars = new HashSet<>();
 
-		if (ts1.subs().isEmpty()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(ts1));
-		} else {
-			for (Term t : ts1.subs()) {
-				locSetVars.addAll(collectProgramAndLogicVariables(t));
-			}
-		}
-		if (ts2.subs().isEmpty()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(ts2));
-		} else {
-			for (Term t : ts2.subs()) {
-				locSetVars.addAll(collectProgramAndLogicVariables(t));
-			}
-		}
+		locSetVars.addAll(collectProgramAndLogicVariables(ts1));
+		locSetVars.addAll(collectProgramAndLogicVariables(ts2));
 
-		Set<Term> anteFmlVars;
-		Set<SequentFormula> tempAnteToAdd = new HashSet<>();
-		Set<SequentFormula> tempSuccToAdd = new HashSet<>();
+		final Set<SequentFormula> tempAnteToAdd = new HashSet<>();
+		final Set<SequentFormula> tempSuccToAdd = new HashSet<>();
 		int size;
-
 		do {
 			size = locSetVars.size();
-			for (SequentFormula sfAnte : seq.antecedent()) {
-				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-				for (Term tfv : anteFmlVars) {
-					if (locSetVars.contains(tfv)) {
-						if (tempAnteToAdd.add(sfAnte)) {
-							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
-							locSetVars.addAll(anteFmlVars);
-							break;
-						}
-					}
-				}
-			}
-
-			Set<Term> succFmlVars;
-			for (SequentFormula sfSucc : seq.succedent()) {
-				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
-				for (Term tfv : succFmlVars) {
-					if (locSetVars.contains(tfv)) {
-						if (tempSuccToAdd.add(sfSucc)) {
-							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
-							locSetVars.addAll(succFmlVars);
-							break;
-						}
-					}
-				}
-			}
+			sideSeq = addRelevantSequentFormulas(seq.antecedent(), tempAnteToAdd, locSetVars, sideSeq, true);
+			sideSeq = addRelevantSequentFormulas(seq.succedent(), tempSuccToAdd, locSetVars, sideSeq, false);
 		} while (size != locSetVars.size());
 
 		cache.put(key, new CacheValue(sideSeq));
+		return sideSeq;
+	}
+
+	/**
+	 * determines relevant formulas of the given semisequent to add. Relevant formulas are those that have
+	 * program variables or constant symbols common with those in locSetVars
+	 * @param seq the Semisequent where to look for relevant formulas
+	 * @param tempAnteToAdd Set of newly added formulas to the antecedent
+	 * @param locSetVars Set of newly added formulas to the succedent
+	 * @param sideSeq the Sequent reflecting the current state of the to be constructed sequent
+	 * @param antec boolean indicating whether the given semisequent is the antecedent or succedent of the original sequent
+	 * @return the resulting sequent with added relevant formulas to sideSeq
+	 */
+	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
+											   Set<Term> locSetVars, Sequent sideSeq, boolean antec) {
+		for (SequentFormula sfAnte : seq) {
+			if (tempAnteToAdd.contains(sfAnte)) {
+				continue;
+			}
+			final Set<Term> anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+			for (Term tfv : anteFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					if (tempAnteToAdd.add(sfAnte)) {
+						sideSeq = sideSeq.addFormula(sfAnte, antec, true).sequent();
+						locSetVars.addAll(anteFmlVars);
+						break;
+					}
+				}
+			}
+		}
+		return sideSeq;
+	}
+
+	private Sequent simplifySequent(Sequent sideSeq) {
+		try {
+			ApplyStrategyInfo info = isProvableHelper(sideSeq, 1000,
+					true, false, services);
+			if (info.getProof().openGoals().size() != 1) {
+				throw new ProofInputException("simplification of sequent failed. Open goals " + info.getProof().openGoals().size());
+			}
+			sideSeq = info.getProof().openGoals().head().sequent();
+		} catch (ProofInputException e) {
+			e.printStackTrace();
+		}
 		return sideSeq;
 	}
 
@@ -281,7 +273,7 @@ public class SideProof {
 //		if(!closed) {
 //			System.out.println(info.reason() + " CO" + COUNTER);
 //			System.out.println(" proof could not be closed for " + ps.getProof());
-//			System.out.println(" proof could not be closed for " + seq2prove.succedent());
+//			System.out.println(" proof could not be closed for " + seq2prove);
 //		**		
 		try {
 				new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRMissing"+COUNTER+".key")).save();

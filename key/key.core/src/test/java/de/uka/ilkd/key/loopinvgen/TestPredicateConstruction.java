@@ -204,7 +204,6 @@ public class TestPredicateConstruction {
 	}
 
 	public void withoutFunc() {////////////////////DONE!
-
 		Term succFormula;
 
 		try {
