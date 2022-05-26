@@ -67,11 +67,11 @@ public class LIGNested  extends AbstractLoopInvariantGenerator  {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefinementNew3 pr0 =
-				new PredicateRefinementNew3(currentGoal.sequent(),
+		PredicateRefiner pr0 =
+				new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
 						allDepPreds, allCompPreds,
 						index, itrNumber, services);
-		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.predicateCheckAndRefine();
+		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.refine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
 		allDepPreds = refinedPreds.first;
 		allCompPreds = refinedPreds.second;
@@ -106,9 +106,9 @@ public class LIGNested  extends AbstractLoopInvariantGenerator  {
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
-			PredicateRefinementNew3 pr = new PredicateRefinementNew3(currentGoal.sequent(), allDepPreds, allCompPreds,
+			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
 					index, itrNumber, services);
-			refinedPreds = pr.predicateCheckAndRefine();
+			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;
 			
