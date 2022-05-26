@@ -26,6 +26,7 @@ public class SideProof {
 	private final TermBuilder tb;
 	private final Sequent seq;
 	private final int maxRuleApp;
+
 	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
 		tb = services.getTermBuilder();

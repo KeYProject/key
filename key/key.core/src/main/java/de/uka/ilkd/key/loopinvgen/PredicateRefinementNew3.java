@@ -19,11 +19,6 @@ import java.util.Set;
 
 public class PredicateRefinementNew3 {
 
-	public Set<Term> refinedCompList;
-	public Set<Term> refinedDepList;
-
-	private Set<Term> depPredicates;
-	private Set<Term> compPredicates;
 	private final Sequent sequent;
 	private final Services services;
 	private final SideProof sProof;
@@ -33,6 +28,10 @@ public class PredicateRefinementNew3 {
 	private final Term index;
 	private final IntegerLDT intLDT;
 	private final int itrNumber;
+	private Set<Term> refinedCompList;
+	private Set<Term> refinedDepList;
+	private Set<Term> depPredicates;
+	private Set<Term> compPredicates;
 
 	public PredicateRefinementNew3(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList,
 								   Term index, int iteration, Services services) {

@@ -96,7 +96,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 
-		LIGNew curNew = new LIGNew(services, seq);
+		LIGNew curNew = new LIGNew(seq, services);
 		curNew.mainAlg();
 	}
 
@@ -148,7 +148,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 
-		LIGNew curNew = new LIGNew(services, seq);
+		LIGNew curNew = new LIGNew(seq, services);
 		curNew.mainAlg();
 	}
 
@@ -199,7 +199,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 
-		LIGNew cur = new LIGNew(services, seq);
+		LIGNew cur = new LIGNew(seq, services);
 		cur.mainAlg();
 	}
 
@@ -248,7 +248,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 
-		LIGNew cur = new LIGNew(services, seq);
+		LIGNew cur = new LIGNew(seq, services);
 		cur.mainAlg();
 	}
 
@@ -299,7 +299,7 @@ public class TestPredicateConstruction {
 			return;
 		}
 		
-		LIGNew curNew = new LIGNew(services, seq);
+		LIGNew curNew = new LIGNew(seq, services);
 		curNew.mainAlg();
 	}
 //
@@ -442,7 +442,7 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		LIGNew cur = new LIGNew(services, seq);
+		LIGNew cur = new LIGNew(seq, services);
 		cur.mainAlg();
 	}
 
@@ -522,7 +522,7 @@ public class TestPredicateConstruction {
 		}
 
 
-		LIGNew curNew = new LIGNew(services, seq);
+		LIGNew curNew = new LIGNew(seq, services);
 		curNew.mainAlg();
 	
 	}
@@ -600,14 +600,10 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-
-
-		LIGNew curNew = new LIGNew(services, seq);
+		LIGNew curNew = new LIGNew(seq, services);
 		curNew.mainAlg();
-	
 	}
 
-	
 //
 //	
 //	
