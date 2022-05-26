@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PredicateSetCompression {
+public class PredicateSetCompressor {
 	private final DependenciesLDT depLDT;
 	private final TermBuilder tb;
 //	private final SequentFormula currentIdxF;
@@ -27,7 +27,7 @@ public class PredicateSetCompression {
 	private final boolean ailias;
 	private Set<Term> allPreds;
 
-	public PredicateSetCompression(Set<Term> preds, Sequent seq, boolean ailiasing, Services services) {
+	public PredicateSetCompressor(Set<Term> preds, Sequent seq, boolean ailiasing, Services services) {
 		tb = services.getTermBuilder();
 //		currentIdxF = currentIndexFormula;
 		depLDT = services.getTypeConverter().getDependenciesLDT();

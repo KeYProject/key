@@ -121,8 +121,8 @@ public class LIGNested  extends AbstractLoopInvariantGenerator  {
 		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
 		allDepPreds.addAll(allCompPreds);
-		PredicateSetCompression compressor =
-				new PredicateSetCompression(allDepPreds, currentGoal.sequent(), false, services);
+		PredicateSetCompressor compressor =
+				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
 
 		allDepPreds = compressor.compress();
 

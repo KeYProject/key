@@ -118,8 +118,8 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
 		allDepPreds.addAll(allCompPreds);
 
-		final PredicateSetCompression compressor =
-				new PredicateSetCompression(allDepPreds, currentGoal.sequent(), false, services);
+		final PredicateSetCompressor compressor =
+				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
 		allDepPreds = compressor.compress();
 
 		return new LoopInvariantGenerationResult(allDepPreds, itrNumber);
