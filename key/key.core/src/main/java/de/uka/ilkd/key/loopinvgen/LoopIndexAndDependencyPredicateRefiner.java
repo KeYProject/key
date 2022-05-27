@@ -216,8 +216,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 						subLoc = tb.empty();
 					}
 
-					final Function op = unProven.op() instanceof Function ? (Function) unProven.op() : null;
-					if (op != null && depLDT.isDependencePredicate(op)) {
+					if (depLDT.isDependencePredicate(unProven.op())) {
+						final Function op = (Function) unProven.op();
 						result.add(tb.func(op, subLoc));
 						result.add(tb.func(op, lowSingleton));
 						result.add(tb.func(op, highSingleton));
