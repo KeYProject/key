@@ -656,6 +656,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
+        setupLocset(d);
         setupDependencyPredicateStrategy(d);
 
         return d;
@@ -672,7 +673,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Operator noW = depLDT.getNoW();;
 
 
-        final TermFeature isDepPredicate = or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
+        final TermFeature isDepPredicate =
+                or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
         bindRuleSet(d, "pull_out_dep_locations",
                 add(applyTF(FocusProjection.create(1), isDepPredicate),
                         applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
@@ -689,7 +691,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
                 let(assumesLocSet, instOfNonStrict("loc1"),
                         sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
-                                ifZero(applyTF(findSubTerms,op(setMinus)), not(eq(assumesLocSet, sub(findSubTerms,1))), longConst(0)))), longConst(0));
+                                ifZero(applyTF(findSubTerms,op(setMinus)),
+                                        not(eq(assumesLocSet, sub(findSubTerms,1))),
+                                        longConst(0)))), longConst(0));
 
 
 //		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
@@ -1055,6 +1059,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean normalSplitting() {
         return StrategyProperties.SPLITTING_NORMAL.equals(strategyProperties
                 .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY));
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////
+    //
+    // Application of locset rules
+    //
+    // //////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////
+    private  void setupLocset(RuleSetDispatchFeature d) {
+        bindRuleSet(d, "locset_expand_setMinus", 100);
     }
 
     // //////////////////////////////////////////////////////////////////////////

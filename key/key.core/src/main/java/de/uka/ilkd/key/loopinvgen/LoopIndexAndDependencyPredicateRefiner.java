@@ -1,55 +1,41 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.DependenciesLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class PredicateRefinementNew3 {
+public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
-	public Set<Term> refinedCompList;
-	public Set<Term> refinedDepList;
-
-	private final Sequent seq;
-	private Set<Term> depPredicates = new HashSet<>();
-	private Set<Term> compPredicates = new HashSet<>();
-	private final Services services;
-	private SideProof sProof;
-	private final DependenciesLDT depLDT;
-	private final LocSetLDT locsetLDT;
-	private final TermBuilder tb;
 	private final Term index;
-	private final IntegerLDT intLDT;
 	private final int itrNumber;
+	private Set<Term> refinedCompList;
+	private Set<Term> refinedDepList;
+	private Set<Term> depPredicates;
+	private Set<Term> compPredicates;
 
-	public PredicateRefinementNew3(Services s, Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term i,
-			int itr) {
-		services = s;
-		depPredicates = depPredList;
-		compPredicates = compPredList;
-		seq = sequent;
-		sProof = new SideProof(services, seq);
-		depLDT = services.getTypeConverter().getDependenciesLDT();
-		locsetLDT = services.getTypeConverter().getLocSetLDT();
-		tb = services.getTermBuilder();
-		index = i;
-		intLDT = services.getTypeConverter().getIntegerLDT();
-		itrNumber = itr;
+	public LoopIndexAndDependencyPredicateRefiner(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList,
+												  Term index, int iteration, Services services) {
+		super(sequent, services);
+		this.depPredicates  = depPredList;
+		this.compPredicates = compPredList;
+		this.index = index;
+		this.itrNumber = iteration;
 	}
 
-	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
+	@Override
+	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//	**				
 			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
@@ -64,7 +50,6 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for (Term dp : depPredicates) {
 				if (predicateImpliedBypredicate(w, dp)) {
-//					**		
 					System.out.println("IMPLIED " + w + " by " + dp);
 					break;
 				}
@@ -96,7 +81,7 @@ public class PredicateRefinementNew3 {
 				compPredicates.add(w);
 			}
 		}
-		return new Pair<Set<Term>, Set<Term>>(depPredicates, compPredicates);
+		return new Pair<>(depPredicates, compPredicates);
 	}
 
 	private boolean predicateImpliedBypredicate(Term dp1, Term dp2) {
@@ -104,54 +89,15 @@ public class PredicateRefinementNew3 {
 			return true;
 		} else if (dp2.op().equals(depLDT.getNoR())) {
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
-				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-					return true;
-				}
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		} else if (dp2.op().equals(depLDT.getNoW())) {
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
 					|| dp1.op().equals(depLDT.getNoWaW())) {
-				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-					return true;
-				}
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		}
 		return false;
-	}
-
-	private boolean sequentImpliesPredicate(Term pred) {
-//		**		
-		System.out.println("sequentImpliesPredicate is called for: "+pred);
-		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
-		for (SequentFormula sequentFormula : seq.antecedent()) {
-			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
-		}
-
-		for (SequentFormula sequentFormula : seq.succedent()) {
-			if (!sequentFormula.formula().containsJavaBlockRecursive()) {
-				sideSeq = sideSeq.addFormula(sequentFormula, false, false).sequent();
-			}
-		}
-
-//		System.out.println("is Provable called for: " +  pred);
-		final boolean provable = sProof.isProvable(sideSeq, services);
-//		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
-//				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
-//				|| pred.op() == Equality.EQUALS)) {//
-//			System.out.println("NOT Proved: " + ProofSaver.printAnything(sideSeq, services));
-//		}
-//		else if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
-//			System.out.println("Check: " + ProofSaver.printAnything(sideSeq, services));
-//		}
-//		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
-//		System.out.println(sideSeq);
-//		System.out.println("---------------------------------------------------------------");
-//		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {
-//			System.out.println("We have a Problem" );
-//		}
-//		**	
-		System.out.println(provable);
-		return provable;
 	}
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
@@ -195,14 +141,10 @@ public class PredicateRefinementNew3 {
 	}
 
 	private Set<Term> weakenBySubSetOLD(Term unProven) {
-		Set<Term> result = new HashSet<>();
+		final Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
-		Term lowSingleton = null;
-		Term highSingleton = null;
-		Term subLoc = null;
 
-//		Term opOnSubLocs = null;
-		if (!locSet.equals(locsetLDT.getEmpty()) && locSet != null && locSet.op().equals(locsetLDT.getArrayRange())) {
+		if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
 			final Term low = locSet.sub(1);
 			final Term newLow = tb.add(low, tb.one());
@@ -210,12 +152,15 @@ public class PredicateRefinementNew3 {
 			final Term newHigh = tb.sub(high, tb.one());
 
 			if (sProof.proofLEQ(low, high)) {
-				lowSingleton = tb.singleton(array, tb.arr(low));
-				highSingleton = tb.singleton(array, tb.arr(high));
-				if (sProof.proofEquality(newLow, newHigh))
+				final Term lowSingleton  = tb.singleton(array, tb.arr(low));
+				final Term highSingleton = tb.singleton(array, tb.arr(high));
+
+				final Term subLoc;
+				if (sProof.proofEquality(newLow, newHigh)) {
 					subLoc = tb.singleton(array, tb.arr(newLow));
-				else
+				} else {
 					subLoc = tb.arrayRange(array, newLow, newHigh);
+				}
 
 				if (unProven.op().equals(depLDT.getNoR())) {
 					result.add(tb.noR(subLoc));
@@ -247,12 +192,9 @@ public class PredicateRefinementNew3 {
 	private Set<Term> weakenBySubSet(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
-		Term lowSingleton = null;
-		Term highSingleton = null;
-		Term subLoc = null;
 
 //		Term opOnSubLocs = null;
-		if (!locSet.equals(locsetLDT.getEmpty()) && locSet != null && locSet.op().equals(locsetLDT.getArrayRange())) {
+		if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
 			final Term low = locSet.sub(1);
 			final Term newLow = tb.add(low, tb.one());
@@ -260,35 +202,25 @@ public class PredicateRefinementNew3 {
 			final Term newHigh = tb.sub(high, tb.one());
 
 			if (!sProof.proofEquality(low, high)) {
-				lowSingleton = tb.singleton(array, tb.arr(low));
-				highSingleton = tb.singleton(array, tb.arr(high));
+				final Term lowSingleton = tb.singleton(array, tb.arr(low));
+				final Term highSingleton = tb.singleton(array, tb.arr(high));
 
+				Term subLoc;
 				if (sProof.proofLT(tb.zero(), newHigh)) {
 					if (sProof.proofLT(newLow, newHigh)) {
 						subLoc = tb.arrayRange(array, newLow, newHigh);
 					} else if (sProof.proofEquality(newLow, newHigh)) {
 						subLoc = tb.singleton(array, tb.arr(newLow));
+					} else {
+						// should not happen, weaken to essentially tru
+						subLoc = tb.empty();
 					}
-					if (unProven.op().equals(depLDT.getNoR())) {
-						result.add(tb.noR(subLoc));
-						result.add(tb.noR(lowSingleton));
-						result.add(tb.noR(highSingleton));
-					} else if (unProven.op().equals(depLDT.getNoW())) {
-						result.add(tb.noW(subLoc));
-						result.add(tb.noW(lowSingleton));
-						result.add(tb.noW(highSingleton));
-					} else if (unProven.op().equals(depLDT.getNoRaW())) {
-						result.add(tb.noRaW(subLoc));
-						result.add(tb.noRaW(lowSingleton));
-						result.add(tb.noRaW(highSingleton));
-					} else if (unProven.op().equals(depLDT.getNoWaR())) {
-						result.add(tb.noWaR(subLoc));
-						result.add(tb.noWaR(lowSingleton));
-						result.add(tb.noWaR(highSingleton));
-					} else if (unProven.op().equals(depLDT.getNoWaW())) {
-						result.add(tb.noWaW(subLoc));
-						result.add(tb.noWaW(lowSingleton));
-						result.add(tb.noWaW(highSingleton));
+
+					if (depLDT.isDependencePredicate(unProven.op())) {
+						final Function op = (Function) unProven.op();
+						result.add(tb.func(op, subLoc));
+						result.add(tb.func(op, lowSingleton));
+						result.add(tb.func(op, highSingleton));
 					}
 				}
 			}
@@ -379,8 +311,8 @@ public class PredicateRefinementNew3 {
 			Term array = locSet.sub(0);
 			Term low = locSet.sub(1);
 			Term high = locSet.sub(2);
-			Term lowToI = null;
-			Term iToHigh = null;
+			Term lowToI;
+			Term iToHigh;
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
 			if (!sProof.proofEquality(low, index)) {
 				if (!sProof.proofEquality(index, high)) {
@@ -428,13 +360,13 @@ public class PredicateRefinementNew3 {
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
-		Set<Term> result = new HashSet<>();
+		Set<Term> result = compPredWeakeningByPredicates(pred);
 //		result.addAll(compPredWeakenByIndex(pred));
 //		System.out.println("Weakening by Predicate for: " + pred);
-		result.addAll(compPredWeakeningByPredicates(pred));
 //		System.out.println("Weakening by Heuristics for: " + pred);
-		if (itrNumber < 1)
+		if (itrNumber < 1) {
 			result.addAll(compPredWeakeningByHeuristics(pred));
+		}
 		return result;
 	}
 
