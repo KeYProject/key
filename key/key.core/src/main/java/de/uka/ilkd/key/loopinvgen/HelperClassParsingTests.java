@@ -35,15 +35,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassParsingTests {
     private static final Profile profile = JavaProfile.getDefaultProfile(); //{
-//            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-//	    @Override
-//      public RuleCollection getStandardRules() {
-//                return new RuleCollection(
-//                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
-//                                ImmutableSLList.<BuiltInRule>nil());
-//            }
-//        };
-    
     public HelperClassParsingTests() {
         
     }

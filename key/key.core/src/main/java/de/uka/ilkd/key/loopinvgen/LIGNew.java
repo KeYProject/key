@@ -48,7 +48,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 //			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
 //		}
 
-//		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
+		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
 		allCompPreds.add(tb.geq(index, low));
 		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
 		for (Term arr : arrays) {
@@ -74,7 +74,6 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
 		do {
 			itrNumber++;
-//			**		
 			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.clear();
