@@ -9,6 +9,8 @@ import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.swing.*;
 
+import java.math.RoundingMode;
+
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
 /**
@@ -20,7 +22,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String INFO_SOLVER_PARAMETERS = "infoSolverParameters";
     private static final String INFO_SOLVER_COMMAND = "infoSolverCommand";
     private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
-    private static final String[] solverSupportText = {
+    private static final String[] SOLVER_SUPPORT_TEXT = {
             BUNDLE.getString("SOLVER_SUPPORTED"),
             BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
             BUNDLE.getString("SOLVER_UNSUPPORTED")};
@@ -75,25 +77,32 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private String getSolverSupportText() {
         if (solverType.supportHasBeenChecked()) {
             return solverType.isSupportedVersion()
-                    ? solverSupportText[SOLVER_SUPPORTED]
-                    : solverSupportText[SOLVER_NOT_SUPPOTED];
+                    ? SOLVER_SUPPORT_TEXT[SOLVER_SUPPORTED]
+                    : SOLVER_SUPPORT_TEXT[SOLVER_NOT_SUPPOTED];
         } else {
-            return solverSupportText[SOLVER_SUPPORT_NOT_CHECKED];
+            return SOLVER_SUPPORT_TEXT[SOLVER_SUPPORT_NOT_CHECKED];
         }
     }
 
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), null);
+                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), emptyValidator());
         txt.setEditable(false);
         return txt;
     }
 
     private JSpinner createSolverTimeout() {
-        var model = new SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(-1L), Long.valueOf(Long.MAX_VALUE),
-                Long.valueOf(1L));
-        var jsp = createNumberTextField(model, null);
+        var model = new SpinnerNumberModel(0.0, -1.0, Long.MAX_VALUE, 1);
+        // Validator is empty as no additional requirements have to be fulfilled by the entered
+        // value (except being a number, which is ensured by the model itself).
+        var jsp = createNumberTextField(model, emptyValidator());
+        // Set the editor so that entered Strings only have three decimal places.
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jsp,
+                "#.###");
+        // Use floor rounding to be consistent with the value that will be set for the timeout.
+        editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
+        jsp.setEditor(editor);
         addTitledComponent("Timeout", jsp, BUNDLE.getString(INFO_SOLVER_TIMEOUT));
         return jsp;
     }
@@ -139,13 +148,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
                         (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
             }
         }
-        JTextField txt = addTextField("Installed", info, "", null);
+        JTextField txt = addTextField("Installed", info, "", emptyValidator());
         txt.setEditable(false);
         return txt;
     }
 
     protected JTextField createSolverName() {
-        JTextField txt = addTextField("Name", solverType.getName(), BUNDLE.getString(INFO_SOLVER_NAME), null);
+        JTextField txt = addTextField("Name", solverType.getName(),
+                BUNDLE.getString(INFO_SOLVER_NAME), emptyValidator());
         txt.setEditable(false);
         return txt;
     }
@@ -166,7 +176,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             solverCommand.setText(solverData.getSolverCommand());
             solverParameters.setText(solverData.getSolverParameters());
-            solverTimeout.setValue((Long) solverData.getTimeout()/1000L);
+            solverTimeout.setValue(((double) solverData.getTimeout())/1000);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
@@ -188,7 +198,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (solverData != null) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
-            long timeout = ((Long) solverTimeout.getValue())*1000L;
+            long timeout = (long) (((Number) solverTimeout.getValue()).doubleValue()*1000.0);
 
             solverData.setTimeout(timeout);
             solverData.setSolverCommand(command);

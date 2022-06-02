@@ -6,6 +6,8 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import javax.annotation.Nullable;
 import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -30,6 +32,8 @@ import java.text.Format;
  * @author weigl
  */
 public class SimpleSettingsPanel extends JPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSettingsPanel.class);
     private static final ColorSettings.ColorProperty COLOR_ERROR = ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
@@ -96,8 +100,7 @@ public class SimpleSettingsPanel extends JPanel {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
-        JScrollPane scrollArea = new JScrollPane(area);
-        return scrollArea;
+        return new JScrollPane(area);
     }
 
 
@@ -107,14 +110,33 @@ public class SimpleSettingsPanel extends JPanel {
         return field;
     }
 
-    protected JFormattedTextField createNumberFormattedTextField(Format format, final @Nullable Validator<String> validator) {
+    protected JFormattedTextField createNumberFormattedTextField(Format format,
+                                                                 final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
-    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(
-            T min, T max, T step, final @Nullable Validator<Number> validator) {
+    /**
+     * Create a new JSpinner for numbers in [min, max] using the given step size for its arrow
+     * buttons.
+     * The min and max values have to be comparable and min will be set as the initial value, so
+     * it has to be subclassing the Number class, in order to be handled correctly by the
+     * SpinnerNumberModel.
+     * Note that min will also determine the Number class into which the JSpinner's NumberFormatter
+     * will format entered Strings
+     * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
+     * Entered values have to be Numbers, otherwise the Number-Validator will fail.
+     *
+     * @param min the minimum value of the JSpinner
+     * @param max the maximum value of the JSpinner
+     * @param step the step size of the JSpinner
+     * @param validator a validator used to check the entered values for additional restrictions
+     * @return the created JSpinner
+     * @param <T> the class of the minimum value
+     */
+    protected <T extends Number & Comparable<?>> JSpinner createNumberTextField(
+            T min, Comparable<?> max, Number step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
@@ -172,11 +194,13 @@ public class SimpleSettingsPanel extends JPanel {
             Object current = model.getValue();
             try {
                 if (validator != null) {
+                    // This typecast will lead to an exception if the model's value is not of
+                    // (a subclass of) class T.
                     validator.validate((T) current);
                 }
                 demarkComponentAsErrornous(model);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.error(ex.getMessage());
                 markComponentAsErrornous(model, ex.getMessage());
             }
         }
