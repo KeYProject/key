@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     private int hashCode = -1;
 
     /**
-     * 
+     *
      * @param type
      *            at least on solver type must be passed.
      * @param types

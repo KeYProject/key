@@ -50,7 +50,8 @@ public class FloatHandler implements SMTHandler {
     private boolean sqrtNative;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) throws IOException {
 
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();

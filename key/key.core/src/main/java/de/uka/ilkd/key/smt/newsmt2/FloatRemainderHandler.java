@@ -2,22 +2,15 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 /**
  * This handler is a fallback handler that introduces a new uninterpreted
@@ -38,7 +31,8 @@ public class FloatRemainderHandler implements SMTHandler {
     private Sort doubleSort;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) {
         enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();

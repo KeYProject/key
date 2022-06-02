@@ -4,11 +4,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
  */
+@SuppressWarnings("unused")     // used via reflection by the legacy solver types
 public class SmtLib2Translator extends AbstractSMTTranslator {
     private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
@@ -60,24 +62,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     private static final StringBuilder DISTINCT = new StringBuilder("distinct");
 
-    /**
-     * Just a constructor which starts the conversion to Simplify syntax.
-     * The result can be fetched with
-     *
-     * @param sequent  The sequent which shall be translated.
-     * @param services The Services Object belonging to the sequent.
-     */
-    public SmtLib2Translator(Sequent sequent, Services services, Configuration config) {
-        super(sequent, services, config);
-    }
-
-    /**
-     * For translating only terms and not complete sequents.
-     */
-    public SmtLib2Translator(Services s, Configuration config) {
-        super(s, config);
-    }
-
     protected StringBuilder translateNull() {
         return NULLSTRING;
     }
@@ -95,6 +79,18 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         return BOOL;
     }
 
+    /**
+     * This constructor only exists to have uniform constructors for both the modular and
+     * the legacy translation.
+     * @param handlerNames not used by this translator!
+     * @param handlerOptions also not used by this translator
+     * @param preamble also also not used
+     */
+    @SuppressWarnings("unused")     // can be called via reflection
+    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
+                             @Nullable String preamble) {
+    }
+
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
                                               ArrayList<StringBuilder> assumptions,
@@ -105,9 +101,12 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
                                               ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
                                               SMTSettings settings) {
         StringBuilder result = new StringBuilder();
-        if (getConfig().mentionLogic()) {
+        /* Always set logic now, (hopefully) does no harm with the modern SMT solvers we support.
+        Note that the logic to be set may be (and is) hardcoded into the
+        SMTSettings#getLogic() method (currently AUFNIRA). */
+        //if (getConfig().mentionLogic()) {
             result.append("(set-logic " + settings.getLogic() + " )\n");
-        }
+        //}
         result.append("(set-option :print-success true) \n");
         result.append("(set-option :produce-unsat-cores true)\n");
         result.append("(set-option :produce-models true)\n");
@@ -155,7 +154,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
         //add the assumptions
-        ArrayList<StringBuilder> AssumptionsToRemove = new ArrayList<>();
+        ArrayList<StringBuilder> assumptionsToRemove = new ArrayList<>();
         StringBuilder assump = new StringBuilder();
         boolean needsAnd = assumptions.size() > 1;
 
@@ -165,7 +164,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             if (block.getStart() <= block.getEnd()) {
                 assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()]).append("\n");
                 for (int i = block.getStart(); i <= block.getEnd(); i++) {
-                    AssumptionsToRemove.add(assumptions.get(i));
+                    assumptionsToRemove.add(assumptions.get(i));
                     assump.append(assumptions.get(i));
                     assump.append("\n");
                 }
@@ -173,7 +172,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         }
 
 
-        assumptions.removeAll(AssumptionsToRemove);
+        assumptions.removeAll(assumptionsToRemove);
 
 
         if (!assumptions.isEmpty()) {
@@ -577,9 +576,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
     @Override
-    protected StringBuilder translateDistinct(FunctionWrapper[] fw) {
+    protected StringBuilder translateDistinct(FunctionWrapper[] fw, Services services) {
         if (getSettings() == null || !getSettings().useBuiltInUniqueness()) {
-            return super.translateDistinct(fw);
+            return super.translateDistinct(fw, services);
         }
         int start = 0;
         ArrayList<ArrayList<StringBuilder>> temp = new ArrayList<>();
