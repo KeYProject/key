@@ -657,6 +657,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             // not part of the class declaration
             // A special case is needed, hence.
             result = javaInfo.getInvProgramVar();
+        } else if (attributeName.equals("<inv_free>")) {
+            result = javaInfo.getFreeInvProgramVar();
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {

@@ -443,25 +443,39 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
+                final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
                 if (!pm.isConstructor()) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(ctx,
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invString),
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
-                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(ctx,
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx,
+                    specCase.addClause(ENSURES, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invString),
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    final ParserRuleContext ctx = JmlFacade.parseClause(format("signals (Throwable e) %s;", invString));
-                    specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS, new LabeledParserRuleContext(ctx,
+                    specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS, new LabeledParserRuleContext(
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    //TODO signals_free
+                    /*specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invFreeString)),
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));*/
                 }
             }
 

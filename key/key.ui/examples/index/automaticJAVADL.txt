@@ -587,6 +587,9 @@ group javadl {
    provable ./standard_key/java_dl/jml-free/assignableFree0.key
    provable ./standard_key/java_dl/jml-free/assignableFree1.key
    provable ./standard_key/java_dl/jml-free/assignableFree2.key
+   provable ./standard_key/java_dl/jml-free/invFree1.key
+   provable ./standard_key/java_dl/jml-free/invFree2.key
+   provable ./standard_key/java_dl/jml-free/invFree3.key
    provable ./standard_key/java_dl/jml-free/assignableFree3.key
    provable ./standard_key/java_dl/jml-free/assignableFreeLoopScopeRule.key
    provable ./standard_key/java_dl/jml-free/assignableFreeLoopTransformationRule.key

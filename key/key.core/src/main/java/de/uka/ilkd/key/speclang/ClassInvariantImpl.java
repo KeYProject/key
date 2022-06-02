@@ -69,6 +69,10 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * or an instance invariant (i.e., &lt;inv&gt;).
      */
     private final boolean isStatic;
+    /**
+     * Whether the class invariant is free.
+     */
+    private final boolean isFree;
 
 
     //-------------------------------------------------------------------------
@@ -86,25 +90,46 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name,
-                              String displayName,
-                              KeYJavaType kjt,
-                              VisibilityModifier visibility,
-                              Term inv,
-                              ParsableVariable selfVar) {
+            String displayName,
+            KeYJavaType kjt,
+            VisibilityModifier visibility,
+            Term inv,
+            ParsableVariable selfVar) {
+        this(name, displayName, kjt, visibility, inv, selfVar, false);
+    }
+
+    /**
+     * Creates a class invariant.
+     * @param name the unique internal name of the invariant
+     * @param displayName the displayed name of the invariant
+     * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant
+     *        (null for default visibility)
+     * @param inv the invariant formula itself
+     * @param selfVar the variable used for the receiver object
+     * @param free whether this contract is free.
+     */
+    public ClassInvariantImpl(String name,
+            String displayName,
+            KeYJavaType kjt,
+            VisibilityModifier visibility,
+            Term inv,
+            ParsableVariable selfVar,
+            boolean free) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
-	assert kjt != null;
+        assert kjt != null;
         assert inv != null;
         this.name            = name;
         this.displayName     = displayName;
-	this.kjt             = kjt;
+        this.kjt             = kjt;
         this.visibility      = visibility;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
         this.isStatic        = selfVar == null;
-//        assert isStatic == !oc.contains(originalSelfVar);
+        this.isFree = free;
     }
 
 
@@ -113,8 +138,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
     //-------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(
-                ParsableVariable selfVar,
-                TermServices services) {
+            ParsableVariable selfVar,
+            TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 
         if(selfVar != null && originalSelfVar != null) {
@@ -151,14 +176,14 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
 
 
     @Override
     public Term getInv(ParsableVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap
-        	= getReplaceMap(selfVar, services);
+        = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
@@ -174,13 +199,18 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public boolean isStatic() {
-	return isStatic;
+        return isStatic;
+    }
+
+    @Override
+    public boolean isFree() {
+        return isFree;
     }
 
 
     @Override
     public VisibilityModifier getVisibility() {
-	return visibility;
+        return visibility;
     }
 
 
@@ -188,11 +218,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public ClassInvariant setKJT(KeYJavaType newKjt) {
         String newName = name.replaceFirst(kjt.getName(), newKjt.getName());
         return new ClassInvariantImpl(newName,
-                                      displayName,
-                                      newKjt,
-                                      visibility,
-                                      originalInv,
-                                      originalSelfVar);
+                displayName,
+                newKjt,
+                visibility,
+                originalInv,
+                originalSelfVar);
     }
 
 
