@@ -27,7 +27,8 @@ public class CastingFunctionsHandler implements SMTHandler {
     private SortDependingFunction select;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
         this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);

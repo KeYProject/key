@@ -10,11 +10,10 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
@@ -53,7 +52,7 @@ public class SMTCommand
         } else {
              goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
-        
+
         for (Goal goal : goals) {
             runSMT(args, su, goal);
         }
@@ -107,7 +106,7 @@ public class SMTCommand
     public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
-        
+
         @Option(value = "all", required = false)
         public boolean all = false;
 
