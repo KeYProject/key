@@ -59,8 +59,7 @@ public class ProveSMTLemmasTest {
             path = Paths.get(proofFile.toURI());
         } else {
             path = Files.createTempFile("SMT_lemma_" + name + "_", ".key");
-            // TODO Use writeString in Java 11
-            Files.write(path, (HEADER + "\\problem { " + lemmaString + "}").getBytes());
+            Files.writeString(path, HEADER + "\\problem { " + lemmaString + "}");
         }
 
         File file = path.toFile();
