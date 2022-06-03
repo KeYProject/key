@@ -117,7 +117,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1,
+        return addNumberField("Locset bound:", 0L, (long) Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_BOUND),
                 e -> settings.setLocsetBound(e.longValue()));
     }
@@ -145,19 +145,19 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1,
+        return addNumberField("Integer bound:", 0L, (long) Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_BOUND),
                 e -> settings.setIntBound(e.longValue()));
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1,
+        return addNumberField("Seq bound:", 0L, (long) Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_BOUND),
                 e -> settings.setSeqBound(e.longValue()));
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1,
+        return addNumberField("Object bound:", 0L, (long) Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_BOUND),
                 e -> settings.setObjectBound(e.longValue()));
     }

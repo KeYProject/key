@@ -135,8 +135,8 @@ public class SimpleSettingsPanel extends JPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<?>> JSpinner createNumberTextField(
-            T min, Comparable<?> max, Number step, final @Nullable Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(
+            T min, Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
