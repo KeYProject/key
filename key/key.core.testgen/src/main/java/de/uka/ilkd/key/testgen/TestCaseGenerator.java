@@ -677,11 +677,6 @@ public class TestCaseGenerator {
                     init = "false";
                 }
 
-                // Bugfix #1711: remove labels from constants
-                if (c.hasLabels()) {
-                    c = services.getTermFactory().createTerm(c.op(), c.subs(), c.boundVars(), c.javaBlock());
-                }
-
                 result.append(NEW_LINE).append(TAB).append(NULLABLE)
                         .append(" ").append(getSafeType(c.sort())).append(" ")
                         .append(c).append(" = ").append(init).append(";");
