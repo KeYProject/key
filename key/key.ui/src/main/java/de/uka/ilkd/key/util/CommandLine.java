@@ -203,7 +203,7 @@ public final class CommandLine {
     private Map<String, CommandLine> subcommands = new HashMap<>();
 
     public void addSubCommand(String name) {
-        // TODO: test if valid name
+        // TODO: test if valid name (e.g. must not start with MINUS)
         // TODO: test if already exists
         subcommands.put(name, new CommandLine());
     }

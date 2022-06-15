@@ -28,13 +28,15 @@ import org.key_project.proofmanagement.merge.ProofBundleMerger;
  *        --settings settings check
  *        --dependency dependency check
  *        --auto try to use automode to close open proofs
- *        --explicit (implies a) stores automatically found proofs explicitly as files
- *        --report generate html report + API
+ *        --explicit (implies --auto) stores automatically found proofs explicitly as files
+ *        --report generate html report, needs the target filename as parameter
  *        --missing check for contracts that have no proof
  *    checks that are always enabled:
  *        - check for duplicate proofs of the same contracts
  *    individually and independently trigger different checks
  *  merge [--force] [--no-check] <bundle1> <bundle2> ... <output>
+ *    Merges the given n bundles into a single bundle. By default, no consistency checks are run
+ *    (note that this may produce a completely broken bundle, if there are inconsistencies).
  *    options:
  *        --force merge the bundles even when the consistency check failed
  *        --check "<check_options>" passes the given options to the check command and
@@ -115,7 +117,20 @@ public final class Main {
                 CL.printUsage(System.out);
             }
         } catch (CommandLineException e) {
-            e.printStackTrace();
+            if (CL.subCommandUsed("check")) {
+                System.out.println(USAGE_CHECK);
+                System.out.println();
+
+                CL.getSubCommandLine("check").printUsage(System.out);
+            } else if (CL.subCommandUsed("merge")) {
+                System.out.println(USAGE_MERGE);
+            } else if (CL.subCommandUsed("bundle")) {
+                // TODO
+            } else {
+                CL.printUsage(System.out);
+            }
+            //e.printStackTrace();
+            //System.out.println(USAGE);
         }
     }
 
@@ -172,9 +187,11 @@ public final class Main {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("Error while accessing the proof bundle!");
             globalResult.print("ProofManagement interrupted due to critical error.");
+            e.printStackTrace();
         } catch (ProofManagementException e) {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("ProofManagement interrupted due to critical error.");
+            e.printStackTrace();
         } catch (Throwable e) {
             System.err.println("Error creating the report: ");
             e.printStackTrace();
@@ -224,7 +241,12 @@ public final class Main {
         }
 
         // TODO: use result, print message, clean up created zips
-        ProofBundleMerger.merge(inputs, output);
+        try {
+            ProofBundleMerger.merge(inputs, output);
+        } catch (ProofManagementException e) {
+            System.err.println("Error when trying to merge the bundles: ");
+            e.printStackTrace();
+        }
 
         // perform a check with given commands
         if (commandLine.isSet("--check")) {

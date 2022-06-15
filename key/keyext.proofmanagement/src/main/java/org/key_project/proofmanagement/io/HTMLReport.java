@@ -2,13 +2,7 @@ package org.key_project.proofmanagement.io;
 
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
-import org.stringtemplate.v4.Interpreter;
-import org.stringtemplate.v4.NumberRenderer;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STRawGroupDir;
-import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STMessage;
@@ -103,6 +97,26 @@ public final class HTMLReport {
                     return map.entrySet();
                 }
                 return super.getProperty(interp, self, map, property, propertyName);
+            }
+        });
+
+        /* This additional ModelAdaptor is workaround needed for access of Node.getValue in string
+         * template, otherwise we would have to add this to build.gradle files in key.ui and
+         * keyext.proofmanagement:
+         *    jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED'] */
+        Class<Map.Entry<?, ?>> mapEntryClass = (Class<Map.Entry<?, ?>>)(Class)Map.Entry.class;
+        group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
+            @Override
+            public synchronized Object getProperty(Interpreter interp, ST self,
+                                                   Map.Entry<?, ?> entry, Object property,
+                                                   String propertyName)
+                throws STNoSuchPropertyException {
+                if (property.equals("value")) {
+                    return entry.getValue();
+                } else if (property.equals("key")) {
+                    return entry.getKey();
+                }
+                return super.getProperty(interp, self, entry, property, propertyName);
             }
         });
 

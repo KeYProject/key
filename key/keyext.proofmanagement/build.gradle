@@ -4,7 +4,7 @@ dependencies {
     implementation project(':key.core')
     implementation project(':key.ui')
 
-    implementation group: 'org.antlr', name: 'ST4', version: '4.3'
+    implementation group: 'org.antlr', name: 'ST4', version: '4.3.3'
 }
 
 application {
@@ -14,5 +14,9 @@ application {
 }
 
 run {
-    args('check', '--missing', '--settings', '--report', '../../../testReport3.html', '--replay', '--dependency', '../../../Bugs_Examples/ba_simple')
+    args('check', '--missing', '--settings', '--report', '../../../proofManagementReport.html', '--replay', '--dependency', '../../../../dev/ba_simple')
+
+    // not necessary any more with the workaround in HTMLReport
+    // needed for access of Node.getValue in string template
+    // jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
 }

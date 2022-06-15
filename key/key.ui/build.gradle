@@ -63,8 +63,6 @@ run {
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
     //jvmArgs += "-Dsun.awt.disablegrab=true"
 
-    // needed for access of Node.getValue in string template
-    jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
 }
 
 task runWithProfiler(type: JavaExec) {

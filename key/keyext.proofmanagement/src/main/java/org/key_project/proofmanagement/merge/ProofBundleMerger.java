@@ -1,5 +1,6 @@
 package org.key_project.proofmanagement.merge;
 
+import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 import java.io.IOException;
@@ -9,8 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ProofBundleMerger {
-    // TODO: output is assumed to be absolute
-    public static void merge(List<Path> inputs, Path output) {
+    private ProofBundleMerger() {
+    }
+
+    /**
+     * This method merges n proof bundles into a single one.
+     * @param inputs
+     * @param output
+     * @throws ProofManagementException
+     */
+    public static void merge(List<Path> inputs, Path output) throws ProofManagementException {
         if (FilesChecker.listOfPathsConsistent(inputs)) {
             try {
                 final Path absZipOutput = output.toAbsolutePath();

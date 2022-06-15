@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import javax.annotation.Nonnull;
+
 // IMPORTANT: difference from other checkers: works with multiple packages instead of a single
 //          bundle!
 /**
@@ -24,7 +26,7 @@ public class FilesChecker {
         R apply(T t) throws IOException;
     }
     
-    static boolean listOfPathsConsistent(List<Path> paths) {
+    static boolean listOfPathsConsistent(@Nonnull List<Path> paths) {
         boolean res = true;
         Path reference = paths.get(0);
         for (int i = 1; i < paths.size(); i++) {

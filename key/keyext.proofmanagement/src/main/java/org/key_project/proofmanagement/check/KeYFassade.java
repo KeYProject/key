@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
@@ -80,7 +79,6 @@ public final class KeYFassade {
      * Ensures that the given proof files are loaded and the ASTs are stored inside the
      * CheckerData object. Does not replay the proofs! Proofs that already have been loaded
      * are not reloaded.
-     * @param proofPaths the list of proofs to load
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
@@ -246,8 +244,7 @@ public final class KeYFassade {
         // Instantiate proof obligation
         if (keyFile instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
             return new IPersistablePO.LoadedPOContainer((ProofOblInput)keyFile);
-        }
-        else if (chooseContract != null && chooseContract.length() > 0) {
+        } else if (chooseContract != null && chooseContract.length() > 0) {
             int proofNum = 0;
             String baseContractName = null;
             int ind = -1;
@@ -261,8 +258,7 @@ public final class KeYFassade {
             if (ind == -1) {
                 baseContractName = chooseContract;
                 proofNum = 0;
-            }
-            else {
+            } else {
                 baseContractName = chooseContract.substring(0, ind);
             }
             final Contract contract = initConfig.getServices()
@@ -270,12 +266,10 @@ public final class KeYFassade {
                                                 .getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);
-            }
-            else {
+            } else {
                 return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
             }
-        }
-        else if (proofObligation != null && proofObligation.length() > 0) {
+        } else if (proofObligation != null && proofObligation.length() > 0) {
 
             String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
@@ -286,12 +280,10 @@ public final class KeYFassade {
                 Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
                 Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
                 return (IPersistablePO.LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -314,13 +306,12 @@ public final class KeYFassade {
                 if (line.replayState == CheckerData.ReplayState.UNKNOWN) {
                     Proof proof = line.proof;
                     EnvInput envInput = line.envInput;
-                    ProblemInitializer problemInitializer = line.problemInitializer;
 
                     if (proof != null) {
                         OneStepSimplifier.refreshOSS(proof);
                         try {
                             // store result in CheckerData
-                            line.replayResult = replayProof(line, envInput, problemInitializer, data);
+                            line.replayResult = replayProof(line, envInput, data);
                         } catch (ProofInputException e) {
                             throw new ProofManagementException("Could not replay proof from " + envInput
                                     + System.lineSeparator() + e.toString());
@@ -332,15 +323,13 @@ public final class KeYFassade {
     }
 
     private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-                                            ProblemInitializer problemInitializer, Logger logger)
-            throws ProofInputException {
+                                            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
 
-        IntermediatePresentationProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
