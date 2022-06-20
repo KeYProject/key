@@ -209,10 +209,10 @@ public final class ProofManagementDialog extends JDialog {
         startButton.setMinimumSize(buttonDim);
         startButton.setEnabled(false);
         startButton.addActionListener(e -> {
-            ProofOblInput po = createPOForSelectedContract();
-            if (po != null) {
+            Contract contract = getSelectedContract();
+            if (contract != null) {
                 setVisible(false);
-                findOrStartProof(po);
+                findOrStartProof(contract);
             }
         });
         buttonPanel.add(startButton);
@@ -445,35 +445,40 @@ public final class ProofManagementDialog extends JDialog {
         return getActiveContractPanel().getContract();
     }
 
-    private ProofOblInput createPOForSelectedContract() {
-        final Contract contract = getSelectedContract();
-
-        return contract == null
-                ? null
-                : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()));
-    }
-
-    private Proof findPreferablyClosedProof(ProofOblInput po) {
-        ImmutableSet<Proof> proofs = initConfig.getServices().getSpecificationRepository().getProofs(po);
-
+    /**
+     * Finds a proof for the given contract.
+     * Preferring a already closed proof, laking that a proof that just misses lemmas.
+     *
+     * @param contract the contract for which to find a proof
+     * @return a proof for the contract, preferring closed proofs
+     * then closed proofs needing some lemmas and then just any proof
+     * or {@code null} if there is no proof for the contract
+     */
+    @Nullable
+    private Proof findPreferablyClosedProof(@Nonnull Contract contract) {
+        // will the contracts here always be atomic?
+        // it seems that way, but not completely sure
+        ImmutableSet<Proof> proofs = initConfig.getServices()
+                .getSpecificationRepository().getProofs(contract);
         //no proofs?
         if (proofs.isEmpty()) {
             return null;
         }
-
         //try to find closed proof
+        Proof fallback = null;
         for (Proof proof : proofs) {
-            if (proof.mgt().getStatus().getProofClosed()) {
+            final ProofStatus status = proof.mgt().getStatus();
+            if (status.getProofClosed()) {
                 return proof;
+            } else if (fallback == null || status.getProofClosedButLemmasLeft()) {
+                fallback = proof;
             }
         }
-
-        //just take any proof
-        return proofs.iterator().next();
+        return fallback;
     }
 
-    private void findOrStartProof(ProofOblInput po) {
-        Proof proof = findPreferablyClosedProof(po);
+    private void findOrStartProof(@Nonnull Contract contract) {
+        Proof proof = findPreferablyClosedProof(contract);
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();
 
@@ -483,6 +488,8 @@ public final class ProofManagementDialog extends JDialog {
             pi.setFileRepo(initConfig.getFileRepo());
 
             try {
+                final ProofOblInput po = contract.createProofObl(
+                        initConfig.copyWithServices(initConfig.getServices()));
                 final ProofAggregate pl = pi.startProver(initConfig, po);
 
                 if (env == null) {
@@ -501,13 +508,13 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     private void updateStartButton() {
-        final ProofOblInput po = createPOForSelectedContract();
-        if (po == null) {
+        final Contract contract = getSelectedContract();
+        if (contract == null) {
             startButton.setText("No Contract");
             startButton.setIcon(null);
             startButton.setEnabled(false);
         } else {
-            final Proof proof = findPreferablyClosedProof(po);
+            final Proof proof = findPreferablyClosedProof(contract);
             if (proof == null) {
                 startButton.setText("Start Proof");
                 startButton.setIcon(null);
@@ -574,6 +581,11 @@ public final class ProofManagementDialog extends JDialog {
 
         Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
+            // skip library classes, the user isn't shown contracts for them
+            if (kjt.getJavaType() instanceof TypeDeclaration
+                    && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
+                continue;
+            }
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
                 if (!isInstanceMethodOfAbstractClass(kjt, target)) {
@@ -586,10 +598,7 @@ public final class ProofManagementDialog extends JDialog {
                         if (contract.isAuxiliary()) {
                             continue;
                         }
-
-                        // TODO: why do we create a PO to check if all proofs have been closed?
-                        final ProofOblInput po = contract.createProofObl(initConfig, contract);
-                        Proof proof = findPreferablyClosedProof(po);
+                        final Proof proof = findPreferablyClosedProof(contract);
                         if (proof == null) {
                             allClosed = false;
                         } else {
