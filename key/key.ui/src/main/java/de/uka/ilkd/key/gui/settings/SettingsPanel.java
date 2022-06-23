@@ -245,16 +245,30 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     * @param title
-     * @param min
-     * @param max
-     * @param step
-     * @param info
-     * @param validator
-     * @return
+     * Create a titled JSpinner (with additional information) for entering numbers in [min, max].
+     * The min and max values have to be comparable (to check min <= value <= max) and min must be
+     * a Number to be handled by the JSpinner's SpinnerNumberModel correctly.
+     * The Number class of min also determines how the default NumberFormatter used by the JSpinner
+     * formats entered Strings (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
+     *
+     * If there are additional restrictions for the entered values, the passed validator can
+     * check those.
+     * The entered values have to be of a subclass of Number (as this is a number text field),
+     * otherwise the Number-Validator will fail.
+     *
+     * @param title the title of the text field
+     * @param min the minimum value that can be entered
+     * @param max the maximum value that can be entered
+     * @param step the step size used when changing the entered value using the JSpinner's
+     *             arrow buttons
+     * @param info arbitrary information about the text field
+     * @param validator a validator for checking the entered values
+     * @return the created JSpinner
+     * @param <T> the class of the minimum value
      */
-    protected JSpinner addNumberField(String title, int min, int max, int step, String info,
-                                      final Validator<Integer> validator) {
+    protected <T extends Number & Comparable<T>> JSpinner addNumberField(
+            String title, T min, Comparable<T> max, Number step, String info,
+            final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -287,7 +301,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
         pane.add(sep, gbc);
 
         Box box = new Box(BoxLayout.X_AXIS);

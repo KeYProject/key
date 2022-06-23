@@ -13,6 +13,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 
 import javax.swing.*;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
+ * General SMT settings panel in the settings dialog.
+ *
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
@@ -114,40 +117,55 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setLocsetBound(e));
+        return addNumberField("Locset bound:", 0L, (long) Integer.MAX_VALUE, 1,
+                BUNDLE.getString(INFO_BOUND),
+                e -> settings.setLocsetBound(e.longValue()));
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.setMaxConcurrentProcesses(e));
+                e -> settings.setMaxConcurrentProcesses(e.intValue()));
     }
 
     private JSpinner createTimeoutField() {
-        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e * 1000L));
+        // Use doubles so that the formatter doesn't make every entered String into integers.
+        // [see NumberFormatter#stringToValue()].
+        JSpinner timeoutSpinner = addNumberField("Timeout:", 0.0, (double) Long.MAX_VALUE,
+                1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
+                e -> settings.setTimeout((long) Math.floor(e.doubleValue() * 1000)));
+        // Set the editor so that entered Strings only have three decimal places.
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(timeoutSpinner,
+                "#.###");
+        // Use floor rounding to be consistent with the value that will be set for the timeout.
+        editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
+        timeoutSpinner.setEditor(editor);
+        return timeoutSpinner;
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setIntBound(e));
+        return addNumberField("Integer bound:", 0L, (long) Integer.MAX_VALUE, 1,
+                BUNDLE.getString(INFO_BOUND),
+                e -> settings.setIntBound(e.longValue()));
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setSeqBound(e));
+        return addNumberField("Seq bound:", 0L, (long) Integer.MAX_VALUE, 1,
+                BUNDLE.getString(INFO_BOUND),
+                e -> settings.setSeqBound(e.longValue()));
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setObjectBound(e));
+        return addNumberField("Object bound:", 0L, (long) Integer.MAX_VALUE, 1,
+                BUNDLE.getString(INFO_BOUND),
+                e -> settings.setObjectBound(e.longValue()));
     }
 
     private JComboBox<String> getProgressModeBox() {
         return addComboBox("", BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
-                e -> settings.setModeOfProgressDialog(ProgressMode.values()[progressModeBox.getSelectedIndex()]),
+                e -> settings.setModeOfProgressDialog(
+                        ProgressMode.values()[progressModeBox.getSelectedIndex()]),
                 getProgressMode(ProgressMode.USER),
                 getProgressMode(ProgressMode.CLOSE));
     }
@@ -186,7 +204,8 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField.setValue(this.settings.getLocsetBound());
         objectBoundField.setValue(this.settings.getObjectBound());
         seqBoundField.setValue(this.settings.getSeqBound());
-        timeoutField.setValue(((float) this.settings.getTimeout() / 1000));
+        // Timeout can have up to 3 decimal places in seconds to still be an integer in ms.
+        timeoutField.setValue(((double) this.settings.getTimeout()) / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
     }
 }
