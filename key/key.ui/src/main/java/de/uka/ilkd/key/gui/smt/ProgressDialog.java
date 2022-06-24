@@ -66,6 +66,7 @@ public class ProgressDialog extends JDialog{
         super(MainWindow.getInstance());
         	    table = new ProgressTable(resolution,listener,labelTitles);
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                table.getTableHeader().setReorderingAllowed(false);
                 table.setModel(model,titles);
                 this.listener = listener;
                 this.setLocationByPlatform(true);
@@ -384,7 +385,6 @@ class ProgressTable extends JTable{
                         @Override
                         public void actionPerformed(ActionEvent e) {
                                 listener.infoButtonClicked(currentEditorCell.x-1, currentEditorCell.y);
-                                
                         }
                 });
                 

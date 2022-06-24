@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;

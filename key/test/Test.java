@@ -1,11 +1,15 @@
 class Test {
-    /*@ normal_behavior
-        ensures \result;
+    /*@
+      requires ary.length > 0;
+      requires pos >= 0;
+      ensures \result ==
+                  (\sum int i; pos <= i < ary.length; ary[i]);
+      measured_by ary.length - pos;
+      assignable \strictly_nothing;
      */
-    public boolean foo() {
-        String a = "abc";
-        String b = "abd";
-        return a.compareTo(b) == 1;
+    public int sum(int[] ary, int pos) {
+        if( pos < 0 || pos >= ary.length)
+            return 0;
+        return ary[pos] + sum(ary,pos+1);
     }
-
 }

@@ -4,7 +4,7 @@ package de.uka.ilkd.key.settings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 import java.io.File;
@@ -96,9 +96,8 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public long getTimeout(SolverType type) {
-        ProofIndependentSMTSettings.SolverData data = piSettings.getSolverData(type);
-        if (data != null && data.getTimeout() >= 1) {
-            return data.getTimeout();
+        if (piSettings.getSolverTimeout(type) >= 1) {
+            return piSettings.getSolverTimeout(type);
         }
         return getTimeout();
     }
@@ -188,7 +187,8 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public String getLogic() {
-        return "AUFLIA";
+        // Set the logic to the most general one according to the SMT-LIB standard.
+        return "AUFNIRA";
     }
 
     @Override

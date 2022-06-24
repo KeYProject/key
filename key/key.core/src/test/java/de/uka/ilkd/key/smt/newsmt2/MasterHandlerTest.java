@@ -8,7 +8,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -60,6 +62,10 @@ public class MasterHandlerTest {
     private static final boolean STRICT_TEST = Boolean.getBoolean("key.newsmt2.stricttests");
     private static final boolean DUMP_SMT = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream().filter(it -> it.getClass()
+                    .equals(SolverTypeImplementation.class) && it.getName()
+                    .equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
 
     public static List<Arguments> data() throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
@@ -188,8 +194,8 @@ public class MasterHandlerTest {
     @ParameterizedTest
     @MethodSource("data")
     public void testZ3(TestData data) throws Exception {
-        Assumptions.assumeTrue(SolverTypes.Z3_SOLVER != null);
-        Assumptions.assumeTrue(SolverTypes.Z3_SOLVER.isInstalled(false),
+        Assumptions.assumeTrue(Z3_SOLVER != null);
+        Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
                 "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");

@@ -28,7 +28,14 @@ import java.util.Collection;
  */
 class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
-    public NewTranslationOptions() {
+    /**
+     * Create a NewTranslationOptions object.
+     * Note that it uses only the smt properties that are *currently* known to the
+     * SMTHandlerServices instance. Hence, either the creation of this object needs to take
+     * place only after the necessary smt properties are known or it needs to be created anew
+     * when new smt properties become known.
+     */
+    public  NewTranslationOptions() {
         setHeaderText(getDescription());
         makeComponents();
     }
@@ -38,7 +45,10 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     private void makeComponents() {
 
         try {
-            Collection<SMTHandlerProperty<?>> properties = SMTHandlerServices.getInstance().getSMTProperties();
+            // This loads only the smt properties that are *currently* known to the
+            // SMTHandlerServices instance.
+            Collection<SMTHandlerProperty<?>> properties = SMTHandlerServices.getInstance()
+                    .getSMTProperties();
             for (SMTHandlerProperty<?> property : properties) {
                 JComponent comp = property.accept(new ComCreationVisitor(), null);
                 comp.putClientProperty("smtProperty", property);
