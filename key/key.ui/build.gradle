@@ -24,8 +24,6 @@ dependencies {
     api 'org.dockingframes:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
-
-    //runtimeOnly project(":keyext.script.ui")
     runtimeOnly project(":keyext.exploration")
 }
 
@@ -40,13 +38,15 @@ task createExamplesZip(type: Zip) {
 
 processResources.dependsOn << createExamplesZip
 
+
 shadowJar {
-    archiveClassifier = "exe"
-    archiveBaseName = "key"
+    archiveClassifier.set("exe")
+    archiveBaseName.set("key")
+    mergeServiceFiles()
 }
 
 distZip {
-    archiveBaseName = "key"
+    archiveBaseName.set("key")
 }
 
 application {
@@ -69,7 +69,7 @@ task runWithProfiler(type: JavaExec) {
                    See https://www.baeldung.com/java-flight-recorder-monitoring for a how to.""")
 
     classpath = sourceSets.main.runtimeClasspath
-    mainClass = "de.uka.ilkd.key.core.Main"
+    mainClass.set("de.uka.ilkd.key.core.Main")
     jvmArgs = ["-XX:+FlightRecorder",
                "-XX:StartFlightRecording=duration=30s,filename=key_profile.jfr",
                "-XX:FlightRecorderOptions=stackdepth=256"]

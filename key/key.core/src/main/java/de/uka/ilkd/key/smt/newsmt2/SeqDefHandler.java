@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -56,7 +55,8 @@ public class SeqDefHandler implements SMTHandler {
     private TermFactory termFactory;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) {
         enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
         seqLDT = services.getTypeConverter().getSeqLDT();
         termFactory = services.getTermFactory();

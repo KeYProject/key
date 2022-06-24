@@ -22,6 +22,8 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
+import javax.annotation.Nullable;
+
 /**
  * Instances of this class are the controlling units of the translation. They
  * control how the translation is delegated to different {@link SMTHandler}s and
@@ -75,6 +77,25 @@ public class MasterHandler {
     private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
     /**
+     * Create a new handler with the default set of smt handlers.
+     *
+     * @param services non-null services
+     * @param settings settings from the proof for the property settings.
+     * @param handlerNames fully qualified class names of the handlers to use.
+     *                     If empty, all available handlers are used.
+     * @param handlerOptions arbitrary String options for the handlers to process
+     * @throws IOException if the handlers cannot be loaded
+     */
+    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames,
+                         String[] handlerOptions)
+            throws IOException {
+        this.services = services;
+        getTranslationState().putAll(settings.getNewSettings().getMap());
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
+                handlerOptions, this);
+    }
+
+    /**
      * Copy toplevel declarations and axioms from a collection of snippets
      * directly and make all named declarations (name.decl) and axioms
      * (name.axioms)
@@ -112,31 +133,6 @@ public class MasterHandler {
     public interface SymbolIntroducer {
         void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
     }
-
-    /**
-     * Create a new handler with the default set of smt handlers.
-     *
-     * @param services non-null services
-     * @param settings settings from the proof for the property settings.
-     * @throws IOException
-     */
-    public MasterHandler(Services services, SMTSettings settings) throws IOException {
-        this(services, settings, null);
-    }
-
-    /**
-     * Create a new handler with a custom set of smt handlers.
-     *
-     * @param services non-null services
-     * @param settings settings from the proof for the property settings.
-     * @throws IOException
-     */
-    public MasterHandler(Services services, SMTSettings settings, List<SMTHandler> smtHandlers) throws IOException {
-        this.services = services;
-        getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, smtHandlers, this);
-    }
-
 
     /**
      * Translate a single term to an SMTLib S-Expression.
@@ -197,6 +193,7 @@ public class MasterHandler {
      * A default translation is triggered if no handler can be found.
      *
      * @param problem the non-null term to translate
+     * @param type the type of the resulting s-expression
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem, Type type)  {
@@ -258,12 +255,13 @@ public class MasterHandler {
      * <pre>
      *     (functionName t1 ... tn)
      * </pre>
-     * is returned where t1, ..., tn are the smt-translations of the subterms of
+     * is returned where t1, ..., tn are the smt-translations of the sub-terms of
      * term.
      *
      * @param functionName the name of the function
+     * @param type the type of the resulting s-expression
      * @param term the term to be translated
-     * @return an expression with the name functionName and subterms as children
+     * @return an expression with the name functionName and the term's sub-terms as children
      */
     SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         List<SExpr> children = new ArrayList<>();
@@ -297,6 +295,7 @@ public class MasterHandler {
      * @param terms non-null list of terms.
      * @param type the non-null smt type to coerce to
      * @return a list of translations
+     * @throws SMTTranslationException if the type conversion is impossible
      */
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
         return SExprs.coerce(translate(terms), type);

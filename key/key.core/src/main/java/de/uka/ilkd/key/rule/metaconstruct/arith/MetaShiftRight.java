@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;

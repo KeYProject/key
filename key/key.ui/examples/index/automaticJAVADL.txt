@@ -231,6 +231,11 @@ group jmlAsserts {
    provable ./standard_key/java_dl/jml-assert/model-methods-instance-static.key
    provable ./standard_key/java_dl/jml-assert/model-methods-instance-instance.key
    provable ./standard_key/java_dl/jml-assert/model-methods-static-instance.key
+   # \old()
+   provable ./standard_key/java_dl/jml-assert/assert-old/inc-field.key
+   provable ./standard_key/java_dl/jml-assert/assert-old/inc-parameter.key
+   provable ./standard_key/java_dl/jml-assert/assert-old/inc-parameter-field.key
+   provable ./standard_key/java_dl/jml-assert/assert-old/inc-ghost-field.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)

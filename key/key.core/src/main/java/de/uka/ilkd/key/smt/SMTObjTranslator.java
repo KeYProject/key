@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -998,7 +985,7 @@ public class SMTObjTranslator implements SMTTranslator {
      *
      * @param problem The KeY proof obligation.
      */
-    public SMTFile translateProblem(Term problem) throws IllegalFormulaException {
+    private SMTFile translateProblem(Term problem) throws IllegalFormulaException {
         SMTFile file = new SMTFile();
         // initialize smt sorts
         cc.countConstants(problem);
@@ -1079,7 +1066,7 @@ public class SMTObjTranslator implements SMTTranslator {
      * @param term the KeY term.
      * @return the SMT term.
      */
-    public SMTTerm translateTerm(Term term) throws IllegalFormulaException {
+    private SMTTerm translateTerm(Term term) throws IllegalFormulaException {
         Operator op = term.op();
         if (opTable.containsKey(op)) {
             SMTTerm left = translateTerm(term.sub(0));
@@ -1846,7 +1833,7 @@ public class SMTObjTranslator implements SMTTranslator {
      *
      * @author mihai
      */
-    public class ConstantCounter {
+    private class ConstantCounter {
 
 
         Set<String> locsets;

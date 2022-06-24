@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -79,6 +66,7 @@ public class ProgressDialog extends JDialog{
         super(MainWindow.getInstance());
         	    table = new ProgressTable(resolution,listener,labelTitles);
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                table.getTableHeader().setReorderingAllowed(false);
                 table.setModel(model,titles);
                 this.listener = listener;
                 this.setLocationByPlatform(true);
@@ -397,7 +385,6 @@ class ProgressTable extends JTable{
                         @Override
                         public void actionPerformed(ActionEvent e) {
                                 listener.infoButtonClicked(currentEditorCell.x-1, currentEditorCell.y);
-                                
                         }
                 });
                 

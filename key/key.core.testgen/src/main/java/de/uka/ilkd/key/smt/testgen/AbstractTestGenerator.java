@@ -5,8 +5,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -38,7 +38,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.slf4j.Logger;
@@ -80,9 +79,8 @@ public abstract class AbstractTestGenerator {
        return;
     }
     if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
-       log.writeln("Warning: z3 supported versions are: "
-             + Arrays.toString(SolverTypes.Z3_CE_SOLVER
-                   .getSupportedVersions()));
+       log.writeln("Warning: z3 supported minimum supported version is: "
+               + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
     }
     if(originalProof.closed() && settings.includePostCondition()){
     	log.writeln("Cannot generate test cases from closed proof with "
