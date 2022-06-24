@@ -2,24 +2,12 @@ package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
-/**
- * The socket for generating counterexamples.
- *
- * @author Wolfram Pfeifer (overhaul)
- */
 public class Z3CESocket extends AbstractSolverSocket {
-    /**
-     * Creates a new Z3CESocket. Should not be called directly, better use the static factory method
-     * {@link AbstractSolverSocket#createSocket(SolverType, ModelExtractor)}.
-     *
-     * @param name  the name of the solver
-     * @param query the ModelExtractor for CE generation
-     */
+
     public Z3CESocket(String name, ModelExtractor query) {
         super(name, query);
     }
@@ -33,7 +21,7 @@ public class Z3CESocket extends AbstractSolverSocket {
             if (msg.contains("WARNING:")) {
                 return;
             }
-            throw new IOException("Error while executing Z3: " + msg);
+            throw new IOException("Error while executing " + getName() + ": " + msg);
         }
         // These two messages are only used to steer the interaction with the solver and are thus
         // currently filtered out to avoid cluttering up the output.
@@ -89,4 +77,10 @@ public class Z3CESocket extends AbstractSolverSocket {
                 throw new IllegalStateException("Unexpected value: " + sc.getState());
         }
     }
+
+    @Override
+    public AbstractSolverSocket copy() {
+        return new Z3CESocket(getName(), getQuery());
+    }
+
 }

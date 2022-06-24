@@ -1,17 +1,39 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+
+import de.uka.ilkd.key.logic.TermFactory;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -984,7 +1006,14 @@ public class InvariantConfigurator {
             protected Term parseModifies(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-                Term result = parser.parseExpression(invariants.get(index)[MOD_IDX].get(heap.toString()));
+                String string = invariants.get(index)[MOD_IDX].get(heap.toString());
+                if(string.trim().equals("\\strictly_nothing")) {
+                    // FIXME
+                    // This is a hack that has been introduced to be able
+                    // to enter "strictly_nothing" also in interactive mode.
+                    return services.getTermBuilder().strictlyNothing();
+                }
+                Term result = parser.parseExpression(string);
                 if (result.sort() != locSetSort) {
                     throw newUnexpectedTypeException(locSetSort, result.sort());
                 }

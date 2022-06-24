@@ -1,21 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
+import org.key_project.util.Streams;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
-public class SettingsConverter {
+public final class SettingsConverter {
     private static String[][] encoding = {
             {"#", "#hash"}, // must be the first in the list.
             {"\n", "#newline"},
@@ -28,6 +20,9 @@ public class SettingsConverter {
     private static final String PREFIX = "#beg";
     private static final String POSTFIX = "#end";
     private static final String LIST_SEPARATOR = ",";
+
+    private SettingsConverter() {
+    }
 
     public static String convert(String str, boolean encode) {
         String result = str;
@@ -62,6 +57,40 @@ public class SettingsConverter {
             return eth == null ? defaultVal : encode(eth);
         } catch (Exception e) {
             return defaultVal;
+        }
+    }
+
+    public static String readRawString(Properties props, String key, String defaultValue) {
+        String value = props.getProperty(key);
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    public static String[] readRawStringList(Properties props, String key, String split,
+                                             String[] defaultValue) {
+        String value = props.getProperty(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value.split(split);
+    }
+
+
+    public static String readFile(Properties props, String key, String defaultValue) {
+        String filePath = props.getProperty(key);
+        if (filePath == null) {
+            return defaultValue;
+        }
+        InputStream fileContent = SolverPropertiesLoader.class.getResourceAsStream(filePath);
+        if (fileContent == null) {
+            return defaultValue;
+        }
+        try {
+            return Streams.toString(fileContent);
+        } catch (IOException e) {
+            return defaultValue;
         }
     }
 
@@ -106,7 +135,6 @@ public class SettingsConverter {
 
 
     public static String[] read(Properties props, String key, String[] defaultVal) {
-
         String val = props.getProperty(key);
         if (val == null) {
             return defaultVal;
@@ -152,10 +180,8 @@ public class SettingsConverter {
         }
     }
 
-    private SettingsConverter() {
-    }
-
-    public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue, T[] values) {
+    public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
+                                             T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {

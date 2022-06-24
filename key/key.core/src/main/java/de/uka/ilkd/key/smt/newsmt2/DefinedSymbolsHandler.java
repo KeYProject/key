@@ -22,8 +22,6 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -96,12 +94,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     public static final TermLabel TRIGGER_LABEL =
             new ParameterlessTermLabel(new Name("Trigger"));
-    
+
     private Properties snippets;
     private boolean enabled;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) throws IOException {
         this.services = services;
         this.snippets = handlerSnippets;
 

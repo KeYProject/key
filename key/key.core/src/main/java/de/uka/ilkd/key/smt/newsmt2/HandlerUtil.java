@@ -53,11 +53,7 @@ public class HandlerUtil {
      * SMT handler.
      */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-            Arrays.asList(PROPERTY_NO_TYPE_HIERARCHY,
-                    new EnumProperty<>("identifier",
-                            "Smt some heading",
-                            "lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim ",
-                            ProofStatus.class));
+            Arrays.asList(/* add global handler properties here */);
 
     private HandlerUtil() {
         throw new Error("do not instantiate");

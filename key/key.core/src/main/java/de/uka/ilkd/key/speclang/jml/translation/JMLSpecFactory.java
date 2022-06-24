@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -102,11 +89,10 @@ public class JMLSpecFactory {
             final ImmutableList<LocationVariable> allHeaps, final TermBuilder tb) {
         Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
         for (LocationVariable heap : allHeaps) {
-            atPres.put(heap, tb.var(tb.heapAtPreVar(heap + AT_PRE, heap.sort(), false)));
+            atPres.put(heap, tb.var(tb.atPreVar(heap.toString(), heap.sort(), false)));
         }
         for (LocationVariable param : paramVars) {
-            // TODO rename heapAtPreVar
-            atPres.put(param, tb.var(tb.heapAtPreVar(param + AT_PRE, param.sort(), false)));
+            atPres.put(param, tb.var(tb.atPreVar(param.toString(), param.sort(), false)));
         }
         return atPres;
     }
@@ -345,7 +331,7 @@ public class JMLSpecFactory {
         progVar.atPreVars = new LinkedHashMap<>();
         progVar.atPres = new LinkedHashMap<>();
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            LocationVariable lv = tb.heapAtPreVar(h + AT_PRE, h.sort(), false);
+            LocationVariable lv = tb.atPreVar(h.toString(), h.sort(), false);
             progVar.atPreVars.put(h, lv);
             progVar.atPres.put(h, tb.var(lv));
         }
@@ -1305,10 +1291,10 @@ public class JMLSpecFactory {
             final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
             final ImmutableList<LocationVariable> allHeaps
                     = services.getTypeConverter().getHeapLDT().getAllHeaps();
-            final String atPrePrefix = AT_PRE;
-            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.heapAtPreVar(heap + atPrePrefix, heap.sort(), false))));
+            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.atPreVar(heap.toString(),
+                    heap.sort(), false))));
             params.forEach(param -> atPres.put(param,
-                    tb.var(tb.heapAtPreVar(param + atPrePrefix, param.sort(), false))));
+                    tb.var(tb.atPreVar(param.toString(), param.sort(), false))));
 
             final MergeParamsSpec specs = jmlIo
                     .clear()
@@ -1445,10 +1431,27 @@ public class JMLSpecFactory {
      * @param pm the enclosing method
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
-        final AuxiliaryContract.Variables variables = new AuxiliaryContract.VariablesCreator(
-                        jmlAssert, Collections.emptyList(), pm, services)
-                .create();
-        final ProgramVariableCollection pv = createProgramVariables(pm, jmlAssert, variables);
+        final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
+        }
+        final ImmutableList<LocationVariable> parameters = pm.collectParameters();
+        for (LocationVariable parameter : parameters) {
+            atPreVars.put(parameter, tb.atPreVar(parameter.toString(),
+                    parameter.getKeYJavaType(), true));
+        }
+        final ImmutableList<ProgramVariable> paramVars =
+                append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
+        final ProgramVariableCollection pv = new ProgramVariableCollection(
+                tb.selfVar(pm, pm.getContainerType(), false),
+                paramVars,
+                tb.resultVar(pm, false),
+                tb.excVar(pm, false),
+                atPreVars,
+                termify(atPreVars),
+                Collections.emptyMap(), // should be the pre-state of the enclosing contract
+                Collections.emptyMap()  // ignore for now
+        );
         jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 

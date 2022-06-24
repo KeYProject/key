@@ -132,25 +132,22 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
-            long result = Integer.MAX_VALUE;
             if (settings != null) {
-                result = settings.maxInteger;
+                settings.maxInteger = e.longValue();
             }
-            try {
-                result = (long) maxField.getValue();
-                maxField.setForeground(Color.BLACK);
-            } catch (Throwable ex) {
-                maxField.setForeground(Color.RED);
-            }
-            settings.maxInteger = result;
         });
-        max.setValue(Integer.MAX_VALUE);
+        try {
+            max.setValue(Long.valueOf(Integer.MAX_VALUE));
+            max.setForeground(Color.BLACK);
+        } catch (IllegalArgumentException e) {
+            max.setForeground(Color.RED);
+        }
         return max;
     }
 
     protected JSpinner createMinField() {
-        return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, null,
-                val -> settings.minInteger = val);
+        return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "",
+                val -> settings.minInteger = val.longValue());
     }
 
     protected JCheckBox createConstantsForIntegers() {

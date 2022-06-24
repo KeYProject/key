@@ -619,10 +619,9 @@ public class ProofTreePopupFactory {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
+            context.delegateModel.setBatchGoalStateChange(true);
             super.actionPerformed(e);
-            for (final Goal goal : getGoalList()) {
-                context.delegateModel.updateTree(goal.node());
-            }
+            context.delegateModel.setBatchGoalStateChange(false);
             // trigger repainting the tree after the completion of this event.
             context.delegateView.repaint();
         }

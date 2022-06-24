@@ -2,24 +2,12 @@ package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.st.SolverType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
-/**
- * The socket for CVC4.
- *
- * @author Wolfram Pfeifer (overhaul)
- */
 public class CVC4Socket extends AbstractSolverSocket {
-    /**
-     * Creates a new CVC4Socket. Should not be called directly, better use the static factory method
-     * {@link AbstractSolverSocket#createSocket(SolverType, ModelExtractor)}.
-     *
-     * @param name  the name of the solver
-     * @param query the ModelExtractor for CE generation (unused by this socket)
-     */
+
     public CVC4Socket(String name, ModelExtractor query) {
         super(name, query);
     }
@@ -27,7 +15,7 @@ public class CVC4Socket extends AbstractSolverSocket {
     @Override
     public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
-        if ("".equals(msg)) {
+        if ("".equals(msg.trim())) {
             return;
         }
 
@@ -38,7 +26,7 @@ public class CVC4Socket extends AbstractSolverSocket {
 
         if (msg.contains("error") || msg.contains("Error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-            throw new IOException("Error while executing CVC4: " + msg);
+            throw new IOException("Error while executing " + getName() + ": " + msg);
         }
 
         // Currently we rely on the solver to terminate after receiving "(exit)". If this does
@@ -62,4 +50,10 @@ public class CVC4Socket extends AbstractSolverSocket {
             }
         }
     }
+
+    @Override
+    public AbstractSolverSocket copy() {
+        return new CVC4Socket(getName(), getQuery());
+    }
+
 }

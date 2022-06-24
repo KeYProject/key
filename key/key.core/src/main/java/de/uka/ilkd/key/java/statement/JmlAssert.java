@@ -7,8 +7,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.ReplacementMap;
+import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.ExtList;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -41,31 +44,40 @@ public class JmlAssert extends JavaStatement {
      * the program variables used to create the Term form of the condition
      */
     private ProgramVariableCollection vars;
+    /**
+     * services (needed for pretty printing)
+     */
+    private Services services;
 
     /**
      *
      * @param kind assert or assume
      * @param condition the condition of this statement
      * @param positionInfo the position information for this statement
+     * @param services needed for pretty printing (not pretty when null)
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind,
                      LabeledParserRuleContext condition,
-                     PositionInfo positionInfo) {
+                     PositionInfo positionInfo,
+                     Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
+        this.services = services;
     }
 
     /**
      *
      * @param children the children of this element
+     * @param services needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(ExtList children) {
+    public JmlAssert(ExtList children, Services services) {
         super(children);
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);
         this.cond = children.get(Term.class);
         this.vars = children.get(ProgramVariableCollection.class);
+        this.services = services;
         if ((cond == null) == (condition == null)) {
             throw new IllegalArgumentException("exactly one of cond and condition has to be null");
         }
@@ -80,7 +92,7 @@ public class JmlAssert extends JavaStatement {
      */
     public String getConditionText() {
         if (cond != null) {
-            return cond.toString();
+            return LogicPrinter.quickPrintTerm(cond, services);
         }
         // this will lose whitespace, so e.g. \forall will not be printed correctly
         // but normally the term form should get printed.
@@ -108,16 +120,17 @@ public class JmlAssert extends JavaStatement {
      * @param services services
      */
     public Term getCond(final Term self, final Services services) {
+        final TermFactory termFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
         if (self != null) {
-            final TermFactory termFactory = services.getTermFactory();
-            final ReplacementMap<Term, Term> replacementMap =
-                    new ReplacementMap.NoIrrelevantLabelsReplacementMap<>(termFactory);
-            replacementMap.put(services.getTermBuilder().var(vars.selfVar), self);
-            final OpReplacer replacer = new OpReplacer(
-                    replacementMap, termFactory, services.getProof());
-            return replacer.replace(cond);
+            replacementMap.replaceSelf(vars.selfVar, self, services);
         }
-        return cond;
+        replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, vars.atPres, services);
+        replacementMap.replaceRemembranceLocalVariables(vars.atBeforeVars, vars.atBefores,
+                services);
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, termFactory, services.getProof());
+        return replacer.replace(cond);
     }
 
 
@@ -189,5 +202,21 @@ public class JmlAssert extends JavaStatement {
 
     public ProgramVariableCollection getVars() {
         return vars;
+    }
+
+    /**
+     * updates this statement with prestate renaming
+     * @param atPres prestate renaming
+     * @param services services
+     */
+    public void updateVars(final Map<LocationVariable, Term> atPres, final Services services) {
+        final TermFactory termFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+        replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, termFactory, services.getProof());
+        cond = replacer.replace(cond);
+        vars.atPres = atPres;
+
     }
 }

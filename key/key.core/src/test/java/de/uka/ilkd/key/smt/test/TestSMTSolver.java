@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -101,19 +89,6 @@ public abstract class TestSMTSolver extends TestCommons {
 	@Test
 	public void testLogicalIte2() throws Exception {
 		Assertions.assertTrue(correctResult(testFile + "logicalite2.key", false));
-	}
-
-	@Test
-	public void testTermIte1() throws Exception {
-		if (getSolverType().supportsIfThenElse())
-			Assertions.assertTrue(correctResult(testFile + "termite1.key", true));
-	}
-
-	// LONG runtime in CVC3 (~300s)
-	@Test
-	public void testTermlIte2() throws Exception {
-		if (getSolverType().supportsIfThenElse())
-			Assertions.assertTrue(correctResult(testFile + "termite2.key", false));
 	}
 
 	@Test

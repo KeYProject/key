@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -22,8 +9,8 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import javax.annotation.Nonnull;
@@ -167,8 +154,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         this.listener = listener;
         this.services = services;
         this.type = myType;
+        // Why not just call type.getSocket(query) here?
         this.socket = AbstractSolverSocket.createSocket(type, query);
-        processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
+        processLauncher = new ExternalProcessLauncher(solverCommunication, myType.getDelimiters());
     }
 
     /**
@@ -353,7 +341,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             tacletTranslation = null;
 
         } else {
-            SMTTranslator trans = getType().createTranslator(services);
+            SMTTranslator trans = getType().createTranslator();
             problemString = indent(trans.translateProblem(sequent, services, smtSettings)
                     .toString());
             if (trans instanceof AbstractSMTTranslator) {
