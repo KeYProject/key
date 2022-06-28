@@ -37,7 +37,6 @@ public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
-    private Function jDivision;
     private Function mul;
     private boolean limitedToPresbuger;
     private IntegerLDT integerLDT;
@@ -54,8 +53,6 @@ public class IntegerOpHandler implements SMTHandler {
         supportedOperators.put(integerLDT.getSub(), "-");
         supportedOperators.put(integerLDT.getDiv(), "div");
         supportedOperators.put(integerLDT.getNeg(), "-");
-        jDivision = integerLDT.getJDivision();
-        supportedOperators.put(jDivision, "jdiv");
 
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
         predicateOperators.add(integerLDT.getLessOrEquals());
@@ -109,10 +106,6 @@ public class IntegerOpHandler implements SMTHandler {
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
-
-        if(op == jDivision) {
-            trans.introduceSymbol("jdiv");
-        }
 
         Type resultType;
         if(predicateOperators.contains(op)) {
