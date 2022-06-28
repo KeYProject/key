@@ -83,7 +83,7 @@
                <callStackEntry path="/0"/>
                <operationContract name="result_sum = self.sum(array) catch(exc_0)
 pre: (  !array = null
- &amp; ((self.&lt;inv&gt;&lt;&lt;impl&gt;&gt; &amp; !array = null)&lt;&lt;SC&gt;&gt;))&lt;&lt;SC&gt;&gt;
+ &amp; ((self.&lt;inv&gt;&lt;&lt;impl&gt;&gt; &amp; (!array = null)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;))&lt;&lt;SC&gt;&gt;
 post: (  result_sum
    = javaCastInt(bsum{int i;}(0,
                               array.length,
