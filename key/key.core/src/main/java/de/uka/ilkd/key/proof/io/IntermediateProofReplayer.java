@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -459,6 +460,19 @@ public class IntermediateProofReplayer {
         if (currFormula != 0) { // otherwise we have no pos
             try {
                 pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+
+                /* part of the fix for #1716: ensure that position of find term
+                 * (antecedent/succedent) matches the kind of the taclet.
+                 */
+                Taclet taclet = ourApp.taclet();
+                if (taclet instanceof AntecTaclet && !pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in succedent.");
+                } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in antecedent.");
+                }
+
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
