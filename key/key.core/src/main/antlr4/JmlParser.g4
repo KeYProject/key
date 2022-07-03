@@ -301,7 +301,6 @@ integerliteral: (HEXLITERAL | DECLITERAL | OCTLITERAL | BINLITERAL);
 fractionalliteral: FLOAT_LITERAL | DOUBLE_LITERAL | REAL_LITERAL;
 jmlprimary
   : RESULT                                                                            #primaryResult
-  | KEY_TERM                                                                          #primaryKeyTerm
   | EXCEPTION                                                                         #primaryException
   | infinite_union_expr                                                               #pignore1
   | specquantifiedexpression                                                          #pignore2

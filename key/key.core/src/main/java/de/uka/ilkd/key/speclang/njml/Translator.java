@@ -1132,27 +1132,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPrimaryKeyTerm(JmlParser.PrimaryKeyTermContext ctx) {
-        NamespaceSet nss = services.getNamespaces().shallowCopy();
-        nss.programVariables().add(selfVar);
-        nss.programVariables().add(excVar);
-        this.paramVars.forEach(it -> nss.programVariables().add(it));
-
-        KeyIO io = new KeyIO(services, nss);
-        final String text = ctx.getText();
-        CharStream stream = CharStreams.fromString(text.substring(1, text.length() - 1),
-                ctx.start.getTokenSource().getSourceName());
-        try {
-            KeyAst.Term syn = ParsingFacade.parseExpression(stream, ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            Term expr = io.parseExpression(syn);
-            return new SLExpression(expr);
-        } catch (SyntaxErrorReporter.ParserException e) {
-            raiseError(ctx, e);
-            return null;
-        }
-    }
-
-    @Override
     public Object visitPrimaryException(JmlParser.PrimaryExceptionContext ctx) {
         if (excVar == null) raiseError("\\exception may only appear in determines clauses", ctx);
         return new SLExpression(tb.var(excVar), excVar.getKeYJavaType());
