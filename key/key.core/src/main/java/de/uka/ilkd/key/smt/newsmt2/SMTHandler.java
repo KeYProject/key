@@ -25,8 +25,8 @@ import java.util.Properties;
  * They are always used within the same proof, but possibly for several proof
  * obligations.
  *
- * After creation, the {@link #init(MasterHandler, Services, Properties)} method is called that injects the
- * {@link Services} object belonging to the proof.
+ * After creation, the {@link #init(MasterHandler, Services, Properties)} method is
+ * called that injects the {@link Services} object belonging to the proof.
  *
  * During translation, an SMT handler can be asked via {@link #canHandle(Term)}
  * if it can translate a term into smt.
@@ -62,14 +62,18 @@ public interface SMTHandler {
      * translation.
      *
      *
-     * @param masterHandler
+     * @param masterHandler the MasterHandler coordinating the other handlers
+     *                      (including the one at hand)
      * @param services the non-null services object which is relevant for
      *                 this handler
      * @param handlerSnippets the snippets loaded for this handler, null if no
      *                        snippet property file is available for this handler
+     * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
-    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException;
+    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+              String[] handlerOptions)
+            throws IOException;
 
     /**
      * Query if this handler can translate a term.
@@ -130,4 +134,5 @@ public interface SMTHandler {
     default List<SMTHandlerProperty<?>> getProperties() {
         return Collections.emptyList();
     }
+
 }

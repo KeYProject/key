@@ -1,21 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 
 import java.util.*;
-import java.util.logging.ErrorManager;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -42,7 +28,6 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
@@ -70,65 +55,15 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 public abstract class AbstractSMTTranslator implements SMTTranslator {
         private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
-        public static class Configuration {
-                /**
-                 * Some solvers (e.q Yices) support only multiplications where
-                 * one operand is a simple integer (even a constant symbol is
-                 * not allowed.). In this case the multiplication is translated
-                 * into a uninterpreted function with some assumptions.
-                 */
-                private final boolean supportsOnlySimpleMultiplication;
-                private final boolean hasNumberLimit;
-
-                /**
-                 * Used for SMT2 format: if true the (set-logic AUFLIA) command is used otherwise
-                 * the logic is not set. For instance Z3 then uses automatically the appropriate
-                 * logic.
-                 */
-                private final boolean mentionLogic;
-
-
-                public Configuration(boolean supportsOnlySimpleMultiplication, boolean mentionLogic) {
-                        this(supportsOnlySimpleMultiplication,false,mentionLogic);
-                }
-
-                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit,
-                					 boolean mentionLogic) {
-                        super();
-                        this.supportsOnlySimpleMultiplication = supportsOnlySimpleMultiplication;
-                        this.hasNumberLimit = hasNumberLimit;
-                        this.mentionLogic = mentionLogic;
-                }
-                public boolean hasNumberLimit(){
-                        return hasNumberLimit;
-                }
-
-                public boolean mentionLogic() {
-					return mentionLogic;
-				}
-
-        }
-
-        private final TermBuilder tb; // TODO: Rename
-
-        private int nameCounter =0;
-
-        private Sort integerSort;
+        private int nameCounter = 0;
 
         /** The string used as standard sort for translations */
         private final StringBuilder standardSort = new StringBuilder("u");
 
-        // private static long counter = 0;
-        protected static final int YESNOT = 2;
-
         /** The translation result is stored in this variable. */
         protected String text;
 
-//        protected SMTTranslation translation = new SMTTranslation();
-
-
         /** remember all function declarations */
-
         protected static class FunctionWrapper {
                 private StringBuilder name;
                 private Function function;
@@ -224,7 +159,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** Formulae made of taclets, used for assumptions. */
         private TacletSetTranslation tacletSetTranslation = null;
 
-        private Collection<Throwable> exceptionsForTacletTranslation= new LinkedList<>();
+        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
         /**
          * Assumptions made of taclets - the translation of
@@ -233,7 +168,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private ArrayList<StringBuilder> tacletAssumptions = new ArrayList<>();
 
         private SMTSettings smtSettings = null;
-        private Configuration config = null;
 
         /**
          * If the solver supports only simple multiplications, complex
@@ -250,35 +184,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return tacletSetTranslation;
         }
 
-        /**
-         * Just a constructor which starts the conversion to Simplify syntax.
-         * The result can be fetched with
-         *
-         * @param sequent
-         *                The sequent which shall be translated.
-         * @param services
-         *                The services object belonging to sequent.
-         */
-        public AbstractSMTTranslator(Sequent sequent, Services services,
-                        Configuration config) {
-                this.config = config;
-                integerSort = services.getTypeConverter().getIntegerLDT()
-                                .targetSort();
-                this.tb = services.getTermBuilder();
-
-        }
-
-        /**
-         * For translating only terms and not complete sequents. The service
-         * object to be used.
-         *
-         * @param s
-         *
-         */
-        public AbstractSMTTranslator(Services s, Configuration config) {
-                this(null, s, config);
-        }
-
         @Override
         public final StringBuilder translateProblem(Sequent sequent,
                         Services services, SMTSettings settings)
@@ -290,10 +195,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add one variable for each sort
                 for (Sort s : this.usedRealSort.keySet()) {
-                   if(!s.equals(Sort.FORMULA)){
+                   if(!s.equals(Sort.FORMULA)) {
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
-                        this.addFunction(l, new ArrayList<>(), s);
+                        this.addFunction(l, new ArrayList<>(), s, services);
                         this.translateFunc(l, new ArrayList<>());
                    }
                 }
@@ -311,15 +216,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return smtSettings;
         }
 
-        public Configuration getConfig() {
-			return config;
-		}
-
         private Function getMultiplicationFunction(Services services) {
                 if (multiplicationFunction == null) {
                         Function reference = services.getTypeConverter()
                                         .getIntegerLDT().getMul();
 
+                        TermBuilder tb = services.getTermBuilder();
                         multiplicationFunction = new Function(new Name(
                                         tb.newName("unin_mult")),
                                         reference.sort(), reference.argSorts());
@@ -351,7 +253,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // symbols)
 
                 int start = toReturn.size();
-                toReturn.addAll(this.getTypeDefinitions());
+                toReturn.addAll(getTypeDefinitions(services));
                 assumptionTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
@@ -396,7 +298,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // }
 
                 start = toReturn.size();
-                toReturn.addAll(buildUniqueAssumptions());
+                toReturn.addAll(buildUniqueAssumptions(services));
                 assumptionTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_DISTINCT));
@@ -602,14 +504,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          *
          * @return see above
          */
-        private ArrayList<StringBuilder> getTypeDefinitions() {
+        private ArrayList<StringBuilder> getTypeDefinitions(Services services) {
                 ArrayList<StringBuilder> toReturn = new ArrayList<>();
 
                 // add the type definitions for functions
                 for (Operator op : functionDecls.keySet()) {
                         StringBuilder currentForm = this.getSingleFunctionDef(
                                         this.usedFunctionNames.get(op),
-                                        functionDecls.get(op));
+                                        functionDecls.get(op), services);
                         if (currentForm.length() > 0) {
                                 // Do not add it, if an empty result was
                                 // returned.
@@ -641,7 +543,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return well formed expression that defines the type of the function.
          */
         private StringBuilder getSingleFunctionDef(StringBuilder funName,
-                        ArrayList<Sort> sorts) {
+                        ArrayList<Sort> sorts, Services services) {
                 StringBuilder toReturn = new StringBuilder();
 
                 /*
@@ -659,8 +561,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                  */
                 int firstIndex = -1;
                 if (!this.isMultiSorted()
-                                || !isSomeIntegerSort(sorts
-                                                .get(sorts.size() - 1))) {
+                                || !isSomeIntegerSort(sorts.get(sorts.size() - 1), services)) {
                         // collect the quantify vars
                         ArrayList<StringBuilder> qVar = new ArrayList<>();
                         for (int i = 0; i < sorts.size() - 1; i++) {
@@ -687,7 +588,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                                 for (int i = 0; i < qVar.size()
                                                 && firstIndex == -1; i++) {
-                                        if (!isSomeIntegerSort(sorts.get(i))) {
+                                        if (!isSomeIntegerSort(sorts.get(i), services)) {
                                                 firstIndex = i;
                                                 toReturn = this.getTypePredicate(
                                                                 sorts.get(i),
@@ -697,7 +598,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                                 for (int i = firstIndex + 1; i < qVar.size()
                                                 && firstIndex > -1; i++) {
-                                        if (!isSomeIntegerSort(sorts.get(i))) {
+                                        if (!isSomeIntegerSort(sorts.get(i), services)) {
                                                 StringBuilder temp = getTypePredicate(
                                                                 sorts.get(i),
                                                                 qVar.get(i));
@@ -758,7 +659,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          *
          * @return structured List of declaration.
          */
-        private ArrayList<ArrayList<StringBuilder>> buildTranslatedFuncDecls(TermServices services) {
+        private ArrayList<ArrayList<StringBuilder>> buildTranslatedFuncDecls(Services services) {
                 ArrayList<ArrayList<StringBuilder>> toReturn = new ArrayList<>();
                 // add the function declarations for each used function
                 for (Operator op : this.functionDecls.keySet()) {
@@ -775,6 +676,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         toReturn.add(element);
                 }
 
+                Sort integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
 
                 // add the type definitions for the bsum function symbols
                 for (StringBuilder sb: usedBsumTerms.values()) {
@@ -966,7 +868,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return toReturn;
         }
 
-        private ArrayList<StringBuilder> buildUniqueAssumptions()
+        private ArrayList<StringBuilder> buildUniqueAssumptions(Services services)
                         throws IllegalFormulaException {
 
                 ArrayList<StringBuilder> distinct = new ArrayList<>();
@@ -974,7 +876,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (FunctionWrapper function : usedFunctions) {
                         if (function.getFunction().isUnique()) {
                                 StringBuilder buffer = translateUniqueness(
-                                                function, usedFunctions);
+                                                function, usedFunctions, services);
                                 if (buffer != null) {
                                         distinct.add(buffer);
                                 }
@@ -986,8 +888,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 
 
-        private Term createLogicalVar(TermServices services, String baseName,
+        private Term createLogicalVar(Services services, String baseName,
                         Sort sort) {
+                TermBuilder tb = services.getTermBuilder();
                 return tb.var(new LogicVariable(new Name(
                                 tb.newName(baseName)),
                                 sort));
@@ -999,6 +902,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
+                TermBuilder tb = services.getTermBuilder();
                 Term zero = tb.zero();
                 Term one = tb.one();
                 LinkedList<Term> multAssumptions = new LinkedList<>();
@@ -1057,23 +961,23 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
 
-        private ArrayList<StringBuilder> buildAssumptionsForSorts(TermServices services){
-        	ArrayList<StringBuilder> result = new ArrayList<>();
-        	if(this.isMultiSorted()){
-         		for(Sort sort : usedRealSort.keySet()){
+        private ArrayList<StringBuilder> buildAssumptionsForSorts(Services services){
+            ArrayList<StringBuilder> result = new ArrayList<>();
+            if(this.isMultiSorted()){
+                for(Sort sort : usedRealSort.keySet()) {
 
-         		//Do not add Assumptions for Boolean or integer sorts
-             		if(!isSomeIntegerSort(sort) && sort != Sort.FORMULA ){
-             			Term var = createLogicalVar(services, "x", sort);
-             			StringBuilder sVar = translateVariable(var.op());
-            			//StringBuilder var = this.makeUnique(new StringBuilder("x"));
-             			StringBuilder typePredicate = this.getTypePredicate(sort, sVar);
-             			StringBuilder assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
-             			result.add(assumption);
-             		}
-        		}
-        	}
-        	return result;
+                //Do not add Assumptions for Boolean or integer sorts
+                    if(!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA) {
+                        Term var = createLogicalVar(services, "x", sort);
+                        StringBuilder sVar = translateVariable(var.op());
+                        //StringBuilder var = this.makeUnique(new StringBuilder("x"));
+                        StringBuilder typePredicate = this.getTypePredicate(sort, sVar);
+                        StringBuilder assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
+                        result.add(assumption);
+                    }
+                }
+            }
+            return result;
         }
 
         private HashMap<Long, StringBuilder> getRightConstantContainer(
@@ -1082,7 +986,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private Term getRightBorderAsTerm(long integer, TermServices services) {
+        private Term getRightBorderAsTerm(long integer, Services services) {
+                TermBuilder tb = services.getTermBuilder();
                 return tb.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
@@ -1092,15 +997,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return integer < 0 ? getMinNumber() : getMaxNumber();
         }
 
-        private StringBuilder getNameForIntegerConstant(TermServices services,
-                        long integer) {
+        private StringBuilder getNameForIntegerConstant(Services services, long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
-                return new StringBuilder(tb.newName("i")
-                                + "_" + val);
+                TermBuilder tb = services.getTermBuilder();
+                return new StringBuilder(tb.newName("i") + "_" + val);
 
         }
 
-        private StringBuilder buildUniqueConstant(long integer, TermServices services)
+        private StringBuilder buildUniqueConstant(long integer, Services services)
                         throws IllegalFormulaException {
                 HashMap<Long, StringBuilder> map = getRightConstantContainer(integer);
                 StringBuilder buf = map.get(integer);
@@ -1115,7 +1019,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 addConstantTypePredicate(
                                 term,
                                 translateIntegerValue(getRightBorderAsInteger(
-                                                integer, services)));
+                                                integer, services)), services);
                 return buf;
         }
 
@@ -1632,7 +1536,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return the translation of the unique function
          */
         protected StringBuilder translateUniqueness(FunctionWrapper function,
-                        Collection<FunctionWrapper> distinct)
+                        Collection<FunctionWrapper> distinct, Services services)
                         throws IllegalFormulaException {
                 if (!function.getFunction().isUnique()) {
                         return null;
@@ -1655,17 +1559,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                                                 .sort())) {
                                         result = translateLogicalAnd(
                                                         result,
-                                                        translateDistinct(array));
+                                                        translateDistinct(array, services));
                                 }
 
                         }
                 }
                 return translateLogicalAnd(result,
-                                buildInjectiveFunctionAssumption(function));
+                                buildInjectiveFunctionAssumption(function, services));
         }
 
         protected StringBuilder buildInjectiveFunctionAssumption(
-                        FunctionWrapper fw) {
+                        FunctionWrapper fw, Services services) {
                 if (fw.getFunction().arity() == 0) {
                         return translateLogicalTrue();
                 }
@@ -1687,9 +1591,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 result = translateLogicalOr(leftSide, result);
                 result = translateLogicalAll(vars1, getArgSorts(fw.function),
-                                result);
+                                result, services);
                 result = translateLogicalAll(vars2, getArgSorts(fw.function),
-                                result);
+                                result, services);
                 return result;
         }
 
@@ -1715,7 +1619,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return list;
         }
 
-        protected StringBuilder translateDistinct(FunctionWrapper[] functions) {
+        protected StringBuilder translateDistinct(FunctionWrapper[] functions, Services services) {
                 assert functions.length == 2;
                 int start = 0;
                 StringBuilder functionTranslation[] = new StringBuilder[functions.length];
@@ -1737,24 +1641,24 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 functionTranslation[1]);
                 result = translateLogicalNot(result);
 
-                result = translateLogicalAll(createdVariables, sorts, result);
+                result = translateLogicalAll(createdVariables, sorts, result, services);
 
                 return result;
         }
 
         protected StringBuilder translateLogicalAll(
                         ArrayList<StringBuilder> variables,
-                        ArrayList<Sort> sorts, StringBuilder result) {
+                        ArrayList<Sort> sorts, StringBuilder result, Services services) {
                 for (int i = 0; i < variables.size(); i++) {
                         result = translateLogicalAll(variables.get(i),
-                                        sorts.get(i), result);
+                                        sorts.get(i), result, services);
                 }
                 return result;
         }
 
         protected StringBuilder translateLogicalAll(StringBuilder var, Sort sort,
-                        StringBuilder result) {
-                return translateLogicalAll(var, translateSort(sort), result);
+                        StringBuilder result, Services services) {
+                return translateLogicalAll(var, translateSort(sort, services), result);
         }
 
         private final StringBuilder translateTermIte(Term iteTerm,
@@ -1770,13 +1674,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 quantifiedVars, services);
                 if (this.isMultiSorted()) {
                         ifterm = this.castIfNeccessary(ifterm, iteTerm.sub(1)
-                                        .sort(), iteTerm.sort());
+                                        .sort(), iteTerm.sort(), services);
                 }
                 StringBuilder elseterm = translateTerm(iteTerm.sub(2),
                                 quantifiedVars, services);
                 if (this.isMultiSorted()) {
                         elseterm = this.castIfNeccessary(elseterm,
-                                        iteTerm.sub(2).sort(), iteTerm.sort());
+                                        iteTerm.sub(2).sort(), iteTerm.sort(), services);
                 }
                 //try {
                         return this.translateTermIfThenElse(cond, ifterm,
@@ -1806,9 +1710,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 //                }
         }
 
-        private void addConstantTypePredicate(Term term, StringBuilder name) {
+        private void addConstantTypePredicate(Term term, StringBuilder name, Services services) {
                 if (!this.constantTypePreds.containsKey(term)) {
-                        this.translateSort(term.sort());
+                        this.translateSort(term.sort(), services);
                         StringBuilder typePred = this.getTypePredicate(
                                         term.sort(), name);
                         this.constantTypePreds.put(term, typePred);
@@ -1872,15 +1776,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         StringBuilder arg2 = translateTerm(term.sub(1),
                                         quantifiedVars, services);
                         if (this.isMultiSorted()
-                                        && isSomeIntegerSort(term.sub(0).sort())
-                                        && !isSomeIntegerSort(term.sub(1)
-                                                        .sort())) {
+                                        && isSomeIntegerSort(term.sub(0).sort(), services)
+                                        && !isSomeIntegerSort(term.sub(1).sort(), services)) {
                                 arg1 = cast(arg1);
                         }
                         if (this.isMultiSorted()
-                                        && !isSomeIntegerSort(term.sub(0)
-                                                        .sort())
-                                        && isSomeIntegerSort(term.sub(1).sort())) {
+                                        && !isSomeIntegerSort(term.sub(0).sort(), services)
+                                        && isSomeIntegerSort(term.sub(1).sort(), services)) {
                                 arg2 = cast(arg2);
                         }
                         return this.translateObjectEqual(arg1, arg2);
@@ -1923,14 +1825,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         quantifiedVars.add(vars.get(0));
 
                         StringBuilder qv = this.translateVariable(vars.get(0));
-                        StringBuilder sort = this.translateSort(vars.get(0)
-                                        .sort());
+                        StringBuilder sort = this.translateSort(vars.get(0).sort(), services);
                         StringBuilder form = this.translateTerm(term.sub(0),
                                         quantifiedVars, services);
 
                         if (!this.isMultiSorted()
-                                        || !isSomeIntegerSort(vars.get(0)
-                                                        .sort())) {
+                                        || !isSomeIntegerSort(vars.get(0).sort(), services)) {
                                 // add the typepredicate
                                 // this is not needed, if the variable, that is
                                 // quantified over is of
@@ -1953,14 +1853,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         quantifiedVars.add(vars.get(0));
 
                         StringBuilder qv = this.translateVariable(vars.get(0));
-                        StringBuilder sort = this.translateSort(vars.get(0)
-                                        .sort());
+                        StringBuilder sort = this.translateSort(vars.get(0).sort(), services);
                         StringBuilder form = this.translateTerm(term.sub(0),
                                         quantifiedVars, services);
 
                         if (!this.isMultiSorted()
-                                        || !isSomeIntegerSort(vars.get(0)
-                                                        .sort())) {
+                                        || !isSomeIntegerSort(vars.get(0).sort(), services)) {
                                 // add the typepredicate
                                 // a and is needed!!
                                 // This is not the case, if the variable, that
@@ -1980,12 +1878,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return this.translateLogicalFalse();
                 } else if (op == services.getTypeConverter().getHeapLDT()
                                 .getNull()) {
-                        Function nullOp = services.getTypeConverter()
-                                        .getHeapLDT().getNull();
+                        Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
 
-                        addFunction(nullOp, new ArrayList<>(),
-                                        nullOp.sort());
-                        translateSort(nullOp.sort());
+                        addFunction(nullOp, new ArrayList<>(), nullOp.sort(), services);
+                        translateSort(nullOp.sort(), services);
                         return translateNull();
                 } else if (op instanceof LogicVariable
                                 || op instanceof ProgramVariable) {
@@ -2005,8 +1901,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         services));
                                 }
 
-                                addFunction(op, new ArrayList<>(),
-                                                term.sort());
+                                addFunction(op, new ArrayList<>(), term.sort(), services);
 
                                 return translateFunc(op, subterms);
                         }
@@ -2089,7 +1984,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                                         subterm,
                                                                         term.sub(i)
                                                                                         .sort(),
-                                                                        fun.argSort(i));
+                                                                        fun.argSort(i), services);
                                                 }
                                                 subterms.add(subterm);
                                         }
@@ -2097,7 +1992,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         for (int i = 0; i < fun.arity(); i++) {
                                                 sorts.add(fun.argSort(i));
                                         }
-                                        this.addPredicate(fun, sorts);
+                                        this.addPredicate(fun, sorts, services);
 
                                         return translatePred(op, subterms);
                                     }
@@ -2157,6 +2052,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         this.addSpecialFunction(fun);
                                         // return the final translation
 
+                                        /* TODO WP: not needed anymore with the modern SMT solvers
+                                         *    we support -> remove
+                                         */
+                                        /*
                                         if (isComplexMultiplication(services,
                                                         term.sub(0),
                                                         term.sub(1))
@@ -2180,7 +2079,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                                                         + " handled by using uninterpreted functions.\nFor more information see the settings of"
                                                                                         + " the SMT integration: Options/SMT Settings/Translation.");
                                                 }
-                                        }
+                                        }*/
 
                                         return this.translateIntegerMult(arg1,
                                                         arg2);
@@ -2205,6 +2104,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         term.sub(0))
                                                         .longValue();
                                         StringBuilder numVal;
+
+                                        /* TODO WP: not needed anymore with the modern SMT solvers
+                                             we support -> remove
+                                         */
+                                        /*
                                         if (hasNumberLimit()
                                                         && (num < getMinNumber() || num > getMaxNumber())) {
                                                 if (smtSettings.useAssumptionsForBigSmallIntegers()) {
@@ -2220,13 +2124,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                                                         + " handled by using uninterpreted constants. For more information see the settings of"
                                                                                         + " the SMT integration: Options/SMT Settings/Translation.");
                                                 }
-                                        } else {
+                                         */
+                                        //} else {
                                                 numVal = translateIntegerValue(num);
-                                        }
+                                        //}
 
                                         // add the type predicate for this
                                         // constant
-                                        addConstantTypePredicate(term, numVal);
+                                        addConstantTypePredicate(term, numVal, services);
 
                                         return numVal;
                                 } else if (fun == services.getTypeConverter().getIntegerLDT().getBsum()) {
@@ -2287,7 +2192,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     quantifiedVars, services);
                     if (this.isMultiSorted()) {
                             subterm = this.castIfNeccessary(subterm,
-                                            sub.sort(), fun.argSort(i));
+                                            sub.sort(), fun.argSort(i), services);
                     }
                     subterms.add(subterm);
                 }
@@ -2397,7 +2302,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     quantifiedVars, services);
                     if (this.isMultiSorted()) {
                             subterm = this.castIfNeccessary(subterm,
-                                            sub.sort(), fun.argSort(i));
+                                            sub.sort(), fun.argSort(i), services);
                     }
                     subterms.add(subterm);
                 }
@@ -2499,13 +2404,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         quantifiedVars, services);
                         if (this.isMultiSorted()) {
                                 subterm = this.castIfNeccessary(subterm,
-                                                sub.sort(), fun.argSort(i));
+                                                sub.sort(), fun.argSort(i), services);
                         }
                         subterms.add(subterm);
                         i++;
                 }
 
-                this.addFunction(fun, getArgSorts(fun), fun.sort());
+                this.addFunction(fun, getArgSorts(fun), fun.sort(), services);
 
                 return translateFunc(fun, subterms);
         }
@@ -2549,15 +2454,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return A StringBuilder containing a type cast, if neccessary.
          */
         private StringBuilder castIfNeccessary(StringBuilder formula,
-                        Sort formulaSort, Sort targetSort) {
+                        Sort formulaSort, Sort targetSort, Services services) {
                 if (!this.isMultiSorted()) {
                         return formula;
                 }
-                if (isSomeIntegerSort(formulaSort)
-                                && !isSomeIntegerSort(targetSort)) {
+                if (isSomeIntegerSort(formulaSort, services)
+                                && !isSomeIntegerSort(targetSort, services)) {
                         return this.cast(formula);
-                } else if (!isSomeIntegerSort(formulaSort)
-                                && isSomeIntegerSort(targetSort)) {
+                } else if (!isSomeIntegerSort(formulaSort, services)
+                                && isSomeIntegerSort(targetSort, services)) {
                         throw new RuntimeException(
                                         "Error while translation.\n"
                                                         + "Not possible to perform a typecast\n"
@@ -2627,6 +2532,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                 .size()]);
                 Term[] subs = new Term[args.length];
                 Sort[] argsorts = new Sort[args.length];
+                TermBuilder tb = services.getTermBuilder();
                 for (int i = 0; i < args.length; i++) {
                         QuantifiableVariable qv = args[i];
                         if (qv instanceof LogicVariable) {
@@ -2713,7 +2619,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         for (int i = 0; i < op.arity(); i++) {
                                 sorts.add(term.sub(i).sort());
                         }
-                        this.addPredicate(op, sorts);
+                        this.addPredicate(op, sorts, services);
 
                         return translatePred(op, subterms);
                 } else {
@@ -2732,7 +2638,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 sorts.add(Sort.FORMULA);
                             }
                         }
-                        this.addFunction(op, sorts, term.sort());
+                        this.addFunction(op, sorts, term.sort(), services);
 
                         return translateFunc(op, subterms);
                 }
@@ -2853,23 +2759,24 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          *                the list of sort parameter of this function
          * @result the function's result sort
          */
-        private void addFunction(Operator op, ArrayList<Sort> sorts, Sort result) {
+        private void addFunction(Operator op, ArrayList<Sort> sorts, Sort result,
+                                 Services services) {
                 if (!this.functionDecls.containsKey(op)) {
                         sorts.add(result);
                         this.functionDecls.put(op, sorts);
                         // add all sorts
                         for (Sort s : sorts) {
-                                this.translateSort(s);
+                                this.translateSort(s, services);
                         }
                 }
         }
 
-        private void addPredicate(Operator op, ArrayList<Sort> sorts) {
+        private void addPredicate(Operator op, ArrayList<Sort> sorts, Services services) {
                 if (!this.predicateDecls.containsKey(op)) {
                         this.predicateDecls.put(op, sorts);
                         // add all sorts
                         for (Sort s : sorts) {
-                                this.translateSort(s);
+                                this.translateSort(s, services);
                         }
                 }
         }
@@ -2896,18 +2803,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return translatePredicate(name, sub);
         }
 
-        private final StringBuilder translateSort(Sort s) {
+        private final StringBuilder translateSort(Sort s, Services services) {
                 if (usedDisplaySort.containsKey(s)) {
                         return usedDisplaySort.get(s);
                 } else {
                         StringBuilder sortname = this.translateSort(s.name()
-                                        .toString(), isSomeIntegerSort(s));
+                                        .toString(), isSomeIntegerSort(s, services));
                         StringBuilder displaysort;
 
                         if (!this.isMultiSorted()) {
                                 displaysort = this.getIntegerSort();
                         } else {
-                                if (isSomeIntegerSort(s)) {
+                                if (isSomeIntegerSort(s, services)) {
                                         displaysort = this.getIntegerSort();
                                 } else {
                                         displaysort = this.standardSort;
@@ -2941,73 +2848,74 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
         }
 
-        protected boolean isSomeIntegerSort(Sort s) {
+        protected boolean isSomeIntegerSort(Sort s, Services services) {
+                Sort integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 return s == integerSort;
         }
 
 
 
         private StringBuilder removeIllegalChars(StringBuilder template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-    	//replace one String
-    	for (int i = 0; i < toReplace.size(); i++) {
-    	    String toRep = toReplace.get(i);
-    	    String replace = replacement.get(i);
-    	    int index = template.indexOf(toRep);
-    	    while (index >= 0) {
-    		template.replace(index, index + toRep.length(), replace);
-    		index = template.indexOf(toRep);
-    	    }
-    	}
+        //replace one String
+        for (int i = 0; i < toReplace.size(); i++) {
+            String toRep = toReplace.get(i);
+            String replace = replacement.get(i);
+            int index = template.indexOf(toRep);
+            while (index >= 0) {
+            template.replace(index, index + toRep.length(), replace);
+            index = template.indexOf(toRep);
+            }
+        }
 
-    	return template;
+        return template;
         }
 
 
         protected StringBuilder makeUnique(StringBuilder name) {
-        	StringBuilder toReturn = new StringBuilder(name);
+            StringBuilder toReturn = new StringBuilder(name);
 
-        	//build the replacement pairs
-        	ArrayList<String> toReplace = new ArrayList<>();
-        	ArrayList<String> replacement = new ArrayList<>();
+            //build the replacement pairs
+            ArrayList<String> toReplace = new ArrayList<>();
+            ArrayList<String> replacement = new ArrayList<>();
 
-        	toReplace.add("[]");
-        	replacement.add("_Array");
+            toReplace.add("[]");
+            replacement.add("_Array");
 
-        	toReplace.add("<");
-        	replacement.add("_abo_");
+            toReplace.add("<");
+            replacement.add("_abo_");
 
-        	toReplace.add(">");
-        	replacement.add("_abc_");
+            toReplace.add(">");
+            replacement.add("_abc_");
 
-        	toReplace.add("{");
-        	replacement.add("_cbo_");
+            toReplace.add("{");
+            replacement.add("_cbo_");
 
-        	toReplace.add("}");
-        	replacement.add("_cbc_");
+            toReplace.add("}");
+            replacement.add("_cbc_");
 
-        	toReplace.add(".");
-        	replacement.add("_dot_");
+            toReplace.add(".");
+            replacement.add("_dot_");
 
-        	toReplace.add(":");
-        	replacement.add("_col_");
+            toReplace.add(":");
+            replacement.add("_col_");
 
-        	toReplace.add("\\");
-        	replacement.add("_");
+            toReplace.add("\\");
+            replacement.add("_");
 
-        	toReplace.add("$");
-        	replacement.add("_dollar_");
+            toReplace.add("$");
+            replacement.add("_dollar_");
 
-        	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
-        	// names are must not begin with special characters
+            toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+            // names are must not begin with special characters
 
-        	if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
-        	   !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
-        	toReturn = (new StringBuilder()).append("a_").append(toReturn);
-        	}
+            if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
+               !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
+            toReturn = (new StringBuilder()).append("a_").append(toReturn);
+            }
 
-        	toReturn.append("_").append(nameCounter);
-        	nameCounter++;
-        	return toReturn;
+            toReturn.append("_").append(nameCounter);
+            nameCounter++;
+            return toReturn;
             }
 
 
@@ -3069,7 +2977,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                		StringBuilder term = translateComment(1,tf.getTaclet().displayName()+":\n");
+                                        StringBuilder term = translateComment(1,tf.getTaclet().displayName() + ":\n");
 
                                         term.append(translateTerm(
                                                         subterm, vector,
@@ -3091,8 +2999,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
 
-        protected StringBuilder translateComment(int newLines, String comment){
-        	return new StringBuilder();
+        protected StringBuilder translateComment(int newLines, String comment) {
+            return new StringBuilder();
         }
 
         /**
@@ -3111,13 +3019,5 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * */
         private long getMinNumber() {
                 return smtSettings.getMinimumInteger();
-        }
-
-        /**
-         * returns <code>true</code> if the format supports only integers within
-         * a certain interval.
-         */
-        private boolean hasNumberLimit() {
-                return config.hasNumberLimit;
         }
 }

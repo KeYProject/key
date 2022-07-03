@@ -1,20 +1,8 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.Locale;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -40,9 +28,20 @@ import de.uka.ilkd.key.core.Main;
 public final class KeYFileChooser extends JFileChooser {
 
     /** default file filter for loading files */
-    public static final FileFilter DEFAULT_FILTER = new FileNameExtensionFilter(
-        "Java files, (compressed) KeY files, proof bundles, and source directories",
-        "java", "key", "proof", "proof.gz", "zproof");
+    public static final FileFilter DEFAULT_FILTER = new FileFilter() {
+        // FileNameExtensionFilter is not sufficient, as it only checks the part after the last dot
+        @Override
+        public boolean accept(File f) {
+            String s = f.toString().toLowerCase(Locale.ROOT);
+            return f.isDirectory() || s.endsWith(".java") || s.endsWith(".key")
+                ||  s.endsWith(".proof") || s.endsWith(".proof.gz") || s.endsWith(".zproof");
+        }
+
+        @Override
+        public String getDescription() {
+            return "Java files, (compressed) KeY files, proof bundles, and source directories";
+        }
+    };
 
     /** file filter for *.key files */
     public static final FileFilter KEY_FILTER = new FileNameExtensionFilter(
@@ -58,8 +57,18 @@ public final class KeYFileChooser extends JFileChooser {
         "Java source files (.java)", "java");
 
     /** filter for compressed proof files */
-    public static final FileFilter COMPRESSED_FILTER = new FileNameExtensionFilter(
-        "compressed proof files (.proof.gz)", "proof.gz");
+    public static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+        // FileNameExtensionFilter is not sufficient, as it only checks the part after the last dot
+        @Override
+        public boolean accept(File f) {
+            return f.isDirectory() || f.toString().toLowerCase(Locale.ROOT).endsWith(".proof.gz");
+        }
+
+        @Override
+        public String getDescription() {
+            return "compressed proof files (.proof.gz)";
+        }
+    };
 
     /** filter for interaction log files */
     public static final FileFilter INTERACTION_LOG_FILTER = new FileNameExtensionFilter(

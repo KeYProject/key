@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java;
 
 import java.lang.reflect.Constructor;
@@ -990,6 +977,16 @@ public class Recoder2KeYConverter {
         return new CatchAllStatement
             ((StatementBlock)callConvert(cas.getStatementAt(0)),
              (LocationVariable) callConvert(cas.getVariable()));
+    }
+
+    /**
+     * convert a recorder JML assert statment into a KeY JML assert statement.
+     *
+     * @param ja the statement to convert
+     * @return the converted statement
+     */
+    public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
+        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja), services);
     }
 
     // ------------------- declaration ---------------------

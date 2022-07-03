@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
@@ -135,6 +122,7 @@ public final class PartialInvAxiom extends ClassAxiom {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         for (int i = 0; i < 2; i++) {
+            // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
                                                     + (target.isStatic()? "static ": "")
@@ -174,7 +162,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                 services);
             result = result.union(taclets);
 
-            //EQ taclet only for non-static invariants
+            //EQ taclet (with i==1) only for non-static invariants
             if (target.isStatic()) {
                 break;
             }

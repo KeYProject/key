@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -39,7 +26,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 import javax.annotation.Nonnull;
-import java.io.StringReader;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -425,23 +411,14 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         ParserRuleContext ctx = stat.getContext().first;
 
-        // Convert to block with block contract, attach to AST.
         de.uka.ilkd.key.java.Position pos = new de.uka.ilkd.key.java.Position(
                 ctx.start.getLine(),
                 ctx.start.getCharPositionInLine());
-
+        final Kind kind = stat.getKind();
+        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext());
         try {
-            String comment = String.format(
-                    "/*@ normal_behavior\n"
-                    + "  @ %s %s\n"
-                    + "  @ assignable \\strictly_nothing;\n"
-                    + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
-
-            StatementBlock block = services.getProgramFactory().parseStatementBlock(
-                    new StringReader(String.format("{\n%s\n{;;}}", comment)));
-
-            updatePositionInformation(block, pos);
-            doAttach(block, astParent, childIndex);
+            updatePositionInformation(jmlAssert, pos);
+            doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
                     String.format("%s (%s)", e.getMessage(), e.getClass().getName()),

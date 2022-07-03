@@ -21,6 +21,9 @@ plugins {
 
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"
+
+    // Code formatting
+    id "com.diffplug.spotless" version "5.17.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -81,6 +84,8 @@ subprojects {
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
+
+    apply plugin: "com.diffplug.spotless"
 
     group = rootProject.group
     version = rootProject.version
@@ -318,6 +323,47 @@ subprojects {
             }
         }
     }
+
+
+    spotless {
+        // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
+
+        // optional: limit format enforcement to just the files changed by this feature branch
+        // ratchetFrom 'origin/master'
+
+        format('Key') {
+            // define the files to apply `misc` to
+            //target '*.gradle', '*.md', '.gitignore'
+            target 'src/main/resources/**/*.key'
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+            licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
+        }
+
+        antlr4 {
+            target 'src/*/antlr4/**/*.g4' // default value, you can change if you want
+            licenseHeaderFile "$rootDir/gradle/header"
+        }
+
+        java {
+            //target("*.java")
+            // don't need to set target, it is inferred from java
+
+            // We ignore the build folder to avoid double checks and checks of generated code.
+            targetExclude 'build/**'
+
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            trimTrailingWhitespace()        // not sure how to set this in the xml file ...
+            //googleJavaFormat().aosp().reflowLongStrings()
+
+            // specific delimiter: normally just 'package', but spotless crashes for files in default package
+            // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
+            // with completely commented out code (which would probably better just be removed in future).
+            licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+        }
+    }
+
 }
 
 task start {
@@ -350,12 +396,12 @@ task alldoc(type: Javadoc) {
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
-        bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        bottom = "Copyright &copy; 2003-2022 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
-        links += 'http://download.oracle.com/javase/8/docs/api/'
+        links += "https://docs.oracle.com/en/java/javase/11/docs/api/"
         links += "http://www.antlr2.org/javadoc/"
         links += "http://www.antlr3.org/api/Java/"
-        links += "http://recoder.sourceforge.net/doc/api/"
+        links += "https://www.antlr.org/api/Java/"
     }
 }
 

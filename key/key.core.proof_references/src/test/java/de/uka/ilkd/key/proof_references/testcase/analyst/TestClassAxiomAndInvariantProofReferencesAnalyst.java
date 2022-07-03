@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof_references.testcase.analyst;
 
 import de.uka.ilkd.key.proof_references.analyst.ClassAxiomAndInvariantProofReferencesAnalyst;
@@ -99,18 +86,16 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                 new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
-    /**
-     * Tests "AccessibleTest".
-     */
-    @Test
-    public void testAccessibleTest() throws Exception {
-        doReferenceFunctionTest(TESTCASE_DIRECTORY,
-                "/proofReferences/AccessibleTest/AccessibleTest.java",
-                "test.B",
-                "java.lang.Object::<inv>",
-                false,
-                new ClassAxiomAndInvariantProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
-    }
+   /**
+    * Tests "AccessibleTest".
+    */
+   public void testAccessibleTest() throws Exception {
+      doReferenceFunctionTest(TESTCASE_DIRECTORY,
+                              "/proofReferences/AccessibleTest/AccessibleTest.java",
+                              "test.B",
+                              "java.lang.Object::<inv>",
+                              false,
+                              new ClassAxiomAndInvariantProofReferencesAnalyst(),
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"));
+   }
 }

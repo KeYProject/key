@@ -1,17 +1,5 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.*;
@@ -62,6 +50,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     protected void walk(ProgramElement node) {
+        if (node instanceof JmlAssert) {
+            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
+        }
         super.walk(node);
         if(node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
@@ -90,7 +81,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
     }
-
 
     /**
      * the action that is performed just before leaving the node the last time
@@ -965,4 +955,13 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionOnJmlAssert(JmlAssert x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnJmlAssertCondition(final Term cond) {
+        // empty
+    }
 }

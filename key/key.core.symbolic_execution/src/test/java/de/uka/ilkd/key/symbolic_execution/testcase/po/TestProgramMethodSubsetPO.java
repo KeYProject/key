@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -41,7 +28,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 null,
                 new Position(24, 27),
                 new Position(25, 33),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
     }
 
     /**
@@ -116,7 +103,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 "x == 1 && asdf == 2 && this.field == 3",
                 new Position(27, 19),
                 new Position(31, 25),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**
@@ -131,7 +118,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                 null,
                 new Position(27, 19),
                 new Position(31, 25),
-                "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**

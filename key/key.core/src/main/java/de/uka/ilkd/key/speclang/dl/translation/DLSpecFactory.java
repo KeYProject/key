@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.dl.translation;
 
 import java.util.LinkedHashMap;
@@ -284,7 +271,8 @@ public final class DLSpecFactory {
 	//heapAtPre variable may be omitted
 	TermBuilder tb = services.getTermBuilder();
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = tb.heapAtPreVar(heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
+	    heapAtPreVar = tb.atPreVar(heapLDT.getHeap().toString(),
+				heapLDT.getHeap().sort(), false);
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);

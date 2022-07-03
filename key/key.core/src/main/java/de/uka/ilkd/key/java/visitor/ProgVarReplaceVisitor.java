@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
@@ -20,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -36,7 +25,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor.DefaultAction;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -657,5 +645,52 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 newFreeInvariants, newMods, newInfFlowSpecs, newVariant,
                 newSelfTerm, newLocalIns, newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
+    }
+
+    @Override
+    public void performActionOnJmlAssertCondition(final Term x) {
+        if (x == null) {
+            throw new IllegalStateException("JML assert is incomplete");
+        }
+        Term newCond = replaceVariablesInTerm(x);
+        stack.peek().add(newCond);
+        if (!x.equals(newCond)) {
+            changed();
+        }
+    }
+
+    @Override
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        final ProgramVariableCollection vars = x.getVars();
+        final Map<LocationVariable, Term> atPres = vars.atPres;
+        final Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
+        final Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
+        final Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+        for (Entry<LocationVariable, Term> e: atPres.entrySet()) {
+            LocationVariable pv = e.getKey();
+            final Term t = e.getValue();
+            if (t == null) {
+                continue;
+            }
+            if (replaceMap.containsKey(pv)) {
+                newAtPres.remove(pv);
+                pv = (LocationVariable) replaceMap.get(pv);
+                newAtPreVars.put(pv, atPreVars.get(e.getKey()));
+            }
+            newAtPres.put(pv, replaceVariablesInTerm(t));
+        }
+        final ProgramVariableCollection newVars = new ProgramVariableCollection(vars.selfVar,
+                vars.paramVars,
+                vars.resultVar,
+                vars.excVar,
+                newAtPreVars,
+                newAtPres,
+                vars.atBeforeVars,
+                vars.atBefores);
+        stack.peek().add(newVars);
+        if (!newAtPres.equals(vars.atPres)) {
+            changed();
+        }
+        super.performActionOnJmlAssert(x);
     }
 }

@@ -1,21 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
+
+import javax.annotation.Nonnull;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -58,6 +47,18 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
+    @Nonnull
+    @Override
+    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+        if (cost instanceof TopRuleAppCost) {
+            return cost.mul(this);
+        }
+        if (cost instanceof NumberRuleAppCost) {
+            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+            return create(getValue() * numberRuleAppCost.getValue());
+        }
+        throw new IllegalArgumentException();
+    }
 
     @Override
     public int compareTo(RuleAppCost o) {

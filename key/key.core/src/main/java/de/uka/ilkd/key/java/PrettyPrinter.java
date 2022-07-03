@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -3231,4 +3218,33 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    /**
+     * Prints the JML assert statement.
+     *
+     * @param jmlAssert the statement to print
+     * @exception IOException occasionally thrown.
+     */
+    public void printJmlAssert(JmlAssert jmlAssert) throws IOException {
+        printHeader(jmlAssert);
+        writeInternalIndentation(jmlAssert);
+
+        final String kind = jmlAssert.getKind().name().toLowerCase();
+
+        markStart(0, jmlAssert);
+
+        markKeywordStart();
+        write("@");
+        write(kind);
+        markKeywordEnd();
+        write(" ");
+
+        write(jmlAssert.getConditionText());
+
+        write(";");
+
+        output();
+        markEnd(0, jmlAssert);
+
+        printFooter(jmlAssert);
+    }
 }

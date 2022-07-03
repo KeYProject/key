@@ -22,25 +22,69 @@ import java.util.List;
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
  * language for modern SMT solvers.
  *
- * It aims to be modular and therefore easily extendable. Special handlers are used for different
- * terms. New handlers need to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in
- * the /key/key.core/src/main/resources/META-INF/services/ directory.
+ * It aims to be modular and therefore easily extendable.
+ * Special {@link SMTHandler}s are used for different terms. The class names of the desired
+ * handlers have to be given to the constructor.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
 public class ModularSMTLib2Translator implements SMTTranslator {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
-    /** If there is a custom list of smt handlers, store them here */
-    private final @Nullable List<SMTHandler> smtHandlers;
+    /**
+     * The smt preamble prepended to smt problems that are created with this translator.
+     */
+    private final String preamble;
+    /**
+     * The fully classified class names of the SMTHandlers used by this translator.
+     */
+    private final String[] handlerNames;
+    /**
+     * Arbitrary String options for the SMTHandlers used by this translator.
+     */
+    private final String[] handlerOptions;
 
-    public ModularSMTLib2Translator(List<SMTHandler> smtHandlers) {
-        this.smtHandlers = smtHandlers;
+    /**
+     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of
+     * the default values.
+     * @param preamble the preamble to be prepended to smt problems created with this translator
+     * @param handlerOptions arbitrary String options for the SMTHandlers used by this translator
+     * @param handlerNames fully classified class names of the SMTHandlers to be used by this
+     *                     translator
+     */
+    public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
+                                    @Nullable String preamble) {
+        if (preamble == null) {
+            this.preamble = SMTHandlerServices.getInstance().getPreamble();
+        } else {
+            this.preamble = preamble;
+        }
+        this.handlerNames = handlerNames;
+        this.handlerOptions = handlerOptions;
+        /* Make sure to load the needed handlers once so that their smt
+        properties are loaded as well. This is needed so that the properties
+        already exist before first translating anything as they may have settings
+        that should be visible beforehand (see {@link SMTSettingsProvider).
+        Also, loading them once before the first translation may save runtime for
+        that first translation.
+        */
+        try {
+            SMTHandlerServices.getInstance().getTemplateHandlers(handlerNames);
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+        }
     }
 
+    /**
+     * If the preamble and handlers don't have to be customized, the handlers are empty
+     * and the preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
+     */
     public ModularSMTLib2Translator() {
-        this.smtHandlers = null;
+        this(new String[0], new String[0], null);
     }
 
     @Override
@@ -48,7 +92,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         MasterHandler master;
         try {
-            master = new MasterHandler(services, settings, smtHandlers);
+            master = new MasterHandler(services, settings, handlerNames, handlerOptions);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -58,8 +102,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("; --- Preamble");
-        sb.append(SMTHandlerServices.getInstance().getPreamble());
+        sb.append("; --- Preamble\n");
+        sb.append(preamble);
+        sb.append(System.lineSeparator());
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(sequent, services, master, sequentAsserts);

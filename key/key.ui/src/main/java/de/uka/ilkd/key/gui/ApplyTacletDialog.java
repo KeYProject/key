@@ -1,16 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
+/** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
 
 
@@ -130,13 +118,13 @@ public abstract class ApplyTacletDialog extends JDialog {
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
                 new NotationInfo(), backend, mediator.getServices(), true,
                 MainWindow.getInstance().getVisibleTermLabels());
-        
+
         tp.printTaclet(taclet,
         	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
-        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(), 
+        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
         	       false);
         tacletSB.append(backend.getString());
-        
+
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet
         JScrollPane scroll = new JScrollPane();

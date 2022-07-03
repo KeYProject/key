@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -45,7 +32,8 @@ public class HeapContext {
   public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, TermServices services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
-       final LocationVariable atPreVar = services.getTermBuilder().heapAtPreVar(heap.name()+contextName, heap.sort(), true);
+       final LocationVariable atPreVar = services.getTermBuilder().locationVariable(
+                heap.name() + contextName, heap.sort(), true);
        result.put(heap, atPreVar);
     }
     return result;

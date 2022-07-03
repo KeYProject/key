@@ -63,6 +63,10 @@ public class ProveTest {
         runKey(file, TestProperty.LOADABLE);
     }
 
+    protected void assertUnLoadability(String file) throws Exception {
+        runKey(file, TestProperty.NOTLOADABLE);
+    }
+
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
@@ -98,18 +102,25 @@ public class ProveTest {
                 }
             }
 
-            assertFalse(replayResult.hasErrors(), "Loading problem file failed");
-
-            // For a reload test we are done at this point. Loading was successful.
-            if (testProperty == TestProperty.LOADABLE) {
+            if (testProperty == TestProperty.NOTLOADABLE) {
+                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
                 success = true;
-                debugOut("... success: loaded");
             } else {
-                autoMode(env, loadedProof, script);
-                success = (testProperty == TestProperty.PROVABLE) == loadedProof.closed();
-                debugOut("... finished proof: " + (success ? "closed." : "open goal(s)"));
-                appendStatistics(loadedProof, keyFile);
-                if (success) reload(proofFile, loadedProof);
+                assertFalse(replayResult.hasErrors(), "Loading problem file failed");
+
+                // For a reload test we are done at this point. Loading was successful.
+                if (testProperty == TestProperty.LOADABLE) {
+                    success = true;
+                    debugOut("... success: loaded");
+                } else {
+                    autoMode(env, loadedProof, script);
+                    boolean closed = loadedProof.closed();
+                    success = (testProperty == TestProperty.PROVABLE) == closed;
+                    debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                    appendStatistics(loadedProof, keyFile);
+                    if (success)
+                        reload(proofFile, loadedProof);
+                }
             }
         } finally {
             if (loadedProof != null) {
