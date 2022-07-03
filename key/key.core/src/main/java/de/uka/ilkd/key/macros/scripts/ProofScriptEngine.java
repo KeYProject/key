@@ -193,9 +193,11 @@ public class ProofScriptEngine {
         var map = new TreeMap<String, Object>();
         int i = KEY_START_INDEX_PARAMETER;
 
-        for (var pc : commandContext.proofScriptParameters().proofScriptParameter()) {
-            String key = pc.pname != null ? pc.pname.getText() : "#" + (i++);
-            map.put(key, pc.expr);
+        if (commandContext.proofScriptParameters() != null) {
+            for (var pc : commandContext.proofScriptParameters().proofScriptParameter()) {
+                String key = pc.pname != null ? pc.pname.getText() : "#" + (i++);
+                map.put(key, pc.expr);
+            }
         }
         var in = commandContext.start.getTokenSource().getInputStream();
         var txt = in.getText(Interval.of(commandContext.start.getStartIndex(), commandContext.stop.getStopIndex()));

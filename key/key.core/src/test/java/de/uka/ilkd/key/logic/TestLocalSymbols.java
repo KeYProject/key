@@ -123,8 +123,13 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
+        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  "doubleSkolem.key");
+        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
-        KeYEnvironment<?> env = loadProof("doubleSkolem.key");
+        KeYEnvironment<?> env = KeYEnvironment.load(
+                JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, true);
+
         Proof proof = env.getLoadedProof();
         var script = env.getProofScript();
 
