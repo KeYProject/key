@@ -324,7 +324,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
            && endIdx <= \dl_seqLen(\dl_strContent(this));
       //boolean::select(heapAtPre, result, java.lang.Object::<created>)==FALSE
       ensures \result != null;
-      ensures \dl_strContent(result)==\dl_seqSub(\dl_strContent(this), startIdx, endIdx);
+      ensures \dl_strContent(\result)==\dl_seqSub(\dl_strContent(this), startIdx, endIdx);
       assignable \nothing;
    also
    public exceptional_behavior
