@@ -8,6 +8,7 @@ import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
 import java.io.File;
@@ -28,13 +29,17 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
 public class ProofScriptEngine {
+    public static final int KEY_START_INDEX_PARAMETER = 2;
+
     private static final String SYSTEM_COMMAND_PREFIX = "@";
     private static final int MAX_CHARS_PER_COMMAND = 80;
     private static final Map<String, ProofScriptCommand<? extends Object>> COMMANDS = loadCommands();
@@ -158,8 +163,7 @@ public class ProofScriptEngine {
                                     BuilderHelpers.getPosition(commandContext)),
                             url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
                 } else {
-                    LOGGER.info(
-                            "Proof already closed at command \"%s\" at line %s, terminating.\n",
+                    LOGGER.info("Proof already closed at command \"{}\" at line {}, terminating",
                             argMap.get(ScriptLineParser.LITERAL_KEY), BuilderHelpers.getPosition(commandContext));
                     break;
                 }
@@ -167,15 +171,23 @@ public class ProofScriptEngine {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
                 proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        "Error while executing script: " + e.getMessage()
-                                + "\n\nCommand: "
-                                + commandContext.cmd.getText(),
+                        String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
+                                e.getMessage(), prettyPrintCommand(commandContext), BuilderHelpers.getPosition(commandContext)),
                         url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
             }
         }
     }
 
-    public static final int KEY_START_INDEX_PARAMETER = 2;
+    public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
+        return (ctx.AT() != null ? "@ " : "") +
+                ctx.cmd.getText() +
+                (ctx.proofScriptParameters() != null
+                        ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
+                        .map(RuleContext::getText)
+                        .collect(Collectors.joining(" "))
+                        : "") + ";";
+    }
+
 
     private Map<String, Object> getArguments(KeYParser.ProofScriptCommandContext commandContext) {
         var map = new TreeMap<String, Object>();

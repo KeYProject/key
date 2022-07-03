@@ -74,7 +74,7 @@ public class TestProofScriptCommand {
             pse.execute(env.getUi(), proof);
         } catch (Exception ex) {
             assertTrue(props.containsKey("exception"), "unexpected exception");
-            Assertions.assertEquals(ex.getMessage(), props.get("exception").trim());
+            Assertions.assertTrue(ex.getMessage().startsWith(props.get("exception").trim()));
             return;
         }
 
