@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -164,9 +166,32 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
+     *
+     * @param listener problem initializer listener for the current proof
+     * @param progressMonitor progress monitor used to report replay progress
+     * @return result of the replay procedure (see {@link Result})
      */
-    public Result replay() {
+    public Result replay(
+            ProblemInitializer.ProblemInitializerListener listener,
+            ProgressMonitor progressMonitor
+    ) {
+        // initialize progress monitoring
+        int stepIndex = 0;
+        int reportInterval = 1;
+        if (listener != null && progressMonitor != null) {
+            int max = !queue.isEmpty() && queue.peekFirst().second != null
+                    ? queue.peekFirst().second.countAllChildren() : 1;
+            listener.reportStatus(this, "Replaying proof", max);
+            reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
+        }
+
         while (!queue.isEmpty()) {
+            // periodically report replay progress
+            if (listener != null && progressMonitor != null && stepIndex % reportInterval == 0) {
+                progressMonitor.setProgress(stepIndex);
+            }
+            stepIndex++;
+
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
@@ -505,7 +530,7 @@ public class IntermediateProofReplayer {
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
-            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
+            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for {}",
                     tacletName);
             // try to find instantiations automatically
             ImmutableList<TacletApp> instApps = ourApp
