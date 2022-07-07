@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
+import de.uka.ilkd.key.macros.scripts.meta.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -10,8 +11,6 @@ import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -37,20 +36,17 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-                                        Map<String, Object> arguments) {
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+            throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
+            NoSpecifiedConverterException {
         Parameters args = new Parameters();
-        try {
-            ValueInjector.getInstance().inject(this, args, arguments);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        state.getValueInjector().inject(this, args, arguments);
         return args;
     }
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl,
-            Parameters arguments, EngineState state)
+                        Parameters arguments, EngineState state)
             throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         final Profile profile = services.getProfile();
@@ -65,7 +61,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             goals = state.getProof().openGoals();
         } else {
             final Goal goal = state.getFirstOpenAutomaticGoal();
-            goals = ImmutableSLList.<Goal> nil().prepend(goal);
+            goals = ImmutableSLList.<Goal>nil().prepend(goal);
 
             final Optional<String> matchesRegEx = Optional
                     .ofNullable(arguments.matches);
@@ -90,7 +86,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         try {
             for (Goal goal : goals) {
                 applyStrategy.start(state.getProof(),
-                        ImmutableSLList.<Goal> nil().prepend(goal));
+                        ImmutableSLList.<Goal>nil().prepend(goal));
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {
@@ -107,18 +103,13 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * Sets up a focused automatic strategy. Focus is on the sequent formula
      * matching the matchesRegEx (may not be null).
      *
-     * @param maybeMatchesRegEx
-     *            The RegEx which should match on the sequent formula to focus.
-     * @param breakpointArg
-     *            An optional breakpoint argument.
-     * @param goal
-     *            The {@link Goal} to apply the strategy on, needed for the rule
-     *            application manager.
-     * @param proverCore
-     *            The {@link ProverCore}, needed for resetting the strategy
-     *            afterward.
-     * @param services
-     *            The {@link Services} object.
+     * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus.
+     * @param breakpointArg     An optional breakpoint argument.
+     * @param goal              The {@link Goal} to apply the strategy on, needed for the rule
+     *                          application manager.
+     * @param proverCore        The {@link ProverCore}, needed for resetting the strategy
+     *                          afterward.
+     * @param services          The {@link Services} object.
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(
@@ -128,8 +119,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(
-                        MacroCommand.extractMatchingPio(goal.node().sequent(),
-                                maybeMatchesRegEx.get(), services))
+                MacroCommand.extractMatchingPio(goal.node().sequent(),
+                        maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
         final AutomatedRuleApplicationManager realManager = //
@@ -153,11 +144,15 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "steps", required = false)
         public int maxSteps = -1;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "matches", required = false)
         public String matches = null;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "breakpoint", required = false)
         public String breakpoint = null;
 

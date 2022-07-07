@@ -45,7 +45,7 @@ public class JavascriptCommand
     @Override
     public Parameters evaluateArguments(EngineState state,
                                         Map<String, Object> arguments) throws Exception {
-        return ValueInjector.injection(this, new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class JavascriptCommand
 
         public void setVar(String var, String term) throws ScriptException {
             try {
-                setVar(var, state.toTerm(term, null));
+                setVar(var, state.toTerm(term));
             }
             catch (ParserException e) {
                 throw new ScriptException(e);

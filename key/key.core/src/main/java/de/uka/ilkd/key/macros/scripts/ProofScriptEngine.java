@@ -1,13 +1,18 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -19,14 +24,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
-import java.util.Optional;
 import java.util.ServiceLoader;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +114,7 @@ public class ProofScriptEngine {
             stateMap.setObserver(commandMonitor);
         }
 
+
         int cnt = 0;
         for (KeYParser.ProofScriptCommandContext commandContext : ctx.proofScriptCommand()) {
             if (Thread.interrupted()) {
@@ -172,11 +172,13 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
                         String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
-                                e.getMessage(), prettyPrintCommand(commandContext), BuilderHelpers.getPosition(commandContext)),
+                                e.getMessage(), prettyPrintCommand(commandContext),
+                                BuilderHelpers.getPosition(commandContext)),
                         url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
             }
         }
     }
+
 
     public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
         return (ctx.AT() != null ? "@ " : "") +

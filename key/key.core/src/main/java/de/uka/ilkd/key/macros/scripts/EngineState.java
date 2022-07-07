@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -14,7 +15,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
+import org.antlr.v4.runtime.RuleContext;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Deque;
@@ -27,6 +32,8 @@ import java.util.Optional;
  * @version 1 (28.03.17)
  */
 public class EngineState {
+    public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);
+
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
     /**
@@ -34,7 +41,7 @@ public class EngineState {
      */
     private Observer observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = createDefaultValueInjector();
+    private final ValueInjector valueInjector = createDefaultValueInjector();
 
 
     private Goal goal;
@@ -59,10 +66,13 @@ public class EngineState {
 
     private ValueInjector createDefaultValueInjector() {
         var v = ValueInjector.createDefault();
-        v.addConverter(Term.class, String.class, (String s) -> toTerm(s, null));
+        v.addConverter(Term.class, String.class, this::toTerm);
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
         addContextTranslator(v, String.class);
+
+        //v.addConverter(String.class, KeYParser.ProofScriptExpressionContext.class, RuleContext::getText);
+
         addContextTranslator(v, Term.class);
         addContextTranslator(v, Integer.class);
         addContextTranslator(v, Byte.class);
@@ -75,7 +85,35 @@ public class EngineState {
         addContextTranslator(v, Long.TYPE);
         addContextTranslator(v, Boolean.TYPE);
         addContextTranslator(v, Character.TYPE);
+
+
+        v.addConverter(Term.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+        v.addConverter(Sequent.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+        v.addConverter(Semisequent.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+
         return v;
+    }
+
+    private <T> T toKeYEntity(KeYParser.ProofScriptExpressionContext expr) throws ScriptException {
+        final var firstNode = getFirstOpenAutomaticGoal();
+        ExpressionBuilder visitor = new ExpressionBuilder(
+                getProof().getServices(),
+                firstNode.getLocalNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        //if (schemaNamespace != null)
+        //    visitor.setSchemaVariables(schemaNamespace);
+        T ret = (T) expr.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        for (BuildingIssue warning : warnings) {
+            LOGGER.warn(warning.toString());
+        }
+        return ret;
     }
 
     private <T> void addContextTranslator(ValueInjector v, Class<T> aClass) {
@@ -100,6 +138,8 @@ public class EngineState {
         return (R) inj.getConverter(aClass, String.class).convert(v);
 
     }
+
+
 
     private Sequent parseSequent(KeYParser.SeqContext term) {
         ExpressionBuilder visitor = new ExpressionBuilder(proof.getServices(), proof.getNamespaces());
@@ -255,7 +295,7 @@ public class EngineState {
         return result;
     }
 
-    public Term toTerm(String string, Sort sort)
+    public Term toTerm(String string)
             throws ParserException, ScriptException {
         KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);

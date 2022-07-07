@@ -28,7 +28,7 @@ public class TryCloseCommand
 
     @Override public TryCloseArguments evaluateArguments(EngineState state,
                                                          Map<String, Object> arguments) throws Exception {
-        return ValueInjector.injection(this, new TryCloseArguments(), arguments);
+        return state.getValueInjector().inject(this, new TryCloseArguments(), arguments);
     }
 
     @Override public void execute(TryCloseArguments args)

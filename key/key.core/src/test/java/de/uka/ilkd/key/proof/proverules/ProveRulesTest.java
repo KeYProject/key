@@ -143,6 +143,7 @@ public class ProveRulesTest {
          * taclet name. (that means there will be one test case for each taclet)
          */
         return tacletNames.stream()
+                .filter(it -> it.equals("schiffl_thm_1"))
                 .map(tacletName -> DynamicTest.dynamicTest(tacletName,
                         () -> loadTacletProof(tacletName,
                                 tacletObjectByTacletName.get(tacletName),
