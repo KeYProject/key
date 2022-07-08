@@ -101,6 +101,19 @@ public class EngineState {
     }
 
     private <T> T toKeYEntity(KeYParser.ProofScriptExpressionContext expr) throws ScriptException {
+
+        if (ctx.string_literal() != null) {
+            var v = ctx.string_literal().getText();
+            v = v.substring(1, v.length() - 1);
+            return (R) inj.getConverter(aClass, String.class).convert(v);
+        } else if (ctx.term() != null && aClass == Term.class) {
+            return (R) parseExpr(ctx.term());
+        } else if (ctx.seq() != null && aClass == Sequent.class) {
+            return (R) parseSequent(ctx.seq());
+        }
+        var v = ctx.getText();
+        return (R) inj.getConverter(aClass, String.class).convert(v);
+
         final var firstNode = getFirstOpenAutomaticGoal();
         ExpressionBuilder visitor = new ExpressionBuilder(
                 getProof().getServices(),

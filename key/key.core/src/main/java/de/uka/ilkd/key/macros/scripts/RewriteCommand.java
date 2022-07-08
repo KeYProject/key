@@ -78,7 +78,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         List<PosInOccurrence> failposInOccs = findAndExecReplacement(args, allApps, state);
 
         // if not all find terms successfully replaced, apply cut
-        if (failposInOccs.size() >= 1) {
+        if (!failposInOccs.isEmpty()) {
 
             CutCommand cut = new CutCommand();
             CutCommand.Parameters param = new CutCommand.Parameters();

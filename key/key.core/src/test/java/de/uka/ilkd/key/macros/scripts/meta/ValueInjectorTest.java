@@ -22,7 +22,7 @@ public class ValueInjectorTest {
         args.put("i", "42");
         args.put("s", "blubb");
 
-        ValueInjector.injection(null, null, args);
+        ValueInjector.injection(new LetCommand(), pp, args);
 
         assertEquals(true, pp.b);
         assertEquals(42, pp.i);
@@ -37,7 +37,7 @@ public class ValueInjectorTest {
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class, () ->
-                ValueInjector.injection(new LetCommand(), null, args));
+                ValueInjector.injection(new LetCommand(), pp, args));
     }
 
     @Test
