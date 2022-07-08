@@ -448,10 +448,9 @@ public final class String extends java.lang.Object implements java.io.Serializab
       assignable \nothing;
    //also
    //public normal_behavior
-   //   requires obj!=null && obj instanceof boolean;
-   //   ensures \dl_strContent(\result) == (obj == true ? "true" : "else");
+   //   requires obj != null && obj instanceof Boolean;
+   //   ensures \dl_strContent(\result) == (obj == true ? "true" : "false");
    //   ensures \result != null;
-   //   //&& boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
    //   assignable \strictly_nothing;
    also
    public normal_behavior
