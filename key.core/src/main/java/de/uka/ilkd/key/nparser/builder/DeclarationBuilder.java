@@ -19,6 +19,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.Token;
@@ -48,8 +49,22 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
+        mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(), ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
+        return null;
+    }
+
+    @Override
+    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        boolean freeAdt = ctx.FREE() != null;
+        var name = ctx.name.getText();
+        var s = new SortImpl(new Name(name));
+        if (ctx.DOC_COMMENT() != null) {
+            var documentation = ctx.DOC_COMMENT().getText();
+            s.setDocumentation(documentation);
+        }
+        s.setOrigin(BuilderHelpers.getPosition(ctx));
+        sorts().add(s);
         return null;
     }
 

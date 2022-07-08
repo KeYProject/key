@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -43,7 +44,23 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls());
+        mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
+        return null;
+    }
+
+    @Override
+    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        //boolean freeAdt = ctx.FREE() != null;
+        var sort = sorts().lookup(ctx.name.getText());
+        for (KeYParser.Datatype_constructorContext constructorContext : ctx.datatype_constructor()) {
+            Name name = new Name(constructorContext.name.getText());
+            Sort[] args = new Sort[constructorContext.sortId().size()];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = accept(constructorContext.sortId(i));
+            }
+            Function function = new Function(name, sort, args);
+            namespaces().functions().add(function);
+        }
         return null;
     }
 
