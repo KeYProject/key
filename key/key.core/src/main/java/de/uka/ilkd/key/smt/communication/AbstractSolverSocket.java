@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import java.io.IOException;
  * @author Wolfram Pfeifer (overhaul, removed legacy solvers)
  */
 public abstract class AbstractSolverSocket {
+
     /** Indicates that the solver has not yet sent a sat/unsat/unknown result. */
     protected static final int WAIT_FOR_RESULT = 0;
 
@@ -44,7 +45,6 @@ public abstract class AbstractSolverSocket {
      * @param query the ModelExtractor used to extract a counterexample
      */
     protected AbstractSolverSocket(@Nonnull String name, ModelExtractor query) {
-        super();
         this.name = name;
         this.query = query;
     }
@@ -67,7 +67,19 @@ public abstract class AbstractSolverSocket {
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
      */
-    public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException;
+    public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg)
+            throws IOException;
+
+    /**
+     * Modify an SMT problem String in some way (e.g. prepend some SMT commands).
+     * By default, the String is not changed at all.
+     *
+     * @param problem the SMT problem String to be modified
+     * @return a modified version of the problem
+     */
+    public String modifyProblem(String problem) {
+        return problem;
+    }
 
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
@@ -76,8 +88,14 @@ public abstract class AbstractSolverSocket {
      *              solvers this can be null)
      * @return the newly created socket
      */
-    public static @Nonnull AbstractSolverSocket createSocket(@Nonnull SolverType type, ModelExtractor query) {
+    public static @Nonnull AbstractSolverSocket createSocket(
+            @Nonnull SolverType type, ModelExtractor query) {
         return type.getSocket(query);
     }
-}
 
+    /**
+     * @return a shallow copy of the socket at hand
+     *      (new object with the same class and identical attributes)
+     */
+    public abstract AbstractSolverSocket copy();
+}

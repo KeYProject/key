@@ -23,7 +23,8 @@ public class InstanceOfHandler implements SMTHandler {
     private SortDependingFunction instanceOfOp;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+                     String[] handlerOptions) {
         this.instanceOfOp = Sort.ANY.getInstanceofSymbol(services);
         this.exactInstanceOfOp = Sort.ANY.getExactInstanceofSymbol(services);
     }

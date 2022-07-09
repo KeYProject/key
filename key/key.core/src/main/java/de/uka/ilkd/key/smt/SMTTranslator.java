@@ -11,9 +11,6 @@ import de.uka.ilkd.key.logic.Term;
 /**
  * Classes that implement this interface provide a translation of
  * a KeY-problem into a specific format.
- *
- * Consider not implementing this interface directly, but to extend
- * the class {@link AbstractSMTTranslator}.
  */
 public interface SMTTranslator {
 

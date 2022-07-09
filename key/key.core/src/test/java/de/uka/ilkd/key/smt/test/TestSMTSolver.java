@@ -92,19 +92,6 @@ public abstract class TestSMTSolver extends TestCommons {
 	}
 
 	@Test
-	public void testTermIte1() throws Exception {
-		if (getSolverType().supportsIfThenElse())
-			Assertions.assertTrue(correctResult(testFile + "termite1.key", true));
-	}
-
-	// LONG runtime in CVC3 (~300s)
-	@Test
-	public void testTermlIte2() throws Exception {
-		if (getSolverType().supportsIfThenElse())
-			Assertions.assertTrue(correctResult(testFile + "termite2.key", false));
-	}
-
-	@Test
 	public void testEqual1() throws Exception {
 		Assertions.assertTrue(correctResult(testFile + "equal1.key", true));
 	}

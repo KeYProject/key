@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
@@ -14,15 +15,25 @@ public class VersionChecker {
 
     private static final long MAX_DELAY = 1000;
 
-    public String getVersionFor(String command, String parameter) {
+    /**
+     *
+     * @param command to start the solver process
+     * @param parameter version parameter of the solver
+     * @return the returned version String of the solver, if any was returned, null otherwise
+     */
+    public @Nullable String getVersionFor(String command, String parameter) {
         ProcessBuilder pb = new ProcessBuilder(command, parameter);
         Process p = null;
         try {
             p = pb.start();
             p.waitFor(MAX_DELAY, TimeUnit.MILLISECONDS);
             try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                // Avoid potential blocking by the buffer's readLine()
+                if (!r.ready()) {
+                    return null;
+                }
                 String line = r.readLine();
-                // TODO weigl for Java 11 use "p.destroyForcibly();"                
+                // TODO weigl for Java 11 use "p.destroyForcibly();"
                 return line;
             }
         } catch (Exception e) {
