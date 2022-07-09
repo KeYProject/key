@@ -333,7 +333,6 @@ public class LogicPrinter {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
         try {
-            LOGGER.debug(taclet.name().toString());
             if (showWholeTaclet) {
                 layouter.beginC(2).print(taclet.name().toString()).print(" {");
             } else {
@@ -369,7 +368,7 @@ public class LogicPrinter {
             }
             layouter.end();
         } catch (java.io.IOException e) {
-            LOGGER.error("xxx exception occurred during printTaclet");
+            LOGGER.error("Exception occurred during printTaclet", e);
         }
         instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
