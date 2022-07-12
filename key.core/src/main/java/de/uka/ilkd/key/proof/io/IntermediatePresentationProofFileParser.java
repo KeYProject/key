@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -12,13 +13,6 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateA
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -262,7 +256,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes);
             }
             break;
-
+        case SOLVERTYPE:
+            ((BuiltinRuleInformation) ruleInfo).solver = str;
+            break;
         default:
             break;
         }
@@ -367,6 +363,10 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
+        } else if (builtinInfo.currRuleName.equals("SMTRule")) {
+            result = new SMTAppIntermediate(builtinInfo.currRuleName,
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                builtinInfo.solver);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
@@ -454,7 +454,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
             null;
         protected String currAbstractionPredicates = null;
-        public String currUserChoices = null;
+        protected String currUserChoices = null;
+
+        protected String solver;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);

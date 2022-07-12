@@ -54,7 +54,7 @@ public class ProofSMTApplyUserAction extends UserAction {
         for (SMTProblem problem : smtProblems) {
             if (problem.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                 IBuiltInRuleApp app =
-                    RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
+                        RuleAppSMT.RULE.createApp(problem.getFinalResult().solverName);
                 goalsClosed.add(problem.getGoal().node());
                 problem.getGoal().apply(app);
             }
