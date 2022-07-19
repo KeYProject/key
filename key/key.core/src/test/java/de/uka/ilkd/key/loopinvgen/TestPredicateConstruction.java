@@ -51,7 +51,7 @@ public class TestPredicateConstruction {
 		}
 	}
 
-	public LoopInvariantGenerationResult shiftArrayToLeft() {////////////////////DONE!
+	public LoopInvariantGenerationResult shiftArrayToLeft() {
 
 		Term succFormula;
 
@@ -151,7 +151,7 @@ public class TestPredicateConstruction {
 		return loopInvGenerator.generate();
 	}
 
-	public LoopInvariantGenerationResult withFunc() {////////////////////DONE!
+	public LoopInvariantGenerationResult withFunc() {
 
 		Term succFormula;
 
@@ -201,7 +201,7 @@ public class TestPredicateConstruction {
 		return loopInvGenerator.generate();
 	}
 
-	public LoopInvariantGenerationResult withoutFunc() {////////////////////DONE!
+	public LoopInvariantGenerationResult withoutFunc() {
 		Term succFormula;
 
 		try {
@@ -381,7 +381,7 @@ public class TestPredicateConstruction {
 //	}
 //
 //	
-	public LoopInvariantGenerationResult condition() {//////////////DONE!
+	public LoopInvariantGenerationResult condition() {
 		Term formula;
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		
@@ -443,7 +443,7 @@ public class TestPredicateConstruction {
 		return loopInvGenerator.generate();
 	}
 
-	public LoopInvariantGenerationResult conditionDifferentNumberOfEvents() {/////////////DONE!
+	public LoopInvariantGenerationResult conditionDifferentNumberOfEvents() {
 
 		Term formula;
 
@@ -601,10 +601,6 @@ public class TestPredicateConstruction {
 	}
 
 //
-//	
-//	
-//	
-//
 //	public void testCaseFor_mbps() {
 //
 //		Term formula;
@@ -723,12 +719,71 @@ public class TestPredicateConstruction {
 ////		loopInvGenerator.mainAlg();
 //	}
 
+
+//======================================================================================================================
+//													Nested Loops
+//======================================================================================================================
+public LoopInvariantGenerationResult shiftArrayToLeftNested() {
+
+	Term succFormula;
+
+	try {
+		succFormula = parse("{i:=0 || j:=1}\\<{" + "		while (i<a.length-1) {"
+													+ "			while (j<a.length-1) {"
+													+ "				a[j] = 1;"
+													+ "				j++;}"
+													+ "			i++;}"
+													+ "		}\\>true");
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+	String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+	String[] arrRight = { "a=null" };
+	try {
+		for (String fml : arrLeft) {
+			seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+		}
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+
+	try {
+		for (String fml : arrRight) {
+			seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+		}
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+
+	final LIGNested loopInvGenerator = new LIGNested(seq, services);
+	return loopInvGenerator.generate();
+}
+
+
+
 	
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
-		long start = System.currentTimeMillis();
 		LoopInvariantGenerationResult result;
-		result = tpc.shiftArrayToLeft();//Precise Result
+		long start = System.currentTimeMillis();
+//		result = tpc.shiftArrayToLeft();//Precise Result
 //		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
 //		result = tpc.condition();//Precise Result
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
@@ -736,6 +791,8 @@ public class TestPredicateConstruction {
 //		result = tpc.withFunc();
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		result = tpc.shiftArrayToLeftNested();
 		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

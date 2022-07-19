@@ -22,15 +22,29 @@ public abstract class AbstractLoopInvariantGenerator {
     protected final RuleApplication ruleApp;
     protected final IntegerLDT intLDT;
     protected Term low;
+    protected Term lowOuter;
+    protected Term lowInner;
     protected Term high;
+    protected Term highOuter;
+    protected Term highInner;
     protected Term index;
+    protected Term indexOuter;
+    protected Term indexInner;
     protected Term guard;
     protected Set<Term> arrays = new HashSet<>();
     protected Set<Term> oldDepPreds = new HashSet<>();
+    protected Set<Term> oldInnerDepPreds = new HashSet<>();
+    protected Set<Term> oldOuterDepPreds = new HashSet<>();
     protected Set<Term> allDepPreds = new HashSet<>();
-    protected Set<Term> oldCompPreds = new HashSet<>();
-    protected Set<Term> allCompPreds = new HashSet<>();
 
+    protected Set<Term> innerDepPreds = new HashSet<>();
+    protected Set<Term> outerDepPreds = new HashSet<>();
+    protected Set<Term> oldCompPreds = new HashSet<>();
+    protected Set<Term> oldInnerCompPreds = new HashSet<>();
+    protected Set<Term> oldOuterCompPreds = new HashSet<>();
+    protected Set<Term> allCompPreds = new HashSet<>();
+    protected Set<Term> outerCompPreds = new HashSet<>();
+    protected Set<Term> innerCompPreds = new HashSet<>();
     public AbstractLoopInvariantGenerator(Sequent sequent, Services s) {
         seq = sequent;
         ruleApp = new RuleApplication(s, seq);
@@ -39,7 +53,7 @@ public abstract class AbstractLoopInvariantGenerator {
         intLDT = services.getTypeConverter().getIntegerLDT();
     }
 
-    protected void abstractGoal(Goal currentGoal) {
+    protected void abstractGoal(Goal currentGoal, Set<Term> compPredsSet, Set<Term> depPredsSet) {
 //		System.out.println("Goal: " + currentGoal);
         for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
             PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
@@ -53,13 +67,39 @@ public abstract class AbstractLoopInvariantGenerator {
             }
         }
 
-        for (Term cp : allCompPreds) {
+        for (Term cp : compPredsSet) {
             currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
 
-        for (Term cp : allDepPreds) {
+        for (Term cp : depPredsSet) {
             currentGoal.addFormula(new SequentFormula(cp), true, false);
+//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+        }
+//		System.out.println("Modified Goal: " + currentGoal);
+    }
+
+    protected void abstractSequent(Sequent seq, Set<Term> compPredsSet, Set<Term> depPredsSet) {
+//		System.out.println("Goal: " + currentGoal);
+        for (SequentFormula cgsf : seq.antecedent()) {
+            PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
+            seq.removeFormula(p);
+        }
+
+        for(SequentFormula cgsf:seq.succedent()) {
+            PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), false);
+            if(!cgsf.formula().containsJavaBlockRecursive()) {
+                seq.removeFormula(p);
+            }
+        }
+
+        for (Term cp : compPredsSet) {
+            seq.addFormula(new SequentFormula(cp), true, false);
+//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+        }
+
+        for (Term cp : depPredsSet) {
+            seq.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
 //		System.out.println("Modified Goal: " + currentGoal);
@@ -78,6 +118,25 @@ public abstract class AbstractLoopInvariantGenerator {
         }
     }
 
+    protected void getLows(Sequent seq) {
+        for (SequentFormula sf : seq.succedent()) {
+            Term formula = sf.formula();
+            if (formula.op() instanceof UpdateApplication) {
+                Term update = UpdateApplication.getUpdate(formula);
+                if(update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
+                    Term updateOuter = update.sub(0);
+                    Term updateInner = update.sub(1);
+                    if (updateOuter.op() instanceof ElementaryUpdate) {
+                        this.lowOuter = updateOuter.sub(0);
+                    }
+                    if (updateInner.op() instanceof ElementaryUpdate) {
+                        this.lowInner = updateInner.sub(0);
+                    }
+                    break;
+                }
+            }
+        }
+    }
     protected void getIndexAndHigh(Sequent seq) {
         Expression high = null, index = null;
         for (final SequentFormula sf : seq.succedent()) {
@@ -106,6 +165,50 @@ public abstract class AbstractLoopInvariantGenerator {
         this.high = expr2term(high);
         this.index = expr2term(index);
     }
+
+    protected void getIndexesAndHighs(Sequent seq) {
+        Expression highInner = null, indexInner = null;
+        Expression highOuter = null, indexOuter = null;
+        for (final SequentFormula sf : seq.succedent()) {
+            final Term formula = skipUpdates(sf.formula());
+            if (formula.op() == Modality.DIA) {
+                ProgramElement pe = formula.javaBlock().program();
+                Statement activePE;
+                if (pe instanceof ProgramPrefix) {
+                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                } else {
+                    activePE = (Statement) pe.getFirstElement();
+                }
+                if (activePE instanceof While) {
+                    final Expression expr = ((While) activePE).getGuardExpression();
+                    if (expr instanceof GreaterOrEquals || expr instanceof GreaterThan) {
+                        highOuter = ((ComparativeOperator) expr).getExpressionAt(0);
+                        indexOuter = ((ComparativeOperator) expr).getExpressionAt(1);
+                    } else if (expr instanceof LessOrEquals || expr instanceof LessThan) {
+                        highOuter = ((ComparativeOperator) expr).getExpressionAt(1);
+                        indexOuter = ((ComparativeOperator) expr).getExpressionAt(0);
+                    }
+                    final Statement stmtInner = ((While) activePE).getBody();
+                    if (stmtInner.getFirstElement() instanceof While) {
+                        final Expression exprInner = ((While) stmtInner.getFirstElement() ).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                            highInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
+                            indexInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
+                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                            highInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
+                            indexInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        this.highOuter = expr2term(highOuter);
+        this.indexOuter = expr2term(indexOuter);
+        this.highInner = expr2term(highInner);
+        this.indexInner = expr2term(indexInner);
+    }
+
 
     protected void getLoopGuard(Sequent seq) {
         Term guard = null;

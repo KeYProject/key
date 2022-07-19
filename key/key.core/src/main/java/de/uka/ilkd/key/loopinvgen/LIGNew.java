@@ -110,7 +110,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 			
 //			currentGoal = abstractGoal(currentGoal);
 			for (Goal g : goalsAfterShift) {
-				abstractGoal(g);
+				abstractGoal(g, allCompPreds,allDepPreds);
 			}
 //			System.out.println("Dep Preds: " + allDepPreds);
 		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);

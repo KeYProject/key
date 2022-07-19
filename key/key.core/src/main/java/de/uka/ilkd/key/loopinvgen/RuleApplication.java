@@ -12,7 +12,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
@@ -22,9 +21,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-
-import java.io.File;
-import java.io.IOException;
 
 public class RuleApplication {
 
@@ -279,4 +275,61 @@ public class RuleApplication {
 		return tApp;
 	}
 
+
+	/////////////////////////////////////Loop Invariant Rule -> Use Case///////////////////////////////////////////
+
+	ImmutableList<Goal> applyLoopInvariantRuleUseCase(ImmutableList<Goal> openGoals) {
+		Goal currentGoal = findLoopInvarianTacletGoal(openGoals);
+
+		if (currentGoal == null) {
+//			System.out.println("OPEN GOALE: " + openGoals);
+			throw new IllegalStateException("Goal for applying Loop Invarian rule is null.");
+
+		}
+
+		IBuiltInRuleApp app = null;
+		for (SequentFormula sf : currentGoal.sequent().succedent()) {
+			app = findLoopInvarianRuleApp(currentGoal.ruleAppIndex().getBuiltInRules(currentGoal,
+					new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+			if (app != null) {
+				break;
+			}
+		}
+		if (app != null) {
+			Node subtreeRoot = currentGoal.node();
+
+			final ImmutableList<Goal> goals = currentGoal.apply(app);
+
+			ps.start(goals);
+
+			return ps.getProof().getSubtreeGoals(subtreeRoot);
+
+		}
+		return null;
+	}
+
+	Goal findLoopInvarianTacletGoal(ImmutableList<Goal> goals) {
+		for (Goal g : goals) {
+			for (SequentFormula sf : g.sequent().succedent()) {
+				IBuiltInRuleApp bApp = findLoopInvarianRuleApp(
+						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+				if (bApp != null) {
+					System.out.println("Goal of taclet WhileInvariantRuleUseCaseOnly" + " is: " + g);
+					return g;
+				}
+			}
+			System.out.println("Taclet WhileInvariantRuleUseCaseOnly" + " is not applicable at " + g);
+		}
+		return null;
+	}
+
+	private IBuiltInRuleApp findLoopInvarianRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
+		for (IBuiltInRuleApp app : tApp) {
+			if (WhileInvariantRuleUseCaseOnly.NAME.equals(app.rule().name())) {
+				System.out.println(WhileInvariantRuleUseCaseOnly.NAME + " rule is among applicable rules.");
+				return app;
+			}
+		}
+		return null;
+	}
 }

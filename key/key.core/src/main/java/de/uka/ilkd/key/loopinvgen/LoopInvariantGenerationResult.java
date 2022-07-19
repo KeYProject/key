@@ -30,6 +30,7 @@ class LoopInvariantGenerationResult {
         result.append("Conjuncts:\n");
         for (Term term : conjuncts) {
             result.append(term).append('\n');
+            System.out.println(term);
         }
         return result.toString();
     }
