@@ -209,7 +209,21 @@ public abstract class AbstractLoopInvariantGenerator {
         this.indexInner = expr2term(indexInner);
     }
 
+    protected Set<Term> getInnerLocSets(){
+        Set<Term> arr=new HashSet<>();
+        for(Term a:arrays) {
+           arr.add(tb.arrayRange(a, this.lowInner, this.highInner));
+        }
+       return arr;
+    }
 
+    protected Set<Term> getOuterLocSets(){
+        Set<Term> arr=new HashSet<>();
+        for(Term a:arrays) {
+            arr.add(tb.arrayRange(a, this.lowOuter, this.highOuter));
+        }
+        return arr;
+    }
     protected void getLoopGuard(Sequent seq) {
         Term guard = null;
         for (SequentFormula sf : seq.succedent()) {
