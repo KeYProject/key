@@ -287,7 +287,7 @@ public class Recoder2KeY implements JavaReader {
         if (r != null && k != null) {
             rec2key().put(r, k);
         } else {
-            LOGGER.debug("Rec2Key.insertToMap: Omitting entry  (r = " + r + " -> k = " + k + ")");
+            LOGGER.debug("Rec2Key.insertToMap: Omitting entry  (r = {} -> k = {}", r, k);
         }
     }
 
@@ -318,7 +318,7 @@ public class Recoder2KeY implements JavaReader {
                 recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
         de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
-            LOGGER.debug("converting now " + cUnitStrings[i]);
+            LOGGER.debug("converting now {}", cUnitStrings[i]);
             try {
                 recoder.java.CompilationUnit cu = cUnits.get(i);
                 result[i] = getConverter().processCompilationUnit(cu, cu.getDataLocation());
@@ -450,7 +450,7 @@ public class Recoder2KeY implements JavaReader {
         try {
             for (int i = 0; i < cUnitStrings.length; i++) {
                 current = i;
-                LOGGER.debug("Reading " + trim(cUnitStrings[i]));
+                LOGGER.debug("Reading {}", trim(cUnitStrings[i]));
                     sr = new BufferedReader(new StringReader(cUnitStrings[i]));                
                     cUnits.add(servConf.getProgramFactory().parseCompilationUnit(sr));
             }
@@ -469,7 +469,8 @@ public class Recoder2KeY implements JavaReader {
 
             transformModel(cUnits);
         } catch (IOException ioe) {
-            LOGGER.error("recoder2key: IO Error when readingcompilation unit {}", cUnitStrings[current], ioe);
+            LOGGER.error("recoder2key: IO Error when readingcompilation unit {}",
+                    cUnitStrings[current], ioe);
             reportError("IOError reading java program " + cUnitStrings[current] + ". " +
                     "May be file not found or missing permissions.", ioe);
         } catch (recoder.ParserException pe) {
@@ -564,7 +565,7 @@ public class Recoder2KeY implements JavaReader {
             }
             
             if (Debug.ENABLE_DEBUG) {
-                LOGGER.debug("parsed: " + loc);
+                LOGGER.debug("parsed: {}", loc);
             }
         }
         
@@ -700,8 +701,8 @@ public class Recoder2KeY implements JavaReader {
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
                 if(!allowed && methDecl.getBody() != null) {
-                    LOGGER.warn("Method body ("+methDecl.getName()+") should not be allowed: "+rcu.getDataLocation(),
-                	            Recoder2KeY.class.getName());
+                    LOGGER.warn("Method body ({}) should not be allowed: {}",
+                            methDecl.getName(), rcu.getDataLocation(), Recoder2KeY.class.getName());
                 }
                 methDecl.setBody(null);
             }
@@ -862,7 +863,7 @@ public class Recoder2KeY implements JavaReader {
         final ChangeHistory cHistory = servConf.getChangeHistory();
         for (RecoderModelTransformer aTransformer : transformer) {
             if (Debug.ENABLE_DEBUG) {
-                LOGGER.debug("current transformer : " + aTransformer);
+                LOGGER.debug("current transformer : {}", aTransformer);
             }
             aTransformer.execute();
         }
