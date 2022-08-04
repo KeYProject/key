@@ -984,14 +984,17 @@ public class TermBuilder {
         return tf.createTerm(EventUpdate.SINGLETON, marker, locset, label);
     }
 
-    public Term anonEventUpdate(Term locset,Term anonUnique) {
-        return tf.createTerm(AnonEventUpdate.SINGLETON, locset, anonUnique);
+    public Term anonEventUpdate(Term anonUnique) {
+        return tf.createTerm(AnonEventUpdate.SINGLETON, anonUnique);
     }
 
     public Term invEventUpdate(Term marker, Term locset, Term label) {
         return tf.createTerm(InverseEventUpdate.SINGLETON, marker, locset, label);
     }
 
+    public Term invAnonEventUpdate(Term anonUnique) {
+        return tf.createTerm(InverseAnonEventUpdate.SINGLETON, anonUnique);
+    }
     // update connectives
 
     public Term parallel(Term u1, Term u2) {
@@ -2466,5 +2469,10 @@ public class TermBuilder {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
         return func(dependenciesLDT.getWPred(), locSet, counter);
     }
+
+//    public Term evPred(Term locSet, Term counter) {
+//        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+//        return func(dependenciesLDT.getEvPred(), locSet, counter);
+//    }
 }
 

@@ -194,7 +194,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             return updateOrigin(tb.invEventUpdate(depKind, locset, label), ctx);
         } else if (ctx.ANONEVENTUPDATE() != null) {
             // return anon update
-            return updateOrigin(tb.anonEventUpdate(locset, accept(ctx.anonUnique)), ctx);
+            return updateOrigin(tb.anonEventUpdate(accept(ctx.anonUnique)), ctx);
+        } else if (ctx.INVERSEANONEVENTUPDATE() != null) {
+            return updateOrigin(tb.invAnonEventUpdate(accept(ctx.anonUnique)), ctx);
         }
         throw new RuntimeException("Unknown event update type: " + ctx.getText());
     }

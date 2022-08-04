@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.loopinvgen.NestedLoopUsecaseRule;
 import de.uka.ilkd.key.loopinvgen.RelaxedShiftUpdateRule;
 import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
 import de.uka.ilkd.key.proof.Goal;
@@ -217,7 +218,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // Dependencies
         final Feature shiftUpdateF = shiftUpdateFeature();
         final Feature relaxedShiftUpdateF = relaxedShiftUpdateFeature();
-
+        final Feature nestedLoopUsecaseF = nestedLoopUsecaseFeature();
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -227,7 +228,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
-                shiftUpdateF, relaxedShiftUpdateF, // dependencies
+                shiftUpdateF, relaxedShiftUpdateF, nestedLoopUsecaseF,// dependencies
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
@@ -243,6 +244,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private Feature relaxedShiftUpdateFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(RelaxedShiftUpdateRule.RELAXED_SHIFT_RULE);
+        return ConditionalFeature.createConditional(filter, inftyConst());
+    }
+
+    private Feature nestedLoopUsecaseFeature() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE);
         return ConditionalFeature.createConditional(filter, inftyConst());
     }
 

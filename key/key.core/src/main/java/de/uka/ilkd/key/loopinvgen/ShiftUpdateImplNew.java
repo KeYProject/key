@@ -1,7 +1,11 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -14,13 +18,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 
 public class ShiftUpdateImplNew {
@@ -28,7 +25,6 @@ public class ShiftUpdateImplNew {
 	private final Services services;
 	private final TermBuilder tb;
 	private Term keepParallelUpdateRenames;
-
 	public ShiftUpdateImplNew(Goal g) {
 		goal = g;
 		services = g.proof().getServices();
@@ -73,6 +69,7 @@ public class ShiftUpdateImplNew {
 	 */
 	private void doShift(final Term renameUpdate, Goal g, PosInOccurrence pos, final Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
+
 		DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
 		Term counter = services.getTermBuilder().zTerm(-1);
 		while (!updateList.isEmpty()) {
@@ -90,6 +87,10 @@ public class ShiftUpdateImplNew {
 										tb.equals(update.sub(0), tb.func(writeMarker))),
 								tb.add(counter, tb.one()), counter);
 				shiftEventUpdate(update, counter);
+
+			} else if(update.op() instanceof AnonEventUpdate){
+//				shiftAnonEventUpdate(update.sub(0), update.sub(1));
+
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -116,6 +117,7 @@ public class ShiftUpdateImplNew {
 		// collect inverseUpdate of each event
 		HashSet<UpdateableOperator> updatedLocations = new HashSet<>();
 		ImmutableList<Term> inverseEventUpdates = ImmutableSLList.<Term>nil();
+		ImmutableList<Term> inverseAnonEventUpdates = ImmutableSLList.<Term>nil();
 
 		while (!updateList.isEmpty()) {
 			final Term update = updateList.head();
@@ -125,7 +127,11 @@ public class ShiftUpdateImplNew {
 			} else if (update.op() instanceof EventUpdate) {
 				inverseEventUpdates = inverseEventUpdates
 						.append(tb.invEventUpdate(update.sub(0), update.sub(1), update.sub(2)));
-			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+			} else if (update.op() instanceof AnonEventUpdate) {
+				inverseAnonEventUpdates = inverseAnonEventUpdates
+						.append(tb.invAnonEventUpdate(update.sub(0)));
+			}
+			else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 				updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
 			}
 		}
@@ -145,7 +151,10 @@ public class ShiftUpdateImplNew {
 
 		keepParallelUpdateRenames = tb.parallel(renameUpdates);
 		final Term parallelInversesEvents = tb.parallel(inverseEventUpdates);
+		final Term parallelInvAnonEvents = tb.parallel(inverseAnonEventUpdates);
 		final Term updateRenameAndInverseEvents = tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
+		final Term updateAnonInvEvents = tb.sequential(keepParallelUpdateRenames, parallelInvAnonEvents);
+		final Term ret = tb.sequential(updateRenameAndInverseEvents, updateAnonInvEvents);
 		return updateRenameAndInverseEvents;
 	}
 
@@ -199,7 +208,7 @@ public class ShiftUpdateImplNew {
 		Term updateTS = eventUpdate.sub(2);
 		Term locSet = eventUpdate.sub(1);
 		Term eventMarker = eventUpdate.sub(0);
-		Term inverseEvent = tb.invEventUpdate(eventMarker, locSet, updateTS);
+//		Term inverseEvent = tb.invEventUpdate(eventMarker, locSet, updateTS);
 		Term readMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getReadMarker());
 		Term cond1 = tb.equals(eventMarker, readMarker);
 		Term writeMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
@@ -223,4 +232,12 @@ public class ShiftUpdateImplNew {
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}
 
+	private void shiftAnonEventUpdate(Term anonEventUpdate, Term counter) {
+//		Term updateTS = anonEventUpdate.sub(1);
+//		Term locSet = anonEventUpdate.sub(0);
+//
+//		final Term linkTerm4InvEventUpdate = tb.evPred(locSet, updateTS);
+//
+//		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4InvEventUpdate)), true, true);
+	}
 }

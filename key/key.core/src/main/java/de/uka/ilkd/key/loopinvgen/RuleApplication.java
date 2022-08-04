@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,6 +19,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class RuleApplication {
 
@@ -63,13 +65,89 @@ public class RuleApplication {
 		services = proof.getServices();
 	}
 
+
+/////////////////////////////////////Nested Loop Usecase///////////////////////////////////////////
+
+	ImmutableList<Goal> applyNestedLoopUsecaseRule(ImmutableList<Goal> openGoals) {
+		Goal currentGoal = findNestedLoopUsecaseTacletGoal(openGoals);
+
+		if (currentGoal == null) {
+			System.out.println("OPEN GOAL: " + openGoals);
+			throw new IllegalStateException("Goal for applying NestedLoopUsecase rule is null.");
+
+		}
+
+		IBuiltInRuleApp app = null;
+		for (SequentFormula sf : currentGoal.sequent().succedent()) {
+			app = findNestedLoopUsecaseRuleApp(currentGoal.ruleAppIndex().getBuiltInRules(currentGoal,
+					new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+			if (app != null) {
+				break;
+			}
+		}
+		if (app != null) {
+			Node subtreeRoot = currentGoal.node();
+
+			final ImmutableList<Goal> goals = currentGoal.apply(app);
+
+			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
+			System.out.println("NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
+			try {
+				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ps.start(goals);
+
+//			try {
+//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+//			} catch (IOException e) {
+			// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			return ps.getProof().getSubtreeGoals(subtreeRoot);
+			// return currentGoal.proof().openGoals();
+//			return services.getProof().openEnabledGoals();
+		}
+		return null;
+	}
+
+	Goal findNestedLoopUsecaseTacletGoal(ImmutableList<Goal> goals) {
+		for (Goal g : goals) {
+			for (SequentFormula sf : g.sequent().succedent()) {
+				IBuiltInRuleApp bApp = findNestedLoopUsecaseRuleApp(
+						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+				if (bApp != null) {
+					System.out.println("Goal of taclet NestedLoopUsecase" + " is: " + g);
+					return g;
+				}
+			}
+			System.out.println("Taclet NestedLoopUsecase" + " is not applicable at " + g);
+		}
+		return null;
+	}
+
+	private IBuiltInRuleApp findNestedLoopUsecaseRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
+		for (IBuiltInRuleApp app : tApp) {
+			if (NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE_NAME.equals(app.rule().name())) {
+				System.out.println(NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE_NAME + " is among applicable rules.");
+				return app;
+			}
+		}
+		return null;
+	}
+
 /////////////////////////////////////Shift Update///////////////////////////////////////////
 
 	ImmutableList<Goal> applyShiftUpdateRule(ImmutableList<Goal> openGoals) {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-//			System.out.println("OPEN GOALE: " + openGoals);
+//			System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying Shift rule is null.");
 
 		}
@@ -273,63 +351,5 @@ public class RuleApplication {
 		}, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
 
 		return tApp;
-	}
-
-
-	/////////////////////////////////////Loop Invariant Rule -> Use Case///////////////////////////////////////////
-
-	ImmutableList<Goal> applyLoopInvariantRuleUseCase(ImmutableList<Goal> openGoals) {
-		Goal currentGoal = findLoopInvarianTacletGoal(openGoals);
-
-		if (currentGoal == null) {
-//			System.out.println("OPEN GOALE: " + openGoals);
-			throw new IllegalStateException("Goal for applying Loop Invarian rule is null.");
-
-		}
-
-		IBuiltInRuleApp app = null;
-		for (SequentFormula sf : currentGoal.sequent().succedent()) {
-			app = findLoopInvarianRuleApp(currentGoal.ruleAppIndex().getBuiltInRules(currentGoal,
-					new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
-			if (app != null) {
-				break;
-			}
-		}
-		if (app != null) {
-			Node subtreeRoot = currentGoal.node();
-
-			final ImmutableList<Goal> goals = currentGoal.apply(app);
-
-			ps.start(goals);
-
-			return ps.getProof().getSubtreeGoals(subtreeRoot);
-
-		}
-		return null;
-	}
-
-	Goal findLoopInvarianTacletGoal(ImmutableList<Goal> goals) {
-		for (Goal g : goals) {
-			for (SequentFormula sf : g.sequent().succedent()) {
-				IBuiltInRuleApp bApp = findLoopInvarianRuleApp(
-						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
-				if (bApp != null) {
-					System.out.println("Goal of taclet WhileInvariantRuleUseCaseOnly" + " is: " + g);
-					return g;
-				}
-			}
-			System.out.println("Taclet WhileInvariantRuleUseCaseOnly" + " is not applicable at " + g);
-		}
-		return null;
-	}
-
-	private IBuiltInRuleApp findLoopInvarianRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
-		for (IBuiltInRuleApp app : tApp) {
-			if (WhileInvariantRuleUseCaseOnly.NAME.equals(app.rule().name())) {
-				System.out.println(WhileInvariantRuleUseCaseOnly.NAME + " rule is among applicable rules.");
-				return app;
-			}
-		}
-		return null;
 	}
 }

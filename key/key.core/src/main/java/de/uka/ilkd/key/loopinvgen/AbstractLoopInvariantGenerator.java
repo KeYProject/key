@@ -140,7 +140,7 @@ public abstract class AbstractLoopInvariantGenerator {
     protected void getIndexAndHigh(Sequent seq) {
         Expression high = null, index = null;
         for (final SequentFormula sf : seq.succedent()) {
-            final Term formula = skipUpdates(sf.formula());
+            final Term formula = tb.goBelowUpdates(sf.formula());
             if (formula.op() == Modality.DIA) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
@@ -170,7 +170,7 @@ public abstract class AbstractLoopInvariantGenerator {
         Expression highInner = null, indexInner = null;
         Expression highOuter = null, indexOuter = null;
         for (final SequentFormula sf : seq.succedent()) {
-            final Term formula = skipUpdates(sf.formula());
+            final Term formula = tb.goBelowUpdates(sf.formula());
             if (formula.op() == Modality.DIA) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
@@ -227,7 +227,7 @@ public abstract class AbstractLoopInvariantGenerator {
     protected void getLoopGuard(Sequent seq) {
         Term guard = null;
         for (SequentFormula sf : seq.succedent()) {
-            final Term formula = skipUpdates(sf.formula());
+            final Term formula = tb.goBelowUpdates(sf.formula());
             if (formula.op() == Modality.DIA) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
@@ -261,9 +261,9 @@ public abstract class AbstractLoopInvariantGenerator {
         return this.services.getTypeConverter().convertToLogicElement(expr);
     }
 
-    protected Term skipUpdates(Term formula) {
-        return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
-    }
+//    protected Term skipUpdates(Term formula) {
+//        return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
+//    }
 
     protected Set<LocationVariable> extractProgramVariable(Statement s) {
         ProgramVariableCollectorWithArrayIndices pvc = new ProgramVariableCollectorWithArrayIndices(s, services);
@@ -277,7 +277,7 @@ public abstract class AbstractLoopInvariantGenerator {
     protected void getLocSet(Sequent seq) {
         // How to find the targeted location set (the array)?
         for (SequentFormula sf : seq.succedent()) {
-            Term formula = skipUpdates(sf.formula());
+            Term formula = tb.goBelowUpdates(sf.formula());
             if (formula.op() == Modality.DIA) {
                 Statement activePE = (Statement) formula.javaBlock().program();
                 Set<LocationVariable> lvs = extractProgramVariable(activePE);

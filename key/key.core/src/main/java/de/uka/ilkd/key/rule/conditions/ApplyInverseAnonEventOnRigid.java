@@ -8,12 +8,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ApplyInverseEventUpdateOnRigid implements VariableCondition {
+public class ApplyInverseAnonEventOnRigid implements VariableCondition {
 	private final UpdateSV u;
 	private final SchemaVariable x;
 	private final SchemaVariable x2;
-	
-	public ApplyInverseEventUpdateOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
+
+	public ApplyInverseAnonEventOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
 		this.u = u;
 		this.x = x;
 		this.x2 = x2;
@@ -35,7 +35,7 @@ public class ApplyInverseEventUpdateOnRigid implements VariableCondition {
 		SVInstantiations svInst = mc.getInstantiations();
 		
 		Term uInst = null;
-		if(svInst.getInstantiation(u) instanceof InverseEventUpdate) {
+		if(svInst.getInstantiation(u) instanceof InverseAnonEventUpdate) {
 			uInst = (Term) svInst.getInstantiation(u);
 		} else {
 			return null;
@@ -64,7 +64,6 @@ public class ApplyInverseEventUpdateOnRigid implements VariableCondition {
 	}
 	
 	public String toString() {
-		return "\\applyInverseEventOnRigid(" + u + ", " + x + ", " + x2 + ")";
+		return "\\applyInvAnonEventOnRigid(" + u + ", " + x + ", " + x2 + ")";
 	}
-
 }

@@ -187,7 +187,8 @@ ANONEVENTUPDATE:
     '\\anonEvUp';
 INVERSEEVENTUPDATE:
     '\\invEvUp';
-
+INVERSEANONEVENTUPDATE:
+    '\\invAnonEvUp';
 
 // inclusion and stuff, things that (usually) come at the beginning
 // of the file

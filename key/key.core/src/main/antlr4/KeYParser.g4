@@ -347,8 +347,8 @@ elementary_dependency_update_term:
               LPAREN marker=equivalence_term
                 COMMA locset=equivalence_term
                 COMMA depLabel=equivalence_term RPAREN
-        | ANONEVENTUPDATE
-              LPAREN locset=equivalence_term COMMA anonUnique=equivalence_term RPAREN;
+        | (ANONEVENTUPDATE | INVERSEANONEVENTUPDATE)
+              LPAREN anonUnique=equivalence_term RPAREN;
 
 equivalence_term: a=implication_term (EQV b+=implication_term)*;
 implication_term: a=disjunction_term (IMP b=implication_term)?;

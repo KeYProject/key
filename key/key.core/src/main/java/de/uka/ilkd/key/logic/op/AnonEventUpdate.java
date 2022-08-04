@@ -35,11 +35,11 @@ public class AnonEventUpdate extends AbstractSortedOperator {
 	public static final Operator SINGLETON = new AnonEventUpdate();
 
 	private AnonEventUpdate() {
-		super(new Name("anon-event-update"), new Sort[]{/* LocSet */Sort.ANY, /* int, but no order */Sort.ANY}, Sort.UPDATE, false);
+		super(new Name("\\anonEvUp"), new Sort[]{/* int, but no order */Sort.ANY}, Sort.UPDATE, false);
 	}
 	
 	public String toString() {
-		return "anonEvent";
+		return "anonEvUp";
 	}
 
 }

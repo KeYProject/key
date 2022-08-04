@@ -1,11 +1,20 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
@@ -13,13 +22,12 @@ import java.util.*;
 
 public class LIGNested  extends AbstractLoopInvariantGenerator {
 	private final DependenciesLDT depLDT;
-	private Sequent newSeq;
-	private Semisequent newSeqAnte;
-	private Semisequent newSeqSucc;
+	private final HeapLDT heapLDT;
 
 	public LIGNested(Sequent sequent, Services services) {
 		super(sequent, services);
 		depLDT = services.getTypeConverter().getDependenciesLDT();
+		heapLDT = services.getTypeConverter().getHeapLDT();
 	}
 
 	public LoopInvariantGenerationResult generate() {
@@ -39,8 +47,6 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 				outerCompPreds.add(tb.not(sf.formula()));
 			}
 		}
-
-
 //		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");
@@ -48,7 +54,6 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 
-		Sequent seqZero = Sequent.createSequent(goalsAfterShift.head().sequent().antecedent(), goalsAfterShift.head().sequent().succedent());
 
 		// Number of goals after shift does not change
 
@@ -87,8 +92,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		outerDepPreds = refinedPreds.first;
 		outerCompPreds = refinedPreds.second;
 
-		Boolean nested = false;
-		//do {
+		do {
 			outerItrNumber++;
 //			**		
 			System.out.println("OUTER Iteration Number: " + outerItrNumber);
@@ -99,262 +103,191 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 			oldOuterDepPreds.addAll(outerDepPreds);
 			oldOuterCompPreds.addAll(outerCompPreds);
 
-//			System.out.println("Before UNWIND");
+//			System.out.println("Before UNWIND: " + goalsAfterShift.head());
 			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("UNWIND");
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
-//			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
-			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("SHIFT");
-//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-//			System.out.println("Goals After Shift:" + goalsAfterShift);
+//			System.out.println("Goals After Unwind no" +outerItrNumber + " and before inner LI" + goalsAfterUnwind);
 
-
-			Goal currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("Current Goal: " + currentGoal);
-
+			LoopStatement innerLoop = null;
 			LoopInvariantGenerationResult innerLI = null;
-			Term readLocSet = null;
-			Term writtenLocSet = null;
-			Term rawLocSet = null;
-			Term warLocSet = null;
-			for (final SequentFormula sf : currentGoal.sequent().succedent()) {
-				if (sf.formula().op() == Modality.DIA) {
-					ProgramElement pe = sf.formula().javaBlock().program();
-					Statement activePE;
-					if (pe instanceof ProgramPrefix) {
-						activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
-					} else {
-						activePE = (Statement) pe.getFirstElement();
-					}
-					if (activePE instanceof While) {
-						System.out.println("Nested Loop!");
-						nested = true;
-
-						innerLI = innerLIComputation(currentGoal, 0, activePE);
-						readLocSet = readLocSets(innerLI);
-						writtenLocSet = writtenLocSets(innerLI);
-						Term intersectRandW = tb.intersect(readLocSet, writtenLocSet);
-						rawLocSet = extractRaWLocs(innerLI, intersectRandW);
-						warLocSet = extractWaRLocs(innerLI, intersectRandW);
+			boolean nested = false;
+			for(Goal g:goalsAfterUnwind) {
+				for (final SequentFormula sf : g.sequent().succedent()) {
+					final Term formula = tb.goBelowUpdates(sf.formula());
+					if (formula.op() == Modality.DIA) {
+						ProgramElement pe = formula.javaBlock().program();
+						Statement activePE;
+						if (pe instanceof ProgramPrefix) {
+							activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+						} else {
+							activePE = (Statement) pe.getFirstElement();
+						}
+						if (activePE instanceof While) {
+//							System.out.println("Nested Loop!");
+							nested= true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
+							innerLoop = (LoopStatement) activePE;
+							innerLI = innerLIComputation(g, outerItrNumber, activePE);
+						}
+						break;
 					}
 				}
-				break;
+//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
+				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
+				if(nested) {
+					nested = false;
+					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
+					services.getSpecificationRepository().addLoopInvariant(loopSpec);
+					System.out.println("g: " + goalsAfterShiftUpdate.head());
+					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
+					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
+				}
 			}
-			if(nested) {
-				nested = false;
-				Statement outerLoop = reconstructOuterLoop(seqZero);
-//					Term u = constructU(seqZero); //U is shifted and it's in \Gama
-				Term wUpdate = constructW(seqZero, readLocSet, writtenLocSet, rawLocSet, warLocSet);
-				//apply the usecase of LI rule
-				constructUsecase(seqZero, outerLoop, innerLI,wUpdate, currentGoal);
-				}
-//			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
-//			System.out.println("Before refinement: " + currentGoal.sequent());
-//			PredicateRefiner pr = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), innerDepPreds, innerCompPreds,
-//					indexOuter, indexInner, outerItrNumber, services);
-//			refinedPreds = pr.refine();
-//			innerDepPreds = refinedPreds.first;
-//			innerCompPreds = refinedPreds.second;
-//			for (Term t : refinedPreds.first) {
-//				System.out.println("refined: " + t);
-//			}
-////			currentGoal = abstractGoal(currentGoal);
-//			for (Goal g : goalsAfterShift) {
-////				System.out.println("goal before abstraction: "+g);
-//				abstractGoal(g, innerCompPreds, innerDepPreds);
-////				System.out.println("goal after abstraction: "+g);
-//			}
+			Goal currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 
-//			System.out.println("Dep Preds: " + allDepPreds);
-		//} while ((!innerCompPreds.equals(oldInnerCompPreds) || !innerDepPreds.equals(oldInnerDepPreds)) || outerItrNumber < 3);
+			PredicateRefiner pr1 =
+					new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+							innerDepPreds, innerCompPreds,
+							indexOuter, indexInner, outerItrNumber, services);
+			Pair<Set<Term>, Set<Term>> refinedPreds1 = pr1.refine();
+//		System.out.println(ProofSaver.printAnything(seq, services));
+			innerDepPreds = refinedPreds1.first;
+			innerCompPreds = refinedPreds1.second;
+			outerDepPreds = refinedPreds1.first;
+			outerCompPreds = refinedPreds1.second;
 
-		innerDepPreds.addAll(innerCompPreds);
+
+		} while ((!outerCompPreds.equals(oldOuterCompPreds) || !outerDepPreds.equals(oldOuterDepPreds)) || outerItrNumber < 2);
+
+		outerDepPreds.addAll(outerCompPreds);
 
 //		PredicateSetCompressor compressor =
 //				new PredicateSetCompressor(innerDepPreds, currentGoal.sequent(), false, services);
 //		innerDepPreds = compressor.compress();
-		LoopInvariantGenerationResult inLoopInv = new LoopInvariantGenerationResult(innerDepPreds, outerItrNumber);
-		System.out.println("Inner loops invariant: " + inLoopInv);
-		return null;
+		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
+		System.out.println("Outer loops invariant: " + outLoopInv);
+		return outLoopInv;
 	}
 
-	private Goal constructUsecase(Sequent seqZero, Statement outerLoop,LoopInvariantGenerationResult innerLI, Term wUpdate, Goal g) {
-		StatementBlock loopBlock = new StatementBlock(outerLoop);
-		JavaBlock jb = JavaBlock.createJavaBlock(loopBlock);
-		SequentFormula phi=null;
-		for(SequentFormula sf:seqZero.succedent()){
-			if(sf.formula().op() != Modality.DIA){
-				phi=sf;
-				System.out.println("Phi is: "+phi);
-			}
-			break;
-		}
-		//Succ:
-		Term newDiamond = tb.dia(jb, (Term)phi);
-		Term newSuccTerm = tb.apply(wUpdate, newDiamond);
-		SequentFormula newSuccSF = new SequentFormula(newSuccTerm);
-
-		for(SequentFormula sf:g.sequent().succedent()){
-			PosInOccurrence p = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
-			g.removeFormula(p);
-		}
-
-		g.addFormula(newSuccSF,false, true);
-
-		//Ante:
-		Expression outerLoopGuard = null;
-		if(outerLoop instanceof  While){
-			outerLoopGuard = ((While) outerLoop).getGuardExpression();
-		}
-		Term updatedFalseGuard=tb.apply(wUpdate,tb.not((Term)outerLoopGuard));
-		g.addFormula((SequentFormula) updatedFalseGuard,true,false);
-
-		for(Term t:innerLI.getConjuncts()) {
-			g.addFormula((SequentFormula)tb.apply(wUpdate, t), true, false);
-		}
-
-		System.out.println("UseCase goal is: "+ g.sequent());
-
-		return g;
-	}
+//	private boolean findDiamond(Term t) {
+//		if(t instanceof SequentFormula) {
+//			SequentFormula sf = (SequentFormula) t;
+//			if (sf.formula().op() == Modality.DIA) {
+//				return true;
+//			} else if (sf.formula().op() instanceof UpdateApplication) {
+//				findDiamond(sf.formula().sub(1));
+//			}
+//		}
+//		return false;
+//	}
 
 
-	private Term constructW(Sequent seqZero, Term readLocSet, Term writtenLocSet, Term rawLocSet, Term warLocSet){//assuming loop does not creat new objects
-		//readEv, writeEv, readEv
-		Term w = null;
+//	private Term constructW(Sequent seqZero, Term readLocSet, Term writtenLocSet, Term rawLocSet, Term warLocSet){//assuming loop does not creat new objects
+//		//readEv, writeEv, readEv
+//		Term w = null;
+//
+//		Term readEv1 = tb.anonEventUpdate(rawLocSet, tb.zTerm(2));
+//		Term writeEv = tb.anonEventUpdate(tb.union(rawLocSet, warLocSet), tb.zTerm(1));
+//		Term readEv2 = tb.anonEventUpdate(warLocSet, tb.zTerm(0));
+//		w = tb.sequential(readEv1, tb.sequential(writeEv,readEv2));
+//		return w;
+//	}
 
-		Term readEv1 = tb.anonEventUpdate(rawLocSet, tb.zTerm(2));
-		Term writeEv = tb.anonEventUpdate(tb.union(rawLocSet, warLocSet), tb.zTerm(1));
-		Term readEv2 = tb.anonEventUpdate(warLocSet, tb.zTerm(0));
-		w = tb.sequential(readEv1, tb.sequential(writeEv,readEv2));
-		return w;
-	}
+//	private Term extractWaRLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
+//		Term locSet =null;
+//
+//		for(Term pred: innerLI.getConjuncts()){
+//			if (pred.op() == depLDT.getNoWaR()){
+//				locSet = pred.sub(0);
+//				break;
+//			}
+//		}
+//		System.out.println("noWaR LocSet: "+locSet);
+//
+//		if(locSet!=null){
+//			locSet = tb.intersect(locSet, intersectRandW);
+//		}
+//		System.out.println("Read and written LocSets but noWaR: " + locSet);
+//
+//		return locSet;
+//	}
+//	private Term extractRaWLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
+//		Term locSet =null;
+//
+//		for(Term pred: innerLI.getConjuncts()){
+//			if (pred.op().equals(depLDT.getNoRaW())){
+//				locSet = pred.sub(0);
+//				break;
+//			}
+//		}
+//		System.out.println("noRaW LocSet: "+locSet);
+//
+//		if(locSet!=null){
+//			locSet = tb.intersect(locSet, intersectRandW);
+//		}
+//		System.out.println("Read and written LocSets but noRaW: " + locSet);
+//
+//		return locSet;
+//	}
 
-	private Term extractWaRLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-		Term locSet =null;
+//	private Term readLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noR in the LI and it doesn't have \cap or \cup in it
+//		Term locSet =null;
+//		for(Term pred: innerLI.getConjuncts()){
+//			if (pred.op().equals(depLDT.getNoR())){
+//				locSet = pred.sub(0);
+//				break;
+//			}
+//		}
+//		System.out.println("Unread LocSet: "+locSet);
+//
+//		Set<Term> arr = getInnerLocSets();
+//		Set<Term> ret = new HashSet<>();
+//		Term retTerm = null;
+//
+//		if(locSet!=null){
+//			for(Term a:arr){
+//				if(locSet.sub(0)==a.sub(0)) {//Same array
+//					ret.add(tb.setMinus(a, locSet));
+//				}
+//			}
+//		}
+//		retTerm = tb.union(ret);
+//		System.out.println("Read LocSets is: "+retTerm);
+//
+//		return retTerm;
+//
+//	}
 
-		for(Term pred: innerLI.getConjuncts()){
-			if (pred.op().equals(depLDT.getNoWaR())){
-				locSet = pred.sub(0);
-			}
-			break;
-		}
-		System.out.println("noRaW LocSet: "+locSet);
-
-		if(locSet!=null){
-			locSet = tb.intersect(locSet, intersectRandW);
-		}
-		System.out.println("Read and written LocSets but noRaW: " + locSet);
-
-		return locSet;
-	}
-	private Term extractRaWLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-		Term locSet =null;
-
-		for(Term pred: innerLI.getConjuncts()){
-			if (pred.op().equals(depLDT.getNoRaW())){
-				locSet = pred.sub(0);
-			}
-			break;
-		}
-		System.out.println("noRaW LocSet: "+locSet);
-
-		if(locSet!=null){
-			locSet = tb.intersect(locSet, intersectRandW);
-		}
-		System.out.println("Read and written LocSets but noRaW: " + locSet);
-
-		return locSet;
-	}
-
-	private Term readLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noR in the LI and it doesn't have \cap or \cup in it
-		Term locSet =null;
-		for(Term pred: innerLI.getConjuncts()){
-			if (pred.op().equals(depLDT.getNoR())){
-				locSet = pred.sub(0);
-			}
-			break;
-		}
-		System.out.println("Unread LocSet: "+locSet);
-
-		Set<Term> arr = getInnerLocSets();
-		Set<Term> ret = new HashSet<>();
-		Term retTerm = null;
-
-		if(locSet!=null){
-			for(Term a:arr){
-				if(locSet.sub(0)==a.sub(0)) {//Same array
-					ret.add(tb.sub(a, locSet));
-				}
-			}
-		}
-		retTerm = tb.union(ret);
-		System.out.println("Read LocSets is: "+retTerm);
-
-		return retTerm;
-
-	}
-
-	private Term writtenLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noW in the LI and it doesn't have \cap or \cup in it
-		Term locSet =null;
-		for(Term pred: innerLI.getConjuncts()){
-			if (pred.op().equals(depLDT.getNoW())){
-				locSet = pred.sub(0);
-			}
-			break;
-		}
-		System.out.println("Unwritten LocSet: "+locSet);
-
-		Set<Term> arr = getInnerLocSets();
-		Set<Term> ret = new HashSet<>();
-		Term retTerm = null;
-		if(locSet!=null){
-			for(Term a:arr){
-				if(locSet.sub(0)==a.sub(0)) {//Same array
-					ret.add(tb.sub(a, locSet));
-				}
-			}
-		}
-		retTerm = tb.union(ret);
-		System.out.println("Written LocSets is: "+retTerm);
-
-		return retTerm;
-	}
-
-	private Statement reconstructOuterLoop(Sequent seq) {
-		Statement newOuterLoop =null;
-		for (final SequentFormula sf : seq.succedent()) {
-			if (sf.formula().op() == Modality.DIA) {
-				ProgramElement pe = sf.formula().javaBlock().program();
-				Statement activePE;
-				if (pe instanceof ProgramPrefix) {
-					activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
-				} else {
-					activePE = (Statement) pe.getFirstElement();
-				}
-				if (activePE instanceof While) {
-					Expression outerLoopGuard = ((While) activePE).getGuardExpression();
-					Expression lastExpression = null;
-					Statement outerLoopBody = ((While) activePE).getBody();
-					if(outerLoopBody.getFirstElement() instanceof While){
-						System.out.println(outerLoopBody.getFirstElement());
-						System.out.println("Inner loop is here and should be removed");
-						lastExpression = (Expression) outerLoopBody.getLastElement();
-						newOuterLoop = new While(outerLoopGuard, (Statement) lastExpression);
-						System.out.println("New Outer Loop: " + newOuterLoop);
-					}
-				}
-			}
-			break;
-		}
-		return newOuterLoop;
-	}
+//	private Term writtenLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noW in the LI and it doesn't have \cap or \cup in it
+//		Term locSet =null;
+//		for(Term pred: innerLI.getConjuncts()){
+//			if (pred.op().equals(depLDT.getNoW())){
+//				locSet = pred.sub(0);
+//				break;
+//			}
+//		}
+//		System.out.println("Unwritten LocSet: "+locSet);
+//
+//		Set<Term> arr = getInnerLocSets();
+//		Set<Term> ret = new HashSet<>();
+//		Term retTerm = null;
+//		if(locSet!=null){
+//			for(Term a:arr){
+//				if(locSet.sub(0)==a.sub(0)) {//Same array
+//					ret.add(tb.setMinus(a, locSet));
+//				}
+//			}
+//		}
+//		retTerm = tb.union(ret);
+//		System.out.println("Written LocSets is: "+retTerm);
+//
+//		return retTerm;
+//	}
 
 
 	private LoopInvariantGenerationResult innerLIComputation(Goal g, int itrNumber, Statement activePE) {
 		System.out.println("Entered innerLIComputation");
-		Sequent oldSeq = g.sequent();
 
 		StatementBlock stmtBlck = new StatementBlock(activePE);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
@@ -362,49 +295,12 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		SequentFormula newSF = new SequentFormula(newDiamond);
 		Semisequent newSucc = new Semisequent(newSF);
 
-		SemisequentChangeInfo ssci = new SemisequentChangeInfo();
-		ssci.removedFormula(0,g.sequent().succedent().getFirst());
-		ssci.addedFormula(0,newSF);
-		SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo(false,ssci, Sequent.createSequent(g.sequent().antecedent(), newSucc),oldSeq);
-		g.setSequent(sci);
-		System.out.println("new goal seq: "+ g.sequent());
+		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
+		System.out.println("NEW SEQ "+ newSeq);
 
-		List<Goal> gList = new ArrayList<>(Arrays.asList(g));
-		ImmutableList<Goal> gImList = ImmutableList.fromList(gList);
+		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
+		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();
 
-		do{
-			System.out.println("Inner Iteration Number: " + itrNumber);
-			oldInnerDepPreds.clear();
-			oldInnerCompPreds.clear();
-
-			oldInnerDepPreds.addAll(innerDepPreds);
-			oldInnerCompPreds.addAll(innerCompPreds);
-
-			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(gImList);
-			gImList = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-			Goal currGoal = ruleApp.findLoopUnwindTacletGoal(gImList);
-
-			PredicateRefiner prInner = new LoopIndexAndDependencyPredicateRefiner(currGoal.sequent(), innerDepPreds, innerCompPreds, indexInner, itrNumber, services);
-			itrNumber++;
-			Pair<Set<Term>, Set<Term>> refinedPredsInner = prInner.refine();
-			innerDepPreds = refinedPredsInner.first;
-			innerCompPreds = refinedPredsInner.second;
-			for (Goal gl : gImList) {
-				if(gl!=null)
-					abstractGoal(gl, innerCompPreds, innerDepPreds);
-			}
-		} while ((!innerCompPreds.equals(oldInnerCompPreds) || !innerDepPreds.equals(oldInnerDepPreds)) || itrNumber < 2);
-
-		innerCompPreds.addAll(innerDepPreds);
-		PredicateSetCompressor psc = new PredicateSetCompressor(innerCompPreds,g.sequent(),false,services);
-		innerCompPreds = psc.compress();
-
-		System.out.println("Inner Loop Invariant Is:::::::::::::::::::::::::::");
-		for(Term t: innerCompPreds){
-			System.out.println(t);
-		}
-		LoopInvariantGenerationResult loopInvariantGenerationResult = new LoopInvariantGenerationResult(innerCompPreds, itrNumber);
 		return loopInvariantGenerationResult;
-
 	}
 }

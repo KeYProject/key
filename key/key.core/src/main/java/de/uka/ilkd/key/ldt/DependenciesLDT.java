@@ -37,6 +37,7 @@ public class DependenciesLDT extends LDT {
 
     private final Function rPred;
     private final Function wPred;
+//    private final Function evPred;
 
     private final Function nothingMarker;
     private final Function readMarker;
@@ -65,6 +66,7 @@ public class DependenciesLDT extends LDT {
 
         rPred = addFunction(services, "rPred");
         wPred = addFunction(services, "wPred");
+//        evPred = addFunction(services, "evPred");
 
         readMarker = addFunction(services, "read");
         writeMarker = addFunction(services, "write");
@@ -118,6 +120,11 @@ public class DependenciesLDT extends LDT {
     public Function getWPred() {
         return wPred;
     }
+
+//    public Function getEvPred() {
+//        return evPred;
+//    }
+
 
     public Function getNothingMarker() {
         return nothingMarker;

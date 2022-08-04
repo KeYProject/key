@@ -38,8 +38,8 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 	}
 
 	protected void collectHeapVariables() {
-		HeapLDT ldt = services.getTypeConverter().getHeapLDT();
-		for (LocationVariable heap : ldt.getAllHeaps()) {
+		HeapLDT heapldt = services.getTypeConverter().getHeapLDT();
+		for (LocationVariable heap : heapldt.getAllHeaps()) {
 			result.add(heap);
 		}
 	}

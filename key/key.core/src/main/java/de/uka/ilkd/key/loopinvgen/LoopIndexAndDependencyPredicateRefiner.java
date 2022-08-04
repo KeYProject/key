@@ -39,7 +39,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-			System.out.println("Proving Dep Pred: " + pred);
+//			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -54,7 +54,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			boolean weakerPredicateIsSubsumed = false;
 			for (Term dp : depPredicates) {  // to not loose precision here, the refinement needs to have the property that if dp is removed at some point t1 then there will be a time tn which adds w again (or something that implies it)
 				if (predicateImpliedBypredicate(w, dp)) {
-					System.out.println("IMPLIED " + w + " by " + dp);
+//					System.out.println("IMPLIED " + w + " by " + dp);
 					//weakerPredicateIsSubsumed = true;
 					break;
 				}
@@ -265,6 +265,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			Term lowToI;
 			Term iToHigh;
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
+			if (array!=null && low!=null && high !=null && index!=null){
 			if (!sProof.proofEquality(low, index)) {
 				if (!sProof.proofEquality(index, high)) {
 					lowToI = tb.arrayRange(array, low, index);
@@ -295,7 +296,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 		}
 //		System.out.println(result);
-		return result;
+		return result;}
+		return null;
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
