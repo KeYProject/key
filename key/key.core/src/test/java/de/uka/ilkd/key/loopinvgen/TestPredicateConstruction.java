@@ -723,12 +723,12 @@ public class TestPredicateConstruction {
 //======================================================================================================================
 //													Nested Loops
 //======================================================================================================================
-public LoopInvariantGenerationResult shiftArrayToLeftNested() {
+public LoopInvariantGenerationResult basicEx0() {
 
 	Term succFormula;
 
 	try {
-		succFormula = parse("{i:=0 || j:=1}\\<{" + "		while (i<a.length-1) {"
+		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
 													+ "			while (j<a.length-1) {"
 													+ "				a[j] = 1;"
 													+ "				j++;}"
@@ -792,7 +792,7 @@ public LoopInvariantGenerationResult shiftArrayToLeftNested() {
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.shiftArrayToLeftNested();
+		result = tpc.basicEx0();
 		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

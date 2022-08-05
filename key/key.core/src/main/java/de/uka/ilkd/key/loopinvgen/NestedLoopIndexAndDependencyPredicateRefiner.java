@@ -37,7 +37,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-			System.out.println("Proving Dep Pred: " + pred);
+//			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -52,7 +52,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			boolean weakerPredicateIsSubsumed = false;
 			for (Term dp : depPredicates) {  // to not loose precision here, the refinement needs to have the property that if dp is removed at some point t1 then there will be a time tn which adds w again (or something that implies it)
 				if (predicateImpliedBypredicate(w, dp)) {
-					System.out.println("IMPLIED " + w + " by " + dp);
+//					System.out.println("IMPLIED " + w + " by " + dp);
 					//weakerPredicateIsSubsumed = true;
 					break;
 				}
@@ -76,7 +76,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		compPredicates.removeAll(unProvenCompPreds);
 		Set<Term> weakenedCompPreds = new HashSet<>();
 		for (Term un : unProvenCompPreds) {
-			System.out.println(un);
+//			System.out.println(un);
 			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
 		}
 

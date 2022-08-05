@@ -134,12 +134,12 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 				}
 //				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
 				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
+//				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
 				if(nested) {
 					nested = false;
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
-					System.out.println("g: " + goalsAfterShiftUpdate.head());
+//					System.out.println("g: " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
 				}
@@ -162,11 +162,11 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 
 		outerDepPreds.addAll(outerCompPreds);
 
-//		PredicateSetCompressor compressor =
-//				new PredicateSetCompressor(innerDepPreds, currentGoal.sequent(), false, services);
-//		innerDepPreds = compressor.compress();
+		PredicateSetCompressor compressor =
+				new PredicateSetCompressor(outerDepPreds, goalsAfterShift.head().sequent(), false, services);
+		outerDepPreds = compressor.compress();
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
-		System.out.println("Outer loops invariant: " + outLoopInv);
+		System.out.println("Outer loops invariant: " + outLoopInv.toString());
 		return outLoopInv;
 	}
 
@@ -287,7 +287,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 
 
 	private LoopInvariantGenerationResult innerLIComputation(Goal g, int itrNumber, Statement activePE) {
-		System.out.println("Entered innerLIComputation");
+//		System.out.println("Entered innerLIComputation");
 
 		StatementBlock stmtBlck = new StatementBlock(activePE);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
@@ -296,7 +296,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		Semisequent newSucc = new Semisequent(newSF);
 
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
-		System.out.println("NEW SEQ "+ newSeq);
+		System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
 		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();

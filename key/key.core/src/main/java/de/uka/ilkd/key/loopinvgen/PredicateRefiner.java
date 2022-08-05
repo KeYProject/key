@@ -54,12 +54,12 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-        System.out.println("sequentImpliesPredicate is called for: "+pred);
+//        System.out.println("sequentImpliesPredicate is called for: "+pred);
 
         final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
         final boolean provable = SideProof.isProvable(sideSeq, 100000, true, services);
 
-        System.out.println(provable);
+//        System.out.println(provable);
         return provable;
     }
 

@@ -72,7 +72,7 @@ public class RuleApplication {
 		Goal currentGoal = findNestedLoopUsecaseTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-			System.out.println("OPEN GOAL: " + openGoals);
+//			System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying NestedLoopUsecase rule is null.");
 
 		}
@@ -90,15 +90,15 @@ public class RuleApplication {
 
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
-			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
-			System.out.println("NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
-			try {
-				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
+//			System.out.println("NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
+//			try {
+//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 			ps.start(goals);
 
 //			try {
@@ -122,11 +122,11 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findNestedLoopUsecaseRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-					System.out.println("Goal of taclet NestedLoopUsecase" + " is: " + g);
+//					System.out.println("Goal of taclet NestedLoopUsecase" + " is: " + g);
 					return g;
 				}
 			}
-			System.out.println("Taclet NestedLoopUsecase" + " is not applicable at " + g);
+//			System.out.println("Taclet NestedLoopUsecase" + " is not applicable at " + g);
 		}
 		return null;
 	}
@@ -134,7 +134,7 @@ public class RuleApplication {
 	private IBuiltInRuleApp findNestedLoopUsecaseRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
 		for (IBuiltInRuleApp app : tApp) {
 			if (NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE_NAME.equals(app.rule().name())) {
-				System.out.println(NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE_NAME + " is among applicable rules.");
+//				System.out.println(NestedLoopUsecaseRule.NESTED_LOOP_USECASE_RUlE_NAME + " is among applicable rules.");
 				return app;
 			}
 		}
@@ -222,7 +222,7 @@ public class RuleApplication {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-//System.out.println("OPEN GOALE: " + openGoals);
+//System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying Relaxed Shift rule is null.");
 
 		}

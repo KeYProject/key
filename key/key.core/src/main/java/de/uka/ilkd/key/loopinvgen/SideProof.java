@@ -108,15 +108,15 @@ public class SideProof {
 //	static long COUNTER=0; // only used for saving - unique filenames
 	private static void printDebugAndSaveProof(ApplyStrategyInfo info) {
 		if (DEBUG_VERBOSITY == 0) return;
-		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+//		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
 		if (DEBUG_VERBOSITY > 1) {
-			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-			System.out.println("Rules: " + info.getProof().getStatistics());
+//			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+//			System.out.println("Rules: " + info.getProof().getStatistics());
 			if (!info.getProof().closed()) {
-				System.out.println("Open Goals: " + info.getProof().openGoals());
+//				System.out.println("Open Goals: " + info.getProof().openGoals());
 			}
-			System.out.println("Applied rules:" + info.getAppliedRuleApps());
+//			System.out.println("Applied rules:" + info.getAppliedRuleApps());
 		}
 
 //		try {
