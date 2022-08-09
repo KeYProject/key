@@ -8,17 +8,18 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ApplyInverseAnonEventOnRigid implements VariableCondition {
+public final class ApplyAnonEventUpdateOnRigid implements VariableCondition {
+
 	private final UpdateSV u;
 	private final SchemaVariable x;
 	private final SchemaVariable x2;
 
-	public ApplyInverseAnonEventOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
+	public ApplyAnonEventUpdateOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
 		this.u = u;
 		this.x = x;
 		this.x2 = x2;
 	}
-	
+
 	private static Term applyUpdateOnRigid(Term update, Term target, TermServices services) {
 		Term[] updatedSubs = new Term[target.arity()];
 		for (int i = 0; i < updatedSubs.length; i++) {
@@ -35,7 +36,7 @@ public class ApplyInverseAnonEventOnRigid implements VariableCondition {
 		SVInstantiations svInst = mc.getInstantiations();
 		
 		Term uInst = null;
-		if(svInst.getInstantiation(u) instanceof InverseAnonEventUpdate) {
+		if(svInst.getInstantiation(u) instanceof AnonEventUpdate) {
 			uInst = (Term) svInst.getInstantiation(u);
 		} else {
 			return null;
@@ -62,8 +63,9 @@ public class ApplyInverseAnonEventOnRigid implements VariableCondition {
 			return null;
 		}
 	}
-	
+
+	@Override
 	public String toString() {
-		return "\\applyInvAnonEventOnRigid(" + u + ", " + x + ", " + x2 + ")";
+		return "\\applyAnonEventUpdateOnRigid(" + u + ", " + x + ", " + x2 + ")";
 	}
 }

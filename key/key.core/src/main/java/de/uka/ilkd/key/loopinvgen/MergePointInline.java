@@ -21,7 +21,7 @@ import org.key_project.util.ExtList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MergePointInline extends CreatingASTVisitor { 
+public class MergePointInline extends CreatingASTVisitor {
 	private final TermBuilder tb;
 	private final NamespaceSet nss;
 	private final Services services;
@@ -32,35 +32,35 @@ public class MergePointInline extends CreatingASTVisitor {
 		tb = services.getTermBuilder();
 		nss = services.getNamespaces();
 	}
-	
-	public ProgramElement inline()
-    {
-        stack.push(new ExtList());
-        walk(root());
-        ExtList el = stack.peek();
-        return el.get(ProgramElement.class);
-    }
 
-    public List<MergeContract> getContracts() {
+	public ProgramElement inline()
+	{
+		stack.push(new ExtList());
+		walk(root());
+		ExtList el = stack.peek();
+		return el.get(ProgramElement.class);
+	}
+
+	public List<MergeContract> getContracts() {
 		return contracts;
 	}
 
 	protected void doAction(ProgramElement element)
-    {
-        if (element instanceof EmptyStatement) {
-        	final KeYJavaType mergePointIndexType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-			LocationVariable newIndexVar = new LocationVariable(new ProgramElementName(tb.newName("#mpIndex", nss)), 
-        			mergePointIndexType);	            
-        	final MergePointStatement mergePoint = new MergePointStatement(newIndexVar);
+	{
+		if (element instanceof EmptyStatement) {
+			final KeYJavaType mergePointIndexType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+			LocationVariable newIndexVar = new LocationVariable(new ProgramElementName(tb.newName("#mpIndex", nss)),
+					mergePointIndexType);
+			final MergePointStatement mergePoint = new MergePointStatement(newIndexVar);
 			final MergeProcedure mergeProcedure = new MergeByIfThenElse();//new MergeIfThenElseAntecedent();
-        	final MergeContract mergeContract = new UnparameterizedMergeContract(mergeProcedure, 
+			final MergeContract mergeContract = new UnparameterizedMergeContract(mergeProcedure,
 					mergePoint, mergePointIndexType);
-        	this.contracts.add(mergeContract);
-        	addChild(mergePoint);
-            changed();
-        }
-        else {
-            super.doAction(element);
-        }
-    }
+			this.contracts.add(mergeContract);
+			addChild(mergePoint);
+			changed();
+		}
+		else {
+			super.doAction(element);
+		}
 	}
+}

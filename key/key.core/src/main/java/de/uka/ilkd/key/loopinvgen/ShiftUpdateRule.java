@@ -15,15 +15,15 @@ import java.util.List;
 
 public class ShiftUpdateRule implements BuiltInRule {
 
-    public final static BuiltInRule SHIFT_RULE = new ShiftUpdateRule(); 
+    public final static BuiltInRule SHIFT_RULE = new ShiftUpdateRule();
     public final static Name SHIFT_UPDATE_NAME = new Name("Shift Update");
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
+                                     RuleApp ruleApp) throws RuleAbortException {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
-        
+
         ShiftUpdateImplNew worker = new ShiftUpdateImplNew(newGoal);
         worker.shiftUpdate(newGoal, ruleApp.posInOccurrence());
 
@@ -41,7 +41,7 @@ public class ShiftUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {        
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return pio != null && pio.sequentFormula().formula().op() == UpdateApplication.UPDATE_APPLICATION;
     }
 
@@ -52,7 +52,7 @@ public class ShiftUpdateRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
+                                     TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

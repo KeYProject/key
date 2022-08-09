@@ -3,25 +3,23 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.AnonEventUpdate;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ApplyAnonEventOnRigid implements VariableCondition {
+public final class ApplyInverseAnonEventUpdateOnRigid implements VariableCondition {
+
 	private final UpdateSV u;
 	private final SchemaVariable x;
 	private final SchemaVariable x2;
-	
-	public ApplyAnonEventOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
+
+	public ApplyInverseAnonEventUpdateOnRigid(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
 		this.u = u;
 		this.x = x;
 		this.x2 = x2;
 	}
-	
+
 	private static Term applyUpdateOnRigid(Term update, Term target, TermServices services) {
 		Term[] updatedSubs = new Term[target.arity()];
 		for (int i = 0; i < updatedSubs.length; i++) {
@@ -38,7 +36,7 @@ public class ApplyAnonEventOnRigid implements VariableCondition {
 		SVInstantiations svInst = mc.getInstantiations();
 		
 		Term uInst = null;
-		if(svInst.getInstantiation(u) instanceof AnonEventUpdate) {
+		if(svInst.getInstantiation(u) instanceof InverseAnonEventUpdate) {
 			uInst = (Term) svInst.getInstantiation(u);
 		} else {
 			return null;
@@ -65,8 +63,9 @@ public class ApplyAnonEventOnRigid implements VariableCondition {
 			return null;
 		}
 	}
-	
+
+	@Override
 	public String toString() {
-		return "\\applyAnonEventOnRigid(" + u + ", " + x + ", " + x2 + ")";
+		return "\\applyInverseAnonEventUpdateOnRigid(" + u + ", " + x + ", " + x2 + ")";
 	}
 }

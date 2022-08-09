@@ -170,7 +170,12 @@ APPLY_EVENT_UPDATE_ON_RIGID: '\\applyEventUpdateOnRigid';
 APPLY_INVERSE_EVENT_UPDATE_ON_RIGID: '\\applyInverseEventUpdateOnRigid';
 NO_EVENT_UPDATE : '\\noEventUpdate';
 NO_INVERSE_EVENT_UPDATE : '\\noInverseEventUpdate';
-
+ONLY_ANON_EVENT_UPDATES : '\\onlyAnonEventUpdates';
+ONLY_INVERSE_ANON_EVENT_UPDATES : '\\onlyInverseAnonEventUpdates';
+APPLY_ANON_EVENT_UPDATE_ON_RIGID: '\\applyAnonEventUpdateOnRigid';
+APPLY_INVERSE_ANON_EVENT_UPDATE_ON_RIGID: '\\applyInverseAnonEventUpdateOnRigid';
+NO_ANON_EVENT_UPDATE : '\\noAnonEventUpdate';
+NO_INVERSE_ANON_EVENT_UPDATE : '\\noInverseAnonEventUpdate';
 // Quantifiers, binding, substitution
 FORALL : '\\forall' | '\u2200';
 EXISTS : '\\exists' | '\u2203';

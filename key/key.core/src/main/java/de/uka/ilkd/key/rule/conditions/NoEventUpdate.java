@@ -2,15 +2,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AnonEventUpdate;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.InverseEventUpdate;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -46,9 +38,9 @@ public class NoEventUpdate extends VariableConditionAdapter {
 		
 		final Operator op = update.op();
 		
-		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == InverseEventUpdate.SINGLETON) {
+		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == InverseEventUpdate.SINGLETON|| op == AnonEventUpdate.SINGLETON|| op == InverseAnonEventUpdate.SINGLETON) {
 			return false;
-		} else if (op==EventUpdate.SINGLETON || op == AnonEventUpdate.SINGLETON) {
+		} else if (op==EventUpdate.SINGLETON ) {
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForEvent(update.sub(0)) || checkForEvent(update.sub(1)));

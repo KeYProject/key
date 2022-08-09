@@ -108,16 +108,17 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
-//		**		
+//		**
+		if (unProven!=null) {
 //		System.out.println("Weaken " + unProven + ": ");
-		result.addAll(weakenByPredicateSymbol(unProven));
+			result.addAll(weakenByPredicateSymbol(unProven));
 
 //		System.out.println("Weaken by Index for "+unProven);
-		result.addAll(weakenByIndexANDPredicate(unProven));
-		if (itrNumber < 1) {
+			result.addAll(weakenByIndexANDPredicate(unProven));
+			if (itrNumber < 1) {
 //			System.out.println("Weaken by Subset for "+unProven);
-			result.addAll(weakenBySubSet(unProven));
-		}
+				result.addAll(weakenBySubSet(unProven));
+			}
 //		System.out.println("index added: ");
 //		result.addAll(weakenByIndex(unProven));// 0 or 2
 //		System.out.println("subset added: ");
@@ -127,6 +128,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
 //		**		
 //		System.out.println(result);
+		}
 		return result;
 	}
 
@@ -145,6 +147,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 	private Set<Term> weakenBySubSet(Term unProven) {
 		Set<Term> result = new HashSet<>();
+
 		final Term locSet = unProven.sub(0);
 
 		if (locSet.op().equals(locsetLDT.getArrayRange())) {
@@ -256,57 +259,59 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	private Set<Term> weakenByIndexANDPredicate(Term pred) {
 		Set<Term> result = new HashSet<>();
 		Term locSet = findArrayRange(pred.sub(0));
-
 		if (locSet != null) {
 //			System.out.println("Find Loc Set: "+locSet);
 			Term array = locSet.sub(0);
-			Term low  = locSet.sub(1);
+			Term low = locSet.sub(1);
 			Term high = locSet.sub(2);
 			Term lowToI;
 			Term iToHigh;
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
-			if (array!=null && low!=null && high !=null && index!=null){
-			if (!sProof.proofEquality(low, index)) {
-				if (!sProof.proofEquality(index, high)) {
-					lowToI = tb.arrayRange(array, low, index);
-					iToHigh = tb.arrayRange(array, index, high);
+			if (array != null && low != null && high != null && index != null) {
+				if (!sProof.proofEquality(low, index)) {
+					if (!sProof.proofEquality(index, high)) {
+						lowToI = tb.arrayRange(array, low, index);
+						iToHigh = tb.arrayRange(array, index, high);
 //					if(sProof.proofLT(low, tb.subtract(index, tb.one())) && sProof.proofLT(tb.add(index, tb.one()), high)) {
 //						lowToI = tb.arrayRange(array, low, tb.subtract(index, tb.one()));
 //						iToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
 //					}
+					} else {
+						lowToI = tb.arrayRange(array, low, index);
+						iToHigh = tb.singleton(array, tb.arr(index));
+					}
 				} else {
-					lowToI = tb.arrayRange(array, low, index);
-					iToHigh = tb.singleton(array, tb.arr(index));
+					if (!sProof.proofEquality(index, high)) {
+						iToHigh = tb.arrayRange(array, index, high);
+						lowToI = tb.singleton(array, tb.arr(index));
+					} else {
+						lowToI = tb.singleton(array, tb.arr(index));
+						iToHigh = tb.singleton(array, tb.arr(index));
+					}
 				}
-			} else {
-				if (!sProof.proofEquality(index, high)) {
-					iToHigh = tb.arrayRange(array, index, high);
-					lowToI = tb.singleton(array, tb.arr(index));
-				} else {
-					lowToI = tb.singleton(array, tb.arr(index));
-					iToHigh = tb.singleton(array, tb.arr(index));
+				if (lowToI != null && iToHigh != null) {
+					if (depLDT.isDependencePredicate(pred.op())) {
+						final Function dependencyOp = (Function) pred.op();
+						result.add(tb.func(dependencyOp, lowToI));
+						result.add(tb.func(dependencyOp, iToHigh));
+					}
 				}
 			}
-			if (lowToI != null && iToHigh != null) {
-				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
-					result.add(tb.func(dependencyOp, lowToI));
-					result.add(tb.func(dependencyOp, iToHigh));
-				}
-			}
-		}
 //		System.out.println(result);
-		return result;}
-		return null;
+		}
+		return result;
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
-		Set<Term> result = compPredWeakeningByPredicates(pred);
+		Set<Term> result = new HashSet<>();
+		if(pred!=null){
+			result = compPredWeakeningByPredicates(pred);
 //		result.addAll(compPredWeakenByIndex(pred));
 //		System.out.println("Weakening by Predicate for: " + pred);
 //		System.out.println("Weakening by Heuristics for: " + pred);
-		if (itrNumber < 1) {
-			result.addAll(compPredWeakeningByHeuristics(pred));
+			if (itrNumber < 1) {
+				result.addAll(compPredWeakeningByHeuristics(pred));
+			}
 		}
 		return result;
 	}
@@ -338,24 +343,26 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 	private Set<Term> compPredWeakeningByPredicates(Term pred) {
 		Set<Term> result = new HashSet<>();
-		Term low = pred.sub(0);
-		Term high = null;
-		if(pred.arity()> 1)
-			high = pred.sub(1);
-		if (low != null && high != null) {
-			if (pred.op() == intLDT.getLessThan()) {
-				result.add(tb.leq(low, high));
-			} else if (pred.op() == intLDT.getGreaterThan()) {
-				result.add(tb.geq(low, high));
-			} else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
-				result.add(tb.gt(low, high));
-				result.add(tb.equals(low, high));
-			} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
-				result.add(tb.lt(low, high));
-				result.add(tb.equals(low, high));
-			} else if (pred.op() == Equality.EQUALS) {
-				result.add(tb.gt(low, high));
-				result.add(tb.lt(low, high));
+		if(pred!=null){
+			Term low = pred.sub(0);
+			Term high = null;
+			if (pred.arity() > 1)
+				high = pred.sub(1);
+			if (low != null && high != null) {
+				if (pred.op() == intLDT.getLessThan()) {
+					result.add(tb.leq(low, high));
+				} else if (pred.op() == intLDT.getGreaterThan()) {
+					result.add(tb.geq(low, high));
+				} else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
+					result.add(tb.gt(low, high));
+					result.add(tb.equals(low, high));
+				} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
+					result.add(tb.lt(low, high));
+					result.add(tb.equals(low, high));
+				} else if (pred.op() == Equality.EQUALS) {
+					result.add(tb.gt(low, high));
+					result.add(tb.lt(low, high));
+				}
 			}
 		}
 //		System.out.println(result);
@@ -363,24 +370,25 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	}
 
 	private Set<Term> compPredWeakeningByHeuristics(Term pred) {
-
 		Set<Term> result = new HashSet<>();
-		Term left = pred.sub(0);
-		Term right = null;
-		if (pred.arity()>1)
-			right = pred.sub(1);
-		if (left != null && right != null) {
-			if (pred.op() == intLDT.getLessThan()) {
-				result.add(tb.lt(left, tb.add(right, tb.one())));
-			} else if (pred.op() == intLDT.getGreaterThan()) {
-				result.add(tb.gt(left, tb.sub(right, tb.one())));
-			} else if (pred.op() == intLDT.getLessOrEquals()) {
-				result.add(tb.leq(left, tb.add(right, tb.one())));
-			} else if (pred.op() == intLDT.getGreaterOrEquals()) {
-				result.add(tb.geq(left, tb.sub(right, tb.one())));
-			} else if (pred.op() == Equality.EQUALS) {
-				result.add(tb.geq(left, right));
-				result.add(tb.leq(right, left));
+		if(pred!=null) {
+			Term left = pred.sub(0);
+			Term right = null;
+			if (pred.arity() > 1)
+				right = pred.sub(1);
+			if (left != null && right != null) {
+				if (pred.op() == intLDT.getLessThan()) {
+					result.add(tb.lt(left, tb.add(right, tb.one())));
+				} else if (pred.op() == intLDT.getGreaterThan()) {
+					result.add(tb.gt(left, tb.sub(right, tb.one())));
+				} else if (pred.op() == intLDT.getLessOrEquals()) {
+					result.add(tb.leq(left, tb.add(right, tb.one())));
+				} else if (pred.op() == intLDT.getGreaterOrEquals()) {
+					result.add(tb.geq(left, tb.sub(right, tb.one())));
+				} else if (pred.op() == Equality.EQUALS) {
+					result.add(tb.geq(left, right));
+					result.add(tb.leq(right, left));
+				}
 			}
 		}
 //		System.out.println(result);

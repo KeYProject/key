@@ -20,7 +20,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
+                                     RuleApp ruleApp) throws RuleAbortException {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
 
@@ -130,7 +130,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
+                                     TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

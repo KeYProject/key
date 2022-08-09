@@ -8,11 +8,11 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class OnlyInverseEventUpdates extends VariableConditionAdapter {
+public class OnlyInverseAnonEventUpdates extends VariableConditionAdapter {
 
 	private final SchemaVariable updateSV;
 
-	public OnlyInverseEventUpdates(SchemaVariable var) {
+	public OnlyInverseAnonEventUpdates(SchemaVariable var) {
 		this.updateSV = var;
 	}
 
@@ -41,10 +41,10 @@ public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 		if (op instanceof ElementaryUpdate ||
 				op == UpdateJunctor.SKIP ||
 				op == EventUpdate.SINGLETON ||
-				op == AnonEventUpdate.SINGLETON ||
-				op == InverseAnonEventUpdate.SINGLETON) {
+				op == InverseEventUpdate.SINGLETON ||
+				op == AnonEventUpdate.SINGLETON) {
 			return false;
-		} else if (op==InverseEventUpdate.SINGLETON) {
+		} else if (op==InverseAnonEventUpdate.SINGLETON) {
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForInverseEvent(update.sub(0)) && checkForInverseEvent(update.sub(1)));
@@ -57,7 +57,7 @@ public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 	}
 	
 	public String toString() {
-		return "\\onlyInverseEventUpdates("+updateSV.name()+")";
+		return "\\onlyInverseAnonEventUpdates("+updateSV.name()+")";
 	}
 	
 }

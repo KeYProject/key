@@ -251,12 +251,23 @@ public class TacletBuilderManipulators {
                                                                                USV);
     public static final AbstractConditionBuilder ONLY_INVERSE_EVENT_UPDATES = new ConstructorBasedBuilder("onlyInverseEventUpdates",
             OnlyInverseEventUpdates.class, USV);
+    public static final AbstractConditionBuilder ONLY_ANON_EVENT_UPDATES = new ConstructorBasedBuilder("onlyAnonEventUpdates",
+            OnlyAnonEventUpdates.class,
+            USV);
+    public static final AbstractConditionBuilder ONLY_INVERSE_ANON_EVENT_UPDATES = new ConstructorBasedBuilder("onlyInverseAnonEventUpdates",
+            OnlyInverseAnonEventUpdates.class, USV);
 
     public static final AbstractConditionBuilder NO_EVENT_UPDATE = new ConstructorBasedBuilder("noEventUpdate",
             NoEventUpdate.class, USV);
 
     public static final AbstractConditionBuilder NO_INVERSE_EVENT_UPDATE = new ConstructorBasedBuilder("noInverseEventUpdate",
             NoInverseEventUpdate.class, USV);
+
+    public static final AbstractConditionBuilder NO_ANON_EVENT_UPDATE = new ConstructorBasedBuilder("noAnonEventUpdate",
+            NoAnonEventUpdate.class, USV);
+
+    public static final AbstractConditionBuilder NO_INVERSE_ANON_EVENT_UPDATE = new ConstructorBasedBuilder("noInverseAnonEventUpdate",
+            NoInverseAnonEventUpdate.class, USV);
 
     public static final AbstractConditionBuilder APPLY_EVENT_UPDATE_ON_RIGID =
             new ConstructorBasedBuilder("applyEventUpdateOnRigid",
@@ -265,6 +276,14 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder APPLY_INVERSE_EVENT_UPDATE_ON_RIGID =
             new ConstructorBasedBuilder("applyInverseEventUpdateOnRigid",
                     ApplyInverseEventUpdateOnRigid.class, USV, ASV, ASV);
+
+    public static final AbstractConditionBuilder APPLY_ANON_EVENT_UPDATE_ON_RIGID =
+            new ConstructorBasedBuilder("applyAnonEventUpdateOnRigid",
+                    ApplyAnonEventUpdateOnRigid.class, USV, ASV, ASV);
+
+    public static final AbstractConditionBuilder APPLY_INVERSE_ANON_EVENT_UPDATE_ON_RIGID =
+            new ConstructorBasedBuilder("applyInverseANONEventUpdateOnRigid",
+                    ApplyInverseAnonEventUpdateOnRigid.class, USV, ASV, ASV);
 
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
@@ -342,7 +361,9 @@ public class TacletBuilderManipulators {
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT,
                 IS_IN_STRICTFP,
                 NO_EVENT_UPDATE, NO_INVERSE_EVENT_UPDATE, ONLY_EVENT_UPDATES, ONLY_INVERSE_EVENT_UPDATES,
-                APPLY_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_EVENT_UPDATE_ON_RIGID
+                APPLY_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_EVENT_UPDATE_ON_RIGID,
+                NO_ANON_EVENT_UPDATE, NO_INVERSE_ANON_EVENT_UPDATE, ONLY_ANON_EVENT_UPDATES, ONLY_INVERSE_ANON_EVENT_UPDATES,
+                APPLY_ANON_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_ANON_EVENT_UPDATE_ON_RIGID
         );
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT,
                 GET_INVARIANT, GET_FREE_INVARIANT, GET_VARIANT, IS_LABELED);

@@ -105,7 +105,7 @@ public class SideProof {
 		return ps.start();
 	}
 
-//	static long COUNTER=0; // only used for saving - unique filenames
+	//	static long COUNTER=0; // only used for saving - unique filenames
 	private static void printDebugAndSaveProof(ApplyStrategyInfo info) {
 		if (DEBUG_VERBOSITY == 0) return;
 //		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
@@ -149,11 +149,11 @@ public class SideProof {
 	public boolean proofEquality(Term left, Term right) {
 		if(left!=null && right!=null){
 			Term fml = tb.equals(left, right);
-		Sequent sideSeq = prepareSideProof(left, right);
-		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-		boolean closed = isProvable(sideSeq, services);
-		// true: Holds, false: Unknown
-		return closed;
+			Sequent sideSeq = prepareSideProof(left, right);
+			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
+			boolean closed = isProvable(sideSeq, services);
+			// true: Holds, false: Unknown
+			return closed;
 		}
 		return false;
 	}

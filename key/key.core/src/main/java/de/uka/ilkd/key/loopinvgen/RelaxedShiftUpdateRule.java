@@ -12,19 +12,19 @@ import de.uka.ilkd.key.logic.op.*;
 
 public class RelaxedShiftUpdateRule implements BuiltInRule {
 
-    public final static BuiltInRule RELAXED_SHIFT_RULE = new RelaxedShiftUpdateRule(); 
-    public final static Name RELAXED_SHIFT_UPDATE_NAME = new Name("Relaxed Shift Update"); 
-    
-    
+    public final static BuiltInRule RELAXED_SHIFT_RULE = new RelaxedShiftUpdateRule();
+    public final static Name RELAXED_SHIFT_UPDATE_NAME = new Name("Relaxed Shift Update");
+
+
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
+                                     RuleApp ruleApp) throws RuleAbortException {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
-        
+
         ShiftUpdateImplNew worker = new ShiftUpdateImplNew(newGoal);
         worker.shiftUpdate(newGoal, ruleApp.posInOccurrence());
-        
+
         return newGoals;
     }
 
@@ -39,7 +39,7 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {        
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return pio != null && pio.sequentFormula().formula().op() == UpdateApplication.UPDATE_APPLICATION;
     }
 
@@ -50,7 +50,7 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
+                                     TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

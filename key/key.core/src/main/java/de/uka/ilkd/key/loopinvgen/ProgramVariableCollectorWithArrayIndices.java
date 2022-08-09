@@ -71,10 +71,10 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 	}
 
 	@Override
-    public void performActionOnLocationVariable(LocationVariable x) {
-        result.add(x);
-        if (x.sort() instanceof ArraySort) {
-        	array.add(x);
+	public void performActionOnLocationVariable(LocationVariable x) {
+		result.add(x);
+		if (x.sort() instanceof ArraySort) {
+			array.add(x);
 //        	if(x instanceof ProgramElement) { //Doesn't work!
 //        		ProgramElement pe = (ProgramElement) x;
 //        		if(pe instanceof ArrayReference) {
@@ -83,10 +83,10 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 //        		}
 //        		
 //        	}
-        }
-        	
-        	
-    }
+		}
+
+
+	}
 
 //    public void performActionOnArrayReferences(ArrayReference x) {
 //        array.add(x);
@@ -97,7 +97,7 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 	public void performActionOnMergeContract(MergeContract x) {
 		assert (x instanceof UnparameterizedMergeContract)
 				|| (x instanceof PredicateAbstractionMergeContract) : "Unexpected type of merge contract: "
-						+ x.getClass().getSimpleName();
+				+ x.getClass().getSimpleName();
 
 		if (x instanceof UnparameterizedMergeContract) {
 			return;

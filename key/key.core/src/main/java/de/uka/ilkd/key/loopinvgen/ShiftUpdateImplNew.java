@@ -60,7 +60,7 @@ public class ShiftUpdateImplNew {
 	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind, ls , ts)}ls,t)</code>
 	 * where <code>kindPred</code> is the corresponding dependence predicate for the
 	 * kind (read or write) of the event update
-	 * 
+	 *
 	 * @param renameUpdate the {@link Term} representing the renaming update
 	 * @param g            the current {@link Goal}
 	 * @param pos          the {@link PosInOccurrence} of the loopFormula
@@ -83,9 +83,9 @@ public class ShiftUpdateImplNew {
 				final Function writeMarker = depLDT.getWriteMarker();
 				counter = kind == readMarker || kind == writeMarker ? tb.add(counter, tb.one())
 						: tb.ife(
-								tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
-										tb.equals(update.sub(0), tb.func(writeMarker))),
-								tb.add(counter, tb.one()), counter);
+						tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
+								tb.equals(update.sub(0), tb.func(writeMarker))),
+						tb.add(counter, tb.one()), counter);
 				shiftEventUpdate(update, counter);
 
 			} else if(update.op() instanceof AnonEventUpdate){
@@ -104,7 +104,7 @@ public class ShiftUpdateImplNew {
 	 * formula has the shape
 	 * <code>{l1:=r2 || ... || ln:=rn || eventupdates} and constructs an update that
 	 * renames each left-hand side of the elementary update <code>li:=ri</code>
-	 * 
+	 *
 	 * @param loopFormula the {@link Term} with formula containing the loop
 	 * @return a parallel update
 	 *         <code>{l1:=l1'|| ... || ln:=ln'}{\event(kind,l1,ts),\event(kind,l1',ts),...}</code>
@@ -160,7 +160,7 @@ public class ShiftUpdateImplNew {
 
 	/**
 	 * applies the renaming update on each formula of the given semisequent
-	 * 
+	 *
 	 * @param renameUpdate the {@link Term} representing the renaming update
 	 * @param semi         the {@link Semisequent}
 	 * @param antec        a boolean being true if the semisequent is the antecedent
@@ -177,7 +177,7 @@ public class ShiftUpdateImplNew {
 	/**
 	 * constructs for an elementary update <code>lhs:=rhs</code> the equation
 	 * <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code>
-	 * 
+	 *
 	 * @param update         a {@link Term} denoting the elementary update (assumes
 	 *                       {@link ElementaryUpdate} as top level operator)
 	 * @param renamingUpdate the {@link Term} representing the renaming update
@@ -199,7 +199,7 @@ public class ShiftUpdateImplNew {
 	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind,ls,ts)}ls,t)</code>
 	 * where <code>kindPred</code> is the corresponding dependence predicate for the
 	 * kind (read or write) of the event update
-	 * 
+	 *
 	 * @param eventUpdate    the {@link Term} with an event update at top level
 	 * @param counter the {@link Term} representing the label to be used
 	 */

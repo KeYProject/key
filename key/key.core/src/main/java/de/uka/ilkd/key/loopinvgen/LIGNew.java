@@ -20,7 +20,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
-		
+
 		for (SequentFormula sf : seq.antecedent()) {
 			if (!sf.formula().containsJavaBlockRecursive() && isComparisonOperator(sf.formula())) {
 				allCompPreds.add(sf.formula());
@@ -107,7 +107,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;
-			
+
 //			currentGoal = abstractGoal(currentGoal);
 			for (Goal g : goalsAfterShift) {
 				abstractGoal(g, allCompPreds,allDepPreds);

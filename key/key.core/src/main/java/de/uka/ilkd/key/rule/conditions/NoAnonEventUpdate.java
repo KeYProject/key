@@ -8,11 +8,11 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class OnlyInverseEventUpdates extends VariableConditionAdapter {
+public class NoAnonEventUpdate extends VariableConditionAdapter {
 
 	private final SchemaVariable updateSV;
 
-	public OnlyInverseEventUpdates(SchemaVariable var) {
+	public NoAnonEventUpdate(SchemaVariable var) {
 		this.updateSV = var;
 	}
 
@@ -28,36 +28,31 @@ public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 		
 		final Term update = (Term)inst;
 		if(update.sort()==Sort.UPDATE) {
-			return checkForInverseEvent(update);
+			return !checkForAnonEvent(update);
 		}
 		
 		return false;
 	}
 
-	private boolean checkForInverseEvent(Term update) {
+	private boolean checkForAnonEvent(Term update) {
 		
 		final Operator op = update.op();
 		
-		if (op instanceof ElementaryUpdate ||
-				op == UpdateJunctor.SKIP ||
-				op == EventUpdate.SINGLETON ||
-				op == AnonEventUpdate.SINGLETON ||
-				op == InverseAnonEventUpdate.SINGLETON) {
+		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == EventUpdate.SINGLETON||op == InverseEventUpdate.SINGLETON|| op == InverseAnonEventUpdate.SINGLETON) {
 			return false;
-		} else if (op==InverseEventUpdate.SINGLETON) {
+		} else if (op == AnonEventUpdate.SINGLETON) {
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
-			return (checkForInverseEvent(update.sub(0)) && checkForInverseEvent(update.sub(1)));
-		} else if (op == UpdateApplication.UPDATE_APPLICATION) {
-			return checkForInverseEvent(update.sub(1));
+			return (checkForAnonEvent(update.sub(0)) || checkForAnonEvent(update.sub(1)));
+		} else if(op == UpdateApplication.UPDATE_APPLICATION) {
+			return checkForAnonEvent(update.sub(1));
 		}
 		Debug.fail("Forgotten update operator", op.getClass());
-
-		return false;
+		return true;
 	}
 	
 	public String toString() {
-		return "\\onlyInverseEventUpdates("+updateSV.name()+")";
+		return "\\noAnonEventUpdate("+updateSV.name()+")";
 	}
 	
 }

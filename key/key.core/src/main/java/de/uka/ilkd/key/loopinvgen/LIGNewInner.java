@@ -79,7 +79,7 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;
-			
+
 //			currentGoal = abstractGoal(currentGoal);
 			for (Goal g : goalsAfterShift) {
 				if(g!=null)
@@ -95,7 +95,7 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 		allDepPreds = compressor.compress();
 		System.out.println("Inner loop inv is: ");
 		LoopInvariantGenerationResult ligr = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
-
+		ligr.toString();
 		return ligr;
 	}
 

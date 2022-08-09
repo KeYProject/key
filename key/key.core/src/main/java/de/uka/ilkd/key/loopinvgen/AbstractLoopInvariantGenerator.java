@@ -128,9 +128,11 @@ public abstract class AbstractLoopInvariantGenerator {
                     Term updateInner = update.sub(1);
                     if (updateOuter.op() instanceof ElementaryUpdate) {
                         this.lowOuter = updateOuter.sub(0);
+//                        System.out.println("Low Outer: " + this.lowOuter);
                     }
                     if (updateInner.op() instanceof ElementaryUpdate) {
                         this.lowInner = updateInner.sub(0);
+//                        System.out.println("Low Inner: " + this.lowInner);
                     }
                     break;
                 }
@@ -207,14 +209,18 @@ public abstract class AbstractLoopInvariantGenerator {
         this.indexOuter = expr2term(indexOuter);
         this.highInner = expr2term(highInner);
         this.indexInner = expr2term(indexInner);
+//        System.out.println("High Inner: " + this.highInner);
+//        System.out.println("High Outer: " + this.highOuter);
+//        System.out.println("Index Inner: " + this.indexInner);
+//        System.out.println("index Outer: " + this.indexOuter);
     }
 
     protected Set<Term> getInnerLocSets(){
         Set<Term> arr=new HashSet<>();
         for(Term a:arrays) {
-           arr.add(tb.arrayRange(a, this.lowInner, this.highInner));
+            arr.add(tb.arrayRange(a, this.lowInner, this.highInner));
         }
-       return arr;
+        return arr;
     }
 
     protected Set<Term> getOuterLocSets(){
@@ -305,10 +311,10 @@ public abstract class AbstractLoopInvariantGenerator {
     protected boolean isComparisonOperator(Term pred) {
         final boolean isComparison =
                 pred.op() == intLDT.getLessThan() ||
-                pred.op() == intLDT.getGreaterThan() ||
-                pred.op() == intLDT.getLessOrEquals() ||
-                pred.op() == intLDT.getGreaterOrEquals() ||
-                pred.op() == Equality.EQUALS;
+                        pred.op() == intLDT.getGreaterThan() ||
+                        pred.op() == intLDT.getLessOrEquals() ||
+                        pred.op() == intLDT.getGreaterOrEquals() ||
+                        pred.op() == Equality.EQUALS;
         return isComparison;
     }
 

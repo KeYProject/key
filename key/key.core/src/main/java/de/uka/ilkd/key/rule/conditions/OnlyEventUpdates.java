@@ -38,9 +38,9 @@ public class OnlyEventUpdates extends VariableConditionAdapter {
 		
 		final Operator op = update.op();
 		
-		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == InverseEventUpdate.SINGLETON) {
+		if(op instanceof ElementaryUpdate || op == UpdateJunctor.SKIP || op == InverseEventUpdate.SINGLETON|| op == AnonEventUpdate.SINGLETON|| op == InverseAnonEventUpdate.SINGLETON) {
 			return false;
-		} else if (op==EventUpdate.SINGLETON || op instanceof AnonEventUpdate) {
+		} else if (op==EventUpdate.SINGLETON ) {//|| op instanceof AnonEventUpdate
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForEvent(update.sub(0)) && checkForEvent(update.sub(1)));

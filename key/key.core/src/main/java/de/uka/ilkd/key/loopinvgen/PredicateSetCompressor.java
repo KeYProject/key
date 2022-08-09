@@ -17,7 +17,7 @@ import java.util.Set;
 public class PredicateSetCompressor {
 	private final DependenciesLDT depLDT;
 	private final TermBuilder tb;
-//	private final SequentFormula currentIdxF;
+	//	private final SequentFormula currentIdxF;
 	private final IntegerLDT intLDT;
 	private final LocSetLDT locSetLDT;
 
@@ -112,7 +112,7 @@ public class PredicateSetCompressor {
 		}
 		fDepPredList.addAll(toAdd);
 		fDepPredList.removeAll(toDelete);
-		
+
 		toDelete.clear();
 		if (ailias) {
 			for (Term depPred1 : fDepPredList) {
@@ -218,7 +218,7 @@ public class PredicateSetCompressor {
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
-						toDelete.add(compPred1);
+							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {

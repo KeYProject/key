@@ -36,22 +36,22 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 public class HelperClassParsingTests {
     private static final Profile profile = JavaProfile.getDefaultProfile(); //{
     public HelperClassParsingTests() {
-        
+
     }
-    
+
     public ProofAggregate parse(File file) {
         return parse(file, profile);
     }
-    
+
     public ProofAggregate parse(File file, Profile profile) {
         ProblemInitializer pi = null;
         ProofAggregate result = null;
-       
-        try {	    
-            KeYUserProblemFile po 
-            	= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
+
+        try {
+            KeYUserProblemFile po
+                    = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
             pi = new ProblemInitializer(profile);
-           
+
             result = pi.startProver(po, po);
 
         } catch (Exception e) {
@@ -61,19 +61,19 @@ public class HelperClassParsingTests {
         }
         return result;
     }
-    
-    public ProofAggregate parseThrowException(File file) throws ProofInputException{        
+
+    public ProofAggregate parseThrowException(File file) throws ProofInputException{
         return parseThrowException(file, profile);
     }
-       
-    
+
+
     public ProofAggregate parseThrowException(File file, Profile profile) throws ProofInputException{
-	KeYUserProblemFile po 
-		= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
+        KeYUserProblemFile po
+                = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
     }
-       
+
     public Term extractProblemTerm(Proof p) {
         return p.root().sequent().succedent().iterator().next().formula();
     }
@@ -84,21 +84,21 @@ public class HelperClassParsingTests {
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
     public static boolean isOneStepSimplificationEnabled(Proof proof) {
-       StrategyProperties props;
-       if (proof != null && !proof.isDisposed()) {
-           props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-       }
-       else {
-           props = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties(); 
-       }
-       
-       return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+        StrategyProperties props;
+        if (proof != null && !proof.isDisposed()) {
+            props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+        }
+        else {
+            props = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
+        }
+
+        return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
     }
 
     /**
      * Defines if one step simplification is enabled in general and within the
      * {@link Proof}.
-     * 
+     *
      * @param proof
      *            The optional {@link Proof}.
      * @param enabled
@@ -106,7 +106,7 @@ public class HelperClassParsingTests {
      *            use one step simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof,
-            boolean enabled) {
+                                                       boolean enabled) {
         final String newVal = enabled ? StrategyProperties.OSS_ON
                 : StrategyProperties.OSS_OFF;
 
@@ -128,10 +128,10 @@ public class HelperClassParsingTests {
         }
     }
 
-   public static Services createServices(File keyFile) {
-      JavaInfo javaInfo = new HelperClassParsingTests().parse(keyFile)
-            .getFirstProof().getJavaInfo();
-      return javaInfo.getServices();
-   }
-   
+    public static Services createServices(File keyFile) {
+        JavaInfo javaInfo = new HelperClassParsingTests().parse(keyFile)
+                .getFirstProof().getJavaInfo();
+        return javaInfo.getServices();
+    }
+
 }
