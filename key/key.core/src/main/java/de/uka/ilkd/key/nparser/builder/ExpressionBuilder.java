@@ -1055,7 +1055,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
-        Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
+        Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula(), ctx.elementary_dependency_update_term());
         if (ctx.u.isEmpty()) return t;
         Term u = accept(ctx.u);
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);

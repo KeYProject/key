@@ -1103,6 +1103,10 @@ public class TermBuilder {
         return apply(update, target, null);
     }
 
+    public Term applyForce(Term update, Term target) {
+        return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update,
+                target, null);
+    }
     public ImmutableList<Term> apply(Term update, ImmutableList<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term target : targets) {

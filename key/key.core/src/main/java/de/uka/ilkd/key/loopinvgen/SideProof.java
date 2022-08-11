@@ -105,7 +105,7 @@ public class SideProof {
 		return ps.start();
 	}
 
-	//	static long COUNTER=0; // only used for saving - unique filenames
+		static long COUNTER=0; // only used for saving - unique filenames
 	private static void printDebugAndSaveProof(ApplyStrategyInfo info) {
 		if (DEBUG_VERBOSITY == 0) return;
 //		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
@@ -114,18 +114,18 @@ public class SideProof {
 //			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
 //			System.out.println("Rules: " + info.getProof().getStatistics());
 			if (!info.getProof().closed()) {
-//				System.out.println("Open Goals: " + info.getProof().openGoals());
+				System.out.println("Open Goals: " + info.getProof().openGoals());
 			}
 //			System.out.println("Applied rules:" + info.getAppliedRuleApps());
 		}
 
-//		try {
-//			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\outOfBound"+COUNTER+".key")).save();
-//			System.out.println(COUNTER);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		COUNTER++;
+		try {
+			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
+			System.out.println(COUNTER + "   " +info.getProof().closed());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		COUNTER++;
 	}
 
 	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,

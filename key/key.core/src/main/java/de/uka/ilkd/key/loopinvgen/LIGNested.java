@@ -114,14 +114,15 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 						break;
 					}
 				}
-//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
+				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
+				//Take everything after the inner loop and before the outer, e.g. i++ and turn it to update and shift it.
 				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
 				if (nested) {
 					nested = false;
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
-//					System.out.println("g: " + goalsAfterShiftUpdate.head());
+//					System.out.println("Goals before : " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
 				}
@@ -295,7 +296,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		Semisequent newSucc = new Semisequent(newSF);
 
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
-		System.out.println("New Seq for inner loop:  "+ newSeq);
+//		System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
 		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();

@@ -77,7 +77,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		compPredicates.removeAll(unProvenCompPreds);
 		Set<Term> weakenedCompPreds = new HashSet<>();
 		for (Term un : unProvenCompPreds) {
-//			System.out.println("weakening: "+un);
+			System.out.println("weakening: "+un);
 			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
 		}
 

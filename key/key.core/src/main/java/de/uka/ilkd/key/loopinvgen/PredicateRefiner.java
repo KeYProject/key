@@ -59,7 +59,7 @@ public abstract class PredicateRefiner {
         final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
         final boolean provable = SideProof.isProvable(sideSeq, 100000, true, services);
         if(!provable)
-            System.out.println("Seq: "+ sideSeq);
+            System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
 //        System.out.println(provable);
         return provable;
     }

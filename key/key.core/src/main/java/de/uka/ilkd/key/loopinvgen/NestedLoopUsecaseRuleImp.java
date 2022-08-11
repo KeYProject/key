@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.CreateLocalAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
@@ -38,7 +38,7 @@ public class NestedLoopUsecaseRuleImp{
 
     public void nestedLoopUsecase(Goal g, PosInOccurrence pos, LoopSpecification innerSpec, Term loopGuard) {
         final Term loopInvariant = innerSpec.getInvariant(services);
-        final Term anonUpdate = creatUpdates(loopInvariant);
+        final Term anonUpdate = creatUpdates(loopInvariant, pos);
         constructUsecase(loopInvariant, anonUpdate, loopGuard);
     }
 
@@ -53,7 +53,7 @@ public class NestedLoopUsecaseRuleImp{
         }
         return mod;
     }
-    private Term creatUpdates(Term innerLI) {
+    private Term creatUpdates(Term innerLI, PosInOccurrence pos) {
         Term mod = findNoW(innerLI);
 
         final Name heapPrimeName = new Name(tb.newName(tb.getBaseHeap()+"_Prime"));
@@ -69,7 +69,16 @@ public class NestedLoopUsecaseRuleImp{
 
         Term anonEv = tb.anonEventUpdate(freshCons);
 
-        Term result = tb.parallel(heapAnonUpdate, anonEv);
+        // creates the term transformer #createLocalAnonUpdate(\<{ while ... }\>true) which computes
+        // the anonymizing update for the local variables potentially changed by the while loop
+        CreateLocalAnonUpdate clau = new CreateLocalAnonUpdate();
+        final Term loopTerm = tb.goBelowUpdates(pos.sequentFormula().formula());
+        final StatementBlock prg = (StatementBlock) loopTerm.javaBlock().program();
+        final StatementBlock loop = new StatementBlock((Statement) prg.getStatementAt(0).getFirstElement());
+        final Term termTransformerTerm = tb.tf().createTerm(clau, tb.dia(JavaBlock.createJavaBlock(loop), tb.tt()));
+
+        final Term anonLocal = clau.transform(termTransformerTerm, SVInstantiations.EMPTY_SVINSTANTIATIONS, services);
+        Term result = tb.parallel(anonLocal, heapAnonUpdate, anonEv);
         return result;
     }
 

@@ -365,7 +365,7 @@ comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak
 weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
-update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
+update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula | elementary_dependency_update_term);
 substitution_term:
  LBRACE SUBST  bv=one_bound_variable SEMI
      replacement=comparison_term RBRACE

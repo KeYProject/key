@@ -71,7 +71,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		for (Term pred : compPredicates) {
 //			System.out.println("Proving Comp Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
-//				System.out.println("not proved: "+pred);
+//				System.out.println("not proved Inner: "+pred);
 				unProvenCompPreds.add(pred);
 			}
 		}

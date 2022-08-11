@@ -91,7 +91,7 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
-//			System.out.println("NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
+			System.out.println("After NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
 //			try {
 //				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 //
@@ -100,7 +100,9 @@ public class RuleApplication {
 //				e.printStackTrace();
 //			}
 			ps.start(goals);
-
+			for(Goal g: goals){
+				System.out.println("After Start:"+g.sequent());
+			}
 //			try {
 //				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
@@ -122,7 +124,7 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findNestedLoopUsecaseRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-//					System.out.println("Goal of taclet NestedLoopUsecase" + " is: " + g);
+					System.out.println("Goal of taclet NestedLoopUsecase is: " + g.sequent());
 					return g;
 				}
 			}
