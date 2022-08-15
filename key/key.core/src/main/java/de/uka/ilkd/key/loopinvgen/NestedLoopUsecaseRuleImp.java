@@ -56,28 +56,29 @@ public class NestedLoopUsecaseRuleImp{
     private Term creatUpdates(Term innerLI, PosInOccurrence pos) {
         Term mod = findNoW(innerLI);
 
+        //anonymizes the heap
         final Name heapPrimeName = new Name(tb.newName(tb.getBaseHeap()+"_Prime"));
         final Function heapPrimeFunc = new Function(heapPrimeName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(heapPrimeFunc);
         final Term heapPrime = tb.func(heapPrimeFunc);
-        Term heapAnonUpdate = tb.anonUpd(heapLDT.getHeap(), mod, heapPrime);
+        final Term heapAnonUpdate = tb.anonUpd(heapLDT.getHeap(), mod, heapPrime);
 
+        //anonymizes the events
         final Name freshConsSymb = new Name(tb.newName("f_" + tb.newName(Sort.ANY), services.getNamespaces()));
         final Function freshConsFunc = new Function(freshConsSymb, Sort.ANY, true);
         services.getNamespaces().functions().addSafely(freshConsFunc);
         final Term freshCons = tb.func(freshConsFunc);
-
-        Term anonEv = tb.anonEventUpdate(freshCons);
+        final Term anonEv = tb.anonEventUpdate(freshCons);
 
         // creates the term transformer #createLocalAnonUpdate(\<{ while ... }\>true) which computes
-        // the anonymizing update for the local variables potentially changed by the while loop
+        // the anonymizing update for the local variables potentially changed by the INNER while loop
         CreateLocalAnonUpdate clau = new CreateLocalAnonUpdate();
         final Term loopTerm = tb.goBelowUpdates(pos.sequentFormula().formula());
         final StatementBlock prg = (StatementBlock) loopTerm.javaBlock().program();
         final StatementBlock loop = new StatementBlock((Statement) prg.getStatementAt(0).getFirstElement());
         final Term termTransformerTerm = tb.tf().createTerm(clau, tb.dia(JavaBlock.createJavaBlock(loop), tb.tt()));
-
         final Term anonLocal = clau.transform(termTransformerTerm, SVInstantiations.EMPTY_SVINSTANTIATIONS, services);
+
         Term result = tb.parallel(anonLocal, heapAnonUpdate, anonEv);
         return result;
     }
@@ -104,7 +105,7 @@ public class NestedLoopUsecaseRuleImp{
             rwl.start();
 
             StatementBlock withoutInnerLoop  = (StatementBlock) rwl.result();
-
+//            System.out.println("without: "+withoutInnerLoop);
             target = tb.prog((Modality) target.op(), JavaBlock.createJavaBlock(withoutInnerLoop), target.sub(0));
 
             Term updatedRight = tb.applySequential(updatesAndTarget.first,

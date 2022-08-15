@@ -17,8 +17,10 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.util.LRUCache;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides means to perform side proofs required by the loop invariant generator.
@@ -91,6 +93,8 @@ public class SideProof {
 			sp = strategyDefinition.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		}
 
+		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
+
 		if (stopAtFirstUncloseableGoal) {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
 		} else {
@@ -101,7 +105,6 @@ public class SideProof {
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
-
 		return ps.start();
 	}
 

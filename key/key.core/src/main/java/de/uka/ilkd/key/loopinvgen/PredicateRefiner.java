@@ -57,7 +57,7 @@ public abstract class PredicateRefiner {
 //        System.out.println("sequentImpliesPredicate is called for: "+pred);
 
         final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
-        final boolean provable = SideProof.isProvable(sideSeq, 100000, true, services);
+        final boolean provable = sProof.isProvable(sideSeq, services);//SideProof.isProvable(sideSeq, 100000, true, services);
         if(!provable)
             System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
 //        System.out.println(provable);

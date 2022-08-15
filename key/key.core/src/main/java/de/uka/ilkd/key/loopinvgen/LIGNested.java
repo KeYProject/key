@@ -114,7 +114,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 						break;
 					}
 				}
-				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
+//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
 				//Take everything after the inner loop and before the outer, e.g. i++ and turn it to update and shift it.
 				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
@@ -124,11 +124,13 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
 //					System.out.println("Goals before : " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
+//					System.out.println("Goals after nested: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
+//					System.out.println("Goals After Everything : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-
+			System.out.println("current goal: " + currentGoal);
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
 							outerDepPreds, outerCompPreds,
