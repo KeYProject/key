@@ -130,7 +130,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-			System.out.println("current goal: " + currentGoal);
+//			System.out.println("current goal: " + currentGoal);
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
 							outerDepPreds, outerCompPreds,

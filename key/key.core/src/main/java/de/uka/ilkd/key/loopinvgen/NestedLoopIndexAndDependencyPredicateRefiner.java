@@ -67,8 +67,8 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
-			if(pred.arity()==2 &&(pred.sub(0)==indexOuter || pred.sub(1)==indexOuter))
-				System.out.println("Proving Comp Pred involving "+ indexOuter +": "  + pred);
+//			if(pred.arity()==2 &&(pred.sub(0)==indexOuter || pred.sub(1)==indexOuter))
+//				System.out.println("Proving Comp Pred involving "+ indexOuter +": "  + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				System.out.println("not implied by seq: "+pred);
 				unProvenCompPreds.add(pred);
@@ -77,7 +77,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		compPredicates.removeAll(unProvenCompPreds);
 		Set<Term> weakenedCompPreds = new HashSet<>();
 		for (Term un : unProvenCompPreds) {
-			System.out.println("weakening: "+un);
+//			System.out.println("weakening: "+un);
 			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
 		}
 

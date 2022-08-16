@@ -116,9 +116,9 @@ public class SideProof {
 		if (DEBUG_VERBOSITY > 1) {
 //			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
 //			System.out.println("Rules: " + info.getProof().getStatistics());
-			if (!info.getProof().closed()) {
-				System.out.println("Open Goals: " + info.getProof().openGoals());
-			}
+//			if (!info.getProof().closed()) {
+//				System.out.println("Open Goals: " + info.getProof().openGoals());
+//			}
 //			System.out.println("Applied rules:" + info.getAppliedRuleApps());
 		}
 
