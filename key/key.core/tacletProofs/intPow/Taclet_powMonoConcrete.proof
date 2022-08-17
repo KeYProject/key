@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Aug 17 13:42:23 CEST 2022
+#Wed Aug 17 13:42:36 CEST 2022
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -48,18 +48,23 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Aug 17 13:42:23 CEST 2022
-name=logPositiveConcrete
+#Wed Aug 17 13:42:36 CEST 2022
+name=powMonoConcrete
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "e1a85b31e7"))
 
-(autoModeTime "52")
+(autoModeTime "23")
 
 (branch "dummy ID"
-(rule "logPositive" (formula "1") (term "0,1") (newnames "f_base,f_x") (userinteraction))
-(rule "close" (formula "2") (ifseqformula "1"))
+(rule "impRight" (formula "1") (newnames "f_exp,f_exp_2,f_base"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "powMono" (formula "4") (userinteraction))
+(rule "replace_known_left" (formula "1") (term "1,0") (ifseqformula "4"))
+ (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "2")) (ifInst ""  (formula "3")) (ifInst ""  (formula "5")))
+(rule "closeFalse" (formula "1"))
 )
 }

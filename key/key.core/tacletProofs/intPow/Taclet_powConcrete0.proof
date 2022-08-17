@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Aug 15 19:50:08 CEST 2022
+#Wed Aug 17 13:44:43 CEST 2022
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -12,7 +12,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , finalFields-finalFields\\:immutable , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , finalFields-finalFields\\:immutable , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsCheckingOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -48,7 +48,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Mon Aug 15 19:50:08 CEST 2022
+#Wed Aug 17 13:44:43 CEST 2022
 name=powConcrete0
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -56,21 +56,14 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "e1a85b31e7"))
 
-(autoModeTime "5")
+(autoModeTime "8")
 
 (branch "dummy ID"
- (builtin "One Step Simplification" (formula "1") (newnames "f_base"))
-(rule "impRight" (formula "1"))
-(rule "powDef" (formula "2") (term "0") (inst "i=i") (userinteraction))
-(rule "ifthenelse_split" (formula "2") (term "0") (userinteraction))
-(branch "0 >= 0 TRUE"
-   (rule "bprod_lower_equals_upper" (formula "3") (term "0"))
-    (builtin "One Step Simplification" (formula "3"))
-   (rule "closeTrue" (formula "3"))
-)
-(branch "0 >= 0 FALSE"
-   (rule "qeq_literals" (formula "2"))
-   (rule "closeTrue" (formula "2"))
-)
+(rule "powDef" (formula "1") (term "0") (newnames "f_base") (inst "i=i") (userinteraction))
+(rule "bprod_lower_equals_upper" (formula "1") (term "1,0"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "qeq_literals" (formula "1") (term "0"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "closeTrue" (formula "1"))
 )
 }
