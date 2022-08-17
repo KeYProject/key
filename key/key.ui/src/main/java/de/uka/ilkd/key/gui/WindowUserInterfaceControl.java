@@ -447,7 +447,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        // Suggest default file name if required
        final String defaultName;
        if (selectedFile == null) {
-           defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+           // Remove space
+           var name = proof.name().toString();
+           var prefix = "Taclet: ";
+           if (name.startsWith(prefix)) {
+               name = "Taclet:" + name.substring(prefix.length());
+           }
+           defaultName = MiscTools.toValidFileName(name) + fileExtension;
            selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
        } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
            defaultName = selectedFile.getName();
