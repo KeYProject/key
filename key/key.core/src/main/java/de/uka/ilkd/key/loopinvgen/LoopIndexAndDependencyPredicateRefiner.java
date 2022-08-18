@@ -39,7 +39,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//			System.out.println("Proving Dep Pred: " + pred);
+			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}

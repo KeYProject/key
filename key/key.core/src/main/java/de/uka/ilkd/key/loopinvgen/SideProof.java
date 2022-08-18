@@ -46,8 +46,8 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 100000);
-	}
+		this(s, sequent, 25000);
+	}//100000
 
 	/**
 	 * simplifies the given sequent

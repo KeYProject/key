@@ -155,7 +155,8 @@ public class ShiftUpdateImplNew {
 		final Term updateRenameAndInverseEvents = tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
 		final Term updateAnonInvEvents = tb.sequential(keepParallelUpdateRenames, parallelInvAnonEvents);
 		final Term ret = tb.sequential(updateRenameAndInverseEvents, updateAnonInvEvents);
-		return updateRenameAndInverseEvents;
+//		System.out.println("Anon Update: "+ ret);
+		return ret;
 	}
 
 	/**

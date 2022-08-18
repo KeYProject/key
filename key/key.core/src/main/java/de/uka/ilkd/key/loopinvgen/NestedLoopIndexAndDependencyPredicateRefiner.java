@@ -37,7 +37,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//			System.out.println("Proving Dep Pred: " + pred);
+			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -67,17 +67,13 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
-//			if(pred.arity()==2 &&(pred.sub(0)==indexOuter || pred.sub(1)==indexOuter))
-//				System.out.println("Proving Comp Pred involving "+ indexOuter +": "  + pred);
 			if (!sequentImpliesPredicate(pred)) {
-				System.out.println("not implied by seq: "+pred);
 				unProvenCompPreds.add(pred);
 			}
 		}
 		compPredicates.removeAll(unProvenCompPreds);
 		Set<Term> weakenedCompPreds = new HashSet<>();
 		for (Term un : unProvenCompPreds) {
-//			System.out.println("weakening: "+un);
 			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
 		}
 
@@ -395,9 +391,9 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		return result;
 	}
 	private Set<Term> compPredWeakeningByHeuristics(Term pred) {
-
 		Set<Term> result = new HashSet<>();
-		Term left = pred.sub(0);
+		if (pred.arity() == 2) {
+			Term left = pred.sub(0);
 		Term right = pred.sub(1);
 		if (left != null && right != null) {
 			if (pred.op() == intLDT.getLessThan()) {
@@ -412,6 +408,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 				result.add(tb.geq(left, right));
 				result.add(tb.leq(right, left));
 			}
+		}
 		}
 //		System.out.println(result);
 		return result;

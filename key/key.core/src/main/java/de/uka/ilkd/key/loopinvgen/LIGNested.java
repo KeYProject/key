@@ -90,7 +90,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 			oldOuterCompPreds.addAll(outerCompPreds);
 
 			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-
+//			System.out.println("Goals after unwind no "+outerItrNumber+" and BEFORE generationg inner LI: "+ goalsAfterUnwind);
 			LoopStatement innerLoop = null;
 			LoopInvariantGenerationResult innerLI = null;
 			boolean nested = false;
@@ -114,8 +114,9 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 						break;
 					}
 				}
-//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind.head());
+//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind);
 				//Take everything after the inner loop and before the outer, e.g. i++ and turn it to update and shift it.
+//				System.out.println("number of goals after Unwind no: "+ outerItrNumber+"  "+goalsAfterUnwind.size());
 				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
 				if (nested) {
@@ -126,11 +127,13 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
 //					System.out.println("Goals after nested: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
-//					System.out.println("Goals After Everything : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
+//					System.out.println("Goals After Shifting the inner LI : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
+					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterShift);
+//					System.out.println("Goals After Shifting the Outer parts after the inner loop : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("current goal: " + currentGoal);
+//			System.out.println("goal for refinement: " + currentGoal);
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
 							outerDepPreds, outerCompPreds,

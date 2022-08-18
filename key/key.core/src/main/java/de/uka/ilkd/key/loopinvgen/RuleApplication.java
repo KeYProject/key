@@ -27,7 +27,7 @@ import java.util.List;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 40000;
+	private static final int MAX_RULE_APP = 10000;//40000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -99,7 +99,7 @@ public class RuleApplication {
 //			} catch (IOException e) {
 //				e.printStackTrace();
 //			}
-			ps.start(goals);
+//			ps.start(goals);
 //			for(Goal g: goals){
 //				System.out.println("After Start:"+g.sequent());
 //			}
