@@ -49,7 +49,7 @@
 
 \proofObligation "#Proof Obligation Settings
 #Sun Jun 05 14:01:14 CEST 2022
-name=bsum_positive_element_upper_bound
+name=bsum_positive_lower_bound_element
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
