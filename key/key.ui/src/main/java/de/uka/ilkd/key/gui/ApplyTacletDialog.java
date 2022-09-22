@@ -4,6 +4,7 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -19,7 +20,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
@@ -57,16 +57,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         applyButton  = new JButton("Apply");
         cancelButton = new JButton("Cancel");
 
-        ActionListener escapeListener = event -> {
-            if (event.getActionCommand().equals("ESC")) {
-                cancelButton.doClick();
-            }
-        };
-        cancelButton.registerKeyboardAction(
-                escapeListener,
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         mediator.requestModalAccess(this);
         addWindowListener(new WindowAdapter() {
