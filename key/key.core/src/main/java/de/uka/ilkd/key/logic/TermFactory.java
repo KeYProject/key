@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.logic.origin.TermOrigin;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -48,16 +50,25 @@ public final class TermFactory {
     //-------------------------------------------------------------------------
 
 
+    public Term createTerm(Operator op,
+                           ImmutableArray<Term> subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<TermLabel> labels) {
+        return createTerm(op, subs, boundVars, javaBlock, labels, null);
+    }
+
 
     /**
      * Master method for term creation. Should be the only place where terms
      * are created in the entire system.
      */
     public Term createTerm(Operator op,
-	    		   ImmutableArray<Term> subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock,
-			   ImmutableArray<TermLabel> labels) {
+                           ImmutableArray<Term> subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<TermLabel> labels,
+                           ImmutableArray<TermOrigin> origin) {
         if(op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -66,7 +77,7 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
-        return doCreateTerm(op, subs, boundVars, javaBlock, labels);
+        return doCreateTerm(op, subs, boundVars, javaBlock, labels, origin);
     }
 
     public Term createTerm(Operator op,
@@ -138,12 +149,17 @@ public final class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
+                              ImmutableArray<QuantifiableVariable> boundVars,
+                              JavaBlock javaBlock,
+                              ImmutableArray<TermLabel> labels,
+                              ImmutableArray<TermOrigin> origin) {
+
+        origin = origin == null ? new ImmutableArray<>() : origin;
+
         final Term newTerm
             = (labels == null || labels.isEmpty() ?
-                    new TermImpl(op, subs, boundVars, javaBlock) :
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+                    new TermImpl(op, subs, boundVars, javaBlock, origin) :
+                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.

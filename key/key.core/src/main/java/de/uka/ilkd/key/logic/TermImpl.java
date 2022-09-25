@@ -3,6 +3,8 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.logic.origin.TermOrigin;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -72,6 +74,8 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
+    private final ImmutableArray<TermOrigin> termOrigin;
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -88,15 +92,18 @@ public class TermImpl implements Term {
     public TermImpl(Operator op,
                     ImmutableArray<Term> subs,
                     ImmutableArray<QuantifiableVariable> boundVars,
-                    JavaBlock javaBlock) {
+                    JavaBlock javaBlock,
+                    ImmutableArray<TermOrigin> origin) {
         assert op != null;
         assert subs != null;
+        assert origin != null : "origin must not be null";
         this.op = op;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null
                 ? JavaBlock.EMPTY_JAVABLOCK
                         : javaBlock;
+        this.termOrigin = origin;
     }
 
 
