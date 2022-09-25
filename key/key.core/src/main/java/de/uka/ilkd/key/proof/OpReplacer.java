@@ -243,7 +243,8 @@ public class OpReplacer {
                                    newSubTerms,
                                    newBoundVars,
                                    term.javaBlock(),
-                                   term.getLabels());
+                                   term.getLabels(),
+                                   term.getTermOrigin());
         } else {
             result = term;
         }

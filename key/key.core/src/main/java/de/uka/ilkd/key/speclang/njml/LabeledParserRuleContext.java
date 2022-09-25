@@ -56,7 +56,7 @@ public class LabeledParserRuleContext {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
-        return new TermOrigin(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getTokenIndex(), ctx.stop.getTokenIndex(), specType);
+        return new TermOrigin(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType);
     }
 
     public Term addOrigin(TermBuilder tb, Term term) {

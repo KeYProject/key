@@ -101,8 +101,15 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             sequentView.highlight(me.getPoint());
         }
 
+        PosInSequent pos = sequentView.getPosInSequent(me.getPoint());
+
         if (sequentView.isInUserSelectionHighlight(null)) {
-            highlightOriginInSourceView(sequentView.getPosInSequent(me.getPoint()));
+            highlightOriginInSourceView(pos);
+        }
+
+        if (pos != null && pos.getPosInOccurrence() != null) {
+            Term term = pos.getPosInOccurrence().subTerm();
+            sequentView.getMainWindow().getMediator().fireTermHover(term);
         }
     }
 

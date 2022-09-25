@@ -438,7 +438,8 @@ public class OriginTermLabel implements TermLabel {
                                                     newSubs.terms,
                                                     term.boundVars(),
                                                     term.javaBlock(),
-                                                    labels);
+                                                    labels,
+                                                    term.getTermOrigin());
     }
 
     @Override

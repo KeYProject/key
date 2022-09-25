@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.gui.SequentInteractionListener;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -363,6 +364,10 @@ public class KeYMediator {
         keySelectionModel.addKeYSelectionListenerChecked(listener);
     }
 
+    public void addSequentInteractionListener(SequentInteractionListener listener) {
+        listenerList.add(SequentInteractionListener.class, listener);
+    }
+
     /**
      * removes a listener from the KeYSelectionModel
      *
@@ -396,6 +401,10 @@ public class KeYMediator {
 
     public void removeInterruptedListener(InterruptListener listener) {
         listenerList.remove(InterruptListener.class, listener);
+    }
+
+    public void removeSequentInteractionListener(SequentInteractionListener listener) {
+        listenerList.remove(SequentInteractionListener.class, listener);
     }
 
     /**
@@ -478,6 +487,12 @@ public class KeYMediator {
             if (listeners[i] == GUIListener.class) {
                 ((GUIListener) listeners[i + 1]).shutDown(e);
             }
+        }
+    }
+
+    public synchronized void fireTermHover(Term term) {
+        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+            listener.hover(term);
         }
     }
 
@@ -663,7 +678,6 @@ public class KeYMediator {
         if(userData == null) userData = new Lookup();
         return userData;
     }
-
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;

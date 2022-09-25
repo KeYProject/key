@@ -106,7 +106,16 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
+    }
+
+    public Term createTerm(Operator op,
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<TermLabel> labels,
+                           ImmutableArray<TermOrigin> origin) {
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, origin);
     }
 
     public Term createTerm(Operator op,

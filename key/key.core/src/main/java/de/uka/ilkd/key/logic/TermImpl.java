@@ -74,7 +74,7 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
-    private final ImmutableArray<TermOrigin> termOrigin;
+    protected final ImmutableArray<TermOrigin> termOrigin;
 
     //-------------------------------------------------------------------------
     //constructors
@@ -497,6 +497,13 @@ public class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
+        if (termOrigin.size() != t.termOrigin.size()) return false;
+        for (TermOrigin to : termOrigin) {
+            if (! t.termOrigin.contains(to)) {
+                return false;
+            }
+        }
+
         return op.equals(t.op)
                 && t.hasLabels() == hasLabels()
                 && subs.equals(t.subs)
@@ -592,6 +599,10 @@ public class TermImpl implements Term {
         hashcode = hashcode * 17 + subs().hashCode();
         hashcode = hashcode * 17 + boundVars().hashCode();
         hashcode = hashcode * 17 + javaBlock().hashCode();
+
+        for (TermOrigin to : termOrigin) {
+            hashcode = hashcode * 7 + to.hashCode();
+        }
 
         if(hashcode == -1) {
             hashcode = 0;
@@ -702,4 +713,9 @@ public class TermImpl implements Term {
     public void setOrigin(String origin) {
         this.origin = origin;
     }
+
+    public ImmutableArray<TermOrigin> getTermOrigin() {
+        return termOrigin;
+    }
+
 }

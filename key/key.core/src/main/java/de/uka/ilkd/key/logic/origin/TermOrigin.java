@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.logic.origin;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
 
-import java.net.URI;
-import java.util.ArrayList;
+import java.util.Objects;
 
 public class TermOrigin {
 
-    public static final ImmutableList<TermOrigin> EMPTY = ImmutableList.fromList(new ArrayList<>());
+    public static final ImmutableArray<TermOrigin> EMPTY = new ImmutableArray<>();
 
     public final String File;
 
@@ -28,4 +27,43 @@ public class TermOrigin {
         PositionEnd = positionEnd;
         Type = type;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        final TermOrigin cmp = (TermOrigin) o;
+
+        return Objects.equals(this.File, cmp.File) &&
+                this.Type ==  cmp.Type &&
+                this.LineStart ==  cmp.LineStart &&
+                this.LineEnd ==  cmp.LineEnd &&
+                this.PositionStart ==  cmp.PositionStart &&
+                this.PositionEnd ==  cmp.PositionEnd;
+    }
+
+    private int hashcode = -1;
+
+    @Override
+    public final int hashCode(){
+        if(hashcode == -1) {
+            // compute into local variable first to be thread-safe.
+            this.hashcode = computeHashCode();
+        }
+        return hashcode;
+    }
+
+    public int computeHashCode() {
+        int hash = 0;
+        hash += 7 * this.File.hashCode();
+        hash += 7 * this.Type.hashCode();
+        hash += 7 * this.LineStart;
+        hash += 7 * this.LineEnd;
+        hash += 7 * this.PositionStart;
+        hash += 7 * this.PositionEnd;
+        return hash;
+    }
+
 }
