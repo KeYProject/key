@@ -92,6 +92,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             List<Node> explorationNodes =
                 collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
+        } else {
+            treeModelExploration.setRoot(null);
         }
         updateLabel();
     }
