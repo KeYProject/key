@@ -49,12 +49,6 @@ class LabeledTermImpl extends TermImpl {
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
-
-        String tostr = this.toString();
-
-        if (tostr.startsWith("gt(v1,v2)")) {
-            System.out.println("CREATE:->  " + this.toString() + " || " + getOriginRef().size());
-        }
     }
 
     /**
