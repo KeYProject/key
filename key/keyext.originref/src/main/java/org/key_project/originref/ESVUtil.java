@@ -23,6 +23,9 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,4 +148,14 @@ public class ESVUtil {
         }
     }
 
+    public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart, int lineEnd) throws URISyntaxException, IOException {
+
+        List<String> lines = Files.readAllLines(Path.of(file));
+
+        String r = "";
+        for (int i = lineStart; i <= lineEnd; i++) {
+            if (i < lines.size()) r += lines.get(i)+"\n";
+        }
+        return r;
+    }
 }

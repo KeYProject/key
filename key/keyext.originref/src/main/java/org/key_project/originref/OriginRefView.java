@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class OriginRefView extends JPanel implements TabPanel {
@@ -20,12 +21,7 @@ public class OriginRefView extends JPanel implements TabPanel {
         super();
 
         // add a listener for changes in the proof tree
-        mediator.addSequentInteractionListener(new SequentInteractionListener() {
-            @Override
-            public void hover(Term t) {
-                showTerm(mediator, t);
-            }
-        });
+        mediator.addSequentInteractionListener(t -> showTerm(mediator, t));
 
     }
 
@@ -45,7 +41,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             String txt = "";
             txt += ESVUtil.TermToString(t, proof.getServices()) + "\n";
             txt += "\n";
-            txt += "-------------------------";
+            txt += "----------<SELF>----------";
             txt += "\n";
             txt += "\n";
 
@@ -59,10 +55,16 @@ public class OriginRefView extends JPanel implements TabPanel {
                     txt += "Type: " + o.Type + "\n";
                     txt += "\n";
                 }
+                txt += "\n";
+
+                for (OriginRef o : term.getOriginRef()) {
+                    txt += ESVUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd) + "\n";
+                    txt += "\n";
+                }
 
             }
 
-            txt += "-------------------------";
+            txt += "----------<CHILDS>----------";
             txt += "\n";
             txt += "\n";
 
@@ -82,7 +84,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             txt += "\n";
 
             taSource.setText(txt);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             taSource.setText(e.toString());
         }
     }
