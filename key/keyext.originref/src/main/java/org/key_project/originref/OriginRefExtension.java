@@ -1,4 +1,4 @@
-package org.key_project.termorigin;
+package org.key_project.originref;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -9,19 +9,19 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 
-@KeYGuiExtension.Info(name = "TermOrigin",
+@KeYGuiExtension.Info(name = "OriginRefView",
         description = "Author: Mike Schwörer <main@mikescher.com>",
         experimental = false,
         optional = true,
         priority = 10000)
-public class TermOriginExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
+public class OriginRefExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
 
-    private TermOriginView view;
+    private OriginRefView view;
 
     @Nonnull
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (view == null) view = new TermOriginView(window, mediator);
+        if (view == null) view = new OriginRefView(window, mediator);
         return Collections.singleton(view);
     }
 }

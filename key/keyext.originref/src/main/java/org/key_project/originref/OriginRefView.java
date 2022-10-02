@@ -1,4 +1,4 @@
-package org.key_project.termorigin;
+package org.key_project.originref;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -14,9 +14,9 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TermOriginView extends JPanel implements TabPanel {
+public class OriginRefView extends JPanel implements TabPanel {
 
-    public TermOriginView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
         // add a listener for changes in the proof tree
