@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -1746,7 +1747,7 @@ public class TermBuilder {
 
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(),
-                    new ImmutableArray<TermLabel>(newLabelList));
+                    new ImmutableArray<>(newLabelList), term.getOriginRef().stream().collect(Collectors.toList()));
         }
     }
 
