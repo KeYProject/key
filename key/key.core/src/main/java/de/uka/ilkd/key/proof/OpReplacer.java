@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -244,7 +245,7 @@ public class OpReplacer {
                                    newBoundVars,
                                    term.javaBlock(),
                                    term.getLabels(),
-                                   term.getTermOrigin());
+                                   term.getOriginRef().stream().collect(Collectors.toList()));
         } else {
             result = term;
         }

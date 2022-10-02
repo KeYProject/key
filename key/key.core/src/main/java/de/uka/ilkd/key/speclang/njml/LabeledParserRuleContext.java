@@ -4,13 +4,13 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.origin.TermOrigin;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.net.URI;
+import java.util.ArrayList;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
@@ -21,7 +21,7 @@ public class LabeledParserRuleContext {
     @Nullable
     public final TermLabel second;
     @Nullable
-    public final TermOrigin origin;
+    public final OriginRef origin;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
         if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
@@ -52,17 +52,18 @@ public class LabeledParserRuleContext {
         return new OriginTermLabel(origin);
     }
 
-    private static TermOrigin constructOrigin(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    private static OriginRef constructOrigin(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
-        return new TermOrigin(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType);
+        return new OriginRef(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType);
     }
 
     public Term addOrigin(TermBuilder tb, Term term) {
         if (origin == null) return term;
 
-        ImmutableArray<TermOrigin> arr = new ImmutableArray<>(origin);
+        ArrayList<OriginRef> arr = new ArrayList<>();
+        arr.add(origin);
 
         return tb.tf().createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), term.getLabels(), arr);
     }

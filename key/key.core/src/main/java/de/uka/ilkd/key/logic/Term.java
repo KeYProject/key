@@ -2,7 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.logic.origin.TermOrigin;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -150,7 +150,7 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public ImmutableArray<TermLabel> getLabels();
 
-    public ImmutableArray<TermOrigin> getTermOrigin();
+    public ImmutableSet<OriginRef> getOriginRef();
 
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.

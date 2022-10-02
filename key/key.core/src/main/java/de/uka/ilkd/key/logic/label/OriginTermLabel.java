@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -439,7 +440,7 @@ public class OriginTermLabel implements TermLabel {
                                                     term.boundVars(),
                                                     term.javaBlock(),
                                                     labels,
-                                                    term.getTermOrigin());
+                                                    term.getOriginRef().stream().collect(Collectors.toList()));
     }
 
     @Override

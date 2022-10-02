@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.logic.origin.TermOrigin;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -74,7 +75,7 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
-    protected final ImmutableArray<TermOrigin> termOrigin;
+    protected final ImmutableSet<OriginRef> originRef;
 
     //-------------------------------------------------------------------------
     //constructors
@@ -93,17 +94,17 @@ public class TermImpl implements Term {
                     ImmutableArray<Term> subs,
                     ImmutableArray<QuantifiableVariable> boundVars,
                     JavaBlock javaBlock,
-                    ImmutableArray<TermOrigin> origin) {
+                    Collection<OriginRef> originRef) {
         assert op != null;
         assert subs != null;
-        assert origin != null : "origin must not be null";
+        assert originRef != null : "origin must not be null";
         this.op = op;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null
                 ? JavaBlock.EMPTY_JAVABLOCK
                         : javaBlock;
-        this.termOrigin = origin;
+        this.originRef = ImmutableSet.fromCollection(originRef);
     }
 
 
@@ -497,9 +498,9 @@ public class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
-        if (termOrigin.size() != t.termOrigin.size()) return false;
-        for (TermOrigin to : termOrigin) {
-            if (! t.termOrigin.contains(to)) {
+        if (originRef.size() != t.originRef.size()) return false;
+        for (OriginRef to : originRef) {
+            if (! t.originRef.contains(to)) {
                 return false;
             }
         }
@@ -600,7 +601,7 @@ public class TermImpl implements Term {
         hashcode = hashcode * 17 + boundVars().hashCode();
         hashcode = hashcode * 17 + javaBlock().hashCode();
 
-        for (TermOrigin to : termOrigin) {
+        for (OriginRef to : originRef) {
             hashcode = hashcode * 7 + to.hashCode();
         }
 
@@ -714,8 +715,8 @@ public class TermImpl implements Term {
         this.origin = origin;
     }
 
-    public ImmutableArray<TermOrigin> getTermOrigin() {
-        return termOrigin;
+    public ImmutableSet<OriginRef> getOriginRef() {
+        return originRef;
     }
 
 }

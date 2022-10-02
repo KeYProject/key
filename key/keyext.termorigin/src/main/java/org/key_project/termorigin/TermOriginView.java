@@ -1,33 +1,18 @@
 package org.key_project.termorigin;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.origin.TermOrigin;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.IOUtil;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class TermOriginView extends JPanel implements TabPanel {
 
@@ -67,7 +52,7 @@ public class TermOriginView extends JPanel implements TabPanel {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (TermOrigin o : term.getTermOrigin()) {
+                for (OriginRef o : term.getOriginRef()) {
                     txt += "File: " + o.File + "\n";
                     txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
                     txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
@@ -84,7 +69,7 @@ public class TermOriginView extends JPanel implements TabPanel {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (TermOrigin o : getSubOrigins(term)) {
+                for (OriginRef o : getSubOrigins(term)) {
                     txt += "File: " + o.File + "\n";
                     txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
                     txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
@@ -102,12 +87,12 @@ public class TermOriginView extends JPanel implements TabPanel {
         }
     }
 
-    private ArrayList<TermOrigin> getSubOrigins(TermImpl term) {
-        ArrayList<TermOrigin> r = new ArrayList<>();
+    private ArrayList<OriginRef> getSubOrigins(TermImpl term) {
+        ArrayList<OriginRef> r = new ArrayList<>();
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                r.addAll(((TermImpl)t).getTermOrigin().toList());
+                for (OriginRef o: t.getOriginRef()) r.add(o);
                 r.addAll(getSubOrigins((TermImpl)t));
             }
         }

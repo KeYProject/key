@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.logic;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.logic.origin.TermOrigin;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -68,7 +66,7 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           ImmutableArray<TermOrigin> origin) {
+                           Collection<OriginRef> origin) {
         if(op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -114,7 +112,7 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           ImmutableArray<TermOrigin> origin) {
+                           Collection<OriginRef> origin) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, origin);
     }
 
@@ -124,7 +122,7 @@ public final class TermFactory {
             JavaBlock javaBlock,
             TermLabel label) {
         return createTerm(op, createSubtermArray(subs), boundVars,
-                javaBlock, new ImmutableArray<TermLabel>(label));
+                javaBlock, new ImmutableArray<>(label));
     }
 
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
@@ -161,9 +159,9 @@ public final class TermFactory {
                               ImmutableArray<QuantifiableVariable> boundVars,
                               JavaBlock javaBlock,
                               ImmutableArray<TermLabel> labels,
-                              ImmutableArray<TermOrigin> origin) {
+                              Collection<OriginRef> origin) {
 
-        origin = origin == null ? new ImmutableArray<>() : origin;
+        origin = origin == null ? new ArrayList<>() : origin;
 
         final Term newTerm
             = (labels == null || labels.isEmpty() ?

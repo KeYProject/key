@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.origin.TermOrigin;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -43,11 +44,17 @@ class LabeledTermImpl extends TermImpl {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           ImmutableArray<TermOrigin> origin) {
-        super(op, subs, boundVars, javaBlock, origin);
+                           Collection<OriginRef> originRef) {
+        super(op, subs, boundVars, javaBlock, originRef);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
+
+        String tostr = this.toString();
+
+        if (tostr.startsWith("gt(v1,v2)")) {
+            System.out.println("CREATE:->  " + this.toString() + " || " + getOriginRef().size());
+        }
     }
 
     /**

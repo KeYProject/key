@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.logic.origin;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import org.key_project.util.collection.ImmutableArray;
-
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
-public class TermOrigin {
+public class OriginRef {
 
-    public static final ImmutableArray<TermOrigin> EMPTY = new ImmutableArray<>();
+    public static final Collection<OriginRef> EMPTY = new ArrayList<>();
 
     public final String File;
 
@@ -19,7 +19,7 @@ public class TermOrigin {
 
     public final OriginTermLabel.SpecType Type;
 
-    public TermOrigin(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginTermLabel.SpecType type) {
+    public OriginRef(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginTermLabel.SpecType type) {
         File = file;
         LineStart = lineStart;
         LineEnd = lineEnd;
@@ -34,7 +34,7 @@ public class TermOrigin {
             return false;
         }
 
-        final TermOrigin cmp = (TermOrigin) o;
+        final OriginRef cmp = (OriginRef) o;
 
         return Objects.equals(this.File, cmp.File) &&
                 this.Type ==  cmp.Type &&
