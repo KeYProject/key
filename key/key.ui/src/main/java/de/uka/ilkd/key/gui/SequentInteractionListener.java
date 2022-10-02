@@ -8,4 +8,6 @@ public interface SequentInteractionListener extends EventListener {
 
     void hover(Term t);
 
+    void leaveHover();
+
 }

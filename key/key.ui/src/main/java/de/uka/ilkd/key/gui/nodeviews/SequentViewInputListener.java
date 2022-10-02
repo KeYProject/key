@@ -110,6 +110,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         if (pos != null && pos.getPosInOccurrence() != null) {
             Term term = pos.getPosInOccurrence().subTerm();
             sequentView.getMainWindow().getMediator().fireTermHover(term);
+        } else {
+            sequentView.getMainWindow().getMediator().fireTermLeaveHover();
         }
     }
 
@@ -122,6 +124,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         if (sequentView.isInUserSelectionHighlight(null)) {
             highlightOriginInSourceView(null);
         }
+
+        sequentView.getMainWindow().getMediator().fireTermLeaveHover();
     }
 
     @Override

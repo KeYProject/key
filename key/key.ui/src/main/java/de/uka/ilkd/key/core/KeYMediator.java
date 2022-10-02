@@ -496,6 +496,12 @@ public class KeYMediator {
         }
     }
 
+    public synchronized void fireTermLeaveHover() {
+        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+            listener.leaveHover();
+        }
+    }
+
     /**
      * returns the current selected proof
      *

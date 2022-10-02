@@ -4,12 +4,14 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,8 +22,18 @@ public class OriginRefView extends JPanel implements TabPanel {
     public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
-        // add a listener for changes in the proof tree
-        mediator.addSequentInteractionListener(t -> showTerm(mediator, t));
+        // add a listener for hover in the proof tree
+        mediator.addSequentInteractionListener(new SequentInteractionListener() {
+            @Override
+            public void hover(Term t) {
+                showTerm(window, mediator, t);
+            }
+
+            @Override
+            public void leaveHover() {
+                unshowTerm(window, mediator);
+            }
+        });
 
     }
 
@@ -34,8 +46,27 @@ public class OriginRefView extends JPanel implements TabPanel {
     private JPanel pnlMain;
     private JTextArea taSource;
 
-    private void showTerm(@Nonnull KeYMediator mediator, Term t) {
+    private final ArrayList<SourceView.Highlight> existingHighlights = new ArrayList<>();
+
+    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, Term t) {
         var proof = mediator.getSelectedProof();
+
+        try {
+            SourceView sv = window.getSourceViewFrame().getSourceView();
+            for (SourceView.Highlight h: existingHighlights) sv.removeHighlight(h);
+            existingHighlights.clear();
+
+            if (t instanceof TermImpl) {
+                TermImpl term = (TermImpl)t;
+                for (OriginRef o : getSubOrigins(term, true)) {
+                    for (int i = o.LineStart; i <= o.LineEnd; i++) {
+                        existingHighlights.add(sv.addHighlight(o.fileURI(), i, Color.MAGENTA, 11));
+                    }
+                }
+            }
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
+        }
 
         try {
             String txt = "";
@@ -55,6 +86,8 @@ public class OriginRefView extends JPanel implements TabPanel {
                     txt += "Type: " + o.Type + "\n";
                     txt += "\n";
                 }
+                txt += "----------";
+                txt += "\n";
                 txt += "\n";
 
                 for (OriginRef o : term.getOriginRef()) {
@@ -71,7 +104,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (OriginRef o : getSubOrigins(term)) {
+                for (OriginRef o : getSubOrigins(term, false)) {
                     txt += "File: " + o.File + "\n";
                     txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
                     txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
@@ -89,13 +122,23 @@ public class OriginRefView extends JPanel implements TabPanel {
         }
     }
 
-    private ArrayList<OriginRef> getSubOrigins(TermImpl term) {
+    private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+        SourceView sv = window.getSourceViewFrame().getSourceView();
+        for (SourceView.Highlight h: existingHighlights) sv.removeHighlight(h);
+        existingHighlights.clear();
+    }
+
+    private ArrayList<OriginRef> getSubOrigins(TermImpl term, boolean includeSelf) {
         ArrayList<OriginRef> r = new ArrayList<>();
+
+        if (includeSelf) {
+            for (OriginRef o: term.getOriginRef()) r.add(o);
+        }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
                 for (OriginRef o: t.getOriginRef()) r.add(o);
-                r.addAll(getSubOrigins((TermImpl)t));
+                r.addAll(getSubOrigins((TermImpl)t, false));
             }
         }
 

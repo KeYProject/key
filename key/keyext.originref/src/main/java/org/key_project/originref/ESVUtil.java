@@ -154,7 +154,7 @@ public class ESVUtil {
 
         String r = "";
         for (int i = lineStart; i <= lineEnd; i++) {
-            if (i < lines.size()) r += lines.get(i)+"\n";
+            if (i+1 < lines.size()) r += lines.get(i+1)+"\n";
         }
         return r;
     }

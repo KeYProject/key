@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.logic.origin;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -66,4 +69,7 @@ public class OriginRef {
         return hash;
     }
 
+    public URI fileURI() {
+        return new File(File).toURI();
+    }
 }
