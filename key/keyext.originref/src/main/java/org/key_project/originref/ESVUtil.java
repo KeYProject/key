@@ -5,12 +5,16 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -29,6 +33,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ESVUtil {
 
@@ -154,8 +159,22 @@ public class ESVUtil {
 
         String r = "";
         for (int i = lineStart; i <= lineEnd; i++) {
-            if (i+1 < lines.size()) r += lines.get(i+1)+"\n";
+            if (i-1 < lines.size()) r += lines.get(i-1)+"\n";
         }
         return r;
+    }
+
+    public static Term getParentWithOriginRef(PosInSequent pos) {
+        PosInOccurrence poc = pos.getPosInOccurrence();
+        while (true) {
+            Term t = poc.subTerm();
+            java.util.List<OriginRef> to = t.getOriginRef().stream().collect(Collectors.toList());
+            if (to.size() == 0) {
+                if (poc.isTopLevel()) return t;
+                poc = poc.up();
+                continue;
+            }
+            return t;
+        }
     }
 }

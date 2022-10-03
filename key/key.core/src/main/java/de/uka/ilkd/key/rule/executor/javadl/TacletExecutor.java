@@ -3,7 +3,9 @@ package de.uka.ilkd.key.rule.executor.javadl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -153,6 +155,17 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
                     instantiatedFormula);         
         }
+
+        var origRef = instantiatedFormula.getOriginRef();
+        for (OriginRef o: applicationPosInOccurrence.getTotalOriginRef()) origRef = origRef.add(o);
+
+        instantiatedFormula = services.getTermFactory().createTerm(
+                instantiatedFormula.op(),
+                instantiatedFormula.subs(),
+                instantiatedFormula.boundVars(),
+                instantiatedFormula.javaBlock(),
+                instantiatedFormula.getLabels(),
+                origRef.stream().collect(Collectors.toList()));
 
         return new SequentFormula(instantiatedFormula);
     }

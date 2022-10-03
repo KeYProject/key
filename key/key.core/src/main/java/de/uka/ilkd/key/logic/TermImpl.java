@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
@@ -717,6 +719,13 @@ public class TermImpl implements Term {
 
     public ImmutableSet<OriginRef> getOriginRef() {
         return originRef;
+    }
+
+    public ImmutableSet<OriginRef> getCombinedOriginRef() {
+        Set<OriginRef> result = new HashSet<>();
+        result.addAll(originRef.toSet());
+        for (Term t: subs) result.addAll(t.getCombinedOriginRef().toSet());
+        return ImmutableSet.fromSet(result);
     }
 
 }

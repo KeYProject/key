@@ -109,7 +109,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         if (pos != null && pos.getPosInOccurrence() != null) {
             Term term = pos.getPosInOccurrence().subTerm();
-            sequentView.getMainWindow().getMediator().fireTermHover(term);
+            sequentView.getMainWindow().getMediator().fireTermHover(pos, term);
         } else {
             sequentView.getMainWindow().getMediator().fireTermLeaveHover();
         }

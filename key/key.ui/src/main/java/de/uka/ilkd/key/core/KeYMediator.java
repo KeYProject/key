@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.core;
 
-import java.util.Collection;
 import java.util.EventObject;
 
 import javax.annotation.Nonnull;
@@ -9,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.gui.SequentInteractionListener;
+import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -490,9 +490,9 @@ public class KeYMediator {
         }
     }
 
-    public synchronized void fireTermHover(Term term) {
+    public synchronized void fireTermHover(PosInSequent pos, Term term) {
         for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
-            listener.hover(term);
+            listener.hover(pos, term);
         }
     }
 
