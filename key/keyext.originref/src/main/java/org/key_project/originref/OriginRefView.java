@@ -146,6 +146,8 @@ public class OriginRefView extends JPanel implements TabPanel {
         SourceView sv = window.getSourceViewFrame().getSourceView();
         for (SourceView.Highlight h: existingHighlights) sv.removeHighlight(h);
         existingHighlights.clear();
+
+        taSource.setText("");
     }
 
     private ArrayList<OriginRef> getSubOrigins(TermImpl term, boolean includeSelf) {
