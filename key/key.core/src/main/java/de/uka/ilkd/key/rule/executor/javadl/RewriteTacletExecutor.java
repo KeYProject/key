@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import java.util.stream.Collectors;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends FindTacletExecutor<TacletKind> {
 
@@ -72,6 +75,17 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
         if(!with.sort().extendsTrans(maxSort)) {
             with = services.getTermBuilder().cast(maxSort, with);
         }
+
+        var origRef = with.getOriginRef();
+        for (OriginRef o: term.getOriginRef()) origRef = origRef.add(o);
+
+        with = services.getTermFactory().createTerm(
+                with.op(),
+                with.subs(),
+                with.boundVars(),
+                with.javaBlock(),
+                with.getLabels(),
+                origRef.stream().collect(Collectors.toList()));
 
         return with;
     }
