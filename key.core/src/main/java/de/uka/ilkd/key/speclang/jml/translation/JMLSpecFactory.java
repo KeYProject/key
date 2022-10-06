@@ -293,12 +293,12 @@ public class JMLSpecFactory {
     }
 
     private VisibilityModifier getVisibility(TextualJMLConstruct textualConstruct) {
-        for (String mod : textualConstruct.getMods()) {
-            if (mod.equals("private")) {
+        for (JMLModifier mod : textualConstruct.getMods()) {
+            if (mod.equals(JMLModifier.PRIVATE)) {
                 return new Private();
-            } else if (mod.equals("protected")) {
+            } else if (mod.equals(JMLModifier.PROTECTED)) {
                 return new Protected();
-            } else if (mod.equals("public")) {
+            } else if (mod.equals(JMLModifier.PUBLIC)) {
                 return new Public();
             }
         }
@@ -966,12 +966,12 @@ public class JMLSpecFactory {
 
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, TextualJMLClassInv textualInv) {
         // check whether the invariant is static
-        final ImmutableList<String> mods = textualInv.getMods();
-        final boolean isStatic = (mods.contains("static") || // modifier
+        final ImmutableList<JMLModifier> mods = textualInv.getMods();
+        final boolean isStatic = (mods.contains(JMLModifier.STATIC) || // modifier
         // "static"
         // in an interface "static" is the default (see Sect. 2.5 of the
         // reference manual)
-                (services.getJavaInfo().isInterface(kjt) && !mods.contains("instance")));
+                (services.getJavaInfo().isInterface(kjt) && !mods.contains(JMLModifier.INSTANCE)));
 
         // create variable for self
         ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
@@ -1034,7 +1034,7 @@ public class JMLSpecFactory {
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
             throws SLTranslationException {
 
-        boolean isStatic = textualRep.getMods().contains("static");
+        boolean isStatic = textualRep.getMods().contains(JMLModifier.STATIC);
         // create variable for self
         final ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
@@ -1595,7 +1595,8 @@ public class JMLSpecFactory {
      */
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini,
             IProgramMethod pm) throws SLTranslationException {
-        final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
+        final ImmutableList<JMLModifier> mods =
+            ImmutableSLList.<JMLModifier>nil().append(JMLModifier.PRIVATE);
         final TextualJMLSpecCase specCase = new TextualJMLSpecCase(mods, Behavior.NONE);
         specCase.addName(ini.getName());
         for (LabeledParserRuleContext context : createPrecond(pm, ini.getOriginalSpec())) {
