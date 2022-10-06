@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
@@ -372,7 +373,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                                 subs,
                                 in.boundVars(),
                                 in.javaBlock(),
-                                in.getLabels());
+                                in.getLabels(),
+                                in.getOriginRef().stream().collect(Collectors.toList()));
             } else {
                 return in;
             }
