@@ -94,15 +94,22 @@ public class OverloadedOperatorHandler {
     }
 
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
+    private final IntegerHandler integerHandler;
 
-    public OverloadedOperatorHandler(Services services, SLExceptionFactory exc) {
+    public OverloadedOperatorHandler(Services services, SpecMathMode specMathMode) {
+        this.integerHandler = new IntegerHandler(services, specMathMode);
+
         handlers.add(new BinaryBooleanHandler(services));
         // handlers.add(new SequenceHandler(services));
         // handlers.add(new LocSetHandler(services));
-        handlers.add(new IntegerHandler(services));
+        handlers.add(this.integerHandler);
         handlers.add(new FloatHandler(services));
         handlers.add(new DoubleHandler(services));
         // handlers.add(new RealHandler(services));
+    }
+
+    public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
+        return integerHandler.replaceSpecMathMode(specMathMode);
     }
 
     @Nullable

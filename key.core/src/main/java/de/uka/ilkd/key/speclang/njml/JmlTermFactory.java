@@ -71,12 +71,16 @@ public final class JmlTermFactory {
     private final OverloadedOperatorHandler overloadedFunctionHandler;
 
 
-    public JmlTermFactory(SLExceptionFactory exc, Services services) {
+    public JmlTermFactory(SLExceptionFactory exc, Services services, SpecMathMode specMathMode) {
 
         this.exc = exc;
         this.services = services;
         this.tb = services.getTermBuilder();
-        overloadedFunctionHandler = new OverloadedOperatorHandler(services, exc);
+        overloadedFunctionHandler = new OverloadedOperatorHandler(services, specMathMode);
+    }
+
+    public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
+        return overloadedFunctionHandler.replaceSpecMathMode(specMathMode);
     }
 
     // region reach

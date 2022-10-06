@@ -47,6 +47,7 @@ public class JmlIO {
     private Services services;
     private KeYJavaType specInClass;
     private ProgramVariable selfVar;
+    private SpecMathMode specMathMode;
     private ImmutableList<ProgramVariable> paramVars;
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
@@ -193,8 +194,8 @@ public class JmlIO {
      * Interpret the given parse tree as an JML expression in the current context.
      */
     private Object interpret(ParserRuleContext ctx) {
-        Translator visitor = new Translator(services, specInClass, selfVar, paramVars, resultVar,
-            excVar, atPres, atBefores);
+        Translator visitor = new Translator(services, specInClass, selfVar, specMathMode, paramVars,
+            resultVar, excVar, atPres, atBefores);
         Object obj = ctx.accept(visitor);
         ImmutableList<PositionedString> newWarnings = ImmutableList.fromList(visitor.getWarnings());
         warnings = warnings.prepend(newWarnings);
@@ -335,6 +336,14 @@ public class JmlIO {
     }
 
     /**
+     * Sets the spec math mode.
+     */
+    public JmlIO specMathMode(SpecMathMode specMathMode) {
+        this.specMathMode = specMathMode;
+        return this;
+    }
+
+    /**
      * Sets the current list of known parameter. Can also be used to give additionally variables.
      */
     public JmlIO parameters(ImmutableList<ProgramVariable> params) {
@@ -393,6 +402,7 @@ public class JmlIO {
         atPres(null);
         classType(null);
         selfVar(null);
+        specMathMode(null);
         clearWarnings();
         exceptionVariable(null);
         parameters(ImmutableSLList.nil());

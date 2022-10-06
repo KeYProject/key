@@ -25,10 +25,20 @@ public class IntegerHandler extends LDTHandler {
         new IdentityHashMap<>();
 
     private final Services services;
+    /**
+     * The spec math mode to use for all following calls to build.
+     */
+    private SpecMathMode specMathMode;
 
-    public IntegerHandler(Services services) {
+    public IntegerHandler(Services services, SpecMathMode specMathMode) {
         super(services);
+
+        if (specMathMode == null) {
+            throw new IllegalArgumentException("specMathMode cannot be null");
+        }
+
         this.services = services;
+        this.specMathMode = specMathMode;
 
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         jmlIntMap.put(ADD, intLDT.getJavaAddInt());
@@ -81,6 +91,12 @@ public class IntegerHandler extends LDTHandler {
         opCategories.put(PrimitiveType.JAVA_BIGINT, jmlBigintMap);
         opCategories.put(PrimitiveType.JAVA_INT, jmlIntMap);
         opCategories.put(PrimitiveType.JAVA_LONG, jmlLongMap);
+    }
+
+    public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
+        var mode = this.specMathMode;
+        this.specMathMode = specMathMode;
+        return mode;
     }
 
     @Override

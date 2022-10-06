@@ -267,6 +267,8 @@ NOT_MODIFIED: '\\not_modified';
 NOT_SPECIFIED: '\\not_specified';
 NUM_OF: '\\num_of';
 OLD: '\\old';
+JAVA_MATH: '\\java_math';
+BIGINT_MATH: '\\bigint_math';
 PERMISSION: '\\permission';
 PRE: '\\pre';
 PRODUCT: '\\product';
