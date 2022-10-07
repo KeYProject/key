@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -15,16 +16,18 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 
 public class IntegerHandler extends LDTHandler {
 
+    private enum IntType {
+        Bigint, Int, Long
+    }
+
     private final Map<JMLOperator, Operator> jmlIntMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlLongMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlBigintMap = new EnumMap<>(JMLOperator.class);
 
-    private final Map<PrimitiveType, Map<JMLOperator, Operator>> opCategories =
-        new IdentityHashMap<>();
+    private final Map<Type, Map<JMLOperator, Operator>> opCategories = new IdentityHashMap<>();
 
-    private final Services services;
     /**
      * The spec math mode to use for all following calls to build.
      */
@@ -37,7 +40,6 @@ public class IntegerHandler extends LDTHandler {
             throw new IllegalArgumentException("specMathMode cannot be null");
         }
 
-        this.services = services;
         this.specMathMode = specMathMode;
 
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
@@ -88,6 +90,8 @@ public class IntegerHandler extends LDTHandler {
         jmlBigintMap.put(GTE, intLDT.getGreaterOrEquals());
         jmlBigintMap.put(LTE, intLDT.getLessOrEquals());
 
+        // TODO bigint bitwise operators?
+
         opCategories.put(PrimitiveType.JAVA_BIGINT, jmlBigintMap);
         opCategories.put(PrimitiveType.JAVA_INT, jmlIntMap);
         opCategories.put(PrimitiveType.JAVA_LONG, jmlLongMap);
@@ -100,9 +104,33 @@ public class IntegerHandler extends LDTHandler {
     }
 
     @Override
-    protected Map<JMLOperator, Operator> getOperatorMap(Type promotedType) {
-        Map<JMLOperator, Operator> opMap = opCategories.get(promotedType);
-        return opMap;
-    }
+    protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
+        switch (this.specMathMode) {
+        case BIGINT: {
+            IntType type;
+            if (PrimitiveType.JAVA_INT.equals(promotedType)) {
+                type = IntType.Int;
+            } else if (PrimitiveType.JAVA_LONG.equals(promotedType)) {
+                type = IntType.Long;
+            } else if (PrimitiveType.JAVA_BIGINT.equals(promotedType)) {
+                type = IntType.Bigint;
+            } else {
+                return null;
+            }
 
+            // Always use bigint operator, fall back to the corresponding type operators since
+            // bitwise is missing TODO
+            var bigIntOperator = jmlBigintMap.get(op);
+            if (bigIntOperator != null || type == IntType.Bigint) {
+                return bigIntOperator;
+            }
+
+            return (type == IntType.Int ? jmlIntMap : jmlLongMap).get(op);
+        }
+        case JAVA:
+            return LDTHandler.getOperatorFromMap(opCategories.get(promotedType), op);
+        }
+
+        throw new AssertionError("unreachable");
+    }
 }

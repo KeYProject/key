@@ -1,42 +1,17 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
-import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandler;
-import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.ADD;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.BITWISE_AND;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.BITWISE_NEGATE;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.BITWISE_OR;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.BITWISE_XOR;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.DIVISION;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.GT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.GTE;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.LT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.LTE;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.MODULO;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.MULT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.SHIFT_LEFT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.SHIFT_RIGHT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.SUBTRACT;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.UNARY_MINUS;
-import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.UNSIGNED_SHIFT_RIGHT;
+import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
 public class FloatHandler extends LDTHandler {
 
@@ -60,12 +35,11 @@ public class FloatHandler extends LDTHandler {
     }
 
     @Override
-    protected Map<JMLOperator, Operator> getOperatorMap(Type promotedType) {
-        if (promotedType == PrimitiveType.JAVA_FLOAT) {
-            return opMap;
+    protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
+        if (promotedType.equals(PrimitiveType.JAVA_FLOAT)) {
+            return LDTHandler.getOperatorFromMap(this.opMap, op);
         } else {
             return null;
         }
     }
-
 }

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -34,12 +35,11 @@ public class DoubleHandler extends LDTHandler {
     }
 
     @Override
-    protected Map<JMLOperator, Operator> getOperatorMap(Type promotedType) {
-        if (promotedType == PrimitiveType.JAVA_DOUBLE) {
-            return opMap;
+    protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
+        if (promotedType.equals(PrimitiveType.JAVA_DOUBLE)) {
+            return LDTHandler.getOperatorFromMap(this.opMap, op);
         } else {
             return null;
         }
     }
-
 }
