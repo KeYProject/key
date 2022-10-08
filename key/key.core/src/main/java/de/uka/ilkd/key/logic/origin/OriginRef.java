@@ -12,6 +12,7 @@ import java.util.Objects;
 public class OriginRef {
 
     public static final ImmutableSet<OriginRef> EMPTY = ImmutableSet.empty();
+    public static final ImmutableSet<OriginRef> ENSURES_EXCNULL = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
 
     public final String File;
 
@@ -23,12 +24,25 @@ public class OriginRef {
 
     public final OriginRefType Type;
 
+    public OriginRef(OriginRefType type) {
+        this(null, 0, 0, 0, 0, type);
+    }
+
     public OriginRef(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginRefType type) {
-        File = file;
-        LineStart = lineStart;
-        LineEnd = lineEnd;
-        PositionStart = positionStart;
-        PositionEnd = positionEnd;
+        if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
+            File = null;
+            LineStart = 0;
+            LineEnd = 0;
+            PositionStart = 0;
+            PositionEnd = 0;
+        } else {
+            File = file;
+            LineStart = lineStart;
+            LineEnd = lineEnd;
+            PositionStart = positionStart;
+            PositionEnd = positionEnd;
+        }
+
         Type = type;
     }
 
@@ -61,7 +75,7 @@ public class OriginRef {
 
     public int computeHashCode() {
         int hash = 0;
-        hash += 7 * this.File.hashCode();
+        hash += 7 * (this.File == null ? 0 : this.File.hashCode());
         hash += 7 * this.Type.hashCode();
         hash += 7 * this.LineStart;
         hash += 7 * this.LineEnd;
@@ -71,6 +85,51 @@ public class OriginRef {
     }
 
     public URI fileURI() {
+        if (File == null) {
+            return null;
+        };
         return new File(File).toURI();
+    }
+
+    public boolean hasFile() {
+        return (File != null);
+    }
+
+    @Override
+    public String toString() {
+        if (hasFile()) {
+
+            String f = File;
+
+            String prefix = "";
+            if (f.contains(":")) {
+                int idx = f.indexOf(":");
+                prefix = f.substring(0, idx);
+                f = f.substring(idx+1);
+            }
+            String main = f;
+            if (f.contains("/")) {
+                main = f.substring(f.lastIndexOf("/")+1);
+            } else if (f.contains("\\")) {
+                main = f.substring(f.lastIndexOf("\\")+1);
+            }
+
+            String line = ""+LineStart;
+            if (LineStart != LineEnd) {
+                line = LineStart+"-"+LineEnd;
+            }
+
+            String pos = ""+PositionStart;
+            if (PositionStart != PositionEnd) {
+                pos = PositionStart+"-"+PositionEnd;
+            }
+
+            return Type.toString() + " || " + prefix + main + ":" + line + " [" + pos + "]";
+
+        } else {
+
+            return Type.toString() + " || (no-src)";
+
+        }
     }
 }

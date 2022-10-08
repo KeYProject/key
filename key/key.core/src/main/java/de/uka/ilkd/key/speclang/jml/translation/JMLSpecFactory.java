@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -856,10 +857,9 @@ public class JMLSpecFactory {
         } else {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.ensures.get(heap) != null) {
-                    Term excNull = tb.addLabelToAllSubs(
-                            (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
-                            new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    Term excNull = tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()), ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                    excNull = tb.addLabelToAllSubs(excNull, new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    excNull = tb.tf().appendOriginRef(excNull, OriginRef.ENSURES_EXCNULL);
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
                             : tb.imp(excNull, tb.convertToFormula(clauses.ensures.get(heap))));

@@ -20,7 +20,9 @@ public enum OriginRefType {
     RETURNS("returns"),
 
     REQUIRES("requires"), // @requires clause
-    ENSURES("ensures");   // @ensures clause
+    ENSURES("ensures"),   // @ensures clause
+
+    ENSURES_IMPLICT("ensures_implicit");   // autom. generated ensures term
 
     private final String name;
 

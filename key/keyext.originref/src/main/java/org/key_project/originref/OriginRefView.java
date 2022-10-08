@@ -65,7 +65,9 @@ public class OriginRefView extends JPanel implements TabPanel {
 
             for (OriginRef o : ESVUtil.getParentWithOriginRef(pos).getOriginRef()) {
                 for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                    existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_MAIN, 11));
+                    if (o.hasFile()) {
+                        existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_MAIN, 11));
+                    }
                 }
                 anyRefs = true;
             }
@@ -73,7 +75,9 @@ public class OriginRefView extends JPanel implements TabPanel {
             if (!anyRefs) {
                 for (OriginRef o : ESVUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
                     for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                        existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_CHILDS, 11));
+                        if (o.hasFile()) {
+                            existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_CHILDS, 11));
+                        }
                     }
                 }
             }
@@ -98,19 +102,19 @@ public class OriginRefView extends JPanel implements TabPanel {
                 TermImpl term = (TermImpl)t;
 
                 for (OriginRef o : term.getOriginRef()) {
-                    txt += "File: " + o.File + "\n";
-                    txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
-                    txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
-                    txt += "Type: " + o.Type + "\n";
+                    txt += o.toString();
                     txt += "\n";
                 }
+                txt += "\n";
                 txt += "----------";
                 txt += "\n";
                 txt += "\n";
 
                 for (OriginRef o : term.getOriginRef()) {
-                    txt += ESVUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd) + "\n";
-                    txt += "\n";
+                    if (o.hasFile()) {
+                        txt += ESVUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd);
+                        txt += "\n";
+                    }
                 }
 
             }
@@ -123,10 +127,7 @@ public class OriginRefView extends JPanel implements TabPanel {
                 TermImpl term = (TermImpl)t;
 
                 for (OriginRef o : ESVUtil.getSubOriginRefs(term, false)) {
-                    txt += "File: " + o.File + "\n";
-                    txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
-                    txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
-                    txt += "Type: " + o.Type + "\n";
+                    txt += o.toString();
                     txt += "\n";
                 }
 
@@ -141,10 +142,7 @@ public class OriginRefView extends JPanel implements TabPanel {
                 txt += ESVUtil.TermToString(parent, proof.getServices()) + "\n";
                 txt += "\n";
                 for (OriginRef o : parent.getOriginRef()) {
-                    txt += "File: " + o.File + "\n";
-                    txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
-                    txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
-                    txt += "Type: " + o.Type + "\n";
+                    txt += o.toString();
                     txt += "\n";
                 }
             }
