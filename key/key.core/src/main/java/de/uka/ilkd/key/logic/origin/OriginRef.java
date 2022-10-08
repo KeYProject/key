@@ -21,9 +21,9 @@ public class OriginRef {
     public final int PositionStart;
     public final int PositionEnd;
 
-    public final OriginTermLabel.SpecType Type;
+    public final OriginRefType Type;
 
-    public OriginRef(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginTermLabel.SpecType type) {
+    public OriginRef(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginRefType type) {
         File = file;
         LineStart = lineStart;
         LineEnd = lineEnd;

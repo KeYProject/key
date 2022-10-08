@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -39,11 +40,11 @@ public class LabeledParserRuleContext {
         this.origin = null;
     }
 
-    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType, OriginRefType refType) {
         if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = ctx;
         this.second = constructTermLabel(ctx, specType);
-        this.origin = constructOrigin(ctx, specType);
+        this.origin = constructOrigin(ctx, refType);
     }
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
@@ -53,8 +54,7 @@ public class LabeledParserRuleContext {
         return new OriginTermLabel(origin);
     }
 
-    private static OriginRef constructOrigin(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
-
+    private static OriginRef constructOrigin(ParserRuleContext ctx, OriginRefType specType) {
         String src = ctx.start.getTokenSource().getSourceName();
 
         return new OriginRef(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType);
