@@ -369,7 +369,13 @@ public final class SymbolicExecutionUtil {
          }
       }
       if (subChanged) {
-         term = services.getTermFactory().createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
+         term = services.getTermFactory().createTerm(
+                 term.op(),
+                 new ImmutableArray<Term>(newSubs),
+                 term.boundVars(),
+                 term.javaBlock(),
+                 term.getLabels(),
+                 term.getOriginRef());
       }
       // Improve readability: a < 1 + b, a < b + 1
       final TermBuilder tb = services.getTermBuilder();
@@ -2969,7 +2975,7 @@ public final class SymbolicExecutionUtil {
                List<Term> newSubs = new LinkedList<Term>();
                newSubs.add(definition);
                newSubs.add(skolem);
-               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels());
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
                sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
             }
          }
@@ -2981,7 +2987,7 @@ public final class SymbolicExecutionUtil {
                List<Term> newSubs = new LinkedList<Term>();
                newSubs.add(definition);
                newSubs.add(skolem);
-               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels());
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
                sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
             }
          }
@@ -3003,7 +3009,7 @@ public final class SymbolicExecutionUtil {
       }
       if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
          // Do not label skolem equality and skolem terms
-         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef());
       }
       else {
          /// Label term which is not a skolem equality and not a skolem term
@@ -3012,7 +3018,7 @@ public final class SymbolicExecutionUtil {
             newLabels.add(oldLabel);
          }
          newLabels.add(label);
-         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels), term.getOriginRef());
       }
    }
 
@@ -3038,7 +3044,7 @@ public final class SymbolicExecutionUtil {
             newLabels.add(oldLabel);
          }
       }
-      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels), term.getOriginRef());
    }
 
    /**
@@ -3283,10 +3289,11 @@ public final class SymbolicExecutionUtil {
                else {
                   // Create new term in general.
                   return services.getTermFactory().createTerm(term.op(),
-                                                              new ImmutableArray<Term>(newChildren),
+                                                              new ImmutableArray<>(newChildren),
                                                               term.boundVars(),
                                                               term.javaBlock(),
-                                                              term.getLabels());
+                                                              term.getLabels(),
+                                                              term.getOriginRef());
                }
             }
             else {

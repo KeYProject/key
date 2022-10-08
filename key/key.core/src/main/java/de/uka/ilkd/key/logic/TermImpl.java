@@ -721,11 +721,4 @@ public class TermImpl implements Term {
         return originRef;
     }
 
-    public ImmutableSet<OriginRef> getCombinedOriginRef() {
-        Set<OriginRef> result = new HashSet<>();
-        result.addAll(originRef.toSet());
-        for (Term t: subs) result.addAll(t.getCombinedOriginRef().toSet());
-        return ImmutableSet.fromSet(result);
-    }
-
 }

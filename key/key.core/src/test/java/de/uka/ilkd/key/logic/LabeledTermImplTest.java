@@ -4,6 +4,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.rule.TacletForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,9 @@ public class LabeledTermImplTest {
 		Term labeledTerm =
 				tf.createTerm(Junctor.AND,
 						tf.createTerm(Junctor.TRUE),
-						tf.createTerm(Junctor.FALSE), labels);
+						tf.createTerm(Junctor.FALSE),
+                        labels,
+                        OriginRef.EMPTY);
 
         assertNotEquals(labeledTerm, unlabeledTerm, "Labeled and unlabeled terms must not be equal");
         assertNotEquals(unlabeledTerm, labeledTerm, "Labeled and unlabeled terms must not be equal");

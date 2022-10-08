@@ -49,15 +49,6 @@ public final class TermFactory {
     //-------------------------------------------------------------------------
 
 
-    public Term createTerm(Operator op,
-                           ImmutableArray<Term> subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
-                           ImmutableArray<TermLabel> labels) {
-        return createTerm(op, subs, boundVars, javaBlock, labels, null);
-    }
-
-
     /**
      * Master method for term creation. Should be the only place where terms
      * are created in the entire system.
@@ -76,23 +67,27 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
+        if (originref == null || originref.isEmpty()) {
+            originref = OriginRef.EMPTY;
+        }
+
         return doCreateTerm(op, subs, boundVars, javaBlock, labels, originref);
     }
 
     public Term createTerm(Operator op,
-	    		   ImmutableArray<Term> subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
+	                       ImmutableArray<Term> subs,
+	                       ImmutableArray<QuantifiableVariable> boundVars,
+	                       JavaBlock javaBlock) {
 
-    	return createTerm(op, subs, boundVars, javaBlock, null);
+    	return createTerm(op, subs, boundVars, javaBlock, null, null);
     }
 
 
     public Term createTerm(Operator op,
                            Term[] subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
-	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock) {
+	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, null);
     }
 
 
@@ -104,47 +99,31 @@ public final class TermFactory {
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
-                           ImmutableArray<TermLabel> labels) {
-        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
-    }
-
-    public Term createTerm(Operator op,
-                           Term[] subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
                            ImmutableSet<OriginRef> originref) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, originref);
     }
 
-    public Term createTerm(Operator op,
-            Term[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock,
-            TermLabel label) {
-        return createTerm(op, createSubtermArray(subs), boundVars,
-                javaBlock, new ImmutableArray<>(label));
-    }
-
-    public Term createTerm(Operator op, Term[] subs, TermLabel label) {
-        return createTerm(op, subs, null, null, label);
-    }
-
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, createSubtermArray(subs), null, null, labels);
-    }
-
-    public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
-    }
-
-    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
+    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels, ImmutableSet<OriginRef> originref) {
+    	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels, originref);
     }
 
 
-    public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, NO_SUBTERMS, null, null, labels);
+    public Term createTerm(Operator op, ImmutableArray<TermLabel> labels, ImmutableSet<OriginRef> originref) {
+    	return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
+    }
+
+    public @Nonnull Term appendOriginRef(Term base, ImmutableSet<OriginRef> add) {
+        return setOriginRef(base, base.getOriginRef().add(add));
+    }
+
+    public @Nonnull Term setOriginRef(Term base, ImmutableSet<OriginRef> origref) {
+        return createTerm(base.op(),
+                base.subs(),
+                base.boundVars(),
+                base.javaBlock(),
+                base.getLabels(),
+                origref);
     }
 
     //-------------------------------------------------------------------------
@@ -156,7 +135,8 @@ public final class TermFactory {
                 NO_SUBTERMS : new ImmutableArray<Term>(subs);
     }
 
-    private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
+    private Term doCreateTerm(Operator op,
+                              ImmutableArray<Term> subs,
                               ImmutableArray<QuantifiableVariable> boundVars,
                               JavaBlock javaBlock,
                               ImmutableArray<TermLabel> labels,
@@ -207,18 +187,5 @@ public final class TermFactory {
         if(reduce.isPresent())
             return reduce.get();
         throw new IllegalArgumentException("list of terms is empty.");
-    }
-
-    public @Nonnull Term appendOriginRef(Term base, ImmutableSet<OriginRef> add) {
-        return setOriginRef(base, base.getOriginRef().add(add));
-    }
-
-    public @Nonnull Term setOriginRef(Term base, ImmutableSet<OriginRef> origref) {
-        return createTerm(base.op(),
-                base.subs(),
-                base.boundVars(),
-                base.javaBlock(),
-                base.getLabels(),
-                origref);
     }
 }

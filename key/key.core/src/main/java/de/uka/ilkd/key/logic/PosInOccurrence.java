@@ -238,25 +238,6 @@ public final class PosInOccurrence {
 
     }
 
-	public ImmutableSet<OriginRef> getTotalOriginRef() {
-
-		// [1] Upwards case: if a parent has an originref, use it (parents always trump children)
-
-		PosInOccurrence pos = this;
-		ImmutableSet<OriginRef> result = null;
-		while (pos != null) {
-			ImmutableSet<OriginRef> orig = pos.subTerm().getOriginRef();
-			if (orig.size() > 0) result = orig;
-
-			pos = pos.isTopLevel() ? null : pos.up();
-		}
-		if (result != null) return result;
-
-		// [2] Downwards case: use combined children origins
-
-		return this.subTerm().getCombinedOriginRef();
-	}
-
 
     private final class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;

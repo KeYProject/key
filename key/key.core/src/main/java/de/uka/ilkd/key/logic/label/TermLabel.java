@@ -181,7 +181,8 @@ public interface TermLabel extends Named {
                 term.javaBlock(),
                 new ImmutableArray<>(
                         term.getLabels().stream()
-                        .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
+                        .filter(TermLabel::isProofRelevant).collect(Collectors.toList())),
+                term.getOriginRef());
     }
 
     /**

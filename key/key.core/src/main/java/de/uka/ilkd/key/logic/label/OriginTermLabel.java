@@ -296,7 +296,8 @@ public class OriginTermLabel implements TermLabel {
                              newSubs,
                              term.boundVars(),
                              term.javaBlock(),
-                             new ImmutableArray<>(labels));
+                             new ImmutableArray<>(labels),
+                             term.getOriginRef());
     }
 
     /**

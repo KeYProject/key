@@ -86,7 +86,7 @@ public class ClashFreeSubst {
         for ( int i=0; i<arity; i++ ) {
             applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels(), t.getOriginRef());
     }
 
     /**

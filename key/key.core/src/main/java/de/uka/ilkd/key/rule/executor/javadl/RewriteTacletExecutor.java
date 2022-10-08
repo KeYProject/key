@@ -67,7 +67,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
                     subs,
                     term.boundVars(),
                     term.javaBlock(),
-                    term.getLabels());
+                    term.getLabels(),
+                    term.getOriginRef());
         }
 
         with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp, services);

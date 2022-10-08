@@ -26,6 +26,6 @@ public class GenericTermReplacer {
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
                 newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),
-                newTopLevelTerm.getLabels());
+                newTopLevelTerm.getLabels(), newTopLevelTerm.getOriginRef());
     }
 }

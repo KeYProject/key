@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -452,7 +453,7 @@ public class TermBuilder {
 
     public Term prog(Modality mod, JavaBlock jb, Term t,
                      ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
+        return tf.createTerm(mod, new Term[]{t}, null, jb, labels, OriginRef.EMPTY);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -778,7 +779,7 @@ public class TermBuilder {
         } else if (t2.op() == Junctor.FALSE) {
             return not(t1);
         } else {
-            return tf.createTerm(Junctor.IMP, t1, t2, labels);
+            return tf.createTerm(Junctor.IMP, t1, t2, labels, OriginRef.EMPTY);
         }
     }
 
@@ -1081,8 +1082,7 @@ public class TermBuilder {
         } else if (target.equals(tt())) {
             return tt();
         } else {
-            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update,
-                    target, labels);
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels, OriginRef.EMPTY);
         }
     }
 
@@ -1701,7 +1701,8 @@ public class TermBuilder {
                 newSubs,
                 term.boundVars(),
                 term.javaBlock(),
-                term.getLabels());
+                term.getLabels(),
+                term.getOriginRef());
         result = addLabel(result, labels);
         return result;
     }
@@ -1730,8 +1731,12 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(), labels);
+            return tf.createTerm(term.op(),
+                    term.subs(),
+                    term.boundVars(),
+                    term.javaBlock(),
+                    labels,
+                    term.getOriginRef());
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
@@ -1781,8 +1786,12 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(), labels);
+            return tf.createTerm(term.op(),
+                    term.subs(),
+                    term.boundVars(),
+                    term.javaBlock(),
+                    labels,
+                    term.getOriginRef());
         }
     }
 
@@ -2169,7 +2178,8 @@ public class TermBuilder {
                 newSubs,
                 term.boundVars(),
                 term.javaBlock(),
-                term.getLabels());
+                term.getLabels(),
+                term.getOriginRef());
     }
 
     public ImmutableSet<Term> unionToSet(Term s) {

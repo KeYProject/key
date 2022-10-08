@@ -349,7 +349,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 final ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
                                 boundVars, jb, visited.getLabels());
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels);
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels, visited.getOriginRef());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
@@ -360,9 +360,13 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                     t = visited;
                 }
                 else {
-                    t = tb.tf().createTerm(visitedOp, visited.subs(),
+                    t = tb.tf().createTerm(
+                            visitedOp,
+                            visited.subs(),
                             visited.boundVars(),
-                            visited.javaBlock(), labels);
+                            visited.javaBlock(),
+                            labels,
+                            visited.getOriginRef());
                 }
                 t = resolveSubst(t);
                 if (t == visited)

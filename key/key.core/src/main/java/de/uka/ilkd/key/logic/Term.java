@@ -152,8 +152,6 @@ public interface Term extends SVSubstitute, Sorted {
 
     public ImmutableSet<OriginRef> getOriginRef();
 
-    public ImmutableSet<OriginRef> getCombinedOriginRef();
-
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.

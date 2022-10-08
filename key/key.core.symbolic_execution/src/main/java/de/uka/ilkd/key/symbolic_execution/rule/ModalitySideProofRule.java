@@ -166,7 +166,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
          final TermBuilder tb = sideProofServices.getTermBuilder();
          Term newTerm = tb.func(newPredicate, varTerm);
-         Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
+         Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels(), modalityTerm.getOriginRef());
          Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions

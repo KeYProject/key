@@ -596,9 +596,13 @@ public class MergeRuleUtils {
                         replMap, services));
             }
 
-            return services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<Term>(transfSubs), term.boundVars(),
-                    term.javaBlock(), term.getLabels());
+            return services.getTermFactory().createTerm(
+                    term.op(),
+                    new ImmutableArray<>(transfSubs),
+                    term.boundVars(),
+                    term.javaBlock(),
+                    term.getLabels(),
+                    term.getOriginRef());
 
         }
     }
