@@ -11,8 +11,14 @@ import java.util.Objects;
 
 public class OriginRef {
 
-    public static final ImmutableSet<OriginRef> EMPTY = ImmutableSet.empty();
-    public static final ImmutableSet<OriginRef> ENSURES_EXCNULL = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
+    public static final ImmutableSet<OriginRef> EMPTY                       = ImmutableSet.empty();
+    public static final ImmutableSet<OriginRef> ENSURES_EXCNULL             = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_SELFNOTNULL        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_SELFCREATED        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTTYPE      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_PARAMSOK           = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_MEASUREDBY_INITIAL = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_WELLFORMEDHEAP     = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
 
     public final String File;
 
@@ -124,11 +130,11 @@ public class OriginRef {
                 pos = PositionStart+"-"+PositionEnd;
             }
 
-            return Type.toString() + " || " + prefix + main + ":" + line + " [" + pos + "]";
+            return String.format("%-17s", Type) + " || " + prefix + main + ":" + line + " [" + pos + "]";
 
         } else {
 
-            return Type.toString() + " || (no-src)";
+            return String.format("%-17s", Type) + " || (no-src)";
 
         }
     }

@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -663,24 +664,28 @@ public abstract class AbstractOperationPO extends AbstractPO {
             List<LocationVariable> heaps,
             Services services) {
         // "self != null"
-        final Term selfNotNull =
-                generateSelfNotNull(getProgramMethod(), selfVar);
+        Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
+        selfNotNull = services.getTermFactory().appendOriginRef(selfNotNull, OriginRef.REQUIRES_SELFNOTNULL);
 
         // "self.<created> = TRUE"
-        final Term selfCreated =
-                generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
+        Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
+        selfCreated = services.getTermFactory().appendOriginRef(selfCreated, OriginRef.REQUIRES_SELFCREATED);
 
         // "MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType =
-                generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
+        Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
+        selfExactType = services.getTermFactory().appendOriginRef(selfExactType, OriginRef.REQUIRES_SELFEXACTTYPE);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
+        paramsOK = services.getTermFactory().appendOriginRef(paramsOK, OriginRef.REQUIRES_PARAMSOK);
 
         // initial value of measured_by clause
-        final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
+        Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
+        mbyAtPreDef = services.getTermFactory().appendOriginRef(mbyAtPreDef, OriginRef.REQUIRES_MEASUREDBY_INITIAL);
+
+        // wellformed(heap)
         Term wellFormed = null;
         for (LocationVariable heap : heaps) {
             final Term wf = tb.wellFormed(tb.var(heap));
@@ -690,13 +695,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
+        wellFormed = (wellFormed == null) ? null : services.getTermFactory().appendOriginRef(wellFormed, OriginRef.REQUIRES_WELLFORMEDHEAP);
 
-        Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(),
-                      selfNotNull, selfCreated, selfExactType,
-                      paramsOK, mbyAtPreDef);
+        Term result = tb.and(
+                wellFormed != null ? wellFormed : tb.tt(),
+                selfNotNull,
+                selfCreated,
+                selfExactType,
+                paramsOK,
+                mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(
-                new Origin(SpecType.REQUIRES)));
+        return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
     }
 
     /**

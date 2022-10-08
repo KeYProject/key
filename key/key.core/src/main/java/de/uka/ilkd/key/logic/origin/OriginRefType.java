@@ -22,7 +22,8 @@ public enum OriginRefType {
     REQUIRES("requires"), // @requires clause
     ENSURES("ensures"),   // @ensures clause
 
-    ENSURES_IMPLICT("ensures_implicit");   // autom. generated ensures term
+    REQUIRES_IMPLICT("requires_implicit"),   // autom. generated requires term
+    ENSURES_IMPLICT("ensures_implicit");     // autom. generated ensures term
 
     private final String name;
 
