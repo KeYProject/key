@@ -245,7 +245,7 @@ public class OpReplacer {
                                    newBoundVars,
                                    term.javaBlock(),
                                    term.getLabels(),
-                                   term.getOriginRef().stream().collect(Collectors.toList()));
+                                   term.getOriginRef());
         } else {
             result = term;
         }

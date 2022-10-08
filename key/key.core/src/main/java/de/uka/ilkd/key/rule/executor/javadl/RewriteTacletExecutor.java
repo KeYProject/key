@@ -79,13 +79,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
         var origRef = with.getOriginRef();
         for (OriginRef o: term.getOriginRef()) origRef = origRef.add(o);
 
-        with = services.getTermFactory().createTerm(
-                with.op(),
-                with.subs(),
-                with.boundVars(),
-                with.javaBlock(),
-                with.getLabels(),
-                origRef.stream().collect(Collectors.toList()));
+        with = services.getTermFactory().appendOriginRef(with, origRef);
 
         return with;
     }

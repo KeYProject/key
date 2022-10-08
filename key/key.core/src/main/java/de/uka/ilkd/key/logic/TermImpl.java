@@ -96,7 +96,7 @@ public class TermImpl implements Term {
                     ImmutableArray<Term> subs,
                     ImmutableArray<QuantifiableVariable> boundVars,
                     JavaBlock javaBlock,
-                    Collection<OriginRef> originRef) {
+                    ImmutableSet<OriginRef> originRef) {
         assert op != null;
         assert subs != null;
         assert originRef != null : "origin must not be null";
@@ -106,7 +106,7 @@ public class TermImpl implements Term {
         this.javaBlock = javaBlock == null
                 ? JavaBlock.EMPTY_JAVABLOCK
                         : javaBlock;
-        this.originRef = ImmutableSet.fromCollection(originRef);
+        this.originRef = originRef;
     }
 
 

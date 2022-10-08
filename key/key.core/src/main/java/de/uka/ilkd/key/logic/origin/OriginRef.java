@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic.origin;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
 import java.net.URI;
@@ -10,7 +11,7 @@ import java.util.Objects;
 
 public class OriginRef {
 
-    public static final Collection<OriginRef> EMPTY = new ArrayList<>();
+    public static final ImmutableSet<OriginRef> EMPTY = ImmutableSet.empty();
 
     public final String File;
 

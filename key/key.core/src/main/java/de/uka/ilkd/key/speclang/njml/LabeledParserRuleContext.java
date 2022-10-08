@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,9 +63,6 @@ public class LabeledParserRuleContext {
     public Term addOrigin(TermBuilder tb, Term term) {
         if (origin == null) return term;
 
-        ArrayList<OriginRef> arr = new ArrayList<>();
-        arr.add(origin);
-
-        return tb.tf().createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), term.getLabels(), arr);
+        return tb.tf().appendOriginRef(term, ImmutableSet.singleton(origin));
     }
 }

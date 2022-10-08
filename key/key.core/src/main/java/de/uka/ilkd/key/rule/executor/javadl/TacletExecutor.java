@@ -165,7 +165,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 instantiatedFormula.boundVars(),
                 instantiatedFormula.javaBlock(),
                 instantiatedFormula.getLabels(),
-                origRef.stream().collect(Collectors.toList()));
+                origRef);
 
         return new SequentFormula(instantiatedFormula);
     }

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -44,7 +45,7 @@ class LabeledTermImpl extends TermImpl {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           Collection<OriginRef> originRef) {
+                           ImmutableSet<OriginRef> originRef) {
         super(op, subs, boundVars, javaBlock, originRef);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";

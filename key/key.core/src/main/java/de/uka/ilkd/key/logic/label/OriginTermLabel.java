@@ -440,7 +440,7 @@ public class OriginTermLabel implements TermLabel {
                                                     term.boundVars(),
                                                     term.javaBlock(),
                                                     labels,
-                                                    term.getOriginRef().stream().collect(Collectors.toList()));
+                                                    term.getOriginRef());
     }
 
     @Override

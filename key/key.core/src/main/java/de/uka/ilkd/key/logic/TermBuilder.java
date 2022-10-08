@@ -1745,9 +1745,13 @@ public class TermBuilder {
                 newLabelList.add(newLabel);
             }
 
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+            return tf.createTerm(
+                    term.op(),
+                    term.subs(),
+                    term.boundVars(),
                     term.javaBlock(),
-                    new ImmutableArray<>(newLabelList), term.getOriginRef().stream().collect(Collectors.toList()));
+                    new ImmutableArray<>(newLabelList),
+                    term.getOriginRef());
         }
     }
 

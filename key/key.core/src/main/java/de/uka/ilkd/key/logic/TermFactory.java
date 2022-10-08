@@ -10,6 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors
@@ -66,7 +67,7 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           Collection<OriginRef> origin) {
+                           ImmutableSet<OriginRef> originref) {
         if(op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -75,7 +76,7 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
-        return doCreateTerm(op, subs, boundVars, javaBlock, labels, origin);
+        return doCreateTerm(op, subs, boundVars, javaBlock, labels, originref);
     }
 
     public Term createTerm(Operator op,
@@ -112,8 +113,8 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           Collection<OriginRef> origin) {
-        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, origin);
+                           ImmutableSet<OriginRef> originref) {
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, originref);
     }
 
     public Term createTerm(Operator op,
@@ -159,14 +160,14 @@ public final class TermFactory {
                               ImmutableArray<QuantifiableVariable> boundVars,
                               JavaBlock javaBlock,
                               ImmutableArray<TermLabel> labels,
-                              Collection<OriginRef> origin) {
+                              ImmutableSet<OriginRef> originref) {
 
-        origin = origin == null ? new ArrayList<>() : origin;
+        originref = originref == null ? ImmutableSet.empty() : originref;
 
         final Term newTerm
             = (labels == null || labels.isEmpty() ?
-                    new TermImpl(op, subs, boundVars, javaBlock, origin) :
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin)).checked();
+                    new TermImpl(op, subs, boundVars, javaBlock, originref) :
+                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -206,5 +207,18 @@ public final class TermFactory {
         if(reduce.isPresent())
             return reduce.get();
         throw new IllegalArgumentException("list of terms is empty.");
+    }
+
+    public @Nonnull Term appendOriginRef(Term base, ImmutableSet<OriginRef> add) {
+        return setOriginRef(base, base.getOriginRef().add(add));
+    }
+
+    public @Nonnull Term setOriginRef(Term base, ImmutableSet<OriginRef> origref) {
+        return createTerm(base.op(),
+                base.subs(),
+                base.boundVars(),
+                base.javaBlock(),
+                base.getLabels(),
+                origref);
     }
 }
