@@ -177,4 +177,22 @@ public class ESVUtil {
             return t;
         }
     }
+
+    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
+        ArrayList<OriginRef> r = new ArrayList<>();
+
+        if (includeSelf) {
+            for (OriginRef o: term.getOriginRef()) r.add(o);
+        }
+
+        for (Term t : term.subs()) {
+            if (t instanceof TermImpl) {
+                for (OriginRef o: t.getOriginRef()) r.add(o);
+                r.addAll(getSubOriginRefs(t, false));
+            }
+        }
+
+        return r;
+    }
+
 }

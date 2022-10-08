@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 public class OriginRefView extends JPanel implements TabPanel {
 
+    private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
+    private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
+
     public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
@@ -58,11 +61,23 @@ public class OriginRefView extends JPanel implements TabPanel {
             for (SourceView.Highlight h : existingHighlights) sv.removeHighlight(h);
             existingHighlights.clear();
 
+            boolean anyRefs = false;
+
             for (OriginRef o : ESVUtil.getParentWithOriginRef(pos).getOriginRef()) {
                 for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                    existingHighlights.add(sv.addHighlight(o.fileURI(), i, Color.MAGENTA, 11));
+                    existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_MAIN, 11));
+                }
+                anyRefs = true;
+            }
+
+            if (!anyRefs) {
+                for (OriginRef o : ESVUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
+                    for (int i = o.LineStart; i <= o.LineEnd; i++) {
+                        existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_CHILDS, 11));
+                    }
                 }
             }
+
         } catch (IOException | BadLocationException e) {
             e.printStackTrace();
         }
@@ -107,7 +122,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (OriginRef o : getSubOrigins(term, false)) {
+                for (OriginRef o : ESVUtil.getSubOriginRefs(term, false)) {
                     txt += "File: " + o.File + "\n";
                     txt += "Line: " + o.LineStart + " - " + o.LineEnd + "\n";
                     txt += "Pos:  " + o.PositionStart + " - " + o.PositionEnd + "\n";
@@ -148,23 +163,6 @@ public class OriginRefView extends JPanel implements TabPanel {
         existingHighlights.clear();
 
         taSource.setText("");
-    }
-
-    private ArrayList<OriginRef> getSubOrigins(TermImpl term, boolean includeSelf) {
-        ArrayList<OriginRef> r = new ArrayList<>();
-
-        if (includeSelf) {
-            for (OriginRef o: term.getOriginRef()) r.add(o);
-        }
-
-        for (Term t : term.subs()) {
-            if (t instanceof TermImpl) {
-                for (OriginRef o: t.getOriginRef()) r.add(o);
-                r.addAll(getSubOrigins((TermImpl)t, false));
-            }
-        }
-
-        return r;
     }
 
     @Nonnull
