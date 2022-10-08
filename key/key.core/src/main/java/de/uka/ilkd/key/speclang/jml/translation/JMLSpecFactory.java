@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -1734,7 +1735,8 @@ public class JMLSpecFactory {
         final String invariantFor = "\\invariant_for(this)";
         final LabeledParserRuleContext ctxFor = new LabeledParserRuleContext(
                 JmlFacade.parseExpr(invariantFor),
-                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL,
+                OriginRef.ENSURES_SELFINVARIANT);
 
         specCase.addClause(ENSURES, ctxFor);
         specCase.addClause(ENSURES, ini.getOriginalSpec());

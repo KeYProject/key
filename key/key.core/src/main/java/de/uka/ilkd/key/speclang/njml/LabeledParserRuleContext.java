@@ -23,7 +23,7 @@ public class LabeledParserRuleContext {
     @Nullable
     public final TermLabel second;
     @Nullable
-    public final OriginRef origin;
+    public final ImmutableSet<OriginRef> origin;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
         if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
@@ -47,6 +47,13 @@ public class LabeledParserRuleContext {
         this.origin = constructOrigin(ctx, refType);
     }
 
+    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel second, ImmutableSet<OriginRef> originRef) {
+        if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
+        this.first = ctx;
+        this.second = second;
+        this.origin = originRef;
+    }
+
     private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
         String filename = ctx.start.getTokenSource().getSourceName();
         int line = ctx.start.getLine();
@@ -54,15 +61,15 @@ public class LabeledParserRuleContext {
         return new OriginTermLabel(origin);
     }
 
-    private static OriginRef constructOrigin(ParserRuleContext ctx, OriginRefType specType) {
+    private static ImmutableSet<OriginRef> constructOrigin(ParserRuleContext ctx, OriginRefType specType) {
         String src = ctx.start.getTokenSource().getSourceName();
 
-        return new OriginRef(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType);
+        return ImmutableSet.singleton(new OriginRef(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType));
     }
 
     public Term addOrigin(TermBuilder tb, Term term) {
         if (origin == null) return term;
 
-        return tb.tf().appendOriginRef(term, ImmutableSet.singleton(origin));
+        return tb.tf().appendOriginRef(term, origin);
     }
 }

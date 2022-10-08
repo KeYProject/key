@@ -119,7 +119,7 @@ public class OriginRefView extends JPanel implements TabPanel {
 
             }
 
-            txt += "----------<CHILDS>----------";
+            txt += "----------<CHILDREN>----------";
             txt += "\n";
             txt += "\n";
 
@@ -133,12 +133,14 @@ public class OriginRefView extends JPanel implements TabPanel {
 
             }
 
+            txt += "\n";
+
             txt += "----------<PARENT>----------";
             txt += "\n";
             txt += "\n";
 
             Term parent = ESVUtil.getParentWithOriginRef(pos);
-            if (!parent.getOriginRef().isEmpty()) {
+            if (parent != pos.getPosInOccurrence().subTerm() && !parent.getOriginRef().isEmpty()) {
                 txt += ESVUtil.TermToString(parent, proof.getServices()) + "\n";
                 txt += "\n";
                 for (OriginRef o : parent.getOriginRef()) {

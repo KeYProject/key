@@ -17,6 +17,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableArray;
@@ -74,6 +75,10 @@ public class ESVUtil {
 
     public static String TermToString(Term t, Services svc) throws IOException {
         //return t.toString();
+
+        if (svc == null) {
+            svc = new Services(AbstractProfile.getDefaultProfile());
+        }
 
         var ni = new NotationInfo();
 

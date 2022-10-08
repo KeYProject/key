@@ -1,24 +1,24 @@
 package de.uka.ilkd.key.logic.origin;
 
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 
 public class OriginRef {
 
     public static final ImmutableSet<OriginRef> EMPTY                       = ImmutableSet.empty();
     public static final ImmutableSet<OriginRef> ENSURES_EXCNULL             = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
+    public static final ImmutableSet<OriginRef> ENSURES_SELFINVARIANT       = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFNOTNULL        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFCREATED        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTTYPE      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_PARAMSOK           = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_MEASUREDBY_INITIAL = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_WELLFORMEDHEAP     = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_SELFINVARIANT      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> SIGNALS_SELFINVARIANT       = ImmutableSet.singleton(new OriginRef(OriginRefType.SIGNALS_IMPLICT));
 
     public final String File;
 

@@ -23,7 +23,8 @@ public enum OriginRefType {
     ENSURES("ensures"),   // @ensures clause
 
     REQUIRES_IMPLICT("requires_implicit"),   // autom. generated requires term
-    ENSURES_IMPLICT("ensures_implicit");     // autom. generated ensures term
+    ENSURES_IMPLICT("ensures_implicit"),     // autom. generated requires term
+    SIGNALS_IMPLICT("signals_implicit");     // autom. generated signals term
 
     private final String name;
 
