@@ -68,7 +68,7 @@ public class SMTTacletTranslator {
 
         Term[] subs = { smt };
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
-        return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
+        return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null, null);
     }
 
     private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables) throws SMTTranslationException {

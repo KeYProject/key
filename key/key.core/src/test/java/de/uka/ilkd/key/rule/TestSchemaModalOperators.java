@@ -125,13 +125,15 @@ public class TestSchemaModalOperators {
 	    osv,
 	    new Term[]{tpost},
 	    null,
-            JavaBlock.EMPTY_JAVABLOCK);
+            JavaBlock.EMPTY_JAVABLOCK,
+	    null);
 
 	Term replace = TB.tf().createTerm(
 	    osv,
 	    new Term[]{TB.tt()},
 	    null,
-            JavaBlock.EMPTY_JAVABLOCK);
+            JavaBlock.EMPTY_JAVABLOCK,
+	    null);
 
 	rtb.setName(new Name("test_schema_modal1"));
 	rtb.setFind(find); 

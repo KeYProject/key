@@ -140,7 +140,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	    for ( int i = arity-1; i>=0; i-- ) {
 		sub[i] = subStack.pop();
 	    }
-	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
+	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null, visited.getOriginRef()));
 	}
 
 	Term getResult() {

@@ -96,7 +96,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, JavaBlock.EMPTY_JAVABLOCK);
+        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, JavaBlock.EMPTY_JAVABLOCK, term.getOriginRef());
 
         term = changeTerm(term);
 

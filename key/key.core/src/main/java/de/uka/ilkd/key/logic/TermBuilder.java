@@ -435,20 +435,20 @@ public class TermBuilder {
     }
 
     public Term func(Function f, Term... s) {
-        return tf.createTerm(f, s, null, null);
+        return tf.createTerm(f, s, null, null, null);
     }
 
     public Term func(IObserverFunction f, Term... s) {
-        return tf.createTerm(f, s, null, null);
+        return tf.createTerm(f, s, null, null, null);
     }
 
     public Term func(Function f, Term[] s,
                      ImmutableArray<QuantifiableVariable> boundVars) {
-        return tf.createTerm(f, s, boundVars, null);
+        return tf.createTerm(f, s, boundVars, null, null);
     }
 
     public Term prog(Modality mod, JavaBlock jb, Term t) {
-        return tf.createTerm(mod, new Term[]{t}, null, jb);
+        return tf.createTerm(mod, new Term[]{t}, null, jb, null);
     }
 
     public Term prog(Modality mod, JavaBlock jb, Term t,
@@ -476,7 +476,7 @@ public class TermBuilder {
                      Term _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
                 new ImmutableArray<Term>(cond, _then, _else),
-                new ImmutableArray<QuantifiableVariable>(qv), null);
+                new ImmutableArray<QuantifiableVariable>(qv), null, null);
     }
 
     /**
@@ -509,7 +509,7 @@ public class TermBuilder {
 
     public Term all(QuantifiableVariable qv, Term t) {
         return tf.createTerm(Quantifier.ALL, new ImmutableArray<Term>(t),
-                new ImmutableArray<QuantifiableVariable>(qv), null);
+                new ImmutableArray<QuantifiableVariable>(qv), null, null);
     }
 
     public Term all(Iterable<QuantifiableVariable> qvs, Term t) {
@@ -538,7 +538,7 @@ public class TermBuilder {
 
     public Term ex(QuantifiableVariable qv, Term t) {
         return tf.createTerm(Quantifier.EX, new ImmutableArray<Term>(t),
-                new ImmutableArray<QuantifiableVariable>(qv), null);
+                new ImmutableArray<QuantifiableVariable>(qv), null, null);
     }
 
     public Term ex(Iterable<QuantifiableVariable> qvs, Term t) {
@@ -815,7 +815,7 @@ public class TermBuilder {
                       Term origTerm) {
         return tf.createTerm(op,
                 new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
-                new ImmutableArray<QuantifiableVariable>(substVar), null);
+                new ImmutableArray<QuantifiableVariable>(substVar), null, null);
     }
 
     public Term subst(QuantifiableVariable substVar, Term substTerm,
@@ -1441,7 +1441,7 @@ public class TermBuilder {
     public Term infiniteUnion(QuantifiableVariable[] qvs, Term s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(), new Term[]{s},
-                new ImmutableArray<QuantifiableVariable>(qvs), null);
+                new ImmutableArray<QuantifiableVariable>(qvs), null, null);
     }
 
     public Term infiniteUnion(QuantifiableVariable[] qvs, Term guard, Term s) {
@@ -1817,7 +1817,7 @@ public class TermBuilder {
 
     public Term unlabel(Term term) {
         return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                term.javaBlock());
+                term.javaBlock(), null, null);
     }
 
     public Term unlabelRecursive(Term term) {
@@ -1826,7 +1826,7 @@ public class TermBuilder {
             subs[i] = unlabelRecursive(term.sub(i));
         }
         return tf.createTerm(term.op(), subs, term.boundVars(),
-                term.javaBlock());
+                term.javaBlock(), null, null);
     }
 
     public Term dotArr(Term ref, Term idx) {

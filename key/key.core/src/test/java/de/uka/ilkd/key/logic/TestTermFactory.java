@@ -158,14 +158,14 @@ public class TestTermFactory {
     @Test
 	public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createTerm(Modality.DIA, new Term[]{t2()}, null, jb);
+	Term t_dia_ryw=tf.createTerm(Modality.DIA, new Term[]{t2()}, null, jb, null);
 	assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ImmutableArray<>(t2()), null, jb, OriginRef.EMPTY));
     }
 
     @Test
 	public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createTerm(Modality.BOX, new ImmutableArray<>(t2()), null, jb);
+	Term t_dia_ryw=tf.createTerm(Modality.BOX, new ImmutableArray<>(t2()), null, jb, null);
 	assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ImmutableArray<>(t2()), null, jb, OriginRef.EMPTY));
     }
 
@@ -185,7 +185,8 @@ public class TestTermFactory {
 	    tf.createTerm(WarySubstOp.SUBST, 
 		    	  new Term[]{ t2(), t1()},
 				new ImmutableArray<>(x),
-		    	  null);
+		    	  null,
+			  null);
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -319,14 +320,14 @@ public class TestTermFactory {
        Term noJB = tf.createTerm(Junctor.TRUE);
        Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
        JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-       Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
+       Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
        Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
        Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
        // Create Same terms again
        Term noJBAgain = tf.createTerm(Junctor.TRUE);
        Term noJBWithChildAgain = tf.createTerm(Junctor.NOT, noJB);
        JavaBlock javaBlockAgain = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-       Term withJBAgain = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlockAgain);
+       Term withJBAgain = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlockAgain, null);
        Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
        Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
        // Test caching

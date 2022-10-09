@@ -112,7 +112,7 @@ public class QuantifierHandler implements SMTHandler {
 
         ImmutableArray<Term> subs = new ImmutableArray<>(current);
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
-        return services.getTermFactory().createTerm(type, subs, bvars, null);
+        return services.getTermFactory().createTerm(type, subs, bvars, null, term.getOriginRef());
     }
 
 }

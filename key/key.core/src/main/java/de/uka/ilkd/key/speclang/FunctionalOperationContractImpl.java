@@ -1126,7 +1126,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final Term modalityTerm = tb.tf().createTerm(modality,
                 new Term[] { originalPosts.get(baseHeap) },
                 new ImmutableArray<QuantifiableVariable>(),
-                jb);
+                jb,
+                null);
         final Term updateTerm = tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION,
                 update,
                 modalityTerm);

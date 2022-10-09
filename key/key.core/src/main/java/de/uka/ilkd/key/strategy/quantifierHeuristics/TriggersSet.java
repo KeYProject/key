@@ -270,7 +270,8 @@ public class TriggersSet {
                         services.getTermFactory().createTerm(oriTerm.op(),
                         chosenSubs,
                         boundVars,
-                        oriTerm.javaBlock());
+                        oriTerm.javaBlock(),
+                        oriTerm.getOriginRef());
 
 
                 set.add(res);

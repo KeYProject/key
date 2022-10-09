@@ -75,24 +75,26 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op,
-	                       ImmutableArray<Term> subs,
-	                       ImmutableArray<QuantifiableVariable> boundVars,
-	                       JavaBlock javaBlock) {
+	                   ImmutableArray<Term> subs,
+	                   ImmutableArray<QuantifiableVariable> boundVars,
+	                   JavaBlock javaBlock,
+                           ImmutableSet<OriginRef> originref) {
 
-    	return createTerm(op, subs, boundVars, javaBlock, null, null);
+    	return createTerm(op, subs, boundVars, javaBlock, null, originref);
     }
 
 
     public Term createTerm(Operator op,
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock) {
-	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, null);
+                           JavaBlock javaBlock,
+                           ImmutableSet<OriginRef> originref) {
+	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, originref);
     }
 
 
     public Term createTerm(Operator op, Term... subs) {
-        return createTerm(op, subs, null, null);
+        return doCreateTerm(op, createSubtermArray(subs), null, null, null, null);
     }
 
     public Term createTerm(Operator op,

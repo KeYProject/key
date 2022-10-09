@@ -37,7 +37,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }
-        return goal.proof().getServices().getTermFactory().createTerm ( op, subs, null, null );
+        return goal.proof().getServices().getTermFactory().createTerm ( op, subs, null, null, null );
     }
     
 }

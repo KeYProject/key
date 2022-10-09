@@ -83,8 +83,8 @@ public class TestTermParser extends AbstractTestTermParser {
         ys = declareVar("ys", list);
         t_ys = tf.createTerm(ys);
 
-        t_headxs = tf.createTerm(head, new Term[]{t_xs}, null, null);
-        t_tailys = tf.createTerm(tail, new Term[]{t_ys}, null, null);
+        t_headxs = tf.createTerm(head, new Term[]{t_xs}, null, null, null);
+        t_tailys = tf.createTerm(tail, new Term[]{t_ys}, null, null, null);
         t_nil = tf.createTerm(nil);
 
         assertNotNull(head);
@@ -159,7 +159,7 @@ public class TestTermParser extends AbstractTestTermParser {
                                         tf.createTerm(Equality.EQUALS, t_z, t_z),
                                         tf.createTerm(Equality.EQUALS, t_xs, t_xs))),
                                 tf.createTerm(Junctor.NOT,
-                                        tf.createTerm(Equality.EQUALS, t_ys, t_ys))}, null, null);
+                                        tf.createTerm(Equality.EQUALS, t_ys, t_ys))}, null, null, null);
 
 
         assertEquals(t, parseFormula("x=x|y=y->z=z&xs=xs<->!ys=ys"), "parse x=x | y=y -> z=z & xs =xs <-> ! ys = ys");
@@ -205,7 +205,7 @@ public class TestTermParser extends AbstractTestTermParser {
         Term inner = tf.createTerm(head, xs); //head(xs)
         Term replacement = tf.createTerm(tail, tf.createTerm(thisxs)); //tail(xs)
         Term subst = tf.createTerm(WarySubstOp.SUBST, new Term[]{replacement, inner},
-                new ImmutableArray<>(thisxs), null);
+                new ImmutableArray<>(thisxs), null, null);
 
         assertNotSame(thisxs, xs);
         assertEquals(subst, t);
@@ -223,7 +223,7 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t1 = tb.ex(thisx,
                 tf.createTerm
                         (Junctor.NOT,
-                                tf.createTerm(isempty, new Term[]{tf.createTerm(thisx)}, null, null)));
+                                tf.createTerm(isempty, new Term[]{tf.createTerm(thisx)}, null, null, null)));
 
         assertNotSame(thisx, x, "new variable in quantifier");
         assertEquals(t1, t, "parse \\forall list x; \\forall list l1; ! x = l1");

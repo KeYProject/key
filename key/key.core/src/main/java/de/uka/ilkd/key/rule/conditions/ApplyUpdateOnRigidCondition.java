@@ -34,7 +34,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	Term result = services.getTermFactory().createTerm(target.op(), 
 				         updatedSubs,
 				         target.boundVars(), 
-				         target.javaBlock());
+				         target.javaBlock(),
+			                 target.getOriginRef());
 	return result;
     }
     

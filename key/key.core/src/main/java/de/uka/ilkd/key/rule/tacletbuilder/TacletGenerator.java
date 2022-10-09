@@ -651,7 +651,7 @@ public class TacletGenerator {
                                         DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX).add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
-        final Term findTerm = TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, findBlock);
+        final Term findTerm = TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, findBlock, null);
 
         final JavaBlock replaceBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(),null));
 
@@ -670,7 +670,7 @@ public class TacletGenerator {
 
         final Term replaceTerm = TB.apply(
                               TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                              TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock));
+                              TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock, null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder = new RewriteTacletBuilder<>();
 
@@ -956,8 +956,9 @@ public class TacletGenerator {
             newTerm = services.getTermBuilder().tf().createTerm(
                     t.op(),
                     newSubs,
-                    new ImmutableArray<QuantifiableVariable>(newBoundVars),
-                    t.javaBlock());
+                    new ImmutableArray<>(newBoundVars),
+                    t.javaBlock(),
+                    t.getOriginRef());
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -996,7 +997,7 @@ public class TacletGenerator {
         }
 
         //reassemble, return
-        final Term term = services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
+        final Term term = services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock(), t.getOriginRef());
         return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
     }
 

@@ -47,23 +47,23 @@ public class TestTerm {
 
     private Term t1() {
         Term t_x = tf.createTerm(x);
-        return tf.createTerm(p, new Term[]{t_x}, null, null);
+        return tf.createTerm(p, new Term[]{t_x}, null, null, null);
     }
 
     private Term t2() {
         Term t_x = tf.createTerm(x);
         Term t_w = tf.createTerm(w);
-        return tf.createTerm(r, new Term[]{t_x, t_w}, null, null);
+        return tf.createTerm(r, new Term[]{t_x, t_w}, null, null, null);
     }
 
     private Term t3() {
         Term t_y = tf.createTerm(y);
-        return tf.createTerm(f, new Term[]{t_y}, null, null);
+        return tf.createTerm(f, new Term[]{t_y}, null, null, null);
     }
 
     private Term t4() {
         Term t_pv0 = tf.createTerm(pv0);
-        return tf.createTerm(p, new Term[]{t_pv0}, null, null);
+        return tf.createTerm(p, new Term[]{t_pv0}, null, null, null);
     }
 
     @Test
@@ -129,10 +129,10 @@ public class TestTerm {
     @Test
     public void testEqualsModRenaming() {
 
-        final Term px = tf.createTerm(p, new Term[]{tf.createTerm(x)}, null, null);
+        final Term px = tf.createTerm(p, new Term[]{tf.createTerm(x)}, null, null, null);
         final Term quant1 = tb.all(z, tb.all(zz, tb.all(x, px)));
 
-        final Term pz = tf.createTerm(p, new Term[]{tf.createTerm(z)}, null, null);
+        final Term pz = tf.createTerm(p, new Term[]{tf.createTerm(z)}, null, null, null);
         final Term quant2 = tb.all(z,
                 tb.all(z,
                         tb.all(z, pz)));
@@ -187,7 +187,7 @@ public class TestTerm {
         Term noJB = tf.createTerm(Junctor.TRUE);
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
+        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         assertFalse(noJB.containsJavaBlockRecursive());

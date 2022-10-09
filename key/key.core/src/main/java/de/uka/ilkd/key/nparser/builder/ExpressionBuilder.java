@@ -960,11 +960,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         Term thenT = accept(ctx.thenT);
         Term elseT = accept(ctx.elseT);
-        ImmutableArray<QuantifiableVariable> exVarsArray
-                = new ImmutableArray<>(exVars);
-        Term result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
+        ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
+        Term result = getTermFactory().createTerm(
+                IfExThenElse.IF_EX_THEN_ELSE,
                 new Term[]{condF, thenT, elseT},
                 exVarsArray,
+                null,
                 null);
         unbindVars(orig);
         return result;
@@ -983,6 +984,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term a = getTermFactory().createTerm(op,
                 new ImmutableArray<>(a1),
                 new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
+                null,
                 null);
         unbindVars(orig);
         return a;
@@ -1082,7 +1084,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
         }
 
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock));
+        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock, null));
     }
 
     @Override
@@ -1437,7 +1439,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
                 //create term
                 Term[] finalArgs1 = args;
-                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
+                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null, null));
             }
         }
         current = handleAttributes(current, ctx.attribute());

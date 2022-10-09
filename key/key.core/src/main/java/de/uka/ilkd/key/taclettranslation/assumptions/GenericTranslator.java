@@ -199,8 +199,10 @@ class GenericTranslator {
         } else {
 
             term = services.getTermFactory().createTerm(term.op(),
-                    subTerms, variables,
-                    JavaBlock.EMPTY_JAVABLOCK);
+                    subTerms,
+                    variables,
+                    JavaBlock.EMPTY_JAVABLOCK,
+                    term.getOriginRef());
 
         }
 

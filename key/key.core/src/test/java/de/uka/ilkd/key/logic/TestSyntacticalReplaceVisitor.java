@@ -55,9 +55,9 @@ public class TestSyntacticalReplaceVisitor {
 	Function p=new Function(new Name("p"), Sort.FORMULA, s);
 
 	Term t_x= TB.tf().createTerm(x);
-	Term t_px= TB.tf().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_px= TB.tf().createTerm(p, new Term[]{t_x}, null, null, null);
 	Term t_y= TB.tf().createTerm(y);
-	Term t_py= TB.tf().createTerm(p, new Term[]{t_y}, null, null);
+	Term t_py= TB.tf().createTerm(p, new Term[]{t_y}, null, null, null);
 
 	Services services = TacletForTests.services();
 	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px, services).add(v, t_y, services)

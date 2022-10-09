@@ -64,8 +64,8 @@ public class TestCollisionResolving {
 	Function q = new Function(new Name("q"), Sort.FORMULA, s);
 
 	Term t_x = services.getTermFactory().createTerm(x);
-	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = services.getTermFactory().createTerm(q, new Term[]{t_x}, null, null);
+	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null, null);
+	Term t_q_x = services.getTermFactory().createTerm(q, new Term[]{t_x}, null, null, null);
    TermBuilder tb = services.getTermBuilder();
 	Term t_all_p_x =
 	    tb.all(x, t_p_x);
@@ -113,8 +113,8 @@ public class TestCollisionResolving {
 	final TermFactory tf = services.getTermFactory();
 
 	Term t_x = tf.createTerm(x);
-	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = tf.createTerm(q, new Term[]{t_x}, null, null);
+	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null, null);
+	Term t_q_x = tf.createTerm(q, new Term[]{t_x}, null, null, null);
 
 
 	Term t_ex_q_x =

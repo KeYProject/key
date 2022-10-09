@@ -317,12 +317,12 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
                 Operator newOp = replaceOp(term.op(), services);
 
-                return services.getTermFactory()
-                                .createTerm(newOp,
-                                                newSubs,
-                                                new ImmutableArray<QuantifiableVariable>(
-                                                                qvars), term
-                                                                .javaBlock());
+                return services.getTermFactory().createTerm(
+                        newOp,
+                        newSubs,
+                        new ImmutableArray<>(qvars),
+                        term.javaBlock(),
+                        term.getOriginRef());
         }
 
         /**
