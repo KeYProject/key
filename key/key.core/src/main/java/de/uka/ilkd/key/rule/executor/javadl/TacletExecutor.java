@@ -159,13 +159,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         var origRef = instantiatedFormula.getOriginRef();
         for (OriginRef o: applicationPosInOccurrence.subTerm().getOriginRef()) origRef = origRef.add(o);
 
-        instantiatedFormula = services.getTermFactory().createTerm(
-                instantiatedFormula.op(),
-                instantiatedFormula.subs(),
-                instantiatedFormula.boundVars(),
-                instantiatedFormula.javaBlock(),
-                instantiatedFormula.getLabels(),
-                origRef);
+        // new terms from \replacewith have the OriginRef of themself plus the OriginRef of the term from the \find term
+        instantiatedFormula = services.getTermFactory().appendOriginRef(instantiatedFormula, applicationPosInOccurrence.subTerm().getOriginRef());
 
         return new SequentFormula(instantiatedFormula);
     }
