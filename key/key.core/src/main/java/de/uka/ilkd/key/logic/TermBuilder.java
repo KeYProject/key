@@ -1376,9 +1376,9 @@ public class TermBuilder {
     public Term union(Term s1, Term s2) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s1.op() == ldt.getEmpty()) {
-            return s2;
+            return tf.appendOriginRef(s2, s1.getOriginRef());
         } else if (s2.op() == ldt.getEmpty()) {
-            return s1;
+            return tf.appendOriginRef(s1, s2.getOriginRef());
         } else {
             return func(ldt.getUnion(), s1, s2);
         }

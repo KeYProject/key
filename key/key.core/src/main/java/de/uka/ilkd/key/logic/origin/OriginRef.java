@@ -11,6 +11,7 @@ public class OriginRef {
     public static final ImmutableSet<OriginRef> EMPTY                       = ImmutableSet.empty();
     public static final ImmutableSet<OriginRef> ENSURES_EXCNULL             = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
     public static final ImmutableSet<OriginRef> ENSURES_SELFINVARIANT       = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
+    public static final ImmutableSet<OriginRef> ENSURES_ASSIGNABLE_IMPLICIT = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFNOTNULL        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFCREATED        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTTYPE      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));

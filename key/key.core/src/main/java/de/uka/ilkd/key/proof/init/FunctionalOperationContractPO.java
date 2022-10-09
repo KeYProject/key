@@ -235,14 +235,20 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<ProgramVariable> paramVars, Services services) {
         Term frameTerm = null;
         for(LocationVariable heap : modHeaps) {
-            final Term ft;
+            Term ft;
             if(!getContract().hasModifiesClause(heap)) {
+                Term mod = getContract().getMod(heap, selfVar, paramVars, services);
                 // strictly pure have a different contract.
                 ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                if (ft.getOriginRef().isEmpty() && !mod.getOriginRef().isEmpty()) {
+                    ft = tb.tf().setOriginRef(ft, mod.getOriginRef());
+                }
             } else {
-                ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getMod(heap, selfVar,
-                                paramVars, services));
+                Term mod = getContract().getMod(heap, selfVar, paramVars, services);
+                ft = tb.frame(tb.var(heap), heapToAtPre, mod);
+                if (ft.getOriginRef().isEmpty() && !mod.getOriginRef().isEmpty()) {
+                    ft = tb.tf().setOriginRef(ft, mod.getOriginRef());
+                }
             }
 
             if(frameTerm == null) {

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -476,20 +475,32 @@ public class JMLSpecFactory {
                                      LocationVariable heap, final LocationVariable savedHeap,
                                      final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
             throws SLTranslationException {
-        clauses.hasMod.put(heap,
-                !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod));
+
+        Pair<Boolean, ImmutableSet<OriginRef>> strictlyPure = translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod);
+
+        clauses.hasMod.put(heap, !strictlyPure.first);
+
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else {
-            final Boolean hasMod = clauses.hasMod.get(heap);
-            if (hasMod == null || !hasMod) {
-                final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList
-                        .<LabeledParserRuleContext>nil().append(getAssignableNothing());
-                clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
-                        progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
+            if (strictlyPure.first) {
+                // assignable strictly_nothing is set
+
+                final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList.<LabeledParserRuleContext>nil().append(getAssignableNothing());
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing);
+                term = tb.tf().appendOriginRef(term, strictlyPure.second);
+                clauses.assignables.put(heap, term);
+            } else if (mod.isEmpty()) {
+                // no assignable clauses exist
+
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, mod);
+                term = tb.tf().appendOriginRef(term, OriginRef.ENSURES_ASSIGNABLE_IMPLICIT);
+                clauses.assignables.put(heap, term);
             } else {
-                clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
-                        progVars.paramVars, progVars.atPres, progVars.atBefores, mod));
+                // some assignable clauses are set
+
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, mod);
+                clauses.assignables.put(heap, term);
             }
         }
     }
@@ -766,7 +777,7 @@ public class JMLSpecFactory {
         }
     }
 
-    private boolean translateStrictlyPure(IProgramMethod pm, ProgramVariable selfVar,
+    private Pair<Boolean, ImmutableSet<OriginRef>> translateStrictlyPure(IProgramMethod pm, ProgramVariable selfVar,
                                           ImmutableList<ProgramVariable> paramVars,
                                           ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
@@ -780,11 +791,11 @@ public class JMLSpecFactory {
 
             // less than nothing is marked by some special term
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
-                return true;
+                return new Pair<>(true, translated.getOriginRef());
             }
         }
 
-        return false;
+        return new Pair<>(false, OriginRef.EMPTY);
     }
 
     private Term translateMeasuredBy(IProgramMethod pm, ProgramVariable selfVar,
