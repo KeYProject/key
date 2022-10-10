@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker {
+            label "bwcloud"
             image 'wadoon/key-test-docker:jdk11'
         }
     }
