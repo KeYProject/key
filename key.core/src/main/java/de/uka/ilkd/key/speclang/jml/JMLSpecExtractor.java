@@ -235,7 +235,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
                     // add invariant only for fields of reference types
                     // and not for implicit fields.
-                    if (!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
+                    if (!JMLInfoExtractor.isNullable(field.getProgramName(), td)) {
                         ImmutableSet<LabeledParserRuleContext> nonNullInvs =
                             createNonNullPositionedString(field.getProgramName(),
                                 field.getProgramVariable().getKeYJavaType(),

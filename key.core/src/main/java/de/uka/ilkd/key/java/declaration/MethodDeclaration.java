@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -30,6 +33,22 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     protected final ImmutableArray<ParameterDeclaration> parameters;
     protected final Throws exceptions;
     protected final StatementBlock body;
+    protected final JMLModifiers jmlModifiers;
+
+    public static final class JMLModifiers {
+        public final boolean pure;
+        public final boolean strictlyPure;
+        public final boolean helper;
+        public final SpecMathMode specMathMode;
+
+        public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
+                SpecMathMode specMathMode) {
+            this.pure = pure;
+            this.strictlyPure = strictlyPure;
+            this.helper = helper;
+            this.specMathMode = specMathMode;
+        }
+    }
 
 
     /**
@@ -61,6 +80,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         assert returnType == null || voidComments == null;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
 
@@ -105,8 +125,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
+    public JMLModifiers getJmlModifiers() {
+        return jmlModifiers;
+    }
 
     @Override
     public ProgramElementName getProgramElementName() {
@@ -298,7 +322,6 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         return parentIsInterfaceDeclaration || super.isPublic();
     }
 
-
     @Override
     public boolean isStatic() {
         return super.isStatic();
@@ -313,6 +336,10 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public int getStateCount() {
         return super.getStateCount();
+    }
+
+    public boolean isVoid() {
+        return returnType.getKeYJavaType().equals(KeYJavaType.VOID_TYPE);
     }
 
     /**
