@@ -2,11 +2,13 @@ package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * @author Alexander Weigl
@@ -53,8 +55,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            return new Location(MiscTools.parseURL(
-                    offendingSymbol.getTokenSource().getSourceName()),
+            var source = offendingSymbol.getTokenSource().getSourceName();
+            URL url = null;
+            if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+                url = MiscTools.parseURL(source);
+            }
+            return new Location(url,
                     offendingSymbol.getLine(),
                     /* Location is assumed to be 1-based in line and column, while ANTLR
                      * generates 1-based line and 0-based column numbers! */
