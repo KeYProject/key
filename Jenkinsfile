@@ -34,11 +34,25 @@ pipeline {
             steps {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
-        }    
+        }
 
-        stage('Test: testRunAllProofs') {
+        stage('Test: testRunAllFunProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofs'
+                sh 'cd key && ./gradlew --continue testRunAllFunProofs'
+            }
+        }
+
+        stage('Test: testRunAllInfProofs') {
+            steps {
+                sh 'cd key && ./gradlew --continue testRunAllInfProofs'
+            }
+        }
+
+        stage('Check Formatting') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'cd key && ./gradlew --continue spotlessCheck'
+                }
             }
         }
 
