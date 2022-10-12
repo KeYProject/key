@@ -339,7 +339,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     public boolean isVoid() {
-        return returnType.getKeYJavaType().equals(KeYJavaType.VOID_TYPE);
+        return returnType == null || returnType.getKeYJavaType() == KeYJavaType.VOID_TYPE;
     }
 
     /**

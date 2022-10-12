@@ -92,8 +92,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final JMLResolverManager resolverManager;
 
     Translator(Services services, KeYJavaType specInClass, ProgramVariable self,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable result, ProgramVariable exc,
-            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores) {
+            SpecMathMode specMathMode, ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, Term> atBefores) {
+        assert self == null || specInClass != null;
+
         // save parameters
         this.services = services;
         this.tb = services.getTermBuilder();

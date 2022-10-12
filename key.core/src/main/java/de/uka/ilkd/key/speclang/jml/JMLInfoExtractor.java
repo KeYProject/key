@@ -11,6 +11,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.MiscTools;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
  * as "pure") in comments, and that help in desugaring such keywords.
@@ -349,7 +352,8 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type
      */
-    public static SpecMathMode getSpecMathMode(KeYJavaType t) {
+    @Nullable
+    public static SpecMathMode getSpecMathMode(@Nonnull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
@@ -357,11 +361,33 @@ public final class JMLInfoExtractor {
         }
     }
 
+    @Nonnull
+    private static SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
+        return mode == null ? SpecMathMode.defaultMode() : mode;
+    }
+
+    /**
+     * Returns the spec math mode of this type or the default
+     */
+    @Nonnull
+    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull KeYJavaType t) {
+        return modeOrDefault(getSpecMathMode(t));
+    }
+
     /**
      * Returns the spec math mode of this method
      */
-    public static SpecMathMode getSpecMathMode(IProgramMethod pm) {
+    @Nullable
+    public static SpecMathMode getSpecMathMode(@Nonnull IProgramMethod pm) {
         var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode;
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
+    }
+
+    /**
+     * Returns the spec math mode of this method
+     */
+    @Nonnull
+    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull IProgramMethod pm) {
+        return modeOrDefault(getSpecMathMode(pm));
     }
 }

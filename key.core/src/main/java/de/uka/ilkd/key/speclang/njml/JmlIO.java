@@ -338,7 +338,7 @@ public class JmlIO {
     /**
      * Sets the spec math mode.
      */
-    public JmlIO specMathMode(SpecMathMode specMathMode) {
+    public JmlIO specMathMode(@Nonnull SpecMathMode specMathMode) {
         this.specMathMode = specMathMode;
         return this;
     }
@@ -402,7 +402,7 @@ public class JmlIO {
         atPres(null);
         classType(null);
         selfVar(null);
-        specMathMode(null);
+        this.specMathMode = null;
         clearWarnings();
         exceptionVariable(null);
         parameters(ImmutableSLList.nil());

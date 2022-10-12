@@ -11,6 +11,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,8 @@ public class ContractFactoryTest {
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        jmlIO = new JmlIO().services(services).classType(testClassType);
+        jmlIO = new JmlIO().services(services).specMathMode(SpecMathMode.BIGINT)
+                .classType(testClassType);
     }
 
     /**

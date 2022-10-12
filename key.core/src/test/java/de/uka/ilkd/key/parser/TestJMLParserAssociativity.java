@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +27,8 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self =
             services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO().services(getServices()).classType(containerType).selfVar(self);
+        JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+                .specMathMode(SpecMathMode.JAVA).selfVar(self);
         return io.parseExpression(p);
     }
 

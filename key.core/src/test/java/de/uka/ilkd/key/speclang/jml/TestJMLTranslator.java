@@ -47,6 +47,7 @@ public class TestJMLTranslator {
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
         jmlIO = new JmlIO().services(services).classType(testClassType)
+                .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
                 .selfVar(buildSelfVarAsProgVar());
     }
 
