@@ -21,18 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -110,6 +99,26 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		setLocationRelativeTo(parent);
 
 		setVisible(true);
+
+		this.focusFirstEditableCell();
+	}
+
+	private void focusFirstEditableCell() {
+		for (int i = 0; i < model.length; i++) {
+			if (model[i] != null) {
+				var table = dataTable[i];
+				for (int row = 0; row < table.getRowCount(); ++row) {
+					for (int column = 0; column < table.getColumnCount(); ++column) {
+						if (table.isCellEditable(row, column)) {
+							table.editCellAt(row, column);
+							table.changeSelection(row, column, false, false);
+							((PositionSettable) table.getCellEditor(row, column)).requestFocus();
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
 
 
