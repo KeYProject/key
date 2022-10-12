@@ -160,8 +160,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
-            JmlIO io = new JmlIO().services(services).classType(getCalleeKeYJavaType())
-                    .selfVar(selfVar).parameters(paramVars);
+         // TODO wiesler: method?
+         JmlIO io = new JmlIO()
+                 .services(services)
+                 .classType(getCalleeKeYJavaType())
+                 .selfVar(selfVar)
+                 .parameters(paramVars);
 
             PositionedString ps = new PositionedString(precondition);
             return io.parseExpression(ps);

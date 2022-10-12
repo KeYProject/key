@@ -327,6 +327,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         // parse string
         PositionedString ps = new PositionedString(condition);
 
+      // TODO wiesler: what to do here?
       JmlIO io = new JmlIO()
               .services(getProof().getServices())
               .classType(containerType)

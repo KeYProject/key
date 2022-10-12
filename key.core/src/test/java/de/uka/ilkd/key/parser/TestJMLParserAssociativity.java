@@ -28,6 +28,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         ProgramVariable self =
             services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
         JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+                // TODO wiesler
                 .specMathMode(SpecMathMode.JAVA).selfVar(self);
         return io.parseExpression(p);
     }

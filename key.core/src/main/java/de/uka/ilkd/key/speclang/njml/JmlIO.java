@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
@@ -390,6 +391,16 @@ public class JmlIO {
 
     public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {
         this.atBefores = atBefores;
+        return this;
+    }
+
+    /**
+     * Sets class type, spec math mode and self var.
+     */
+    public JmlIO context(Context context) {
+        this.classType(context.classType);
+        this.specMathMode(context.specMathMode);
+        this.selfVar(context.selfVar);
         return this;
     }
 

@@ -280,6 +280,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             // call preparser
             JmlIO jmlIO = new JmlIO();
+            // TODO wiesler
             ImmutableList<TextualJMLConstruct> constructs =
                 jmlIO.parseClassLevel(concatenatedComment, fileName, pos);
 
@@ -357,6 +358,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             // call preparser
             JmlIO io = new JmlIO();
+            // TODO wiesler
             constructs = io.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(io.getWarnings());
         } else {
@@ -557,8 +559,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     .filter(c -> c instanceof TextualJMLMergePointDecl).collect(Collectors.toList())
                     .toArray(new TextualJMLConstruct[0]);
 
-        return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0],
-            methodParams);
+        return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
@@ -637,6 +638,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final String concatenatedComment = concatenate(comments);
         final Position position = comments[0].getStartPosition();
         final JmlIO io = new JmlIO();
+        // TODO wiesler
 
         final ImmutableList<TextualJMLConstruct> constructs =
             io.parseMethodLevel(concatenatedComment, fileName, position);
@@ -670,6 +672,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         // call preparser
         JmlIO io = new JmlIO();
+        // TODO wiesler
         ImmutableList<TextualJMLConstruct> constructs =
             io.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(io.getWarnings());
