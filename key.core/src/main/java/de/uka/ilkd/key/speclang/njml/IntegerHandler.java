@@ -107,25 +107,15 @@ public class IntegerHandler extends LDTHandler {
     protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
         switch (this.specMathMode) {
         case BIGINT: {
-            IntType type;
-            if (PrimitiveType.JAVA_INT.equals(promotedType)) {
-                type = IntType.Int;
-            } else if (PrimitiveType.JAVA_LONG.equals(promotedType)) {
-                type = IntType.Long;
-            } else if (PrimitiveType.JAVA_BIGINT.equals(promotedType)) {
-                type = IntType.Bigint;
-            } else {
+            var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)
+                    || PrimitiveType.JAVA_LONG.equals(promotedType)
+                    || PrimitiveType.JAVA_BIGINT.equals(promotedType);
+            if (!isIntLike) {
                 return null;
             }
 
-            // Always use bigint operator, fall back to the corresponding type operators since
-            // bitwise is missing TODO
-            var bigIntOperator = jmlBigintMap.get(op);
-            if (bigIntOperator != null || type == IntType.Bigint) {
-                return bigIntOperator;
-            }
-
-            return (type == IntType.Int ? jmlIntMap : jmlLongMap).get(op);
+            // Always use bigint operator
+            return jmlBigintMap.get(op);
         }
         case JAVA:
             return LDTHandler.getOperatorFromMap(opCategories.get(promotedType), op);
