@@ -49,11 +49,10 @@ public final class JMLInfoExtractor {
      * Checks the passed comments for the spec math mode.
      */
     private static SpecMathMode checkForSpecMathMode(ImmutableList<Comment> comments) {
-        var specJavaMath = checkFor("spec_java_math", comments);
         var specBigintMath = checkFor("spec_bigint_math", comments);
-
-        // java math takes precedence if both are given
-        return specJavaMath ? SpecMathMode.JAVA : (specBigintMath ? SpecMathMode.BIGINT : null);
+        var specJavaMath = checkFor("spec_java_math", comments);
+        // Consistency: bigint is returned when bot modifiers are given
+        return specBigintMath ? SpecMathMode.BIGINT : (specJavaMath ? SpecMathMode.JAVA : null);
     }
 
     private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {

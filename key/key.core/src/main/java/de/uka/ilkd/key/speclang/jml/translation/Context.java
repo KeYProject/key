@@ -2,7 +2,6 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
@@ -12,7 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Common information that is needed almost everywhere during translation
+ * Common information that is needed almost everywhere during translation. Class is immutable.
  */
 public class Context {
     /**
@@ -59,5 +58,9 @@ public class Context {
         var selfVar = createSelfVar(tb, classType, isStaticContext);
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(classType);
         return new Context(mode, classType, selfVar);
+    }
+
+    public Context orWithSpecMathMode(@Nullable SpecMathMode mode) {
+        return mode == null ? this : new Context(mode, this.classType, this.selfVar);
     }
 }

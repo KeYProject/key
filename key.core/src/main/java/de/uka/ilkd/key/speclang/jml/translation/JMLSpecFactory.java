@@ -29,10 +29,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.njml.JmlFacade;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.JmlParser;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+import de.uka.ilkd.key.speclang.njml.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -44,6 +41,7 @@ import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -322,9 +320,25 @@ public class JMLSpecFactory {
         return progVar;
     }
 
-    private ContractClauses translateJMLClauses(TextualJMLSpecCase textualSpecCase, Context context,
-            ProgramVariableCollection progVars, Behavior originalBehavior)
+    private static @Nullable SpecMathMode specMathModeFromModifiers(
+            ImmutableList<JMLModifier> mods) {
+        for (var mod : mods) {
+            // Consistency: bigint is returned when bot modifiers are given
+            if (mod == JMLModifier.SPEC_BIGINT_MATH) {
+                return SpecMathMode.BIGINT;
+            }
+            if (mod == JMLModifier.SPEC_JAVA_MATH) {
+                return SpecMathMode.JAVA;
+            }
+        }
+        return null;
+    }
+
+    private ContractClauses translateJMLClauses(TextualJMLSpecCase textualSpecCase,
+            Context outerContext, ProgramVariableCollection progVars, Behavior originalBehavior)
             throws SLTranslationException {
+        var context =
+            outerContext.orWithSpecMathMode(specMathModeFromModifiers(textualSpecCase.getMods()));
         ContractClauses clauses = new ContractClauses();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
 
