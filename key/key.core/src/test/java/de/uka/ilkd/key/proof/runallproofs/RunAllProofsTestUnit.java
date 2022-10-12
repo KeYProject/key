@@ -124,7 +124,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         boolean success = true;
         StringBuilder message = new StringBuilder("group " + testName + ":\n");
         for (int i = 0; i < testResults.size(); i++) {
-            TestFile<?> file = testFiles.get(i);
+            TestFile file = testFiles.get(i);
             TestResult testResult = testResults.get(i);
             xml.addTestcase(file.getKeYFile().getName(), this.testName, false, "",
                     !testResult.success ? "error" : "", testResult.message, ""

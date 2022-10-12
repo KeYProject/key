@@ -86,8 +86,8 @@ public abstract class RunAllProofsTest {
        * method. Suitable constructor is automatically determined by JUnit.
        */
       List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
-      return units.stream().map(it ->
-              DynamicTest.dynamicTest(it.getTestName(),
+      return units.stream().map(unit ->
+              DynamicTest.dynamicTest(unit.getTestName(),
                       () -> {
                          /*
                           * Tests each file defined by the instance variables. The tests steps are
@@ -97,7 +97,7 @@ public abstract class RunAllProofsTest {
                          try(JunitXmlWriter xml = new JunitXmlWriter(new BufferedWriter(new FileWriter(xmlFile)),
                                  unit.getTestName(), unit.getTotalNumTests())) {
                             TestResult report = unit.runTest(xml);
-                            assertTrue(report.message, report.success);
+                            Assertions.assertTrue(report.success, report.message);
                          }
                       }));
    }
