@@ -503,7 +503,6 @@ public class JMLSpecFactory {
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as
             // (ghost)
             // parameter
-            // TODO wiesler Spec math mode, what even is this?
             Term rhs = new JmlIO(services).context(context).parameters(progVars.paramVars)
                     .atPres(progVars.atPres).atBefore(progVars.atBefores)
                     .translateTerm(abbrv.third);
