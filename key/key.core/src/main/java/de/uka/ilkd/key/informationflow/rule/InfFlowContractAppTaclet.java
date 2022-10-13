@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.informationflow.rule;
 
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -69,7 +70,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          Term find,
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
-                         ImmutableSet<Choice> choices,
+                         ChoiceExpr choices,
                          ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, tacletAnnotations);
     }
@@ -83,7 +84,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          Term find,
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
-                         ImmutableSet<Choice> choices,
+                         ChoiceExpr choices,
                          boolean surviveSymbExec,
                          ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, surviveSymbExec, tacletAnnotations);

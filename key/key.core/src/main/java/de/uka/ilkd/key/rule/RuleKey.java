@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Name;
+
+import javax.annotation.Nonnull;
 
 
 /**
@@ -18,18 +16,17 @@ import de.uka.ilkd.key.logic.Name;
  */
 public class RuleKey {
    public final @Nonnull Name name;
-   public final @Nonnull ImmutableSet<Choice> choices;
+   public final @Nonnull ChoiceExpr choices;
    public final Rule r;
 
-   RuleKey(@Nonnull Name name, @Nonnull ImmutableSet<Choice> choices, Rule r) {
+   RuleKey(@Nonnull Name name, @Nonnull ChoiceExpr choices, Rule r) {
       this.name = name;
       this.choices = choices;
       this.r = r;
    }
 
    public RuleKey(Rule r) {
-      this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices()
-            : DefaultImmutableSet.<Choice> nil()), r);
+      this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices() : ChoiceExpr.TRUE), r);
    }
 
    public boolean equals(Object o) {
