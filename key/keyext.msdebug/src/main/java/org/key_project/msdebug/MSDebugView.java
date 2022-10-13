@@ -1,11 +1,10 @@
-package org.key_project.originref;
+package org.key_project.msdebug;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -18,14 +17,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
-public class OriginRefView extends JPanel implements TabPanel {
+public class MSDebugView extends JPanel implements TabPanel {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
 
-    public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public MSDebugView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
         // add a listener for hover in the proof tree
@@ -63,7 +61,7 @@ public class OriginRefView extends JPanel implements TabPanel {
 
             boolean anyRefs = false;
 
-            for (OriginRef o : ESVUtil.getParentWithOriginRef(pos).getOriginRef()) {
+            for (OriginRef o : MSDUtil.getParentWithOriginRef(pos).getOriginRef()) {
                 for (int i = o.LineStart; i <= o.LineEnd; i++) {
                     if (o.hasFile()) {
                         existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_MAIN, 11));
@@ -73,7 +71,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             }
 
             if (!anyRefs) {
-                for (OriginRef o : ESVUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
+                for (OriginRef o : MSDUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
                     for (int i = o.LineStart; i <= o.LineEnd; i++) {
                         if (o.hasFile()) {
                             existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_CHILDS, 11));
@@ -92,7 +90,7 @@ public class OriginRefView extends JPanel implements TabPanel {
 
         try {
             String txt = "";
-            txt += ESVUtil.TermToString(t, proof.getServices()) + "\n";
+            txt += MSDUtil.TermToString(t, proof.getServices()) + "\n";
             txt += "\n";
             txt += "----------<SELF>----------";
             txt += "\n";
@@ -112,7 +110,7 @@ public class OriginRefView extends JPanel implements TabPanel {
 
                 for (OriginRef o : term.getOriginRef()) {
                     if (o.hasFile()) {
-                        txt += ESVUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd);
+                        txt += MSDUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd);
                         txt += "\n";
                     }
                 }
@@ -126,7 +124,7 @@ public class OriginRefView extends JPanel implements TabPanel {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (OriginRef o : ESVUtil.getSubOriginRefs(term, false)) {
+                for (OriginRef o : MSDUtil.getSubOriginRefs(term, false)) {
                     txt += o.toString();
                     txt += "\n";
                 }
@@ -139,9 +137,9 @@ public class OriginRefView extends JPanel implements TabPanel {
             txt += "\n";
             txt += "\n";
 
-            Term parent = ESVUtil.getParentWithOriginRef(pos);
+            Term parent = MSDUtil.getParentWithOriginRef(pos);
             if (parent != pos.getPosInOccurrence().subTerm() && !parent.getOriginRef().isEmpty()) {
-                txt += ESVUtil.TermToString(parent, proof.getServices()) + "\n";
+                txt += MSDUtil.TermToString(parent, proof.getServices()) + "\n";
                 txt += "\n";
                 for (OriginRef o : parent.getOriginRef()) {
                     txt += o.toString();
