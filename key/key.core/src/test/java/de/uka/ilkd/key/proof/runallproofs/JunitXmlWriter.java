@@ -33,34 +33,25 @@ public class JunitXmlWriter implements AutoCloseable {
  */
 
     private final PrintWriter writer;
-    private final String fqName;
-    private final int totalTestCases;
-    private boolean testsuiteIsOpen = false;
 
     public JunitXmlWriter(Writer writer, String fqName, int total) {
         this.writer = new PrintWriter(writer);
-        this.fqName = fqName;
-        this.totalTestCases = total;
+        this.writer.format("<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\">",
+                fqName, total);
     }
 
     @Override
     public void close() {
-        if (testsuiteIsOpen) {
-            writer.format("</testsuite>");
-            writer.format("</testsuites>");
-        }
+        writer.format("</testsuite>");
+        writer.format("</testsuites>");
+        writer.flush();
         writer.close();
     }
 
     public void addTestcase(String name, String classname,
                             boolean skipped, String error,
                             String failure, String sout, String serr) {
-        if (!testsuiteIsOpen) {
-            testsuiteIsOpen = true;
-            writer.format("<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\">",
-                    fqName, totalTestCases);
-        }
-        writer.format("<testcase name=\"\"  classname=\"%s\">", name, classname);
+        writer.format("<testcase name=\"%s\"  classname=\"%s\">", name, classname);
         if (skipped)
             writer.format("<skipped/>");
 
