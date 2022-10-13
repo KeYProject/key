@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -10,7 +9,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -23,15 +21,13 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Stateful service for translating JML into KeY entities.
  * <p>
- * This facade stores a the parsing context of JML constructs, e.g., the return or self variable,
- * the parameters. You can set these values via the builder methods. The {@code translate*} methods
+ * This facade stores the parsing context of JML constructs, e.g., the return or self variable, the
+ * parameters. You can set these values via the builder methods. The {@code translate*} methods
  * translate a given {@link ParserRuleContext} into a KeY-entity.
  * <p>
  * It also maintains the list of translation warnings, see {@link #getWarnings()}.
@@ -151,36 +147,7 @@ public class JmlIO {
         return (MergeParamsSpec) interpret(ctx);
     }
 
-    /**
-     * Parse and interpret class level comments.
-     */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
-            String fileName, Position pos) {
-        return parseClassLevel(new PositionedString(concatenatedComment, fileName, pos));
-    }
 
-    /**
-     * Parse and interpret class level comments.
-     */
-    private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
-        JmlLexer lexer = JmlFacade.createLexer(positionedString);
-        return parseClassLevel(lexer);
-    }
-
-    /**
-     * returns the gathered interpretation warnings, e.g., deprecated constructs.
-     */
-    public ImmutableList<PositionedString> getWarnings() {
-        return warnings;
-    }
-
-    /**
-     * Parse and interpret the given string as a method level construct.
-     */
-    public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
-            String fileName, Position position) {
-        return parseMethodLevel(new PositionedString(concatenatedComment, fileName, position));
-    }
 
     /**
      * Parse and interpret the given string as an JML expression in the current context.
@@ -420,68 +387,19 @@ public class JmlIO {
         return this;
     }
 
+    // endregion
+
+    /**
+     * returns the gathered interpretation warnings, e.g., deprecated constructs.
+     */
+    public ImmutableList<PositionedString> getWarnings() {
+        return warnings;
+    }
+
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
     }
-    // endregion
-
 
     // region
-
-    /**
-     * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
-     * parse tree.
-     */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
-        @Nonnull
-        JmlParser p = JmlFacade.createParser(lexer);
-        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        p.getErrorReporter().throwException();
-        jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator();
-        ctx.accept(translator);
-        return translator.constructs;
-    }
-
-    private void jmlCheck(ParserRuleContext ctx) {
-        List<PositionedString> warn = new ArrayList<>();
-        for (JmlCheck check : JmlChecks.getJmlChecks()) {
-            List<PositionedString> w = check.check(ctx);
-            warn.addAll(w);
-        }
-        this.warnings = warnings.prepend(ImmutableList.fromList(warn));
-    }
-
-
-    /**
-     * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
-     * parse tree.
-     */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(String content) {
-        return parseClassLevel(JmlFacade.createLexer(content));
-    }
-
-    /**
-     * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a
-     * parse tree.
-     */
-    public ImmutableList<TextualJMLConstruct> parseMethodLevel(PositionedString positionedString) {
-        return parseMethodLevel(JmlFacade.createLexer(positionedString));
-    }
-
-    /**
-     * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a
-     * parse tree.
-     */
-    private ImmutableList<TextualJMLConstruct> parseMethodLevel(JmlLexer lexer) {
-        @Nonnull
-        JmlParser p = JmlFacade.createParser(lexer);
-        JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        p.getErrorReporter().throwException();
-        jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator();
-        ctx.accept(translator);
-        return translator.constructs;
-    }
     // endregion
 }

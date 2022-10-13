@@ -6,6 +6,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -483,10 +484,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 new de.uka.ilkd.key.java.Position(recoderPos.getLine(), recoderPos.getColumn());
 
             // call preparser
-            JmlIO io = new JmlIO();
+            var parser = new PreParser();
             ImmutableList<TextualJMLConstruct> constructs =
-                io.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.append(io.getWarnings());
+                parser.parseClassLevel(concatenatedComment, fileName, pos);
+            warnings = warnings.append(parser.getWarnings());
 
             // handle model and ghost declarations in textual constructs
             // (and set assignments which RecodeR evilly left hanging *behind*
@@ -538,11 +539,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
             new de.uka.ilkd.key.java.Position(recoderPos.getLine(), recoderPos.getColumn());
 
         // call preparser
-        JmlIO io = new JmlIO();
-        // TODO wiesler
+        var parser = new PreParser();
         ImmutableList<TextualJMLConstruct> constructs =
-            io.parseMethodLevel(concatenatedComment, fileName, pos);
-        warnings = warnings.append(io.getWarnings());
+            parser.parseMethodLevel(concatenatedComment, fileName, pos);
+        warnings = warnings.append(parser.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
         for (TextualJMLConstruct c : constructs) {
