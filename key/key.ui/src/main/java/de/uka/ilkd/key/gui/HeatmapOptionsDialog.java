@@ -34,6 +34,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -127,6 +128,7 @@ public class HeatmapOptionsDialog extends JDialog {
         final ButtonGroup group = new ButtonGroup();
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         // set up spinner for age value
 

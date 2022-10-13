@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -30,8 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
@@ -224,16 +223,7 @@ public final class ProofManagementDialog extends JDialog {
         cancelButton.setMinimumSize(buttonDim);
         cancelButton.addActionListener(e -> setVisible(false));
         buttonPanel.add(cancelButton);
-        ActionListener escapeListener = event -> {
-            if (event.getActionCommand().equals("ESC")) {
-                cancelButton.doClick();
-            }
-        };
-        cancelButton.registerKeyboardAction(
-                escapeListener,
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         //show
         getContentPane().setLayout(new BoxLayout(getContentPane(),
