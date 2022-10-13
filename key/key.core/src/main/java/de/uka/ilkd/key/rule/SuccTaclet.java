@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -39,7 +40,7 @@ public class SuccTaclet extends FindTaclet {
 		    TacletAttributes attrs,
 		    Term find,
                      boolean ignoreTopLevelUpdates,
-		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
+		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ChoiceExpr choices,
 		     ImmutableSet<TacletAnnotation> tacletAnnotations){
         super(name, applPart, goalTemplates, heuristics, attrs,
 	      find, prefixMap, choices, tacletAnnotations);
