@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -168,6 +169,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
                                         cancel();
                                 }
                         });
+                        GuiUtilities.attachClickOnEscListener(cancelButton);
                 }
                 return cancelButton;
         }
