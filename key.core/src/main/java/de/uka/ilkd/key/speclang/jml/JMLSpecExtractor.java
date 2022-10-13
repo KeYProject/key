@@ -357,7 +357,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             // call preparser
             PreParser parser = new PreParser();
-            // TODO wiesler
             constructs = parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
         } else {

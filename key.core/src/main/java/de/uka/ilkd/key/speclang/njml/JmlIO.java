@@ -59,6 +59,15 @@ public class JmlIO {
     }
 
     /**
+     * Generate an empty jml i/o instance.
+     *
+     * @param services a service object used for constructing the terms
+     */
+    public JmlIO(Services services) {
+        this.services = services;
+    }
+
+    /**
      * Full constructor of this class. Prefer the use via builder methods.
      *
      * @param services a service object used for constructing the terms
