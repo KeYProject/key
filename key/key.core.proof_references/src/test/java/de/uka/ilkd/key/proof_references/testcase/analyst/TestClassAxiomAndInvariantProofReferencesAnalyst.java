@@ -38,7 +38,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                 false,
                 new ClassAxiomAndInvariantProofReferencesAnalyst(),
                 element -> IProofReference.USE_AXIOM.equals(element.getKind()),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null)))"));
+                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null))<<impl>>)"));
     }
 
     /**
@@ -53,7 +53,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                 false,
                 new ClassAxiomAndInvariantProofReferencesAnalyst(),
                 element -> IProofReference.USE_AXIOM.equals(element.getKind()),
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"));
+                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null))<<impl>>)"));
     }
 
     /**
