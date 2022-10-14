@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.sourceview;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
@@ -42,7 +43,9 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private JTextComponent component;
+    private final JTextComponent component;
+
+    private final int[] skipLines;
 
     // Properties that can be changed
 
@@ -80,7 +83,22 @@ public class TextLineNumber extends JPanel
      *            the number of digits used to calculate the minimum width of the component
      */
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
+        this(component, minimumDisplayDigits, new int[0]);
+    }
+
+    /**
+     * Create a line number component for a text component.
+     *
+     * @param component
+     *            the related text component
+     * @param minimumDisplayDigits
+     *            the number of digits used to calculate the minimum width of the component
+     * @param skips
+     *            skip line numbers for these lines
+     */
+    public TextLineNumber(JTextComponent component, int minimumDisplayDigits, int[] skips) {
         this.component = component;
+        this.skipLines = Arrays.stream(skips).sorted().toArray();
 
         setFont(component.getFont());
 
@@ -267,9 +285,21 @@ public class TextLineNumber extends JPanel
         Element line = root.getElement(index);
 
         if (line.getStartOffset() == rowStartOffset) {
-            return String.valueOf(index + 1);
+
+            boolean skip = false;
+            int skipOffset = 0;
+
+            for (int i = 0; i < skipLines.length && skipLines[i] <= index+1; i++) {
+                if (skipLines[i] == index+1) {
+                    return ""; // skipped
+                }
+                skipOffset++;
+            }
+
+            return String.valueOf(index + 1 - skipOffset);
+
         } else {
-            return "";
+            return ""; // wrapped
         }
     }
 

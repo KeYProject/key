@@ -952,9 +952,8 @@ public final class SourceView extends JComponent {
             getVerticalScrollBar().setUnitIncrement(30);
             getHorizontalScrollBar().setUnitIncrement(30);
 
-            //add Line numbers to each Scrollview
-            TextLineNumber tln = new TextLineNumber(textPane, 1);
-            setRowHeaderView(tln);
+            initLineNumbers();
+
         }
 
         private String extractFileName(URI uri) {
@@ -1047,6 +1046,22 @@ public final class SourceView extends JComponent {
 
             textPane.addMouseListener(new TextPaneMouseAdapter(
                 textPane, lineInformation, absoluteFileName));
+        }
+
+        private void initLineNumbers() {
+
+            List<SourceViewInsertion> ins = insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
+
+
+            int[] skips = new int[ins.size()];
+
+            for (int i = 0; i < ins.size(); i++) {
+                skips[i] = ins.get(i).Line+i;
+            }
+
+            //add Line numbers to each Scrollview
+            TextLineNumber tln = new TextLineNumber(textPane, 1, skips);
+            setRowHeaderView(tln);
         }
 
         private void markTabComponent() {
@@ -1204,6 +1219,8 @@ public final class SourceView extends JComponent {
 
             initTextPane();
 
+            initLineNumbers();
+
             textPane.revalidate();
             textPane.repaint();
         }
@@ -1213,7 +1230,7 @@ public final class SourceView extends JComponent {
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             lineInformation = IOUtil.computeLineInformation(inStream);
 
-            insertions = insertions.stream().sorted((a,b) -> b.Line - a.Line).collect(Collectors.toList());
+            insertions = insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList());
 
             String lineBreak = "\n";
             if (source.contains("\r\n")) {
