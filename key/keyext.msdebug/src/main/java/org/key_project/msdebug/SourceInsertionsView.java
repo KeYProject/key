@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -30,21 +31,23 @@ public class SourceInsertionsView extends MSDebugTab {
     }
 
     private void initGUI() {
-        setLayout(new GridLayout(1, 2, 20, 20));
+        setLayout(new GridLayout(3, 1, 8, 8));
 
         JTextField ed1 = new JTextField("3");
+        JTextField ed2 = new JTextField("Some Text");
         JButton btn1 = new JButton("Add Insertion");
-        btn1.addActionListener((e) -> addInsertion(ed1.getText()));
+        btn1.addActionListener((e) -> addInsertion(ed1.getText(), ed2.getText()));
         add(ed1);
+        add(ed2);
         add(btn1);
     }
 
-    private void addInsertion(String pos) {
+    private void addInsertion(String pos, String text) {
         try {
 
             int intpos = Integer.parseInt(pos);
 
-            //do something
+            sourceView.addInsertion(sourceView.getSelectedFile(), new SourceViewInsertion("debug", intpos, text));
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(SourceInsertionsView.this, e.toString());

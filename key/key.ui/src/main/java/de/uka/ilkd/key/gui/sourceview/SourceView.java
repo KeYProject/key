@@ -43,15 +43,14 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.Dimension;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -742,6 +741,42 @@ public final class SourceView extends JComponent {
         return list;
     }
 
+    public void addInsertion(URI fileURI, SourceViewInsertion ins) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        tab.insertions.add(ins);
+        tab.updateInsertions();
+    }
+
+    public void removeInsertion(URI fileURI, SourceViewInsertion ins) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        tab.insertions.remove(ins);
+        tab.updateInsertions();
+    }
+
+    public void clearInsertion(URI fileURI, String group) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        tab.insertions = tab.insertions.stream().filter(p -> !p.Group.equals(group)).collect(Collectors.toList());
+        tab.updateInsertions();
+    }
+
+    public void clearAllInsertion(URI fileURI) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        tab.insertions.clear();
+        tab.updateInsertions();
+    }
+
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      * @param se the given SourceElement
@@ -807,6 +842,10 @@ public final class SourceView extends JComponent {
         }
         // if no label was found we have to prove the postcondition
         return "Show Postcondition/Assignable";
+    }
+
+    public URI getSelectedFile() {
+        return tabPane.getSelectedTab().absoluteFileName;
     }
 
     /**
@@ -879,6 +918,9 @@ public final class SourceView extends JComponent {
          * Maps line numbers to highlights.
          */
         private final Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
+
+        /** Extra lines dynamically added into the view */
+        private List<SourceViewInsertion> insertions = new ArrayList<>();
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
@@ -954,9 +996,16 @@ public final class SourceView extends JComponent {
             try {
                 JavaDocument doc = new JavaDocument();
                 textPane.setDocument(doc);
-                doc.insertString(0, source, new SimpleAttributeSet());
-            } catch (BadLocationException e) {
+                doc.insertString(0, patchSourceWithInsertions(source, insertions), new SimpleAttributeSet());
+            } catch (IOException|BadLocationException e) {
                 throw new AssertionError();
+            }
+
+            for (MouseListener l: textPane.getMouseListeners()) {
+                textPane.removeMouseListener(l);
+            }
+            for (MouseMotionListener l: textPane.getMouseMotionListeners()) {
+                textPane.removeMouseMotionListener(l);
             }
 
             // add a listener to highlight the line currently pointed to
@@ -1147,6 +1196,43 @@ public final class SourceView extends JComponent {
         private void scrollToLine(int line) {
             int offs = lineInformation[line].getOffset();
             textPane.setCaretPosition(offs);
+        }
+
+        public void updateInsertions() {
+
+            initLineInfo();
+
+            initTextPane();
+
+            textPane.revalidate();
+            textPane.repaint();
+        }
+
+        private String patchSourceWithInsertions(String source, List<SourceViewInsertion> insertions) throws IOException {
+
+            InputStream inStream = new ByteArrayInputStream(source.getBytes());
+            lineInformation = IOUtil.computeLineInformation(inStream);
+
+            insertions = insertions.stream().sorted((a,b) -> b.Line - a.Line).collect(Collectors.toList());
+
+            String lineBreak = "\n";
+            if (source.contains("\r\n")) {
+                lineBreak = "\r\n";
+            }
+
+            for (SourceViewInsertion ins: insertions) {
+
+                int idx = ins.Line-1;
+
+                if (idx < 0 || idx >= lineInformation.length) continue;
+
+                int pos = lineInformation[idx].getOffset();
+
+                source = source.substring(0, pos) + ins.getCleanText() + lineBreak + source.substring(pos);
+            }
+
+            return source;
+
         }
     }
 
