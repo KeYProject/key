@@ -448,7 +448,11 @@ public final class SourceView extends JComponent {
      * @param pos the position to check
      * @return the range of text (may be empty if there is just whitespace in the line)
      */
-    private static Range calculateLineRange(JTextPane textPane, int pos) {
+    private static Range calculateLineRange(Tab tab, int pos) {
+        JTextPane textPane = tab.textPane;
+
+        pos = tab.translateSourceOffset(pos);
+
         Document doc = textPane.getDocument();
         String text = "";
         try {
@@ -506,7 +510,7 @@ public final class SourceView extends JComponent {
         for (Highlight h : symbExHighlights) {
             if (line == h.line) {
                 // found matching highlight h: Is the mouse cursor inside the highlight?
-                Range range = calculateLineRange(tab.textPane,
+                Range range = calculateLineRange(tab,
                     tab.lineInformation[line - 1].getOffset());
                 // we need < here, since viewToModel can not return a position after the last
                 // char in a line
@@ -1124,9 +1128,7 @@ public final class SourceView extends JComponent {
 
             if (set != null && !set.isEmpty()) {
                 for (Highlight highlight : set) {
-                    Range range = calculateLineRange(
-                            textPane,
-                            lineInformation[highlight.getLine() - 1].getOffset());
+                    Range range = calculateLineRange(this, lineInformation[highlight.getLine() - 1].getOffset());
 
                     Color c = highlight.getColor();
                     int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
@@ -1225,17 +1227,20 @@ public final class SourceView extends JComponent {
             textPane.repaint();
         }
 
-        private String patchSourceWithInsertions(String source, List<SourceViewInsertion> insertions) throws IOException {
+        private String getLineBreakSequence(){
+            if (source.contains("\r\n")) {
+                return "\r\n";
+            }
+            return "\n";
+        }
 
+        private String patchSourceWithInsertions(String source, List<SourceViewInsertion> insertions) throws IOException {
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             lineInformation = IOUtil.computeLineInformation(inStream);
 
             insertions = insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList());
 
-            String lineBreak = "\n";
-            if (source.contains("\r\n")) {
-                lineBreak = "\r\n";
-            }
+            String lineBreak = getLineBreakSequence();
 
             for (SourceViewInsertion ins: insertions) {
 
@@ -1251,6 +1256,33 @@ public final class SourceView extends JComponent {
             return source;
 
         }
+
+        /**
+         * Translates an offset in the source file into an offset in the displayed
+         * Document (must skip Insertions)
+         */
+        public int translateSourceOffset(int pos) {
+            insertions = insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
+
+            String lineBreak = getLineBreakSequence();
+
+            int sourceLine = 1;
+            for (LineInformation li:lineInformation) {
+                if (li.getOffset() <= pos) {
+                    sourceLine++;
+                }
+            }
+
+            int offset = 0;
+            for (SourceViewInsertion ins: insertions) {
+                if (ins.Line <= sourceLine) {
+                    offset += ins.getCleanText().length() + lineBreak.length();
+                }
+            }
+
+            return pos + offset;
+        }
+
     }
 
     /**

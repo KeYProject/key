@@ -286,9 +286,7 @@ public class TextLineNumber extends JPanel
 
         if (line.getStartOffset() == rowStartOffset) {
 
-            boolean skip = false;
             int skipOffset = 0;
-
             for (int i = 0; i < skipLines.length && skipLines[i] <= index+1; i++) {
                 if (skipLines[i] == index+1) {
                     return ""; // skipped
