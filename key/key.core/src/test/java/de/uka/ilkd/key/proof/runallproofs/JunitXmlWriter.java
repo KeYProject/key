@@ -64,10 +64,10 @@ public class JunitXmlWriter implements AutoCloseable {
         }
 
         if (sout != null && !sout.trim().isEmpty()) {
-            writer.format("<system-out><[[CDATA![%s]]></system-out>", sout);
+            writer.format("<system-out><![CDATA![%s]]></system-out>", sout);
         }
         if (serr != null && !serr.trim().isEmpty()) {
-            writer.format("<system-out><[[CDATA![%s]]></system-out>", serr);
+            writer.format("<system-out><![CDATA![%s]]></system-out>", serr);
         }
         writer.format("</testcase>");
     }
