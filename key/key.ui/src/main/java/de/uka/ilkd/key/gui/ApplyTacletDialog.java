@@ -4,6 +4,7 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -55,6 +56,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         applyButton  = new JButton("Apply");
         cancelButton = new JButton("Cancel");
+
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         mediator.requestModalAccess(this);
         addWindowListener(new WindowAdapter() {

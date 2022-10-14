@@ -12,6 +12,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 
@@ -478,6 +479,7 @@ public class LoadUserTacletsDialog extends JPanel {
                 getDialog().dispose();
                 closedByOkButton = false;
             });
+            GuiUtilities.attachClickOnEscListener(cancelButton);
         }
         return cancelButton;
     }

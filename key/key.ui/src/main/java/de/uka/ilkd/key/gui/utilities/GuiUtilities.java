@@ -5,9 +5,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
@@ -86,5 +87,24 @@ public final class GuiUtilities {
         } else {
             setCenter(comp);
         }
+    }
+
+    private static final String ESC_COMMAND = "ESC";
+
+    /**
+     * Adds a listener to the esc button that clicks the button.
+     * @param button the button to click
+     */
+    public static void attachClickOnEscListener(JButton button) {
+        ActionListener escapeListener = event -> {
+            if (event.getActionCommand().equals(ESC_COMMAND)) {
+                button.doClick();
+            }
+        };
+        button.registerKeyboardAction(
+                escapeListener,
+                ESC_COMMAND,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 }
