@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import javax.annotation.Nonnull;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
 import java.util.Objects;
 
 public class SourceViewInsertion {
@@ -11,13 +15,20 @@ public class SourceViewInsertion {
 
     public final String Text;
 
+    public final Color Foreground;
+    public final Color Background;
+
+    private SimpleAttributeSet attr = null;
+
     //TODO Style, RightClickListener, LeftClickListener, OnMouseEnterListener, OnMouseELeaveListener
 
 
-    public SourceViewInsertion(@Nonnull String group, int line, @Nonnull String text) {
+    public SourceViewInsertion(String group, int line, String text, Color fg, Color bg) {
         Group = group;
         Line = line;
         Text = text;
+        Foreground = fg;
+        Background = bg;
     }
 
     @Override
@@ -35,5 +46,17 @@ public class SourceViewInsertion {
 
     public String getCleanText() {
         return Text.replaceAll("[\r\n]", "");
+    }
+
+    public AttributeSet getStyleAttrbuteSet() {
+        if (attr != null) {
+            return attr;
+        }
+
+        attr = new SimpleAttributeSet();
+        StyleConstants.setForeground(attr, Foreground);
+        StyleConstants.setBackground(attr, Background);
+
+        return attr;
     }
 }

@@ -1025,7 +1025,20 @@ public final class SourceView extends JComponent {
 
                 JavaDocument doc = new JavaDocument();
                 textPane.setDocument(doc);
-                doc.insertString(0, this.patchedSource, new SimpleAttributeSet());
+                doc.insertString(0, this.source, new SimpleAttributeSet());
+
+                String lineBreak = getLineBreakSequence();
+                for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList())) {
+                    int idx = ins.Line-1;
+                    if (idx < 0 || idx >= lineInformation.length) continue;
+
+                    int pos = lineInformation[idx].getOffset();
+
+                    doc.insertExtraString(pos, ins.getCleanText() + lineBreak, ins.getStyleAttrbuteSet());
+                }
+
+
+
             } catch (IOException|BadLocationException e) {
                 throw new AssertionError();
             }

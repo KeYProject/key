@@ -2,21 +2,12 @@ package org.key_project.msdebug;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermImpl;
-import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.pp.PosInSequent;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 public class SourceInsertionsView extends MSDebugTab {
 
@@ -47,7 +38,9 @@ public class SourceInsertionsView extends MSDebugTab {
 
             int intpos = Integer.parseInt(pos);
 
-            sourceView.addInsertion(sourceView.getSelectedFile(), new SourceViewInsertion("debug", intpos, text));
+            SourceViewInsertion ins = new SourceViewInsertion("debug", intpos, text, Color.BLACK, Color.LIGHT_GRAY);
+
+            sourceView.addInsertion(sourceView.getSelectedFile(), ins);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(SourceInsertionsView.this, e.toString());
