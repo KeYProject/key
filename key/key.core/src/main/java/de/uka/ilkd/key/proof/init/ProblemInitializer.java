@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.javac.JavaCompilerCheckFacade;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -299,6 +300,7 @@ public final class ProblemInitializer {
             } catch (ParseExceptionInFile e) {
                 throw new ProofInputException(e);
             }
+            JavaCompilerCheckFacade.check(listener, bootClassPath, classPath, javaPath);
         } else {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);
@@ -561,7 +563,7 @@ public final class ProblemInitializer {
                 }
                 for (ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if(pm == null) continue; //weigl 2021-11-10
+                    if (pm == null) continue; //weigl 2021-11-10
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
@@ -660,5 +662,7 @@ public final class ProblemInitializer {
         void resetStatus(Object sender);
 
         void reportException(Object sender, ProofOblInput input, Exception e);
+
+        default void showIssueDialog(Collection<PositionedString> issues) {}
     }
 }

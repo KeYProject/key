@@ -162,8 +162,8 @@ public final class IssueDialog extends JDialog {
         }).collect(Collectors.toList());
     }
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
-                        boolean critical, Throwable throwable) {
+    IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+                boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
         this.throwable = throwable;
@@ -579,7 +579,7 @@ public final class IssueDialog extends JDialog {
      * (text, filename, position) contains a String for additional information which can be used
      * to store a stacktrace if present.
      */
-    private static class PositionedIssueString extends PositionedString {
+    public static class PositionedIssueString extends PositionedString {
 
         /** contains additional information, e.g., a stacktrace */
         private final @Nonnull String additionalInfo;
