@@ -37,9 +37,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.Dimension;
 import java.awt.*;
@@ -149,7 +146,7 @@ public final class SourceView extends JComponent {
     private LinkedList<Pair<Node, PositionInfo>> lines;
 
     /** The symbolic execution highlights. */
-    private final Set<Highlight> symbExHighlights = new HashSet<>();
+    private final Set<SourceViewHighlight> symbExHighlights = new HashSet<>();
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -247,29 +244,43 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public Highlight addHighlight(URI fileURI, int line, Color color, int level)
-            throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlight(URI fileURI, int sourceLine, Color color, int level) throws BadLocationException, IOException {
+        Tab tab = tabs.get(fileURI);
+
+        if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
+            throw new BadLocationException("Not a valid line number for " + fileURI, sourceLine);
+        }
+
+        int patchedLine = tab.translateSourceLineToPatchedLine(sourceLine);
+
+        Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine);
+
+        return addHighlightDirect(fileURI, sourceLine, patchedLine, patchedRange, color, level);
+    }
+
+    /**
+     * <p> Creates a new highlight (directly supplies patchedLine). </p>
+     *
+     * @see addHighlight
+     */
+    public SourceViewHighlight addHighlightDirect(URI fileURI, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) throws BadLocationException, IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        if (tab == null || line < 0 || line >= tab.lineInformation.length) {
-            throw new BadLocationException("Not a valid line number for " + fileURI, line);
+        if (!tab.highlights.containsKey(patchedLine)) {
+            tab.highlights.put(patchedLine, new TreeSet<>(Collections.reverseOrder()));
         }
 
-        if (!tab.highlights.containsKey(line)) {
-            tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder()));
-        }
+        SortedSet<SourceViewHighlight> highlights = tab.highlights.get(patchedLine);
 
-        SortedSet<Highlight> highlights = tab.highlights.get(line);
-
-        Highlight highlight = new Highlight(fileURI, line, color, level);
+        SourceViewHighlight highlight = new SourceViewHighlight(fileURI, sourceLine, patchedLine, patchedRange, color, level);
         highlights.add(highlight);
 
         tab.markTabComponent();
 
-        tab.removeHighlights(line);
-        tab.applyHighlights(line);
+        tab.removeHighlights(patchedLine);
+        tab.applyHighlights(patchedLine);
 
         return highlight;
     }
@@ -290,7 +301,7 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public Set<Highlight> addHighlightsForJMLStatement(
+    public Set<SourceViewHighlight> addHighlightsForJMLStatement(
             URI fileURI, int firstLine, Color color, int level)
             throws BadLocationException, IOException {
         openFile(fileURI);
@@ -320,7 +331,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        Set<Highlight> result = new HashSet<>();
+        Set<SourceViewHighlight> result = new HashSet<>();
 
         for (int i = firstLine; i <= lastLine && tab != null; ++i) {
             result.add(addHighlight(fileURI, i, color, level));
@@ -337,37 +348,38 @@ public final class SourceView extends JComponent {
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(Highlight highlight, int newSourceLine)
-            throws BadLocationException {
+    public void changeHighlight(SourceViewHighlight highlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
         URI fileURI = highlight.getFileURI();
-        int oldLine = highlight.getLine();
+        int oldPatchedLine = highlight.getPatchedLine();
 
         Tab tab = tabs.get(fileURI);
 
         if (tab == null
-                || !tab.highlights.containsKey(oldLine)
-                || !tab.highlights.get(oldLine).contains(highlight)) {
+                || !tab.highlights.containsKey(oldPatchedLine)
+                || !tab.highlights.get(oldPatchedLine).contains(highlight)) {
             throw new IllegalArgumentException("highlight");
         }
 
-        tab.removeHighlights(oldLine);
-        tab.highlights.get(oldLine).remove(highlight);
-        tab.applyHighlights(oldLine);
+        tab.removeHighlights(oldPatchedLine);
+        tab.highlights.get(oldPatchedLine).remove(highlight);
+        tab.applyHighlights(oldPatchedLine);
 
-        if (tab.highlights.get(oldLine).isEmpty()) {
-            tab.highlights.remove(oldLine);
+        if (tab.highlights.get(oldPatchedLine).isEmpty()) {
+            tab.highlights.remove(oldPatchedLine);
         }
 
-        highlight.line = newSourceLine;
+        highlight.sourceLine = newSourceLine;
+        highlight.patchedLine = newPatchedLine;
+        highlight.patchedRange = newPatchedRange;
         highlight.setTag(null);
 
-        if (!tab.highlights.containsKey(newSourceLine)) {
-            tab.highlights.put(newSourceLine, new TreeSet<>());
+        if (!tab.highlights.containsKey(newPatchedLine)) {
+            tab.highlights.put(newPatchedLine, new TreeSet<>());
         }
 
-        tab.highlights.get(newSourceLine).add(highlight);
-        tab.removeHighlights(newSourceLine);
-        tab.applyHighlights(newSourceLine);
+        tab.highlights.get(newPatchedLine).add(highlight);
+        tab.removeHighlights(newPatchedLine);
+        tab.applyHighlights(newPatchedLine);
     }
 
     /**
@@ -377,24 +389,24 @@ public final class SourceView extends JComponent {
      * @return {@code true} iff
      *      this {@code SourceView} previously contained the specified highlight.
      */
-    public boolean removeHighlight(Highlight highlight) {
+    public boolean removeHighlight(SourceViewHighlight highlight) {
         Tab tab = tabs.get(highlight.getFileURI());
 
         if (tab == null) {
             return false;
         }
 
-        tab.removeHighlights(highlight.getLine());
+        tab.removeHighlights(highlight.getPatchedLine());
 
-        boolean result = tab.highlights.containsKey(highlight.getLine())
-                && tab.highlights.get(highlight.getLine()).remove(highlight);
+        boolean result = tab.highlights.containsKey(highlight.getPatchedLine())
+                && tab.highlights.get(highlight.getPatchedLine()).remove(highlight);
         highlight.setTag(null);
 
-        if (result && tab.highlights.get(highlight.getLine()).isEmpty()) {
-            tab.highlights.remove(highlight.getLine());
+        if (result && tab.highlights.get(highlight.getPatchedLine()).isEmpty()) {
+            tab.highlights.remove(highlight.getPatchedLine());
         } else {
             try {
-                tab.applyHighlights(highlight.getLine());
+                tab.applyHighlights(highlight.getPatchedLine());
             } catch (BadLocationException e) {
                 // The locations of the highlights have already been checked
                 // in addHighlight & changeHighlight, so no error can occur here.
@@ -443,43 +455,6 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * Calculates the range of actual text (not whitespace) in the line containing the given
-     * position.
-     * @param textPane the JTextPane with the text
-     * @param pos the position to check (in source)
-     * @return the range of text (may be empty if there is just whitespace in the line)
-     */
-    private static Range calculateLineRange(Tab tab, int sourcePos) {
-        JTextPane textPane = tab.textPane;
-
-        int patchedPos = tab.translateToPatchedPos(sourcePos);
-
-        Document doc = textPane.getDocument();
-        String text = "";
-        try {
-            text = doc.getText(0, doc.getLength());
-        } catch (BadLocationException e) {
-            LOGGER.debug("Caught exception!", e);
-        }
-
-        // find line end
-        int end = text.indexOf('\n', patchedPos);
-        end = end == -1 ? text.length() : end;      // last line?
-
-        // find line start
-        int start = text.lastIndexOf('\n', patchedPos - 1);          // TODO: different line endings?
-        start = start == -1 ? 0 : start;            // first line?
-
-        // ignore whitespace at the beginning of the line
-        while (start < text.length() && start < end
-            && Character.isWhitespace(text.charAt(start))) {
-            start++;
-        }
-
-        return new Range(start, end);
-    }
-
-    /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
      * @param s the String to replace
      * @return the resulting String (without tabs)
@@ -503,21 +478,16 @@ public final class SourceView extends JComponent {
      * @param point the point to check, usually the position of the mouse cursor
      * @return true iff the point is on a highlight
      */
-    private boolean isHighlighted(Point point) {
+    private boolean isSymbExecHighlighted(Point point) {
         Tab tab = tabs.get(selectedFile);
         int pos = tab.textPane.viewToModel(point);
-        int line = tab.patchedPosToSourceLine(pos);
 
-        for (Highlight h : symbExHighlights) {
-            if (line == h.line) {
-                // found matching highlight h: Is the mouse cursor inside the highlight?
-                Range range = calculateLineRange(tab,
-                    tab.lineInformation[line - 1].getOffset());
-                // we need < here, since viewToModel can not return a position after the last
-                // char in a line
-                if (range.start() <= pos && pos < range.end()) {
-                    return true;
-                }
+        for (SourceViewHighlight h : symbExHighlights) {
+            // found matching highlight h: Is the mouse cursor inside the highlight?
+            // we need < here, since viewToModel can not return a position after the last
+            // char in a line
+            if (h.patchedRange.start() <= pos && pos < h.patchedRange.end()) {
+                return true;
             }
         }
         return false;
@@ -745,40 +715,48 @@ public final class SourceView extends JComponent {
         return list;
     }
 
-    public void addInsertion(URI fileURI, SourceViewInsertion ins) throws IOException {
+    public void addInsertion(URI fileURI, SourceViewInsertion ins) throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        tab.insertions.add(ins);
-        tab.updateInsertions();
+        tab.addInsertions(ins);
+
+        tab.refreshInsertions();
     }
 
-    public void removeInsertion(URI fileURI, SourceViewInsertion ins) throws IOException {
+    public void removeInsertion(URI fileURI, SourceViewInsertion ins) throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        tab.insertions.remove(ins);
-        tab.updateInsertions();
+        tab.removeInsertion(ins);
+
+        tab.refreshInsertions();
     }
 
-    public void clearInsertion(URI fileURI, String group) throws IOException {
+    public void clearInsertion(URI fileURI, String group) throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        tab.insertions = tab.insertions.stream().filter(p -> !p.Group.equals(group)).collect(Collectors.toList());
-        tab.updateInsertions();
+        for (SourceViewInsertion ins: tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList())) {
+            tab.removeInsertion(ins);
+        }
+
+        tab.refreshInsertions();
     }
 
-    public void clearAllInsertion(URI fileURI) throws IOException {
+    public void clearAllInsertion(URI fileURI) throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        tab.insertions.clear();
-        tab.updateInsertions();
+        for (SourceViewInsertion ins: new ArrayList<>(tab.insertions)) {
+            tab.removeInsertion(ins);
+        }
+
+        tab.refreshInsertions();
     }
 
     /**
@@ -896,7 +874,7 @@ public final class SourceView extends JComponent {
                     return null;
                 }
 
-                if (isHighlighted(mouseEvent.getPoint())) {
+                if (isSymbExecHighlighted(mouseEvent.getPoint())) {
                     return TEXTPANE_HIGHLIGHTED_TOOLTIP;
                 }
                 return null;
@@ -921,19 +899,20 @@ public final class SourceView extends JComponent {
         private final HashMap<Integer, Integer> cacheTranslateToSourcePos = new HashMap<>();
         private final HashMap<Integer, Integer> cacheTranslateToPatchedPos = new HashMap<>();
         private final HashMap<Integer, Integer> cacheTranslatePosToSourceLine = new HashMap<>();
+        private final HashMap<Integer, Integer> cacheTranslatePosToPatchedLine = new HashMap<>();
 
         /**
          * The highlight for the user's selection.
          */
-        private Highlight selectionHL;
+        private SourceViewHighlight selectionHL;
 
         /**
          * Maps line numbers to highlights.
          */
-        private final Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
+        private final Map<Integer, SortedSet<SourceViewHighlight>> highlights = new HashMap<>();
 
         /** Extra lines dynamically added into the view */
-        private List<SourceViewInsertion> insertions = new ArrayList<>();
+        private final List<SourceViewInsertion> insertions = new ArrayList<>();
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
@@ -999,6 +978,7 @@ public final class SourceView extends JComponent {
             this.cacheTranslateToSourcePos.clear();
             this.cacheTranslateToPatchedPos.clear();
             this.cacheTranslatePosToSourceLine.clear();
+            this.cacheTranslatePosToPatchedLine.clear();
 
             // insert source code into text pane
             try {
@@ -1014,11 +994,18 @@ public final class SourceView extends JComponent {
                 textPane.addMouseMotionListener(new MouseMotionAdapter() {
                     @Override
                     public void mouseMoved(MouseEvent mouseEvent) {
-                        if (isHighlighted(mouseEvent.getPoint())) {
+                        if (isSymbExecHighlighted(mouseEvent.getPoint())) {
                             textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        } else {
-                            textPane.setCursor(Cursor.getDefaultCursor());
+                            return;
                         }
+
+                        SourceViewInsertion ins = getInsertionAtPatchedPos(textPane.viewToModel(mouseEvent.getPoint()));
+                        if (ins != null && ins.hasClickListener()) {
+                            textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            return;
+                        }
+
+                        textPane.setCursor(Cursor.getDefaultCursor());
                     }
                 });
 
@@ -1072,8 +1059,9 @@ public final class SourceView extends JComponent {
                 }
             });
 
-            textPane.addMouseListener(new TextPaneMouseAdapter(
-                textPane, lineInformation, absoluteFileName));
+            MouseAdapter adapter = new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
+            textPane.addMouseListener(adapter);
+            textPane.addMouseMotionListener(adapter);
         }
 
         private void initLineNumbers() {
@@ -1119,14 +1107,14 @@ public final class SourceView extends JComponent {
             }
         }
 
-        private void removeHighlights(int sourceLine) {
-            SortedSet<Highlight> set = highlights.get(sourceLine);
+        private void removeHighlights(int patchedLine) {
+            SortedSet<SourceViewHighlight> set = highlights.get(patchedLine);
 
             if (set == null) {
                 return;
             }
 
-            for (Highlight highlight : set) {
+            for (SourceViewHighlight highlight : set) {
                 if (highlight.getTag() != null) {
                     textPane.getHighlighter().removeHighlight(highlight.getTag());
                     highlight.setTag(null);
@@ -1134,18 +1122,16 @@ public final class SourceView extends JComponent {
             }
         }
 
-        private void applyHighlights(int sourceLine)
-                throws BadLocationException {
-            SortedSet<Highlight> set = highlights.get(sourceLine);
+        private void applyHighlights(int patchedLine) throws BadLocationException {
+            SortedSet<SourceViewHighlight> set = highlights.get(patchedLine);
 
             if (set != null && !set.isEmpty()) {
-                for (Highlight highlight : set) {
-                    Range range = calculateLineRange(this, lineInformation[highlight.getLine() - 1].getOffset());
+                for (SourceViewHighlight highlight : set) {
+                    Range range = highlight.patchedRange;
 
                     Color c = highlight.getColor();
                     int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
-                    Color color = new Color(
-                            c.getRed(), c.getGreen(), c.getBlue(), alpha);
+                    Color color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
 
                     highlight.setTag(textPane.getHighlighter().addHighlight(
                             range.start(),
@@ -1163,7 +1149,7 @@ public final class SourceView extends JComponent {
          * highlighted with a different color.
          */
         private void paintSymbExHighlights() {
-            for (Highlight hl : symbExHighlights) {
+            for (SourceViewHighlight hl : symbExHighlights) {
                 removeHighlight(hl);
             }
 
@@ -1223,14 +1209,26 @@ public final class SourceView extends JComponent {
 
                 SourceViewInsertion ins = getInsertionAtPatchedPos(patchedPos);
                 if (ins != null) {
-                    if (selectionHL != null) {
-                        removeHighlight(selectionHL);
-                        selectionHL = null;
+
+                    int patchedLine = translatePatchedPosToPatchedLine(patchedPos);
+                    Range patchedRange = calculatePatchedLineRange(patchedPos);
+
+                    if (selectionHL == null) {
+                        try {
+                            selectionHL = addHighlightDirect(absoluteFileName, -1, patchedLine, patchedRange, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                        } catch (BadLocationException | IOException e) {
+                            LOGGER.debug("Caught exception!", e);
+                        }
+                    } else {
+                        changeHighlight(selectionHL, -1, patchedLine, patchedRange);
                     }
+
                     return;
                 }
 
-                int sourceLine = patchedPosToSourceLine(patchedPos);
+                int sourceLine = translatePatchedPosToSourceLine(patchedPos);
+                int patchedLine = translatePatchedPosToPatchedLine(patchedPos);
+                Range patchedRange = calculatePatchedLineRange(patchedPos);
 
                 if (selectionHL == null) {
                     try {
@@ -1239,43 +1237,12 @@ public final class SourceView extends JComponent {
                         LOGGER.debug("Caught exception!", e);
                     }
                 } else {
-                    changeHighlight(selectionHL, sourceLine);
+                    changeHighlight(selectionHL, sourceLine, patchedLine, patchedRange);
                 }
 
             } catch (BadLocationException e) {
                 LOGGER.debug("Caught exception!", e);
             }
-        }
-
-        private SourceViewInsertion getInsertionAtPatchedPos(int patchedPos) {
-
-            int patchedLine = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
-
-            int offset = 0;
-            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
-
-                int idx = ins.Line-1;
-                if (idx < 0 || idx >= lineInformation.length) continue;
-
-                if (offset + ins.Line == patchedLine) return ins;
-
-                offset++;
-            }
-
-            return null;
-        }
-
-        private int patchedPosToSourceLine(int patchedPos) {
-            if (this.cacheTranslatePosToSourceLine.containsKey(patchedPos)) {
-                return this.cacheTranslatePosToSourceLine.get(patchedPos);
-            }
-
-            patchedPos = translateToSourcePos(patchedPos);
-            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.source.substring(0, patchedPos)).results().count();
-
-            this.cacheTranslatePosToSourceLine.put(patchedPos, result);
-
-            return result;
         }
 
         private void scrollToSourceLine(int sourceLine) {
@@ -1284,7 +1251,10 @@ public final class SourceView extends JComponent {
             textPane.setCaretPosition(offs);
         }
 
-        public void updateInsertions() {
+        /**
+         * Called after insertions array changed
+         */
+        public void refreshInsertions() {
 
             initTextPane(this.source);
 
@@ -1292,6 +1262,67 @@ public final class SourceView extends JComponent {
 
             textPane.revalidate();
             textPane.repaint();
+        }
+
+        /**
+         * Calculates the range of actual text (not whitespace) in the line containing the given
+         * position.
+         * @param patchedPos the position to check (in displayed content)
+         * @return the range of text (may be empty if there is just whitespace in the line)
+         */
+        private Range calculatePatchedLineRange(int patchedPos) {
+            String text = this.patchedSource;
+
+            // find line end
+            int end = text.indexOf('\n', patchedPos);
+            end = end == -1 ? text.length() : end;      // last line?
+
+            // find line start
+            int start = text.lastIndexOf('\n', patchedPos - 1);          // TODO: different line endings?
+            start = start == -1 ? 0 : start;            // first line?
+
+            // ignore whitespace at the beginning of the line
+            while (start < text.length() && start < end
+                    && Character.isWhitespace(text.charAt(start))) {
+                start++;
+            }
+
+            return new Range(start, end);
+        }
+
+        /**
+         * Calculates the range of actual text (not whitespace) in the line containing the given
+         * position.
+         * @param patchedLine the line to check (in displayed content)
+         * @return the range of text (may be empty if there is just whitespace in the line)
+         */
+        private Range calculatePatchedLineRangeFromLine(int patchedLine) {
+
+            int start = 0;
+
+            for (int i = 1; i < patchedLine; i++) {
+                int next = patchedSource.indexOf('\n', start+1);
+                if (next == -1) {
+                    if (i == patchedLine-1) { // last line
+                        break;
+                    }
+
+                    return new Range(0, 0);
+                }
+                start = next;
+            }
+
+            int end = patchedSource.indexOf('\n', start+1);
+            if (end == -1) {
+                end = patchedSource.length();
+            }
+
+            // ignore whitespace at the beginning of the line
+            while (start < patchedSource.length() && start < end && Character.isWhitespace(patchedSource.charAt(start))) {
+                start++;
+            }
+
+            return new Range(start, end);
         }
 
         private String getLineBreakSequence(){
@@ -1322,6 +1353,52 @@ public final class SourceView extends JComponent {
 
         }
 
+        private SourceViewInsertion getInsertionAtPatchedPos(int patchedPos) {
+
+            int patchedLine = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+
+            ArrayList<SourceViewInsertion> rev = new ArrayList<>(insertions);
+            Collections.reverse(rev);
+
+            int offset = 0;
+            for (SourceViewInsertion ins: rev.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
+
+                int idx = ins.Line-1;
+                if (idx < 0 || idx >= lineInformation.length) continue;
+
+                if (offset + ins.Line == patchedLine) return ins;
+
+                offset++;
+            }
+
+            return null;
+        }
+
+        private int translatePatchedPosToSourceLine(int patchedPos) {
+            if (this.cacheTranslatePosToSourceLine.containsKey(patchedPos)) {
+                return this.cacheTranslatePosToSourceLine.get(patchedPos);
+            }
+
+            patchedPos = translateToSourcePos(patchedPos);
+            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.source.substring(0, patchedPos)).results().count();
+
+            this.cacheTranslatePosToSourceLine.put(patchedPos, result);
+
+            return result;
+        }
+
+        private int translatePatchedPosToPatchedLine(int patchedPos) {
+            if (this.cacheTranslatePosToPatchedLine.containsKey(patchedPos)) {
+                return this.cacheTranslatePosToPatchedLine.get(patchedPos);
+            }
+
+            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+
+            this.cacheTranslatePosToPatchedLine.put(patchedPos, result);
+
+            return result;
+        }
+
         /**
          * Translates an offset in the source file into an offset in the displayed
          * Document (must skip Insertions)
@@ -1330,8 +1407,6 @@ public final class SourceView extends JComponent {
             if (this.cacheTranslateToPatchedPos.containsKey(sourcePos)) {
                 return this.cacheTranslateToPatchedPos.get(sourcePos);
             }
-
-            insertions = insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
 
             String lineBreak = getLineBreakSequence();
 
@@ -1343,7 +1418,7 @@ public final class SourceView extends JComponent {
             }
 
             int offset = 0;
-            for (SourceViewInsertion ins: insertions) {
+            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
                 if (ins.Line <= sourceLine) {
                     offset += ins.getCleanText().length() + lineBreak.length();
                 }
@@ -1387,171 +1462,91 @@ public final class SourceView extends JComponent {
             return result;
 
         }
-    }
 
-    /**
-     * <p> An object of this class represents a highlight of a specific line in the
-     *  {@code SourceView}. </p>
-     *
-     * @author lanzinger
-     *
-     * @see SourceView#addHighlight(URI, int, Color, int)
-     * @see SourceView#changeHighlight(Highlight, int)
-     * @see SourceView#removeHighlight(Highlight)
-     */
-    public static final class Highlight implements Comparable<Highlight> {
+        public int translateSourceLineToPatchedLine(int sourceLine) {
 
-        /** @see #getTag() */
-        private static final Map<Highlight, Object> TAGS = new HashMap<>();
+            int offset = (int)insertions.stream().filter(p -> p.Line < sourceLine).count();
 
-        /** @see #getLevel() */
-        private final int level;
+            return sourceLine + offset;
 
-        /** @see #getColor() */
-        private final Color color;
-
-        /** @see #getFileURI() */
-        private final URI fileURI;
-
-        /** @see #getLine() */
-        private int line;
-
-        /**
-         * Creates a new highlight.
-         *
-         * @param fileURI URI of the file in which this highlight is used.
-         * @param line the line being highlighted.
-         * @param color this highlight's color.
-         * @param level this highlight's level.
-         */
-        private Highlight(URI fileURI, int line, Color color, int level) {
-            this.level = level;
-            this.color = color;
-            this.fileURI = fileURI;
-            this.line = line;
         }
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((color == null) ? 0 : color.hashCode());
-            result = prime * result + ((fileURI == null) ? 0 : fileURI.hashCode());
-            result = prime * result + level;
-            result = prime * result + line;
-            return result;
+        public void addInsertions(SourceViewInsertion ins) throws BadLocationException {
+            this.insertions.add(ins);
+
+            // adjust existing highlights
+
+            String lineBreak = getLineBreakSequence();
+
+            int patchedLine = translateSourceLineToPatchedLine(ins.Line);
+
+            int addLen = ins.getCleanText().length() + lineBreak.length();
+
+            batchUpdateHighlights(-1, patchedLine, 1, addLen);
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
+        public void removeInsertion(SourceViewInsertion ins) throws BadLocationException {
+            if (!this.insertions.remove(ins)) {
+                return;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            Highlight other = (Highlight) obj;
-            if (color == null) {
-                if (other.color != null) {
-                    return false;
+
+            // adjust existing highlights
+
+            String lineBreak = getLineBreakSequence();
+
+            int patchedLine = translateSourceLineToPatchedLine(ins.Line);
+
+            int remLen = ins.getCleanText().length() + lineBreak.length();
+
+            batchUpdateHighlights(patchedLine, patchedLine, -1, -remLen);
+        }
+
+        private void batchUpdateHighlights(int remLine, int startLine, int lineDelta, int rangeDelta) throws BadLocationException {
+            int maxLine = startLine;
+            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry: highlights.entrySet()) {
+                if (entry.getKey() >= startLine) {
+                    maxLine = Math.max(maxLine, entry.getKey());
                 }
-            } else if (!color.equals(other.color)) {
-                return false;
             }
-            if (fileURI == null) {
-                if (other.fileURI != null) {
-                    return false;
+            for (int i = startLine; i <= maxLine; i++) {
+                removeHighlights(i);
+            }
+            if (remLine != -1) {
+                removeHighlights(remLine);
+            }
+
+            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry: highlights.entrySet().stream().sorted(Comparator.comparingInt(a -> -a.getKey())).collect(Collectors.toList())) {
+                for (SourceViewHighlight hl: entry.getValue()) {
+                    if (remLine >= 0 && hl.patchedLine == remLine) {
+                        highlights.get(entry.getKey()).remove(hl);
+                        continue;
+                    }
+                    if (hl.patchedLine >= startLine) {
+                        hl.patchedLine+=lineDelta;
+                        hl.patchedRange = new Range(hl.patchedRange.start() + rangeDelta, hl.patchedRange.end() + rangeDelta);
+                        hl.setTag(null);
+                        highlights.get(entry.getKey()).remove(hl);
+
+                        if (!highlights.containsKey(hl.patchedLine)) {
+                            highlights.put(hl.patchedLine, new TreeSet<>(Collections.reverseOrder()));
+                        }
+                        highlights.get(hl.patchedLine).add(hl);
+                    }
                 }
-            } else if (!fileURI.equals(other.fileURI)) {
-                return false;
-            }
-            if (level != other.level) {
-                return false;
-            }
-            return line == other.line;
-        }
 
-        @Override
-        public int compareTo(Highlight other) {
-            int result = fileURI.compareTo(other.fileURI);
-
-            if (result == 0) {
-                result = Integer.compare(line, other.line);
+                if (highlights.get(entry.getKey()).isEmpty()) {
+                    highlights.remove(entry.getKey());
+                }
             }
 
-            if (result == 0) {
-                result = Integer.compare(level, other.level);
+            for (int i = startLine; i <= maxLine + Math.max(lineDelta, 0); i++) {
+                applyHighlights(i);
             }
-
-            if (result == 0) {
-                result = Integer.compare(color.getRGB(), other.color.getRGB());
-            }
-
-            return result;
-        }
-
-        /**
-         *
-         * @param tag the new tag wrapped by this object.
-         *
-         * @see Highlighter#addHighlight(int, int, HighlightPainter)
-         * @see Highlighter#changeHighlight(Object, int, int)
-         * @see Highlighter#removeHighlight(Object)
-         */
-        private void setTag(Object tag) {
-            if (tag == null) {
-                TAGS.remove(this);
-            } else {
-                TAGS.put(this, tag);
+            if (remLine != -1) {
+                applyHighlights(remLine);
             }
         }
 
-        /**
-         *
-         * @return the tag wrapped by this object.
-         *
-         * @see Highlighter#addHighlight(int, int, HighlightPainter)
-         * @see Highlighter#changeHighlight(Object, int, int)
-         * @see Highlighter#removeHighlight(Object)
-         */
-        private Object getTag() {
-            return TAGS.get(this);
-        }
-
-        /**
-         *
-         * @return this highlight's level.
-         */
-        public int getLevel() {
-            return level;
-        }
-
-        /**
-         *
-         * @return this highlight's color.
-         */
-        public Color getColor() {
-            return color;
-        }
-
-        /**
-         *
-         * @return the file in which this highlight is used.
-         */
-        public URI getFileURI() {
-            return fileURI;
-        }
-
-        /**
-         *
-         * @return the line being highlighted.
-         */
-        public int getLine() {
-            return line;
-        }
     }
 
     /**
@@ -1579,38 +1574,84 @@ public final class SourceView extends JComponent {
          */
         final URI fileURI;
 
-        private TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
-                URI fileURI) {
+        /**
+         * The source Tab
+         */
+        final Tab tab;
+
+        private SourceViewInsertion hoveredInsertion = null;
+
+        private TextPaneMouseAdapter(Tab tab, JTextPane textPane, LineInformation[] li, URI fileURI) {
             this.textPane = textPane;
             this.li = li;
             this.fileURI = fileURI;
+            this.tab = tab;
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            int pos = textPane.viewToModel(e.getPoint());
-            if (isHighlighted(e.getPoint())) {
-                int line = 0;
-                // calculate the line number
-                while (line < li.length - 1) {
-                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) {
-                        break;
-                    }
-                    line++;
+            int patchedPos = textPane.viewToModel(e.getPoint());
+            int patchedLine = tab.translatePatchedPosToSourceLine(patchedPos);
+
+            if (isSymbExecHighlighted(e.getPoint())) {
+                onClickSymbExec(patchedPos, patchedLine);
+            }
+
+            SourceViewInsertion ins = tab.getInsertionAtPatchedPos(patchedPos);
+            if (ins != null) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    ins.triggerClickListener(e);
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    ins.triggerRightClickListener(e);
                 }
-                // jump in proof tree (get corresponding node from list)
-                Node n = null;
-                for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().getLine() == line + 1
-                            && p.second.getURI().equals(fileURI)) {
-                        n = p.first;
-                        break;
-                    }
+            }
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            int patchedPos = textPane.viewToModel(e.getPoint());
+
+            SourceViewInsertion ins = tab.getInsertionAtPatchedPos(patchedPos);
+            if (ins != null) {
+                if (hoveredInsertion == ins) {
+                    ins.triggerMouseMoveListener(e);
+                } else if (hoveredInsertion != null) {
+                    hoveredInsertion.triggerMouseLeaveListener(e);
+                    ins.triggerMouseEnterListener(e);
+                } else {
+                    ins.triggerMouseEnterListener(e);
                 }
 
-                if (n != null) {
-                    mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
+                hoveredInsertion = ins;
+            } else {
+                if (hoveredInsertion != null) {
+                    hoveredInsertion.triggerMouseLeaveListener(e);
                 }
+                hoveredInsertion = null;
+            }
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            if (hoveredInsertion != null) {
+                hoveredInsertion.triggerMouseLeaveListener(e);
+            }
+            hoveredInsertion = null;
+        }
+
+        private void onClickSymbExec(int patchedPos, int patchedLine) {
+
+            // jump in proof tree (get corresponding node from list)
+            Node n = null;
+            for (Pair<Node, PositionInfo> p : lines) {
+                if (p.second.getStartPosition().getLine() == patchedLine && p.second.getURI().equals(fileURI)) {
+                    n = p.first;
+                    break;
+                }
+            }
+
+            if (n != null) {
+                mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
             }
         }
     }

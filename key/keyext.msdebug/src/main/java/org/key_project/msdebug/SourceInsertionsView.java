@@ -48,10 +48,16 @@ public class SourceInsertionsView extends MSDebugTab {
 
     private void addInsertion(String pos, String text) {
         try {
-
             int intpos = Integer.parseInt(pos);
 
-            SourceViewInsertion ins = new SourceViewInsertion("debug", intpos, text, Color.BLACK, Color.LIGHT_GRAY);
+            SourceViewInsertion ins = new SourceViewInsertion("debug", intpos, text, Color.BLACK, new Color(222, 222, 222));
+
+            ins.addClickListener(e ->      JOptionPane.showMessageDialog(null, "[LeftClick]\n"  + text));
+            ins.addRightClickListener(e -> JOptionPane.showMessageDialog(null, "[RightClick]\n" + text));
+
+            ins.addMouseEnterListener(e -> System.out.println("[ENTER] " + text));
+            ins.addMouseMoveListener(e ->  System.out.println("[MOVE]  " + text));
+            ins.addMouseLeaveListener(e -> System.out.println("[LEAVE] " + text));
 
             sourceView.addInsertion(sourceView.getSelectedFile(), ins);
 

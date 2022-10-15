@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceView.Highlight;
+import de.uka.ilkd.key.gui.sourceview.SourceViewHighlight;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -62,7 +62,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private Set<Highlight> originHighlights = new HashSet<>();
+    private Set<SourceViewHighlight> originHighlights = new HashSet<>();
 
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewHighlight;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -61,12 +62,12 @@ public class OriginRefView extends MSDebugTab {
         return "TermOrigin Inspector";
     }
 
-    private final ArrayList<SourceView.Highlight> existingHighlights = new ArrayList<>();
+    private final ArrayList<SourceViewHighlight> existingHighlights = new ArrayList<>();
 
     private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
-            for (SourceView.Highlight h : existingHighlights) sv.removeHighlight(h);
+            for (SourceViewHighlight h : existingHighlights) sv.removeHighlight(h);
             existingHighlights.clear();
 
             boolean anyRefs = false;
@@ -167,7 +168,7 @@ public class OriginRefView extends MSDebugTab {
 
     private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         SourceView sv = window.getSourceViewFrame().getSourceView();
-        for (SourceView.Highlight h: existingHighlights) sv.removeHighlight(h);
+        for (SourceViewHighlight h: existingHighlights) sv.removeHighlight(h);
         existingHighlights.clear();
 
         taSource.setText("");
