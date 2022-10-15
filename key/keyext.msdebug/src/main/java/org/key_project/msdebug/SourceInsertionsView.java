@@ -22,15 +22,28 @@ public class SourceInsertionsView extends MSDebugTab {
     }
 
     private void initGUI() {
-        setLayout(new GridLayout(3, 1, 8, 8));
+        setLayout(new GridLayout(4, 1, 8, 8));
 
         JTextField ed1 = new JTextField("3");
-        JTextField ed2 = new JTextField("Some Text");
+        JTextField ed2 = new JTextField("    "+"    "+"Some Text");
         JButton btn1 = new JButton("Add Insertion");
         btn1.addActionListener((e) -> addInsertion(ed1.getText(), ed2.getText()));
+        JButton btn2 = new JButton("Clear Insertion");
+        btn2.addActionListener((e) -> clearInsertions());
         add(ed1);
         add(ed2);
         add(btn1);
+        add(btn2);
+    }
+
+    private void clearInsertions() {
+        try {
+
+            sourceView.clearInsertion(sourceView.getSelectedFile(), "debug");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(SourceInsertionsView.this, e.toString());
+        }
     }
 
     private void addInsertion(String pos, String text) {

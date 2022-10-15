@@ -333,11 +333,11 @@ public final class SourceView extends JComponent {
      * Moves an existing highlight to another line.
      *
      * @param highlight the highlight to change.
-     * @param newLine the line to move the highlight to.
+     * @param newSourceLine the line to move the highlight to.
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(Highlight highlight, int newLine)
+    public void changeHighlight(Highlight highlight, int newSourceLine)
             throws BadLocationException {
         URI fileURI = highlight.getFileURI();
         int oldLine = highlight.getLine();
@@ -358,16 +358,16 @@ public final class SourceView extends JComponent {
             tab.highlights.remove(oldLine);
         }
 
-        highlight.line = newLine;
+        highlight.line = newSourceLine;
         highlight.setTag(null);
 
-        if (!tab.highlights.containsKey(newLine)) {
-            tab.highlights.put(newLine, new TreeSet<>());
+        if (!tab.highlights.containsKey(newSourceLine)) {
+            tab.highlights.put(newSourceLine, new TreeSet<>());
         }
 
-        tab.highlights.get(newLine).add(highlight);
-        tab.removeHighlights(newLine);
-        tab.applyHighlights(newLine);
+        tab.highlights.get(newSourceLine).add(highlight);
+        tab.removeHighlights(newSourceLine);
+        tab.applyHighlights(newSourceLine);
     }
 
     /**
@@ -449,10 +449,10 @@ public final class SourceView extends JComponent {
      * @param pos the position to check (in source)
      * @return the range of text (may be empty if there is just whitespace in the line)
      */
-    private static Range calculateLineRange(Tab tab, int pos) {
+    private static Range calculateLineRange(Tab tab, int sourcePos) {
         JTextPane textPane = tab.textPane;
 
-        pos = tab.translateFromSourceOffset(pos);
+        int patchedPos = tab.translateToPatchedPos(sourcePos);
 
         Document doc = textPane.getDocument();
         String text = "";
@@ -463,11 +463,11 @@ public final class SourceView extends JComponent {
         }
 
         // find line end
-        int end = text.indexOf('\n', pos);
+        int end = text.indexOf('\n', patchedPos);
         end = end == -1 ? text.length() : end;      // last line?
 
         // find line start
-        int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
+        int start = text.lastIndexOf('\n', patchedPos - 1);          // TODO: different line endings?
         start = start == -1 ? 0 : start;            // first line?
 
         // ignore whitespace at the beginning of the line
@@ -646,8 +646,7 @@ public final class SourceView extends JComponent {
         }
     }
 
-    private void addPosToList(
-            PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list, Node node) {
+    private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list, Node node) {
         if (pos != null
                 && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI() != null) {
@@ -919,8 +918,8 @@ public final class SourceView extends JComponent {
          */
         private String patchedSource;
 
-        private final HashMap<Integer, Integer> cacheTranslatePosToSource = new HashMap<>();
-        private final HashMap<Integer, Integer> cacheTranslatePosFromSource = new HashMap<>();
+        private final HashMap<Integer, Integer> cacheTranslateToSourcePos = new HashMap<>();
+        private final HashMap<Integer, Integer> cacheTranslateToPatchedPos = new HashMap<>();
         private final HashMap<Integer, Integer> cacheTranslatePosToSourceLine = new HashMap<>();
 
         /**
@@ -982,7 +981,7 @@ public final class SourceView extends JComponent {
 
         private void initLineInfo(String fsource) {
             try {
-                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                InputStream inStream = new ByteArrayInputStream(fsource.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);
@@ -997,8 +996,8 @@ public final class SourceView extends JComponent {
                 textPane.removeMouseMotionListener(l);
             }
 
-            this.cacheTranslatePosToSource.clear();
-            this.cacheTranslatePosFromSource.clear();
+            this.cacheTranslateToSourcePos.clear();
+            this.cacheTranslateToPatchedPos.clear();
             this.cacheTranslatePosToSourceLine.clear();
 
             // insert source code into text pane
@@ -1048,9 +1047,7 @@ public final class SourceView extends JComponent {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     synchronized(SourceView.this) {
-                        if (selectionHL != null) {
-                            paintSelectionHighlight(e.getPoint(), selectionHL);
-                        }
+                        updateSelectionHighlight(e.getPoint());
                     }
                 }
 
@@ -1063,19 +1060,14 @@ public final class SourceView extends JComponent {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     synchronized(SourceView.this) {
-                        if (selectionHL != null) {
-                            removeHighlight(selectionHL);
-                            selectionHL = null;
-                        }
+                        updateSelectionHighlight(null);
                     }
                 }
 
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     synchronized(SourceView.this) {
-                        if (selectionHL == null) {
-                            initSelectionHL();
-                        }
+                        updateSelectionHighlight(e.getPoint());
                     }
                 }
             });
@@ -1127,20 +1119,8 @@ public final class SourceView extends JComponent {
             }
         }
 
-        private void initSelectionHL() {
-            try {
-                selectionHL = addHighlight(
-                        absoluteFileName,
-                        1,
-                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
-                        Integer.MAX_VALUE - 1);
-            } catch (BadLocationException | IOException e) {
-                LOGGER.debug("Caught exception!", e);
-            }
-        }
-
-        private void removeHighlights(int line) {
-            SortedSet<Highlight> set = highlights.get(line);
+        private void removeHighlights(int sourceLine) {
+            SortedSet<Highlight> set = highlights.get(sourceLine);
 
             if (set == null) {
                 return;
@@ -1154,9 +1134,9 @@ public final class SourceView extends JComponent {
             }
         }
 
-        private void applyHighlights(int line)
+        private void applyHighlights(int sourceLine)
                 throws BadLocationException {
-            SortedSet<Highlight> set = highlights.get(line);
+            SortedSet<Highlight> set = highlights.get(sourceLine);
 
             if (set != null && !set.isEmpty()) {
                 for (Highlight highlight : set) {
@@ -1229,31 +1209,78 @@ public final class SourceView extends JComponent {
          * @param p the current position of the mouse pointer
          * @param highlight the highlight to change
          */
-        private void paintSelectionHighlight(Point p, Highlight highlight) {
+        private void updateSelectionHighlight(Point p) {
+            if (p == null) {
+                if (selectionHL != null) {
+                    removeHighlight(selectionHL);
+                    selectionHL = null;
+                }
+                return;
+            }
+
             try {
-                int line = patchedPosToSourceLine(textPane.viewToModel(p));
-                changeHighlight(highlight, line);
+                int patchedPos = textPane.viewToModel(p);
+
+                SourceViewInsertion ins = getInsertionAtPatchedPos(patchedPos);
+                if (ins != null) {
+                    if (selectionHL != null) {
+                        removeHighlight(selectionHL);
+                        selectionHL = null;
+                    }
+                    return;
+                }
+
+                int sourceLine = patchedPosToSourceLine(patchedPos);
+
+                if (selectionHL == null) {
+                    try {
+                        selectionHL = addHighlight(absoluteFileName, sourceLine, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                    } catch (BadLocationException | IOException e) {
+                        LOGGER.debug("Caught exception!", e);
+                    }
+                } else {
+                    changeHighlight(selectionHL, sourceLine);
+                }
+
             } catch (BadLocationException e) {
                 LOGGER.debug("Caught exception!", e);
             }
         }
 
-        private int patchedPosToSourceLine(int pos) {
-            if (this.cacheTranslatePosToSourceLine.containsKey(pos)) {
-                return this.cacheTranslatePosToSourceLine.get(pos);
+        private SourceViewInsertion getInsertionAtPatchedPos(int patchedPos) {
+
+            int patchedLine = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+
+            int offset = 0;
+            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
+
+                int idx = ins.Line-1;
+                if (idx < 0 || idx >= lineInformation.length) continue;
+
+                if (offset + ins.Line == patchedLine) return ins;
+
+                offset++;
             }
 
-            pos = translateToSourceOffset(pos);
-            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.source.substring(0, pos)).results().count();
+            return null;
+        }
 
-            this.cacheTranslatePosToSourceLine.put(pos, result);
+        private int patchedPosToSourceLine(int patchedPos) {
+            if (this.cacheTranslatePosToSourceLine.containsKey(patchedPos)) {
+                return this.cacheTranslatePosToSourceLine.get(patchedPos);
+            }
+
+            patchedPos = translateToSourcePos(patchedPos);
+            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.source.substring(0, patchedPos)).results().count();
+
+            this.cacheTranslatePosToSourceLine.put(patchedPos, result);
 
             return result;
         }
 
-        private void scrollToSourceLine(int line) {
-            int offs = lineInformation[line].getOffset();
-            offs = translateToSourceOffset(offs);
+        private void scrollToSourceLine(int sourceLine) {
+            int offs = lineInformation[sourceLine].getOffset();
+            offs = translateToSourcePos(offs);
             textPane.setCaretPosition(offs);
         }
 
@@ -1278,11 +1305,9 @@ public final class SourceView extends JComponent {
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             lineInformation = IOUtil.computeLineInformation(inStream);
 
-            insertions = insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList());
-
             String lineBreak = getLineBreakSequence();
 
-            for (SourceViewInsertion ins: insertions) {
+            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList())) {
 
                 int idx = ins.Line-1;
 
@@ -1301,9 +1326,9 @@ public final class SourceView extends JComponent {
          * Translates an offset in the source file into an offset in the displayed
          * Document (must skip Insertions)
          */
-        public int translateFromSourceOffset(int pos) {
-            if (this.cacheTranslatePosFromSource.containsKey(pos)) {
-                return this.cacheTranslatePosFromSource.get(pos);
+        public int translateToPatchedPos(int sourcePos) {
+            if (this.cacheTranslateToPatchedPos.containsKey(sourcePos)) {
+                return this.cacheTranslateToPatchedPos.get(sourcePos);
             }
 
             insertions = insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
@@ -1312,7 +1337,7 @@ public final class SourceView extends JComponent {
 
             int sourceLine = 1;
             for (LineInformation li:lineInformation) {
-                if (li.getOffset() <= pos) {
+                if (li.getOffset() < sourcePos) {
                     sourceLine++;
                 }
             }
@@ -1324,9 +1349,9 @@ public final class SourceView extends JComponent {
                 }
             }
 
-            int result = pos+offset;
+            int result = sourcePos+offset;
 
-            cacheTranslatePosFromSource.put(pos, result);
+            cacheTranslateToPatchedPos.put(sourcePos, result);
 
             return result;
         }
@@ -1335,24 +1360,29 @@ public final class SourceView extends JComponent {
          * Translates an offset in displayed document into an offset in the source file
          * (must undo Insertions)
          */
-        public int translateToSourceOffset(int pos) {
-            if (this.cacheTranslatePosToSource.containsKey(pos)) {
-                return this.cacheTranslatePosToSource.get(pos);
+        public int translateToSourcePos(int patchedPos) {
+            if (this.cacheTranslateToSourcePos.containsKey(patchedPos)) {
+                return this.cacheTranslateToSourcePos.get(patchedPos);
             }
 
-            int lineInPatched = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, pos)).results().count();
+            int lineInPatched = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
 
             String lineBreak = getLineBreakSequence();
 
-            int negOffset = this.insertions
-                    .stream()
-                    .filter(p -> p.Line <= lineInPatched)
-                    .mapToInt(p -> p.getCleanText().length() + lineBreak.length())
-                    .sum();
+            int result = patchedPos;
 
-            int result = pos-negOffset;
+            int offset = 0;
+            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
 
-            cacheTranslatePosToSource.put(pos, result);
+                int idx = ins.Line-1;
+                if (idx < 0 || idx >= lineInformation.length) continue;
+                if (offset + ins.Line > lineInPatched) break;
+
+                offset++;
+                result -= ins.getCleanText().length() + lineBreak.length();
+            }
+
+            cacheTranslateToSourcePos.put(patchedPos, result);
 
             return result;
 

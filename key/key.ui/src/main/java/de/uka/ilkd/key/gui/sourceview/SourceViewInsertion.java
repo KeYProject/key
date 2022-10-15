@@ -11,7 +11,7 @@ public class SourceViewInsertion {
 
     public final String Group;
 
-    public final int Line;
+    public final int Line; // in Source
 
     public final String Text;
 
