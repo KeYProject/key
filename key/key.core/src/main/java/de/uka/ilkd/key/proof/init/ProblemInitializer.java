@@ -661,4 +661,12 @@ public final class ProblemInitializer {
 
         void reportException(Object sender, ProofOblInput input, Exception e);
     }
+
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
 }
