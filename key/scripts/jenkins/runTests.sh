@@ -8,7 +8,7 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 # Run unit tests
 #
 cd key
-./gradlew --continue test testProveRules testRunAllProofs
+./gradlew --continue test testProveRules testRunAllFunProofs testRunAllInfProofs
 EXIT_UNIT_TESTS=$?
 
 # Adapt to old scheme. copy tests xml to a folder where jenkins find them.
