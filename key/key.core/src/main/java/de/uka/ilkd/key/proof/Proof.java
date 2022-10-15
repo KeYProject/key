@@ -298,6 +298,7 @@ public class Proof implements Named {
         ruleAppListenerList = null;
         listenerList = null;
         disposed = true;
+        userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
     }
 

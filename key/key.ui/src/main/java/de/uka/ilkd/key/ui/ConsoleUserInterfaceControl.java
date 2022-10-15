@@ -52,7 +52,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-    ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
+    ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
     final byte verbosity;
     final KeYMediator mediator;
@@ -98,20 +98,19 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         if (verbosity > Verbosity.SILENT) {
             LOGGER.info("[ DONE  ... rule application ]");
             if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("\n== Proof " + (openGoals > 0 ? "open" : "closed") + " ==");
+                LOGGER.info("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
                 final Statistics stat = info.getProof().getStatistics();
-                LOGGER.info("Proof steps: " + stat.nodes);
-                LOGGER.info("Branches: " + stat.branches);
-                LOGGER.info("Automode Time: " + stat.autoModeTimeInMillis + "ms");
-                LOGGER.info("Time per step: " + stat.timePerStepInMillis + "ms");
+                LOGGER.info("Proof steps: {}", stat.nodes);
+                LOGGER.info("Branches: {}" , stat.branches);
+                LOGGER.info("Automode Time: {} ms", stat.autoModeTimeInMillis);
+                LOGGER.info("Time per step: {} ms", stat.timePerStepInMillis);
             }
-            LOGGER.info("Number of goals remaining open: " + openGoals);
+            LOGGER.info("Number of goals remaining open: {}", openGoals);
             if (openGoals == 0) {
                 LOGGER.info("Proved");
             } else {
                 LOGGER.info("Not proved");
             }
-            System.out.flush();
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
@@ -163,7 +162,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             System.exit(-1);
         }
         if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: " + openGoals);
+            LOGGER.info("Number of open goals after loading: {}", openGoals);
             System.exit(0);
         }
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
@@ -194,9 +193,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskStarted(info);
         progressMax = info.getSize();
         if (TaskKind.Strategy.equals(info.getKind())) {
-            LOGGER.debug(info.getMessage() + " ["); // start progress bar
+            System.out.println(info.getMessage() + " ["); // start progress bar
         } else {
-            LOGGER.debug(info.getMessage());
+            System.out.println(info.getMessage());
         }
     }
 
@@ -252,37 +251,37 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void progressStarted(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
+    public final void progressStarted(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStarted({})", sender);
     }
 
     @Override
-    final public void progressStopped(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
+    public final void progressStopped(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStopped({})", sender);
     }
 
     @Override
-    final public void reportException(Object sender, ProofOblInput input, Exception e) {
+    public final void reportException(Object sender, ProofOblInput input, Exception e) {
         LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
     }
 
     @Override
-    final public void reportStatus(Object sender, String status, int progress) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
+    public final void reportStatus(Object sender, String status, int progress) {
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{},{})", sender, status, progress);
     }
 
     @Override
-    final public void reportStatus(Object sender, String status) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
+    public final void reportStatus(Object sender, String status) {
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{})", sender, status);
     }
 
     @Override
-    final public void resetStatus(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
+    public final void resetStatus(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus({})", sender);
     }
 
     @Override
-    final public void taskProgress(int position) {
+    public final void taskProgress(int position) {
         super.taskProgress(position);
         if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
             if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
@@ -292,13 +291,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void setMaximum(int maximum) {
-        LOGGER.debug("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
+    public final void setMaximum(int maximum) {
+        LOGGER.debug("ConsoleUserInterfaceControl.setMaximum({})", maximum);
     }
 
     @Override
-    final public void setProgress(int progress) {
-        LOGGER.debug("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
+    public final void setProgress(int progress) {
+        LOGGER.debug("ConsoleUserInterfaceControl.setProgress({})", progress);
     }
 
     @Override
@@ -307,16 +306,15 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void openExamples() {
+    public final void openExamples() {
         LOGGER.info("Open Examples not suported by console UI.");
     }
 
     @Override
-    final public ProblemInitializer createProblemInitializer(Profile profile) {
-        ProblemInitializer pi = new ProblemInitializer(this,
+    public final ProblemInitializer createProblemInitializer(Profile profile) {
+        return new ProblemInitializer(this,
                 new Services(profile),
                 this);
-        return pi;
     }
 
     /**
@@ -338,7 +336,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public boolean selectProofObligation(InitConfig initConfig) {
+    public final boolean selectProofObligation(InitConfig initConfig) {
         ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
         return sel.selectProofObligation();
     }
@@ -408,8 +406,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-            ) {
+                         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
             } catch (IOException e) {
                 e.printStackTrace();

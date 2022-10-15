@@ -184,9 +184,6 @@ public final class Main {
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
-
-        logInformation();
-
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
             verbosity = Verbosity.TRACE;
@@ -199,7 +196,6 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
-            Log.configureLogging(verbosity);
             fileArguments = cl.getFileArguments();
             fileArguments = preProcessInput(fileArguments);
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
@@ -222,18 +218,17 @@ public final class Main {
         LOGGER.debug("OS: {}", System.getProperty("java.os"));
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
-        LOGGER.debug("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
-        LOGGER.debug("Available processors:  " + rt.availableProcessors());
+        LOGGER.debug("Total memory: {} MB", (rt.totalMemory() / 1048576.0));
+        LOGGER.debug("Maximum memory:  {} MB" , (rt.maxMemory() / 1048576.0));
+        LOGGER.debug("Free memory: {} MB", (rt.freeMemory() / 1048576.0));
+        LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
-            for (int i = 0; i < fileArguments.size(); i++) {
-                File f = fileArguments.get(i);
+            for (File f : fileArguments) {
                 ui.loadProblem(f);
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
@@ -322,6 +317,9 @@ public final class Main {
             }
         }
 
+        Log.configureLogging(verbosity);
+        logInformation();
+
         if (verbosity > Verbosity.SILENT) {
             printHeader();
         }
@@ -329,8 +327,8 @@ public final class Main {
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
                 java.util.Properties props = System.getProperties();
-                for (Object o : props.keySet()) {
-                    LOGGER.info("" + o + "=\"" + props.get(o) + "\"");
+                for (var e : props.entrySet()) {
+                    LOGGER.info("Property: {} = {}", e.getKey(), e.getValue());
                 }
             } finally {
                 System.exit(0);
@@ -378,7 +376,7 @@ public final class Main {
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
                 if (verbosity >= Verbosity.DEBUG) {
-                    LOGGER.info("Timeout is: " + timeout + " ms");
+                    LOGGER.info("Timeout is: {} ms", timeout);
                 }
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
@@ -422,7 +420,7 @@ public final class Main {
         if (cl.isSet(RIFL)) {
             riflFileName = new File(cl.getString(RIFL, null));
             if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("[RIFL] Loading RIFL specification from " + riflFileName);
+                LOGGER.info("[RIFL] Loading RIFL specification from {}", riflFileName);
             }
         }
 
@@ -489,11 +487,7 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
-        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
-        } catch (IOException e) {
-            //LOGGER.log(Level.INFO, e.getMessage(), e);
-        }*/
+        LOGGER.info("Experimental Features: {}", state);
     }
 
     public static boolean isExperimentalMode() {
@@ -504,7 +498,7 @@ public final class Main {
      * Print a header text on to the console.
      */
     private static void printHeader() {
-        LOGGER.info("KeY Version " + KeYConstants.VERSION);
+        LOGGER.info("KeY Version {}", KeYConstants.VERSION);
         LOGGER.info(KeYConstants.COPYRIGHT);
         LOGGER.info("KeY is protected by the GNU General Public License");
     }
@@ -561,7 +555,7 @@ public final class Main {
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
-                        LOGGER.info("File does not exist anymore: " + mostRecentFile.toString());
+                        LOGGER.info("File does not exist anymore: {}", mostRecentFile);
                     }
                 }
             }
@@ -669,7 +663,7 @@ public final class Main {
                         RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
                 if (verbosity > Verbosity.SILENT) {
-                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                    LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
                 }
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException e) {

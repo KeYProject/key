@@ -930,7 +930,7 @@ public final class SourceView extends JComponent {
                 InputStream inStream = new ByteArrayInputStream(source.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
-                LOGGER.debug("Error while computing line information from " + absoluteFileName, e);
+                LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);
             }
         }
 

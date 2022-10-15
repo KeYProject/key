@@ -76,7 +76,7 @@ public final class Location {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Location could not be created from String: " + re.input.getSourceName(), e);
+            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(), e);
             return null;
         }
     }
