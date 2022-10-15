@@ -51,12 +51,12 @@ public class TacletPBuilder extends ExpressionBuilder {
     /**
      * Current required choices for taclets
      */
-    private ImmutableSet<Choice> requiredChoices = DefaultImmutableSet.nil();
+    private ChoiceExpr requiredChoices = ChoiceExpr.TRUE;
 
     /**
      * Required choices for taclet goals.
      */
-    private ImmutableSet<Choice> goalChoice = DefaultImmutableSet.nil();
+    private ChoiceExpr goalChoice = ChoiceExpr.TRUE;
 
     public TacletPBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -80,11 +80,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         enableJavaSchemaMode();
         if (ctx.RULES() != null) axiomMode = false;
         if (ctx.AXIOMS() != null) axiomMode = true;
-        List<Choice> choices = accept(ctx.choices);
+        ChoiceExpr choices = accept(ctx.choices);
         if (choices != null) {
-            this.requiredChoices = ImmutableSet.fromCollection(choices);
+            this.requiredChoices = choices;
         } else {
-            this.requiredChoices = DefaultImmutableSet.nil();
+            this.requiredChoices = ChoiceExpr.TRUE;
         }
         List<Taclet> seq = mapOf(ctx.taclet());
         topLevelTaclets.addAll(seq);
@@ -133,10 +133,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
         }
         String name = ctx.name.getText();
-        List<Choice> ch = accept(ctx.option_list());
-        ImmutableSet<Choice> choices = requiredChoices;
+        ChoiceExpr ch = accept(ctx.option_list());
+        var choices = requiredChoices;
         if (ch != null) {
-            choices = choices.add(ch);
+            choices = ChoiceExpr.and(ch, choices);
         }
 
         Term form = accept(ctx.form);
@@ -350,8 +350,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitGoalspecwithoption(KeYParser.GoalspecwithoptionContext ctx) {
-        List<Choice> s = accept(ctx.option_list());
-        goalChoice = s == null ? DefaultImmutableSet.nil() : ImmutableSet.fromCollection(s);
+        ChoiceExpr expr = accept(ctx.option_list());
+        goalChoice = expr == null ? ChoiceExpr.TRUE : expr;
         accept(ctx.goalspec());
         return null;
     }
@@ -367,13 +367,45 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public List<Choice> visitOption_list(KeYParser.Option_listContext ctx) {
-        return mapOf(ctx.option());
+    public ChoiceExpr visitOption_list(KeYParser.Option_listContext ctx) {
+        if (ctx.option().isEmpty()) {
+            return accept(ctx.option_expr());
+        } else {
+            return ctx.option().stream()
+                    .map(it -> ChoiceExpr.variable(it.cat.getText(), it.value.getText()))
+                    .reduce(ChoiceExpr::and)
+                    .orElse(ChoiceExpr.TRUE);
+        }
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_or(KeYParser.Option_expr_orContext ctx) {
+        return ChoiceExpr.or(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_paren(KeYParser.Option_expr_parenContext ctx) {
+        return accept(ctx.option_expr());
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_prop(KeYParser.Option_expr_propContext ctx) {
+        return ChoiceExpr.variable(ctx.option().cat.getText(), ctx.option().value.getText());
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_not(KeYParser.Option_expr_notContext ctx) {
+        return ChoiceExpr.not(accept(ctx.option_expr()));
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_and(KeYParser.Option_expr_andContext ctx) {
+        return ChoiceExpr.and(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
     }
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
-        ImmutableSet<Choice> soc = this.goalChoice;
+        var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
@@ -458,7 +490,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
-                                 @Nullable ImmutableSet<Choice> soc,
+                                 @Nullable ChoiceExpr soc,
                                  ParserRuleContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;

@@ -91,7 +91,7 @@ public class TestTacletEquality {
         }
     }
 
-    public void createNewOracle() {
+    public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());
         //sort by name

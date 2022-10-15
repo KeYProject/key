@@ -260,12 +260,13 @@ public class InitConfig {
           return;
        }
        final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+       var choices = Collections.unmodifiableSet(activatedChoices.toSet());
        for (Taclet t : taclets) {
           TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
-          if(t.getChoices().subset(activatedChoices)){
+          if(t.getChoices().eval(choices)){
              if (b != null && b.getGoal2Choices() != null){
-                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+                t = b.getTacletWithoutInactiveGoalTemplates(choices);
              }
 
              if (t != null) {

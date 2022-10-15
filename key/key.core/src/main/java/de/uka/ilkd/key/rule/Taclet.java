@@ -2,22 +2,13 @@ package de.uka.ilkd.key.rule;
 
 import java.util.*;
 
-import javax.annotation.Nonnull;
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -96,7 +87,7 @@ public abstract class Taclet implements Rule, Named {
     private final String displayName;
     
     /** the set of taclet options for this taclet */
-    protected final ImmutableSet<Choice> choices;
+    protected final ChoiceExpr choices;
     
     /**
      * the <tt>if</tt> sequent of the taclet
@@ -202,7 +193,7 @@ public abstract class Taclet implements Rule, Named {
            ImmutableList<RuleSet> ruleSets,
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-           ImmutableSet<Choice> choices,
+           ChoiceExpr choices,
            boolean surviveSmbExec,
            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -253,7 +244,7 @@ public abstract class Taclet implements Rule, Named {
            ImmutableList<RuleSet> ruleSets,
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-           ImmutableSet<Choice> choices,
+           ChoiceExpr choices,
            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false, tacletAnnotations);
     }
@@ -386,7 +377,7 @@ public abstract class Taclet implements Rule, Named {
 	return goalTemplates;
     } 
 
-    public ImmutableSet<Choice> getChoices(){
+    public ChoiceExpr getChoices(){
 	return choices;
     }
 
@@ -906,18 +897,10 @@ public abstract class Taclet implements Rule, Named {
     public abstract Taclet setName(String s);
 
 
-    private @Nonnull ImmutableSet<Choice> tacletOptions = DefaultImmutableSet.nil();
-    public @Nonnull ImmutableSet<Choice> getTacletOptions() {
-        return tacletOptions;
-    }
-    public void setTacletOptions(@Nonnull ImmutableSet<Choice> tacletOptions) {
-        this.tacletOptions = tacletOptions;
-    }
-
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the
      * declaration of the taclet.
-     *
+     * <p>
      * This field is set by the parser with [url]:[lineNumber]
      */
     private @Nullable String origin;
