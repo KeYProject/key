@@ -6,8 +6,15 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.swing.text.BadLocationException;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -17,6 +24,10 @@ import java.util.Collections;
         optional = true,
         priority = 10000)
 public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtSourceViewExtension.class);
+
+    public static final String INSERTION_GROUP = "ExtSourceViewExtension::insertion";
 
     @Nonnull
     @Override
@@ -45,6 +56,61 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
     private void updateSourceview(MainWindow window, KeYMediator mediator) {
         System.out.println("[EXT-SOURCE-VIEW] Update");
 
+        var svc = mediator.getServices();
+
+        var tb = svc.getTermBuilder();
+
+        var sourceView = window.getSourceViewFrame().getSourceView();
+
+        var proof = mediator.getSelectedProof();
+
+        var node = mediator.getSelectedNode();
+
+        var sequent = node.sequent();
+
+        var ante = sequent.antecedent();
+        var succ = sequent.succedent();
+
+        URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
+
+        try {
+
+            sourceView.clearInsertion(fileUri, INSERTION_GROUP);
+
+            var parts = ESVBuilder.extractParts(tb, sequent);
+
+            for (var term: parts.Assumes) {
+
+                if (term.Type == InsertionType.REQUIRES_EXPLICT) {
+
+                    var str = "        " + "//@assumes " + term.toJMLString(svc) + ";";
+                    var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                    var bkg = new Color(222, 222, 222);
+                    var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
+
+                    sourceView.addInsertion(fileUri, ins);
+
+                } else if (term.Type == InsertionType.REQUIRES_IMPLICT) {
+
+                    var str = "        " + "//@assumes " + term.toJMLString(svc) + "; (impl)";
+                    var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                    var bkg = new Color(222, 222, 222);
+                    var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
+
+                    sourceView.addInsertion(fileUri, ins);
+                }
+
+                switch (term.Type) {
+                    case REQUIRES_EXPLICT:
+                    case REQUIRES_IMPLICT:
+                }
+
+
+            }
+
+        } catch (IOException | BadLocationException e) {
+            LOGGER.error("Failed to update ExtSourceView", e);
+        }
 
     }
 }
