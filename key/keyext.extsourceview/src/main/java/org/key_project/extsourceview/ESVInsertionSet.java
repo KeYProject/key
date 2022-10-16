@@ -1,14 +1,19 @@
 package org.key_project.extsourceview;
 
-import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
-public class ESVInsertionSet {
-    public final ImmutableList<InsertionTerm> Assumes;
-    public final ImmutableList<InsertionTerm> Asserts;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    public ESVInsertionSet(ImmutableList<InsertionTerm> assumes, ImmutableList<InsertionTerm> asserts) {
-        Assumes = assumes;
-        Asserts = asserts;
+public class ESVInsertionSet {
+    public final ImmutableList<InsertionTerm> Insertions;
+
+    public ESVInsertionSet(ImmutableList<InsertionTerm> ins) {
+        Insertions = ins;
+    }
+
+    public List<InsertionTerm> get(InsertionType... types) {
+        return Insertions.stream().filter(p -> Arrays.stream(types).anyMatch(q -> p.Type == q)).collect(Collectors.toList());
     }
 }

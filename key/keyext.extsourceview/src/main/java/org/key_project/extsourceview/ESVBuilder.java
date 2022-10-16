@@ -2,6 +2,10 @@ package org.key_project.extsourceview;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -13,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,20 +28,19 @@ public class ESVBuilder {
         var ante = sequent.antecedent().asList().toList();
         var succ = sequent.succedent().asList().toList();
 
-        var assumes = new ArrayList<InsertionTerm>();
-        var asserts = new ArrayList<InsertionTerm>();
+        var extInsertions = new ArrayList<InsertionTerm>();
 
         // all antecedents become asserts
         for (var sf: ante) {
             var t = sf.formula();
 
             if (!t.containsJavaBlockRecursive() && isExplicitRequires(t)) {
-                assumes.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, t));
+                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, t));
                 continue;
             }
 
             if (!t.containsJavaBlockRecursive() && isImplicitRequires(t)) {
-                assumes.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, t));
+                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, t));
                 continue;
             }
 
@@ -50,31 +54,24 @@ public class ESVBuilder {
 
             var t = sf.formula();
 
-            if (!t.containsJavaBlockRecursive() && isExplicitRequires(t)) {
-                assumes.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, tb.not(t)));
+            // an requires after [notLeft]
+            if (isExplicitRequires(t)) {
+                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, tb.not(t)));
                 continue;
             }
 
-            if (!t.containsJavaBlockRecursive() && isImplicitRequires(t)) {
-                assumes.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, tb.not(t)));
+            // an requires after [notLeft]
+            if (isImplicitRequires(t)) {
+                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, tb.not(t)));
                 continue;
             }
 
-            if (!t.containsJavaBlockRecursive() && isExplicitEnsures(t)) {
-                asserts.add(new InsertionTerm(InsertionType.ENSURES_EXPLICT, t));
-                realSuccTerms++;
-            }
-
-            if (!t.containsJavaBlockRecursive() && isImplicitEnsures(t)) {
-                asserts.add(new InsertionTerm(InsertionType.ENSURES_IMPLICT, t));
-                realSuccTerms++;
-            }
-
-            if (t.javaBlock() != null) {
-                //TODO impl
-                //TODO what about update ( java-block ( ... ) )
-                //asserts.add(t); // add stuff after java-block
-                realSuccTerms++;
+            if (t.containsJavaBlockRecursive()) {
+                var ins = extractSuccedent(t);
+                if (ins.size() > 0) {
+                    extInsertions.addAll(ins);
+                    realSuccTerms++;
+                }
             }
 
             //TODO fail if we can't identify a term (or ignore?)
@@ -84,10 +81,47 @@ public class ESVBuilder {
         //TODO fail if multiple succ blocks (?)
         //     or return some kind of either-or thingy
 
-        return new ESVInsertionSet(ImmutableList.fromList(assumes), ImmutableList.fromList(asserts));
+        return new ESVInsertionSet(ImmutableList.fromList(extInsertions));
+    }
+
+    public static List<InsertionTerm> extractSuccedent(Term t) {
+
+        // simple case
+        if (isExplicitEnsures(t)) {
+            return Collections.singletonList(new InsertionTerm(InsertionType.ENSURES_EXPLICT, t));
+        }
+
+        // simple case
+        if (isImplicitEnsures(t)) {
+            return Collections.singletonList(new InsertionTerm(InsertionType.ENSURES_IMPLICT, t));
+        }
+
+        if (t.op() == UpdateApplication.UPDATE_APPLICATION) {
+            return extractSuccedent(t.sub(1)); //TODO handle updates
+        }
+
+        if (t.op() == Modality.DIA && !t.javaBlock().isEmpty()) {
+            var result = new ArrayList<InsertionTerm>();
+            for (var ensTerm: splitFormula(t.sub(0), Junctor.AND)) {
+                if (isExplicitEnsures(ensTerm)) {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_EXPLICT, ensTerm));
+                } else if (isImplicitEnsures(ensTerm)) {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_IMPLICT, ensTerm));
+                } else {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_UNKNOWN, ensTerm)); //TOOD what do here?
+                }
+            }
+            return result;
+        }
+
+        //TODO what do here?
+        return Collections.emptyList();
+
     }
 
     public static boolean isExplicitRequires(Term term) {
+        if (term.containsJavaBlockRecursive()) return false;
+
         var origin = term.getOriginRef();
         if (origin.size() == 0) return false;
 
@@ -108,6 +142,8 @@ public class ESVBuilder {
     }
 
     public static boolean isImplicitRequires(Term term) {
+        if (term.containsJavaBlockRecursive()) return false;
+
         var origin = term.getOriginRef();
         if (origin.size() == 0) return false;
 
@@ -123,6 +159,8 @@ public class ESVBuilder {
     }
 
     public static boolean isExplicitEnsures(Term term) {
+        if (term.containsJavaBlockRecursive()) return false;
+
         var origin = term.getOriginRef();
         if (origin.size() == 0) return false;
 
@@ -143,6 +181,8 @@ public class ESVBuilder {
     }
 
     public static boolean isImplicitEnsures(Term term) {
+        if (term.containsJavaBlockRecursive()) return false;
+
         var origin = term.getOriginRef();
         if (origin.size() == 0) return false;
 
@@ -206,4 +246,25 @@ public class ESVBuilder {
 
         return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(), null, term.getOriginRef());
     }
+
+    public static List<Term> splitFormula(Term f, Operator j)  {
+        var r = new ArrayList<Term>();
+
+        if (f.op() == j) {
+
+            for (var f0: splitFormula(f.sub(0), j)) {
+                r.add(f0);
+            }
+            for (var f1: splitFormula(f.sub(1), j)) {
+                r.add(f1);
+            }
+
+        } else {
+            r.add(f);
+        }
+
+
+        return r;
+    }
+
 }

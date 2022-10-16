@@ -79,32 +79,51 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
             var parts = ESVBuilder.extractParts(tb, sequent);
 
-            for (var term: parts.Assumes) {
+            for (var term: parts.get(InsertionType.REQUIRES_IMPLICT)) {
 
-                if (term.Type == InsertionType.REQUIRES_EXPLICT) {
+                var str = "        " + "//@assumes " + term.toJMLString(svc) + "; //(impl)";
+                var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                var bkg = new Color(222, 222, 222);
+                var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
 
-                    var str = "        " + "//@assumes " + term.toJMLString(svc) + ";";
-                    var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
-                    var bkg = new Color(222, 222, 222);
-                    var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
+                sourceView.addInsertion(fileUri, ins);
 
-                    sourceView.addInsertion(fileUri, ins);
+            }
 
-                } else if (term.Type == InsertionType.REQUIRES_IMPLICT) {
+            sourceView.addInsertion(fileUri, new SourceViewInsertion(INSERTION_GROUP, 11, "", Color.BLACK, Color.WHITE));
 
-                    var str = "        " + "//@assumes " + term.toJMLString(svc) + "; (impl)";
-                    var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
-                    var bkg = new Color(222, 222, 222);
-                    var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
+            for (var term: parts.get(InsertionType.REQUIRES_EXPLICT)) {
 
-                    sourceView.addInsertion(fileUri, ins);
-                }
+                var str = "        " + "//@assumes " + term.toJMLString(svc) + ";";
+                var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                var bkg = new Color(222, 222, 222);
+                var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
 
-                switch (term.Type) {
-                    case REQUIRES_EXPLICT:
-                    case REQUIRES_IMPLICT:
-                }
+                sourceView.addInsertion(fileUri, ins);
 
+            }
+
+            for (var term: parts.get(InsertionType.ENSURES_IMPLICT)) {
+
+                var str = "        " + "//@assert " + term.toJMLString(svc) + "; //(impl)";
+                var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                var bkg = new Color(222, 222, 222);
+                var ins = new SourceViewInsertion(INSERTION_GROUP, 16, str, col, bkg);
+
+                sourceView.addInsertion(fileUri, ins);
+
+            }
+
+            sourceView.addInsertion(fileUri, new SourceViewInsertion(INSERTION_GROUP, 16, "", Color.BLACK, Color.WHITE));
+
+            for (var term: parts.get(InsertionType.ENSURES_EXPLICT)) {
+
+                var str = "        " + "//@assert " + term.toJMLString(svc) + ";";
+                var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+                var bkg = new Color(222, 222, 222);
+                var ins = new SourceViewInsertion(INSERTION_GROUP, 16, str, col, bkg);
+
+                sourceView.addInsertion(fileUri, ins);
 
             }
 
