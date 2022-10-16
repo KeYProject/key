@@ -847,6 +847,14 @@ public final class SourceView extends JComponent {
     /**
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
+     * Because we can add 'Insertions' into the document we have to differentiate in many places
+     * between source-positions and patched-positions.
+     * Where source-positions do not include insertions and are valid in the `source` attribute and
+     * patched-position contains them and are valid in the `patchedSource` attribute.
+     *
+     * The same is true for source-line and patched-line (line numbers)
+     * And tehre are a few methods to convert between the two systems.
+     *
      * @author Wolfram Pfeifer
      * @author lanzinger
      */
@@ -892,7 +900,7 @@ public final class SourceView extends JComponent {
         private String source;
 
         /**
-         * The file's content with Isertions
+         * The file's content with tabs replaced by spaces and with Insertions included
          */
         private String patchedSource;
 
@@ -1325,6 +1333,9 @@ public final class SourceView extends JComponent {
             return new Range(start, end);
         }
 
+        /**
+         * Get the used linebreaks (\n | \r\n) in this document
+         */
         private String getLineBreakSequence(){
             if (source.contains("\r\n")) {
                 return "\r\n";
@@ -1332,6 +1343,9 @@ public final class SourceView extends JComponent {
             return "\n";
         }
 
+        /**
+         * Add Insertions to a string
+         */
         private String patchSourceWithInsertions(String source, List<SourceViewInsertion> insertions) throws IOException {
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             lineInformation = IOUtil.computeLineInformation(inStream);
@@ -1353,6 +1367,9 @@ public final class SourceView extends JComponent {
 
         }
 
+        /**
+         * get the insertion at this (patched) position (or null if none)
+         */
         private SourceViewInsertion getInsertionAtPatchedPos(int patchedPos) {
 
             int patchedLine = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
@@ -1374,6 +1391,10 @@ public final class SourceView extends JComponent {
             return null;
         }
 
+        /**
+         * Translates an offset in the displayed document into a line-number in the source fule
+         * (must undo insertions)
+         */
         private int translatePatchedPosToSourceLine(int patchedPos) {
             if (this.cacheTranslatePosToSourceLine.containsKey(patchedPos)) {
                 return this.cacheTranslatePosToSourceLine.get(patchedPos);
@@ -1387,6 +1408,10 @@ public final class SourceView extends JComponent {
             return result;
         }
 
+        /**
+         * Translates an offset in the displayed document into an offset in the source fule
+         * (must undo insertions)
+         */
         private int translatePatchedPosToPatchedLine(int patchedPos) {
             if (this.cacheTranslatePosToPatchedLine.containsKey(patchedPos)) {
                 return this.cacheTranslatePosToPatchedLine.get(patchedPos);
@@ -1463,6 +1488,10 @@ public final class SourceView extends JComponent {
 
         }
 
+        /**
+         * Translates a line in the souce into a line in the displayed content
+         * (must add Insertion offsets)
+         */
         public int translateSourceLineToPatchedLine(int sourceLine) {
 
             int offset = (int)insertions.stream().filter(p -> p.Line < sourceLine).count();
@@ -1471,6 +1500,9 @@ public final class SourceView extends JComponent {
 
         }
 
+        /**
+         * Add a new insertion (mus move existign highlights)
+         */
         public void addInsertions(SourceViewInsertion ins) throws BadLocationException {
             this.insertions.add(ins);
 
@@ -1485,6 +1517,9 @@ public final class SourceView extends JComponent {
             batchUpdateHighlights(-1, patchedLine, 1, addLen);
         }
 
+        /**
+         * Remove an existing insertion (mus move existign highlights)
+         */
         public void removeInsertion(SourceViewInsertion ins) throws BadLocationException {
             if (!this.insertions.remove(ins)) {
                 return;
@@ -1501,6 +1536,13 @@ public final class SourceView extends JComponent {
             batchUpdateHighlights(patchedLine, patchedLine, -1, -remLen);
         }
 
+        /**
+         * Update the position of all existing highlights
+         * @param remLine remove line at this (patched) position
+         * @param startLine only update lines with (patched) line >=  (patched)startLine
+         * @param lineDelta change the patchedLine attribute by this value
+         * @param rangeDelta change the patchedRange attribute by this value
+         */
         private void batchUpdateHighlights(int remLine, int startLine, int lineDelta, int rangeDelta) throws BadLocationException {
             int maxLine = startLine;
             for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry: highlights.entrySet()) {
