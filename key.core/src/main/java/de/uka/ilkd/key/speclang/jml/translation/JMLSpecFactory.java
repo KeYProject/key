@@ -1000,7 +1000,7 @@ public class JMLSpecFactory {
             @Nonnull LabeledParserRuleContext originalRep, boolean isStatic)
             throws SLTranslationException {
 
-        var context = Context.inClass(kjt, false, tb);
+        var context = Context.inClass(kjt, isStatic, tb);
 
         // translateToTerm expression
         final Pair<IObserverFunction, Term> rep =
@@ -1023,7 +1023,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
 
         boolean isStatic = textualRep.getMods().contains(JMLModifier.STATIC);
-        var context = Context.inClass(kjt, false, tb);
+        var context = Context.inClass(kjt, isStatic, tb);
 
         // translateToTerm expression
         final LabeledParserRuleContext clause = textualRep.getRepresents();
