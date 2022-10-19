@@ -27,9 +27,7 @@ public final class JMLInfoExtractor {
      * Checks whether "comment" is a JML comment containing "key". see bugreport #1166
      */
     private static boolean checkFor(String key, String comment) {
-        int index = comment.indexOf(key);
-        boolean result = index >= 0 && MiscTools.isJMLComment(comment);
-        return result;
+        return comment.contains(key) && MiscTools.isJMLComment(comment);
     }
 
 
@@ -46,11 +44,26 @@ public final class JMLInfoExtractor {
     }
 
     /**
+     * Checks whether one of the passed comments is a JML comment
+     * containing "key" and not *bad*.
+     */
+    private static boolean checkForNotContaining(String key, String bad, ImmutableList<Comment> coms) {
+        for (Comment c : coms) {
+            if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks the passed comments for the spec math mode.
      */
     private static SpecMathMode checkForSpecMathMode(ImmutableList<Comment> comments) {
-        var specBigintMath = checkFor("spec_bigint_math", comments);
-        var specJavaMath = checkFor("spec_java_math", comments);
+        // This is hacky but hard to do better
+        // We exclude comments containing 'behaviour' since they can be from the method contract
+        var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
+        var specJavaMath = checkForNotContaining("spec_java_math", "behaviour", comments);
         // Consistency: bigint is returned when bot modifiers are given
         return specBigintMath ? SpecMathMode.BIGINT : (specJavaMath ? SpecMathMode.JAVA : null);
     }
