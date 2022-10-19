@@ -44,10 +44,10 @@ public final class JMLInfoExtractor {
     }
 
     /**
-     * Checks whether one of the passed comments is a JML comment
-     * containing "key" and not *bad*.
+     * Checks whether one of the passed comments is a JML comment containing "key" and not *bad*.
      */
-    private static boolean checkForNotContaining(String key, String bad, ImmutableList<Comment> coms) {
+    private static boolean checkForNotContaining(String key, String bad,
+            ImmutableList<Comment> coms) {
         for (Comment c : coms) {
             if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
                 return true;

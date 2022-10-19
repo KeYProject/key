@@ -43,37 +43,37 @@ public class IntegerHandler extends LDTHandler {
         this.specMathMode = specMathMode;
 
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-        jmlIntMap.put(ADD, intLDT.getJavaAddInt());
-        jmlIntMap.put(SUBTRACT, intLDT.getJavaSubInt());
-        jmlIntMap.put(MULT, intLDT.getJavaMulInt());
-        jmlIntMap.put(DIVISION, intLDT.getJavaDivInt());
-        jmlIntMap.put(MODULO, intLDT.getJavaMod());
-        jmlIntMap.put(BITWISE_AND, intLDT.getJavaBitwiseAndInt());
-        jmlIntMap.put(BITWISE_OR, intLDT.getJavaBitwiseOrInt());
-        jmlIntMap.put(BITWISE_XOR, intLDT.getJavaBitwiseXOrInt());
-        jmlIntMap.put(SHIFT_RIGHT, intLDT.getJavaShiftRightInt());
-        jmlIntMap.put(SHIFT_LEFT, intLDT.getJavaShiftLeftInt());
-        jmlIntMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getJavaUnsignedShiftRightInt());
-        jmlIntMap.put(BITWISE_NEGATE, intLDT.getJavaBitwiseNegation());
-        jmlIntMap.put(UNARY_MINUS, intLDT.getJavaUnaryMinusInt());
+        jmlIntMap.put(ADD, intLDT.getAddJint());
+        jmlIntMap.put(SUBTRACT, intLDT.getSubJint());
+        jmlIntMap.put(MULT, intLDT.getMulJint());
+        jmlIntMap.put(DIVISION, intLDT.getDivJint());
+        jmlIntMap.put(MODULO, intLDT.getModJint());
+        jmlIntMap.put(BITWISE_AND, intLDT.getBitwiseAndJInt());
+        jmlIntMap.put(BITWISE_OR, intLDT.getBitwiseOrJInt());
+        jmlIntMap.put(BITWISE_XOR, intLDT.getXorJint());
+        jmlIntMap.put(SHIFT_RIGHT, intLDT.getShiftrightJint());
+        jmlIntMap.put(SHIFT_LEFT, intLDT.getShiftleftJint());
+        jmlIntMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getUnsignedshiftrightJint());
+        // jmlIntMap.put(BITWISE_NEGATE, intLDT.getBitwiseNegateJint());
+        jmlIntMap.put(UNARY_MINUS, intLDT.getUnaryMinusJint());
         jmlIntMap.put(GT, intLDT.getGreaterThan());
         jmlIntMap.put(LT, intLDT.getLessThan());
         jmlIntMap.put(GTE, intLDT.getGreaterOrEquals());
         jmlIntMap.put(LTE, intLDT.getLessOrEquals());
 
-        jmlLongMap.put(ADD, intLDT.getJavaAddLong());
-        jmlLongMap.put(SUBTRACT, intLDT.getJavaSubLong());
-        jmlLongMap.put(MULT, intLDT.getJavaMulLong());
-        jmlLongMap.put(DIVISION, intLDT.getJavaDivLong());
-        jmlLongMap.put(MODULO, intLDT.getJavaMod());
-        jmlLongMap.put(BITWISE_AND, intLDT.getJavaBitwiseAndLong());
-        jmlLongMap.put(BITWISE_OR, intLDT.getJavaBitwiseOrLong());
-        jmlLongMap.put(BITWISE_XOR, intLDT.getJavaBitwiseXOrLong());
-        jmlLongMap.put(SHIFT_RIGHT, intLDT.getJavaShiftRightLong());
-        jmlLongMap.put(SHIFT_LEFT, intLDT.getJavaShiftLeftLong());
-        jmlLongMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getJavaUnsignedShiftRightLong());
-        jmlLongMap.put(BITWISE_NEGATE, intLDT.getJavaBitwiseNegation());
-        jmlLongMap.put(UNARY_MINUS, intLDT.getJavaUnaryMinusLong());
+        jmlLongMap.put(ADD, intLDT.getAddJlong());
+        jmlLongMap.put(SUBTRACT, intLDT.getSubJlong());
+        jmlLongMap.put(MULT, intLDT.getMulJlong());
+        jmlLongMap.put(DIVISION, intLDT.getDivJlong());
+        jmlLongMap.put(MODULO, intLDT.getModJlong());
+        jmlLongMap.put(BITWISE_AND, intLDT.getBitwiseAndJLong());
+        jmlLongMap.put(BITWISE_OR, intLDT.getBitwiseOrJlong());
+        jmlLongMap.put(BITWISE_XOR, intLDT.getXorJlong());
+        jmlLongMap.put(SHIFT_RIGHT, intLDT.getShiftrightJlong());
+        jmlLongMap.put(SHIFT_LEFT, intLDT.getShiftleftJlong());
+        jmlLongMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getUnsignedshiftrightJlong());
+        // jmlLongMap.put(BITWISE_NEGATE, intLDT.getBitwiseNegateJlong());
+        jmlLongMap.put(UNARY_MINUS, intLDT.getUnaryMinusJlong());
         jmlLongMap.put(GT, intLDT.getGreaterThan());
         jmlLongMap.put(LT, intLDT.getLessThan());
         jmlLongMap.put(GTE, intLDT.getGreaterOrEquals());
@@ -84,13 +84,20 @@ public class IntegerHandler extends LDTHandler {
         jmlBigintMap.put(MULT, intLDT.getMul());
         jmlBigintMap.put(DIVISION, intLDT.getJDivision());
         jmlBigintMap.put(MODULO, intLDT.getJavaMod());
+        // TODO bigint bitwise operators
+        // jmlBigintMap.put(BITWISE_AND, intLDT.getBitwiseAndJlong());
+        // jmlBigintMap.put(BITWISE_OR, intLDT.getBitwiseOrJlong());
+        // jmlBigintMap.put(BITWISE_XOR, intLDT.getXorJlong());
+        jmlBigintMap.put(SHIFT_RIGHT, intLDT.getShiftright());
+        jmlBigintMap.put(SHIFT_LEFT, intLDT.getShiftleft());
+        // jmlBigintMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getUnsignedshiftrightJlong());
+        // jmlBigintMap.put(BITWISE_NEGATE, intLDT.getBitwiseNegate());
         jmlBigintMap.put(UNARY_MINUS, intLDT.getNeg());
         jmlBigintMap.put(GT, intLDT.getGreaterThan());
         jmlBigintMap.put(LT, intLDT.getLessThan());
         jmlBigintMap.put(GTE, intLDT.getGreaterOrEquals());
         jmlBigintMap.put(LTE, intLDT.getLessOrEquals());
 
-        // TODO bigint bitwise operators?
 
         opCategories.put(PrimitiveType.JAVA_BIGINT, jmlBigintMap);
         opCategories.put(PrimitiveType.JAVA_INT, jmlIntMap);

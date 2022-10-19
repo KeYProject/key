@@ -380,6 +380,134 @@ public final class IntegerLDT extends LDT {
         return lessOrEquals;
     }
 
+    public Function getAddJint() {
+        return addJint;
+    }
+
+    public Function getAddJlong() {
+        return addJlong;
+    }
+
+    public Function getSubJint() {
+        return subJint;
+    }
+
+    public Function getSubJlong() {
+        return subJlong;
+    }
+
+    public Function getMulJint() {
+        return mulJint;
+    }
+
+    public Function getMulJlong() {
+        return mulJlong;
+    }
+
+    public Function getModJint() {
+        return modJint;
+    }
+
+    public Function getModJlong() {
+        return modJlong;
+    }
+
+    public Function getDivJint() {
+        return divJint;
+    }
+
+    public Function getDivJlong() {
+        return divJlong;
+    }
+
+    public Function getShiftright() {
+        return shiftright;
+    }
+
+    public Function getShiftleft() {
+        return shiftleft;
+    }
+
+    public Function getShiftrightJint() {
+        return shiftrightJint;
+    }
+
+    public Function getShiftrightJlong() {
+        return shiftrightJlong;
+    }
+
+    public Function getShiftleftJint() {
+        return shiftleftJint;
+    }
+
+    public Function getShiftleftJlong() {
+        return shiftleftJlong;
+    }
+
+    public Function getUnsignedshiftrightJint() {
+        return unsignedshiftrightJint;
+    }
+
+    public Function getUnsignedshiftrightJlong() {
+        return unsignedshiftrightJlong;
+    }
+
+    public Function getOrJint() {
+        return orJint;
+    }
+
+    public Function getBitwiseOrJlong() {
+        return orJlong;
+    }
+
+    public Function getAndJint() {
+        return andJint;
+    }
+
+    public Function getAndJlong() {
+        return andJlong;
+    }
+
+    public Function getXorJint() {
+        return xorJint;
+    }
+
+    public Function getXorJlong() {
+        return xorJlong;
+    }
+
+    public Function getBitwiseOrJInt() {
+        return orJint;
+    }
+
+    public Function getBitwiseAndJInt() {
+        return andJint;
+    }
+
+    public Function getBitwiseAndJLong() {
+        return andJlong;
+    }
+
+    public Function getUnaryMinusJint() {
+        return unaryMinusJint;
+    }
+
+    public Function getUnaryMinusJlong() {
+        return unaryMinusJlong;
+    }
+
+    public Function getBinaryOr() {
+        return binaryOr;
+    }
+
+    public Function getBinaryXOr() {
+        return binaryXOr;
+    }
+
+    public Function getBinaryAnd() {
+        return binaryAnd;
+    }
+
     /**
      * Placeholder for the loop index variable in an enhanced for loop over arrays. Follows the
      * proposal by David Cok to adapt JML to Java5.
