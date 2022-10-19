@@ -161,7 +161,7 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET expression EQUAL_SINGLE expression SEMI_TOPLEVEL;
+set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?

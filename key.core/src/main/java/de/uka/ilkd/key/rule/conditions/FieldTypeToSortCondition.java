@@ -54,7 +54,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
             if (op instanceof Function) {
-                var split = HeapLDT.trySplitFieldName(op);
+                HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
                 if (split == null) {
                     return null;
                 }

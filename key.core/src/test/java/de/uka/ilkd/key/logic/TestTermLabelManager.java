@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import java.io.File;
 import java.util.*;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -872,10 +873,11 @@ public class TestTermLabelManager {
             this.name = name;
         }
 
+        @Nonnull
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
                 throws RuleAbortException {
-            return null;
+            throw new RuleAbortException("no implementation");
         }
 
         @Override

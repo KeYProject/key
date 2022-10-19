@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -82,7 +83,7 @@ public class PreParser {
      * Parse and interpret class level comments.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
-            URI fileName, Position pos) {
+            @Nullable URI fileName, Position pos) {
         return parseClassLevel(
             new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
@@ -99,7 +100,7 @@ public class PreParser {
      * Parse and interpret the given string as a method level construct.
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
-            URI fileName, Position position) {
+            @Nullable URI fileName, Position position) {
         return parseMethodLevel(
             new PositionedString(concatenatedComment, new Location(fileName, position)));
     }

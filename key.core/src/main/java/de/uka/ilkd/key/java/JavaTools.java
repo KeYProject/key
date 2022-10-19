@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -16,7 +18,6 @@ import org.key_project.util.ExtList;
  * key.util.MiscTools here.
  *
  * @author bruns
- *
  */
 public final class JavaTools {
 
@@ -46,6 +47,20 @@ public final class JavaTools {
     public static JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
+        return replaceStatement(jb, services, activeStatement, null);
+    }
+
+    /**
+     * Returns the passed java block with `statement` replaced with `with`.
+     *
+     * @param jb the block
+     * @param statement the statement to replace
+     * @param with what to replace with. If this is null, the statement will be removed
+     * @return the modified block
+     */
+    public static JavaBlock replaceStatement(JavaBlock jb, Services services,
+            SourceElement statement, @Nullable SourceElement with) {
+        assert jb.program() != null;
         Statement newProg = (Statement) (new CreatingASTVisitor(jb.program(), false, services) {
             private boolean done = false;
 
@@ -58,9 +73,12 @@ public final class JavaTools {
 
             @Override
             public void doAction(ProgramElement node) {
-                if (!done && node == activeStatement) {
+                if (!done && node == statement) {
                     done = true;
                     stack.pop();
+                    if (with != null) {
+                        addToTopOfStack(with);
+                    }
                     changed();
                 } else {
                     super.doAction(node);

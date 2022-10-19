@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -139,7 +141,7 @@ public class JMLSpecFactory {
             } else {
                 freeInvariant = tb.tt();
                 for (LabeledParserRuleContext expr : originalFreeInvariant) {
-                    Term translated = new JmlIO().services(services).context(context)
+                    Term translated = new JmlIO(services).context(context)
                             .parameters(allVars).atPres(atPres).atBefore(atPres)
                             .translateTerm(expr, SpecType.LOOP_INVARIANT_FREE);
                     freeInvariant = tb.andSC(freeInvariant, tb.convertToFormula(translated));
@@ -1324,13 +1326,8 @@ public class JMLSpecFactory {
                     .create();
     }
 
-    /**
-     * Translates the condition Term of a JmlAssert statement.
-     *
-     * @param jmlAssert the statement to create the condition for
-     * @param pm the enclosing method
-     */
-    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+    private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
+            IProgramMethod pm) {
         final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
@@ -1341,19 +1338,76 @@ public class JMLSpecFactory {
                 tb.atPreVar(parameter.toString(), parameter.getKeYJavaType(), true));
         }
         final ImmutableList<ProgramVariable> paramVars =
-            append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
-        final ProgramVariableCollection pv = new ProgramVariableCollection(
-            tb.selfVar(pm, pm.getContainerType(), false), paramVars, tb.resultVar(pm, false),
-            tb.excVar(pm, false), atPreVars, termify(atPreVars), Collections.emptyMap(), // should
-                                                                                         // be the
-                                                                                         // pre-state
-                                                                                         // of the
-                                                                                         // enclosing
-                                                                                         // contract
+            append(collectLocalVariablesVisibleTo(statement, pm), parameters);
+        return new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false),
+            paramVars, tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
+            Collections.emptyMap(), // should be the pre-state of the enclosing contract
             Collections.emptyMap() // ignore for now
         );
-        var io = new JmlIO(services).context(Context.inMethodWithSelfVar(pm, pv.selfVar));
-        jmlAssert.translateCondition(io, pv);
+    }
+
+    /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final var pv = createProgramVariablesForStatement(jmlAssert, pm);
+        jmlAssert.translateCondition(new JmlIO(services).context(Context.inMethod(pm, tb)), pv);
+    }
+
+    public @Nullable String checkSetStatementAssignee(Term assignee) {
+        if (assignee.op() instanceof LocationVariable) {
+            var variable = (LocationVariable) assignee.op();
+            if (variable.isGhost()) {
+                return null;
+            } else {
+                return variable + " is not a ghost variable";
+            }
+        } else if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
+            var field = assignee.subs().last();
+            var op = field.op();
+            var split = HeapLDT.trySplitFieldName(op);
+            if (split != null) {
+                var attribute =
+                    services.getJavaInfo().getAttribute(split.attributeName, split.className);
+                if (attribute.isGhost()) {
+                    return null;
+                } else {
+                    return op + " is not a ghost field";
+                }
+            } else if (op.equals(services.getTypeConverter().getHeapLDT().getArr())) {
+                return "Arrays are not writeable using set statements";
+            } else {
+                return op + " is not a class field";
+            }
+        } else {
+            return "Neither a field access nor a local variable access";
+        }
+    }
+
+    /**
+     * Translates a set statement.
+     *
+     * @param statement the set statement
+     * @param pm the enclosing method
+     */
+    public void translateSetStatement(final SetStatement statement, final IProgramMethod pm)
+            throws SLTranslationException {
+        final var pv = createProgramVariablesForStatement(statement, pm);
+        JmlParser.Set_statementContext setStatementContext = statement.takeParserContext();
+        var io = new JmlIO(services).context(Context.inMethod(pm, tb)).selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        var assignee = io.translateTerm(setStatementContext.assignee);
+        String error = checkSetStatementAssignee(assignee);
+        if (error != null) {
+            throw new SLTranslationException(
+                "Invalid assignment target for set statement: " + error,
+                Location.fromToken(setStatementContext.start));
+        }
     }
 
     /**

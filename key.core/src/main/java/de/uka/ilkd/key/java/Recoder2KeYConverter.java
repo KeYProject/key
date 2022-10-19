@@ -939,7 +939,7 @@ public class Recoder2KeYConverter {
      * @return the converted statement
      */
     public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
-        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja), services);
+        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja));
     }
 
     // ------------------- declaration ---------------------
@@ -1227,7 +1227,7 @@ public class Recoder2KeYConverter {
 
     private static boolean containsModifier(recoder.java.declaration.JavaDeclaration fs,
             Class<? extends DeclarationSpecifier> cls) {
-        var specifiers = fs.getDeclarationSpecifiers();
+        ASTList<DeclarationSpecifier> specifiers = fs.getDeclarationSpecifiers();
         int s = (specifiers == null) ? 0 : specifiers.size();
         for (int i = 0; i < s; i += 1) {
             if (cls.isInstance(specifiers.get(i))) {
@@ -1774,6 +1774,11 @@ public class Recoder2KeYConverter {
 
     public CopyAssignment convert(recoder.java.expression.operator.CopyAssignment arg) {
         return new CopyAssignment(collectChildrenAndComments(arg));
+    }
+
+    public SetStatement convert(
+            de.uka.ilkd.key.java.recoderext.SetStatement arg) {
+        return new SetStatement(collectChildrenAndComments(arg), arg.getParserContext());
     }
 
     public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr) {

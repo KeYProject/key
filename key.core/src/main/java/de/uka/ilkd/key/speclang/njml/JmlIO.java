@@ -43,7 +43,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class JmlIO {
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
-    private Services services;
+    private final Services services;
     private KeYJavaType specInClass;
     private ProgramVariable selfVar;
     private SpecMathMode specMathMode;
@@ -52,13 +52,6 @@ public class JmlIO {
     private ProgramVariable excVar;
     private Map<LocationVariable, Term> atPres;
     private Map<LocationVariable, Term> atBefores;
-
-    /**
-     * Generate an empty jml i/o instance. No very useful until a {@link #services(Services)} is
-     * provided.
-     */
-    public JmlIO() {
-    }
 
     /**
      * Generate an empty jml i/o instance.
@@ -350,14 +343,6 @@ public class JmlIO {
      */
     public JmlIO resultVariable(ProgramVariable resultVar) {
         this.resultVar = resultVar;
-        return this;
-    }
-
-    /**
-     * Sets the current services
-     */
-    public JmlIO services(Services services) {
-        this.services = services;
         return this;
     }
 

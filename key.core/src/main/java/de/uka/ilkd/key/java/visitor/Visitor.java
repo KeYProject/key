@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -180,6 +181,8 @@ public interface Visitor {
     void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
 
     void performActionOnCopyAssignment(CopyAssignment x);
+
+    void performActionOnSetStatement(SetStatement x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 

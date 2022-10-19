@@ -1285,6 +1285,17 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnSetStatement(SetStatement x) {
+        l.print("//@ ");
+        l.keyWord("set");
+
+        l.beginRelativeC();
+        l.brk();
+        performActionOnCopyAssignment(x);
+        l.end();
+    }
+
+    @Override
     public void performActionOnDivideAssignment(DivideAssignment x) {
         printOperator(x, "/=");
     }

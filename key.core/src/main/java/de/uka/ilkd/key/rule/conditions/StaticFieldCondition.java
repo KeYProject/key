@@ -41,7 +41,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
         final Term f = (Term) o;
         final Operator op = f.op();
         if (op instanceof Function) {
-            var split = HeapLDT.trySplitFieldName(op);
+            HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split == null) {
                 return false;
             }

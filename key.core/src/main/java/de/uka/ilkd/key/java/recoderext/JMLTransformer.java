@@ -429,16 +429,19 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
+        var statement = stat.getAssignment();
+
         // parse statement, attach to AST
         de.uka.ilkd.key.java.Position pos =
             de.uka.ilkd.key.java.Position.fromToken(stat.getAssignment().start);
         try {
-            String assignment = getFullText(stat.getAssignment()).substring(3);
+            String assignment = getFullText(statement).substring(3);
             List<Statement> stmtList = services.getProgramFactory().parseStatements(assignment);
             assert stmtList.size() == 1;
-            CopyAssignment assignStmt = (CopyAssignment) stmtList.get(0);
-            updatePositionInformation(assignStmt, pos);
-            doAttach(assignStmt, astParent, childIndex);
+            var setStatement = (CopyAssignment) stmtList.get(0);
+            var set = new SetStatement(setStatement, statement);
+            updatePositionInformation(set, pos);
+            doAttach(set, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
                 Location.fromToken(stat.getAssignment().start), e);

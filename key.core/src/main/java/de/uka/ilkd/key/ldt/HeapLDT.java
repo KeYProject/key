@@ -150,16 +150,28 @@ public final class HeapLDT extends LDT {
     // public interface
     // -------------------------------------------------------------------------
 
+    /**
+     * Wrapper class
+     */
     public static final class SplitFieldName {
+        /** the class name */
         public final String className;
+        /** the attribute name */
         public final String attributeName;
 
+        /** Constructor */
         public SplitFieldName(String className, String attributeName) {
             this.className = className;
             this.attributeName = attributeName;
         }
     }
 
+    /**
+     * Splits a field name.
+     *
+     * @param symbol the field name to split.
+     * @return the split field name
+     */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         var name = symbol.name().toString();
         // check for normal attribute

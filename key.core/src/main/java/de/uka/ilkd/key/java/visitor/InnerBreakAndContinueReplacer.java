@@ -321,6 +321,17 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnSetStatement(final SetStatement x) {
+        DefaultAction def = new DefaultAction() {
+            @Override
+            ProgramElement createNewElement(final ExtList changeList) {
+                return new SetStatement(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnThen(final Then x) {
         DefaultAction def = new DefaultAction() {
             @Override
