@@ -176,8 +176,7 @@ public class StateVars {
         String newName = tb.newName(name);
         ProgramElementName pen = new ProgramElementName(newName);
         ProgramVariable progVar = (ProgramVariable) t.op();
-        LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
-            progVar.getContainerType(), progVar.isStatic(), progVar.isModel());
+        LocationVariable newVar = LocationVariable.fromProgramVariable(progVar, pen);
         register(newVar, services);
         return tb.var(newVar);
     }
