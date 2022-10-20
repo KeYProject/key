@@ -16,10 +16,6 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 
 public class IntegerHandler extends LDTHandler {
 
-    private enum IntType {
-        Bigint, Int, Long
-    }
-
     private final Map<JMLOperator, Operator> jmlIntMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlLongMap = new EnumMap<>(JMLOperator.class);
