@@ -94,8 +94,12 @@ public class OriginRef {
     public URI fileURI() {
         if (File == null) {
             return null;
-        };
-        return new File(File).toURI();
+        }
+        if (File.startsWith("file:")) {
+            return new File(File.substring("file:".length())).toURI();
+        } else {
+            return new File(File).toURI();
+        }
     }
 
     public boolean hasFile() {
