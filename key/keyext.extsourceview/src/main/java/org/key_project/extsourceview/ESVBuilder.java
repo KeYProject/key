@@ -72,6 +72,14 @@ public class ESVBuilder {
                     extInsertions.addAll(ins);
                     realSuccTerms++;
                 }
+            } else {
+
+                var ins = extractSuccedent(t);
+                if (ins.size() > 0) {
+                    extInsertions.addAll(ins);
+                    realSuccTerms++;
+                }
+
             }
 
             //TODO fail if we can't identify a term (or ignore?)
@@ -114,8 +122,19 @@ public class ESVBuilder {
             return result;
         }
 
-        //TODO what do here?
-        return Collections.emptyList();
+        {
+            var result = new ArrayList<InsertionTerm>();
+            for (var ensTerm : splitFormula(t, Junctor.AND)) {
+                if (isExplicitEnsures(ensTerm)) {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_EXPLICT, ensTerm));
+                } else if (isImplicitEnsures(ensTerm)) {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_IMPLICT, ensTerm));
+                } else {
+                    result.add(new InsertionTerm(InsertionType.ENSURES_UNKNOWN, ensTerm)); //TOOD what do here?
+                }
+            }
+            return result;
+        }
 
     }
 
