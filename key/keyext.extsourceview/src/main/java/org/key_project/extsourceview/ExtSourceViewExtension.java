@@ -81,7 +81,7 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
             for (var term: parts.get(InsertionType.REQUIRES_IMPLICT)) {
 
-                var str = "        " + "//@assumes " + term.toJMLString(svc) + "; //(impl)";
+                var str = "        " + "//@assume " + term.toJMLString(svc) + "; //(impl)";
                 var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
                 var bkg = new Color(222, 222, 222);
                 var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
@@ -94,7 +94,7 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
             for (var term: parts.get(InsertionType.REQUIRES_EXPLICT)) {
 
-                var str = "        " + "//@assumes " + term.toJMLString(svc) + ";";
+                var str = "        " + "//@assume " + term.toJMLString(svc) + ";";
                 var col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
                 var bkg = new Color(222, 222, 222);
                 var ins = new SourceViewInsertion(INSERTION_GROUP, 11, str, col, bkg);
