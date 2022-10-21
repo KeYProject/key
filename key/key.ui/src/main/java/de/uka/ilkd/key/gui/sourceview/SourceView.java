@@ -922,6 +922,9 @@ public final class SourceView extends JComponent {
         /** Extra lines dynamically added into the view */
         private final List<SourceViewInsertion> insertions = new ArrayList<>();
 
+        private final List<MouseListener> registeredListener = new ArrayList<>();
+        private final List<MouseMotionListener> registeredMotionListener = new ArrayList<>();
+
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName  = extractFileName(fileURI);
@@ -976,12 +979,15 @@ public final class SourceView extends JComponent {
         }
 
         private void initTextPane(String fsource) {
-            for (MouseListener l: textPane.getMouseListeners()) {
+            for (MouseListener l: registeredListener) {
                 textPane.removeMouseListener(l);
             }
-            for (MouseMotionListener l: textPane.getMouseMotionListeners()) {
+            registeredListener.clear();
+
+            for (MouseMotionListener l: registeredMotionListener) {
                 textPane.removeMouseMotionListener(l);
             }
+            registeredMotionListener.clear();
 
             this.cacheTranslateToSourcePos.clear();
             this.cacheTranslateToPatchedPos.clear();
@@ -999,7 +1005,7 @@ public final class SourceView extends JComponent {
                 textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
                 textPane.setToolTipText("");
                 textPane.setEditable(false);
-                textPane.addMouseMotionListener(new MouseMotionAdapter() {
+                MouseMotionAdapter mml = new MouseMotionAdapter() {
                     @Override
                     public void mouseMoved(MouseEvent mouseEvent) {
                         if (isSymbExecHighlighted(mouseEvent.getPoint())) {
@@ -1015,7 +1021,9 @@ public final class SourceView extends JComponent {
 
                         textPane.setCursor(Cursor.getDefaultCursor());
                     }
-                });
+                };
+                textPane.addMouseMotionListener(mml);
+                registeredMotionListener.add(mml);
 
                 JavaDocument doc = new JavaDocument();
                 textPane.setDocument(doc);
@@ -1038,7 +1046,7 @@ public final class SourceView extends JComponent {
             }
 
             // add a listener to highlight the line currently pointed to
-            textPane.addMouseMotionListener(new MouseMotionListener() {
+            MouseMotionListener mml2 = new MouseMotionListener() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     synchronized(SourceView.this) {
@@ -1048,10 +1056,11 @@ public final class SourceView extends JComponent {
 
                 @Override
                 public void mouseDragged(MouseEvent e) { }
-            });
+            };
+            textPane.addMouseMotionListener(mml2);
+            registeredMotionListener.add(mml2);
 
-            textPane.addMouseListener(new MouseAdapter() {
-
+            MouseMotionListener mml3 = new MouseAdapter() {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     synchronized(SourceView.this) {
@@ -1065,11 +1074,18 @@ public final class SourceView extends JComponent {
                         updateSelectionHighlight(e.getPoint());
                     }
                 }
-            });
+            };
+            textPane.addMouseMotionListener(mml3);
+            registeredMotionListener.add(mml3);
 
             MouseAdapter adapter = new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
+
             textPane.addMouseListener(adapter);
+            registeredListener.add(adapter);
+
             textPane.addMouseMotionListener(adapter);
+            registeredMotionListener.add(adapter);
+
         }
 
         private void initLineNumbers() {
