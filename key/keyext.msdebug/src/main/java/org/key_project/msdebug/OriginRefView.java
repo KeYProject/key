@@ -123,7 +123,8 @@ public class OriginRefView extends MSDebugTab {
                     if (o.hasFile()) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = MSDUtil.getLines(mediator, o.File, i, i);
-                            str = " ".repeat(o.PositionStart) + MSDUtil.safeSubstring(str, o.PositionStart, o.PositionEnd)  + " ".repeat(o.PositionEnd);
+                            txt += str.stripTrailing() + "\n";
+                            str = " ".repeat(o.PositionStart-1) + "[" + MSDUtil.safeSubstring(str, o.PositionStart, o.PositionEnd) + "]" + " ".repeat(o.PositionEnd-1);
                             txt += str + "\n";
                             txt += "\n";
                         }

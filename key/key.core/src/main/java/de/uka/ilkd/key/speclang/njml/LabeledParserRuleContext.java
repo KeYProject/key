@@ -69,7 +69,7 @@ public class LabeledParserRuleContext {
                 ctx.start.getLine(),
                 ctx.stop.getLine(),
                 ctx.start.getCharPositionInLine(),
-                ctx.stop.getCharPositionInLine(),
+                ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1),
                 specType
         );
 
