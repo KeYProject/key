@@ -4,7 +4,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Objects;
 
 public class OriginRef {
 
@@ -26,8 +25,8 @@ public class OriginRef {
     public final int LineStart;
     public final int LineEnd;
 
-    public final int PositionStart;
-    public final int PositionEnd;
+    public final int ColumnStart;
+    public final int ColumnEnd;
 
     public final OriginRefType Type;
 
@@ -35,19 +34,19 @@ public class OriginRef {
         this(null, 0, 0, 0, 0, type);
     }
 
-    public OriginRef(String file, int lineStart, int lineEnd, int positionStart, int positionEnd, OriginRefType type) {
+    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
             LineEnd = 0;
-            PositionStart = 0;
-            PositionEnd = 0;
+            ColumnStart = 0;
+            ColumnEnd = 0;
         } else {
             File = file;
             LineStart = lineStart;
             LineEnd = lineEnd;
-            PositionStart = positionStart;
-            PositionEnd = positionEnd;
+            ColumnStart = colStart;
+            ColumnEnd = colEnd;
         }
 
         Type = type;
@@ -55,13 +54,15 @@ public class OriginRef {
 
     @Override
     public boolean equals(Object o) {
+        if (o.getClass() != this.getClass()) return false;
+
         final OriginRef cmp = (OriginRef) o;
 
-        return this.Type ==  cmp.Type &&
-               this.LineStart ==  cmp.LineStart &&
-               this.LineEnd ==  cmp.LineEnd &&
-               this.PositionStart ==  cmp.PositionStart &&
-               this.PositionEnd ==  cmp.PositionEnd;
+        return this.Type        ==  cmp.Type        &&
+               this.LineStart   ==  cmp.LineStart   &&
+               this.LineEnd     ==  cmp.LineEnd     &&
+               this.ColumnStart ==  cmp.ColumnStart &&
+               this.ColumnEnd   ==  cmp.ColumnEnd;
     }
 
     private int hashcode = -1;
@@ -81,8 +82,8 @@ public class OriginRef {
         hash += 7 * this.Type.hashCode();
         hash += 7 * this.LineStart;
         hash += 7 * this.LineEnd;
-        hash += 7 * this.PositionStart;
-        hash += 7 * this.PositionEnd;
+        hash += 7 * this.ColumnStart;
+        hash += 7 * this.ColumnEnd;
         return hash;
     }
 
@@ -125,9 +126,9 @@ public class OriginRef {
                 line = LineStart+"-"+LineEnd;
             }
 
-            String pos = ""+PositionStart;
-            if (PositionStart != PositionEnd) {
-                pos = PositionStart+"-"+PositionEnd;
+            String pos = ""+ ColumnStart;
+            if (ColumnStart != ColumnEnd) {
+                pos = ColumnStart +"-"+ ColumnEnd;
             }
 
             return String.format("%-17s", Type) + " || " + prefix + main + ":" + line + " [" + pos + "]";

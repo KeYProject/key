@@ -236,7 +236,7 @@ public final class SourceView extends JComponent {
      *  which has level {@code Integer.maxValue() - 1}. </p>
      *
      * @param fileURI the URI of the file in which to create the highlight.
-     * @param line the line to highlight.
+     * @param sourceLine the line to highlight.
      * @param color the color to use for the highlight.
      * @param level the level of the highlight.
      * @return the highlight.
@@ -254,6 +254,39 @@ public final class SourceView extends JComponent {
         int patchedLine = tab.translateSourceLineToPatchedLine(sourceLine);
 
         Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine);
+
+        return addHighlightDirect(fileURI, sourceLine, patchedLine, patchedRange, color, level);
+    }
+
+    /**
+     * <p> Creates a new highlight. </p>
+     *
+     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
+     *  starting with the one with the lowest level. </p>
+     *
+     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
+     *  except for the highlight that appears when the user moves the mouse over a line,
+     *  which has level {@code Integer.maxValue() - 1}. </p>
+     *
+     * @param fileURI the URI of the file in which to create the highlight.
+     * @param sourceLine the line to highlight.
+     * @param color the color to use for the highlight.
+     * @param level the level of the highlight.
+     * @return the highlight.
+     *
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
+     */
+    public SourceViewHighlight addHighlight(URI fileURI, int sourceLine, int startCol, int endCol, Color color, int level) throws BadLocationException, IOException {
+        Tab tab = tabs.get(fileURI);
+
+        if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
+            throw new BadLocationException("Not a valid line number for " + fileURI, sourceLine);
+        }
+
+        int patchedLine = tab.translateSourceLineToPatchedLine(sourceLine);
+
+        Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine, startCol, endCol);
 
         return addHighlightDirect(fileURI, sourceLine, patchedLine, patchedRange, color, level);
     }
@@ -1321,6 +1354,10 @@ public final class SourceView extends JComponent {
          * @return the range of text (may be empty if there is just whitespace in the line)
          */
         private Range calculatePatchedLineRangeFromLine(int patchedLine) {
+            return calculatePatchedLineRangeFromLine(patchedLine, true);
+        }
+
+        private Range calculatePatchedLineRangeFromLine(int patchedLine, boolean skipLeadingSpaces) {
 
             int start = 0;
 
@@ -1341,9 +1378,35 @@ public final class SourceView extends JComponent {
                 end = patchedSource.length();
             }
 
-            // ignore whitespace at the beginning of the line
-            while (start < patchedSource.length() && start < end && Character.isWhitespace(patchedSource.charAt(start))) {
-                start++;
+            if (skipLeadingSpaces) {
+                // ignore whitespace at the beginning of the line
+                while (start < patchedSource.length() && start < end && Character.isWhitespace(patchedSource.charAt(start))) {
+                    start++;
+                }
+            }
+
+            return new Range(start, end);
+        }
+
+
+        public Range calculatePatchedLineRangeFromLine(int patchedLine, int startCol, int endCol) {
+            Range fullRange = calculatePatchedLineRangeFromLine(patchedLine, false);
+
+            int start = fullRange.start();
+            int end = fullRange.end();
+
+            startCol += start + 1;
+            endCol   += start + 1;
+
+            if (startCol > start) {
+                start = Math.min(startCol, fullRange.end());
+            }
+            if (endCol < end) {
+                end = Math.max(endCol, fullRange.start());
+            }
+
+            if (start > end) {
+                end = start;
             }
 
             return new Range(start, end);
@@ -1604,7 +1667,6 @@ public final class SourceView extends JComponent {
                 applyHighlights(remLine);
             }
         }
-
     }
 
     /**

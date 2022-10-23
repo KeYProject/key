@@ -3,7 +3,6 @@ package org.key_project.msdebug;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewHighlight;
 import de.uka.ilkd.key.logic.Term;
@@ -25,6 +24,8 @@ public class OriginRefView extends MSDebugTab {
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
 
     private JTextArea taSource;
+
+    private final static int HIGHTLIGHT_LEVEL = 11;
 
     public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
@@ -73,26 +74,32 @@ public class OriginRefView extends MSDebugTab {
             boolean anyRefs = false;
 
             for (OriginRef o : MSDUtil.getParentWithOriginRef(pos).getOriginRef()) {
-                for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                    if (o.hasFile()) {
-                        existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_MAIN, 11));
-                    }
-                }
+                highlightOriginRef(sv, o);
                 anyRefs = true;
             }
 
             if (!anyRefs) {
                 for (OriginRef o : MSDUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
-                    for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                        if (o.hasFile()) {
-                            existingHighlights.add(sv.addHighlight(o.fileURI(), i, COL_HIGHLIGHT_CHILDS, 11));
-                        }
-                    }
+                    highlightOriginRef(sv, o);
                 }
             }
 
         } catch (IOException | BadLocationException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void highlightOriginRef(SourceView sv, OriginRef orig) throws BadLocationException, IOException {
+        if (!orig.hasFile()) return;
+
+        if (orig.LineStart == orig.LineEnd) {
+            existingHighlights.add(sv.addHighlight(orig.fileURI(), orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+        } else {
+            for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
+                if (orig.hasFile()) {
+                    existingHighlights.add(sv.addHighlight(orig.fileURI(), i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                }
+            }
         }
     }
 
@@ -124,7 +131,7 @@ public class OriginRefView extends MSDebugTab {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = MSDUtil.getLines(mediator, o.File, i, i);
                             txt += str.stripTrailing() + "\n";
-                            str = " ".repeat(o.PositionStart-1) + "[" + MSDUtil.safeSubstring(str, o.PositionStart, o.PositionEnd) + "]" + " ".repeat(o.PositionEnd-1);
+                            str = " ".repeat(o.ColumnStart -1) + "[" + MSDUtil.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]" + " ".repeat(o.ColumnEnd -1);
                             txt += str + "\n";
                             txt += "\n";
                         }
