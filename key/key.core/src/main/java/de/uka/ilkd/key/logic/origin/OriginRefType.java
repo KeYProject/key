@@ -24,7 +24,9 @@ public enum OriginRefType {
 
     REQUIRES_IMPLICT("requires_implicit"),   // autom. generated requires term
     ENSURES_IMPLICT("ensures_implicit"),     // autom. generated requires term
-    SIGNALS_IMPLICT("signals_implicit");     // autom. generated signals term
+    SIGNALS_IMPLICT("signals_implicit"),     // autom. generated signals term
+
+    TERM("term"); // a simple sub-term
 
     private final String name;
 

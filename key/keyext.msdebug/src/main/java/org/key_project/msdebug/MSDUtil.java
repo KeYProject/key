@@ -139,4 +139,10 @@ public class MSDUtil {
         return r;
     }
 
+    public static String safeSubstring(String str, int start, int end) {
+        start = Math.max(start, 0);
+        end = Math.min(end, str.length());
+
+        return str.substring(start, end);
+    }
 }

@@ -64,7 +64,16 @@ public class LabeledParserRuleContext {
     private static ImmutableSet<OriginRef> constructOrigin(ParserRuleContext ctx, OriginRefType specType) {
         String src = ctx.start.getTokenSource().getSourceName();
 
-        return ImmutableSet.singleton(new OriginRef(src, ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getStartIndex(), ctx.stop.getStopIndex(), specType));
+        OriginRef originref = new OriginRef(
+                src,
+                ctx.start.getLine(),
+                ctx.stop.getLine(),
+                ctx.start.getCharPositionInLine(),
+                ctx.stop.getCharPositionInLine(),
+                specType
+        );
+
+        return ImmutableSet.singleton(originref);
     }
 
     public Term addOrigin(TermBuilder tb, Term term) {

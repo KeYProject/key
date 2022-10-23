@@ -11,6 +11,8 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -81,14 +83,26 @@ public class ExpressionBuilder extends DefaultBuilder {
         setSchemaVariables(schemaNamespace);
     }
 
-    public static Term updateOrigin(Term t, ParserRuleContext ctx) {
+    public Term updateOrigin(Term t, ParserRuleContext ctx) {
         try {
             TermImpl ti = (TermImpl) t;
-            ti.setOrigin(ctx.start.getTokenSource().getSourceName()
-                    + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
+            ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
+
         } catch (ClassCastException ignored) {
         }
-        return t;
+
+        String src = ctx.start.getTokenSource().getSourceName();
+
+        OriginRef orig = new OriginRef(
+                src,
+                ctx.start.getLine(),
+                ctx.stop.getLine(),
+                ctx.start.getCharPositionInLine(),
+                ctx.stop.getCharPositionInLine(),
+                OriginRefType.TERM
+        );
+
+        return getTermFactory().appendOriginRef(t, orig);
     }
 
     /**

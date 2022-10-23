@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -239,6 +241,36 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return sigString.substring(0, sigString.length() - 2);
     }
 
+    private SLExpression addOrigin(ParserRuleContext ctx, SLExpression expr) {
+        if (expr == null) {
+            return expr;
+        }
+
+        if (!expr.isTerm()) {
+            return expr;
+        }
+
+        String src = ctx.start.getTokenSource().getSourceName();
+
+        OriginRef origin = new OriginRef(
+                src,
+                ctx.start.getLine(),
+                ctx.stop.getLine(),
+                ctx.start.getCharPositionInLine(),
+                ctx.stop.getCharPositionInLine(),
+                OriginRefType.TERM
+        );
+
+        Term term = expr.getTerm();
+        term = tb.tf().appendOriginRef(term, origin);
+
+        if (expr.getType() == null) {
+            return new SLExpression(term);
+        } else {
+            return new SLExpression(term, expr.getType());
+        }
+    }
+
     //region expression
 
     @Override
@@ -356,7 +388,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (!expr.isTerm() && expr.getTerm().sort() == Sort.FORMULA) {
             raiseError("Expected a formula: " + expr, ctx);
         }
-        return expr;
+        return addOrigin(ctx, expr);
     }
 
     @Override
@@ -366,7 +398,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (!result.isTerm()) {
             raiseError("Expected a term: " + result, ctx);
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -378,7 +410,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert else_ != null;
         assert then != null;
         assert cond != null;
-        return termFactory.ite(cond, then, else_);
+
+        SLExpression result = termFactory.ite(cond, then, else_);
+
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -393,7 +428,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             else
                 result = termFactory.antivalence(result, expr);
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     /*
@@ -419,7 +454,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
         assert result != null;
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -432,7 +467,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
                     tb.convertToFormula(expr.getTerm())));
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -440,26 +475,33 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (ctx.logicalandexpr().size() == 1) return accept(ctx.logicalandexpr(0));
 
         List<SLExpression> seq = mapOf(ctx.logicalandexpr());
-        return seq.stream().reduce((a, b) ->
+        SLExpression result = seq.stream().reduce((a, b) ->
                 new SLExpression(tb.orSC(tb.convertToFormula(a.getTerm()),
                         tb.convertToFormula(b.getTerm())))).orElse(null);
+
+        return addOrigin(ctx, result);
     }
 
     @Override
     public Object visitRelationalexpr(JmlParser.RelationalexprContext ctx) {
-        return oneOf(ctx.shiftexpr(), ctx.instance_of(),
+        SLExpression result = oneOf(ctx.shiftexpr(), ctx.instance_of(),
                 ctx.relational_chain(), ctx.relational_lockset(), ctx.st_expr());
+
+        return addOrigin(ctx, result);
     }
 
     @Override
     public Object visitLogicalandexpr(JmlParser.LogicalandexprContext ctx) {
-        if (ctx.inclusiveorexpr().size() == 1)
-            return accept(ctx.inclusiveorexpr(0));
+        if (ctx.inclusiveorexpr().size() == 1) {
+            SLExpression result = accept(ctx.inclusiveorexpr(0));
+            return addOrigin(ctx, result);
+        }
 
         List<SLExpression> seq = mapOf(ctx.inclusiveorexpr());
-        return seq.stream().reduce((a, b) ->
+        SLExpression result = seq.stream().reduce((a, b) ->
                 new SLExpression(tb.andSC(tb.convertToFormula(a.getTerm()),
                         tb.convertToFormula(b.getTerm())))).orElse(null);
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -472,7 +514,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression expr = seq.get(i);
             result = termFactory.binary(BITWISE_OR, result, expr);
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -485,7 +527,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression expr = exprs.get(i);
             result = termFactory.binary(BITWISE_XOR, result, expr);
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -503,7 +545,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, ex);
             }
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -515,7 +557,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 1; i < expr.size(); i++) {
             TerminalNode tok = ctx.EQ_NEQ(i - 1);
             // floats require special casing for == and !=
-            SLExpression floatResult = floatEqualityExpr(tok.getText(), result, expr.get(i));
+            SLExpression floatResult = floatEqualityExpr(ctx, tok.getText(), result, expr.get(i));
             if (floatResult != null) {
                 return floatResult;
             }
@@ -524,10 +566,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
             else
                 result = termFactory.neq(result, expr.get(i));
         }
-        return result;
+        return addOrigin(ctx, result);
     }
 
-    private SLExpression floatEqualityExpr(String img, SLExpression lhs, SLExpression rhs) {
+    private SLExpression floatEqualityExpr(JmlParser.EqualityexprContext ctx, String img, SLExpression lhs, SLExpression rhs) {
         if (lhs.getType() == null || rhs.getType() == null) {
             return null;
         }
@@ -547,9 +589,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         if (img.equals("=="))
-            return termFactory.fpEq(lhs, rhs);
+            return addOrigin(ctx, termFactory.fpEq(lhs, rhs));
         else
-            return termFactory.fpNeq(lhs, rhs);
+            return addOrigin(ctx, termFactory.fpNeq(lhs, rhs));
     }
 
     @Override
@@ -560,9 +602,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SortDependingFunction f = rtype.getSort().getInstanceofSymbol(services);
         // instanceof-expression
         assert result != null;
-        return new SLExpression(
+        SLExpression exprresult = new SLExpression(
                 tb.and(tb.not(tb.equals(result.getTerm(), tb.NULL())),
                         tb.equals(tb.func(f, result.getTerm()), tb.TRUE())));
+
+        return addOrigin(ctx, exprresult);
     }
 
     @Override
@@ -677,7 +721,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, ex);
             }
         }
-        return result;
+
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -700,7 +745,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, ex);
             }
         }
-        return result;
+
+        return addOrigin(ctx, result);
     }
 
     @Override
@@ -714,7 +760,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Cannot build  +" + result.getType().getName() + ".", ctx);
             }
             assert result.isTerm();
-            return result;
+
+            return addOrigin(ctx, result);
         }
         if (ctx.DECLITERAL() != null) {
             String text = ctx.getText();
@@ -725,7 +772,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                         services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
 
                 PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
-                return new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+                return addOrigin(ctx, new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType)));
             } catch (NumberFormatException e) {
                 raiseError(ctx, e);
             }
@@ -743,14 +790,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, e);
             }
         }
-        return oneOf(ctx.castexpr(), ctx.unaryexprnotplusminus());
+        return addOrigin(ctx, oneOf(ctx.castexpr(), ctx.unaryexprnotplusminus()));
     }
 
     @Override
     public SLExpression visitCastexpr(JmlParser.CastexprContext ctx) {
         KeYJavaType rtype = accept(ctx.typespec());
         SLExpression result = accept(ctx.unaryexpr());
-        return termFactory.cast(rtype, result);
+        return addOrigin(ctx, termFactory.cast(rtype, result));
     }
 
     @Override
@@ -761,9 +808,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             Term t = e.getTerm();
             if (t.sort() == Sort.FORMULA) {
-                return new SLExpression(tb.not(t));
+                return addOrigin(ctx, new SLExpression(tb.not(t)));
             } else if (t.sort() == booleanLDT.targetSort()) {
-                return new SLExpression(tb.not(tb.equals(t, tb.TRUE())));
+                return addOrigin(ctx, new SLExpression(tb.not(tb.equals(t, tb.TRUE()))));
             } else {
                 raiseError("Wrong type in not-expression: " + t, ctx);
             }
@@ -774,7 +821,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert e != null;
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             try {
-                return termFactory.unary(BITWISE_NEGATE, e);
+                return addOrigin(ctx, termFactory.unary(BITWISE_NEGATE, e));
             } catch (RuntimeException ex) {
                 raiseError(ctx, ex);
             }
@@ -785,7 +832,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
         String fieldName = "<transactionConditionallyUpdated>";
-        return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
+        SLExpression result = lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
+        return addOrigin(ctx, result);
     }
 
 
@@ -804,7 +852,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(format("Expression %s cannot be resolved.", fullyQualifiedName), ctx);
         }
         fullyQualifiedName = oldFqName;
-        return expr;
+        return addOrigin(ctx, expr);
     }
 
     @Override
@@ -819,22 +867,24 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError("\"super\" is currently not supported", ctx);
         }
         appendToFullyQualifiedName(ctx.getText());
-        return lookupIdentifier(ctx.getText(), null, null, ctx);
+        SLExpression expr = lookupIdentifier(ctx.getText(), null, null, ctx);
+        return addOrigin(ctx, expr);
     }
 
     @Override
     public Object visitInv(JmlParser.InvContext ctx) {
-        return termFactory.createInv(selfVar == null ? null : tb.var(selfVar), containerType);
+        SLExpression expr = termFactory.createInv(selfVar == null ? null : tb.var(selfVar), containerType);
+        return addOrigin(ctx, expr);
     }
 
     @Override
     public Object visitTrue_(JmlParser.True_Context ctx) {
-        return new SLExpression(tb.tt());
+        return addOrigin(ctx, new SLExpression(tb.tt()));
     }
 
     @Override
     public Object visitFalse_(JmlParser.False_Context ctx) {
-        return new SLExpression(tb.ff());
+        return addOrigin(ctx, new SLExpression(tb.ff()));
     }
 
     @Override
@@ -1442,7 +1492,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         assert e2 != null;
         assert e1 != null;
-        return new SLExpression(tb.equals(tb.func(strContent, e1.getTerm()), tb.func(strContent, e2.getTerm())));
+        return addOrigin(ctx, new SLExpression(tb.equals(tb.func(strContent, e1.getTerm()), tb.func(strContent, e2.getTerm()))));
     }
 
     @Override

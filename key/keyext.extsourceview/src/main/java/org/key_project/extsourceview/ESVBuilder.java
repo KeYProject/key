@@ -66,19 +66,22 @@ public class ESVBuilder {
                 continue;
             }
 
-            if (t.containsJavaBlockRecursive()) {
+            if (t.containsJavaBlockRecursive()) { // TODO: remove this, we dont actually support modalities for now
                 var ins = extractSuccedent(t);
                 if (ins.size() > 0) {
                     extInsertions.addAll(ins);
                     realSuccTerms++;
                 }
-            } else {
+                continue;
+            }
 
+            {
                 var ins = extractSuccedent(t);
                 if (ins.size() > 0) {
                     extInsertions.addAll(ins);
                     realSuccTerms++;
                 }
+                continue;
 
             }
 

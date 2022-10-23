@@ -78,7 +78,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(services.getTermBuilder().getBaseHeap())) {
+	    } else if(!update.sub(0).equalsModOrigins(services.getTermBuilder().getBaseHeap())) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {

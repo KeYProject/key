@@ -119,13 +119,23 @@ public final class TermFactory {
         return setOriginRef(base, base.getOriginRef().add(add));
     }
 
+    public @Nonnull Term appendOriginRef(Term base, OriginRef add) {
+        return setOriginRef(base, base.getOriginRef().add(add));
+    }
+
     public @Nonnull Term setOriginRef(Term base, ImmutableSet<OriginRef> origref) {
-        return createTerm(base.op(),
+        Term newTerm = doCreateTerm(base.op(),
                 base.subs(),
                 base.boundVars(),
                 base.javaBlock(),
                 base.getLabels(),
                 origref);
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl)newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
     }
 
     //-------------------------------------------------------------------------

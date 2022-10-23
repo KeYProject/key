@@ -115,14 +115,18 @@ public class OriginRefView extends MSDebugTab {
                     txt += "\n";
                 }
                 txt += "\n";
-                txt += "----------";
+                txt += "----------<SOURCE>----------";
                 txt += "\n";
                 txt += "\n";
 
                 for (OriginRef o : term.getOriginRef()) {
                     if (o.hasFile()) {
-                        txt += MSDUtil.getLines(mediator, o.File, o.LineStart, o.LineEnd);
-                        txt += "\n";
+                        for (int i = o.LineStart; i <= o.LineEnd; i++) {
+                            var str = MSDUtil.getLines(mediator, o.File, i, i);
+                            str = " ".repeat(o.PositionStart) + MSDUtil.safeSubstring(str, o.PositionStart, o.PositionEnd)  + " ".repeat(o.PositionEnd);
+                            txt += str + "\n";
+                            txt += "\n";
+                        }
                     }
                 }
 

@@ -55,18 +55,13 @@ public class OriginRef {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
-
         final OriginRef cmp = (OriginRef) o;
 
-        return Objects.equals(this.File, cmp.File) &&
-                this.Type ==  cmp.Type &&
-                this.LineStart ==  cmp.LineStart &&
-                this.LineEnd ==  cmp.LineEnd &&
-                this.PositionStart ==  cmp.PositionStart &&
-                this.PositionEnd ==  cmp.PositionEnd;
+        return this.Type ==  cmp.Type &&
+               this.LineStart ==  cmp.LineStart &&
+               this.LineEnd ==  cmp.LineEnd &&
+               this.PositionStart ==  cmp.PositionStart &&
+               this.PositionEnd ==  cmp.PositionEnd;
     }
 
     private int hashcode = -1;

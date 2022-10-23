@@ -493,8 +493,7 @@ public class TermImpl implements Term {
             return true;
         }
 
-        if(o == null || o.getClass() != getClass()
-                || hashCode() != o.hashCode()) {
+        if(o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) {
             return false;
         }
 
@@ -506,6 +505,31 @@ public class TermImpl implements Term {
                 return false;
             }
         }
+
+        return op.equals(t.op)
+                && t.hasLabels() == hasLabels()
+                && subs.equals(t.subs)
+                && boundVars.equals(t.boundVars)
+                && javaBlock.equals(t.javaBlock);
+    }
+
+    public boolean equalsModOrigins(Object o) {
+        if(o == this) {
+            return true;
+        }
+
+        if(o == null || o.getClass() != getClass()) {
+            return false;
+        }
+
+        final TermImpl t = (TermImpl) o;
+
+        //if (originRef.size() != t.originRef.size()) return false;
+        //for (OriginRef to : originRef) {
+        //    if (! t.originRef.contains(to)) {
+        //        return false;
+        //    }
+        //}
 
         return op.equals(t.op)
                 && t.hasLabels() == hasLabels()
