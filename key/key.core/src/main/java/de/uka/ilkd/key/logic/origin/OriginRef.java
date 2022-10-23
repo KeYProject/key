@@ -13,7 +13,7 @@ public class OriginRef {
     public static final ImmutableSet<OriginRef> ENSURES_ASSIGNABLE_IMPLICIT = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFNOTNULL        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_SELFCREATED        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTTYPE      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
+    public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTINSTANCE  = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_PARAMSOK           = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_MEASUREDBY_INITIAL = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
     public static final ImmutableSet<OriginRef> REQUIRES_WELLFORMEDHEAP     = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));

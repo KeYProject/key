@@ -152,9 +152,12 @@ public class ESVBuilder {
 
         var explicitRefs = 0;
         for(var o: origin) {
+            if (o.Type == OriginRefType.TERM) continue;
+
             if (o.Type != OriginRefType.REQUIRES && o.Type != OriginRefType.REQUIRES_IMPLICT) {
                 return false;
             }
+
             if (o.Type == OriginRefType.REQUIRES) {
                 explicitRefs++;
             }
@@ -171,13 +174,19 @@ public class ESVBuilder {
 
         // all origin-refs must be [REQUIRES_IMPLICT]
 
+        int implicitRefs = 0;
+
         for(var o: origin) {
-            if (o.Type != OriginRefType.REQUIRES_IMPLICT) {
+            if (o.Type == OriginRefType.TERM) continue;
+
+            if (o.Type == OriginRefType.REQUIRES_IMPLICT) {
+                implicitRefs++;
+            } else {
                 return false;
             }
         }
 
-        return true;
+        return implicitRefs > 0;
     }
 
     public static boolean isExplicitEnsures(Term term) {
@@ -191,9 +200,12 @@ public class ESVBuilder {
 
         var explicitRefs = 0;
         for(var o: origin) {
+            if (o.Type == OriginRefType.TERM) continue;
+
             if (o.Type != OriginRefType.ENSURES && o.Type != OriginRefType.ENSURES_IMPLICT) {
                 return false;
             }
+
             if (o.Type == OriginRefType.ENSURES) {
                 explicitRefs++;
             }
@@ -210,13 +222,19 @@ public class ESVBuilder {
 
         // all origin-refs must be [ENSURES_IMPLICT]
 
+        int implicitRefs = 0;
+
         for(var o: origin) {
-            if (o.Type != OriginRefType.ENSURES_IMPLICT) {
+            if (o.Type == OriginRefType.TERM) continue;
+
+            if (o.Type == OriginRefType.ENSURES_IMPLICT) {
+                implicitRefs++;
+            } else {
                 return false;
             }
         }
 
-        return true;
+        return implicitRefs > 0;
     }
 
     public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {

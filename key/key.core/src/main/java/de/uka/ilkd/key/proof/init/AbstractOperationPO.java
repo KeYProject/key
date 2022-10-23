@@ -673,7 +673,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // "MyClass::exactInstance(self) = TRUE"
         Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
-        selfExactType = services.getTermFactory().appendOriginRef(selfExactType, OriginRef.REQUIRES_SELFEXACTTYPE);
+        selfExactType = services.getTermFactory().appendOriginRef(selfExactType, OriginRef.REQUIRES_SELFEXACTINSTANCE);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
