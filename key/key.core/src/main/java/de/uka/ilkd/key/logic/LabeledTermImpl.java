@@ -45,7 +45,7 @@ class LabeledTermImpl extends TermImpl {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels,
-                           ImmutableSet<OriginRef> originRef) {
+                           OriginRef originRef) {
         super(op, subs, boundVars, javaBlock, originRef);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";

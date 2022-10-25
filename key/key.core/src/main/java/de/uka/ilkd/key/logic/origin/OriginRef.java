@@ -1,24 +1,9 @@
 package de.uka.ilkd.key.logic.origin;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import java.io.File;
 import java.net.URI;
 
 public class OriginRef {
-
-    public static final ImmutableSet<OriginRef> EMPTY                       = ImmutableSet.empty();
-    public static final ImmutableSet<OriginRef> ENSURES_EXCNULL             = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
-    public static final ImmutableSet<OriginRef> ENSURES_SELFINVARIANT       = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
-    public static final ImmutableSet<OriginRef> ENSURES_ASSIGNABLE_IMPLICIT = ImmutableSet.singleton(new OriginRef(OriginRefType.ENSURES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_SELFNOTNULL        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_SELFCREATED        = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_SELFEXACTINSTANCE  = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_PARAMSOK           = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_MEASUREDBY_INITIAL = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_WELLFORMEDHEAP     = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> REQUIRES_SELFINVARIANT      = ImmutableSet.singleton(new OriginRef(OriginRefType.REQUIRES_IMPLICT));
-    public static final ImmutableSet<OriginRef> SIGNALS_SELFINVARIANT       = ImmutableSet.singleton(new OriginRef(OriginRefType.SIGNALS_IMPLICT));
 
     public final String File;
 
@@ -30,11 +15,16 @@ public class OriginRef {
 
     public final OriginRefType Type;
 
-    public OriginRef(OriginRefType type) {
-        this(null, 0, 0, 0, 0, type);
+    public final boolean IsBooleanTerm;
+    public final boolean IsBooleanAtom;
+
+    public final String SourceString;
+
+    public OriginRef(OriginRefType type, boolean isatom, boolean isbool) {
+        this(null, 0, 0, 0, 0, type, isatom, isbool, null);
     }
 
-    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type) {
+    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, String src) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
@@ -49,6 +39,9 @@ public class OriginRef {
             ColumnEnd = colEnd;
         }
 
+        IsBooleanAtom = isatom;
+        IsBooleanTerm = isbool;
+        SourceString = src;
         Type = type;
     }
 

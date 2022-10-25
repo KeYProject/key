@@ -241,7 +241,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return sigString.substring(0, sigString.length() - 2);
     }
 
-    private SLExpression addOrigin(ParserRuleContext ctx, SLExpression expr) {
+    private SLExpression addOrigin(ParserRuleContext ctx, SLExpression expr, boolean isatom) {
         if (expr == null) {
             return expr;
         }
@@ -252,9 +252,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
+        String srcStr = ctx.getText();
+
         //if (src.contains("jar!/de/")) { //internal file, probably smth.key //TOOD this is hacky, find better way to do it
         //    return expr;
         //}
+
+        Sort sort = expr.getTerm().op().sort(expr.getTerm().subs());
 
         OriginRef origin = new OriginRef(
                 src,
@@ -262,11 +266,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 ctx.stop.getLine(),
                 ctx.start.getCharPositionInLine(),
                 ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1),
-                OriginRefType.TERM
+                OriginRefType.UNKNOWN,
+                isatom,
+                false,
+                srcStr
         );
 
         Term term = expr.getTerm();
-        term = tb.tf().appendOriginRef(term, origin);
+        term = tb.tf().setOriginRef(term, origin);
 
         if (expr.getType() == null) {
             return new SLExpression(term);
@@ -308,8 +315,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return target;
     }
 
-    private @Nullable
-    String accept(@Nullable TerminalNode ident) {
+    private @Nullable String accept(@Nullable TerminalNode ident) {
         if (ident == null) return null;
         return ident.getText();
     }
@@ -376,7 +382,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitPredornot(JmlParser.PredornotContext ctx) {
         if (ctx.predicate() != null) return accept(ctx.predicate());
         if (ctx.NOT_SPECIFIED() != null)
-            return new SLExpression(termFactory.createSkolemExprBool(ctx.NOT_SPECIFIED().getText()).getTerm());
+            return addOrigin(ctx, new SLExpression(termFactory.createSkolemExprBool(ctx.NOT_SPECIFIED().getText()).getTerm()), true);
         if (ctx.SAME() != null) {
             raiseError("'\\same' is currently not supported", ctx);
             return null;
@@ -392,7 +398,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (!expr.isTerm() && expr.getTerm().sort() == Sort.FORMULA) {
             raiseError("Expected a formula: " + expr, ctx);
         }
-        return addOrigin(ctx, expr);
+        return addOrigin(ctx, expr, true);
     }
 
     @Override
@@ -402,7 +408,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (!result.isTerm()) {
             raiseError("Expected a term: " + result, ctx);
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, true);
     }
 
     @Override
@@ -417,7 +423,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = termFactory.ite(cond, then, else_);
 
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -432,7 +438,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             else
                 result = termFactory.antivalence(result, expr);
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     /*
@@ -458,7 +464,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
         assert result != null;
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -471,7 +477,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
                     tb.convertToFormula(expr.getTerm())));
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, true);
     }
 
     @Override
@@ -483,7 +489,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 new SLExpression(tb.orSC(tb.convertToFormula(a.getTerm()),
                         tb.convertToFormula(b.getTerm())))).orElse(null);
 
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -491,21 +497,21 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = oneOf(ctx.shiftexpr(), ctx.instance_of(),
                 ctx.relational_chain(), ctx.relational_lockset(), ctx.st_expr());
 
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, true);
     }
 
     @Override
     public Object visitLogicalandexpr(JmlParser.LogicalandexprContext ctx) {
         if (ctx.inclusiveorexpr().size() == 1) {
             SLExpression result = accept(ctx.inclusiveorexpr(0));
-            return addOrigin(ctx, result);
+            return addOrigin(ctx, result, false);
         }
 
         List<SLExpression> seq = mapOf(ctx.inclusiveorexpr());
         SLExpression result = seq.stream().reduce((a, b) ->
                 new SLExpression(tb.andSC(tb.convertToFormula(a.getTerm()),
                         tb.convertToFormula(b.getTerm())))).orElse(null);
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -518,7 +524,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression expr = seq.get(i);
             result = termFactory.binary(BITWISE_OR, result, expr);
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -531,7 +537,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression expr = exprs.get(i);
             result = termFactory.binary(BITWISE_XOR, result, expr);
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -549,7 +555,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, ex);
             }
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -570,7 +576,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             else
                 result = termFactory.neq(result, expr.get(i));
         }
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, true);
     }
 
     private SLExpression floatEqualityExpr(JmlParser.EqualityexprContext ctx, String img, SLExpression lhs, SLExpression rhs) {
@@ -593,9 +599,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         if (img.equals("=="))
-            return addOrigin(ctx, termFactory.fpEq(lhs, rhs));
+            return addOrigin(ctx, termFactory.fpEq(lhs, rhs), true);
         else
-            return addOrigin(ctx, termFactory.fpNeq(lhs, rhs));
+            return addOrigin(ctx, termFactory.fpNeq(lhs, rhs), true);
     }
 
     @Override
@@ -610,7 +616,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 tb.and(tb.not(tb.equals(result.getTerm(), tb.NULL())),
                         tb.equals(tb.func(f, result.getTerm()), tb.TRUE())));
 
-        return addOrigin(ctx, exprresult);
+        return addOrigin(ctx, exprresult, true);
     }
 
     @Override
@@ -643,7 +649,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                             tb.func(ioFunc, result.getTerm()),
                             tb.TRUE()));
         }
-        return result;
+        return addOrigin(ctx, result, true);
     }
 
 
@@ -666,7 +672,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert f != null;
         assert right != null;
         assert left != null;
-        return new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
+        return addOrigin(ctx, new SLExpression(tb.func(f, left.getTerm(), right.getTerm())), true);
     }
 
     @Override
@@ -690,7 +696,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
         assert result != null;
-        return result;
+        return addOrigin(ctx, result, true);
     }
 
 
@@ -708,7 +714,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, ex);
             }
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -726,7 +732,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
 
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -750,7 +756,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
 
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -765,7 +771,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             assert result.isTerm();
 
-            return addOrigin(ctx, result);
+            return addOrigin(ctx, result, false);
         }
         if (ctx.DECLITERAL() != null) {
             String text = ctx.getText();
@@ -776,7 +782,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                         services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
 
                 PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
-                return addOrigin(ctx, new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType)));
+                return addOrigin(ctx, new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType)), false);
             } catch (NumberFormatException e) {
                 raiseError(ctx, e);
             }
@@ -794,14 +800,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, e);
             }
         }
-        return addOrigin(ctx, oneOf(ctx.castexpr(), ctx.unaryexprnotplusminus()));
+        return addOrigin(ctx, oneOf(ctx.castexpr(), ctx.unaryexprnotplusminus()), false);
     }
 
     @Override
     public SLExpression visitCastexpr(JmlParser.CastexprContext ctx) {
         KeYJavaType rtype = accept(ctx.typespec());
         SLExpression result = accept(ctx.unaryexpr());
-        return addOrigin(ctx, termFactory.cast(rtype, result));
+        return addOrigin(ctx, termFactory.cast(rtype, result), false);
     }
 
     @Override
@@ -812,9 +818,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             Term t = e.getTerm();
             if (t.sort() == Sort.FORMULA) {
-                return addOrigin(ctx, new SLExpression(tb.not(t)));
+                return addOrigin(ctx, new SLExpression(tb.not(t)), false);
             } else if (t.sort() == booleanLDT.targetSort()) {
-                return addOrigin(ctx, new SLExpression(tb.not(tb.equals(t, tb.TRUE()))));
+                return addOrigin(ctx, new SLExpression(tb.not(tb.equals(t, tb.TRUE()))), false);
             } else {
                 raiseError("Wrong type in not-expression: " + t, ctx);
             }
@@ -825,7 +831,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert e != null;
             if (e.isType()) raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             try {
-                return addOrigin(ctx, termFactory.unary(BITWISE_NEGATE, e));
+                return addOrigin(ctx, termFactory.unary(BITWISE_NEGATE, e), false);
             } catch (RuntimeException ex) {
                 raiseError(ctx, ex);
             }
@@ -837,7 +843,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
         String fieldName = "<transactionConditionallyUpdated>";
         SLExpression result = lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
-        return addOrigin(ctx, result);
+        return addOrigin(ctx, result, true);
     }
 
 
@@ -856,7 +862,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(format("Expression %s cannot be resolved.", fullyQualifiedName), ctx);
         }
         fullyQualifiedName = oldFqName;
-        return addOrigin(ctx, expr);
+        return addOrigin(ctx, expr, false);
     }
 
     @Override
@@ -865,35 +871,35 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (selfVar == null) {
                 raiseError("Cannot access \"this\" in a static context", ctx);
             }
-            return getThisReceiver();
+            return addOrigin(ctx, getThisReceiver(), false);
         }
         if (ctx.SUPER() != null) {
             raiseError("\"super\" is currently not supported", ctx);
         }
         appendToFullyQualifiedName(ctx.getText());
         SLExpression expr = lookupIdentifier(ctx.getText(), null, null, ctx);
-        return addOrigin(ctx, expr);
+        return addOrigin(ctx, expr, false);
     }
 
     @Override
     public Object visitInv(JmlParser.InvContext ctx) {
         SLExpression expr = termFactory.createInv(selfVar == null ? null : tb.var(selfVar), containerType);
-        return addOrigin(ctx, expr);
+        return addOrigin(ctx, expr, true);
     }
 
     @Override
     public Object visitTrue_(JmlParser.True_Context ctx) {
-        return addOrigin(ctx, new SLExpression(tb.tt()));
+        return addOrigin(ctx, new SLExpression(tb.tt()), true);
     }
 
     @Override
     public Object visitFalse_(JmlParser.False_Context ctx) {
-        return addOrigin(ctx, new SLExpression(tb.ff()));
+        return addOrigin(ctx, new SLExpression(tb.ff()), true);
     }
 
     @Override
     public Object visitNull_(JmlParser.Null_Context ctx) {
-        return new SLExpression(tb.NULL());
+        return addOrigin(ctx, new SLExpression(tb.NULL()), false);
     }
 
     @Override
@@ -901,7 +907,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (selfVar == null) {
             raiseError("Cannot access \"this\" in a static context!", ctx);
         }
-        return getThisReceiver();
+        return addOrigin(ctx, getThisReceiver(), false);
     }
 
     @Nonnull
@@ -925,7 +931,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         if (result != null) {
-            return result;
+            return addOrigin(ctx, result, false);
         }
 
         // no identifier found, maybe it was just a package prefix.
@@ -964,9 +970,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             fullyQualifiedName = fullyQualifiedName + "." + id;
             try {
-                return lookupIdentifier(lookupName, receiver, params, ctx);
+                return addOrigin(ctx, lookupIdentifier(lookupName, receiver, params, ctx), false);
             } catch (Exception e) {
-                return lookupIdentifier(fullyQualifiedName, null, null, ctx);
+                return addOrigin(ctx, lookupIdentifier(fullyQualifiedName, null, null, ctx), false);
             }
         }
         if (ctx.TRANSIENT() != null) {
@@ -974,34 +980,34 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return lookupIdentifier("<transient>", receiver, null, ctx);
+            return addOrigin(ctx, lookupIdentifier("<transient>", receiver, null, ctx), false);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return new SLExpression(
+            return addOrigin(ctx, new SLExpression(
                     services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
                             tb.var(selfVar),
                             javaInfo.getKeYJavaType(selfVar.sort()),
                             true),
-                    receiver.getType());
+                    receiver.getType()), false);
         }
         if (ctx.INV() != null) {
             assert !methodCall;
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return termFactory.createInv(receiver.getTerm(), receiver.getType());
+            return addOrigin(ctx, termFactory.createInv(receiver.getTerm(), receiver.getType()), true);
         }
         if (ctx.MULT() != null) {
             assert !methodCall;
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return new SLExpression(tb.allFields(receiver.getTerm()),
-                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+            return addOrigin(ctx, new SLExpression(tb.allFields(receiver.getTerm()),
+                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
         }
         assert false;
         return null;
@@ -1034,7 +1040,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 && (atPres == null || atPres.get(getBaseHeap()) == null)) {
             raiseError("Two-state model method " + lookupName + " not allowed in this context!", ctx);
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
@@ -1104,15 +1110,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     "String literals used in specification, but string pool function not found", ctx);
         }
         Term stringTerm = tb.func(strPool, charListTerm);
-        return new SLExpression(stringTerm,
-                javaInfo.getKeYJavaType("java.lang.String"));
+        return addOrigin(ctx, new SLExpression(stringTerm, javaInfo.getKeYJavaType("java.lang.String")), false);
     }
 
     @Override
     public SLExpression visitCharliteral(JmlParser.CharliteralContext ctx) {
         Term charLit = services.getTypeConverter().getIntegerLDT()
                 .translateLiteral(new CharLiteral(ctx.getText()), services);
-        return new SLExpression(charLit, javaInfo.getKeYJavaType("char"));
+        return addOrigin(ctx, new SLExpression(charLit, javaInfo.getKeYJavaType("char")), false);
     }
 
 
@@ -1129,7 +1134,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } catch (NumberFormatException e) {
             raiseError(ctx, e);
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1152,7 +1157,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(ctx, ex);
         }
 
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1161,7 +1166,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError("\\result used in wrong context", ctx);
         }
         appendToFullyQualifiedName("\\result");
-        return new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
+        return addOrigin(ctx, new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType()), false);
     }
 
     private void appendToFullyQualifiedName(String suffix) {
@@ -1174,7 +1179,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryException(JmlParser.PrimaryExceptionContext ctx) {
         if (excVar == null) raiseError("\\exception may only appear in determines clauses", ctx);
-        return new SLExpression(tb.var(excVar), excVar.getKeYJavaType());
+        return addOrigin(ctx, new SLExpression(tb.var(excVar), excVar.getKeYJavaType()), false);
     }
 
     @Override
@@ -1191,13 +1196,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             result = new SLExpression(convertToBackup(result.getTerm()));
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
     public Object visitPrimaryPermission(JmlParser.PrimaryPermissionContext ctx) {
-        return new SLExpression(
-                convertToPermission(((SLExpression) requireNonNull(accept(ctx.expression()))).getTerm(), ctx));
+        SLExpression result = new SLExpression(convertToPermission(((SLExpression) requireNonNull(accept(ctx.expression()))).getTerm(), ctx));
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1225,31 +1230,31 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             raiseError("\\nonnullelements may only be applied to arrays", ctx);
         }
-        return result;
+        return addOrigin(ctx, result, true);
     }
 
     @Override
     public SLExpression visitPrimaryInformalDesc(JmlParser.PrimaryInformalDescContext ctx) {
-        return termFactory.commentary(ctx.INFORMAL_DESCRIPTION().getText(),
-                selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
+        return addOrigin(ctx, termFactory.commentary(ctx.INFORMAL_DESCRIPTION().getText(),
+                selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap())), false);
     }
 
     @Override
     public Object visitPrimaryMapEmpty(JmlParser.PrimaryMapEmptyContext ctx) {
-        return termFactory.translateMapExpressionToJDL(ctx.MAPEMPTY().getText(), null/*?*/, services);
+        return addOrigin(ctx, termFactory.translateMapExpressionToJDL(ctx.MAPEMPTY().getText(), null/*?*/, services), false);
     }
 
     @Override
     public SLExpression visitPrimaryMapExpr(JmlParser.PrimaryMapExprContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.expressionlist());
         Token tk = ctx.mapExpression().getStart();
-        return termFactory.translateMapExpressionToJDL(tk.getText(), list, services);
+        return addOrigin(ctx, termFactory.translateMapExpressionToJDL(tk.getText(), list, services), false);
     }
 
     @Override
     public SLExpression visitPrimarySeq2Map(JmlParser.PrimarySeq2MapContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.expressionlist());
-        return termFactory.translateMapExpressionToJDL(ctx.SEQ2MAP().getText(), list, services);
+        return addOrigin(ctx, termFactory.translateMapExpressionToJDL(ctx.SEQ2MAP().getText(), list, services), false);
     }
 
     @Override
@@ -1267,7 +1272,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
         }
 
-        return new SLExpression(tb.func(op, argument.getTerm()));
+        return addOrigin(ctx, new SLExpression(tb.func(op, argument.getTerm())), false);
     }
 
     @Override
@@ -1275,18 +1280,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.storeRefUnion());
         final Term a = termFactory.notModified(atPres == null ? null : atPres.get(getBaseHeap()), t);
         assert a != null;
-        return new SLExpression(a);
+        return addOrigin(ctx, new SLExpression(a), true);
     }
 
     @Override
     public Object visitPrimaryNotAssigned(JmlParser.PrimaryNotAssignedContext ctx) {
-        return termFactory.createSkolemExprBool(ctx.NOT_ASSIGNED().getText());
+        return addOrigin(ctx, termFactory.createSkolemExprBool(ctx.NOT_ASSIGNED().getText()), true);
     }
 
     @Override
     public Object visitPrimaryFresh(JmlParser.PrimaryFreshContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.expressionlist());
-        return termFactory.fresh(list, atPres);
+        return addOrigin(ctx, termFactory.fresh(list, atPres), true);
     }
 
     @Override
@@ -1297,7 +1302,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression e3 = ctx.expression().size() == 3 ? accept(ctx.expression(2)) : null;
         assert e2 != null;
         assert e1 != null;
-        return termFactory.reach(t, e1, e2, e3);
+        return addOrigin(ctx, termFactory.reach(t, e1, e2, e3), false);
     }
 
     @Override
@@ -1307,7 +1312,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression e2 = accept(ctx.expression(1));
         SLExpression e3 = ctx.expression().size() == 2 ? accept(ctx.expression(1)) : null;
         assert e1 != null;
-        return termFactory.reachLocs(t, e1, e2, e3);
+        return addOrigin(ctx, termFactory.reachLocs(t, e1, e2, e3), false);
     }
 
     @Override
@@ -1319,7 +1324,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             base = visitFieldarrayaccess_suffix(base, suffx);
         }
         fullyQualifiedName = backupFullyQualifiedName;
-        return base;
+        return addOrigin(ctx, base, false);
     }
 
     public SLExpression visitFieldarrayaccess_suffix(SLExpression base,
@@ -1336,29 +1341,29 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 }
                 fullyQualifiedName = fullyQualifiedName + "." + id;
                 try {
-                    return lookupIdentifier(lookupName, base, null, ctx);
+                    return addOrigin(ctx, lookupIdentifier(lookupName, base, null, ctx), false);
                 } catch (Exception e) {
-                    return lookupIdentifier(fullyQualifiedName, null, null, ctx);
+                    return addOrigin(ctx, lookupIdentifier(fullyQualifiedName, null, null, ctx), false);
                 }
             }
             if (ctx.TRANSIENT() != null) {
-                return lookupIdentifier("<transient>", base, null, ctx);
+                return addOrigin(ctx, lookupIdentifier("<transient>", base, null, ctx), false);
             }
             if (ctx.this_() != null) {
-                return new SLExpression(
+                return addOrigin(ctx, new SLExpression(
                         services.getTypeConverter().findThisForSort(base.getType().getSort(),
                                 tb.var(selfVar),
                                 javaInfo.getKeYJavaType(selfVar.sort()),
                                 true),
-                        base.getType());
+                        base.getType()), false);
             }
             if (ctx.INV() != null) {
-                return termFactory.createInv(base.getTerm(), base.getType());
+                return addOrigin(ctx, termFactory.createInv(base.getTerm(), base.getType()), false);
             }
         } else {
             //Array access
             SLExpression index = accept(ctx.expression());
-            return termFactory.arrayRef(base, fullyQualifiedName, index, null);
+            return addOrigin(ctx, termFactory.arrayRef(base, fullyQualifiedName, index, null), false);
         }
         assert false;
         return null;
@@ -1372,7 +1377,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             Term t = e.getTerm();
             final Term objTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
-            return new SLExpression(tb.singleton(objTerm, fieldTerm));
+            return addOrigin(ctx, new SLExpression(tb.singleton(objTerm, fieldTerm)), false);
         } catch (IndexOutOfBoundsException e1) {
             raiseError(ctx, "The given expression %s is not a valid reference.", e);
         }
@@ -1387,7 +1392,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (seq.isEmpty()) raiseError(ctx, "empty!");
         else if (seq.size() == 1) ret = seq.get(0);
         else ret = tb.union(seq);
-        return new SLExpression(ret, javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        return addOrigin(ctx, new SLExpression(ret, javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
     }
 
     @Override
@@ -1417,9 +1422,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimaryTypeOf(JmlParser.PrimaryTypeOfContext ctx) {
         SLExpression result = accept(ctx.expression());
         assert result != null;
-        return new SLExpression(result.getTerm(),
+        return addOrigin(ctx, new SLExpression(result.getTerm(),
                 result.getType(),
-                false);
+                false), false);
     }
 
     @Override
@@ -1433,12 +1438,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimayTypeSpec(JmlParser.PrimayTypeSpecContext ctx) {
         KeYJavaType typ = accept(ctx.typespec());
         assert typ != null;
-        return new SLExpression(typ);
+        return addOrigin(ctx, new SLExpression(typ), false);
     }
 
     @Override
     public Object visitPrimaryLockset(JmlParser.PrimaryLocksetContext ctx) {
-        return termFactory.createSkolemExprObject(ctx.LOCKSET().getText());
+        return addOrigin(ctx, termFactory.createSkolemExprObject(ctx.LOCKSET().getText()), false);
     }
 
     @Override
@@ -1448,20 +1453,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term resTerm = tb.equals(tb.var(
                         javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
                 tb.TRUE());
-        return new SLExpression(resTerm);
+        return addOrigin(ctx, new SLExpression(resTerm), true);
     }
 
     @Override
     public SLExpression visitPrimaryInvFor(JmlParser.PrimaryInvForContext ctx) {
         SLExpression result = accept(ctx.expression());
         assert result != null;
-        return termFactory.invFor(result);
+        return addOrigin(ctx, termFactory.invFor(result), true);
     }
 
     @Override
     public SLExpression visitPrimaryStaticInv(JmlParser.PrimaryStaticInvContext ctx) {
         KeYJavaType typ = accept(ctx.referencetype());
-        return termFactory.staticInfFor(typ);
+        return addOrigin(ctx, termFactory.staticInfFor(typ), true);
     }
 
     @Override
@@ -1478,12 +1483,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryIndex(JmlParser.PrimaryIndexContext ctx) {
-        return termFactory.index();
+        return addOrigin(ctx, termFactory.index(), false);
     }
 
     @Override
     public Object visitPrimaryValues(JmlParser.PrimaryValuesContext ctx) {
-        return termFactory.values(this.containerType);
+        return addOrigin(ctx, termFactory.values(this.containerType), false);
     }
 
     @Override
@@ -1496,31 +1501,31 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         assert e2 != null;
         assert e1 != null;
-        return addOrigin(ctx, new SLExpression(tb.equals(tb.func(strContent, e1.getTerm()), tb.func(strContent, e2.getTerm()))));
+        return addOrigin(ctx, new SLExpression(tb.equals(tb.func(strContent, e1.getTerm()), tb.func(strContent, e2.getTerm()))), true);
     }
 
     @Override
     public Object visitPrimaryEmptySet(JmlParser.PrimaryEmptySetContext ctx) {
-        return termFactory.empty(javaInfo);
+        return addOrigin(ctx, termFactory.empty(javaInfo), false);
     }
 
     @Override
     public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
         Term t = accept(ctx.storeRefUnion());
         assert t != null;
-        return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        return addOrigin(ctx, new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
     }
 
     @Override
     public Object visitPrimaryUnion(JmlParser.PrimaryUnionContext ctx) {
         Term t = accept(ctx.storeRefUnion());
-        return termFactory.createUnion(javaInfo, t);
+        return addOrigin(ctx, termFactory.createUnion(javaInfo, t), false);
     }
 
     @Override
     public Object visitPrimaryIntersect(JmlParser.PrimaryIntersectContext ctx) {
         Term t = accept(ctx.storeRefIntersect());
-        return termFactory.createIntersect(t, javaInfo);
+        return addOrigin(ctx, termFactory.createIntersect(t, javaInfo), false);
     }
 
     @Override
@@ -1528,8 +1533,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term t = accept(ctx.storeref(0));
         Term t2 = accept(ctx.storeref(1));
         assert t != null;
-        return new SLExpression(tb.setMinus(t, t2),
-                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        return addOrigin(ctx, new SLExpression(tb.setMinus(t, t2),
+                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
     }
 
     @Override
@@ -1539,16 +1544,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (!e1.isTerm() || !e1.getTerm().sort().extendsTrans(services.getJavaInfo().objectSort())) {
             raiseError("Invalid argument to \\allFields: " + e1, ctx);
         }
-        return new SLExpression(tb.allFields(e1.getTerm()),
-                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        return addOrigin(ctx, new SLExpression(tb.allFields(e1.getTerm()),
+                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
     }
 
     @Override
     public Object visitPrimaryAllObj(JmlParser.PrimaryAllObjContext ctx) {
         Term t = accept(ctx.storeref());
         assert t != null;
-        return new SLExpression(tb.allObjects(t.sub(1)),
-                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        return addOrigin(ctx, new SLExpression(tb.allObjects(t.sub(1)),
+                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)), false);
     }
 
     @Override
@@ -1558,11 +1563,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 + "\n\tThis is deprecated and won't be valid in future versions of KeY."
                 + "\n\tPlease use \\infinite_union as a binder instead: " +
                 "(\\infinite_union var type; guard; store-ref-expr).");
-        return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(), ctx.storeref());
+        return createInfiniteUnion(ctx, ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(), ctx.storeref());
     }
 
     @Nonnull
     private Object createInfiniteUnion(
+            ParserRuleContext ctx,
             JmlParser.BoundvarmodifiersContext boundvarmodifiers,
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls, JmlParser.PredicateContext predicate,
             JmlParser.StorerefContext storeref) {
@@ -1576,15 +1582,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term t = accept(storeref);
         if (declVars != null) resolverManager.popLocalVariablesNamespace();
         assert declVars != null;
-        return termFactory.createUnionF(Boolean.TRUE.equals(nullable), declVars,
-                t, t2 == null ? tb.tt() : t2.getTerm());
+        return addOrigin(ctx, termFactory.createUnionF(Boolean.TRUE.equals(nullable), declVars,
+                t, t2 == null ? tb.tt() : t2.getTerm()), false);
     }
 
     @Override
     public SLExpression visitPrimaryDisjoint(JmlParser.PrimaryDisjointContext ctx) {
         ImmutableList<Term> tlist = accept(ctx.storeRefList());
         assert tlist != null;
-        return termFactory.createPairwiseDisjoint(tlist);
+        return addOrigin(ctx, termFactory.createPairwiseDisjoint(tlist), false);
     }
 
     @Override
@@ -1592,28 +1598,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term t = accept(ctx.storeref(0));
         Term t2 = accept(ctx.storeref(1));
         assert t != null;
-        return new SLExpression(tb.subset(t, t2));
+        return addOrigin(ctx, new SLExpression(tb.subset(t, t2)), false);
     }
 
     @Override
     public SLExpression visitPrimaryNewElemsfrehs(JmlParser.PrimaryNewElemsfrehsContext ctx) {
         Term t = accept(ctx.storeref());
         assert t != null;
-        return new SLExpression(tb.subset(t,
+        return addOrigin(ctx, new SLExpression(tb.subset(t,
                 tb.union(convertToOld(t),
-                        tb.freshLocs(atPres == null ? null : atPres.get(getBaseHeap())))));
+                        tb.freshLocs(atPres == null ? null : atPres.get(getBaseHeap()))))), false);
     }
 
     @Override
     public SLExpression visitSequenceEmpty(JmlParser.SequenceEmptyContext ctx) {
-        return new SLExpression(tb.seqEmpty());
+        return addOrigin(ctx, new SLExpression(tb.seqEmpty()), false);
     }
 
     @Override
     public SLExpression visitSequenceCreate(JmlParser.SequenceCreateContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.exprList());
         assert list != null;
-        return termFactory.seqConst(list);
+        return addOrigin(ctx, termFactory.seqConst(list), false);
     }
 
     @Override
@@ -1624,14 +1630,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert e3 != null;
         assert e2 != null;
         assert e1 != null;
-        return new SLExpression(tb.seqSub(e1.getTerm(), e2.getTerm(), e3.getTerm()));
+        return addOrigin(ctx, new SLExpression(tb.seqSub(e1.getTerm(), e2.getTerm(), e3.getTerm())), false);
     }
 
     @Override
     public Object visitSequenceReverse(JmlParser.SequenceReverseContext ctx) {
         SLExpression e1 = accept(ctx.expression());
         assert e1 != null;
-        return new SLExpression(tb.seqReverse(e1.getTerm()));
+        return addOrigin(ctx, new SLExpression(tb.seqReverse(e1.getTerm())), false);
     }
 
     @Override
@@ -1649,7 +1655,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term post = tb.seqSub(e1.getTerm(), tb.add(e2.getTerm(), tb.one()),
                 tb.add(tb.seqLen(e1.getTerm()), minusOne));
         final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
-        return new SLExpression(put);
+        return addOrigin(ctx, new SLExpression(put), false);
     }
 
     @Override
@@ -1664,11 +1670,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term t1 = e1.getTerm();
         switch (ctx.op.getType()) {
             case JmlLexer.SEQCONCAT:
-                return termFactory.seqConcat(t1, t2);
+                return addOrigin(ctx, termFactory.seqConcat(t1, t2), false);
             case JmlLexer.SEQGET:
-                return termFactory.seqGet(t1, t2);
+                return addOrigin(ctx, termFactory.seqGet(t1, t2), false);
             case JmlLexer.INDEXOF:
-                return termFactory.createIndexOf(t1, t2);
+                return addOrigin(ctx, termFactory.createIndexOf(t1, t2), false);
             default:
                 raiseError(ctx, "Unexpected syntax case.");
         }
@@ -1678,7 +1684,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitInfinite_union_expr(JmlParser.Infinite_union_exprContext ctx) {
-        return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(0), ctx.storeref());
+        return createInfiniteUnion(ctx, ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(0), ctx.storeref());
     }
 
     @Override
@@ -1707,32 +1713,32 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term body = expr.getTerm();
         switch (ctx.quantifier().start.getType()) {
             case JmlLexer.FORALL:
-                return termFactory.forall(guard, body,
+                return addOrigin(ctx, termFactory.forall(guard, body,
                         declVars.first, declVars.second,
-                        nullable, expr.getType());
+                        nullable, expr.getType()), false);
             case JmlLexer.EXISTS:
-                return termFactory.exists(guard, body,
+                return addOrigin(ctx, termFactory.exists(guard, body,
                         declVars.first, declVars.second,
-                        nullable, expr.getType());
+                        nullable, expr.getType()), false);
             case JmlLexer.MAX:
-                return termFactory.quantifiedMax(guard, body,
-                        declVars.first, nullable, declVars.second);
+                return addOrigin(ctx, termFactory.quantifiedMax(guard, body,
+                        declVars.first, nullable, declVars.second), false);
             case JmlLexer.MIN:
-                return termFactory.quantifiedMin(guard, body,
-                        declVars.first, nullable, declVars.second);
+                return addOrigin(ctx, termFactory.quantifiedMin(guard, body,
+                        declVars.first, nullable, declVars.second), false);
             case JmlLexer.NUM_OF:
                 KeYJavaType kjtInt = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-                return termFactory.quantifiedNumOf(guard, body,
+                return addOrigin(ctx, termFactory.quantifiedNumOf(guard, body,
                         declVars.first, nullable, declVars.second,
-                        kjtInt);
+                        kjtInt), false);
             case JmlLexer.SUM:
-                return termFactory.quantifiedSum(declVars.first, nullable,
+                return addOrigin(ctx, termFactory.quantifiedSum(declVars.first, nullable,
                         declVars.second, guard, body,
-                        expr.getType());
+                        expr.getType()), false);
             case JmlLexer.PRODUCT:
-                return termFactory.quantifiedProduct(declVars.first, nullable,
+                return addOrigin(ctx, termFactory.quantifiedProduct(declVars.first, nullable,
                         declVars.second, guard, body,
-                        expr.getType());
+                        expr.getType()), false);
             default:
                 raiseError(ctx, "Unexpected syntax case.");
         }
@@ -1762,7 +1768,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             result = new SLExpression(convertToOld(result.getTerm()));
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1782,7 +1788,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             result = new SLExpression(convertToBefore(result.getTerm()));
         }
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1797,7 +1803,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert t != null;
         SLExpression result = termFactory.bsum(a, b, t, decls.first, decls.second);
         resolverManager.popLocalVariablesNamespace();
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
@@ -1811,12 +1817,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.expression(2));
         SLExpression result = termFactory.createSeqDef(a, b, t, decls.first, decls.second);
         resolverManager.popLocalVariablesNamespace();
-        return result;
+        return addOrigin(ctx, result, false);
     }
 
     @Override
-    public Pair<KeYJavaType, ImmutableList<LogicVariable>>
-    visitQuantifiedvardecls(JmlParser.QuantifiedvardeclsContext ctx) {
+    public Pair<KeYJavaType, ImmutableList<LogicVariable>> visitQuantifiedvardecls(JmlParser.QuantifiedvardeclsContext ctx) {
         ImmutableList<LogicVariable> vars = ImmutableSLList.nil();
         KeYJavaType t = accept(ctx.typespec());
         for (JmlParser.QuantifiedvariabledeclaratorContext context : ctx.quantifiedvariabledeclarator()) {
@@ -1886,8 +1891,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
-    public LogicVariable visitQuantifiedvariabledeclarator(
-            JmlParser.QuantifiedvariabledeclaratorContext ctx, KeYJavaType t) {
+    public LogicVariable visitQuantifiedvariabledeclarator(JmlParser.QuantifiedvariabledeclaratorContext ctx, KeYJavaType t) {
         KeYJavaType varType;
         final Integer d = accept(ctx.dims());
         int dim = d == null ? 0 : d;
@@ -1936,7 +1940,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (LocationVariable heap : heaps) {
             contractClauses.add(ContractClauses.ACCESSIBLE, heap, t);
         }
-        return new SLExpression(t);
+        return addOrigin(ctx, new SLExpression(t), false);
     }
 
     @Override
@@ -1952,7 +1956,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (LocationVariable heap : heaps) {
             contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
         }
-        return new SLExpression(t);
+        return addOrigin(ctx, new SLExpression(t), false);
     }
 
 
@@ -1964,7 +1968,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         Term t = termFactory.signalsOnly(typeList, this.excVar);
         contractClauses.signalsOnly = t;
-        return new SLExpression(t);
+        return addOrigin(ctx, new SLExpression(t), false);
     }
 
 
@@ -2010,7 +2014,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {
-        return accept(ctx.expression());
+        return addOrigin(ctx, accept(ctx.expression()), false);
     }
 
     @Override
@@ -2083,7 +2087,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     ContractClauses.ENSURES_FREE,
                     ContractClauses.ENSURES);
         }
-        return t;
+        return addOrigin(ctx, t, false);
     }
 
 
@@ -2099,7 +2103,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     ContractClauses.REQUIRES_FREE,
                     ContractClauses.REQUIRES);
         }
-        return t;
+        return addOrigin(ctx, t, false);
     }
 
     @Override
@@ -2110,13 +2114,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 .reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();
         contractClauses.measuredBy = result;
-        return new SLExpression(result);
+        return addOrigin(ctx, new SLExpression(result), false);
     }
 
 
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
-        return this.<SLExpression>accept(ctx.predornot());
+        return addOrigin(ctx, this.<SLExpression>accept(ctx.predornot()), false);
     }
 
     @Override
@@ -2124,13 +2128,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.predornot());
         assert t != null;
         contractClauses.diverges = t.getTerm();
-        return t;
+        return addOrigin(ctx, t, false);
     }
 
     @Override
     public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
         addWarning(ctx, "Working space clause is not supported. Ignored!");
-        return this.<SLExpression>accept(ctx.predornot());
+        return addOrigin(ctx, this.<SLExpression>accept(ctx.predornot()), false);
     }
 
     @Override
@@ -2279,7 +2283,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert result != null;
         Term r = termFactory.signals(result.getTerm(), eVar, excVar, excType);
         contractClauses.signalsOnly = r;
-        return new SLExpression(r);
+        return addOrigin(ctx, new SLExpression(r), false);
     }
 
     @Override
@@ -2315,7 +2319,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
 
-        return termFactory.eq(apply, body);
+        return addOrigin(ctx, termFactory.eq(apply, body), false);
     }
 
 
@@ -2417,7 +2421,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> exprs = mapOf(ctx.expression());
         Optional<SLExpression> t = exprs.stream()
                 .reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
-        return new SLExpression(t.orElse(exprs.get(0)).getTerm());
+        return addOrigin(ctx, new SLExpression(t.orElse(exprs.get(0)).getTerm()), false);
     }
 
     @Override
@@ -2441,12 +2445,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         if (ctx.UNREACHABLE() != null) return new SLExpression(tb.not(tb.tt()));
-        return accept(ctx.expression());
+        return addOrigin(ctx, accept(ctx.expression()), false);
     }
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        return accept(ctx.expression());
+        return addOrigin(ctx, accept(ctx.expression()), false);
     }
 
     @Override

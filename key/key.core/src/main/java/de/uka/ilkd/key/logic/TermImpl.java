@@ -77,7 +77,7 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
-    protected final ImmutableSet<OriginRef> originRef;
+    protected final OriginRef originRef;
 
     //-------------------------------------------------------------------------
     //constructors
@@ -96,10 +96,9 @@ public class TermImpl implements Term {
                     ImmutableArray<Term> subs,
                     ImmutableArray<QuantifiableVariable> boundVars,
                     JavaBlock javaBlock,
-                    ImmutableSet<OriginRef> originRef) {
+                    @Nullable OriginRef originRef) {
         assert op != null;
         assert subs != null;
-        assert originRef != null : "origin must not be null";
         this.op = op;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
@@ -499,12 +498,8 @@ public class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
-        if (originRef.size() != t.originRef.size()) return false;
-        for (OriginRef to : originRef) {
-            if (! t.originRef.contains(to)) {
-                return false;
-            }
-        }
+        if ((originRef == null) != (t.originRef == null)) return false;
+        if (originRef != null && !originRef.equals(t.originRef)) return false;
 
         return op.equals(t.op)
                 && t.hasLabels() == hasLabels()
@@ -627,9 +622,7 @@ public class TermImpl implements Term {
         hashcode = hashcode * 17 + boundVars().hashCode();
         hashcode = hashcode * 17 + javaBlock().hashCode();
 
-        for (OriginRef to : originRef) {
-            hashcode = hashcode * 7 + to.hashCode();
-        }
+        hashcode = hashcode * 7 + ((originRef != null) ? originRef.hashCode() : 0);
 
         if(hashcode == -1) {
             hashcode = 0;
@@ -741,7 +734,7 @@ public class TermImpl implements Term {
         this.origin = origin;
     }
 
-    public ImmutableSet<OriginRef> getOriginRef() {
+    public @Nullable OriginRef getOriginRef() {
         return originRef;
     }
 

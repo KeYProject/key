@@ -150,7 +150,7 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public ImmutableArray<TermLabel> getLabels();
 
-    public ImmutableSet<OriginRef> getOriginRef();
+    public @Nullable OriginRef getOriginRef();
 
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.

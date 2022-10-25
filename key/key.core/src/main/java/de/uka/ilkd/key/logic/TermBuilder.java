@@ -451,9 +451,8 @@ public class TermBuilder {
         return tf.createTerm(mod, new Term[]{t}, null, jb, null);
     }
 
-    public Term prog(Modality mod, JavaBlock jb, Term t,
-                     ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(mod, new Term[]{t}, null, jb, labels, OriginRef.EMPTY);
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<TermLabel> labels) {
+        return tf.createTerm(mod, new Term[]{t}, null, jb, labels, null);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -779,7 +778,7 @@ public class TermBuilder {
         } else if (t2.op() == Junctor.FALSE) {
             return not(t1);
         } else {
-            return tf.createTerm(Junctor.IMP, t1, t2, labels, OriginRef.EMPTY);
+            return tf.createTerm(Junctor.IMP, t1, t2, labels, null);
         }
     }
 
@@ -1082,7 +1081,7 @@ public class TermBuilder {
         } else if (target.equals(tt())) {
             return tt();
         } else {
-            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels, OriginRef.EMPTY);
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels, null);
         }
     }
 
@@ -1376,9 +1375,9 @@ public class TermBuilder {
     public Term union(Term s1, Term s2) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s1.op() == ldt.getEmpty()) {
-            return tf.appendOriginRef(s2, s1.getOriginRef());
+            return s2;
         } else if (s2.op() == ldt.getEmpty()) {
-            return tf.appendOriginRef(s1, s2.getOriginRef());
+            return s1;
         } else {
             return func(ldt.getUnion(), s1, s2);
         }

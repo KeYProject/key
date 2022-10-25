@@ -2,31 +2,39 @@ package de.uka.ilkd.key.logic.origin;
 
 public enum OriginRefType {
 
-    ACCESSIBLE("accessible"),
-    ASSERT("assert"),
-    ASSIGNABLE("assignable"),
-    ASSUME("assume"),
-    DECREASES("decreases"),
-    MEASURED_BY("measured_by"),
-    INVARIANT("invariant"),
-    LOOP_INVARIANT("loop_invariant"),
-    LOOP_INVARIANT_FREE("loop_invariant_free"),
-    REQUIRES_FREE("requires_free"),
-    ENSURES_FREE("ensures_free"),
-    SIGNALS("signals"),
-    SIGNALS_ONLY("signals_only"),
-    BREAKS("breaks"),
-    CONTINUES("continues"),
-    RETURNS("returns"),
+    UNKNOWN("unknown"),
 
-    REQUIRES("requires"), // @requires clause
-    ENSURES("ensures"),   // @ensures clause
+    JML_ACCESSIBLE("accessible"),
+    JML_ASSERT("assert"),
+    JML_ASSIGNABLE("assignable"),
+    JML_ASSUME("assume"),
+    JML_DECREASES("decreases"),
+    JML_MEASURED_BY("measured_by"),
+    JML_INVARIANT("invariant"),
+    JML_LOOP_INVARIANT("loop_invariant"),
+    //JML_LOOP_INVARIANT_FREE("loop_invariant_free"),
+    //JML_REQUIRES_FREE("requires_free"),
+    //JML_ENSURES_FREE("ensures_free"),
+    JML_SIGNALS("signals"),
+    JML_SIGNALS_ONLY("signals_only"),
+    JML_BREAKS("breaks"),
+    JML_CONTINUES("continues"),
+    JML_RETURNS("returns"),
+    JML_REQUIRES("requires"),
+    JML_ENSURES("ensures"),
 
-    REQUIRES_IMPLICT("requires_implicit"),   // autom. generated requires term
-    ENSURES_IMPLICT("ensures_implicit"),     // autom. generated requires term
-    SIGNALS_IMPLICT("signals_implicit"),     // autom. generated signals term
+    IMPLICIT_ENSURES_EXCNULL("ensures_exc_null"),
+    IMPLICIT_ENSURES_SELFINVARIANT("ensures_self_invariant"),
+    IMPLICIT_ENSURES_ASSIGNABLE("ensures_assignable_implicit"),
+    IMPLICIT_REQUIRES_SELFNOTNULL("requires_self_not_null"),
+    IMPLICIT_REQUIRES_SELFCREATED("requires_self_created"),
+    IMPLICIT_REQUIRES_SELFEXACTINSTANCE("requires_self_exact_instance"),
+    IMPLICIT_REQUIRES_PARAMSOK("requires_params_ok"),
+    IMPLICIT_REQUIRES_MEASUREDBY_INITIAL("requires_measuredby_initial"),
+    IMPLICIT_REQUIRES_WELLFORMEDHEAP("requires_wellformed_heap"),
+    IMPLICIT_REQUIRES_SELFINVARIANT("requires_self_invariant"),
+    IMPLICIT_SIGNALS_SELFINVARIANT("signals_self_invariant");
 
-    TERM("term"); // a simple sub-term
 
     private final String name;
 
