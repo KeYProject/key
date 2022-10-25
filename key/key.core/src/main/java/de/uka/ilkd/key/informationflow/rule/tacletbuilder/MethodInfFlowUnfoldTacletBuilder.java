@@ -31,17 +31,15 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " +
-                                           contract.getTarget().getUniqueName());
+        return MiscTools.toValidTacletName(
+            UNFOLD + unfoldCounter + " of " + contract.getTarget().getUniqueName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract,
-                                                   ifVars.c1, ifVars.c2,
-                                                   services);
+            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
     }
 }

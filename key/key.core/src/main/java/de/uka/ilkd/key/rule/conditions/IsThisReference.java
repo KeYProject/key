@@ -11,8 +11,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- * This variable condition checks if a given type denotes an abstract class or
- * interface type.
+ * This variable condition checks if a given type denotes an abstract class or interface type.
  */
 public final class IsThisReference extends VariableConditionAdapter {
 
@@ -24,30 +23,28 @@ public final class IsThisReference extends VariableConditionAdapter {
         this.var = var;
         assert var.sort() == ProgramSVSort.VARIABLE;
     }
-    
 
-    public boolean isNegated(){
-	return negated;
+
+    public boolean isNegated() {
+        return negated;
     }
 
-      
+
     @Override
-    public boolean check(SchemaVariable var, 
-	    		 SVSubstitute instCandidate,
-	    		 SVInstantiations instMap, 
-	    		 Services services) {
-        if(var != this.var) {
-          return true;
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+            Services services) {
+        if (var != this.var) {
+            return true;
         }
-//        boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
+        // boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
         boolean isThisRef = instCandidate instanceof ThisReference;
         return negated ? !isThisRef : isThisRef;
     }
-    
-    
+
+
     @Override
-    public String toString() {      
+    public String toString() {
         String prefix = negated ? "\\not" : "";
-        return prefix+"\\isThisReference (" + var + ")";
+        return prefix + "\\isThisReference (" + var + ")";
     }
 }

@@ -5,11 +5,11 @@ public class ParentIsInterfaceDeclaration {
     private boolean value;
 
     public ParentIsInterfaceDeclaration(boolean val) {
-	this.value=val;
+        this.value = val;
     }
 
     public boolean getValue() {
-	return value;
+        return value;
     }
 
 }

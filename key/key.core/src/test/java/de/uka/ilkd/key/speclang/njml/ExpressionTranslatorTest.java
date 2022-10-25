@@ -29,7 +29,8 @@ public class ExpressionTranslatorTest {
 
     @BeforeEach
     public void setup() {
-        if (services != null) return;
+        if (services != null)
+            return;
         services = TacletForTests.services();
         Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
         r2k.parseSpecialClasses();
@@ -48,7 +49,7 @@ public class ExpressionTranslatorTest {
         JmlParser.ExpressionContext ctx = parser.expression();
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
-                new HashMap<>(), new HashMap<>());
+            new HashMap<>(), new HashMap<>());
         LOGGER.debug("{}", ctx.accept(et));
     }
 }

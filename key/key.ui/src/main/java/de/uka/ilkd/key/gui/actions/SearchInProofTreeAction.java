@@ -6,8 +6,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /*
- * Menu option for showing the proof tree search bar.
- * Keyboard shortcut: STRG+SHIFT+F.
+ * Menu option for showing the proof tree search bar. Keyboard shortcut: STRG+SHIFT+F.
  */
 
 public class SearchInProofTreeAction extends MainWindowAction {
@@ -19,11 +18,10 @@ public class SearchInProofTreeAction extends MainWindowAction {
         setName("Search in Proof Tree");
         setIcon(IconFactory.search2(16));
         setTooltip("Search for rule names or node numbers in the proof tree.");
-        
-        this.setAcceleratorKey(
-                de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
+
+        this.setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
         getMediator().enableWhenProofLoaded(this);
-        
+
     }
 
     @Override

@@ -31,8 +31,7 @@ public class PredictCostProver {
 
     private final Services services;
 
-    private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
-            Services services) {
+    private PredictCostProver(Term instance, ImmutableSet<Term> assertList, Services services) {
         this.assertLiterals = assertList;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -48,8 +47,8 @@ public class PredictCostProver {
             // non-ground substitutions not supported yet
             return -1;
         } else {
-            final PredictCostProver prover = new PredictCostProver(sub
-                    .applyWithoutCasts(matrix, services), assertList, services);
+            final PredictCostProver prover = new PredictCostProver(
+                sub.applyWithoutCasts(matrix, services), assertList, services);
             return prover.cost();
         }
     }
@@ -78,8 +77,7 @@ public class PredictCostProver {
     }
 
     private ImmutableSet<ImmutableSet<Term>> createClauseHelper(
-            ImmutableSet<ImmutableSet<Term>> res,
-            Term self, ImmutableSet<Term> ts) {
+            ImmutableSet<ImmutableSet<Term>> res, Term self, ImmutableSet<Term> ts) {
         res = res.add(ts.add(self));
         return res;
     }
@@ -100,8 +98,8 @@ public class PredictCostProver {
             pro = pro.sub(0);
             op = pro.op();
         }
-        if ((op == Equality.EQUALS || op == Equality.EQV) &&
-                pro.sub(0).equalsModRenaming(pro.sub(1))) {
+        if ((op == Equality.EQUALS || op == Equality.EQV)
+                && pro.sub(0).equalsModRenaming(pro.sub(1))) {
             return negated ? falseT : trueT;
         }
         Term arithRes = HandleArith.provedByArith(pro, services);
@@ -154,7 +152,7 @@ public class PredictCostProver {
     /**
      * try to prove <code>problem</code> by know <code>assertLits</code>
      *
-     * @param problem    a literal to be proved
+     * @param problem a literal to be proved
      * @param assertLits a set of term assertLiterals in which all literals are true
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.

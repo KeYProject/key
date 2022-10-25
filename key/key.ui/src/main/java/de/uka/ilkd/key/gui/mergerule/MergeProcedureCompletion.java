@@ -14,8 +14,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * A completion class for merge procedures. Certain procedures, such as
- * {@link MergeWithPredicateAbstraction}, may not be complete initially and need
- * additional input.
+ * {@link MergeWithPredicateAbstraction}, may not be complete initially and need additional input.
  *
  * @author Dominic Scheurer
  */
@@ -38,9 +37,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
             final Function<T, T> completion) {
         return new MergeProcedureCompletion<T>() {
             @Override
-            public T complete(
-                    T proc,
-                    Pair<Goal, PosInOccurrence> mergeGoalPio,
+            public T complete(T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }
@@ -48,33 +45,27 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
     }
 
     /**
-     * Completes the given merge procedure either automatically (if the procedure
-     * is already complete) or by demanding input from the user in a GUI.
+     * Completes the given merge procedure either automatically (if the procedure is already
+     * complete) or by demanding input from the user in a GUI.
      *
-     * @param proc
-     *            {@link MergeProcedure} to complete.
-     * @param mergeGoalPio
-     *            The {@link Goal} and {@link PosInOccurrence} identifying the merge goal.
-     * @param partners
-     *            The {@link MergePartner}s chosen.
+     * @param proc {@link MergeProcedure} to complete.
+     * @param mergeGoalPio The {@link Goal} and {@link PosInOccurrence} identifying the merge goal.
+     * @param partners The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
-    public abstract C complete(
-            final C proc,
-            final Pair<Goal, PosInOccurrence> mergeGoalPio,
+    public abstract C complete(final C proc, final Pair<Goal, PosInOccurrence> mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**
      * Returns the completion for the given merge procedure class.
-     * 
+     *
      * @return The requested completion.
      */
     public static MergeProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
             Class<? extends MergeProcedure> cls) {
         if (cls.equals(MergeWithPredicateAbstractionFactory.class)) {
             return new PredicateAbstractionCompletion();
-        }
-        else {
+        } else {
             return defaultCompletion();
         }
     }

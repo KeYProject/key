@@ -15,12 +15,12 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 public class OpenFileAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8548805965130100236L;
 
     public OpenFileAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
@@ -48,16 +48,15 @@ public class OpenFileAction extends MainWindowAction {
                 }
             }
 
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&
-                    file.toString().endsWith(".java")) {
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()
+                    && file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");
                 Object[] message = { "When you load a Java file, all java files in the current",
-                        "directory and all subdirectories will be loaded as well.",
-                        checkbox };
-                JOptionPane.showMessageDialog(mainWindow, message,
-                        "Please note", JOptionPane.WARNING_MESSAGE);
+                    "directory and all subdirectories will be loaded as well.", checkbox };
+                JOptionPane.showMessageDialog(mainWindow, message, "Please note",
+                    JOptionPane.WARNING_MESSAGE);
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                            .setNotifyLoadBehaviour(!checkbox.isSelected());
+                        .setNotifyLoadBehaviour(!checkbox.isSelected());
                 ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();
             }
             mainWindow.loadProblem(file);

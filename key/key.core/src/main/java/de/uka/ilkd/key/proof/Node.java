@@ -59,14 +59,14 @@ public class Node implements Iterable<Node> {
     private NameRecorder nameRecorder;
 
     /**
-     * a linked list of the locally generated program variables. It extends the list
-     * of the parent node.
+     * a linked list of the locally generated program variables. It extends the list of the parent
+     * node.
      */
     private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
 
     /**
-     * a linked list of the locally generated function symbols. It extends the list
-     * of the parent node.
+     * a linked list of the locally generated function symbols. It extends the list of the parent
+     * node.
      */
     private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
 
@@ -84,20 +84,18 @@ public class Node implements Iterable<Node> {
     private String cachedName = null;
 
     @Nullable
-    private Lookup userData =null;
+    private Lookup userData = null;
 
 
     /**
-     * If the rule base has been extended e.g. by loading a new taclet as lemma or
-     * by applying a taclet with an addrule section on this node, then these taclets
-     * are stored in this list
+     * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
+     * taclet with an addrule section on this node, then these taclets are stored in this list
      */
-    private ImmutableSet<NoPosTacletApp> localIntroducedRules = DefaultImmutableSet
-            .<NoPosTacletApp>nil();
+    private ImmutableSet<NoPosTacletApp> localIntroducedRules =
+        DefaultImmutableSet.<NoPosTacletApp>nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the
-     * {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
@@ -120,8 +118,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * creates a node with the given contents, the given collection of children (all
-     * elements must be of class Node) and the given parent node.
+     * creates a node with the given contents, the given collection of children (all elements must
+     * be of class Node) and the given parent node.
      */
     public Node(Proof proof, Sequent seq, Node parent) {
         this(proof, seq);
@@ -143,8 +141,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * the node information object encapsulates non-logical information of the node,
-     * e.g.
+     * the node information object encapsulates non-logical information of the node, e.g.
      *
      * @return the NodeInfo containing non-logical information
      */
@@ -168,9 +165,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * When pruning, data referring to future nodes has to be cleared; however, the
-     * sequent change info and the relevant files are related to the parent node,
-     * and have to be preserved.
+     * When pruning, data referring to future nodes has to be cleared; however, the sequent change
+     * info and the relevant files are related to the parent node, and have to be preserved.
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
@@ -242,8 +238,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this
-     * node
+     * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this node
      *
      * @param s the app to add.
      */
@@ -285,9 +280,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Search for the root of the smallest subtree containing
-     * <code>this</code> and <code>other</code>; we assume that the two nodes are
-     * part of the same proof tree
+     * Search for the root of the smallest subtree containing <code>this</code> and
+     * <code>other</code>; we assume that the two nodes are part of the same proof tree
      *
      * @param other a node.
      * @return the most recent common ancestor of {@code this} and the specified node.
@@ -371,8 +365,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Removes child/parent relationship between this node and its parent; if this
-     * node is root nothing happens. This is only used for testing purposes.
+     * Removes child/parent relationship between this node and its parent; if this node is root
+     * nothing happens. This is only used for testing purposes.
      */
     void remove() {
         if (parent != null) {
@@ -381,13 +375,11 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Removes child/parent relationship between the given node and this node; if
-     * the given node is not child of this node, nothing happens and then and only
-     * then false is returned.
+     * Removes child/parent relationship between the given node and this node; if the given node is
+     * not child of this node, nothing happens and then and only then false is returned.
      *
      * @param child the child to remove.
-     * @return false iff the given node was not child of this node and nothing has
-     *         been done.
+     * @return false iff the given node was not child of this node and nothing has been done.
      */
     boolean remove(Node child) {
         if (children.remove(child)) {
@@ -424,8 +416,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for the leaves of the subtree below this node. The
-     *  computation is called at every call!
+     * @return an iterator for the leaves of the subtree below this node. The computation is called
+     *         at every call!
      */
     public Iterator<Node> leavesIterator() {
         return new NodeIterator(getLeaves().iterator());
@@ -461,8 +453,8 @@ public class Node implements Iterable<Node> {
 
     /**
      * @param child a child of this node.
-     * @return the number of the node <code>child</code>, if it is a child of this
-     *         node (starting with <code>0</code>), <code>-1</code> otherwise
+     * @return the number of the node <code>child</code>, if it is a child of this node (starting
+     *         with <code>0</code>), <code>-1</code> otherwise
      */
     public int getChildNr(Node child) {
         int res = 0;
@@ -502,12 +494,11 @@ public class Node implements Iterable<Node> {
      * Helper for {@link #toString()}
      *
      * @param prefix needed to keep track if a line has to be printed
-     * @param tree   the tree representation we want to add this subtree " @param
-     *               preEnumeration the enumeration of the parent without the last
-     *               number
+     * @param tree the tree representation we want to add this subtree " @param preEnumeration the
+     *        enumeration of the parent without the last number
      * @param postNr the last number of the parents enumeration
-     * @param maxNr  the number of nodes at this level
-     * @param ownNr  the place of this node at this level
+     * @param maxNr the number of nodes at this level
+     * @param ownNr the place of this node at this level
      * @return the string representation of this node.
      */
 
@@ -562,7 +553,7 @@ public class Node implements Iterable<Node> {
         while (childrenIt.hasNext()) {
             childId++;
             childrenIt.next().toString(prefix, tree, newEnumeration, newPostNr, children.size(),
-                    childId);
+                childId);
         }
 
         return tree;
@@ -613,11 +604,11 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Checks if the parent has this node as child and continues recursively with
-     * the children of this node.
+     * Checks if the parent has this node as child and continues recursively with the children of
+     * this node.
      *
-     * @return true iff the parent of this node has this node as child and this
-     *         condition holds also for the own children.
+     * @return true iff the parent of this node has this node as child and this condition holds also
+     *         for the own children.
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
@@ -657,10 +648,9 @@ public class Node implements Iterable<Node> {
      * Opens a previously closed node and all its closed parents.
      * <p>
      *
-     * This is, for instance, needed for the {@link MergeRule}: In a situation where
-     * a merge node and its associated partners have been closed and the merge node
-     * is then pruned away, the partners have to be reopened again. Otherwise, we
-     * have a soundness issue.
+     * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
+     * and its associated partners have been closed and the merge node is then pruned away, the
+     * partners have to be reopened again. Otherwise, we have a soundness issue.
      */
     void reopen() {
         closed = false;
@@ -728,8 +718,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Returns an iterator over this node's children.
-     * Use {@link #leavesIterator()} if you need to iterate over leaves instead.
+     * Returns an iterator over this node's children. Use {@link #leavesIterator()} if you need to
+     * iterate over leaves instead.
      *
      * @return iterator over children.
      */
@@ -741,7 +731,7 @@ public class Node implements Iterable<Node> {
      * Retrieves a user-defined data.
      *
      * @param service the class for which the data were registered
-     * @param <T>     any class
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
@@ -760,7 +750,7 @@ public class Node implements Iterable<Node> {
      * Register a user-defined data in this node info.
      *
      * @param obj an object to be registered
-     * @param service  the key under it should be registered
+     * @param service the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -769,6 +759,7 @@ public class Node implements Iterable<Node> {
 
     /**
      * Remove a previous registered user-defined data.
+     *
      * @param obj registered object
      * @param service the key under which the data was registered
      * @param <T> arbitray object
@@ -785,7 +776,8 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if(userData == null) userData = new Lookup();
+        if (userData == null)
+            userData = new Lookup();
         return userData;
     }
 }

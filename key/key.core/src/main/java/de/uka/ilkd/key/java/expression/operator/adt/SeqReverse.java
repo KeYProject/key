@@ -17,38 +17,38 @@ public class SeqReverse extends Operator {
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return PREFIX;
     }
 
 
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqReverse(this);
+        v.performActionOnSeqReverse(this);
     }
 
 
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqReverse(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 1;
+        return 1;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }
 }

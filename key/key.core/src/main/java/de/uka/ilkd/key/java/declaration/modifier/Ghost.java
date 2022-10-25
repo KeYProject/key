@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
- *  The JML modifier "ghost".
+ * The JML modifier "ghost".
  */
 public class Ghost extends Modifier {
 
@@ -14,7 +14,7 @@ public class Ghost extends Modifier {
 
 
     public Ghost(ExtList children) {
-        super (children);
+        super(children);
     }
 
 

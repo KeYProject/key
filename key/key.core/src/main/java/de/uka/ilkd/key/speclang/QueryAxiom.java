@@ -45,9 +45,8 @@ import de.uka.ilkd.key.util.Pair;
 
 
 /**
- * A class axiom that connects an observer symbol representing a Java
- * method (i.e., an object of type IProgramMethod), with the corresponding
- * method body.
+ * A class axiom that connects an observer symbol representing a Java method (i.e., an object of
+ * type IProgramMethod), with the corresponding method body.
  */
 public final class QueryAxiom extends ClassAxiom {
 
@@ -60,8 +59,7 @@ public final class QueryAxiom extends ClassAxiom {
      */
     private final IProgramMethod target;
     /**
-     * The KeYJavaType representing the function to which the
-     * query belongs.
+     * The KeYJavaType representing the function to which the query belongs.
      */
     private final KeYJavaType kjt;
 
@@ -87,14 +85,12 @@ public final class QueryAxiom extends ClassAxiom {
             return false;
         }
         final QueryAxiom other = (QueryAxiom) o;
-        return name.equals(other.name)
-                && target.equals(other.target)
-                && kjt.equals(other.kjt);
+        return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);
     }
 
     @Override
     public int hashCode() {
-       return name.hashCode() * 7 + target.hashCode() * 49 + kjt.hashCode() * 17;
+        return name.hashCode() * 7 + target.hashCode() * 49 + kjt.hashCode() * 17;
     }
 
 
@@ -123,64 +119,41 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(
-                ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-                Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+            Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
-        //create schema variables
+        // create schema variables
         final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
-            heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i),
-                        heapLDT.targetSort(),
-                        false,
-                        false));
+            heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
+                false, false));
         }
-        final SchemaVariable selfSV =
-                target.isStatic() ? null
-	          : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                   kjt.getSort(),
-                                                   false,
-                                                   false);
-        final SchemaVariable[] paramSVs =
-                new SchemaVariable[target.getNumParams()];
+        final SchemaVariable selfSV = target.isStatic() ? null
+                : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort(), false, false);
+        final SchemaVariable[] paramSVs = new SchemaVariable[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
-            paramSVs[i] =
-                    SchemaVariableFactory.createTermSV(new Name("p" + i),
-                                                       target.getParamType(i)
-                                                           .getSort(),
-                                                       false,
-                                                       false);
+            paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("p" + i),
+                target.getParamType(i).getSort(), false, false);
         }
-        final SchemaVariable skolemSV =
-                SchemaVariableFactory.createSkolemTermSV(
-                        new Name(target.getName() + "_sk"),
-                        target.sort());
+        final SchemaVariable skolemSV = SchemaVariableFactory
+                .createSkolemTermSV(new Name(target.getName() + "_sk"), target.sort());
 
-        //create schema variables for program variables
-        final ProgramSV selfProgSV =
-                target.isStatic() ? null
-	          : SchemaVariableFactory.createProgramSV(
-	                  new ProgramElementName("#self"),
-	                  ProgramSVSort.VARIABLE,
-	                  false);
+        // create schema variables for program variables
+        final ProgramSV selfProgSV = target.isStatic() ? null
+                : SchemaVariableFactory.createProgramSV(new ProgramElementName("#self"),
+                    ProgramSVSort.VARIABLE, false);
         final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
         for (int i = 0; i < paramProgSVs.length; i++) {
-            paramProgSVs[i] =
-	            SchemaVariableFactory.createProgramSV(
-	                    new ProgramElementName("#p" + i),
-	                    ProgramSVSort.VARIABLE,
-	                    false);
+            paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
+                new ProgramElementName("#p" + i), ProgramSVSort.VARIABLE, false);
         }
-        final ProgramSV resultProgSV =
-                SchemaVariableFactory.createProgramSV(
-                        new ProgramElementName("#res"),
-                        ProgramSVSort.VARIABLE,
-                        false);
+        final ProgramSV resultProgSV = SchemaVariableFactory
+                .createProgramSV(new ProgramElementName("#res"), ProgramSVSort.VARIABLE, false);
 
-        //create update and postcondition linking schema variables and
-        //program variables
+        // create update and postcondition linking schema variables and
+        // program variables
         Term update = null;
         int hc = 0;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
@@ -195,38 +168,24 @@ public final class QueryAxiom extends ClassAxiom {
             }
         }
         update = target.isStatic() ? update
-                : tb.parallel(update,
-                              tb.elementary(selfProgSV,
-                                            tb.var(selfSV)));
+                : tb.parallel(update, tb.elementary(selfProgSV, tb.var(selfSV)));
         for (int i = 0; i < paramSVs.length; i++) {
-            update = tb.parallel(update,
-                                 tb.elementary(paramProgSVs[i],
-                                               tb.var(paramSVs[i])));
+            update = tb.parallel(update, tb.elementary(paramProgSVs[i], tb.var(paramSVs[i])));
         }
-        final Term post = tb.imp(tb.reachableValue(tb.var(resultProgSV),
-                                 target.getReturnType()),
-                                 tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
+        final Term post = tb.imp(tb.reachableValue(tb.var(resultProgSV), target.getReturnType()),
+            tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
 
-        //create java block
-        final ImmutableList<KeYJavaType> sig =
-                ImmutableSLList.<KeYJavaType>nil()
-		                 .append(target.getParamTypes()
-		                	       .toArray(
-                              new KeYJavaType[target.getNumParams()]));
+        // create java block
+        final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
+                .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
         final IProgramMethod targetImpl =
-                services.getJavaInfo().getProgramMethod(kjt,
-                                                        target.getName(),
-                                                        sig,
-                                                        kjt);
-        final MethodBodyStatement mbs =
-                new MethodBodyStatement(targetImpl,
-					  selfProgSV,
-					  resultProgSV,
-					  new ImmutableArray<Expression>(paramProgSVs));
+            services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
+        final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
+            resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
         final JavaBlock jb = JavaBlock.createJavaBlock(sb);
 
-        //create if sequent
+        // create if sequent
         final Sequent ifSeq;
         if (target.isStatic()) {
             ifSeq = null;
@@ -234,11 +193,11 @@ public final class QueryAxiom extends ClassAxiom {
             final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final Semisequent ifSemiSeq =
-                    Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
         }
 
-        //create find
+        // create find
         final Term[] subs = new Term[target.arity()];
         int offset = 0;
         for (SchemaVariable heapSV : heapSVs) {
@@ -255,21 +214,19 @@ public final class QueryAxiom extends ClassAxiom {
         }
         final Term find = tb.func(target, subs);
 
-        //create replacewith
+        // create replacewith
         final Term replacewith = tb.var(skolemSV);
 
-        //create added sequent
-        final Term addedFormula =
-                tb.apply(update, tb.prog(Modality.BOX, jb, post), null);
+        // create added sequent
+        final Term addedFormula = tb.apply(update, tb.prog(Modality.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
-        final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
-                                                    .insertFirst(addedCf)
-                                                    .semisequent();
+        final Semisequent addedSemiSeq =
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
-        //build taclet
+        // build taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-                new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(find);
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
@@ -281,28 +238,23 @@ public final class QueryAxiom extends ClassAxiom {
         }
         for (int i = 0; i < paramSVs.length; i++) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, paramSVs[i]);
-            tacletBuilder.addVarsNew(paramProgSVs[i],
-                                     target.getParamType(i));
+            tacletBuilder.addVarsNew(paramProgSVs[i], target.getParamType(i));
         }
-        tacletBuilder.addVarsNew(resultProgSV,
-                                 target.getReturnType());
+        tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(addedSeq,
-                                              ImmutableSLList.<Taclet>nil(),
-                                              replacewith));
+            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));
         // Originally used to be "simplify"
 
         return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
-        //return DefaultImmutableSet.<Taclet>nil();
+        // return DefaultImmutableSet.<Taclet>nil();
     }
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
-	    						Services services) {
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
         return DefaultImmutableSet.nil();
     }
 

@@ -10,11 +10,11 @@ import java.util.List;
  * <p>
  * This is not specific to KeY at all.
  * <p>
- * However, it is rather pragmatic and I cannot guarantee that it works correctly on all
- * SMTLib2 input.
+ * However, it is rather pragmatic and I cannot guarantee that it works correctly on all SMTLib2
+ * input.
  * <p>
- * Use the static method {@link #indent(String)} to obtain a nice indented version of
- * your SMTLib2-code.
+ * Use the static method {@link #indent(String)} to obtain a nice indented version of your
+ * SMTLib2-code.
  *
  * @author Mattias Ulbrich
  */
@@ -57,8 +57,8 @@ public abstract class SMTBeautifier {
         }
 
         public boolean hasComments() {
-            return isComment() ||
-                    (children != null && children.stream().anyMatch(Element::hasComments));
+            return isComment()
+                    || (children != null && children.stream().anyMatch(Element::hasComments));
         }
 
         public boolean isComment() {
@@ -66,16 +66,16 @@ public abstract class SMTBeautifier {
         }
 
         public boolean lastChildIsComment() {
-            return children != null && !children.isEmpty() &&
-                    children.get(children.size() - 1).isComment();
+            return children != null && !children.isEmpty()
+                    && children.get(children.size() - 1).isComment();
         }
     }
 
     /**
      * Indent a piece of SMTLib2-code.
      * <p>
-     * Each line consists of some initial spaces and then at most 80 characters
-     * (not counting spaces again).
+     * Each line consists of some initial spaces and then at most 80 characters (not counting spaces
+     * again).
      * <p>
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
@@ -90,13 +90,13 @@ public abstract class SMTBeautifier {
     /**
      * Indent a piece of SMTLib2-code.
      * <p>
-     * Each line consists of some initial spaces and then at most lineLength characters
-     * (not counting spaces again).
+     * Each line consists of some initial spaces and then at most lineLength characters (not
+     * counting spaces again).
      * <p>
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
-     * @param smtCode    the code to indent.
+     * @param smtCode the code to indent.
      * @param lineLength the number of characters per line, > 0
      * @return a string representation equivalent to the input
      */
@@ -114,46 +114,46 @@ public abstract class SMTBeautifier {
     private static Element parse(String s, MutableInt pos) {
         while (pos.val < s.length()) {
             switch (s.charAt(pos.val)) {
-                case ' ':
-                case '\t':
-                case '\r':
-                case '\n':
-                    break;
+            case ' ':
+            case '\t':
+            case '\r':
+            case '\n':
+                break;
 
-                case '(':
-                    return parseParen(s, pos);
+            case '(':
+                return parseParen(s, pos);
 
-                case '|':
-                    int start = pos.val;
+            case '|':
+                int start = pos.val;
+                pos.val++;
+                while (s.charAt(pos.val) != '|') {
                     pos.val++;
-                    while (s.charAt(pos.val) != '|') {
-                        pos.val++;
-                    }
-                    Element result = new Element();
-                    pos.val++;
-                    result.head = s.substring(start, pos.val);
-                    return result;
+                }
+                Element result = new Element();
+                pos.val++;
+                result.head = s.substring(start, pos.val);
+                return result;
 
-                case ';':
-                    start = pos.val;
+            case ';':
+                start = pos.val;
+                pos.val++;
+                while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
                     pos.val++;
-                    while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
-                        pos.val++;
-                    }
-                    result = new Element();
-                    result.head = s.substring(start, pos.val);
-                    pos.val++;
-                    return result;
+                }
+                result = new Element();
+                result.head = s.substring(start, pos.val);
+                pos.val++;
+                return result;
 
-                default:
-                    start = pos.val;
+            default:
+                start = pos.val;
+                pos.val++;
+                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
                     pos.val++;
-                    while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
-                        pos.val++;
-                    }
-                    result = new Element();
-                    result.head = s.substring(start, pos.val);
-                    return result;
+                }
+                result = new Element();
+                result.head = s.substring(start, pos.val);
+                return result;
             }
             pos.val++;
         }

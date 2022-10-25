@@ -8,9 +8,8 @@ import java.util.Set;
 // to do: make Serializable
 
 /**
- * Implements an unary predicate over objects. Implemented as simple marker
- * (external boolean flag), that can be used to mark objects. This may be
- * required e.g. for graph traversals.
+ * Implements an unary predicate over objects. Implemented as simple marker (external boolean flag),
+ * that can be used to mark objects. This may be required e.g. for graph traversals.
  *
  * @author RN
  */

@@ -11,36 +11,35 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Binary feature that returns zero iff the position of the given rule app is
- * not within the scope of a quantifier
+ * Binary feature that returns zero iff the position of the given rule app is not within the scope
+ * of a quantifier
  */
 public class NotBelowQuantifierFeature extends BinaryFeature {
 
-    public static final Feature INSTANCE = new NotBelowQuantifierFeature ();
+    public static final Feature INSTANCE = new NotBelowQuantifierFeature();
 
-    private NotBelowQuantifierFeature () {}
-    
-    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+    private NotBelowQuantifierFeature() {}
 
-        return !belowQuantifier ( pos );
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+        Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
+
+        return !belowQuantifier(pos);
     }
 
     /**
      * @return true iff the given position is in the scope of a quantifier
      */
-    private boolean belowQuantifier (PosInOccurrence pos) {
-        final PIOPathIterator it = pos.iterator ();
+    private boolean belowQuantifier(PosInOccurrence pos) {
+        final PIOPathIterator it = pos.iterator();
 
-        while ( it.next () != -1 ) {
-            final Term t = it.getSubTerm ();
-            final Operator op = t.op ();
+        while (it.next() != -1) {
+            final Term t = it.getSubTerm();
+            final Operator op = t.op();
 
-            if ( op instanceof Quantifier )
+            if (op instanceof Quantifier)
                 return true;
         }
-        
+
         return false;
     }
 

@@ -6,15 +6,16 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * A feature that computes the sum of two given features (faster than the more
- * general class <code>SumFeature</code>)
+ * A feature that computes the sum of two given features (faster than the more general class
+ * <code>SumFeature</code>)
  */
 public class BinarySumTermFeature implements TermFeature {
 
     public RuleAppCost compute(Term term, Services services) {
-        RuleAppCost f0Cost = f0.compute ( term, services );
-        if ( f0Cost instanceof TopRuleAppCost ) return f0Cost;
-        return f0Cost.add ( f1.compute ( term, services ) );
+        RuleAppCost f0Cost = f0.compute(term, services);
+        if (f0Cost instanceof TopRuleAppCost)
+            return f0Cost;
+        return f0Cost.add(f1.compute(term, services));
     }
 
     private BinarySumTermFeature(TermFeature f0, TermFeature f1) {
@@ -23,7 +24,7 @@ public class BinarySumTermFeature implements TermFeature {
     }
 
     public static TermFeature createSum(TermFeature f0, TermFeature f1) {
-        return new BinarySumTermFeature ( f0, f1 );
+        return new BinarySumTermFeature(f0, f1);
     }
 
     private final TermFeature f0, f1;

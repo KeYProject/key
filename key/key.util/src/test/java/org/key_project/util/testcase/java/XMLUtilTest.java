@@ -26,24 +26,31 @@ public class XMLUtilTest {
         assertNull(XMLUtil.replaceTags("Hello", null));
         assertNull(XMLUtil.replaceTags(null, new LoggingReplacer("|")));
         assertReplaceTags("Hello World", "Hello World", "|");
-        assertReplaceTags("<html>Hello<br> World</html>", "|Hello| World|", "|", "<html>", "<br>", "</html>");
+        assertReplaceTags("<html>Hello<br> World</html>", "|Hello| World|", "|", "<html>", "<br>",
+            "</html>");
         assertReplaceTags("Hello World", "Hello World", null);
-        assertReplaceTags("<html>Hello<br> World</html>", "Hello World", null, "<html>", "<br>", "</html>");
+        assertReplaceTags("<html>Hello<br> World</html>", "Hello World", null, "<html>", "<br>",
+            "</html>");
         assertReplaceTags("<html>Hello<br /> World", "|Hello| World", "|", "<html>", "<br />");
         assertReplaceTags("Hello<br/> World</html>", "Hello| World|", "|", "<br/>", "</html>");
-        assertReplaceTags("<html a=\"b\" c='x'>Hello World</html>", "|Hello World|", "|", "<html a=\"b\" c='x'>", "</html>");
-        assertReplaceTags("<html a=\"<<>>>\" c='>'>Hello World</html>", "|Hello World|", "|", "<html a=\"<<>>>\" c='>'>", "</html>");
+        assertReplaceTags("<html a=\"b\" c='x'>Hello World</html>", "|Hello World|", "|",
+            "<html a=\"b\" c='x'>", "</html>");
+        assertReplaceTags("<html a=\"<<>>>\" c='>'>Hello World</html>", "|Hello World|", "|",
+            "<html a=\"<<>>>\" c='>'>", "</html>");
     }
 
     /**
      * Executes a test step of {@link #testReplaceTags()}.
      *
-     * @param text             The text to execute {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)} on.
-     * @param expectedResult   The expected result.
+     * @param text The text to execute
+     *        {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)}
+     *        on.
+     * @param expectedResult The expected result.
      * @param fixedReplacement The fixed replacement to use.
-     * @param expectedTags     The expected found tags.
+     * @param expectedTags The expected found tags.
      */
-    protected void assertReplaceTags(String text, String expectedResult, String fixedReplacement, String... expectedTags) {
+    protected void assertReplaceTags(String text, String expectedResult, String fixedReplacement,
+            String... expectedTags) {
         LoggingReplacer replacer = new LoggingReplacer(fixedReplacement);
         String result = XMLUtil.replaceTags(text, replacer);
         assertEquals(expectedResult, result);
@@ -110,7 +117,8 @@ public class XMLUtilTest {
         assertEquals("Hello World", XMLUtil.removeTags("<html>Hello<br /> World"));
         assertEquals("Hello World", XMLUtil.removeTags("Hello<br/> World</html>"));
         assertEquals("Hello World", XMLUtil.removeTags("<html a=\"b\" c='x'>Hello World</html>"));
-        assertEquals("Hello World", XMLUtil.removeTags("<html a=\"<<>>>\" c='>'>Hello World</html>"));
+        assertEquals("Hello World",
+            XMLUtil.removeTags("<html a=\"<<>>>\" c='>'>Hello World</html>"));
     }
 
     /**
@@ -123,10 +131,14 @@ public class XMLUtilTest {
         // Test empty string
         assertEquals(StringUtil.EMPTY_STRING, XMLUtil.encodeText(StringUtil.EMPTY_STRING));
         // Text XML tags
-        assertEquals("&lt;hello&gt;world&lt;/hello&gt;", XMLUtil.encodeText("<hello>world</hello>"));
+        assertEquals("&lt;hello&gt;world&lt;/hello&gt;",
+            XMLUtil.encodeText("<hello>world</hello>"));
         // Test XML attributes
-        assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;world&lt;/hello&gt;", XMLUtil.encodeText("<hello a=\"A\" b='B'>world</hello>"));
+        assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;world&lt;/hello&gt;",
+            XMLUtil.encodeText("<hello a=\"A\" b='B'>world</hello>"));
         // Test XML entities
-        assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;", XMLUtil.encodeText("<hello a=\"A\" b='B'>&lt;world&gt;</hello>"));
+        assertEquals(
+            "&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;",
+            XMLUtil.encodeText("<hello a=\"A\" b='B'>&lt;world&gt;</hello>"));
     }
 }

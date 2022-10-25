@@ -19,10 +19,9 @@ public interface ExpressionContainer extends NonTerminalProgramElement {
     int getExpressionCount();
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     Expression getExpressionAt(int index);
 }

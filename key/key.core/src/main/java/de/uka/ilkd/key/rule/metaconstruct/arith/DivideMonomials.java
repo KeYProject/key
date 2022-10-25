@@ -13,20 +13,20 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class DivideMonomials extends AbstractTermTransformer {
 
     public DivideMonomials() {
-        super ( new Name ( "#divideMonomials" ), 2 );
+        super(new Name("#divideMonomials"), 2);
     }
 
-    
+
     /** calculates the resulting term. */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term arg1 = term.sub ( 0 );
-        final Term arg2 = term.sub ( 1 );
+        final Term arg1 = term.sub(0);
+        final Term arg2 = term.sub(1);
 
-        final Monomial m1 = Monomial.create ( arg1, services );
-        final Monomial m2 = Monomial.create ( arg2, services );
+        final Monomial m1 = Monomial.create(arg1, services);
+        final Monomial m2 = Monomial.create(arg2, services);
 
-        final Monomial res = m2.reduce ( m1 );
-        return res.toTerm ( services );
+        final Monomial res = m2.reduce(m1);
+        return res.toTerm(services);
     }
 
 }

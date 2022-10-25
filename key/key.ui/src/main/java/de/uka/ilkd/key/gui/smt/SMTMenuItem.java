@@ -9,16 +9,16 @@ public class SMTMenuItem extends JMenuItem {
     private SolverTypeCollection solverUnion;
 
     public SMTMenuItem(SolverTypeCollection solverUnion) {
-	super();
-	this.solverUnion = solverUnion;
-	this.setText(solverUnion.toString());
+        super();
+        this.solverUnion = solverUnion;
+        this.setText(solverUnion.toString());
     }
-    
+
     public SolverTypeCollection getSolverUnion() {
-	return solverUnion;
+        return solverUnion;
     }
-    
-    public String toString(){
-	return solverUnion.toString();
+
+    public String toString() {
+        return solverUnion.toString();
     }
 }

@@ -6,20 +6,19 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class IdDeclaration {
 
     private String name;
-    private Sort   sort;
+    private Sort sort;
 
-    public IdDeclaration ( String p_name,
-			   Sort   p_sort ) {
-	name = p_name;
-	sort = p_sort;
+    public IdDeclaration(String p_name, Sort p_sort) {
+        name = p_name;
+        sort = p_sort;
     }
 
-    public String getName () {
-	return name;
+    public String getName() {
+        return name;
     }
 
-    public Sort   getSort () {
-	return sort;
+    public Sort getSort() {
+        return sort;
     }
 
 }

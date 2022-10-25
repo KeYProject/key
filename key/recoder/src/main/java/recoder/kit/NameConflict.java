@@ -5,8 +5,8 @@ package recoder.kit;
 import recoder.NamedModelElement;
 
 /**
- * Problem report indicating that the planned transformation produces a name
- * conflict with an existing model element.
+ * Problem report indicating that the planned transformation produces a name conflict with an
+ * existing model element.
  */
 public class NameConflict extends Conflict {
 
@@ -17,8 +17,7 @@ public class NameConflict extends Conflict {
     private final NamedModelElement reason;
 
     /**
-     * Creates a new problem report with the given element as the reason of the
-     * conflict.
+     * Creates a new problem report with the given element as the reason of the conflict.
      */
     public NameConflict(NamedModelElement reason) {
         this.reason = reason;

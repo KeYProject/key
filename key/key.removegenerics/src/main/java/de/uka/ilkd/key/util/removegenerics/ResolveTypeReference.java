@@ -11,13 +11,13 @@ import recoder.service.CrossReferenceSourceInfo;
 
 /**
  * Handle a type reference in the generic deletion process.
- * 
- * If the type reference references a type avar or an array over tv, it must be
- * replaced. if the type var is ("extends"-) bounded than <b>with the first
- * boundary(!)</b> otherwise with java.lang.Object.
- * 
+ *
+ * If the type reference references a type avar or an array over tv, it must be replaced. if the
+ * type var is ("extends"-) bounded than <b>with the first boundary(!)</b> otherwise with
+ * java.lang.Object.
+ *
  * @author MU
- * 
+ *
  */
 
 public class ResolveTypeReference extends GenericResolutionTransformation {
@@ -44,8 +44,8 @@ public class ResolveTypeReference extends GenericResolutionTransformation {
         Type type = sourceInfo.getType(reference);
 
         Type replaceType = targetType(type);
-        
-        if(replaceType != null && !replaceType.equals(type)) {
+
+        if (replaceType != null && !replaceType.equals(type)) {
             replaceWith = TypeKit.createTypeReference(getProgramFactory(), replaceType);
             return EQUIVALENCE;
         }

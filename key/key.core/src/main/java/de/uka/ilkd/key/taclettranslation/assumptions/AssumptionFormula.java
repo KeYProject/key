@@ -16,45 +16,43 @@ public class AssumptionFormula implements TacletFormula {
     TacletConditions conditions;
 
     public TacletConditions getConditions() {
-	return conditions;
+        return conditions;
     }
 
-    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
-	    String status)  {
-	this.taclet = taclet;
-	this.formula = formula;
-	this.status = status;
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula, String status) {
+        this.taclet = taclet;
+        this.formula = formula;
+        this.status = status;
     }
-    
-    
 
-    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
-	    String status, TacletConditions conditions) throws IllegalTacletException {
-	super();
-	this.taclet = taclet;
-	this.formula = formula;
-	this.status = status;
-	this.conditions = conditions == null ? new TacletConditions(taclet)
-	        : conditions;
+
+
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula, String status,
+            TacletConditions conditions) throws IllegalTacletException {
+        super();
+        this.taclet = taclet;
+        this.formula = formula;
+        this.status = status;
+        this.conditions = conditions == null ? new TacletConditions(taclet) : conditions;
 
     }
 
     public Term getFormula(TermServices services) {
-	return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
-	// return formula;
+        return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
+        // return formula;
     }
 
     public Taclet getTaclet() {
-	return taclet;
+        return taclet;
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 
     public Collection<Term> getInstantiations() {
 
-	return formula;
+        return formula;
     }
 
 }

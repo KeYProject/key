@@ -7,13 +7,13 @@ import de.uka.ilkd.key.logic.Name;
 
 public final class MetaBinaryAnd extends MetaArithBitMaskOp {
 
-	public MetaBinaryAnd() {
-		super(new Name("#BinaryAnd"));
-	}
+    public MetaBinaryAnd() {
+        super(new Name("#BinaryAnd"));
+    }
 
 
-	@Override
+    @Override
     protected BigInteger bitmaskOp(BigInteger left, BigInteger right) {
-		return left.and(right);
-	}
+        return left.and(right);
+    }
 }

@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains the outsourced routines for KeY sort definitions and axioms
- * for the modular smtlib2 translation.
+ * This class contains the outsourced routines for KeY sort definitions and axioms for the modular
+ * smtlib2 translation.
  *
- * Make sure that your master handler collects all relevent sorts (using {@link
- * MasterHandler#addSort(Sort)} during translation, and then call {@link
- * TypeManager#handle(MasterHandler)} to add the relevant declarations and
- * axioms for the type hierarchy to the handler.
+ * Make sure that your master handler collects all relevent sorts (using
+ * {@link MasterHandler#addSort(Sort)} during translation, and then call
+ * {@link TypeManager#handle(MasterHandler)} to add the relevant declarations and axioms for the
+ * type hierarchy to the handler.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
@@ -31,8 +31,9 @@ class TypeManager {
     }
 
     /**
-     * Creates a translated type hierarchy from the KeY sorts of the master handler
-     * by asserting the subtype relationship (or its absence).
+     * Creates a translated type hierarchy from the KeY sorts of the master handler by asserting the
+     * subtype relationship (or its absence).
+     *
      * @param master the master handler
      */
     private void createSortTypeHierarchy(MasterHandler master, Services services) {
@@ -40,12 +41,14 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
-                master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child),
-                        SExprs.sortExpr(s))));
+                master.addAxiom(new SExpr("assert",
+                    new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
                 for (Sort otherChild : children) {
-                    if (!(child.equals(otherChild)) && (!otherChild.name().toString().equals("Null"))
+                    if (!(child.equals(otherChild))
+                            && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
-                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(otherChild));
+                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
+                            SExprs.sortExpr(otherChild));
                         master.addAxiom(new SExpr("assert", new SExpr("not", st)));
                     }
                 }
@@ -56,8 +59,8 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype",
-                            SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                    master.addAxiom(new SExpr("assert",
+                        new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
                 }
             }
         }
@@ -88,14 +91,14 @@ class TypeManager {
     }
 
     /**
-     * make the constant declarations for the type constants. Each entry is of
-     * the form
+     * make the constant declarations for the type constants. Each entry is of the form
+     *
      * <pre>
      *     (declare-const sort_Name T)
      * </pre>
      *
-     * Those symbols which are already known to the master handler are
-     * not created in the handler but are still included in the result value.
+     * Those symbols which are already known to the master handler are not created in the handler
+     * but are still included in the result value.
      *
      * @param master the handler do which the declarations are added.
      * @return a freshly created list
@@ -105,7 +108,7 @@ class TypeManager {
         List<SExpr> sortExprs = new LinkedList<>();
         for (Sort s : master.getSorts()) {
             SExpr sortExp = SExprs.sortExpr(s);
-            if(!master.isKnownSymbol(sortExp.toString())) {
+            if (!master.isKnownSymbol(sortExp.toString())) {
                 master.addDeclaration(new SExpr("declare-const", sortExp, new SExpr("T")));
                 master.addKnownSymbol(sortExp.toString());
             }
@@ -117,9 +120,8 @@ class TypeManager {
     /**
      * Add smt clauses related to KeY sorts to the provided handler.
      *
-     * The sorts added to the handler are analysed, the respective constants
-     * are declared and axioms regarding distinction and subtyping are added
-     * to master.
+     * The sorts added to the handler are analysed, the respective constants are declared and axioms
+     * regarding distinction and subtyping are added to master.
      *
      * @param master a master handler with collected sorts, will be modified
      */
@@ -129,12 +131,12 @@ class TypeManager {
 
         // ... which are mutually distinct
         if (master.getSorts().size() > 1) {
-            master.addDeclaration(new SExpr("assert", Type.BOOL,
-                    new SExpr("distinct", Type.BOOL, sortExprs)));
+            master.addDeclaration(
+                new SExpr("assert", Type.BOOL, new SExpr("distinct", Type.BOOL, sortExprs)));
         }
 
         // and have a type hierarchy.
-        if(!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
+        if (!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
             createSortTypeHierarchy(master, services);
         }
     }

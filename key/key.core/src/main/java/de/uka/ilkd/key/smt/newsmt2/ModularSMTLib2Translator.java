@@ -22,9 +22,8 @@ import java.util.List;
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
  * language for modern SMT solvers.
  *
- * It aims to be modular and therefore easily extendable.
- * Special {@link SMTHandler}s are used for different terms. The class names of the desired
- * handlers have to be given to the constructor.
+ * It aims to be modular and therefore easily extendable. Special {@link SMTHandler}s are used for
+ * different terms. The class names of the desired handlers have to be given to the constructor.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
@@ -49,15 +48,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private final String[] handlerOptions;
 
     /**
-     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of
-     * the default values.
+     * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the
+     * default values.
+     *
      * @param preamble the preamble to be prepended to smt problems created with this translator
      * @param handlerOptions arbitrary String options for the SMTHandlers used by this translator
      * @param handlerNames fully classified class names of the SMTHandlers to be used by this
-     *                     translator
+     *        translator
      */
     public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
-                                    @Nullable String preamble) {
+            @Nullable String preamble) {
         if (preamble == null) {
             this.preamble = SMTHandlerServices.getInstance().getPreamble();
         } else {
@@ -65,13 +65,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
         this.handlerNames = handlerNames;
         this.handlerOptions = handlerOptions;
-        /* Make sure to load the needed handlers once so that their smt
-        properties are loaded as well. This is needed so that the properties
-        already exist before first translating anything as they may have settings
-        that should be visible beforehand (see {@link SMTSettingsProvider).
-        Also, loading them once before the first translation may save runtime for
-        that first translation.
-        */
+        /*
+         * Make sure to load the needed handlers once so that their smt properties are loaded as
+         * well. This is needed so that the properties already exist before first translating
+         * anything as they may have settings that should be visible beforehand (see {@link
+         * SMTSettingsProvider). Also, loading them once before the first translation may save
+         * runtime for that first translation.
+         */
         try {
             SMTHandlerServices.getInstance().getTemplateHandlers(handlerNames);
         } catch (IOException e) {
@@ -80,8 +80,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
     /**
-     * If the preamble and handlers don't have to be customized, the handlers are empty
-     * and the preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
+     * If the preamble and handlers don't have to be customized, the handlers are empty and the
+     * preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
      */
     public ModularSMTLib2Translator() {
         this(new String[0], new String[0], null);
@@ -128,13 +128,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("\n(check-sat)");
 
-        if(!master.getUnknownValues().isEmpty()) {
+        if (!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
             for (Term t : master.getUnknownValues().keySet()) {
-                sb.append("; ")
-                    .append(master.getUnknownValues().get(t).toString())
-                    .append(" :  ")
-                    .append(t.toString().replace("\n", "")).append("\n");
+                sb.append("; ").append(master.getUnknownValues().get(t).toString()).append(" :  ")
+                        .append(t.toString().replace("\n", "")).append("\n");
             }
         }
 
@@ -146,7 +144,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         // TODO Find a concept for exceptions here
-        if(!exceptions.isEmpty()) {
+        if (!exceptions.isEmpty()) {
             LOGGER.error("Exception while translating: {}", sb);
             throw new RuntimeException(exceptions.get(0));
         }
@@ -158,7 +156,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * precompute the information on the required sources from the translation.
      */
     private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master,
-                                         List<Term> sequentAsserts) {
+            List<Term> sequentAsserts) {
         TypeManager tm = new TypeManager(services);
         tm.handle(master);
     }
@@ -166,8 +164,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     /*
      * extract a sequent into an SMT collection.
      *
-     * The translation adds elements to the lists in the master handler
-     * on the way.
+     * The translation adds elements to the lists in the master handler on the way.
      */
     private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
         List<SExpr> sequentSMTAsserts = new LinkedList<>();
@@ -181,8 +178,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
-                new InputStreamReader(
-                        ModularSMTLib2Translator.class.getResourceAsStream(s)));
+            new InputStreamReader(ModularSMTLib2Translator.class.getResourceAsStream(s)));
 
         try {
             String line;
@@ -219,13 +215,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * @return an equivalent smt code with some simplifications
      */
     private SExpr postProcess(SExpr result) {
-        // remove (u2i (i2u x)) --->  x
-        if(result.getName().equals("u2i") && result.getChildren().get(0).getName().equals("i2u")) {
+        // remove (u2i (i2u x)) ---> x
+        if (result.getName().equals("u2i") && result.getChildren().get(0).getName().equals("i2u")) {
             return postProcess(result.getChildren().get(0).getChildren().get(0));
         }
 
-        // remove (u2b (b2u x)) --->  x
-        if(result.getName().equals("u2b") && result.getChildren().get(0).getName().equals("b2u")) {
+        // remove (u2b (b2u x)) ---> x
+        if (result.getName().equals("u2b") && result.getChildren().get(0).getName().equals("b2u")) {
             return postProcess(result.getChildren().get(0).getChildren().get(0));
         }
 

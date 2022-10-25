@@ -10,7 +10,8 @@ import recoder.java.*;
  * @author <TT>AutoDoc</TT>
  */
 
-public class EmptyStatement extends JavaProgramElement implements Statement, TerminalProgramElement {
+public class EmptyStatement extends JavaProgramElement
+        implements Statement, TerminalProgramElement {
 
     /**
      * serialization id

@@ -63,106 +63,104 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
 
-public class KeYCrossReferenceSourceInfo
-    extends DefaultCrossReferenceSourceInfo {
+public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
-    private HashMap<String, recoder.java.declaration.VariableSpecification>  names2vars = null;
+    private HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
 
-    
+
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
-	super(config);
+        super(config);
     }
 
-    public void setNames2Vars(HashMap<String, recoder.java.declaration.VariableSpecification> names2vars){
-	this.names2vars = names2vars;
+    public void setNames2Vars(
+            HashMap<String, recoder.java.declaration.VariableSpecification> names2vars) {
+        this.names2vars = names2vars;
     }
 
     /**
-       Called by the service configuration indicating that all services
-       are known. Services may now start communicating or linking among
-       their configuration partners. The service configuration can be
-       memorized if it has not been passed in by a constructor already.
-       @param cfg the service configuration this services has been assigned to.
+     * Called by the service configuration indicating that all services are known. Services may now
+     * start communicating or linking among their configuration partners. The service configuration
+     * can be memorized if it has not been passed in by a constructor already.
+     *
+     * @param cfg the service configuration this services has been assigned to.
      */
     public void initialize(ServiceConfiguration cfg) {
-	super.initialize(cfg);
-	cfg.getChangeHistory().
-	    removeChangeHistoryListener(this);
-	cfg.getChangeHistory().addChangeHistoryListener(this);
-	
-	//HEAP
-	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
-	
-	// ADTs
-	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
-	name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
-	name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
-	
-	// JML's primitive types
-	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
-	name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
+        super.initialize(cfg);
+        cfg.getChangeHistory().removeChangeHistoryListener(this);
+        cfg.getChangeHistory().addChangeHistoryListener(this);
+
+        // HEAP
+        name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+
+        // ADTs
+        name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
+        name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
+        name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
+
+        // JML's primitive types
+        name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
+        name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
     }
 
     /**
-	Returns the class type that contains the given program element.
-	@param  context a program element.
-	@return the type to which the given program element belongs
-	(may be <CODE>null</CODE>).
-    */
-    public ClassType getContainingClassType(ProgramElement context){
-	if (context instanceof TypeDeclaration) {
-	    context = context.getASTParent();
-	}
-	do {
-	    if (context instanceof ClassType) {
-		return (ClassType)context;
-	    }else if(context instanceof MethodCallStatement){
-		return (ClassType) getType(((MethodCallStatement) context).
-					      getExecutionContext()
-					      .getTypeReference());
-	    }
-	    context = context.getASTParent();
-	} while (context != null);
-	return null;
+     * Returns the class type that contains the given program element.
+     *
+     * @param context a program element.
+     * @return the type to which the given program element belongs (may be <CODE>null</CODE>).
+     */
+    public ClassType getContainingClassType(ProgramElement context) {
+        if (context instanceof TypeDeclaration) {
+            context = context.getASTParent();
+        }
+        do {
+            if (context instanceof ClassType) {
+                return (ClassType) context;
+            } else if (context instanceof MethodCallStatement) {
+                return (ClassType) getType(
+                    ((MethodCallStatement) context).getExecutionContext().getTypeReference());
+            }
+            context = context.getASTParent();
+        } while (context != null);
+        return null;
     }
 
 
     public void modelChanged(ChangeHistoryEvent event) {
-	List<TreeChange> changes = new ArrayList<TreeChange>();
-	changes.addAll(event.getChanges());
-	super.modelChanged(event);
+        List<TreeChange> changes = new ArrayList<TreeChange>();
+        changes.addAll(event.getChanges());
+        super.modelChanged(event);
 
-	for (TreeChange change : changes) {
-	    if (change instanceof AttachChange) {
-		ProgramElement pe = change.getCompilationUnit();
-		if (pe instanceof TypeDeclarationContainer) {
-		    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
-		    for (int i = 0; i<tdc.getTypeDeclarationCount(); i++) {
-		        ClassType ct = tdc.getTypeDeclarationAt(i);
-		        for (ClassType superType : ct.getSupertypes()) {
-		            registerSubtype(ct, superType);
-		        }
-		    }
-		}
-	    }
-	}
+        for (TreeChange change : changes) {
+            if (change instanceof AttachChange) {
+                ProgramElement pe = change.getCompilationUnit();
+                if (pe instanceof TypeDeclarationContainer) {
+                    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
+                    for (int i = 0; i < tdc.getTypeDeclarationCount(); i++) {
+                        ClassType ct = tdc.getTypeDeclarationAt(i);
+                        for (ClassType superType : ct.getSupertypes()) {
+                            registerSubtype(ct, superType);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void registerSubtype(ClassType c1, ClassType c2) {
 
-	try {
-	    super.registerSubtype(c1, c2);
-	} catch (IllegalAccessError iae) {
-	    // eclipse uses different classloaders and they cause an exception here
-	    // TODO: package new recoder library with protected registerSubtype
-	    // and delete the exception handling code below
-	    eclipseWorkaroundMethodAccess(c1, c2);
-	}
-	
-	
-	
+        try {
+            super.registerSubtype(c1, c2);
+        } catch (IllegalAccessError iae) {
+            // eclipse uses different classloaders and they cause an exception here
+            // TODO: package new recoder library with protected registerSubtype
+            // and delete the exception handling code below
+            eclipseWorkaroundMethodAccess(c1, c2);
+        }
+
+
+
     }
 
     // Woraround for eclipse as we need to access a package private method from the superclass
@@ -171,19 +169,20 @@ public class KeYCrossReferenceSourceInfo
     // TODO: package new recoder library with protected registerSubtype
     // and delete the exception handling code below
     private void eclipseWorkaroundMethodAccess(ClassType c1, ClassType c2) {
-	try {
-	    Method m = DefaultProgramModelInfo.class.getDeclaredMethod("registerSubtype", ClassType.class, ClassType.class);
-	    m.setAccessible(true);
-	    m.invoke(this, c1, c2);
-	} catch (IllegalAccessException e) {
-	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
-	} catch (InvocationTargetException e) {
-	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
-	} catch (SecurityException e) {
-	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
-	} catch (NoSuchMethodException e) {
-	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
-	}
+        try {
+            Method m = DefaultProgramModelInfo.class.getDeclaredMethod("registerSubtype",
+                ClassType.class, ClassType.class);
+            m.setAccessible(true);
+            m.invoke(this, c1, c2);
+        } catch (IllegalAccessException e) {
+            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
+        } catch (InvocationTargetException e) {
+            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
+        } catch (SecurityException e) {
+            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
+        } catch (NoSuchMethodException e) {
+            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
+        }
     }
 
     public Variable getVariable(String name, ProgramElement context) {
@@ -193,22 +192,25 @@ public class KeYCrossReferenceSourceInfo
 
         // Enum constants:
         // 2 cases:
-        //   1) its an original enum constant (see DefaultSourceInfo)
-        //   or
-        //   2) its an already transformed enum class constant
+        // 1) its an original enum constant (see DefaultSourceInfo)
+        // or
+        // 2) its an already transformed enum class constant
         //
         // In the KeY gui, however, the references will always be qualified
         // like in "EnumName.ConstantName"
 
         // 1)
-        if ((context instanceof VariableReference || context instanceof UncollatedReferenceQualifier)
-                && context.getASTParent() instanceof Case
-                && getType(((Case)context.getASTParent()).getParent().getExpression()) instanceof EnumDeclaration) {
-            /* is it an enum constant? Possible iff:
-             * 1) parent is "case" and
-             * 2) switch-selector is an enum type (that way, the selector specifies the scope!)
+        if ((context instanceof VariableReference
+                || context instanceof UncollatedReferenceQualifier)
+                && context.getASTParent() instanceof Case && getType(((Case) context.getASTParent())
+                        .getParent().getExpression()) instanceof EnumDeclaration) {
+            /*
+             * is it an enum constant? Possible iff: 1) parent is "case" and 2) switch-selector is
+             * an enum type (that way, the selector specifies the scope!)
              */
-            EnumConstantSpecification ecs = (EnumConstantSpecification)((EnumDeclaration)getType(((Case)context.getASTParent()).getParent().getExpression())).getVariableInScope(name);
+            EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
+                ((Case) context.getASTParent()).getParent().getExpression()))
+                        .getVariableInScope(name);
             if (ecs != null) {
                 return ecs;
             } else {
@@ -218,14 +220,17 @@ public class KeYCrossReferenceSourceInfo
         }
 
         // 2)
-        if ((context instanceof VariableReference || context instanceof UncollatedReferenceQualifier)
-                && context.getASTParent() instanceof Case
-                && getType(((Case)context.getASTParent()).getParent().getExpression()) instanceof EnumClassDeclaration) {
-            /* is it an enum class constant (after transformation)? Possible iff:
-             * 1) parent is "case" and
-             * 2) switch-selector is an enum type (that way, the selector specifies the scope!)
+        if ((context instanceof VariableReference
+                || context instanceof UncollatedReferenceQualifier)
+                && context.getASTParent() instanceof Case && getType(((Case) context.getASTParent())
+                        .getParent().getExpression()) instanceof EnumClassDeclaration) {
+            /*
+             * is it an enum class constant (after transformation)? Possible iff: 1) parent is
+             * "case" and 2) switch-selector is an enum type (that way, the selector specifies the
+             * scope!)
              */
-            EnumClassDeclaration ecd = ((EnumClassDeclaration)getType(((Case)context.getASTParent()).getParent().getExpression()));
+            EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
+                ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
             if (vs != null) {
                 return vs;
@@ -235,11 +240,9 @@ public class KeYCrossReferenceSourceInfo
             }
         }
 
-        while (pe != null
-                && !(pe instanceof VariableScope)
-                && !((pe instanceof MethodCallStatement)
-                        && !(context instanceof ExecutionContext) && !(context
-                        .equals(((MethodCallStatement) pe).getResultVariable())))) {
+        while (pe != null && !(pe instanceof VariableScope)
+                && !((pe instanceof MethodCallStatement) && !(context instanceof ExecutionContext)
+                        && !(context.equals(((MethodCallStatement) pe).getResultVariable())))) {
             context = pe;
             pe = pe.getASTParent();
 
@@ -249,12 +252,10 @@ public class KeYCrossReferenceSourceInfo
             // speculatively (for URQ resolution)
             return null;
         }
-        if (pe instanceof MethodCallStatement
-                && !(context instanceof ExecutionContext)
-                && !(context.equals(((MethodCallStatement) pe)
-                        .getResultVariable()))) {
-            pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe)
-                    .getExecutionContext().getTypeReference()));
+        if (pe instanceof MethodCallStatement && !(context instanceof ExecutionContext)
+                && !(context.equals(((MethodCallStatement) pe).getResultVariable()))) {
+            pe = getTypeDeclaration((ClassType) getType(
+                ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
         }
         VariableScope scope = (VariableScope) pe;
         Variable result;
@@ -268,8 +269,7 @@ public class KeYCrossReferenceSourceInfo
                     StatementContainer cont = (StatementBlock) scope;
                     // we need the topmost var-scope including context,
                     // or context itself if the found scope is the topmost one
-                    VariableDeclaration def = ((VariableSpecification) result)
-                            .getParent();
+                    VariableDeclaration def = ((VariableSpecification) result).getParent();
                     for (int i = 0; true; i += 1) {
                         Statement s = cont.getStatementAt(i);
                         if (s == def) {
@@ -308,18 +308,16 @@ public class KeYCrossReferenceSourceInfo
                 // might want to check for ambiguity of outer class fields!!!
             }
             pe = scope.getASTParent();
-            while (pe != null
-                    && !(pe instanceof VariableScope)
-                    && !((pe instanceof MethodCallStatement) && !(context instanceof ExecutionContext))) {
+            while (pe != null && !(pe instanceof VariableScope)
+                    && !((pe instanceof MethodCallStatement)
+                            && !(context instanceof ExecutionContext))) {
                 context = pe; // proceed the context
                 pe = pe.getASTParent();
             }
-            if (pe instanceof MethodCallStatement
-                    && !(context instanceof ExecutionContext)
-                    && !(context.equals(((MethodCallStatement) pe)
-                            .getResultVariable()))) {
-                pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe)
-                        .getExecutionContext().getTypeReference()));
+            if (pe instanceof MethodCallStatement && !(context instanceof ExecutionContext)
+                    && !(context.equals(((MethodCallStatement) pe).getResultVariable()))) {
+                pe = getTypeDeclaration((ClassType) getType(
+                    ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
             }
             scope = (VariableScope) pe;
         } while (scope != null);
@@ -331,20 +329,17 @@ public class KeYCrossReferenceSourceInfo
     }
 
     /**
-     * Tries to find a type with the given name using the given program element
-     * as context. Useful to check for name clashes when introducing a new
-     * identifier. Neither name nor context may be <CODE>null</CODE>.
+     * Tries to find a type with the given name using the given program element as context. Useful
+     * to check for name clashes when introducing a new identifier. Neither name nor context may be
+     * <CODE>null</CODE>.
      *
      * This method is identical to
-     * {@link DefaultCrossReferenceSourceInfo#getType(String, ProgramElement)}
-     * but it uses <code>pe = redirectScopeNesting(pe);</code> instead of
-     * <code>s.getASTParent();</code> in Recoder 0.84.
+     * {@link DefaultCrossReferenceSourceInfo#getType(String, ProgramElement)} but it uses
+     * <code>pe = redirectScopeNesting(pe);</code> instead of <code>s.getASTParent();</code> in
+     * Recoder 0.84.
      *
-     * @param name
-     *                the name for the type to be looked up; may or may not be
-     *                qualified.
-     * @param context
-     *                a program element defining the lookup context (scope).
+     * @param name the name for the type to be looked up; may or may not be qualified.
+     * @param context a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
     public Type getType(String name, ProgramElement context) {
@@ -358,7 +353,7 @@ public class KeYCrossReferenceSourceInfo
             return t;
         }
 
-        if(name.startsWith("\\dl_")) {
+        if (name.startsWith("\\dl_")) {
             var pt = new PrimitiveType(name, this);
             name2primitiveType.put(name, pt);
             return pt;
@@ -446,8 +441,8 @@ public class KeYCrossReferenceSourceInfo
         }
         if (result != null) {
             return result;
-        }        
-        
+        }
+
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
 
@@ -461,7 +456,11 @@ public class KeYCrossReferenceSourceInfo
             result = getFromUnitPackage(name, cu);
             if (result == null && il != null) {
                 // then check package imports
-                result = getFromPackageImports(name, il, cu.getTypeDeclarationAt(0 /* doesn't matter which one to check, since this is important for static imports only */));
+                result = getFromPackageImports(name, il,
+                    cu.getTypeDeclarationAt(0 /*
+                                               * doesn't matter which one to check, since this is
+                                               * important for static imports only
+                                               */));
             }
         }
         if (result == null) {
@@ -481,24 +480,24 @@ public class KeYCrossReferenceSourceInfo
 
     /**
      * redirects the nesting of scopes when a method-frame occurs
+     *
      * @param scope the current scope
      * @return the new scope
      */
     private ProgramElement redirectScopeNesting(ProgramElement scope) {
         if (scope instanceof MethodCallStatement) {
-            Type type = getType(((MethodCallStatement) scope)
-                    .getExecutionContext().getTypeReference());
+            Type type =
+                getType(((MethodCallStatement) scope).getExecutionContext().getTypeReference());
             if (!(type instanceof TypeDeclaration)) {
-                throw new IllegalStateException("In the source section of"
-                        + "method-frame only types for which source code is "
+                throw new IllegalStateException(
+                    "In the source section of" + "method-frame only types for which source code is "
                         + "available are supported.");
             }
-            return (TypeDeclaration) getType(((MethodCallStatement) scope)
-                    .getExecutionContext().getTypeReference());
-        } else if (scope instanceof ExecutionContext
-                || (scope.getASTParent() instanceof MethodCallStatement &&
-                        scope == ((MethodCallStatement) scope.getASTParent()).
-                        getResultVariable())) {
+            return (TypeDeclaration) getType(
+                ((MethodCallStatement) scope).getExecutionContext().getTypeReference());
+        } else if (scope instanceof ExecutionContext || (scope
+                .getASTParent() instanceof MethodCallStatement
+                && scope == ((MethodCallStatement) scope.getASTParent()).getResultVariable())) {
             scope = scope.getASTParent();
         }
 
@@ -510,33 +509,32 @@ public class KeYCrossReferenceSourceInfo
     /**
      * The mapping from class names to stub compilation units.
      */
-    protected Map<String, CompilationUnit> stubClasses = new LinkedHashMap<String, CompilationUnit>();
+    protected Map<String, CompilationUnit> stubClasses =
+        new LinkedHashMap<String, CompilationUnit>();
 
     /**
-     *  The flag which decides on the behaviour on undefined classes
+     * The flag which decides on the behaviour on undefined classes
      */
     private boolean ignoreUnresolvedClasses = false;
 
     /**
      * Sets if unresolved classes result in an exception or lead to stubs.
      *
-     * If unresolved classes are ignored, we use
-     * {@link #registerUnresolvedTypeRef(TypeReference)} to create dummy stubs.
+     * If unresolved classes are ignored, we use {@link #registerUnresolvedTypeRef(TypeReference)}
+     * to create dummy stubs.
      *
-     * @param ignoreUnresolvedClasses
-     *                ignore unresolved classes iff true
+     * @param ignoreUnresolvedClasses ignore unresolved classes iff true
      */
     public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
         this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
-        if(ignoreUnresolvedClasses) {
+        if (ignoreUnresolvedClasses) {
             stubClasses.clear();
         }
     }
 
     /*
-     * overwrite the default behaviour:
-     * if the normal lookup fails, generate a stub class, register it
-     * and try to look up again. This might fail again, should never.
+     * overwrite the default behaviour: if the normal lookup fails, generate a stub class, register
+     * it and try to look up again. This might fail again, should never.
      *
      * @see recoder.service.DefaultSourceInfo#getType(recoder.java.reference.TypeReference)
      */
@@ -545,7 +543,7 @@ public class KeYCrossReferenceSourceInfo
         try {
             return super.getType(tr);
         } catch (ExceptionHandlerException e) {
-            if(ignoreUnresolvedClasses && e.getCause() instanceof UnresolvedReferenceException) {
+            if (ignoreUnresolvedClasses && e.getCause() instanceof UnresolvedReferenceException) {
                 registerUnresolvedTypeRef(tr);
                 return super.getType(tr);
             } else {
@@ -555,20 +553,20 @@ public class KeYCrossReferenceSourceInfo
     }
 
     /*
-     * make dummy classes for unresolved type references, store newly created classes to
-     * stubClasses and register the compilation unit.
+     * make dummy classes for unresolved type references, store newly created classes to stubClasses
+     * and register the compilation unit.
      */
     private void registerUnresolvedTypeRef(TypeReference tyref) {
         NameInfo ni = serviceConfiguration.getNameInfo();
         String typeString = Naming.toPathName(tyref);
 
         // bugfix: The reference might be to an array. Remove the array reference then.
-        while(typeString.endsWith("[]"))
+        while (typeString.endsWith("[]"))
             typeString = typeString.substring(0, typeString.length() - 2);
 
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        if(stub != null)
+        if (stub != null)
             throw new IllegalStateException("try to resolve an unknown type twice");
 
         recoder.abstraction.Type ty;
@@ -579,13 +577,17 @@ public class KeYCrossReferenceSourceInfo
             // this is still an unknown type, so set ty = null
             ty = null;
         }
-        if(ty == null) {
-            if(!typeString.contains("."))
-                throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified: " + tyref.toSource(), tyref);
+        if (ty == null) {
+            if (!typeString.contains("."))
+                throw new UnresolvedReferenceException(
+                    "Type references to undefined classes may only appear if they are fully qualified: "
+                        + tyref.toSource(),
+                    tyref);
 
             recoder.java.CompilationUnit cu;
             try {
-                cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(serviceConfiguration.getProgramFactory(), typeString);
+                cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(
+                    serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
                 throw new de.uka.ilkd.key.java.ConvertException(e);
@@ -613,39 +615,31 @@ public class KeYCrossReferenceSourceInfo
     }
 
     /**
-     * clears the cache for the TypeReference to Type resolution.
-     * This is necessary if types are added after model evalutation.
+     * clears the cache for the TypeReference to Type resolution. This is necessary if types are
+     * added after model evalutation.
      *
-    public void clearTypeRefCache() {
-        shit: reference2element.clear();
-    }*/
-    
-    @Override 
+     * public void clearTypeRefCache() { shit: reference2element.clear(); }
+     */
+
+    @Override
     public Type getType(Expression expr) {
-	if(expr instanceof EmptySetLiteral
-           || expr instanceof Singleton
-           || expr instanceof SetUnion
-           || expr instanceof SetMinus
-           || expr instanceof Intersect
-           || expr instanceof AllObjects
-           || expr instanceof AllFields) {
-	    return name2primitiveType.get("\\locset");
-	} else if(expr instanceof EmptySeqLiteral
-                  || expr instanceof SeqSingleton
-                  || expr instanceof SeqConcat
-                  || expr instanceof SeqSub
-                  || expr instanceof SeqReverse) {
-        return name2primitiveType.get("\\seq");
-	} else if(expr instanceof EscapeExpression) {
-	    // w/o further resolution, a type cannot be determined.
-	    // but this does not fail.
-	    return getNameInfo().getUnknownType();
-	} else if (expr instanceof SeqLength
-	        || expr instanceof SeqIndexOf){
-	    return name2primitiveType.get("\\bigint");
-	    // TODO: handle SeqGet
-	} else {
-	    return super.getType(expr);
-	}
+        if (expr instanceof EmptySetLiteral || expr instanceof Singleton || expr instanceof SetUnion
+                || expr instanceof SetMinus || expr instanceof Intersect
+                || expr instanceof AllObjects || expr instanceof AllFields) {
+            return name2primitiveType.get("\\locset");
+        } else if (expr instanceof EmptySeqLiteral || expr instanceof SeqSingleton
+                || expr instanceof SeqConcat || expr instanceof SeqSub
+                || expr instanceof SeqReverse) {
+            return name2primitiveType.get("\\seq");
+        } else if (expr instanceof EscapeExpression) {
+            // w/o further resolution, a type cannot be determined.
+            // but this does not fail.
+            return getNameInfo().getUnknownType();
+        } else if (expr instanceof SeqLength || expr instanceof SeqIndexOf) {
+            return name2primitiveType.get("\\bigint");
+            // TODO: handle SeqGet
+        } else {
+            return super.getType(expr);
+        }
     }
 }

@@ -21,21 +21,20 @@ import java.util.List;
 import java.util.Collection;
 
 /**
- * This is the dialog for the new smt translation mechnism (newsmt2) which
- * aims at a higher degree of flexibility.
+ * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
+ * of flexibility.
  *
  * @author Mattias Ulbrich
  */
 class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
     /**
-     * Create a NewTranslationOptions object.
-     * Note that it uses only the smt properties that are *currently* known to the
-     * SMTHandlerServices instance. Hence, either the creation of this object needs to take
-     * place only after the necessary smt properties are known or it needs to be created anew
-     * when new smt properties become known.
+     * Create a NewTranslationOptions object. Note that it uses only the smt properties that are
+     * *currently* known to the SMTHandlerServices instance. Hence, either the creation of this
+     * object needs to take place only after the necessary smt properties are known or it needs to
+     * be created anew when new smt properties become known.
      */
-    public  NewTranslationOptions() {
+    public NewTranslationOptions() {
         setHeaderText(getDescription());
         makeComponents();
     }
@@ -47,14 +46,14 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         try {
             // This loads only the smt properties that are *currently* known to the
             // SMTHandlerServices instance.
-            Collection<SMTHandlerProperty<?>> properties = SMTHandlerServices.getInstance()
-                    .getSMTProperties();
+            Collection<SMTHandlerProperty<?>> properties =
+                SMTHandlerServices.getInstance().getSMTProperties();
             for (SMTHandlerProperty<?> property : properties) {
                 JComponent comp = property.accept(new ComCreationVisitor(), null);
                 comp.putClientProperty("smtProperty", property);
                 components.add(comp);
             }
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -70,7 +69,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {
-            SMTHandlerProperty<?> prop = (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            SMTHandlerProperty<?> prop =
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             String id = prop.getIdentifier();
             String val = newSMTSettings.get(id);
             if (val != null) {
@@ -85,7 +85,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         ApplyVisitor visitor = new ApplyVisitor(newSMTSettings);
         for (JComponent component : components) {
-            SMTHandlerProperty<?> prop = (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            SMTHandlerProperty<?> prop =
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             prop.accept(visitor, component);
         }
     }
@@ -93,31 +94,24 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     private class ComCreationVisitor implements SMTHandlerPropertyVisitor<Void, JComponent> {
         @Override
         public JComponent visit(EnumProperty<?> eprop, Void unit) {
-            return addComboBox(eprop.getLabel(), eprop.getDescription(),
-                    0, null,
-                    eprop.getEnumType().getEnumConstants());
+            return addComboBox(eprop.getLabel(), eprop.getDescription(), 0, null,
+                eprop.getEnumType().getEnumConstants());
         }
 
         @Override
         public JComponent visit(IntegerProperty iprop, Void unit) {
-            return addNumberField(iprop.getLabel(),
-                    iprop.getMinimum(), iprop.getMaximum(), 1,
-                    iprop.getDescription(),
-                    emptyValidator());
+            return addNumberField(iprop.getLabel(), iprop.getMinimum(), iprop.getMaximum(), 1,
+                iprop.getDescription(), emptyValidator());
         }
 
         @Override
         public JComponent visit(BooleanProperty bprop, Void unit) {
-            return addCheckBox(bprop.getLabel(),
-                    bprop.getDescription(),
-                    false, emptyValidator());
+            return addCheckBox(bprop.getLabel(), bprop.getDescription(), false, emptyValidator());
         }
 
         @Override
         public JComponent visit(StringProperty sprop, Void unit) {
-            return  addTextField(sprop.getLabel(),
-                    sprop.getDescription(),
-                    "", emptyValidator());
+            return addTextField(sprop.getLabel(), sprop.getDescription(), "", emptyValidator());
         }
     }
 
@@ -175,7 +169,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
         @Override
         public Void visit(BooleanProperty booleanProp, JComponent arg) {
-            String val = ((JCheckBox)arg).isSelected() ? "true" : "false";
+            String val = ((JCheckBox) arg).isSelected() ? "true" : "false";
             settings.put(booleanProp.getIdentifier(), val);
             return null;
         }

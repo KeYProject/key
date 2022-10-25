@@ -32,7 +32,8 @@ public class UrlRuleSource extends RuleSource {
         try {
             final InputStream input = url.openStream();
             long localNumberOfBytes = 0;
-            for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue = input.read());
+            for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
+                input.read());
             input.close();
             return localNumberOfBytes;
         } catch (final IOException exception) {
@@ -77,13 +78,8 @@ public class UrlRuleSource extends RuleSource {
     @Override
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
-            return CharStreams.fromChannel(
-                    channel,
-                    StandardCharsets.UTF_8,
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    url.toString(),
-                    -1);
+            return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
+                CodingErrorAction.REPLACE, url.toString(), -1);
         }
     }
 }

@@ -43,40 +43,35 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
     /**
      * Analys a MemberReference.
-     * 
+     *
      * Considering the following example:
-     * 
+     *
      * <pre>
      * class B ...
      * class G&lt;E&gt; { E m() {...} }
-     * 
-     * ... 
-     * G&lt;B&gt; g = new G&lt;B&gt;(); 
+     *
+     * ...
+     * G&lt;B&gt; g = new G&lt;B&gt;();
      * B b = g.m();
-     * ... 
+     * ...
      * </pre>
-     * 
-     * The reference <code>g.m()</code> is the one under test. Several types
-     * will show up:
+     *
+     * The reference <code>g.m()</code> is the one under test. Several types will show up:
      * <ul>
-     * <li><code>declarationType</code> - the type of the member at its
-     * declaration. Here the type of <code>G.m()</code> which is
-     * <code>E</code>.</li>
-     * <li><code>genericFreeDeclaraionType</code> - the type of the
-     * declaration in a non-generic situation, which is
-     * <code>java.lang.Object</code> here.</li>
-     * <li><code>kernelType</code> - if declarationType is an array,
-     * kernelType will be the component type (with all [] removed)</li>
-     * <li><code>actualType</code> - the type of the member in the
-     * parameterized instance: here the type of <code>G&lt;B&gt;.m()</code>
-     * which is <code>B</code>.</li>
-     * <li><code>genericFreeType</code> - if the actualType is a TV itsself,
-     * this is the type that it will be replaced in a non-generic situation (<code>Object</code>
-     * or first boundary).</li>
-     * <li><code>resolvedType</code> - if there are multiple bounds the
-     * reference might have to be cast to a different one than the first.</li>
+     * <li><code>declarationType</code> - the type of the member at its declaration. Here the type
+     * of <code>G.m()</code> which is <code>E</code>.</li>
+     * <li><code>genericFreeDeclaraionType</code> - the type of the declaration in a non-generic
+     * situation, which is <code>java.lang.Object</code> here.</li>
+     * <li><code>kernelType</code> - if declarationType is an array, kernelType will be the
+     * component type (with all [] removed)</li>
+     * <li><code>actualType</code> - the type of the member in the parameterized instance: here the
+     * type of <code>G&lt;B&gt;.m()</code> which is <code>B</code>.</li>
+     * <li><code>genericFreeType</code> - if the actualType is a TV itsself, this is the type that
+     * it will be replaced in a non-generic situation (<code>Object</code> or first boundary).</li>
+     * <li><code>resolvedType</code> - if there are multiple bounds the reference might have to be
+     * cast to a different one than the first.</li>
      * </ul>
-     * 
+     *
      * Also, if there are explicit type parameters, they will be removed.
      */
     @Override
@@ -149,15 +144,15 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     }
 
     /**
-     * return true iff the reference is a lhs of an assignment: Either an
-     * assignment operator or ???.
-     * 
+     * return true iff the reference is a lhs of an assignment: Either an assignment operator or
+     * ???.
+     *
      * @todo
-     * 
+     *
      * @param reference
-     * @return true iff the reference is a lhs of an assignment: Either an
-     * assignment operator or ???.
-     *  
+     * @return true iff the reference is a lhs of an assignment: Either an assignment operator or
+     *         ???.
+     *
      */
     private static boolean isLHS(Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
@@ -170,9 +165,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     }
 
     /**
-     * get the static type of the the declaration of the member. This might be a
-     * type variable even if the type instantiation does not have type variables
-     * 
+     * get the static type of the the declaration of the member. This might be a type variable even
+     * if the type instantiation does not have type variables
+     *
      * @return the type of the the declaration of the referenced member
      */
     private Type getFormalType() {
@@ -195,49 +190,48 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
     /**
      * Problem:
-     * 
+     *
      * <code>
      * interface B { void bb(); }
      * interface C {}
-     * 
+     *
      * class A&lt;E extends C&amp;B&gt; {
      *   E e;
-     *   
+     *
      *   void _d() {
      *     e.bb();
-     *   }         
+     *   }
      * }
      * </code>
-     * 
+     *
      * would be resolved to
-     * 
+     *
      * <code>
      * intfcs s. above
-     * 
+     *
      * class A {
      *   C e;
-     *   
+     *
      *   void _d() {
      *     ((B)e).bb();
      *   }
      * }
      * </code>
-     * 
-     * because the element <code>e</code> cannot have a static types C and B
-     * at the same time. Such casts have to be introduced in such situations.
-     * 
+     *
+     * because the element <code>e</code> cannot have a static types C and B at the same time. Such
+     * casts have to be introduced in such situations.
+     *
      * The detection is handled for the following situations:
      * <ul>
      * <li>FieldReference as suffix</li>
      * <li>MethodReference as suffix</li>
      * <li>CopyAssignments, reference as rhs.</li>
-     * <li>VariableSpecifications (and field specs) (which are not
-     * assignments!)</li>
+     * <li>VariableSpecifications (and field specs) (which are not assignments!)</li>
      * <li>MethodReference as parameter</li>
      * </ul>
-     * 
+     *
      * @todo DAS IST JA WOHL NOCH NICHT
-     * 
+     *
      * @return the resolved type
      */
     private Type resolveType() {
@@ -316,8 +310,10 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
         if (typeToReference != null) {
             ProgramFactory programFactory = getServiceConfiguration().getProgramFactory();
-            TypeCast cast = programFactory.createTypeCast((Expression) reference.deepClone(), typeToReference);
-            ParenthesizedExpression replaceWith = programFactory.createParenthesizedExpression(cast);
+            TypeCast cast =
+                programFactory.createTypeCast((Expression) reference.deepClone(), typeToReference);
+            ParenthesizedExpression replaceWith =
+                programFactory.createParenthesizedExpression(cast);
             if (replaceWith != null)
                 replace(reference, replaceWith);
         }

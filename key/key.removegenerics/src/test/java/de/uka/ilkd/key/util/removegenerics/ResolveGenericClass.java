@@ -8,7 +8,7 @@ import recoder.java.CompilationUnit;
 import java.util.regex.Pattern;
 
 public class ResolveGenericClass {
-    
+
     protected CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
     public CompilationUnit registerCU(String compilationUnit) throws ParserException {
@@ -19,13 +19,10 @@ public class ResolveGenericClass {
     }
 
     /**
-     * parse 2 comp. units transform the first and return whether the result is
-     * equal to the first.
-     * 
-     * @param string1
-     *            first comp unit as string
-     * @param string2
-     *            snd comp unit as string
+     * parse 2 comp. units transform the first and return whether the result is equal to the first.
+     *
+     * @param string1 first comp unit as string
+     * @param string2 snd comp unit as string
      * @throws Exception
      */
     public void equalCU(String string1, String string2) throws Exception {
@@ -33,14 +30,14 @@ public class ResolveGenericClass {
         try {
             cu1 = registerCU(string1);
             cu1before = cu1.deepClone();
-            
+
             sc.getChangeHistory().attached(cu1);
             sc.getChangeHistory().updateModel();
-            
+
             ResolveGenerics rgc = new ResolveGenerics(sc, cu1);
             rgc.analyze();
             rgc.transform();
-            
+
             SingleLineCommentRepairer.repairSingleLineComments(cu1);
 
             String diff = firstDifferentChar(cu1.toSource(), string2);
@@ -65,25 +62,26 @@ public class ResolveGenericClass {
         Pattern nospaces1 = Pattern.compile("(\\w)(\\W)");
         s1 = nospaces1.matcher(s1).replaceAll("$1 $2");
         s2 = nospaces1.matcher(s2).replaceAll("$1 $2");
-        
+
         Pattern nospaces2 = Pattern.compile("(\\W)(\\w)");
         s1 = nospaces2.matcher(s1).replaceAll("$1 $2");
         s2 = nospaces2.matcher(s2).replaceAll("$1 $2");
-        
+
         Pattern spaces = Pattern.compile("\\s+");
         s1 = spaces.matcher(s1).replaceAll(" ").trim();
         s2 = spaces.matcher(s2).replaceAll(" ").trim();
-        
+
 
         int minlength = Math.min(s1.length(), s2.length());
         for (int i = 0; i < minlength; i++) {
             if (s1.charAt(i) != s2.charAt(i))
-                return "'" + s1.substring(i, Math.min(i + 10, s1.length())) + "' vs. '" + s2.substring(i, Math.min(i + 10, s2.length()))
-                        + "' @" + (i+1);
+                return "'" + s1.substring(i, Math.min(i + 10, s1.length())) + "' vs. '"
+                    + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
         }
 
         if (s1.length() != s2.length())
-            return "'" + s1.substring(minlength) + "' vs. '" + s2.substring(minlength) + "' @" + (minlength+1);
+            return "'" + s1.substring(minlength) + "' vs. '" + s2.substring(minlength) + "' @"
+                + (minlength + 1);
         else
             return null;
     }

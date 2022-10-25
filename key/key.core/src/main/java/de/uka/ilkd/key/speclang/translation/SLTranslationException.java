@@ -14,17 +14,17 @@ public class SLTranslationException extends ProofInputException implements HasLo
     private final String fileName;
     private final Position pos;
 
-    public SLTranslationException(String message, Throwable cause,
-                                  String fileName, Position pos) {
+    public SLTranslationException(String message, Throwable cause, String fileName, Position pos) {
         super(message, cause);
-        if (fileName == null) throw new IllegalArgumentException();
-        if (pos == null) throw new IllegalArgumentException();
+        if (fileName == null)
+            throw new IllegalArgumentException();
+        if (pos == null)
+            throw new IllegalArgumentException();
         this.fileName = fileName;
         this.pos = pos;
     }
 
-    public SLTranslationException(String message, String fileName, Position pos,
-                                  Throwable cause) {
+    public SLTranslationException(String message, String fileName, Position pos, Throwable cause) {
         this(message, cause, fileName, pos);
     }
 
@@ -32,8 +32,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this(message, null, fileName, pos);
     }
 
-    public SLTranslationException(String message, String fileName, int line,
-                                  int column) {
+    public SLTranslationException(String message, String fileName, int line, int column) {
         this(message, null, fileName, new Position(line, column));
     }
 
@@ -46,7 +45,8 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     public SLTranslationException(String message, ParserRuleContext expr) {
-        this(message, expr.start.getTokenSource().getSourceName(), new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
+        this(message, expr.start.getTokenSource().getSourceName(),
+            new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
     }
 
     public SLTranslationException(String message, LabeledParserRuleContext expr) {

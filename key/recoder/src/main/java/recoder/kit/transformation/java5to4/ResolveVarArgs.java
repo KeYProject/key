@@ -30,11 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Replaces references to var arg methods and var arg methods itself to make it
- * java 1.4 compliant. Does not change redefined/redefining from different
- * compilation units, so that an entire compilation unit list can be analyzed first
- * before being executed. Note that this means that, if used on a single compilation
- * unit, this transformation may lead to incompilable code.
+ * Replaces references to var arg methods and var arg methods itself to make it java 1.4 compliant.
+ * Does not change redefined/redefining from different compilation units, so that an entire
+ * compilation unit list can be analyzed first before being executed. Note that this means that, if
+ * used on a single compilation unit, this transformation may lead to incompilable code.
  *
  * @author Tobias Gutzmann
  * @since 0.80
@@ -64,16 +63,19 @@ public class ResolveVarArgs extends TwoPassTransformation {
                 MethodDeclaration md = (MethodDeclaration) pe;
                 if (md.isVarArgMethod()) {
                     varArgMeths.add(md);
-                    lastParamTypes.add(getSourceInfo().getType(md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1).getTypeReference()));
+                    lastParamTypes.add(getSourceInfo().getType(
+                        md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1)
+                                .getTypeReference()));
                     List<MemberReference> rl = getCrossReferenceSourceInfo().getReferences(md);
                     for (int i = 0, s = rl.size(); i < s; i++) {
                         // if dimensions already match, don't add!!
                         MethodReference toAdd = (MethodReference) rl.get(i);
-                        if (toAdd.getArguments() != null && toAdd.getArguments().size() == md.getParameterDeclarationCount()) {
+                        if (toAdd.getArguments() != null && toAdd.getArguments().size() == md
+                                .getParameterDeclarationCount()) {
                             int idx = toAdd.getArguments().size() - 1;
                             Type tt = getSourceInfo().getType(toAdd.getExpressionAt(idx));
-                            if (tt instanceof ArrayType && tt.equals(
-                                    getSourceInfo().getType(md.getParameterDeclarationAt(idx).getVariableSpecification())))
+                            if (tt instanceof ArrayType && tt.equals(getSourceInfo().getType(
+                                md.getParameterDeclarationAt(idx).getVariableSpecification())))
                                 continue;
                         }
                         refs.add(toAdd);
@@ -100,10 +102,8 @@ public class ResolveVarArgs extends TwoPassTransformation {
                 eml.add(mr.getArguments().get(from + i).deepClone());
             }
             ArrayInitializer ai = f.createArrayInitializer(eml);
-            NewArray na = f.createNewArray(
-                    TypeKit.createTypeReference(f,
-                            sig.get(sig.size() - 1)), 0, ai
-            );
+            NewArray na =
+                f.createNewArray(TypeKit.createTypeReference(f, sig.get(sig.size() - 1)), 0, ai);
             MethodReference repl = mr.deepClone();
             while (cnt-- > 0)
                 repl.getArguments().remove(repl.getArguments().size() - 1);
@@ -119,10 +119,9 @@ public class ResolveVarArgs extends TwoPassTransformation {
             List<ParameterDeclaration> pds = md.getParameters();
             ParameterDeclaration pd = pds.get(pds.size() - 1);
             ParameterDeclaration newpd = f.createParameterDeclaration(
-                    TypeKit.createTypeReference(f,
-                            getNameInfo().createArrayType(lastParamTypes.get(idx++))),
-                    pd.getVariableSpecification().getIdentifier().deepClone()
-            );
+                TypeKit.createTypeReference(f,
+                    getNameInfo().createArrayType(lastParamTypes.get(idx++))),
+                pd.getVariableSpecification().getIdentifier().deepClone());
             newpd.setVarArg(false);
             replace(repl.getParameterDeclarationAt(repl.getParameterDeclarationCount() - 1), newpd);
             repl.makeParentRoleValid();

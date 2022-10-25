@@ -11,8 +11,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * This filter takes a search string and yields a sequent containing only
- * sequent formulas that match the search.
+ * This filter takes a search string and yields a sequent containing only sequent formulas that
+ * match the search.
  *
  * @author jschiffl
  */
@@ -32,7 +32,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
     protected void filterSequent() {
         Iterator<SequentFormula> it;
 
-        if(antec != null) {
+        if (antec != null) {
             // Result has already been computed. No need to recompute.
             return;
         }

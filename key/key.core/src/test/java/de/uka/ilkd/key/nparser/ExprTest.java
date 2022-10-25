@@ -48,14 +48,10 @@ public class ExprTest {
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);
         KeyIO io = new KeyIO(services);
-        io.load(url).parseFile()
-                .loadDeclarations()
-                .loadSndDegreeDeclarations();
+        io.load(url).parseFile().loadDeclarations().loadSndDegreeDeclarations();
 
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
-        nssb.addVariable("aa", "int")
-                .addVariable("bb", "int")
-                .addVariable("cc", "int")
+        nssb.addVariable("aa", "int").addVariable("bb", "int").addVariable("cc", "int")
                 .addProgramVariable("int", "x");
 
         // Without this call, the LDTs are not available to the expression

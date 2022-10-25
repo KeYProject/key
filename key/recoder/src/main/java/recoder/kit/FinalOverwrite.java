@@ -5,8 +5,8 @@ package recoder.kit;
 import recoder.abstraction.Member;
 
 /**
- * Problem report indicating that a member has been overwritten that was
- * declared final, or was in a final type.
+ * Problem report indicating that a member has been overwritten that was declared final, or was in a
+ * final type.
  */
 public class FinalOverwrite extends Conflict {
 

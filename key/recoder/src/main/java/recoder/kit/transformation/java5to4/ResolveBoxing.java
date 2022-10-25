@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * traverses a (sub)tree and replaces (un-)boxing
- * conversions with explicit conversions.
+ * traverses a (sub)tree and replaces (un-)boxing conversions with explicit conversions.
  *
  * @author Tobias Gutzmann
  * @since 0.80
@@ -86,8 +85,9 @@ public class ResolveBoxing extends TwoPassTransformation {
                             tt = target;
                         }
                     } else if (op.getArity() == 3) {
-                        /* if target is an intersection type, we always box for java 4 compatibility.
-                         * But don't box first argument (condition)!
+                        /*
+                         * if target is an intersection type, we always box for java 4
+                         * compatibility. But don't box first argument (condition)!
                          */
                         if (op.getArguments().get(0) != e) {
 
@@ -95,16 +95,19 @@ public class ResolveBoxing extends TwoPassTransformation {
                             if (target instanceof IntersectionType) {
                                 toBox.add(e);
                             }
-							/* in case it's not an intersection, but just a "most common" type:
-							 /* example: (true ? "hello, world" : 5).getClass(); */
+                            /*
+                             * in case it's not an intersection, but just a "most common" type: /*
+                             * example: (true ? "hello, world" : 5).getClass();
+                             */
                             if (t instanceof PrimitiveType && target instanceof ClassType) {
                                 toBox.add(e);
                             }
                         }
 
                     }
-                    /* else arity == 1 => nothing to do, because stuff like
-                     * i++, where i is of type java.lang.Integer, is not allowed.
+                    /*
+                     * else arity == 1 => nothing to do, because stuff like i++, where i is of type
+                     * java.lang.Integer, is not allowed.
                      */
                 } else if (parent instanceof VariableSpecification) {
                     tt = ((VariableSpecification) parent).getType();
@@ -158,14 +161,11 @@ public class ResolveBoxing extends TwoPassTransformation {
                 id = f.createIdentifier("Float");
             } else if (t == ni.getDoubleType()) {
                 id = f.createIdentifier("Double");
-            } else throw new Error();
+            } else
+                throw new Error();
             TypeReference tr = f.createTypeReference(id);
-            MethodReference replacement = f.createMethodReference(tr,
-                    f.createIdentifier("valueOf"),
-                    new ASTArrayList<Expression>(
-                            e.deepClone()
-                    )
-            );
+            MethodReference replacement = f.createMethodReference(tr, f.createIdentifier("valueOf"),
+                new ASTArrayList<Expression>(e.deepClone()));
             replace(e, replacement);
         }
         for (Expression e : toUnbox) {
@@ -187,7 +187,8 @@ public class ResolveBoxing extends TwoPassTransformation {
                 id = f.createIdentifier("floatValue");
             } else if (t == ni.getJavaLangDouble()) {
                 id = f.createIdentifier("doubleValue");
-            } else throw new Error("cannot unbox type " + t.getFullName() + " (" + t.getClass() + ")");
+            } else
+                throw new Error("cannot unbox type " + t.getFullName() + " (" + t.getClass() + ")");
             ReferencePrefix rp;
             if (e instanceof ParenthesizedExpression)
                 rp = (ParenthesizedExpression) e.deepClone();

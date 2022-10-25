@@ -23,8 +23,7 @@ public class InfFlowSpec {
 
 
     public InfFlowSpec(final ImmutableList<Term> preExpressions,
-                       final ImmutableList<Term> postExpressions,
-                       final ImmutableList<Term> newObjects) {
+            final ImmutableList<Term> postExpressions, final ImmutableList<Term> newObjects) {
         this.preExpressions = preExpressions;
         this.postExpressions = postExpressions;
         this.newObjects = newObjects;
@@ -37,10 +36,9 @@ public class InfFlowSpec {
      * @return this InfFlow specification element with the operator applied.
      */
     public InfFlowSpec map(UnaryOperator<Term> op) {
-        return new InfFlowSpec(
-                preExpressions.stream().map(op).collect(ImmutableList.collector()),
-                postExpressions.stream().map(op).collect(ImmutableList.collector()),
-                newObjects.stream().map(op).collect(ImmutableList.collector()));
+        return new InfFlowSpec(preExpressions.stream().map(op).collect(ImmutableList.collector()),
+            postExpressions.stream().map(op).collect(ImmutableList.collector()),
+            newObjects.stream().map(op).collect(ImmutableList.collector()));
     }
 
     private InfFlowSpec() {

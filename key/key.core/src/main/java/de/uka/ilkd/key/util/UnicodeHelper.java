@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.util;
 
 /**
- * Contains commonly (at least in the context of KeY) used Unicode symbols.
- * The names for the constants mostly derive from the common names in LaTeX,
- * such as the bottom symbol is noted as "BOT".
- * Some symbols are however referred to by their common name within KeY,
- * such as the equivalence arrow (aka. left-right arrow) is named "EQV".
- * In doubt, it is not a bad idea to give several names.
- * See <a href="http://www.fileformat.info/info/unicode/category/Sm/list.htm">
- * this list</a> for more symbols.
+ * Contains commonly (at least in the context of KeY) used Unicode symbols. The names for the
+ * constants mostly derive from the common names in LaTeX, such as the bottom symbol is noted as
+ * "BOT". Some symbols are however referred to by their common name within KeY, such as the
+ * equivalence arrow (aka. left-right arrow) is named "EQV". In doubt, it is not a bad idea to give
+ * several names. See <a href="http://www.fileformat.info/info/unicode/category/Sm/list.htm"> this
+ * list</a> for more symbols.
+ *
  * @author bruns
  *
  */
@@ -104,7 +103,7 @@ public final class UnicodeHelper {
     /**
      * Return a String containing em-spaces.
      */
-    public static String emSpaces (int em) {
+    public static String emSpaces(int em) {
         return Character.toString(EMSPACE).repeat(em);
     }
 }

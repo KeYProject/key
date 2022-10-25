@@ -5,8 +5,7 @@ package recoder.java;
 import java.io.IOException;
 
 /**
- * This runtime exception wraps an IOException thrown by the pretty printer's
- * writer.
+ * This runtime exception wraps an IOException thrown by the pretty printer's writer.
  */
 public class PrettyPrintingException extends RuntimeException {
 

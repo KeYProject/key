@@ -20,9 +20,8 @@ public class Factory implements DesignPattern {
     }
 
     /**
-     * Adds factory methods to the class for all public constructors in the
-     * given types. InterfaceDeclarations are skipped as they provide no
-     * constructors.
+     * Adds factory methods to the class for all public constructors in the given types.
+     * InterfaceDeclarations are skipped as they provide no constructors.
      */
     public Factory(ClassDeclaration factoryClass, List<TypeDeclaration> products) {
         if (factoryClass == null || products == null) {
@@ -44,9 +43,8 @@ public class Factory implements DesignPattern {
     }
 
     /**
-     * Creates factory methods for the public constructors of the given class
-     * and adds the corresponding {@link MethodDeclaration}s to the class
-     * declaration.
+     * Creates factory methods for the public constructors of the given class and adds the
+     * corresponding {@link MethodDeclaration}s to the class declaration.
      */
     public void addFactoryMethods(ClassDeclaration decl) {
         List<? extends Constructor> cl = decl.getConstructors();
@@ -96,12 +94,12 @@ public class Factory implements DesignPattern {
     }
 
     /**
-     * Checks all factory methods and ensures that all methods are members of
-     * the same type.
+     * Checks all factory methods and ensures that all methods are members of the same type.
      */
     public void validate() throws ModelException {
         if (factoryMethods == null || factoryMethods.size() == 0) {
-            throw new InconsistentPatternException("Factories must contain at least one factory method");
+            throw new InconsistentPatternException(
+                "Factories must contain at least one factory method");
         }
         TypeDeclaration parent = null;
         for (int i = 0, s = factoryMethods.size(); i < s; i += 1) {
@@ -110,7 +108,8 @@ public class Factory implements DesignPattern {
             if (parent == null) {
                 parent = m.getProducer().getMemberParent();
             } else if (parent != m.getProducer().getMemberParent()) {
-                throw new InconsistentPatternException("Factory methods must be members of the same type");
+                throw new InconsistentPatternException(
+                    "Factory methods must be members of the same type");
             }
         }
     }

@@ -40,8 +40,7 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 
 public class FloatHandler extends LDTHandler {
 
-    private final Map<JMLOperator, Operator> opMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> opMap = new EnumMap<>(JMLOperator.class);
 
     public FloatHandler(Services services) {
         super(services);
@@ -62,7 +61,7 @@ public class FloatHandler extends LDTHandler {
 
     @Override
     protected Map<JMLOperator, Operator> getOperatorMap(Type promotedType) {
-        if(promotedType == PrimitiveType.JAVA_FLOAT) {
+        if (promotedType == PrimitiveType.JAVA_FLOAT) {
             return opMap;
         } else {
             return null;

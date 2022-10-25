@@ -43,7 +43,7 @@ public final class DescriptionFacade {
             if (properties == null) {
                 properties = new Properties();
                 properties.loadFromXML(
-                        DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
+                    DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,8 +52,8 @@ public final class DescriptionFacade {
     }
 
     /**
-     * Looks up the documentation for the given command in the properties file.
-     * If no documentation is available an empty string is returned.
+     * Looks up the documentation for the given command in the properties file. If no documentation
+     * is available an empty string is returned.
      *
      * @param cmd non-null proof script command
      * @return a non-null string
@@ -64,15 +64,15 @@ public final class DescriptionFacade {
     }
 
     /**
-     * Looks up the documentation for the given proof script argument.
-     * If no documentation is available an empty string is returned.
+     * Looks up the documentation for the given proof script argument. If no documentation is
+     * available an empty string is returned.
      *
      * @param arg non-null proof script argument
      * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if(arg==null || arg.getCommand() == null) {
+        if (arg == null || arg.getCommand() == null) {
             return null;
         }
         String key = arg.getCommand().getName() + "." + arg.getName();

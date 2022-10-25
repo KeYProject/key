@@ -24,7 +24,7 @@ public class UpdateHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         this.services = services;
     }
 
@@ -48,7 +48,7 @@ public class UpdateHandler implements SMTHandler {
     }
 
     private void collectUpdates(Term update, List<SExpr> individualUpdates, MasterHandler trans) {
-        if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term subUpd : update.subs()) {
                 collectUpdates(subUpd, individualUpdates, trans);
             }

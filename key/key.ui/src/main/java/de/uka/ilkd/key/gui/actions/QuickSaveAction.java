@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Immediately saves the currently selected proof to a temporaly location. This
- * feature can be conveniently accessed with the F5 key.
+ * Immediately saves the currently selected proof to a temporaly location. This feature can be
+ * conveniently accessed with the F5 key.
  *
  * @author bruns
  */
@@ -59,8 +59,8 @@ public final class QuickSaveAction extends MainWindowAction {
                 LOGGER.debug(status);
             } catch (IOException x) {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
-                        "Quicksave failed");
+                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksave failed");
                 LOGGER.debug("Quicksaving file {} failed.", filename, x);
             }
         } else {

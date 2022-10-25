@@ -13,8 +13,8 @@ import recoder.list.generic.ASTList;
 /**
  * @author Tobias Gutzmann
  */
-public class EnumConstructorReference extends JavaNonTerminalProgramElement implements ConstructorReference,
-        TypeDeclarationContainer {
+public class EnumConstructorReference extends JavaNonTerminalProgramElement
+        implements ConstructorReference, TypeDeclarationContainer {
 
     /**
      * serialization id
@@ -54,9 +54,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     /**
-     * Inherited through ConstructorReference.
-     * However, this kind of ConstructorReference cannot appear as a statement.
-     * Always returns <code>null</code>
+     * Inherited through ConstructorReference. However, this kind of ConstructorReference cannot
+     * appear as a statement. Always returns <code>null</code>
      *
      * @returns <code>null</code>
      */
@@ -115,7 +114,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) throw new NullPointerException();
+        if (p == null)
+            throw new NullPointerException();
         if (p == classDeclaration) {
             classDeclaration = (ClassDeclaration) q;
             if (q != null)
@@ -137,8 +137,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0 		: classDeclaration
-        // role 1(idx)  : arg
+        // role 0 : classDeclaration
+        // role 1(idx) : arg
         if (child == classDeclaration)
             return 0;
         if (args != null) {
@@ -184,7 +184,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public Expression getExpressionAt(int index) {
-        if (args == null) throw new ArrayIndexOutOfBoundsException(index);
+        if (args == null)
+            throw new ArrayIndexOutOfBoundsException(index);
         return args.get(index);
     }
 

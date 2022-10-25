@@ -6,15 +6,15 @@ import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
- * An ArrayInitializer is a valid expression exclusively for initializing
- * ArrayTypes. Any other expressions are suited for any expression node. These
- * rules could have been expressed by appropriate types, but these solutions
- * would require a couple of new interfaces which did not seem adequate. The
- * parent expression is either another ArrayInitializer (nested blocks) or a
+ * An ArrayInitializer is a valid expression exclusively for initializing ArrayTypes. Any other
+ * expressions are suited for any expression node. These rules could have been expressed by
+ * appropriate types, but these solutions would require a couple of new interfaces which did not
+ * seem adequate. The parent expression is either another ArrayInitializer (nested blocks) or a
  * VariableDeclaration.
  */
 
-public class ArrayInitializer extends JavaNonTerminalProgramElement implements Expression, ExpressionContainer {
+public class ArrayInitializer extends JavaNonTerminalProgramElement
+        implements Expression, ExpressionContainer {
 
     /**
      * serialization id
@@ -110,8 +110,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -167,10 +166,9 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -181,11 +179,10 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

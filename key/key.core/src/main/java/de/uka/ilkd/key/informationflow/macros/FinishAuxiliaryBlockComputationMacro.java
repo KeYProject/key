@@ -25,18 +25,15 @@ import de.uka.ilkd.key.speclang.BlockContract;
  *
  * @author christoph
  */
-public class FinishAuxiliaryBlockComputationMacro
-        extends AbstractFinishAuxiliaryComputationMacro {
+public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (poForProof instanceof BlockExecutionPO) {
-                final Goal initiatingGoal = ((BlockExecutionPO)poForProof).getInitiatingGoal();
+                final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
                     final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
                     if (app instanceof BlockContractInternalBuiltInRuleApp) {
@@ -49,15 +46,12 @@ public class FinishAuxiliaryBlockComputationMacro
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          final Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
 
         // must be BlockExecutionPO otherwise canApplyTo would not have been true
         // and we assume that before calling this method, the applicability of the macro was checked
@@ -72,7 +66,7 @@ public class FinishAuxiliaryBlockComputationMacro
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
 
         final BlockContractInternalBuiltInRuleApp blockRuleApp =
-                (BlockContractInternalBuiltInRuleApp)app;
+            (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
@@ -81,15 +75,15 @@ public class FinishAuxiliaryBlockComputationMacro
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
-                services, blockRuleApp, contract, ifVars, result);
+        final Taclet rwTaclet =
+            buildBlockInfFlowUnfoldTaclet(services, blockRuleApp, contract, ifVars, result);
 
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(((InfFlowProof)proof).getIFSymbols());
+        initiatingProof.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
 
         // close auxiliary computation proof
@@ -101,20 +95,20 @@ public class FinishAuxiliaryBlockComputationMacro
 
     /**
      * constructs a taclet to unfold block contracts for information flow reasoning
+     *
      * @param services the Services
      * @param blockRuleApp the rule application of the block contract
      * @param contract the block contract
      * @param ifVars variables specific for the IF proof obligation
-     * @param result the term representing the result (?) // TODO: someone who knows what the taclet does please provide a description
+     * @param result the term representing the result (?) // TODO: someone who knows what the taclet
+     *        does please provide a description
      * @return the created taclet
      */
-    private Taclet buildBlockInfFlowUnfoldTaclet(
-            final Services services,
-            final BlockContractInternalBuiltInRuleApp blockRuleApp,
-            final BlockContract contract, IFProofObligationVars ifVars,
-            final Term result) {
+    private Taclet buildBlockInfFlowUnfoldTaclet(final Services services,
+            final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
+            IFProofObligationVars ifVars, final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
-                new BlockInfFlowUnfoldTacletBuilder(services);
+            new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);
         tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

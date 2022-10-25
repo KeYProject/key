@@ -23,7 +23,7 @@ public abstract class FilterStrategy implements Strategy {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-        if(!isApprovedApp(app, pio, goal)) {
+        if (!isApprovedApp(app, pio, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
         return delegate.computeCost(app, pio, goal);

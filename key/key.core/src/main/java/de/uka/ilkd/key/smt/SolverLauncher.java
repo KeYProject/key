@@ -16,12 +16,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * 1. Case: Starting the solvers synchronously<br>
  * <br>
  * First Step: Create the SMT problem:<br>
- * <code>SMTProblem problem = new SMTProblem(g); // g can be either a goal or term</code>
- * <br>
+ * <code>SMTProblem problem = new SMTProblem(g); // g can be either a goal or term</code> <br>
  * <br>
  * Second Step: Create the launcher object:<br>
- * <code>SolverLauncher launcher = new SolverLauncher(new SMTSettings(){...});</code>
- * <br>
+ * <code>SolverLauncher launcher = new SolverLauncher(new SMTSettings(){...});</code> <br>
  * <br>
  * Third Step: Launch the solvers you want to execute<br>
  * <code>launcher.launch(problem, services,SolverType.Z3_SOLVER,SolverType.YICES_SOLVER);</code>
@@ -70,10 +68,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * </pre>
  *
  * <br>
- * NOTE: In case that you add at least one listener to a launcher no exception
- * is thrown when a solver produces an error. The exceptions of the solvers are
- * stored within the solver object and can be accessed by
- * <code>solver.getException</code>.
+ * NOTE: In case that you add at least one listener to a launcher no exception is thrown when a
+ * solver produces an error. The exceptions of the solvers are stored within the solver object and
+ * can be accessed by <code>solver.getException</code>.
  */
 
 public class SolverLauncher implements SolverListener {
@@ -81,8 +78,7 @@ public class SolverLauncher implements SolverListener {
     /* ############### Public Interface #################### */
 
     /**
-     * Create for every solver execution a new object. Don't reuse the solver
-     * launcher object.
+     * Create for every solver execution a new object. Don't reuse the solver launcher object.
      *
      * @param settings settings for the execution of the SMT Solvers.
      */
@@ -91,11 +87,10 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * Adds a listener to the launcher object. The listener can be used to
-     * observe the solver execution. If at least one listener was added to the
-     * solver launcher, no exception is thrown when a solver produces an error.
-     * The error can be read when the method <code>launcherStopped</code> of the
-     * listener is called.
+     * Adds a listener to the launcher object. The listener can be used to observe the solver
+     * execution. If at least one listener was added to the solver launcher, no exception is thrown
+     * when a solver produces an error. The error can be read when the method
+     * <code>launcherStopped</code> of the listener is called.
      */
     public void addListener(SolverLauncherListener listener) {
         listeners.add(listener);
@@ -107,13 +102,11 @@ public class SolverLauncher implements SolverListener {
 
     /**
      * Launches several solvers for the problem that is handed over.<br>
-     * Note: Calling this methods does not create an extra thread, i.e. the
-     * calling thread is blocked until the method returns. (Synchronous method
-     * call).
+     * Note: Calling this methods does not create an extra thread, i.e. the calling thread is
+     * blocked until the method returns. (Synchronous method call).
      *
-     * @param problem     The problem that should be translated and passed to the
-     *                    solvers
-     * @param services    The services object of the current proof.
+     * @param problem The problem that should be translated and passed to the solvers
+     * @param services The services object of the current proof.
      * @param solverTypes A list of solver types that should be used for the problem.
      */
     public void launch(SMTProblem problem, Services services, SolverType... solverTypes) {
@@ -122,17 +115,16 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * Launches several solvers for the problems that are handed over. Note:
-     * Calling this methods does not create an extra thread, i.e. the calling
-     * thread is blocked until the method returns. (Synchronous method call).
+     * Launches several solvers for the problems that are handed over. Note: Calling this methods
+     * does not create an extra thread, i.e. the calling thread is blocked until the method returns.
+     * (Synchronous method call).
      *
-     * @param problems    The problems that should be translated and passed to the
-     *                    solvers
-     * @param services    The services object of the current proof.
+     * @param problems The problems that should be translated and passed to the solvers
+     * @param services The services object of the current proof.
      * @param solverTypes A list of solver types that should be used for the problem.
      */
-    public void launch(Collection<SolverType> solverTypes,
-                       Collection<SMTProblem> problems, Services services) {
+    public void launch(Collection<SolverType> solverTypes, Collection<SMTProblem> problems,
+            Services services) {
         checkLaunchCall();
         launchIntern(solverTypes, problems, services);
     }
@@ -148,10 +140,10 @@ public class SolverLauncher implements SolverListener {
     /* ################ Implementation ############################ */
 
     /**
-     * Period of a timer task. Sometimes it happens that a timer event got lost.
-     * Therefore the timer tasks are called periodly until it is canceld
+     * Period of a timer task. Sometimes it happens that a timer event got lost. Therefore the timer
+     * tasks are called periodly until it is canceld
      */
-	private static final int PERIOD = 50;
+    private static final int PERIOD = 50;
 
     /**
      * Used for synchronisation. This lock is used in the same way as the
@@ -159,10 +151,10 @@ public class SolverLauncher implements SolverListener {
      */
     private final ReentrantLock lock = new ReentrantLock();
     /**
-     * This condition is used in order to make the launcher thread wait. The
-     * launcher goes to sleep when no more solvers can be started and some other
-     * solvers are still executed. Everytime a solver stops it sends a signal to
-     * the <code>wait</code>-condition in order to wake up the launcher.
+     * This condition is used in order to make the launcher thread wait. The launcher goes to sleep
+     * when no more solvers can be started and some other solvers are still executed. Everytime a
+     * solver stops it sends a signal to the <code>wait</code>-condition in order to wake up the
+     * launcher.
      */
     private final Condition wait = lock.newCondition();
     /**
@@ -170,8 +162,8 @@ public class SolverLauncher implements SolverListener {
      */
     private final Timer timer = new Timer(true);
     /**
-     * A sesion encapsulates some attributes that should be accessed only by
-     * specified methods (in oder to maintain thread safety)
+     * A sesion encapsulates some attributes that should be accessed only by specified methods (in
+     * oder to maintain thread safety)
      */
     private final Session session = new Session();
 
@@ -181,8 +173,8 @@ public class SolverLauncher implements SolverListener {
     private final SMTSettings settings;
 
     /**
-     * This semaphore is used for stopping the launcher. If the permit is
-     * acquired the launcher stops.
+     * This semaphore is used for stopping the launcher. If the permit is acquired the launcher
+     * stops.
      */
     private final Semaphore stopSemaphore = new Semaphore(1, true);
 
@@ -194,11 +186,10 @@ public class SolverLauncher implements SolverListener {
     private boolean launcherHasBeenUsed = false;
 
     /**
-     * Creates the concrete solver objects and distributes them to the SMT
-     * problems.
+     * Creates the concrete solver objects and distributes them to the SMT problems.
      */
-    private void prepareSolvers(Collection<SolverType> factories,
-                                Collection<SMTProblem> problems, Services services) {
+    private void prepareSolvers(Collection<SolverType> factories, Collection<SMTProblem> problems,
+            Services services) {
         for (SMTProblem problem : problems) {
             for (SolverType factory : factories) {
                 if (factory.isInstalled(false)) {
@@ -210,8 +201,7 @@ public class SolverLauncher implements SolverListener {
         }
     }
 
-    private void launchIntern(SMTProblem problem, Services services,
-                              SolverType[] solverTypes) {
+    private void launchIntern(SMTProblem problem, Services services, SolverType[] solverTypes) {
         LinkedList<SolverType> types = new LinkedList<>();
         Collections.addAll(types, solverTypes);
         LinkedList<SMTProblem> problems = new LinkedList<>();
@@ -219,8 +209,8 @@ public class SolverLauncher implements SolverListener {
         launchIntern(types, problems, services);
     }
 
-    private void launchIntern(Collection<SolverType> factories,
-                              Collection<SMTProblem> problems, Services services) {
+    private void launchIntern(Collection<SolverType> factories, Collection<SMTProblem> problems,
+            Services services) {
         // consider only installed solvers.
         LinkedList<SolverType> installedSolvers = new LinkedList<>();
         for (SolverType type : factories) {
@@ -242,8 +232,7 @@ public class SolverLauncher implements SolverListener {
         launcherHasBeenUsed = true;
     }
 
-    private void launchIntern(Collection<SMTProblem> problems,
-                              Collection<SolverType> factories) {
+    private void launchIntern(Collection<SMTProblem> problems, Collection<SolverType> factories) {
 
         LinkedList<SMTSolver> solvers = new LinkedList<>();
         for (SMTProblem problem : problems) {
@@ -253,8 +242,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * Takes the next solvers from the queue and starts them. It depends on the
-     * settings how many solvers can be executed concurrently.
+     * Takes the next solvers from the queue and starts them. It depends on the settings how many
+     * solvers can be executed concurrently.
      */
     private void fillRunningList(Queue<SMTSolver> solvers) {
         while (startNextSolvers(solvers) && !isInterrupted()) {
@@ -272,8 +261,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * If all permits of the semaphore are acquired the launcher must be
-     * stopped.
+     * If all permits of the semaphore are acquired the launcher must be stopped.
      */
     private boolean isInterrupted() {
         return stopSemaphore.availablePermits() == 0;
@@ -284,13 +272,12 @@ public class SolverLauncher implements SolverListener {
      */
     private boolean startNextSolvers(Queue<SMTSolver> solvers) {
         return !solvers.isEmpty()
-                && session.getCurrentlyRunningCount() < settings
-                .getMaxConcurrentProcesses();
+                && session.getCurrentlyRunningCount() < settings.getMaxConcurrentProcesses();
     }
 
-    private void launchSolvers(Queue<SMTSolver> solvers,
-                               Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
-        //Show progress dialog
+    private void launchSolvers(Queue<SMTSolver> solvers, Collection<SMTProblem> problems,
+            Collection<SolverType> solverTypes) {
+        // Show progress dialog
         notifyListenersOfStart(problems, solverTypes);
 
         // Launch all solvers until the queue is empty or the launcher is
@@ -307,15 +294,16 @@ public class SolverLauncher implements SolverListener {
 
     }
 
-    private void notifyListenersOfStart(Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+    private void notifyListenersOfStart(Collection<SMTProblem> problems,
+            Collection<SolverType> solverTypes) {
         for (SolverLauncherListener listener : listeners) {
             listener.launcherStarted(problems, solverTypes, this);
         }
     }
 
     /**
-     * Core of the launcher. Start all solvers until the queue is empty or the
-     * launcher is interrupted.
+     * Core of the launcher. Start all solvers until the queue is empty or the launcher is
+     * interrupted.
      */
     private void launchLoop(Queue<SMTSolver> solvers) {
         // as long as there are jobs to do, start solvers
@@ -357,8 +345,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * In case of that the user has interrupted the execution the reason of
-     * interruption must be set.
+     * In case of that the user has interrupted the execution the reason of interruption must be
+     * set.
      */
     private void cleanUp(Collection<SMTSolver> solvers) {
         if (isInterrupted()) {
@@ -388,9 +376,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * Is called when a solver has finished its task (Solver Thread). It removes
-     * the solver from the list of the currently running solvers and tries to
-     * wake up the launcher.
+     * Is called when a solver has finished its task (Solver Thread). It removes the solver from the
+     * list of the currently running solvers and tries to wake up the launcher.
      */
     private void notifySolverHasFinished(SMTSolver solver) {
         lock.lock();
@@ -403,8 +390,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * If there is some exception that is caused by the launcher (not by the
-     * solvers) just forward it
+     * If there is some exception that is caused by the launcher (not by the solvers) just forward
+     * it
      */
     private void launcherInterrupted(Exception e) {
         throw new RuntimeException(e);
@@ -421,8 +408,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     @Override
-    public void processInterrupted(SMTSolver solver, SMTProblem problem,
-                                   Throwable e) {
+    public void processInterrupted(SMTSolver solver, SMTProblem problem, Throwable e) {
         session.addProblemSolver(solver);
         notifySolverHasFinished(solver);
     }
@@ -438,9 +424,10 @@ public class SolverLauncher implements SolverListener {
 
 }
 
+
 /**
- * The session class encapsulates some attributes that should be only accessed
- * by specified methods (in order to maintain thread safety)
+ * The session class encapsulates some attributes that should be only accessed by specified methods
+ * (in order to maintain thread safety)
  */
 class Session {
 

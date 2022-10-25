@@ -20,10 +20,9 @@ public interface TypeReferenceContainer extends NonTerminalProgramElement {
     int getTypeReferenceCount();
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     TypeReference getTypeReferenceAt(int index);
 }

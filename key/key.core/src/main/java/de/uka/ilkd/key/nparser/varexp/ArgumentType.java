@@ -14,12 +14,8 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
  * @see TacletBuilderCommand
  */
 public enum ArgumentType {
-    TYPE_RESOLVER(TypeResolver.class),
-    SORT(Sort.class),
-    TERM(Term.class),
-    JAVA_TYPE(KeYJavaType.class),
-    VARIABLE(ParsableVariable.class),
-    STRING(String.class);
+    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(Term.class),
+    JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
 
     public final Class<?> clazz;
 

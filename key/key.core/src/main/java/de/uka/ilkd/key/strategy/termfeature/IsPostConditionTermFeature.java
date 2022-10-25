@@ -10,8 +10,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
  */
 public final class IsPostConditionTermFeature extends BinaryTermFeature {
 
-    public static final IsPostConditionTermFeature INSTANCE =
-            new IsPostConditionTermFeature();
+    public static final IsPostConditionTermFeature INSTANCE = new IsPostConditionTermFeature();
 
 
     private IsPostConditionTermFeature() {
@@ -20,7 +19,6 @@ public final class IsPostConditionTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term t, Services services) {
-        return t.hasLabels() &&
-               t.containsLabel(ParameterlessTermLabel.POST_CONDITION_LABEL);
+        return t.hasLabels() && t.containsLabel(ParameterlessTermLabel.POST_CONDITION_LABEL);
     }
 }

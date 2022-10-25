@@ -6,25 +6,25 @@ import recoder.java.expression.Literal;
 
 
 public final class EmptySetLiteral extends Literal {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 262935836224837458L;
     public static final EmptySetLiteral INSTANCE = new EmptySetLiteral();
-    
+
     @Override
     public Expression deepClone() {
-	return this;
+        return this;
     }
 
-    @Override    
+    @Override
     public void accept(SourceVisitor v) {
     }
 
-    
+
     @Override
     public Object getEquivalentJavaType() {
-	return null;
+        return null;
     }
 }

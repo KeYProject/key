@@ -7,21 +7,20 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
 /**
- * Binary feature that returns zero iff the find-formula of a rule contains a
- * d-path consisting only of positive literals (as a formula of the antecedent).
- * Used terminology is defined in Diss. by Martin Giese.
+ * Binary feature that returns zero iff the find-formula of a rule contains a d-path consisting only
+ * of positive literals (as a formula of the antecedent). Used terminology is defined in Diss. by
+ * Martin Giese.
  */
 public class PurePosDPathFeature extends AbstractBetaFeature {
 
-    public final static Feature INSTANCE = new PurePosDPathFeature ();
+    public final static Feature INSTANCE = new PurePosDPathFeature();
 
-    private PurePosDPathFeature () {}
-    
+    private PurePosDPathFeature() {}
+
     @Override
-    protected RuleAppCost doComputation (PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
-        return hasPurePosPath ( findTerm, !pos.isInAntec (), caches )
-                     ? BinaryFeature.ZERO_COST
-                     : BinaryFeature.TOP_COST;
+    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+        return hasPurePosPath(findTerm, !pos.isInAntec(), caches) ? BinaryFeature.ZERO_COST
+                : BinaryFeature.TOP_COST;
     }
 
 }

@@ -23,18 +23,15 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
         Goal g;
-        if (args.number != null && args.formula == null
-                && args.branch == null) {
+        if (args.number != null && args.formula == null && args.branch == null) {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
 
             if (args.number >= 0) {
@@ -42,26 +39,22 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             } else {
                 g = goals.take(goals.size() + args.number).head();
             }
-        } else if (args.formula != null && args.number == null
-                && args.branch == null) {
+        } else if (args.formula != null && args.number == null && args.branch == null) {
             g = findGoalWith(args.formula, state.getProof());
-        } else if (args.branch != null && args.formula == null
-                && args.number == null) {
+        } else if (args.branch != null && args.formula == null && args.number == null) {
             g = findGoalWith(args.branch, state.getProof());
         } else {
             throw new ScriptException(
-                    "Exactly one of 'formula', 'branch' or 'number' are required");
+                "Exactly one of 'formula', 'branch' or 'number' are required");
         }
 
         state.setGoal(g);
     }
 
-    private Goal findGoalWith(String branchTitle, Proof proof)
-            throws ScriptException {
-        return findGoalWith(
-                node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
-                        .orElse("").equals(branchTitle),
-                node -> getFirstSubtreeGoal(node, proof), proof);
+    private Goal findGoalWith(String branchTitle, Proof proof) throws ScriptException {
+        return findGoalWith(node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
+                .orElse("").equals(branchTitle),
+            node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
     private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
@@ -86,16 +79,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private Goal findGoalWith(Term formula, Proof proof)
-            throws ScriptException {
-        return findGoalWith(
-                node -> node.leaf() && contains(node.sequent(), formula),
-                node -> EngineState.getGoal(proof.openGoals(), node), proof);
+    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
+        return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
+            node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
-    private Goal findGoalWith(Function<Node, Boolean> filter,
-            Function<Node, Goal> goalRetriever, Proof proof)
-            throws ScriptException {
+    private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
+            Proof proof) throws ScriptException {
         Deque<Node> choices = new LinkedList<Node>();
         Node node = proof.root();
 
@@ -141,8 +131,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     private boolean contains(Sequent seq, Term formula) {
-        return contains(seq.antecedent(), formula)
-                || contains(seq.succedent(), formula);
+        return contains(seq.antecedent(), formula) || contains(seq.succedent(), formula);
     }
 
     private boolean contains(Semisequent semiseq, Term formula) {
@@ -164,8 +153,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         @Option(value = "formula", required = false)
         public Term formula;
         /**
-         * The number of the goal to select, starts with 0.
-         * Negative indices are also allowed: -1 is the last goal, -2 the second-to-last, etc.
+         * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
+         * the last goal, -2 the second-to-last, etc.
          */
         @Option(value = "number", required = false)
         public Integer number;

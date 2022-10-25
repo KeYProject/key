@@ -14,12 +14,12 @@ import de.uka.ilkd.key.core.Main;
  * A small framework to handle command lines.
  *
  * <p>
- * Command line options can be defined beforehand, the command line be parsed
- * and set options be queried. It is possible to print a short usage message.
+ * Command line options can be defined beforehand, the command line be parsed and set options be
+ * queried. It is possible to print a short usage message.
  *
  * <p>
- * <i>Note</i> one can use {@code --} to end the list of command line options.
- * This is used if an argument bears a name of a command line option.
+ * <i>Note</i> one can use {@code --} to end the list of command line options. This is used if an
+ * argument bears a name of a command line option.
  *
  * <h3>Typical usage</h3>
  *
@@ -59,20 +59,19 @@ public final class CommandLine {
     private static final String MINUS = "--";
 
     /**
-     * Help elements are messages which can appear in usage pages, here: Options
-     * and AdditionalHelpTexts.
+     * Help elements are messages which can appear in usage pages, here: Options and
+     * AdditionalHelpTexts.
      */
     private static abstract class HelpElement {
         protected abstract void print(PrintStream ps, int descriptionCol);
     }
 
     /**
-     * Option is a data-only structure to capture a single cmd-line option,
-     * its description as well as its value, if set.
+     * Option is a data-only structure to capture a single cmd-line option, its description as well
+     * as its value, if set.
      *
-     * It carries also the information for printing the usage message.
-     * Additional help text which does not belong to this option directly
-     * may be referenced to by the option.
+     * It carries also the information for printing the usage message. Additional help text which
+     * does not belong to this option directly may be referenced to by the option.
      */
     private class Option extends HelpElement {
         private String description;
@@ -83,7 +82,7 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream stream, int descriptionCol) {
             String s = image;
-            if(parameter != null) {
+            if (parameter != null) {
                 s += " " + parameter;
             }
 
@@ -91,14 +90,13 @@ public final class CommandLine {
             stream.print(s);
             indent(stream, descriptionCol - s.length());
 
-            printIndentedMessage(stream, description,
-                    descriptionCol + indentSize);
+            printIndentedMessage(stream, description, descriptionCol + indentSize);
         }
 
     }
     /**
-     * Text that should appear in usage pages. If an external help option/command 
-     * with description should appear in helptext and printed similar to internal options
+     * Text that should appear in usage pages. If an external help option/command with description
+     * should appear in helptext and printed similar to internal options
      */
     private class AdditionalHelpTextParts extends HelpElement {
         private String description;
@@ -109,17 +107,17 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream ps, int descriptionCol) {
             int indent = indentSize;
-            
-         
+
+
             indent(ps, indent);
             printIndentedMessage(ps, command, descriptionCol);
-            indent(ps, descriptionCol-command.length());
+            indent(ps, descriptionCol - command.length());
             printIndentedMessage(ps, description, 0);
         }
     }
     /**
-     * Text that should appear in usage pages. You can decide about the
-     * indentation of the text (beginning of line or description column).
+     * Text that should appear in usage pages. You can decide about the indentation of the text
+     * (beginning of line or description column).
      */
     private class AdditionalHelpText extends HelpElement {
         private String description;
@@ -128,7 +126,7 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream ps, int descriptionCol) {
             int indent = indentSize;
-            if(indentToDescriptionColumn) {
+            if (indentToDescriptionColumn) {
                 indent += descriptionCol;
             }
             indent(ps, indent);
@@ -137,12 +135,13 @@ public final class CommandLine {
     }
     /**
      * Prints section-headlines without any indent
+     *
      * @author sarah
      *
      */
     private class AdditionalHelpTextSection extends HelpElement {
         private String text;
-        //private boolean indentToDescriptionColumn;
+        // private boolean indentToDescriptionColumn;
 
         @Override
         protected void print(PrintStream ps, int descriptionCol) {
@@ -151,6 +150,7 @@ public final class CommandLine {
             printIndentedMessage(ps, text, 0);
         }
     }
+
     /**
      * default value for the length of a line for output.
      */
@@ -172,14 +172,14 @@ public final class CommandLine {
     private final List<String> arguments = new LinkedList<String>();
 
     /**
-     * This is the number of characters printed in one line when printing the
-     * usage page. Longer lines are broken at spaces (if possible).
+     * This is the number of characters printed in one line when printing the usage page. Longer
+     * lines are broken at spaces (if possible).
      */
     private int lineLength = DEFAULT_LINE_LENGTH;
 
     /**
-     * the number of spaces to indent the lines when printing the help
-     * screen. By default lines are not indented;
+     * the number of spaces to indent the lines when printing the help screen. By default lines are
+     * not indented;
      */
     private int indentSize = 0;
 
@@ -192,28 +192,26 @@ public final class CommandLine {
     /**
      * Adds a command line option to this handler.
      *
-     * @param image
-     *            the image of the option (e.g. {@code -help})
-     * @param parameter
-     *            simple description/name of the argument, null if there is no
-     *            argument for this option (e.g. {@code <file>, time, path}, ...
-     * @param description
-     *            the description of the option
+     * @param image the image of the option (e.g. {@code -help})
+     * @param parameter simple description/name of the argument, null if there is no argument for
+     *        this option (e.g. {@code <file>, time, path}, ...
+     * @param description the description of the option
      */
     public void addOption(String image, String parameter, String description) {
 
-        if(!image.startsWith(MINUS)) {
-            throw new IllegalArgumentException("Parameters need to start with '" + MINUS + "': " + image);
+        if (!image.startsWith(MINUS)) {
+            throw new IllegalArgumentException(
+                "Parameters need to start with '" + MINUS + "': " + image);
         }
 
-        if(options.containsKey(image)) {
+        if (options.containsKey(image)) {
             throw new IllegalArgumentException(image + " has already been registered");
         }
 
         Option o = new Option();
         o.image = image;
         o.parameter = parameter;
-        o.description = description+"\n";
+        o.description = description + "\n";
         options.put(image, o);
         helpElements.add(o);
     }
@@ -221,14 +219,11 @@ public final class CommandLine {
     /**
      * Adds an additional help text to be printed on the usage page.
      *
-     * Calling this method has no influence of the parsing of command line
-     * arguments.
+     * Calling this method has no influence of the parsing of command line arguments.
      *
-     * @param description
-     *            the text to be displayed
-     * @param identToDescriptionColumn
-     *            if <code>true</code>, the code is printed underneath the
-     *            remaining descriptions, otherwise it has the full length.
+     * @param description the text to be displayed
+     * @param identToDescriptionColumn if <code>true</code>, the code is printed underneath the
+     *        remaining descriptions, otherwise it has the full length.
      */
     public void addText(String description, boolean identToDescriptionColumn) {
         AdditionalHelpText text = new AdditionalHelpText();
@@ -236,8 +231,11 @@ public final class CommandLine {
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
+
     /**
-     * Add help text of a command which is not part of teh KeY prover, but part of the running script
+     * Add help text of a command which is not part of teh KeY prover, but part of the running
+     * script
+     *
      * @param command
      * @param description
      * @param identToDescriptionColumn
@@ -249,13 +247,15 @@ public final class CommandLine {
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
+
     /**
      * Add Section Heading without any indentation
+     *
      * @param text
      */
     public void addSection(String text) {
         AdditionalHelpTextSection head = new AdditionalHelpTextSection();
-        head.text = "\n"+text+"\n\n";
+        head.text = "\n" + text + "\n\n";
 
         helpElements.add(head);
     }
@@ -263,19 +263,16 @@ public final class CommandLine {
     /**
      * Parses the command line.
      *
-     * @param args
-     *                typically the array of command line arguments passed to
-     *                the main method.
+     * @param args typically the array of command line arguments passed to the main method.
      *
-     * @throws CommandLineException
-     *                If a option is unknown or badly formatted.
+     * @throws CommandLineException If a option is unknown or badly formatted.
      */
     public void parse(String[] args) throws CommandLineException {
         int cnt = 0;
         while (cnt < args.length && args[cnt].startsWith(MINUS)) {
 
-            if("--".equals(args[cnt])) {
-                cnt ++;
+            if ("--".equals(args[cnt])) {
+                cnt++;
                 break;
             }
 
@@ -286,23 +283,23 @@ public final class CommandLine {
                 throw new CommandLineException("Unknown command line option: " + current);
             }
 
-            if(option.parameter != null) {
-                if(cnt == args.length - 1) {
-                    throw new CommandLineException("Command line option " + current +
-                            " expects a parameter but did not receive one");
+            if (option.parameter != null) {
+                if (cnt == args.length - 1) {
+                    throw new CommandLineException("Command line option " + current
+                        + " expects a parameter but did not receive one");
                 }
-                cnt ++;
+                cnt++;
                 option.value = args[cnt];
             } else {
                 option.value = "true";
             }
 
-            cnt ++;
+            cnt++;
         }
 
-        while(cnt < args.length) {
+        while (cnt < args.length) {
             arguments.add(args[cnt]);
-            cnt ++;
+            cnt++;
         }
     }
 
@@ -333,8 +330,7 @@ public final class CommandLine {
     /**
      * Checks if a boolean command line option is set.
      *
-     * @param param
-     *                the image of the command line option to be checked
+     * @param param the image of the command line option to be checked
      *
      * @return true if the option is set, false otherwise
      */
@@ -351,10 +347,8 @@ public final class CommandLine {
      *
      * If the parameter has not been specified, return the default value.
      *
-     * @param param
-     *                the command line option. Needs to take an argument
-     * @param defaultValue
-     *                the default value to return if option is not set
+     * @param param the command line option. Needs to take an argument
+     * @param defaultValue the default value to return if option is not set
      *
      * @return either the set option or defaultValue if not set.
      */
@@ -371,68 +365,60 @@ public final class CommandLine {
     /**
      * Gets the value of an integer command line option.
      *
-     * If not present, a default value is returned. If the argument cannot be
-     * parsed as a (positive or negative) integer, a
-     * {@link CommandLineException} is thrown.
+     * If not present, a default value is returned. If the argument cannot be parsed as a (positive
+     * or negative) integer, a {@link CommandLineException} is thrown.
      *
-     * @param param
-     *            the option to retrieve
-     * @param defaultValue
-     *            the default value to use if no value specified
+     * @param param the option to retrieve
+     * @param defaultValue the default value to use if no value specified
      *
      * @return either the set option or defaultValue if not set.
      *
-     * @throws CommandLineException
-     *             if the argument is ill-formatted.
+     * @throws CommandLineException if the argument is ill-formatted.
      */
     public int getInteger(String param, int defaultValue) throws CommandLineException {
         Option option = options.get(param);
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if(value == null) {
+        if (value == null) {
             return defaultValue;
         }
 
         try {
             return Integer.decode(value);
         } catch (NumberFormatException e) {
-            throw new CommandLineException(param + " expects an integer argument, but received: "
-                                            + option.value, e);
+            throw new CommandLineException(
+                param + " expects an integer argument, but received: " + option.value, e);
         }
     }
 
     /**
      * Gets the value of a long integer command line option.
      *
-     * If not present, a default value is returned. If the argument cannot be
-     * parsed as a (positive or negative) integer, a
-     * {@link CommandLineException} is thrown.
+     * If not present, a default value is returned. If the argument cannot be parsed as a (positive
+     * or negative) integer, a {@link CommandLineException} is thrown.
      *
-     * @param param
-     *            the option to retrieve
-     * @param defaultValue
-     *            the default value to use if no value specified
+     * @param param the option to retrieve
+     * @param defaultValue the default value to use if no value specified
      *
      * @return either the set option or defaultValue if not set.
      *
-     * @throws CommandLineException
-     *             if the argument is ill-formatted.
+     * @throws CommandLineException if the argument is ill-formatted.
      */
     public long getLong(String param, long defaultValue) throws CommandLineException {
         Option option = options.get(param);
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if(value == null) {
+        if (value == null) {
             return defaultValue;
         }
 
         try {
             return Long.decode(value);
         } catch (NumberFormatException e) {
-            throw new CommandLineException(param + " expects a long integer argument, but received: "
-                                            + option.value, e);
+            throw new CommandLineException(
+                param + " expects a long integer argument, but received: " + option.value, e);
         }
     }
 
@@ -440,27 +426,23 @@ public final class CommandLine {
      * Prints the usage page for this command line.
      *
      * <p>
-     * Every of the page is indented to the level set by
-     * {@link #setIndentation(int)} (default is 0). The options and help texts
-     * appear in the order of definition (by
-     * {@link #addOption(String, String, String)} and
-     * {@link #addText(String, boolean)}) The descriptions of the options All
-     * option descriptions commence in the same column.
+     * Every of the page is indented to the level set by {@link #setIndentation(int)} (default is
+     * 0). The options and help texts appear in the order of definition (by
+     * {@link #addOption(String, String, String)} and {@link #addText(String, boolean)}) The
+     * descriptions of the options All option descriptions commence in the same column.
      *
      * <p>
-     * Descriptions which would result in lines longer than
-     * {@link #getLineLength()} characters are broken at spaces (if that is
-     * possible).
+     * Descriptions which would result in lines longer than {@link #getLineLength()} characters are
+     * broken at spaces (if that is possible).
      *
-     * @param stream
-     *            the stream to print to (typically System.out)
+     * @param stream the stream to print to (typically System.out)
      */
     public void printUsage(PrintStream stream) {
         int descriptionCol = 0;
 
         for (Option option : options.values()) {
             int len = option.image.length();
-            if(option.parameter != null) {
+            if (option.parameter != null) {
                 len += 1 + option.parameter.length();
             }
             descriptionCol = Math.max(len, descriptionCol);
@@ -485,11 +467,9 @@ public final class CommandLine {
     }
 
     /*
-     * Used by the Help elements to print text, potentially broken.
-     * The current lines is assumed to be indented to "indentionLevel".
-     * At most textWidth characters of text are printed, the line broken,
-     * indented to indentationLevel, ...
-     * Repeated till the text is completely rendered.
+     * Used by the Help elements to print text, potentially broken. The current lines is assumed to
+     * be indented to "indentionLevel". At most textWidth characters of text are printed, the line
+     * broken, indented to indentationLevel, ... Repeated till the text is completely rendered.
      * Output ends with a line break;
      */
     private void printIndentedMessage(PrintStream stream, String text, int indentationLevel) {
@@ -514,8 +494,8 @@ public final class CommandLine {
     /**
      * Gets the indentation depth.
      *
-     * This is the number of spaces which is put in front of the options when
-     * printing the help screen.
+     * This is the number of spaces which is put in front of the options when printing the help
+     * screen.
      *
      * @return a non-negative number
      */
@@ -526,11 +506,10 @@ public final class CommandLine {
     /**
      * Sets the indentation depth to the argument.
      *
-     * This is the number of spaces which is put in front of the options when
-     * printing the usage page.
+     * This is the number of spaces which is put in front of the options when printing the usage
+     * page.
      *
-     * @param indentSize
-     *            a non-negative number
+     * @param indentSize a non-negative number
      */
     public void setIndentation(int indentSize) {
         this.indentSize = indentSize;
@@ -539,8 +518,8 @@ public final class CommandLine {
     /**
      * Gets the line length used for the usage page.
      *
-     * This is the number of characters printed in one line when printing the
-     * usage page. Longer lines are broken at spaces (if possible).
+     * This is the number of characters printed in one line when printing the usage page. Longer
+     * lines are broken at spaces (if possible).
      *
      * @return the line length
      */
@@ -551,8 +530,8 @@ public final class CommandLine {
     /**
      * Sets the line length used for the usage page.
      *
-     * This is the number of characters printed in one line when printing the
-     * usage page. Longer lines are broken at spaces (if possible).
+     * This is the number of characters printed in one line when printing the usage page. Longer
+     * lines are broken at spaces (if possible).
      *
      * @return the line length
      */

@@ -6,9 +6,8 @@ import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Little helper class that helps to check for the version of a solver. Mainly it provides
- * a method that starts the solver using certain parameters in order to obtain the version of that
- * solver.
+ * Little helper class that helps to check for the version of a solver. Mainly it provides a method
+ * that starts the solver using certain parameters in order to obtain the version of that solver.
  */
 public class VersionChecker {
     public static final VersionChecker INSTANCE = new VersionChecker();
@@ -38,8 +37,8 @@ public class VersionChecker {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally{
-            if( p != null && p.isAlive() ) {
+        } finally {
+            if (p != null && p.isAlive()) {
                 p.destroy();
             }
         }

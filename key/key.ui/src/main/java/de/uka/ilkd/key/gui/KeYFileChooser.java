@@ -14,16 +14,16 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.core.Main;
 
 /**
- * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class
- * is a singleton, the only instance is created lazily and can be obtained via
+ * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
+ * singleton, the only instance is created lazily and can be obtained via
  * {@link #getFileChooser(String)}. This has the benefit of remembering the last visited directory
  * across different load/save actions of the user. To keep it simple, the choosable file filters
- * contain all file extensions that are relevant in KeY. The predefined constants can be used to
- * set the corresponding filter via {@link #setFileFilter(FileFilter)}. Usually it is a good idea to
- * do this right after calling {@link #getFileChooser(String)}.
+ * contain all file extensions that are relevant in KeY. The predefined constants can be used to set
+ * the corresponding filter via {@link #setFileFilter(FileFilter)}. Usually it is a good idea to do
+ * this right after calling {@link #getFileChooser(String)}.
  *
- * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the
- *                          need for delegating many methods)
+ * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the need
+ *         for delegating many methods)
  */
 public final class KeYFileChooser extends JFileChooser {
 
@@ -34,7 +34,7 @@ public final class KeYFileChooser extends JFileChooser {
         public boolean accept(File f) {
             String s = f.toString().toLowerCase(Locale.ROOT);
             return f.isDirectory() || s.endsWith(".java") || s.endsWith(".key")
-                ||  s.endsWith(".proof") || s.endsWith(".proof.gz") || s.endsWith(".zproof");
+                    || s.endsWith(".proof") || s.endsWith(".proof.gz") || s.endsWith(".zproof");
         }
 
         @Override
@@ -44,17 +44,15 @@ public final class KeYFileChooser extends JFileChooser {
     };
 
     /** file filter for *.key files */
-    public static final FileFilter KEY_FILTER = new FileNameExtensionFilter(
-        "KeY files",
-        "key");
+    public static final FileFilter KEY_FILTER = new FileNameExtensionFilter("KeY files", "key");
 
     /** The Constant for the filter for statistics files. */
-    public static final FileFilter STATISTICS_FILTER = new FileNameExtensionFilter(
-        "proof statistics files (.csv, .html)", "csv", "html");
+    public static final FileFilter STATISTICS_FILTER =
+        new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
 
     /** filter for single java source files */
-    public static final FileFilter JAVA_FILTER = new FileNameExtensionFilter(
-        "Java source files (.java)", "java");
+    public static final FileFilter JAVA_FILTER =
+        new FileNameExtensionFilter("Java source files (.java)", "java");
 
     /** filter for compressed proof files */
     public static final FileFilter COMPRESSED_FILTER = new FileFilter() {
@@ -71,16 +69,16 @@ public final class KeYFileChooser extends JFileChooser {
     };
 
     /** filter for interaction log files */
-    public static final FileFilter INTERACTION_LOG_FILTER = new FileNameExtensionFilter(
-        "interaction logs (.xml)", "xml");
+    public static final FileFilter INTERACTION_LOG_FILTER =
+        new FileNameExtensionFilter("interaction logs (.xml)", "xml");
 
     /** filter for zip archives */
-    public static final FileFilter ZIP_FILTER = new FileNameExtensionFilter(
-        "ZIP archives (.zip)", "zip");
+    public static final FileFilter ZIP_FILTER =
+        new FileNameExtensionFilter("ZIP archives (.zip)", "zip");
 
     /** filter for proof bundles */
-    public static final FileFilter PROOF_BUNDLE_FILTER = new FileNameExtensionFilter(
-        "proof bundles (.zproof)", "zproof");
+    public static final FileFilter PROOF_BUNDLE_FILTER =
+        new FileNameExtensionFilter("proof bundles (.zproof)", "zproof");
 
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
@@ -116,8 +114,7 @@ public final class KeYFileChooser extends JFileChooser {
     @Override
     public void approveSelection() {
         File file = getSelectedFile();
-        if (saveDialog && file.exists() &&
-            showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
+        if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
             return;
         }
         super.approveSelection();
@@ -143,9 +140,9 @@ public final class KeYFileChooser extends JFileChooser {
     @Override
     public void setDialogTitle(String title) {
         if (title != null) {
-            super.setDialogTitle (title);
+            super.setDialogTitle(title);
         } else {
-            super.setDialogTitle ("Select file to load");
+            super.setDialogTitle("Select file to load");
         }
     }
 
@@ -160,10 +157,11 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     /**
-     * Show a file dialog for saving a file.
-     * The dialog will provide a naming suggestion.
+     * Show a file dialog for saving a file. The dialog will provide a naming suggestion.
+     *
      * @param parent the main window
-     * @param originalFile the original file to be saved, if it exists and is a proof, this will be the suggestion
+     * @param originalFile the original file to be saved, if it exists and is a proof, this will be
+     *        the suggestion
      * @param extension the desired file name extension (usually ".proof")
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
@@ -173,14 +171,16 @@ public final class KeYFileChooser extends JFileChooser {
             selectedFile = getCurrentDirectory();
         } else {
             selectedFile = originalFile.getAbsoluteFile();
-            if (selectedFile.isFile() || (!selectedFile.exists() && selectedFile.getName().contains("."))) {
+            if (selectedFile.isFile()
+                    || (!selectedFile.exists() && selectedFile.getName().contains("."))) {
                 selectedFile = selectedFile.getParentFile();
             }
         }
 
         if (extension != null) {
             // the idea is to find the right place where to put a key vs. proof file
-            // we should actually have a project file containing that information in a more reliable way
+            // we should actually have a project file containing that information in a more reliable
+            // way
             File dirForExtension = selectedFile;
             if (extension.endsWith(".key")) {
                 // serach for "src" folder;
@@ -190,8 +190,10 @@ public final class KeYFileChooser extends JFileChooser {
             }
             // project structure for KeY would be the sane thing to do; avoid NPE at any cost
 
-            resetFile = "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null ?
-                    dirForExtension.getParentFile() : selectedFile;
+            resetFile =
+                "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null
+                        ? dirForExtension.getParentFile()
+                        : selectedFile;
 
             selectedFile = new File(resetFile, extension);
         } else {
@@ -207,6 +209,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     /**
      * Shows the dialog with the given file/directory as currently selected.
+     *
      * @param parent the Component the dialog is over
      * @param selectedFile the file or directory that shall be currently selected
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
@@ -270,21 +273,18 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     private int showOverwriteDialog(File file) {
-        return JOptionPane.showOptionDialog(this, "File " +
-                        file.getAbsolutePath() + " already exists. Overwrite?",
-                        "Save warning", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+        return JOptionPane.showOptionDialog(this,
+            "File " + file.getAbsolutePath() + " already exists. Overwrite?", "Save warning",
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 
     /**
      * Gets <b>the</b> file chooser for the prover.
      *
-     * The chooser is created lazily when first requested. It points to the
-     * directory of the command line argument (if present), otherwise to the
-     * user's home directory.
+     * The chooser is created lazily when first requested. It points to the directory of the command
+     * line argument (if present), otherwise to the user's home directory.
      *
-     * @param title
-     *            the title of the key file chooser
+     * @param title the title of the key file chooser
      *
      * @return the key file chooser
      */

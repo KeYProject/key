@@ -40,7 +40,7 @@ import org.key_project.util.collection.ImmutableSLList;
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     private List<Function<ProofTreeContext, Component>> builders =
-            new ArrayList<Function<ProofTreeContext, Component>>();
+        new ArrayList<Function<ProofTreeContext, Component>>();
 
     protected ProofTreePopupFactory() {
         addAction(RunStrategyOnNode::new);
@@ -70,7 +70,7 @@ public class ProofTreePopupFactory {
         for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
             add(ctx -> {
                 FilterAction action = new FilterAction(ctx, filter);
-                //JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
+                // JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
                 return new JCheckBoxMenuItem(action);
             });
         }
@@ -84,8 +84,8 @@ public class ProofTreePopupFactory {
         addAction(SubtreeStatistics::new);
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
-        addAction(ctx
-            -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
+        addAction(
+            ctx -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
     }
 
     private Component getMacroMenu(ProofTreeContext proofTreeContext) {
@@ -103,11 +103,10 @@ public class ProofTreePopupFactory {
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
             context.branch = selectedPath.getParentPath();
             context.invokedNode =
-                    ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
         } else {
             context.branch = selectedPath;
-            context.invokedNode =
-                    ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+            context.invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
         }
 
         context.delegateModel = view.delegateModel;
@@ -143,37 +142,22 @@ public class ProofTreePopupFactory {
 
         menu.addSeparator();
         KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
-                                                  context.invokedNode, context.mediator);
+            context.invokedNode, context.mediator);
 
         return menu;
     }
 
-    /*private void expandGoalsBelow() {
-        Object tmpNode = branch.getLastPathComponent();
-        if (branch == path) {
-            ExpansionState.collapseAll(delegateView, branch);
-        } else {
-            for (int count = delegateModel.getChildCount(tmpNode),
-                 i = 0; i < count; i++) {
-                Object child = delegateModel.getChild(tmpNode, i);
-                if (!delegateModel.isLeaf(child))
-                    ExpansionState.collapseAll(delegateView, branch
-                            .pathByAddingChild(child));
-            }
-        }
-        Iterator<Goal> it = proof.openGoals().iterator();
-        Node n;
-        while (it.hasNext()) {
-            n = it.next().node();
-            GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
-            if (node == null) break;
-            TreeNode[] obs = node.getPath();
-            TreePath tp = new TreePath(obs);
-            if (branch.isDescendant(tp)) {
-                delegateView.makeVisible(tp);
-            }
-        }
-    }*/
+    /*
+     * private void expandGoalsBelow() { Object tmpNode = branch.getLastPathComponent(); if (branch
+     * == path) { ExpansionState.collapseAll(delegateView, branch); } else { for (int count =
+     * delegateModel.getChildCount(tmpNode), i = 0; i < count; i++) { Object child =
+     * delegateModel.getChild(tmpNode, i); if (!delegateModel.isLeaf(child))
+     * ExpansionState.collapseAll(delegateView, branch .pathByAddingChild(child)); } }
+     * Iterator<Goal> it = proof.openGoals().iterator(); Node n; while (it.hasNext()) { n =
+     * it.next().node(); GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n); if (node ==
+     * null) break; TreeNode[] obs = node.getPath(); TreePath tp = new TreePath(obs); if
+     * (branch.isDescendant(tp)) { delegateView.makeVisible(tp); } } }
+     */
 
     private static class ProofTreeContext {
         GUIProofTreeModel delegateModel;
@@ -198,9 +182,9 @@ public class ProofTreePopupFactory {
         public void actionPerformed(ActionEvent e) {
             final Proof proof = context.proof;
             if (proof == null) {
-                MainWindow.getInstance().notify(new GeneralInformationEvent(
-                        "No statistics available.",
-                        "If you wish to see the statistics "
+                MainWindow.getInstance()
+                        .notify(new GeneralInformationEvent("No statistics available.",
+                            "If you wish to see the statistics "
                                 + "for a proof you have to load one first"));
             } else {
                 int openGoals = 0;
@@ -214,8 +198,7 @@ public class ProofTreePopupFactory {
 
                 String stats;
                 if (openGoals > 0) {
-                    stats = openGoals + " open goal"
-                            + (openGoals > 1 ? "s." : ".");
+                    stats = openGoals + " open goal" + (openGoals > 1 ? "s." : ".");
                 } else {
                     stats = "Closed.";
                 }
@@ -228,8 +211,8 @@ public class ProofTreePopupFactory {
                     stats += x.first + ": " + x.second + "\n";
                 }
 
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats,
-                        "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats, "Proof Statistics",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -380,13 +363,12 @@ public class ProofTreePopupFactory {
                 return;
             }
             Object sibling = context.delegateModel.getChild(parent,
-                    context.delegateModel.getIndexOfChild(parent, node) - 1);
+                context.delegateModel.getIndexOfChild(parent, node) - 1);
             if (!(sibling != null && sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof
-                            GUIBranchNode) {
+                    if (sibling != null && sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
@@ -414,13 +396,12 @@ public class ProofTreePopupFactory {
                 return;
             }
             Object sibling = context.delegateModel.getChild(parent,
-                    context.delegateModel.getIndexOfChild(parent, node) + 1);
+                context.delegateModel.getIndexOfChild(parent, node) + 1);
             if (!(sibling != null && sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof
-                            GUIBranchNode) {
+                    if (sibling != null && sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
@@ -445,13 +426,9 @@ public class ProofTreePopupFactory {
             // display a dialog to attach text to the node
             final Icon editIcon = IconFactory.editFile(20);
             final String origNotes = context.invokedNode.getNodeInfo().getNotes();
-            final String newNotes = (String) JOptionPane.showInputDialog(
-                    context.proofTreeView, null,
-                    "Annotate this proof node",
-                    JOptionPane.PLAIN_MESSAGE,
-                    editIcon,
-                    null,
-                    origNotes);
+            final String newNotes = (String) JOptionPane.showInputDialog(context.proofTreeView,
+                null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
+                origNotes);
             if (newNotes != null) {
                 if (newNotes.length() == 0) {
                     context.invokedNode.getNodeInfo().setNotes(null);
@@ -469,9 +446,7 @@ public class ProofTreePopupFactory {
             super(context);
             setName("Search");
             setIcon(IconFactory.search2(ICON_SIZE));
-            setAcceleratorKey(
-                    de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke
-            );
+            setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
         }
 
         @Override
@@ -494,8 +469,8 @@ public class ProofTreePopupFactory {
                 if (!context.proof.isGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
-                        || (!GeneralSettings.noPruningClosed
-                        && context.proof.getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
+                                || (!GeneralSettings.noPruningClosed && context.proof
+                                        .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
                     setEnabled(true);
                 }
             }
@@ -519,8 +494,8 @@ public class ProofTreePopupFactory {
             setName("Delayed Cut");
             setEnabled(false);
             if (context.proof != null) {
-                if (!context.invokedNode.leaf() &&
-                        context.proof.getSubtreeGoals(context.invokedNode).size() > 0) {
+                if (!context.invokedNode.leaf()
+                        && context.proof.getSubtreeGoals(context.invokedNode).size() > 0) {
                     setEnabled(true);
                 }
             }
@@ -548,11 +523,11 @@ public class ProofTreePopupFactory {
         }
 
         /**
-         * run automatic on the currently selected node.
-         * All enabled goals below the current node are taken into consideration.
+         * run automatic on the currently selected node. All enabled goals below the current node
+         * are taken into consideration.
          * <p>
-         * CAUTION: If the node itself is a goal then allow applying rules
-         * to it even if it were disabled. Desired behavior?
+         * CAUTION: If the node itself is a goal then allow applying rules to it even if it were
+         * disabled. Desired behavior?
          */
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -561,7 +536,7 @@ public class ProofTreePopupFactory {
             // is the node a goal?
             if (invokedGoal == null) {
                 ImmutableList<Goal> enabledGoals =
-                        context.proof.getSubtreeEnabledGoals(context.invokedNode);
+                    context.proof.getSubtreeEnabledGoals(context.invokedNode);
                 // This method delegates the request only to the UserInterfaceControl
                 // which implements the functionality.
                 // No functionality is allowed in this method body!
@@ -570,9 +545,8 @@ public class ProofTreePopupFactory {
                 // This method delegates the request only to the UserInterfaceControl
                 // which implements the functionality.
                 // No functionality is allowed in this method body!
-                r.getUI().getProofControl()
-                    .startAutoMode(r.getSelectedProof(),
-                                   ImmutableSLList.<Goal>nil().prepend(invokedGoal));
+                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
+                    ImmutableSLList.<Goal>nil().prepend(invokedGoal));
             }
         }
     }
@@ -593,14 +567,12 @@ public class ProofTreePopupFactory {
             String action = enableGoals ? "Automatic" : "Interactive";
             putValue(NAME, "Set All Goals Below to " + action);
             if (enableGoals) {
-                putValue(SHORT_DESCRIPTION,
-                         "Include this node and all goals "
-                       + "in the subtree in automatic rule application");
+                putValue(SHORT_DESCRIPTION, "Include this node and all goals "
+                    + "in the subtree in automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
             } else {
-                putValue(SHORT_DESCRIPTION,
-                         "Exclude this node and all goals "
-                       + "in the subtree from automatic rule application");
+                putValue(SHORT_DESCRIPTION, "Exclude this node and all goals "
+                    + "in the subtree from automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_DISABLED_PULL_DOWN_MENU);
             }
         }
@@ -614,8 +586,8 @@ public class ProofTreePopupFactory {
         }
 
         /*
-         * In addition to marking setting goals, update the tree model
-         * so that the label sizes are recalculated
+         * In addition to marking setting goals, update the tree model so that the label sizes are
+         * recalculated
          */
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -655,8 +627,8 @@ public class ProofTreePopupFactory {
                 context.delegateModel.setFilter(filter, selected);
                 if (context.branch == context.path) {
                     if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode) context.delegateModel
-                                .getRoot()).findBranch(context.invokedNode);
+                        TreeNode node = ((GUIAbstractTreeNode) context.delegateModel.getRoot())
+                                .findBranch(context.invokedNode);
                         if (node instanceof GUIBranchNode) {
                             context.proofTreeView.selectBranchNode((GUIBranchNode) node);
                         }
@@ -668,10 +640,10 @@ public class ProofTreePopupFactory {
             } else {
                 context.delegateModel.setFilter(filter, selected);
                 if (context.branch == context.path) {
-                    if (/*e.getStateChange() != ItemEvent.SELECTED*/ !selected) {
+                    if (/* e.getStateChange() != ItemEvent.SELECTED */ !selected) {
                         if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node = ((GUIAbstractTreeNode) context.delegateModel
-                                    .getRoot()).findBranch(context.invokedNode);
+                            TreeNode node = ((GUIAbstractTreeNode) context.delegateModel.getRoot())
+                                    .findBranch(context.invokedNode);
                             if (node instanceof GUIBranchNode) {
                                 context.proofTreeView.selectBranchNode((GUIBranchNode) node);
                             }
@@ -682,22 +654,23 @@ public class ProofTreePopupFactory {
                                 .findChild(context.invokedNode.parent()) == null) {
                             // it's still a branch
                             if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                                TreeNode node = ((GUIAbstractTreeNode) context.delegateModel
-                                        .getRoot()).findBranch(context.invokedNode);
+                                TreeNode node =
+                                    ((GUIAbstractTreeNode) context.delegateModel.getRoot())
+                                            .findBranch(context.invokedNode);
                                 if (node instanceof GUIBranchNode) {
                                     context.proofTreeView.selectBranchNode((GUIBranchNode) node);
                                 }
                             }
                         } else {
-                            TreePath tp = new TreePath(context.delegateModel.getProofTreeNode(
-                                    context.invokedNode).getPath());
+                            TreePath tp = new TreePath(context.delegateModel
+                                    .getProofTreeNode(context.invokedNode).getPath());
                             context.delegateView.scrollPathToVisible(tp);
                             context.delegateView.setSelectionPath(tp);
                         }
                     }
                 } else {
-                    TreePath tp = new TreePath(context.delegateModel.getProofTreeNode(
-                            context.invokedNode).getPath());
+                    TreePath tp = new TreePath(
+                        context.delegateModel.getProofTreeNode(context.invokedNode).getPath());
                     context.delegateView.scrollPathToVisible(tp);
                     context.delegateView.setSelectionPath(tp);
                 }

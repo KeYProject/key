@@ -24,14 +24,13 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Facet class for interpreting RIFL specifications. The Requirements for
- * Information Flow Language (RIFL) is a tool-independent specification language
- * developed in the RS3 project. Method <code>transform</code> reads a RIFL file
- * and Java sources and writes JML* information flow specifications to the
- * original Java files.
+ * Facet class for interpreting RIFL specifications. The Requirements for Information Flow Language
+ * (RIFL) is a tool-independent specification language developed in the RS3 project. Method
+ * <code>transform</code> reads a RIFL file and Java sources and writes JML* information flow
+ * specifications to the original Java files.
  * <p>
- * <b>changes (weigl, 2016-08-16):</b>
- * changed interfaces to File. This avoid some crud string operations on filenames
+ * <b>changes (weigl, 2016-08-16):</b> changed interfaces to File. This avoid some crud string
+ * operations on filenames
  *
  * @author bruns
  * @author weigl, 2016-08-17
@@ -48,7 +47,7 @@ public class RIFLTransformer {
 
 
     private static final JavaProgramFactory JPF =
-            de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
+        de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
 
     /**
      * Entry point for the stand-alone RIFL to JML* tool.
@@ -68,12 +67,12 @@ public class RIFLTransformer {
      * Transforms plain Java files + RIFL specification to Java+JML* specifications.
      *
      * @param riflFilename path to a RIFL file
-     * @param javaSource   path to Java sources (should be a directory)
-     * @param savePath     custom save path
+     * @param javaSource path to Java sources (should be a directory)
+     * @param savePath custom save path
      * @param kexh
      */
-    public static boolean transform(File riflFilename, File javaSource,
-                                    File savePath, KeYRecoderExcHandler kexh) {
+    public static boolean transform(File riflFilename, File javaSource, File savePath,
+            KeYRecoderExcHandler kexh) {
         if (riflFilename == null || javaSource == null || savePath == null || kexh == null)
             throw new IllegalArgumentException("A parameter is null");
 
@@ -82,7 +81,8 @@ public class RIFLTransformer {
             rt = new RIFLTransformer();
             rt.doTransform(riflFilename, javaSource, savePath);
             return true;
-        } catch (final ParserConfigurationException | SAXException | ParserException | IOException e) {
+        } catch (final ParserConfigurationException | SAXException | ParserException
+                | IOException e) {
             kexh.reportException(e);
         }
         return false;
@@ -103,7 +103,7 @@ public class RIFLTransformer {
      * @return path to the transformed directory
      */
     public static File getDefaultSavePath(File origSourcePath) {
-        //TODO weigl: Shouldn't we use the old directory, because of reference to other java files?
+        // TODO weigl: Shouldn't we use the old directory, because of reference to other java files?
         origSourcePath = getBaseDirPath(origSourcePath);
         return new File(origSourcePath.getParentFile(), origSourcePath.getName() + "_RIFL");
     }
@@ -137,21 +137,18 @@ public class RIFLTransformer {
             try (Reader fr = new BufferedReader(new FileReader(javaFile))) {
                 cu = JPF.parseCompilationUnit(fr);
 
-                //crud relative
+                // crud relative
                 File relative = relative(root, javaFile);
                 javaCUs.put(cu, relative); // relative path
-                serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
+                serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in
+                                                                       // recoder
             }
         }
         return javaCUs;
     }
 
     private File relative(File root, File javaFile) {
-        return new File(
-                javaFile.getAbsolutePath().substring(
-                        root.getAbsolutePath().length()
-                )
-        );
+        return new File(javaFile.getAbsolutePath().substring(root.getAbsolutePath().length()));
     }
 
     private SpecificationContainer readRIFL(File fileName)
@@ -164,16 +161,14 @@ public class RIFLTransformer {
 
         SAXParser saxParser = spf.newSAXParser();
         XMLReader xmlReader = saxParser.getXMLReader();
-        //xmlReader.setFeature("http://xml.org/sax/features/validation", true);
+        // xmlReader.setFeature("http://xml.org/sax/features/validation", true);
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
         xmlReader.parse(fileName.toURI().toString());
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    public void doTransform(final File riflFilename,
-                            final File source,
-                            final File savePath)
+    public void doTransform(final File riflFilename, final File source, final File savePath)
             throws IOException, SAXException, ParserException, ParserConfigurationException {
         ensureTargetDirExists(savePath);
         final File javaRoot = getBaseDirPath(source);
@@ -183,11 +178,11 @@ public class RIFLTransformer {
         Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
         int counter = 0;
         // step 2: inject specifications
-        //TODO rename the public class in the compilation unit and reuse the old java folder,
+        // TODO rename the public class in the compilation unit and reuse the old java folder,
         // for ensure interdepences to other files
         for (CompilationUnit cu : javaCUs.keySet()) {
-            final SpecificationInjector si = new SpecificationInjector(sc,
-                    JPF.getServiceConfiguration().getSourceInfo());
+            final SpecificationInjector si =
+                new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
 
             ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
@@ -203,13 +198,11 @@ public class RIFLTransformer {
                     sb.deleteCharAt(sb.length() - 1);
                 }
 
-                String poname = clazz.getFullName() + "[" +
-                        clazz.getFullName() + "\\\\:\\\\:" +
-                        mdecl.getName() + "(" + sb + ")" + "]"
-                        + ".Non-interference contract.0";
+                String poname = clazz.getFullName() + "[" + clazz.getFullName() + "\\\\:\\\\:"
+                    + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
 
                 File problemFileName = new File(javaRoot.getParent(),
-                        riflFilename.getName() + "_" + counter++ + ".key");
+                    riflFilename.getName() + "_" + counter++ + ".key");
 
                 writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
                 result.add(problemFileName);
@@ -236,15 +229,13 @@ public class RIFLTransformer {
         Objects.requireNonNull(stream);
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-             Writer fw = new BufferedWriter(new FileWriter(problemFileName))) {
+                Writer fw = new BufferedWriter(new FileWriter(problemFileName))) {
             while ((tmp = br.readLine()) != null) {
                 blueprint.append(tmp).append("\n");
             }
 
-            fw.write(
-                    blueprint.toString()
-                            .replace("%%JAVA_SOURCE%%", newJavaFolder)
-                            .replace("%%PO_NAME%%", poname));
+            fw.write(blueprint.toString().replace("%%JAVA_SOURCE%%", newJavaFolder)
+                    .replace("%%PO_NAME%%", poname));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -263,8 +254,7 @@ public class RIFLTransformer {
     /**
      * Writes a single Java file.
      */
-    private void writeJavaFile(File target, CompilationUnit cu)
-            throws IOException {
+    private void writeJavaFile(File target, CompilationUnit cu) throws IOException {
         try (var writer = new BufferedWriter(new FileWriter(target))) {
             LOGGER.debug("Trying to write file {}", target);
             final String source = cu.toSource();

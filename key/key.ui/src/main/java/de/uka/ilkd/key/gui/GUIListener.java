@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui;
+
 import java.util.EventListener;
 import java.util.EventObject;
 
-/** 
- * GUIListener defines the interface for an object that listens to
- * actions of gui components, e.g. it is informed if a gui component
- * requests modal access. 
+/**
+ * GUIListener defines the interface for an object that listens to actions of gui components, e.g.
+ * it is informed if a gui component requests modal access.
  */
 public interface GUIListener extends EventListener {
 

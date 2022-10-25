@@ -6,14 +6,14 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Convenience class to collect all files of a directory tree, recursively. The
- * collection obeys the following rules:
+ * Convenience class to collect all files of a directory tree, recursively. The collection obeys the
+ * following rules:
  * <OL>
  * <LI>If a name corresponds to a file, it is reported.
  * <LI>If a name corresponds to a non-existing file, nothing is reported.
- * <LI>If a name corresponds to a directory, the directory itself is not
- * reported, but all files in it, following rules 1-3. This will lead to a
- * recursive collection of all files in all subdirectories.
+ * <LI>If a name corresponds to a directory, the directory itself is not reported, but all files in
+ * it, following rules 1-3. This will lead to a recursive collection of all files in all
+ * subdirectories.
  * </OL>
  *
  * @author AL
@@ -56,8 +56,7 @@ public class FileCollector {
      * @return true iff there is a next file available for {@link #getFile()}.
      */
     public boolean next() {
-        outer:
-        while (count > 0) {
+        outer: while (count > 0) {
             current = stack[--count]; // pop
             while (current.isDirectory()) {
                 String[] content = current.list();
@@ -81,12 +80,11 @@ public class FileCollector {
     }
 
     /**
-     * Proceed to the next file with the given suffix and return if this has
-     * been possible. Remember to include the dot in the suffix (".java", not
-     * "java").
+     * Proceed to the next file with the given suffix and return if this has been possible. Remember
+     * to include the dot in the suffix (".java", not "java").
      *
-     * @return true iff there is a next file with the given extension available
-     * for {@link #getFile()}.
+     * @return true iff there is a next file with the given extension available for
+     *         {@link #getFile()}.
      */
     public boolean next(String suffix) {
         while (next()) {
@@ -98,11 +96,11 @@ public class FileCollector {
     }
 
     /**
-     * Proceed to the next file that is accepted by the given filter and return
-     * if this has been possible.
+     * Proceed to the next file that is accepted by the given filter and return if this has been
+     * possible.
      *
-     * @return true iff there is a next file available for {@link #getFile()}
-     * that is accepted by the filter.
+     * @return true iff there is a next file available for {@link #getFile()} that is accepted by
+     *         the filter.
      */
     public boolean next(FilenameFilter filter) {
         String pname = "";
@@ -126,20 +124,20 @@ public class FileCollector {
     /**
      * Fetch the current file, or null if no one is available.
      *
-     * @return the current file, or null if {@link #next()}has not been called
-     * before or returned false.
+     * @return the current file, or null if {@link #next()}has not been called before or returned
+     *         false.
      */
     public File getFile() {
         return current;
     }
 
     /*
-     * Sample program printing out all .java files available from the location
-     * as stated by the first argument.
+     * Sample program printing out all .java files available from the location as stated by the
+     * first argument.
      *
-     * public static void main(String[] a) throws IOException { if (a.length !=
-     * 1) { System.err.println("Try it with a single argument."); }
-     * FileCollector me = new FileCollector(a[0]); while (me.next(".java")) {
-     * File f = me.getFile(); System.out.println(f.getName()); } }
+     * public static void main(String[] a) throws IOException { if (a.length != 1) {
+     * System.err.println("Try it with a single argument."); } FileCollector me = new
+     * FileCollector(a[0]); while (me.next(".java")) { File f = me.getFile();
+     * System.out.println(f.getName()); } }
      */
 }

@@ -19,11 +19,10 @@ public class JmlAssert extends JavaStatement {
      */
     private final TextualJMLAssertStatement.Kind kind;
 
-    /* condition should be an Expression,
-       but as KeY doesn't support some jml Expressions as Expression Objects
-       e.g. \forall
-       keep this as the parse tree for now
-       (blockcontracts seem to handle this similar)
+    /*
+     * condition should be an Expression, but as KeY doesn't support some jml Expressions as
+     * Expression Objects e.g. \forall keep this as the parse tree for now (blockcontracts seem to
+     * handle this similar)
      */
     /**
      * The condition of this statement in parse tree form

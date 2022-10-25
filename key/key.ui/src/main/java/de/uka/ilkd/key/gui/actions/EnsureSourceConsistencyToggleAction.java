@@ -19,6 +19,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
 
     /**
      * Creates a new EnsureSourceConsistencyToggleAction.
+     *
      * @param mainWindow the main window of the program
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
@@ -26,9 +27,8 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
         setName("Ensure Source Consistency");
         setTooltip("If ticked, consistency between source and proof is ensured"
             + " (by caching files at first use in a temporary directory).");
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .isEnsureSourceConsistency());
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .isEnsureSourceConsistency());
     }
 
     @Override
@@ -40,8 +40,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
                 "Allow Proof Bundle Saving", JOptionPane.INFORMATION_MESSAGE);
         }
         boolean selected = isSelected();
-        ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .setEnsureSourceConsistency(selected);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .setEnsureSourceConsistency(selected);
     }
 }

@@ -7,8 +7,7 @@ import recoder.java.declaration.VariableSpecification;
 import java.util.List;
 
 /**
- * The property of a non terminal program element to define a scope for
- * variables.
+ * The property of a non terminal program element to define a scope for variables.
  */
 
 public interface VariableScope extends ScopeDefiningElement {

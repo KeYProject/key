@@ -18,16 +18,15 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
-	private static final long serialVersionUID = 4187650510339169399L;
-	// the original rule name
+    private static final long serialVersionUID = 4187650510339169399L;
+    // the original rule name
     private final String altName;
     private String description;
 
     private Rule rule;
 
     /*
-     * This constructor should only be used for the invisible root node of
-     * {@link InfoTreeModel}.
+     * This constructor should only be used for the invisible root node of {@link InfoTreeModel}.
      */
     InfoTreeNode() {
         super("root node");
@@ -59,7 +58,8 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         altName = taclet.name().toString();
         LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(taclet);
-        description = lp.toString() +  "\n\n Defined at:" + taclet.getOrigin() + "\n\n under options:" + taclet.getChoices();
+        description = lp.toString() + "\n\n Defined at:" + taclet.getOrigin()
+            + "\n\n under options:" + taclet.getChoices();
     }
 
     InfoTreeNode(String title, String description) {
@@ -77,13 +77,13 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     String getTitle() {
         return (String) getUserObject();
     }
-    
+
     /**
      * switch title to alternative name (i.e., internal rule name)
      */
     void setTitleToAltName() {
-    	assert altName != null;
-    	userObject = altName;
+        assert altName != null;
+        userObject = altName;
     }
 
     String getDescription() {

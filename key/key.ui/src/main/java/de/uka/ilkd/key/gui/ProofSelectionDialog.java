@@ -26,14 +26,14 @@ public final class ProofSelectionDialog extends JDialog {
     private static final long serialVersionUID = -586107341789859969L;
 
     /**
-     * Regex for identifiers (class, method), which catches for example
-     * "java.lang.Object", "SumAndMax", "sort(int[] a)", ...
+     * Regex for identifiers (class, method), which catches for example "java.lang.Object",
+     * "SumAndMax", "sort(int[] a)", ...
      */
     private static final String IDENT = "(.*)";
 
     /**
-     * Regex for the type of the contract
-     * (catches something like "JML normal_behavior operation contract").
+     * Regex for the type of the contract (catches something like "JML normal_behavior operation
+     * contract").
      */
     private static final String TYPE = "(.*)";
 
@@ -45,18 +45,18 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * The pattern to match the filename of the proof.
      */
-    private static final Pattern PROOF_NAME_PATTERN =
-        Pattern.compile(IDENT + "\\(" + IDENT + "__" + IDENT + "\\)\\)\\."
-            + TYPE + "." + NUM + ".proof");
+    private static final Pattern PROOF_NAME_PATTERN = Pattern.compile(
+        IDENT + "\\(" + IDENT + "__" + IDENT + "\\)\\)\\." + TYPE + "." + NUM + ".proof");
 
     /**
-     * The path of the proof to load (relative to the root of the proof bundle,
-     * so actually just the filename of the proof file inside the bundle).
+     * The path of the proof to load (relative to the root of the proof bundle, so actually just the
+     * filename of the proof file inside the bundle).
      */
     private Path proofToLoad;
 
     /**
      * Creates a new ProofSelectionDialog for the given proof
+     *
      * @param bundlePath the path of the proof bundle to load
      * @throws IOException if the proof bundle can not be read
      */
@@ -114,6 +114,7 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * Creates a JList and fills it with the proofs found in the bundle.
+     *
      * @param bundlePath the path of the proof bundle
      * @return the created JList
      * @throws IOException if the proof bundle can not be read
@@ -123,11 +124,9 @@ public final class ProofSelectionDialog extends JDialog {
         ZipFile bundle = new ZipFile(bundlePath.toFile());
 
         // create a list of all *.proof files (only top level in bundle)
-        List<Path> proofs = bundle.stream()
-            .filter(e -> !e.isDirectory())
-            .filter(e -> e.getName().endsWith(".proof"))
-            .map(e -> Paths.get(e.getName()))
-            .collect(Collectors.toList());
+        List<Path> proofs = bundle.stream().filter(e -> !e.isDirectory())
+                .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
+                .collect(Collectors.toList());
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
@@ -149,11 +148,8 @@ public final class ProofSelectionDialog extends JDialog {
         });
         list.setCellRenderer(new ListCellRenderer<Path>() {
             @Override
-            public Component getListCellRendererComponent(JList<? extends Path> jList,
-                                                          Path value,
-                                                          int index,
-                                                          boolean isSelected,
-                                                          boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<? extends Path> jList, Path value,
+                    int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = new JLabel(abbreviateProofPath(value));
                 label.setOpaque(true); // allows for color changes via setSelectionBackground()
                 if (isSelected) {
@@ -171,6 +167,7 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * Abbreviates the filename of the proof if it matches the usual KeY format.
+     *
      * @param proofPath the path (actually only the filename) of the proof
      * @return the abbreviated proof name if it matches, the given path as String otherwise
      */
@@ -201,6 +198,7 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * Shows the dialog with the given path and returns the filename of the proof to load.
+     *
      * @param bundlePath the path of the proof bundle
      * @return the filename of the proof to load
      */
@@ -219,10 +217,11 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * Shows a dialog and allows the user to choose the proof to load from a bundle.
+     *
      * @param bundlePath the path of the proof bundle that is loaded
-     * @return the path of the proof relative to the bundle (proofs are always top level,
-     *      which means the returned path will only contains the filename of the proof file)
-     *      or null if the given path does not denote a bundle
+     * @return the path of the proof relative to the bundle (proofs are always top level, which
+     *         means the returned path will only contains the filename of the proof file) or null if
+     *         the given path does not denote a bundle
      */
     public static Path chooseProofToLoad(Path bundlePath) {
         if (isProofBundle(bundlePath)) {
@@ -233,6 +232,7 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * Checks if a path denotes a proof bundle.
+     *
      * @param path the path to check
      * @return true iff the path denotes a proof bundle
      */

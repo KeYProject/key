@@ -9,20 +9,18 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
-    private MonomialColumnOp(ProjectionToTerm leftCoefficient,
-                             ProjectionToTerm polynomial) {
-        super ( leftCoefficient, polynomial );
+    private MonomialColumnOp(ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
+        super(leftCoefficient, polynomial);
     }
 
     public static ProjectionToTerm create(ProjectionToTerm leftCoefficient,
-                                          ProjectionToTerm polynomial) {
-        return new MonomialColumnOp ( leftCoefficient, polynomial );
+            ProjectionToTerm polynomial) {
+        return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
-    protected Term divide(Monomial numerator, BigInteger denominator,
-                          Services services) {
+    protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
         final BigInteger newRightCoeff =
-            LexPathOrdering.divide ( numerator.getCoefficient (), denominator );
-        return numerator.setCoefficient ( newRightCoeff ).toTerm ( services );
+            LexPathOrdering.divide(numerator.getCoefficient(), denominator);
+        return numerator.setCoefficient(newRightCoeff).toTerm(services);
     }
 }

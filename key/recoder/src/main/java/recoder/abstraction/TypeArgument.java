@@ -19,9 +19,9 @@ public interface TypeArgument {
     List<? extends TypeArgument> getTypeArguments();
 
     enum WildcardMode {
-        None,        // Type()
-        Any,        // ?
-        Extends,    // ? extends Type()
-        Super        // ? super Type()
+        None, // Type()
+        Any, // ?
+        Extends, // ? extends Type()
+        Super // ? super Type()
     }
 }

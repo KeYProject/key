@@ -50,7 +50,7 @@ class SequentViewPanel extends JPanel {
         add(javax.swing.Box.createGlue(), gbc);
 
         setBorder(new SequentHideWarningBorder(sequentView.getTitle(), sequentView));
-//        setBorder(new TitledBorder("xxx"));
+        // setBorder(new TitledBorder("xxx"));
 
     }
 }

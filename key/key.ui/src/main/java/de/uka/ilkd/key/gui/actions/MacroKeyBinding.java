@@ -15,8 +15,8 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
- * This class provides means to run macros with key bindings such that these can
- * be bound to the main window making them independent of any menu.
+ * This class provides means to run macros with key bindings such that these can be bound to the
+ * main window making them independent of any menu.
  *
  * @author Mattias Ulbrich
  */
@@ -40,23 +40,25 @@ public class MacroKeyBinding extends AbstractAction {
         PosInOccurrence posInOcc = null;
         boolean isGoal = mediator.getSelectedGoal() != null;
 
-        if(isGoal) {
+        if (isGoal) {
             PosInSequent mousePos = sequentView.getLastPosInSequent();
             if (mousePos != null) {
                 posInOcc = mousePos.getPosInOccurrence();
             }
         }
 
-        if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
-            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
+        if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
+                posInOcc);
         }
     }
 
-    public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView, JComponent comp) {
+    public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
+            JComponent comp) {
 
         for (final ProofMacro macro : ProofMacroMenu.REGISTERED_MACROS) {
             KeyStroke ks = KeyStrokeManager.get(macro);
-            if(ks != null) {
+            if (ks != null) {
                 String command = "invoke macro " + macro.getClass();
                 comp.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ks, command);
                 comp.getActionMap().put(command, new MacroKeyBinding(mediator, sequentView, macro));

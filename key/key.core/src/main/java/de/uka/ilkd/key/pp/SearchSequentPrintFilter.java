@@ -4,8 +4,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * This is an interface for filters that are used to
- * modify the sequent view, improving the search function.
+ * This is an interface for filters that are used to modify the sequent view, improving the search
+ * function.
  *
  * @author jschiffl
  */
@@ -44,7 +44,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * @param search the String we are looking for
-     * @param regex  indicating whether search string should be treated as regex
+     * @param regex indicating whether search string should be treated as regex
      * @return A pattern matching the input String
      * @throws IllegalRegexException if the given pattern is not a valid regex
      */
@@ -81,6 +81,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * creates a pattern with the current search string and regex option
+     *
      * @return a brand new shiny pattern
      */
     protected Pattern createPattern() {

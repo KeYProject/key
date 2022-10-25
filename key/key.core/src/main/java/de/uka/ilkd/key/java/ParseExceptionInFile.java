@@ -11,9 +11,8 @@ import java.net.MalformedURLException;
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
  * <p>
- * The filename is used to display the location of an error in the sources. Line
- * and column number are not stored here explicitly but retrieved from the
- * cause.
+ * The filename is used to display the location of an error in the sources. Line and column number
+ * are not stored here explicitly but retrieved from the cause.
  *
  * @author mulbrich
  */

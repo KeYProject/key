@@ -22,7 +22,8 @@ public class CloneTest extends TestCase {
             String buffer1 = cu.toSource();
             CompilationUnit cv = cu.deepClone();
             if (!ProgramElement.STRUCTURAL_EQUALITY.equals(cu, cv)) {
-                Assert.fail("Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
+                Assert.fail(
+                    "Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
             }
             String buffer2 = cv.toSource();
             if (!buffer1.equals(buffer2)) {

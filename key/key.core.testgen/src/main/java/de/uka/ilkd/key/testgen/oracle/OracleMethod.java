@@ -15,16 +15,14 @@ public class OracleMethod {
 
     private Sort returnType;
 
-    public OracleMethod(String methodName, List<OracleVariable> args,
-                        String body) {
+    public OracleMethod(String methodName, List<OracleVariable> args, String body) {
         super();
         this.methodName = methodName;
         this.args = args;
         this.body = body;
     }
 
-    public OracleMethod(String methodName, List<OracleVariable> args,
-                        String body, Sort sort) {
+    public OracleMethod(String methodName, List<OracleVariable> args, String body, Sort sort) {
         super();
         this.methodName = methodName;
         this.args = args;
@@ -60,9 +58,8 @@ public class OracleMethod {
         if (returnType != null) {
             retType = returnType.name().toString();
         }
-        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n"
-                + tab + tab + body + "\n"
-                + tab + "}";
+        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
+            + body + "\n" + tab + "}";
 
     }
 }

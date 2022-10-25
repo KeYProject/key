@@ -49,8 +49,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -59,8 +58,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param info the program model info for this element.
      */
@@ -127,8 +125,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Returns the (empty) list of class types locally defined within this
-     * container.
+     * Returns the (empty) list of class types locally defined within this container.
      *
      * @return an empty list of contained class types.
      */
@@ -207,8 +204,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Returns the list of all supertypes of this class type, including this
-     * type.
+     * Returns the list of all supertypes of this class type, including this type.
      *
      * @return a list with this element as single member.
      */
@@ -226,8 +222,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Returns all visible fields that are defined in this class type or any of
-     * its supertypes.
+     * Returns all visible fields that are defined in this class type or any of its supertypes.
      *
      * @return the (empty) list of visible field members of this type.
      */
@@ -254,8 +249,7 @@ public class NullType implements ClassType {
     }
 
     /**
-     * Returns all visible methods that are defined in this class type or any of
-     * its supertypes.
+     * Returns all visible methods that are defined in this class type or any of its supertypes.
      *
      * @return the (empty) list of visible methods of this type.
      */

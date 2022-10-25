@@ -15,54 +15,49 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  For.
- *  
+ * For.
+ *
  */
 
 public class For extends LoopStatement implements VariableScope {
 
-    private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS=
-            new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+    private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
+        new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
 
     /**
-     *      For.
+     * For.
      */
     public For() {}
 
     /**
-     *      For. Used for the Recoder2KeY transformation
-     *      @param inits a loop initializer mutable list.
-     *      @param guard an expression.
-     *      @param updates an expression mutable list.
-     *      @param body a statement.
+     * For. Used for the Recoder2KeY transformation
+     *
+     * @param inits a loop initializer mutable list.
+     * @param guard an expression.
+     * @param updates an expression mutable list.
+     * @param body a statement.
      */
-    public For(LoopInitializer[] inits, Expression guard,
-               Expression[] updates, Statement body) {
+    public For(LoopInitializer[] inits, Expression guard, Expression[] updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
-    public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body, ExtList comments) {
+    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
+            ExtList comments) {
         super(inits, guard, updates, body, comments);
     }
 
-    public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body,
-	       ExtList comments, PositionInfo pos) {
+    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body, ExtList comments,
+            PositionInfo pos) {
         super(inits, guard, updates, body, comments, pos);
     }
 
-    public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body) {
+    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
     public For(ExtList children) {
-	super(children.get(ILoopInit.class),
-	      children.get(IGuard.class),
-	      children.get(IForUpdates.class),
-	      children.get(Statement.class),
-	      children);
+        super(children.get(ILoopInit.class), children.get(IGuard.class),
+            children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
     public SourceElement getLastElement() {
@@ -70,8 +65,9 @@ public class For extends LoopStatement implements VariableScope {
     }
 
     /**
-     *      Is checked before iteration.
-     *      @return the boolean value.
+     * Is checked before iteration.
+     *
+     * @return the boolean value.
      */
 
     public boolean isCheckedBeforeIteration() {
@@ -86,7 +82,7 @@ public class For extends LoopStatement implements VariableScope {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
-                return ((LocalVariableDeclaration)li).getVariables();
+                return ((LocalVariableDeclaration) li).getVariables();
             }
         }
         return EMPTY_VARSPECS;
@@ -97,7 +93,7 @@ public class For extends LoopStatement implements VariableScope {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
                 ImmutableArray<VariableSpecification> vars =
-                    ((LocalVariableDeclaration)li).getVariables();
+                    ((LocalVariableDeclaration) li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);
                     if (name.equals(v.getName())) {
@@ -109,12 +105,14 @@ public class For extends LoopStatement implements VariableScope {
         return null;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnFor(this);
+        v.performActionOnFor(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

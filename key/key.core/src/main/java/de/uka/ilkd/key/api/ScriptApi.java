@@ -34,16 +34,19 @@ public class ScriptApi {
     }
 
     /**
-     * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes containing matching
-     * results from where the information about instantiated schema variables can be extracted. If no match was possible the list is exmpt.
+     * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes
+     * containing matching results from where the information about instantiated schema variables
+     * can be extracted. If no match was possible the list is exmpt.
      *
-     * @param pattern     a string representation of the pattern sequent against which the current sequent should be matched
-     * @param currentSeq  current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
-     *  @return List of VariableAssignments (possibly empty if no match was found)
+     * @param pattern a string representation of the pattern sequent against which the current
+     *        sequent should be matched
+     * @param currentSeq current concrete sequent
+     * @param assignments variables appearing in the pattern as schemavariables with their
+     *        corresponding type in KeY
+     * @return List of VariableAssignments (possibly empty if no match was found)
      */
-    public List<VariableAssignments> matchPattern(String pattern,
-            Sequent currentSeq, VariableAssignments assignments) {
+    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq,
+            VariableAssignments assignments) {
         return matcher.matchPattern(pattern, currentSeq, assignments);
     }
 
@@ -51,22 +54,19 @@ public class ScriptApi {
      * Execute ScriptCommand onto goal node
      *
      * @param command to be applied with parameters set
-     * @return List of new proof goals (possibly empty)
-     * Should throw an Exception if command not applicable?
+     * @return List of new proof goals (possibly empty) Should throw an Exception if command not
+     *         applicable?
      */
-    public <T> ScriptResults executeScriptCommand(
-            ProofScriptCommandCall<T> call, ProjectedNode onNode)
-            throws ScriptException, InterruptedException {
-        //TODO VariableAssignments should be in instantiateCommand
+    public <T> ScriptResults executeScriptCommand(ProofScriptCommandCall<T> call,
+            ProjectedNode onNode) throws ScriptException, InterruptedException {
+        // TODO VariableAssignments should be in instantiateCommand
 
         state.setGoal(onNode.getProofNode());
-        call.command
-                .execute((AbstractUserInterfaceControl) api.getEnv().getUi(),
-                        call.parameter, state);
+        call.command.execute((AbstractUserInterfaceControl) api.getEnv().getUi(), call.parameter,
+            state);
 
-        ImmutableList<Goal> goals = api.getProof()
-                .getSubtreeGoals(onNode.getProofNode());
-        //TODO filter for open goals if necessary
+        ImmutableList<Goal> goals = api.getProof().getSubtreeGoals(onNode.getProofNode());
+        // TODO filter for open goals if necessary
         ScriptResults sr = new ScriptResults();
 
         goals.forEach(g -> sr.add(ScriptResult.create(g.node(), onNode, call)));
@@ -76,15 +76,14 @@ public class ScriptApi {
 
     /**
      * Evaluate the arguments passed to a command
+     *
      * @param arguments
      * @param <T>
      * @return
      */
-    public <T> ProofScriptCommandCall<T> instantiateCommand(
-            ProofScriptCommand<T> command, Map<String, String> arguments)
-            throws Exception {
-        return new ProofScriptCommandCall<>(command,
-                command.evaluateArguments(state, arguments));
+    public <T> ProofScriptCommandCall<T> instantiateCommand(ProofScriptCommand<T> command,
+            Map<String, String> arguments) throws Exception {
+        return new ProofScriptCommandCall<>(command, command.evaluateArguments(state, arguments));
     }
 
 
@@ -95,32 +94,29 @@ public class ScriptApi {
      * @return
      * @throws Exception either for Syntax or Type error
      */
-    public Term toTerm(String term, VariableAssignments assignments)
-            throws Exception {
-        //TODO
+    public Term toTerm(String term, VariableAssignments assignments) throws Exception {
+        // TODO
         return null;
     }
 
     /**
-     * ~> Beweisbaum -> Shallow Copy
-     * hier implementieren
+     * ~> Beweisbaum -> Shallow Copy hier implementieren
      *
      * @param root
      * @param end
      * @return
      */
-    public ProjectedNode getIntermediateTree(ScriptResults root,
-            ScriptResults end) {
+    public ProjectedNode getIntermediateTree(ScriptResults root, ScriptResults end) {
         /*
-            Baum suche, startet bei allen Nodes von root.
-
-            Endet sobald ein Node von end erreicht ist.
+         * Baum suche, startet bei allen Nodes von root.
+         *
+         * Endet sobald ein Node von end erreicht ist.
          */
         ProjectedNode pseudoRoot = ProjectedNode.pseudoRoot();
         Queue<Node> queue = new LinkedList<>();
         root.forEach(r -> queue.add(r.getProjectedNode().getProofNode()));
 
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
 
         }
 

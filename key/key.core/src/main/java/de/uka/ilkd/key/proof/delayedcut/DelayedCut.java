@@ -11,9 +11,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * This class wraps the information about the delayed cut. It only wraps data
- * but not functional information.
- * 
+ * This class wraps the information about the delayed cut. It only wraps data but not functional
+ * information.
+ *
  * @author Benjamin Niedermann
  */
 public class DelayedCut {
@@ -30,9 +30,8 @@ public class DelayedCut {
     private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private Goal remainingGoal = null;
 
-    public DelayedCut(Proof proof, Node node, Term formula,
-            ImmutableList<Node> subtrees, int sideOfDecisionPredicate,
-            RuleApp firstAppliedRuleApp) {
+    public DelayedCut(Proof proof, Node node, Term formula, ImmutableList<Node> subtrees,
+            int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
         super();
         assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT
                 || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
@@ -72,11 +71,9 @@ public class DelayedCut {
         this.hideApp = hideApp;
     }
 
-    void setGoalsAfterUncovering(
-            ImmutableList<NodeGoalPair> goalsAfterUncovering) {
+    void setGoalsAfterUncovering(ImmutableList<NodeGoalPair> goalsAfterUncovering) {
         if (this.goalsAfterUncovering != null) {
-            throw new IllegalArgumentException(
-                    "There already exists a list of goals.");
+            throw new IllegalArgumentException("There already exists a list of goals.");
         }
         this.goalsAfterUncovering = goalsAfterUncovering;
     }

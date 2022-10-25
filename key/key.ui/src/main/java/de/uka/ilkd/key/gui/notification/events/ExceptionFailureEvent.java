@@ -6,13 +6,13 @@ public class ExceptionFailureEvent extends GeneralFailureEvent {
 
     private final Throwable error;
 
-	public ExceptionFailureEvent(String string, Throwable throwable) {
+    public ExceptionFailureEvent(String string, Throwable throwable) {
         super(NotificationEventID.EXCEPTION_CAUSED_FAILURE);
         this.error = throwable;
     }
 
-	public Throwable getException() {
-	    return error;
+    public Throwable getException() {
+        return error;
     }
 
 }

@@ -14,64 +14,65 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionLoopCondition}.
+ *
  * @author Martin Hentschel
  */
-public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<JavaStatement> implements IExecutionLoopCondition {
-   /**
-    * Constructor.
-    * @param settings The {@link ITreeSettings} to use.
-    * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    */
-   public ExecutionLoopCondition(ITreeSettings settings, 
-                                 Node proofNode) {
-      super(settings, proofNode);
-   }
+public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<JavaStatement>
+        implements IExecutionLoopCondition {
+    /**
+     * Constructor.
+     *
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     *        {@link IExecutionNode}.
+     */
+    public ExecutionLoopCondition(ITreeSettings settings, Node proofNode) {
+        super(settings, proofNode);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String lazyComputeName() {
-      return getGuardExpression().toString();
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String lazyComputeName() {
+        return getGuardExpression().toString();
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Expression getGuardExpression() {
-      if (getActiveStatement() instanceof LoopStatement) {
-         return ((LoopStatement) getActiveStatement()).getGuardExpression();
-      }
-      else if (getActiveStatement() instanceof If) {
-         return ((If) getActiveStatement()).getExpression();
-      }
-      else {
-         return null;
-      }
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Expression getGuardExpression() {
+        if (getActiveStatement() instanceof LoopStatement) {
+            return ((LoopStatement) getActiveStatement()).getGuardExpression();
+        } else if (getActiveStatement() instanceof If) {
+            return ((If) getActiveStatement()).getExpression();
+        } else {
+            return null;
+        }
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PositionInfo getGuardExpressionPositionInfo() {
-      return getGuardExpression().getPositionInfo();
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PositionInfo getGuardExpressionPositionInfo() {
+        return getGuardExpression().getPositionInfo();
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionConstraint[] lazyComputeConstraints() {
-      return SymbolicExecutionUtil.createExecutionConstraints(this);
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected IExecutionConstraint[] lazyComputeConstraints() {
+        return SymbolicExecutionUtil.createExecutionConstraints(this);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Loop Condition";
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getElementType() {
+        return "Loop Condition";
+    }
 }

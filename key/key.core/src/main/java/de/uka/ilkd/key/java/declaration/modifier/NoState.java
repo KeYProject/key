@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
- *  The JML modifier "no_state".
+ * The JML modifier "no_state".
  */
 public class NoState extends Modifier {
 
@@ -14,7 +14,7 @@ public class NoState extends Modifier {
 
 
     public NoState(ExtList children) {
-        super (children);
+        super(children);
     }
 
 
