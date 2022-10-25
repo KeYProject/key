@@ -864,6 +864,10 @@ public final class SourceView extends JComponent {
         return tabPane.getSelectedTab().absoluteFileName;
     }
 
+    public boolean hasFile(URI fileURI) {
+        return tabs.containsKey(fileURI);
+    }
+
     /**
      * The type of the tabbed pane contained in this {@code SourceView}.
      *

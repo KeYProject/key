@@ -92,6 +92,8 @@ public class OriginRefView extends MSDebugTab {
     private void highlightOriginRef(SourceView sv, OriginRef orig) throws BadLocationException, IOException {
         if (!orig.hasFile()) return;
 
+        if (!sv.hasFile(orig.fileURI())) return;
+
         if (orig.LineStart == orig.LineEnd) {
             existingHighlights.add(sv.addHighlight(orig.fileURI(), orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
         } else {
