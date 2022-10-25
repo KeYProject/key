@@ -252,6 +252,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
+        //if (src.contains("jar!/de/")) { //internal file, probably smth.key //TOOD this is hacky, find better way to do it
+        //    return expr;
+        //}
+
         OriginRef origin = new OriginRef(
                 src,
                 ctx.start.getLine(),

@@ -87,22 +87,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             TermImpl ti = (TermImpl) t;
             ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
-
         } catch (ClassCastException ignored) {
+            // ignored
         }
 
-        String src = ctx.start.getTokenSource().getSourceName();
-
-        OriginRef orig = new OriginRef(
-                src,
-                ctx.start.getLine(),
-                ctx.stop.getLine(),
-                ctx.start.getCharPositionInLine(),
-                ctx.stop.getCharPositionInLine(),
-                OriginRefType.TERM
-        );
-
-        return getTermFactory().appendOriginRef(t, orig);
+        return t;
     }
 
     /**
