@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -1636,17 +1637,24 @@ public final class SourceView extends JComponent {
                 removeHighlights(remLine);
             }
 
-            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry: highlights.entrySet().stream().sorted(Comparator.comparingInt(a -> -a.getKey())).collect(Collectors.toList())) {
-                for (SourceViewHighlight hl: entry.getValue()) {
+            // deep-copy highlights map, because we want to modify it in the following loop
+            var data = highlights.
+                    entrySet().
+                    stream().
+                    map(p -> new Tuple<>(p.getKey(), new HashSet<>(p.getValue()))).
+                    sorted(Comparator.comparingInt(a -> -a.getA())).collect(Collectors.toList());
+
+            for (Tuple<Integer, HashSet<SourceViewHighlight>> entry: data) {
+                for (SourceViewHighlight hl: entry.getB()) {
                     if (remLine >= 0 && hl.patchedLine == remLine) {
-                        highlights.get(entry.getKey()).remove(hl);
+                        highlights.get(entry.getA()).remove(hl);
                         continue;
                     }
                     if (hl.patchedLine >= startLine) {
                         hl.patchedLine+=lineDelta;
                         hl.patchedRange = new Range(hl.patchedRange.start() + rangeDelta, hl.patchedRange.end() + rangeDelta);
                         hl.setTag(null);
-                        highlights.get(entry.getKey()).remove(hl);
+                        highlights.get(entry.getA()).remove(hl);
 
                         if (!highlights.containsKey(hl.patchedLine)) {
                             highlights.put(hl.patchedLine, new TreeSet<>(Collections.reverseOrder()));
@@ -1655,8 +1663,8 @@ public final class SourceView extends JComponent {
                     }
                 }
 
-                if (highlights.get(entry.getKey()).isEmpty()) {
-                    highlights.remove(entry.getKey());
+                if (highlights.get(entry.getA()).isEmpty()) {
+                    highlights.remove(entry.getA());
                 }
             }
 
