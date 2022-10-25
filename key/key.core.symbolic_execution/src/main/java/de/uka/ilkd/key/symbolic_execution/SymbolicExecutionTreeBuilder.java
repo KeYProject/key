@@ -124,7 +124,8 @@ import de.uka.ilkd.key.util.Pair;
  *
  * <pre>
  * {@code
- * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set addUninterpretedPredicate to true
+ * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set
+ * // addUninterpretedPredicate to true
  * // Start KeY's auto mode with SymbolicExecutionStrategy to do the proof
  * SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
  * builder.analyse(); // Create initial symbolic execution tree
@@ -872,14 +873,13 @@ public class SymbolicExecutionTreeBuilder {
                                     ExecutionBranchCondition bcChild =
                                         (ExecutionBranchCondition) child;
                                     bcChild.addMergedProofNode(condition.getProofNode());
-                                    addChild(entry.getKey(), child); // Move child one up in
-                                                                     // hierarchy
+                                    // Move child one up in hierarchy
+                                    addChild(entry.getKey(), child);
                                     finishBlockCompletion(condition);
                                 } else {
-                                    addingToParentRequired = true; // Adding of current branch
-                                                                   // condition is required because
-                                                                   // non branch condition children
-                                                                   // are available
+                                    // Adding of current branch condition is required because non
+                                    // branch condition children are available
+                                    addingToParentRequired = true;
                                 }
                             }
                             if (addingToParentRequired) {
@@ -902,13 +902,8 @@ public class SymbolicExecutionTreeBuilder {
 
         protected void finishBlockCompletion(IExecutionBranchCondition node) {
             for (IExecutionBlockStartNode<?> start : node.getCompletedBlocks()) {
-                ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node); // BranchConditions
-                                                                                       // are
-                                                                                       // updated
-                                                                                       // when they
-                                                                                       // are added
-                                                                                       // to the
-                                                                                       // SET.
+                // BranchConditions are updated when they are added to the SET.
+                ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node);
                 completions.addBlockCompletion(node);
             }
         }
@@ -972,12 +967,10 @@ public class SymbolicExecutionTreeBuilder {
                                     parentToAddTo.addCompletedBlock(
                                         (AbstractExecutionBlockStartNode<?>) entryNode);
                                     if (!(parentToAddTo instanceof IExecutionBranchCondition)) {
+                                        // BranchConditions are updated when they are added to the
+                                        // SET.
                                         ((AbstractExecutionBlockStartNode<?>) entryNode)
-                                                .addBlockCompletion(parentToAddTo); // BranchConditions
-                                                                                    // are updated
-                                                                                    // when they are
-                                                                                    // added to the
-                                                                                    // SET.
+                                                .addBlockCompletion(parentToAddTo);
                                         completions.addBlockCompletion(parentToAddTo);
                                     }
                                 }
@@ -1005,27 +998,10 @@ public class SymbolicExecutionTreeBuilder {
                 if (((LoopStatement) statement).getGuardExpression()
                         .getPositionInfo() != PositionInfo.UNDEFINED
                         && !SymbolicExecutionUtil.isDoWhileLoopCondition(node, statement)
-                        && !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while
-                                                                                         // and for
-                                                                                         // loops
-                                                                                         // exists
-                                                                                         // only in
-                                                                                         // the
-                                                                                         // first
-                                                                                         // iteration
-                                                                                         // where
-                                                                                         // the loop
-                                                                                         // condition
-                                                                                         // is not
-                                                                                         // evaluated.
-                                                                                         // They are
-                                                                                         // transfered
-                                                                                         // into
-                                                                                         // while
-                                                                                         // loops in
-                                                                                         // later
-                                                                                         // proof
-                                                                                         // nodes.
+                        && !SymbolicExecutionUtil.isForLoopCondition(node, statement)) {
+                    // do while and for loops exists only in the first iteration where the loop
+                    // condition is not evaluated. They are transfered into while loops in later
+                    // proof nodes.
                     isLoopCondition = true;
                 }
             }
@@ -1540,16 +1516,8 @@ public class SymbolicExecutionTreeBuilder {
         } else {
             while (!done && expectedStatementsIterator.hasNext()) {
                 SourceElement next = expectedStatementsIterator.next();
-                if (SymbolicExecutionUtil.equalsWithPosition(next, currentActiveStatement)) { // Comparison
-                                                                                              // by
-                                                                                              // ==
-                                                                                              // is
-                                                                                              // not
-                                                                                              // possible
-                                                                                              // since
-                                                                                              // loops
-                                                                                              // are
-                                                                                              // recreated
+                // Comparison by == is not possible since loops are recreated
+                if (SymbolicExecutionUtil.equalsWithPosition(next, currentActiveStatement)) {
                     done = true;
                 } else if (expectedStackSize == currentStackSize
                         && (currentInnerMostMethodFrame != null
@@ -1954,16 +1922,8 @@ public class SymbolicExecutionTreeBuilder {
                         while (equals && iter.hasNext()) {
                             SourceElement next = iter.next();
                             SourceElement otherNext = otherIter.next();
-                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) { // Comparison
-                                                                                              // by
-                                                                                              // ==
-                                                                                              // is
-                                                                                              // not
-                                                                                              // possible
-                                                                                              // since
-                                                                                              // loops
-                                                                                              // are
-                                                                                              // recreated
+                            // Comparison by == is not possible since loops are recreated
+                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) {
                                 equals = false;
                             }
                         }

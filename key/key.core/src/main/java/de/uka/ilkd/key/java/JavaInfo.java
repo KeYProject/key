@@ -1355,17 +1355,9 @@ public final class JavaInfo {
         // TODO: Create function when source code is parsed and register it in namespace. Return
         // only function from namespace here. No lazy creation to ensure that all proofs of the same
         // proof environment have the same <inv> symbol.
+        // TODO: Why is the initial check with the heaps needed?
         if (inv == null
-                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO:
-                                                                                                    // Why
-                                                                                                    // is
-                                                                                                    // the
-                                                                                                    // initial
-                                                                                                    // check
-                                                                                                    // with
-                                                                                                    // the
-                                                                                                    // heaps
-                                                                                                    // needed?
+                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
             inv = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
             if (inv == null) {

@@ -31,8 +31,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
     public static final IconFontProvider STOP =
         new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
-    public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES); // OR
-                                                                                               // TIMES_CIRCLE
+    // an alternative would be TIMES_CIRCLE
+    public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES);
     public static final IconFontProvider CONFIGURE_MENU =
         new IconFontProvider(FontAwesomeSolid.SORT_DOWN);
     public static final IconFontProvider OPEN_MOST_RECENT =
@@ -92,8 +92,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.STOP_CIRCLE, ERROR_COLOR);
     public static final IconProvider PROOF_SEARCH_STRATEGY =
         new IconFontProvider(FontAwesomeSolid.COG);
-    public static final IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.SITEMAP); // OR
-                                                                                                  // CODE_BRANCH
+    // an alternative would be CODE_BRANCH
+    public static final IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.SITEMAP);
     public static final IconProvider INFO_VIEW = new IconFontProvider(FontAwesomeSolid.INFO_CIRCLE);
     public static final IconProvider TREE_NODE_EXPANDED =
         new IconFontProvider(FontAwesomeSolid.CARET_DOWN);

@@ -186,12 +186,9 @@ public class DesignTests {
                     continue;
 
                 for (Field f : allClass.getDeclaredFields()) {
-                    if (java.awt.Component.class.isAssignableFrom(f.getType())) { // ||
-                                                                                  // pkgname.contains("key.gui"))
-                                                                                  // { as long as
-                                                                                  // the mediator
-                                                                                  // and settings
-                                                                                  // are in the GUI
+                    if (java.awt.Component.class.isAssignableFrom(f.getType())) {
+                        // || pkgname.contains("key.gui")) { as long as the mediator and settings
+                        // are in the GUI
                         LOGGER.error("Illegal GUI reference at field {} declared in class {}",
                             f.getName(), allClass.getName());
                         badClasses.add(allClass);

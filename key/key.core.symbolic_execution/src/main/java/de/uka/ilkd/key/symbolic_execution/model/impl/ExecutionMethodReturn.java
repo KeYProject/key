@@ -249,25 +249,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 Node methodReturnNode = findMethodReturnNode(getProofNode());
                 if (methodReturnNode != null) {
                     // Start site proof to extract the value of the result variable.
+                    // New OneStepSimplifier is required because it has an internal state and the
+                    // default instance can't be used parallel.
                     final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                            .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                              // OneStepSimplifier
-                                                                                              // is
-                                                                                              // required
-                                                                                              // because
-                                                                                              // it
-                                                                                              // has
-                                                                                              // an
-                                                                                              // internal
-                                                                                              // state
-                                                                                              // and
-                                                                                              // the
-                                                                                              // default
-                                                                                              // instance
-                                                                                              // can't
-                                                                                              // be
-                                                                                              // used
-                                                                                              // parallel.
+                            .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                     SiteProofVariableValueInput input =
                         SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
                             mbs.getBodySourceAsTypeReference(), mbs.getProgramMethod(services),

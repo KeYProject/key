@@ -89,22 +89,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         this.additionalCondition = condition;
         this.simplifyConditions = simplifyConditions;
         // Get path condition
+        // Path condition needs always to be simplified, because otherwise additional symbolic
+        // values might be introduced.
         Term pathCondition =
-            SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, // Path
-                                                                                           // condition
-                                                                                           // needs
-                                                                                           // always
-                                                                                           // to be
-                                                                                           // simplified,
-                                                                                           // because
-                                                                                           // otherwise
-                                                                                           // additinal
-                                                                                           // symbolic
-                                                                                           // values
-                                                                                           // might
-                                                                                           // be
-                                                                                           // introduced.
-                false);
+            SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, false);
         pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
         // Extract locations from updates
         Set<ExtractLocationParameter> temporaryCurrentLocations =

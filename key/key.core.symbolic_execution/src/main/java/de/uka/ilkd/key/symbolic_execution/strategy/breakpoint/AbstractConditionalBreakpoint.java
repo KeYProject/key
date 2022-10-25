@@ -362,21 +362,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             // start side proof
             Term toProof = getProof().getServices().getTermBuilder()
                     .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New
-                                                                                       // OneStepSimplifier
-                                                                                       // is
-                                                                                       // required
-                                                                                       // because it
-                                                                                       // has an
-                                                                                       // internal
-                                                                                       // state and
-                                                                                       // the
-                                                                                       // default
-                                                                                       // instance
-                                                                                       // can't be
-                                                                                       // used
-                                                                                       // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
             Sequent sequent =
                 SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,

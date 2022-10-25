@@ -16,9 +16,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 public final class Assert {
 
     private static boolean assertionsEnabled() {
-        return FunctionalOperationContractImpl.class.desiredAssertionStatus(); // This class is only
-                                                                               // used by
-                                                                               // FunctionalOperationContractImpl
+        // This class is only used by FunctionalOperationContractImpl
+        return FunctionalOperationContractImpl.class.desiredAssertionStatus();
     }
 
     /**

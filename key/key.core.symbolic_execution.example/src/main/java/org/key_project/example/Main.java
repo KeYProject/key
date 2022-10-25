@@ -102,31 +102,12 @@ public class Main {
                 printSymbolicExecutionTree("Initial State", builder);
                 // Configure strategy for full exploration
                 SymbolicExecutionUtil.initializeStrategy(builder);
-                SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 100, false, // true
-                                                                                                   // to
-                                                                                                   // apply
-                                                                                                   // method
-                                                                                                   // contracts
-                                                                                                   // instead
-                                                                                                   // of
-                                                                                                   // inlining,
-                    false, // true to apply loop invariants instead of unrolling,
-                    false, // true to apply block contracts instead of expanding.
-                    false, // true to hide branch conditions caused by symbolic execution within
-                           // modalities not of interest,
-                    false); // true to perform alias checks during symbolic execution
+                SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 100, false,
+                    false, false, false, false);
                 // Optionally, add a more advanced stop conditions like breakpoints
                 CompoundStopCondition stopCondition = new CompoundStopCondition();
-                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100)); // Stop
-                                                                                                     // after
-                                                                                                     // 100
-                                                                                                     // nodes
-                                                                                                     // have
-                                                                                                     // been
-                                                                                                     // explored
-                                                                                                     // on
-                                                                                                     // each
-                                                                                                     // branch.
+                // Stop after 100 nodes have been explored on each branch.
+                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100));
                 // stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
                 // // Perform only a step over
                 // stopCondition.addChildren(new
@@ -134,10 +115,8 @@ public class Main {
                 // return
                 IBreakpoint breakpoint = new ExceptionBreakpoint(proof,
                     "java.lang.NullPointerException", true, true, true, true, 1);
-                stopCondition.addChildren(new SymbolicExecutionBreakpointStopCondition(breakpoint)); // Stop
-                                                                                                     // at
-                                                                                                     // specified
-                                                                                                     // breakpoints
+                // Stop at specified breakpoints
+                stopCondition.addChildren(new SymbolicExecutionBreakpointStopCondition(breakpoint));
                 proof.getSettings().getStrategySettings()
                         .setCustomApplyStrategyStopCondition(stopCondition);
                 // Perform strategy which will stop at breakpoint

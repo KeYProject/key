@@ -522,25 +522,10 @@ public abstract class AbstractSlicer {
                 Term anonHeap = term.sub(2);
                 // Idea: Compute all values of relevant locations in a side proof. Modified
                 // locations are anonymized.
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New
-                                                                                            // OneStepSimplifier
-                                                                                            // is
-                                                                                            // required
-                                                                                            // because
-                                                                                            // it
-                                                                                            // has
-                                                                                            // an
-                                                                                            // internal
-                                                                                            // state
-                                                                                            // and
-                                                                                            // the
-                                                                                            // default
-                                                                                            // instance
-                                                                                            // can't
-                                                                                            // be
-                                                                                            // used
-                                                                                            // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
                 ApplyStrategyInfo info = null;
                 try {
                     // Create location terms
@@ -604,25 +589,10 @@ public abstract class AbstractSlicer {
             if (!relevantLocations.isEmpty()) { // Nothing to do if relevant locations are empty
                 // Idea: Compute all values of relevant locations in a side proof. Modified
                 // locations are anonymized.
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New
-                                                                                            // OneStepSimplifier
-                                                                                            // is
-                                                                                            // required
-                                                                                            // because
-                                                                                            // it
-                                                                                            // has
-                                                                                            // an
-                                                                                            // internal
-                                                                                            // state
-                                                                                            // and
-                                                                                            // the
-                                                                                            // default
-                                                                                            // instance
-                                                                                            // can't
-                                                                                            // be
-                                                                                            // used
-                                                                                            // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
                 ApplyStrategyInfo info = null;
                 try {
                     // Create location terms
@@ -724,9 +694,8 @@ public abstract class AbstractSlicer {
             }
             values.addAll(secondValues);
         } else {
-            throw new IllegalStateException("Reached a state which should never happen."); // Can
-                                                                                           // not
-                                                                                           // happen!
+            // Can not happen!
+            throw new IllegalStateException("Reached a state which should never happen.");
         }
         values.add(first);
         values.add(second);

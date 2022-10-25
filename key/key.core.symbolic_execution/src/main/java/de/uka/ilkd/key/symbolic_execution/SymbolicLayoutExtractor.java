@@ -233,21 +233,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         synchronized (this) {
             if (!isAnalysed()) {
                 // Get path condition
-                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, // Path
-                                                                                            // condition
-                                                                                            // needs
-                                                                                            // always
-                                                                                            // to be
-                                                                                            // simplified,
-                                                                                            // because
-                                                                                            // otherwise
-                                                                                            // additinal
-                                                                                            // symbolic
-                                                                                            // values
-                                                                                            // might
-                                                                                            // be
-                                                                                            // introduced.
-                    false);
+                // Path condition needs always to be simplified, because otherwise additinal
+                // symbolic values might be introduced.
+                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
                 pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
                 // Compute all locations used in path conditions and updates. The values of the
                 // locations will be later computed in the state computation (and finally shown in a
@@ -287,46 +275,16 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                                        // representative term is for
                                                                        // instance self.next and not
                                                                        // self.next.next.
-                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add
-                                                                                                   // null
-                                                                                                   // because
-                                                                                                   // it
-                                                                                                   // can
-                                                                                                   // happen
-                                                                                                   // that
-                                                                                                   // a
-                                                                                                   // object
-                                                                                                   // is
-                                                                                                   // null
-                                                                                                   // and
-                                                                                                   // this
-                                                                                                   // option
-                                                                                                   // must
-                                                                                                   // be
-                                                                                                   // included
-                                                                                                   // in
-                                                                                                   // equivalence
-                                                                                                   // class
-                                                                                                   // computation
+                // Add null because it can happen that a object is null and this option must be
+                // included in equivalence class computation
+                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL());
                 // Find updates
                 updates = extractInitialUpdates();
                 // Compute a Sequent with the initial conditions of the proof without modality
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                          // OneStepSimplifier
-                                                                                          // is
-                                                                                          // required
-                                                                                          // because
-                                                                                          // it has
-                                                                                          // an
-                                                                                          // internal
-                                                                                          // state
-                                                                                          // and the
-                                                                                          // default
-                                                                                          // instance
-                                                                                          // can't
-                                                                                          // be used
-                                                                                          // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
                 ApplyStrategyInfo info = null;
                 try {

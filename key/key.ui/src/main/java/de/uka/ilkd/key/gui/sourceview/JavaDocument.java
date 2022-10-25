@@ -131,7 +131,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "extends", "final", "finally", "float", "for", "if", "implements", "import", "instanceof",
         "int", "interface", "long", "native", "new", "package", "private", "protected", "public",
         "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw",
-        "throws", "transient", "try", "void", "volatile", "while", "true", "false", "null" // literals
+        "throws", "transient", "try", "void", "volatile", "while", "true", "false", "null"
             // "const", "goto" // reserved, but currently not used in Java
     };
 
@@ -306,14 +306,12 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     private void checkPlusMinus(char c) {
-        if (state == CommentState.LINECOMMENT || state == CommentState.JML_ANNOTATION_LINE) { // "//+"
-                                                                                              // or
-                                                                                              // "//-"
+        if (state == CommentState.LINECOMMENT || state == CommentState.JML_ANNOTATION_LINE) {
+            // "//+" or "//-"
             token += c;
             state = CommentState.JML_ANNOTATION_LINE;
-        } else if (state == CommentState.COMMENT || state == CommentState.JML_ANNOTATION) { // "/*+"
-                                                                                            // or
-                                                                                            // "/*-"
+        } else if (state == CommentState.COMMENT || state == CommentState.JML_ANNOTATION) {
+            // "/*+" or "/*-"
             token += c;
             state = CommentState.JML_ANNOTATION;
         } else {

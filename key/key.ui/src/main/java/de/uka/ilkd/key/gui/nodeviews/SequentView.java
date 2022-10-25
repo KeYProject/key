@@ -743,11 +743,9 @@ public abstract class SequentView extends JEditorPane {
                         ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
                                 .<Integer>nil().prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
-                        Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe
-                                                                            // updateUpdateHighlights
-                                                                            // bzw in InnerNodeView.
-                                                                            // rangeForPath ist
-                                                                            // schuld
+                        // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
+                        // rangeForPath ist schuld
+                        Range newR = new Range(r.start() + 1, r.end() + 1);
                         Object tag = getColorHighlight(color);
                         paintHighlight(newR, tag);
                     }
@@ -764,10 +762,9 @@ public abstract class SequentView extends JEditorPane {
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
                             .<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
-                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe
-                                                                        // updateUpdateHighlights
-                                                                        // bzw in InnerNodeView.
-                                                                        // rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
@@ -879,10 +876,9 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
-                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe
-                                                                        // updateUpdateHighlights
-                                                                        // bzw in InnerNodeView.
-                                                                        // rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
@@ -897,10 +893,9 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
-                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe
-                                                                        // updateUpdateHighlights
-                                                                        // bzw in InnerNodeView.
-                                                                        // rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }

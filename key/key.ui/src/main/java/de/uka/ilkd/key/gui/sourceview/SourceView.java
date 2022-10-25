@@ -765,9 +765,8 @@ public final class SourceView extends JComponent {
      */
     private static PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement) {
-            if (se instanceof If || se instanceof Then || se instanceof Else) { // TODO: additional
-                                                                                // elements, e.g.
-                                                                                // code inside if
+            // TODO: additional elements, e.g. code inside if
+            if (se instanceof If || se instanceof Then || se instanceof Else) {
                 return PositionInfo.UNDEFINED;
             }
 
@@ -806,10 +805,7 @@ public final class SourceView extends JComponent {
                 if (label.equals("Invariant Initially Valid")
                         || label.equals("Invariant Preserved and Used") // for loop scope invariant
                         || label.equals("Body Preserves Invariant") || label.equals("Use Case")
-                        || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (") // precondition
-                                                                                                  // of
-                                                                                                  // a
-                                                                                                  // method
+                        || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
                         || label.startsWith("Exceptional Post (") // exceptional postcondition
                         || label.startsWith("Post (") // postcondition of a method
                         || label.contains("Normal Execution") || label.contains("Null Reference")

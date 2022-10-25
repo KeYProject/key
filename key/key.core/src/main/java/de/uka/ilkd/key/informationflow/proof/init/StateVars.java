@@ -251,10 +251,8 @@ public class StateVars {
     public static StateVars buildMethodContractPostVars(StateVars preVars, IProgramMethod pm,
             KeYJavaType kjt, Services services) {
         final String postfix = "AtPost";
-        return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars, // no
-                                                                                          // local
-                                                                                          // out
-                                                                                          // variables
+        // preVars.localVars: no local out variables
+        return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
             buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
             buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services), preVars.mbyAtPre);
     }

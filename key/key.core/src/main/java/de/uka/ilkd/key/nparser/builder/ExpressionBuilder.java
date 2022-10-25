@@ -670,9 +670,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 LogicVariable logicalvar =
                     (LogicVariable) namespaces().variables().lookup(attributeName);
                 if (logicalvar == null) {
-                    semanticError(null,
-                        "There is no attribute '%s' declared in type '%s' and no logical variable of that name.",
-                        attributeName, prefixSort);
+                    semanticError(null, "There is no attribute '%s' declared in type '%s' and no "
+                        + "logical variable of that name.", attributeName, prefixSort);
                 } else {
                     result = logicalvar;
                 }
@@ -1159,9 +1158,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(tv);
                     } else {
-                        semanticError(ctx,
-                            "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
-                            memberName);
+                        semanticError(ctx, "There is no attribute '%s'for sequences (Seq), only "
+                            + "'length' is supported.", memberName);
                     }
                 }
                 memberName = StringUtil.trim(memberName, "()");
@@ -1307,9 +1305,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(current);
                     } else {
-                        semanticError(ctxSuffix,
-                            "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
-                            memberName);
+                        semanticError(ctxSuffix, "There is no attribute '%s'for sequences (Seq), "
+                            + "only 'length' is supported.", memberName);
                     }
                 } else {
                     boolean isCall = attrid.call() != null;
@@ -1509,11 +1506,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Term toFPNotation(String number) {
         String decBitString =
             Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
-        return getTermFactory().createTerm(functions().lookup(new Name("FP")), toNum(decBitString)); // toNum("0"));
-                                                                                                     // //
-                                                                                                     // soon
-                                                                                                     // to
-                                                                                                     // disappear
+        // toNum("0")); // soon to disappear
+        return getTermFactory().createTerm(functions().lookup(new Name("FP")), toNum(decBitString));
     }
 
     private Term toDFPNotation(String number) {

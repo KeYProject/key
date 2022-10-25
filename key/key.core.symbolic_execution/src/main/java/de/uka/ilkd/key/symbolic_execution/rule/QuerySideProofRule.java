@@ -220,21 +220,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 queryConditionTerm = equalitySF.formula().sub(0);
             }
             // Compute sequent for side proof to compute query in.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New
-                                                                                        // OneStepSimplifier
-                                                                                        // is
-                                                                                        // required
-                                                                                        // because
-                                                                                        // it has an
-                                                                                        // internal
-                                                                                        // state and
-                                                                                        // the
-                                                                                        // default
-                                                                                        // instance
-                                                                                        // can't be
-                                                                                        // used
-                                                                                        // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goalSequent, equalitySF);

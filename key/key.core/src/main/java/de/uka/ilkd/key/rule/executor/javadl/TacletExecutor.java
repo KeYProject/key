@@ -444,16 +444,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     itNewGoalSequents = res.iterator();
                     SequentChangeInfo seq = itNewGoalSequents.next();
                     while (itNewGoalSequents.hasNext()) {
-                        addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0)); // (
-                                                                                               // i
-                                                                                               // >
-                                                                                               // 0
-                                                                                               // )
-                                                                                               // iff
-                                                                                               // inst
-                                                                                               // is
-                                                                                               // formula
-                        // of the antecedent
+                        // (i > 0) iff inst is formula of the antecedent
+                        addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0));
                         seq = itNewGoalSequents.next();
                     }
                 }

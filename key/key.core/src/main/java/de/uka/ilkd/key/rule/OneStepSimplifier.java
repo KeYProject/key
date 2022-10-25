@@ -318,23 +318,11 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
             Term result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
+            // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
+            // missing)
             ImmutableArray<TermLabel> labels =
-                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, // TODO:
-                                                                                            // pos.subTerm()
-                                                                                            // == in
-                                                                                            // should
-                                                                                            // be
-                                                                                            // true
-                                                                                            // which
-                                                                                            // is
-                                                                                            // currently
-                                                                                            // not
-                                                                                            // the
-                                                                                            // case
-                                                                                            // (labels
-                                                                                            // are
-                                                                                            // missing)
-                    this, ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
+                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
+                    ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
                     result.javaBlock(), result.getLabels());
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);

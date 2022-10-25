@@ -68,29 +68,13 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
                     Term equality = services.getTermBuilder().equals(storeLocationsArray[i],
                         storeLocationsArray[j]);
                     if (!topTerms.contains(equality)) {
-                        Term negatedEquality = services.getTermBuilder().not(equality); // The not
-                                                                                        // is
-                                                                                        // because
-                                                                                        // the order
-                                                                                        // of the
-                                                                                        // branches
-                                                                                        // is nicer
-                                                                                        // (assumption:
-                                                                                        // default
-                                                                                        // case that
-                                                                                        // objects
-                                                                                        // are
-                                                                                        // different
-                                                                                        // is shown
-                                                                                        // in
-                                                                                        // symbolic
-                                                                                        // execution
-                                                                                        // trees on
-                                                                                        // the left)
+                        // The not is because the order of the branches is nicer (assumption:
+                        // default case that objects are different is shown in symbolic execution
+                        // trees on the left)
+                        Term negatedEquality = services.getTermBuilder().not(equality);
                         if (!topTerms.contains(negatedEquality)) {
-                            equalityTerms.add(negatedEquality); // Do equality cut only if knowledge
-                                                                // is not already part of the
-                                                                // sequent
+                            // Do equality cut only if knowledge is not already part of the sequent
+                            equalityTerms.add(negatedEquality);
                         }
                     }
                 }

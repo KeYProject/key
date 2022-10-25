@@ -361,10 +361,8 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
         modifiers.add(new Static());
         modifiers.add(new Public());
-        return new MethodDeclaration(modifiers, null, // return type is void
-            new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER), new ASTArrayList<>(0), null, // no
-                                                                                              // declared
-                                                                                              // throws
+        return new MethodDeclaration(modifiers, null,
+            new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER), new ASTArrayList<>(0), null,
             createInitializeMethodBody(td));
     }
 

@@ -1133,17 +1133,10 @@ public abstract class AbstractUpdateExtractor {
         for (Term additionalUpdate : collectAdditionalUpdates()) {
             updateLayoutTerm = tb.apply(additionalUpdate, updateLayoutTerm);
         }
+        // New OneStepSimplifier is required because it has an internal state and the default
+        // instance can't be used parallel.
         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                  // OneStepSimplifier
-                                                                                  // is required
-                                                                                  // because it has
-                                                                                  // an internal
-                                                                                  // state and the
-                                                                                  // default
-                                                                                  // instance can't
-                                                                                  // be used
-                                                                                  // parallel.
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
             modalityPio, layoutCondition, updateLayoutTerm, null, false);
         // Instantiate and run proof

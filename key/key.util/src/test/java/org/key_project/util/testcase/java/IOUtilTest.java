@@ -281,12 +281,8 @@ public class IOUtilTest {
             assertEquals(0, visitor.getVisitedFiles().size());
             // Test visiting
             IOUtil.visit(tempDir, visitor);
-            visitor.getVisitedFiles().sort(Comparator.comparing(File::getAbsolutePath)); // Ensure
-                                                                                         // same
-                                                                                         // order in
-                                                                                         // all
-                                                                                         // operating
-                                                                                         // systems
+            // Ensure same order in all operating systems
+            visitor.getVisitedFiles().sort(Comparator.comparing(File::getAbsolutePath));
             assertEquals(8, visitor.getVisitedFiles().size());
             assertEquals(tempDir, visitor.getVisitedFiles().get(0));
             assertEquals(text, visitor.getVisitedFiles().get(1));

@@ -251,17 +251,10 @@ public final class SymbolicExecutionUtil {
     public static Term simplify(InitConfig initConfig, Proof parentProof, Term term)
             throws ProofInputException {
         final Services services = initConfig.getServices();
+        // New OneStepSimplifier is required because it has an internal state and the default
+        // instance can't be used parallel.
         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New
-                                                                                  // OneStepSimplifier
-                                                                                  // is required
-                                                                                  // because it has
-                                                                                  // an internal
-                                                                                  // state and the
-                                                                                  // default
-                                                                                  // instance can't
-                                                                                  // be used
-                                                                                  // parallel.
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
         // Create Sequent to prove
         Sequent sequentToProve =
             Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
@@ -1164,15 +1157,11 @@ public final class SymbolicExecutionUtil {
      */
     public static boolean isStatementNode(Node node, RuleApp ruleApp, SourceElement statement,
             PositionInfo posInfo) {
-        return ruleApp != null && // Do not handle the open goal node which has no applied rule
-                posInfo != null && posInfo.getEndPosition() != Position.UNDEFINED
-                && posInfo.getEndPosition().getLine() >= 0 && // Filter out statements where source
-                                                              // code is missing.
-                !(statement instanceof EmptyStatement) && // Filter out empty statements
-                !(statement instanceof StatementBlock && ((StatementBlock) statement).isEmpty()); // Filter
-                                                                                                  // out
-                                                                                                  // empty
-                                                                                                  // blocks
+        // filter out: open goal node which has no applied rule, statements where source code is
+        // missing, empty statements, empty blocks
+        return ruleApp != null && posInfo != null && posInfo.getEndPosition() != Position.UNDEFINED
+                && posInfo.getEndPosition().getLine() >= 0 && !(statement instanceof EmptyStatement)
+                && !(statement instanceof StatementBlock && ((StatementBlock) statement).isEmpty());
     }
 
     /**
@@ -1270,14 +1259,10 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} has loop condition, {@code false} has no loop condition.
      */
     public static boolean hasLoopCondition(Node node, RuleApp ruleApp, SourceElement statement) {
-        return ruleApp != null && // Do not handle open goal nodes without applied rule
-                statement instanceof LoopStatement && !(statement instanceof EnhancedFor); // For
-                                                                                           // each
-                                                                                           // loops
-                                                                                           // have
-                                                                                           // no
-                                                                                           // loop
-                                                                                           // condition
+        // Do not handle open goal nodes without applied rule.
+        // For each loops have no loop condition.
+        return ruleApp != null && statement instanceof LoopStatement
+                && !(statement instanceof EnhancedFor);
     }
 
     /**
@@ -1658,10 +1643,8 @@ public final class SymbolicExecutionUtil {
                 return !isInImplicitMethod(node, ruleApp);
             } else if (isExceptionalMethodReturnNode(node, ruleApp)) {
                 return !isInImplicitMethod(node, ruleApp);
-            } else if (isLoopStatement(node, ruleApp, statement, posInfo)) { // This check is
-                                                                             // redundant to the
-                                                                             // loop iteration
-                                                                             // check, but is faster
+            } else if (isLoopStatement(node, ruleApp, statement, posInfo)) {
+                // This check is redundant to the loop iteration check, but is faster
                 return true;
             } else if (isBranchStatement(node, ruleApp, statement, posInfo)
                     || isMethodCallNode(node, ruleApp, statement)
@@ -1956,13 +1939,13 @@ public final class SymbolicExecutionUtil {
             PosInOccurrence pio = parent.getAppliedRuleApp().posInOccurrence();
             Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
             if (workingTerm == null) {
-                throw new ProofInputException(
-                    "Term not find in precondition branch, implementation of UseOperationContractRule might have changed!");
+                throw new ProofInputException("Term not find in precondition branch, implementation"
+                    + " of UseOperationContractRule might have changed!");
             }
             workingTerm = TermBuilder.goBelowUpdates(workingTerm);
             if (workingTerm.op() != Junctor.AND) {
-                throw new ProofInputException(
-                    "And operation expected, implementation of UseOperationContractRule might have changed!");
+                throw new ProofInputException("And operation expected, implementation of "
+                    + "UseOperationContractRule might have changed!");
             }
             Term preconditions = workingTerm.sub(0);
             return services.getTermBuilder().not(preconditions);
@@ -1996,46 +1979,31 @@ public final class SymbolicExecutionUtil {
                     parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
                 callerNotNullTerm = TermBuilder.goBelowUpdates(callerNotNullTerm);
                 if (callerNotNullTerm.op() != Junctor.NOT) {
-                    throw new ProofInputException(
-                        "Not operation expected, implementation of UseOperationContractRule might have changed!");
+                    throw new ProofInputException("Not operation expected, implementation of "
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
-                    throw new ProofInputException(
-                        "Equals operation expected, implementation of UseOperationContractRule might have changed!");
+                    throw new ProofInputException("Equals operation expected, implementation of "
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
-                    throw new ProofInputException(
-                        "ProgramVariable expected, implementation of UseOperationContractRule might have changed!");
+                    throw new ProofInputException("ProgramVariable expected, implementation of "
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(),
                     parent.proof().getServices())) {
-                    throw new ProofInputException(
-                        "Null expected, implementation of UseOperationContractRule might have changed!");
+                    throw new ProofInputException("Null expected, implementation of "
+                        + "UseOperationContractRule might have changed!");
                 }
                 result = services.getTermBuilder().and(callerNotNullTerm, result);
             }
             // Create formula which contains the value interested in.
             Term condition;
             if (simplify) {
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New
-                                                                                              // OneStepSimplifier
-                                                                                              // is
-                                                                                              // required
-                                                                                              // because
-                                                                                              // it
-                                                                                              // has
-                                                                                              // an
-                                                                                              // internal
-                                                                                              // state
-                                                                                              // and
-                                                                                              // the
-                                                                                              // default
-                                                                                              // instance
-                                                                                              // can't
-                                                                                              // be
-                                                                                              // used
-                                                                                              // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent =
                     createSequentToProveWithNewSuccedent(parent, (Term) null, result, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
@@ -2069,8 +2037,8 @@ public final class SymbolicExecutionUtil {
             List<Term> exceptinalConditions) throws ProofInputException {
         // Treat general conditions
         if (search.getWorkingTerm().op() != Junctor.AND) {
-            throw new ProofInputException(
-                "And operation expected, implementation of UseOperationContractRule might has changed!");
+            throw new ProofInputException("And operation expected, implementation of "
+                + "UseOperationContractRule might have changed!");
         }
         Term specificationCasesTerm = search.getWorkingTerm().sub(1);
         Term excDefinition = search.getExceptionDefinition();
@@ -2163,12 +2131,13 @@ public final class SymbolicExecutionUtil {
                                     .equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
                                 exceptinalConditions.add(leftTerm);
                             } else {
-                                throw new ProofInputException(
-                                    "Exeptional condition expected, implementation of UseOperationContractRule might has changed!");
+                                throw new ProofInputException("Exeptional condition expected, "
+                                    + "implementation of UseOperationContractRule might have "
+                                    + "changed!");
                             }
                         } else {
-                            throw new ProofInputException(
-                                "Exeptional condition expected, implementation of UseOperationContractRule might has changed!");
+                            throw new ProofInputException("Exeptional condition expected, "
+                                + "implementation of UseOperationContractRule might have changed!");
                         }
                     }
                 }
@@ -2194,8 +2163,8 @@ public final class SymbolicExecutionUtil {
         Pair<ImmutableList<Term>, Term> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
         workingTerm = updatesAndTerm.second;
         if (workingTerm.op() != Junctor.AND) {
-            throw new ProofInputException(
-                "And operation expected, implementation of UseOperationContractRule might has changed!");
+            throw new ProofInputException("And operation expected, implementation of "
+                + "UseOperationContractRule might have changed!");
         }
         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is
                                           // the combination of all normal and exceptional
@@ -2204,8 +2173,8 @@ public final class SymbolicExecutionUtil {
         // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
         Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
         if (exceptionDefinition == null) {
-            throw new ProofInputException(
-                "Exception definition not found, implementation of UseOperationContractRule might has changed!");
+            throw new ProofInputException("Exception definition not found, implementation of "
+                + "UseOperationContractRule might have changed!");
         }
         // Make sure that exception equality was found
         Term exceptionEquality =
@@ -2405,25 +2374,10 @@ public final class SymbolicExecutionUtil {
                     : services.getTermBuilder().dia(loopConditionModalityTerm.javaBlock(), newTerm);
             Term condition;
             if (simplify) {
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New
-                                                                                              // OneStepSimplifier
-                                                                                              // is
-                                                                                              // required
-                                                                                              // because
-                                                                                              // it
-                                                                                              // has
-                                                                                              // an
-                                                                                              // internal
-                                                                                              // state
-                                                                                              // and
-                                                                                              // the
-                                                                                              // default
-                                                                                              // instance
-                                                                                              // can't
-                                                                                              // be
-                                                                                              // used
-                                                                                              // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term) null,
                     modalityTerm, pair.first, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
@@ -2469,9 +2423,8 @@ public final class SymbolicExecutionUtil {
             boolean simplify, boolean improveReadability) throws ProofInputException {
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
-            throw new ProofInputException(
-                "Only AbstractBlockContractBuiltInRuleApp is allowed in branch computation but rule \""
-                    + parent.getAppliedRuleApp() + "\" was found.");
+            throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in "
+                + "branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
         }
 
         RuleApp app = parent.getAppliedRuleApp();
@@ -2489,25 +2442,10 @@ public final class SymbolicExecutionUtil {
             Semisequent antecedent = node.sequent().antecedent();
             Term condition = antecedent.get(antecedent.size() - 1).formula();
             if (simplify) {
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New
-                                                                                              // OneStepSimplifier
-                                                                                              // is
-                                                                                              // required
-                                                                                              // because
-                                                                                              // it
-                                                                                              // has
-                                                                                              // an
-                                                                                              // internal
-                                                                                              // state
-                                                                                              // and
-                                                                                              // the
-                                                                                              // default
-                                                                                              // instance
-                                                                                              // can't
-                                                                                              // be
-                                                                                              // used
-                                                                                              // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term) null,
                     condition, null, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
@@ -2702,9 +2640,8 @@ public final class SymbolicExecutionUtil {
                 if (!NodeInfo.isSymbolicExecution(app.taclet())) {
                     // Make sure that an PosTacletApp was applied
                     if (!(app instanceof PosTacletApp)) {
-                        throw new ProofInputException(
-                            "Only PosTacletApp are allowed with a replace term in branch computation but rule \""
-                                + app + "\" was found.");
+                        throw new ProofInputException("Only PosTacletApp are allowed with a replace"
+                            + " term in branch computation but rule \"" + app + "\" was found.");
                     }
                     // Create new lists
                     ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
@@ -2736,9 +2673,9 @@ public final class SymbolicExecutionUtil {
                     newSuccedents = tempSuccedents;
                 }
             } else if (goalTemplate.replaceWithExpressionAsObject() != null) {
-                throw new ProofInputException(
-                    "Expected replacement as Sequent or Term during branch condition computation but is \""
-                        + goalTemplate.replaceWithExpressionAsObject() + "\".");
+                throw new ProofInputException("Expected replacement as Sequent or Term during "
+                    + "branch condition computation but is \""
+                    + goalTemplate.replaceWithExpressionAsObject() + "\".");
             }
         }
         // Compute branch condition
@@ -2750,22 +2687,10 @@ public final class SymbolicExecutionUtil {
         Term condition;
         if (simplify) {
             // Create formula which contains the value interested in.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New
-                                                                                          // OneStepSimplifier
-                                                                                          // is
-                                                                                          // required
-                                                                                          // because
-                                                                                          // it has
-                                                                                          // an
-                                                                                          // internal
-                                                                                          // state
-                                                                                          // and the
-                                                                                          // default
-                                                                                          // instance
-                                                                                          // can't
-                                                                                          // be used
-                                                                                          // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
             Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, (Term) null,
                 newLeftAndRight, true);
             condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
@@ -3013,18 +2938,10 @@ public final class SymbolicExecutionUtil {
         assert node != null;
         assert newSuccedent != null;
         // Create Sequent to prove
+        // New OneStepSimplifier is required because it has an internal state and the default
+        // instance can't be used parallel.
         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New
-                                                                                    // OneStepSimplifier
-                                                                                    // is required
-                                                                                    // because it
-                                                                                    // has an
-                                                                                    // internal
-                                                                                    // state and the
-                                                                                    // default
-                                                                                    // instance
-                                                                                    // can't be used
-                                                                                    // parallel.
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
         final TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
         Term isNull = tb.equals(newSuccedent, tb.NULL());
         Term isNotNull = tb.not(isNull);
@@ -3485,8 +3402,8 @@ public final class SymbolicExecutionUtil {
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
-                return services.getTermBuilder().tt(); // If no other term is available the quality
-                                                       // is jsut true.
+                // If no other term is available the quality is just true.
+                return services.getTermBuilder().tt();
             }
         } else if (skolemCheck == 1) {
             TermBuilder tb = services.getTermBuilder();
@@ -3500,21 +3417,17 @@ public final class SymbolicExecutionUtil {
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
-                return services.getTermBuilder().tt(); // If no other term is available the quality
-                                                       // is jsut true.
+                // If no other term is available the quality is just true.
+                return services.getTermBuilder().tt();
             }
         } else {
             if (isSkolemConstant(term)) {
                 // Skolem term
                 List<Term> replacements = findSkolemReplacements(sequent, term, null);
-                return !replacements.isEmpty() ? replacements.get(0) : // Any of the replacements
-                                                                       // can be used, for
-                                                                       // simplicity use the first
-                                                                       // one. Alternatively may the
-                                                                       // one with the lowest depth
-                                                                       // or with least symbols
-                                                                       // might be used.
-                        term;
+                // Any of the replacements can be used, for simplicity use the first one.
+                // Alternatively may the one with the lowest depth or with the least symbols might
+                // be used.
+                return !replacements.isEmpty() ? replacements.get(0) : term;
             } else {
                 // No skolem term
                 List<Term> newChildren = new LinkedList<Term>();
