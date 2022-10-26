@@ -10,4 +10,6 @@ public interface SequentInteractionListener extends EventListener {
 
     void leaveHover();
 
+    void click(PosInSequent pos, Term t);
+
 }

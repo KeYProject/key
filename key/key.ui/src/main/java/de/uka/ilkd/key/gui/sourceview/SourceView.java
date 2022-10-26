@@ -377,41 +377,45 @@ public final class SourceView extends JComponent {
     /**
      * Moves an existing highlight to another line.
      *
-     * @param highlight the highlight to change.
+     * @param oldHighlight the highlight to change.
      * @param newSourceLine the line to move the highlight to.
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(SourceViewHighlight highlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
-        URI fileURI = highlight.getFileURI();
-        int oldPatchedLine = highlight.getPatchedLine();
+    public void changeHighlight(SourceViewHighlight oldHighlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
+        URI fileURI = oldHighlight.getFileURI();
+        int oldPatchedLine = oldHighlight.getPatchedLine();
 
         Tab tab = tabs.get(fileURI);
 
         if (tab == null
                 || !tab.highlights.containsKey(oldPatchedLine)
-                || !tab.highlights.get(oldPatchedLine).contains(highlight)) {
+                || !tab.highlights.get(oldPatchedLine).contains(oldHighlight)) {
             throw new IllegalArgumentException("highlight");
         }
 
         tab.removeHighlights(oldPatchedLine);
-        tab.highlights.get(oldPatchedLine).remove(highlight);
+        tab.highlights.get(oldPatchedLine).remove(oldHighlight);
         tab.applyHighlights(oldPatchedLine);
 
         if (tab.highlights.get(oldPatchedLine).isEmpty()) {
             tab.highlights.remove(oldPatchedLine);
         }
 
-        highlight.sourceLine = newSourceLine;
-        highlight.patchedLine = newPatchedLine;
-        highlight.patchedRange = newPatchedRange;
-        highlight.setTag(null);
+        SourceViewHighlight newHighlight = new SourceViewHighlight(
+                oldHighlight.fileURI,
+                oldHighlight.sourceLine,
+                oldHighlight.patchedLine,
+                oldHighlight.patchedRange,
+                oldHighlight.color,
+                oldHighlight.level
+        );
 
         if (!tab.highlights.containsKey(newPatchedLine)) {
             tab.highlights.put(newPatchedLine, new TreeSet<>());
         }
 
-        tab.highlights.get(newPatchedLine).add(highlight);
+        tab.highlights.get(newPatchedLine).add(newHighlight);
         tab.removeHighlights(newPatchedLine);
         tab.applyHighlights(newPatchedLine);
     }
@@ -1655,15 +1659,21 @@ public final class SourceView extends JComponent {
                         continue;
                     }
                     if (hl.patchedLine >= startLine) {
-                        hl.patchedLine+=lineDelta;
-                        hl.patchedRange = new Range(hl.patchedRange.start() + rangeDelta, hl.patchedRange.end() + rangeDelta);
-                        hl.setTag(null);
+                        SourceViewHighlight hLNew = new SourceViewHighlight(
+                            hl.fileURI,
+                            hl.sourceLine,
+                            hl.patchedLine+lineDelta,
+                            new Range(hl.patchedRange.start() + rangeDelta, hl.patchedRange.end() + rangeDelta),
+                            hl.color,
+                            hl.level
+                        );
+
                         highlights.get(entry.getA()).remove(hl);
 
                         if (!highlights.containsKey(hl.patchedLine)) {
                             highlights.put(hl.patchedLine, new TreeSet<>(Collections.reverseOrder()));
                         }
-                        highlights.get(hl.patchedLine).add(hl);
+                        highlights.get(hl.patchedLine).add(hLNew);
                     }
                 }
 

@@ -252,13 +252,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
-        String srcStr = ctx.getText();
-
-        //if (src.contains("jar!/de/")) { //internal file, probably smth.key //TOOD this is hacky, find better way to do it
-        //    return expr;
-        //}
-
         Sort sort = expr.getTerm().op().sort(expr.getTerm().subs());
+
+        boolean boolterm = sort.name().toString().equals("Formula");
+
+        boolean hasAtomSubs = expr.getTerm().subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom);
+
+        assert !(isatom && !boolterm) : "Every Atom must be a boolean term";
+
+        assert !(isatom && hasAtomSubs) : "Every Atom must be at the lowest level (no sub-atoms)";
 
         OriginRef origin = new OriginRef(
                 src,
@@ -268,8 +270,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1),
                 OriginRefType.UNKNOWN,
                 isatom,
-                false,
-                srcStr
+                boolterm
         );
 
         Term term = expr.getTerm();

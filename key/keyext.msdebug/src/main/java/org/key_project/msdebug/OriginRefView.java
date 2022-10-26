@@ -27,6 +27,9 @@ public class OriginRefView extends MSDebugTab {
 
     private final static int HIGHTLIGHT_LEVEL = 11;
 
+    private boolean showOnlyAtoms = true;
+    private boolean triggerOnClick = false;
+
     public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
@@ -35,12 +38,18 @@ public class OriginRefView extends MSDebugTab {
             @Override
             public void hover(PosInSequent pos, Term t) {
                 highlightTerm(window, mediator, pos, t);
-                showTerm(window, mediator, pos, t);
+                if (!OriginRefView.this.triggerOnClick) showTerm(window, mediator, pos, t);
             }
 
             @Override
             public void leaveHover() {
-                unshowTerm(window, mediator);
+                unhighlightTerm(window, mediator);
+                if (!OriginRefView.this.triggerOnClick) unshowTerm(window, mediator);
+            }
+
+            @Override
+            public void click(PosInSequent pos, Term t) {
+                if (OriginRefView.this.triggerOnClick) showTerm(window, mediator, pos, t);
             }
         });
 
@@ -55,6 +64,20 @@ public class OriginRefView extends MSDebugTab {
         taSource.setFont(new Font("Courier New", Font.PLAIN, 12));
 
         this.add(new JScrollPane(taSource), BorderLayout.CENTER);
+
+
+        var pnlConf = new JPanel(new GridLayout(2, 1, 8, 8));
+
+        var cbClick = new JCheckBox("trigger on click");
+        pnlConf.add(cbClick);
+        cbClick.addItemListener(e -> { OriginRefView.this.triggerOnClick = cbClick.isSelected(); });
+
+
+        var cbAtom = new JCheckBox("only show atoms", true);
+        pnlConf.add(cbAtom);
+        cbAtom.addItemListener(e -> { OriginRefView.this.showOnlyAtoms = cbAtom.isSelected(); });
+
+        this.add(pnlConf, BorderLayout.NORTH);
     }
 
     @Nonnull
@@ -71,40 +94,24 @@ public class OriginRefView extends MSDebugTab {
             for (SourceViewHighlight h : existingHighlights) sv.removeHighlight(h);
             existingHighlights.clear();
 
-            boolean anyRefs = false;
+            for (OriginRef orig : MSDUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), true, true)) {
+                if (!orig.hasFile()) continue;
 
-            {
-                OriginRef o = MSDUtil.getParentWithOriginRef(pos).getOriginRef();
-                if (o != null) {
-                    highlightOriginRef(sv, o);
-                    anyRefs = true;
-                }
-            }
+                if (!sv.hasFile(orig.fileURI())) continue;
 
-            if (!anyRefs) {
-                for (OriginRef o : MSDUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), false)) {
-                    highlightOriginRef(sv, o);
+                if (orig.LineStart == orig.LineEnd) {
+                    existingHighlights.add(sv.addHighlight(orig.fileURI(), orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                } else {
+                    for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
+                        if (orig.hasFile()) {
+                            existingHighlights.add(sv.addHighlight(orig.fileURI(), i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                        }
+                    }
                 }
             }
 
         } catch (IOException | BadLocationException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void highlightOriginRef(SourceView sv, OriginRef orig) throws BadLocationException, IOException {
-        if (!orig.hasFile()) return;
-
-        if (!sv.hasFile(orig.fileURI())) return;
-
-        if (orig.LineStart == orig.LineEnd) {
-            existingHighlights.add(sv.addHighlight(orig.fileURI(), orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
-        } else {
-            for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
-                if (orig.hasFile()) {
-                    existingHighlights.add(sv.addHighlight(orig.fileURI(), i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
-                }
-            }
         }
     }
 
@@ -156,7 +163,7 @@ public class OriginRefView extends MSDebugTab {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (OriginRef o : MSDUtil.getSubOriginRefs(term, false)) {
+                for (OriginRef o : MSDUtil.getSubOriginRefs(term, false, showOnlyAtoms)) {
                     txt += o.toString();
                     txt += "\n";
                 }
@@ -169,7 +176,7 @@ public class OriginRefView extends MSDebugTab {
             txt += "\n";
             txt += "\n";
 
-            Term parent = MSDUtil.getParentWithOriginRef(pos);
+            Term parent = MSDUtil.getParentWithOriginRef(pos, showOnlyAtoms);
             if (parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
                 txt += MSDUtil.TermToString(parent, proof.getServices()) + "\n";
                 txt += "\n";
@@ -190,11 +197,13 @@ public class OriginRefView extends MSDebugTab {
         }
     }
 
-    private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void unhighlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         SourceView sv = window.getSourceViewFrame().getSourceView();
         for (SourceViewHighlight h: existingHighlights) sv.removeHighlight(h);
         existingHighlights.clear();
+    }
 
+    private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         taSource.setText("");
     }
 }

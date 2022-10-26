@@ -34,13 +34,13 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
     final URI fileURI;
 
     /** @see #getSourceLine() */
-    int sourceLine;
+    final int sourceLine;
 
     /** @see #getPatchedLine() */
-    int patchedLine;
+    final int patchedLine;
 
     /** @see #getPatchedRange() */
-    Range patchedRange;
+    final Range patchedRange;
 
     /**
      * Creates a new highlight.
@@ -70,6 +70,7 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
         result = prime * result + level;
         result = prime * result + sourceLine;
         result = prime * result + patchedLine;
+        result = prime * result + patchedRange.hashCode();
         return result;
     }
 
@@ -108,6 +109,9 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
         if (patchedLine != other.patchedLine) {
             return false;
         }
+        if (!patchedRange.equals(other.patchedRange)) {
+            return false;
+        }
         return true;
     }
 
@@ -129,6 +133,14 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
 
         if (result == 0) {
             result = Integer.compare(color.getRGB(), other.color.getRGB());
+        }
+
+        if (result == 0) {
+            result = Integer.compare(patchedRange.start(), other.patchedRange.start());
+        }
+
+        if (result == 0) {
+            result = Integer.compare(patchedRange.end(), other.patchedRange.end());
         }
 
         return result;

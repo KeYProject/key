@@ -666,25 +666,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
             Services services) {
         // "self != null"
         Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
-        selfNotNull = services.getTermFactory().setOriginRefTypeRecursive(selfNotNull, OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL);
+        selfNotNull = services.getTermFactory().setOriginRefTypeRecursive(selfNotNull, OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL, true);
 
         // "self.<created> = TRUE"
         Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
-        selfCreated = services.getTermFactory().setOriginRefTypeRecursive(selfCreated, OriginRefType.IMPLICIT_REQUIRES_SELFCREATED);
+        selfCreated = services.getTermFactory().setOriginRefTypeRecursive(selfCreated, OriginRefType.IMPLICIT_REQUIRES_SELFCREATED, true);
 
         // "MyClass::exactInstance(self) = TRUE"
         Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
-        selfExactType = services.getTermFactory().setOriginRefTypeRecursive(selfExactType, OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE);
+        selfExactType = services.getTermFactory().setOriginRefTypeRecursive(selfExactType, OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE, true);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
-        paramsOK = services.getTermFactory().setOriginRefTypeRecursive(paramsOK, OriginRefType.IMPLICIT_REQUIRES_PARAMSOK);
+        paramsOK = services.getTermFactory().setOriginRefTypeRecursive(paramsOK, OriginRefType.IMPLICIT_REQUIRES_PARAMSOK, true);
 
         // initial value of measured_by clause
         Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
-        mbyAtPreDef = services.getTermFactory().setOriginRefTypeRecursive(mbyAtPreDef, OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL);
+        mbyAtPreDef = services.getTermFactory().setOriginRefTypeRecursive(mbyAtPreDef, OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL, true);
 
         // wellformed(heap)
         Term wellFormed = null;
@@ -696,7 +696,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
-        wellFormed = (wellFormed == null) ? null : services.getTermFactory().setOriginRefTypeRecursive(wellFormed, OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP);
+        wellFormed = (wellFormed == null) ? null : services.getTermFactory().setOriginRefTypeRecursive(wellFormed, OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP, true);
 
         Term result = tb.and(
                 wellFormed != null ? wellFormed : tb.tt(),

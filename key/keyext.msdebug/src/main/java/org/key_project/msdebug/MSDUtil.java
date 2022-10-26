@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MSDUtil {
 
@@ -108,30 +107,30 @@ public class MSDUtil {
         return r;
     }
 
-    public static Term getParentWithOriginRef(PosInSequent pos) {
+    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom) {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
-            if (t.getOriginRef() == null) {
-                if (poc.isTopLevel()) return t;
-                poc = poc.up();
-                continue;
+            if (t.getOriginRef() != null && (!atom || t.getOriginRef().IsAtom)) {
+                return t;
             }
-            return t;
+
+            if (poc.isTopLevel()) return t;
+            poc = poc.up();
         }
     }
 
-    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
+    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf, boolean onlyAtoms) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            if (term.getOriginRef() != null) r.add(term.getOriginRef());
+            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().IsAtom)) r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null) r.add(t.getOriginRef());
-                r.addAll(getSubOriginRefs(t, false));
+                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().IsAtom)) r.add(t.getOriginRef());
+                r.addAll(getSubOriginRefs(t, false, onlyAtoms));
             }
         }
 

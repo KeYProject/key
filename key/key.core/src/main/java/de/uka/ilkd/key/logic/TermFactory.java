@@ -127,16 +127,20 @@ public final class TermFactory {
         return newTerm;
     }
 
-    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t) {
+    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
 
         OriginRef origref = base.getOriginRef();
         if (origref != null && origref.Type != t) {
             origref = origref.WithType(t);
         }
 
+        if (origref == null && force) {
+            origref = new OriginRef(t, false, true);
+        }
+
         var subs = base.subs().toList();
 
-        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t));
+        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false));
 
         return doCreateTerm(base.op(),
                 new ImmutableArray<>(subs),

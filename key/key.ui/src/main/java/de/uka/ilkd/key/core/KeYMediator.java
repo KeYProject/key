@@ -502,6 +502,12 @@ public class KeYMediator {
         }
     }
 
+    public synchronized void fireTermClicked(PosInSequent pos, Term term) {
+        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+            listener.click(pos, term);
+        }
+    }
+
     /**
      * returns the current selected proof
      *

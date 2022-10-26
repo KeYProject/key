@@ -134,17 +134,20 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             return;
         }
 
-        if (SwingUtilities.isMiddleMouseButton(e)
-                || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
-            Point point = e.getPoint();
-            PosInSequent pis = sequentView.getPosInSequent(point);
+        Point point = e.getPoint();
+        PosInSequent pis = sequentView.getPosInSequent(point);
 
-            if (pis == null || pis.isSequent()
-                    || sequentView.isInUserSelectionHighlight(point)) {
+        if (SwingUtilities.isMiddleMouseButton(e) || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
+            if (pis == null || pis.isSequent() || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
                 sequentView.setUserSelectionHighlight(point);
             }
+        }
+
+        if (pis != null && pis.getPosInOccurrence() != null) {
+            Term term = pis.getPosInOccurrence().subTerm();
+            sequentView.getMainWindow().getMediator().fireTermClicked(pis, term);
         }
     }
 
