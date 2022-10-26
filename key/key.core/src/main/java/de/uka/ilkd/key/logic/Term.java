@@ -152,6 +152,8 @@ public interface Term extends SVSubstitute, Sorted {
 
     public @Nullable OriginRef getOriginRef();
 
+    public boolean hasOriginRef();
+
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.

@@ -250,6 +250,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return expr;
         }
 
+        if (expr.getTerm().getOriginRef() != null && !(!expr.getTerm().getOriginRef().IsAtom && isatom)) {
+            return expr;
+        }
+
         String src = ctx.start.getTokenSource().getSourceName();
 
         Sort sort = expr.getTerm().op().sort(expr.getTerm().subs());

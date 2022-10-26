@@ -738,4 +738,8 @@ public class TermImpl implements Term {
         return originRef;
     }
 
+    public boolean hasOriginRef() {
+        return originRef != null;
+    }
+
 }
