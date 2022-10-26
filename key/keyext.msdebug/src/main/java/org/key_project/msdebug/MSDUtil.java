@@ -65,7 +65,15 @@ public class MSDUtil {
         return r;
     }
 
-    public static String TermToString(Term t, Services svc) throws IOException {
+    public static String TermToOrigString(Term t, Services svc) {
+        OriginRef or = t.getOriginRef();
+        if (or == null) {
+            return "";
+        }
+        return or.sourceString();
+    }
+
+    public static String TermToString(Term t, Services svc, boolean singleLine) throws IOException {
         //return t.toString();
 
         if (svc == null) {
@@ -82,6 +90,8 @@ public class MSDUtil {
         printer.printTerm(t);
 
         var v = printer.toString();
+
+        if (singleLine) v = v.replaceAll("\\r", "").replaceAll("\\n", " ");
 
         return v;
     }

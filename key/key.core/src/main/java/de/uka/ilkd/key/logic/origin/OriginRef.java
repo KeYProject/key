@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic.origin;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -100,35 +101,42 @@ public class OriginRef {
         return (File != null);
     }
 
-    public @Nullable String sourceString() {
+    public @Nonnull String sourceString() {
         if (!cached) {
 
-            try {
-                List<String> lines = Files.readAllLines(Path.of(fileURI()));
+            if (File != null) {
 
-                StringBuilder r = new StringBuilder();
-                for (int i = LineStart; i <= LineEnd; i++) {
-                    if (i-1 < lines.size()) {
-                        String line = lines.get(i - 1);
-                        if (i == LineStart && i == LineEnd) {
-                            r.append(safeSubstring(line, LineStart, LineEnd));
-                        } else if (i == LineStart) {
-                            r.append(safeSubstring(line, LineStart, line.length()));
-                            r.append("\n");
-                        } else if (i == LineEnd) {
-                            r.append(safeSubstring(line, 0, LineEnd));
-                        } else {
-                            r.append(line);
-                            r.append("\n");
+                try {
+                    List<String> lines = Files.readAllLines(Path.of(fileURI()));
+
+                    StringBuilder r = new StringBuilder();
+                    for (int i = LineStart; i <= LineEnd; i++) {
+                        if (i-1 < lines.size()) {
+                            String line = lines.get(i - 1);
+                            if (i == LineStart && i == LineEnd) {
+                                r.append(safeSubstring(line, ColumnStart, ColumnEnd));
+                            } else if (i == LineStart) {
+                                r.append(safeSubstring(line, ColumnStart, line.length()));
+                                r.append("\n");
+                            } else if (i == LineEnd) {
+                                r.append(safeSubstring(line, 0, ColumnEnd));
+                            } else {
+                                r.append(line);
+                                r.append("\n");
+                            }
                         }
                     }
+                    sourceStringCache = r.toString();
+                    cached = true;
+                } catch (IOException e) {
+                    sourceStringCache = "";
+                    cached = true;
                 }
-                sourceStringCache = r.toString();
-                cached = true;
-            } catch (IOException e) {
+            } else {
                 sourceStringCache = "";
                 cached = true;
             }
+
         }
 
 
