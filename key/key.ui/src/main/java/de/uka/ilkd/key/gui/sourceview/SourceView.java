@@ -245,7 +245,7 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public SourceViewHighlight addHighlight(URI fileURI, int sourceLine, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, Color color, int level) throws BadLocationException, IOException {
         Tab tab = tabs.get(fileURI);
 
         if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
@@ -256,7 +256,7 @@ public final class SourceView extends JComponent {
 
         Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine);
 
-        return addHighlightDirect(fileURI, sourceLine, patchedLine, patchedRange, color, level);
+        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color, level);
     }
 
     /**
@@ -278,7 +278,7 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public SourceViewHighlight addHighlight(URI fileURI, int sourceLine, int startCol, int endCol, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, int startCol, int endCol, Color color, int level) throws BadLocationException, IOException {
         Tab tab = tabs.get(fileURI);
 
         if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
@@ -289,7 +289,7 @@ public final class SourceView extends JComponent {
 
         Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine, startCol, endCol);
 
-        return addHighlightDirect(fileURI, sourceLine, patchedLine, patchedRange, color, level);
+        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color, level);
     }
 
     /**
@@ -297,7 +297,7 @@ public final class SourceView extends JComponent {
      *
      * @see addHighlight
      */
-    public SourceViewHighlight addHighlightDirect(URI fileURI, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlightDirect(URI fileURI, String group, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) throws BadLocationException, IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -308,7 +308,7 @@ public final class SourceView extends JComponent {
 
         SortedSet<SourceViewHighlight> highlights = tab.highlights.get(patchedLine);
 
-        SourceViewHighlight highlight = new SourceViewHighlight(fileURI, sourceLine, patchedLine, patchedRange, color, level);
+        SourceViewHighlight highlight = new SourceViewHighlight(group, fileURI, sourceLine, patchedLine, patchedRange, color, level);
         highlights.add(highlight);
 
         tab.markTabComponent();
@@ -368,7 +368,7 @@ public final class SourceView extends JComponent {
         Set<SourceViewHighlight> result = new HashSet<>();
 
         for (int i = firstLine; i <= lastLine && tab != null; ++i) {
-            result.add(addHighlight(fileURI, i, color, level));
+            result.add(addHighlight(fileURI, Tab.KEY_JML_HL, i, color, level));
         }
 
         return result;
@@ -382,15 +382,13 @@ public final class SourceView extends JComponent {
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(SourceViewHighlight oldHighlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
+    public SourceViewHighlight changeHighlight(SourceViewHighlight oldHighlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
         URI fileURI = oldHighlight.getFileURI();
         int oldPatchedLine = oldHighlight.getPatchedLine();
 
         Tab tab = tabs.get(fileURI);
 
-        if (tab == null
-                || !tab.highlights.containsKey(oldPatchedLine)
-                || !tab.highlights.get(oldPatchedLine).contains(oldHighlight)) {
+        if (tab == null || !tab.highlights.containsKey(oldPatchedLine) || !tab.highlights.get(oldPatchedLine).contains(oldHighlight)) {
             throw new IllegalArgumentException("highlight");
         }
 
@@ -403,10 +401,11 @@ public final class SourceView extends JComponent {
         }
 
         SourceViewHighlight newHighlight = new SourceViewHighlight(
+                oldHighlight.group,
                 oldHighlight.fileURI,
-                oldHighlight.sourceLine,
-                oldHighlight.patchedLine,
-                oldHighlight.patchedRange,
+                newSourceLine,
+                newPatchedLine,
+                newPatchedRange,
                 oldHighlight.color,
                 oldHighlight.level
         );
@@ -418,6 +417,18 @@ public final class SourceView extends JComponent {
         tab.highlights.get(newPatchedLine).add(newHighlight);
         tab.removeHighlights(newPatchedLine);
         tab.applyHighlights(newPatchedLine);
+
+        return newHighlight;
+    }
+
+    public List<SourceViewHighlight> getHighlightsByGroup(URI fileURI, String group) {
+        Tab tab = tabs.get(fileURI);
+
+        if (tab == null) {
+            return new ArrayList<>();
+        }
+
+        return tab.highlights.values().stream().flatMap(Collection::stream).filter(p -> p.group.equals(group)).collect(Collectors.toList());
     }
 
     /**
@@ -903,6 +914,10 @@ public final class SourceView extends JComponent {
     private final class Tab extends JScrollPane {
         private static final long serialVersionUID = -8964428275919622930L;
 
+        private final static String KEY_SELECTION_HL = "de.uka.ild.key.gui.SourceView.Tab::selection_hl";
+        private final static String KEY_JML_HL = "de.uka.ild.key.gui.SourceView.Tab::jml_hl";
+        private final static String KEY_SYMB_EXEC_HL = "de.uka.ild.key.gui.SourceView.Tab::symb_exec";
+
         /**
          * The file this tab belongs to.
          */
@@ -950,11 +965,6 @@ public final class SourceView extends JComponent {
         private final HashMap<Integer, Integer> cacheTranslateToPatchedPos = new HashMap<>();
         private final HashMap<Integer, Integer> cacheTranslatePosToSourceLine = new HashMap<>();
         private final HashMap<Integer, Integer> cacheTranslatePosToPatchedLine = new HashMap<>();
-
-        /**
-         * The highlight for the user's selection.
-         */
-        private SourceViewHighlight selectionHL;
 
         /**
          * Maps line numbers to highlights.
@@ -1239,12 +1249,14 @@ public final class SourceView extends JComponent {
                             mostRecentLine = line;
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
+                                    KEY_SYMB_EXEC_HL,
                                     line,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
                         } else if (line != mostRecentLine) {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
+                                    KEY_SYMB_EXEC_HL,
                                     line,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
@@ -1263,12 +1275,13 @@ public final class SourceView extends JComponent {
          */
         private void updateSelectionHighlight(Point p) {
             if (p == null) {
-                if (selectionHL != null) {
-                    removeHighlight(selectionHL);
-                    selectionHL = null;
+                for (SourceViewHighlight hl: getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL)) {
+                    removeHighlight(hl);
                 }
                 return;
             }
+
+            var selectionHL = getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL).stream().findFirst().orElse(null);
 
             try {
                 int patchedPos = textPane.viewToModel(p);
@@ -1281,7 +1294,7 @@ public final class SourceView extends JComponent {
 
                     if (selectionHL == null) {
                         try {
-                            selectionHL = addHighlightDirect(absoluteFileName, -1, patchedLine, patchedRange, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                            addHighlightDirect(absoluteFileName, KEY_SELECTION_HL, -1, patchedLine, patchedRange, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
                         } catch (BadLocationException | IOException e) {
                             LOGGER.debug("Caught exception!", e);
                         }
@@ -1298,7 +1311,7 @@ public final class SourceView extends JComponent {
 
                 if (selectionHL == null) {
                     try {
-                        selectionHL = addHighlight(absoluteFileName, sourceLine, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                        addHighlight(absoluteFileName, KEY_SELECTION_HL, sourceLine, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
                     } catch (BadLocationException | IOException e) {
                         LOGGER.debug("Caught exception!", e);
                     }
@@ -1655,11 +1668,13 @@ public final class SourceView extends JComponent {
             for (Tuple<Integer, HashSet<SourceViewHighlight>> entry: data) {
                 for (SourceViewHighlight hl: entry.getB()) {
                     if (remLine >= 0 && hl.patchedLine == remLine) {
+
                         highlights.get(entry.getA()).remove(hl);
-                        continue;
-                    }
-                    if (hl.patchedLine >= startLine) {
-                        SourceViewHighlight hLNew = new SourceViewHighlight(
+
+                    } else if (hl.patchedLine >= startLine) {
+
+                        SourceViewHighlight hlNew = new SourceViewHighlight(
+                            hl.group,
                             hl.fileURI,
                             hl.sourceLine,
                             hl.patchedLine+lineDelta,
@@ -1670,10 +1685,11 @@ public final class SourceView extends JComponent {
 
                         highlights.get(entry.getA()).remove(hl);
 
-                        if (!highlights.containsKey(hl.patchedLine)) {
-                            highlights.put(hl.patchedLine, new TreeSet<>(Collections.reverseOrder()));
+                        if (!highlights.containsKey(hlNew.patchedLine)) {
+                            highlights.put(hlNew.patchedLine, new TreeSet<>(Collections.reverseOrder()));
                         }
-                        highlights.get(hl.patchedLine).add(hLNew);
+                        highlights.get(hlNew.patchedLine).add(hlNew);
+
                     }
                 }
 

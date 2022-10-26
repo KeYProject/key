@@ -21,6 +21,9 @@ import java.util.Map;
  */
 public final class SourceViewHighlight implements Comparable<SourceViewHighlight> {
 
+    /** @see #getLevel() */
+    final String group;
+
     /** @see #getTag() */
     static final Map<SourceViewHighlight, Object> TAGS = new HashMap<>();
 
@@ -52,7 +55,8 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
      * @param color this highlight's color.
      * @param level this highlight's level.
      */
-    SourceViewHighlight(URI fileURI, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) {
+    SourceViewHighlight(String group, URI fileURI, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) {
+        this.group = group;
         this.level = level;
         this.color = color;
         this.fileURI = fileURI;

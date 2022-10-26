@@ -24,6 +24,8 @@ public class OriginRefView extends MSDebugTab {
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
 
+    private final static String HL_KEY = "OriginRefView::highlight";
+
     private JTextArea taSource;
 
     private final static int HIGHTLIGHT_LEVEL = 11;
@@ -155,11 +157,11 @@ public class OriginRefView extends MSDebugTab {
                 if (!sv.hasFile(orig.fileURI())) continue;
 
                 if (orig.LineStart == orig.LineEnd) {
-                    existingHighlights.add(sv.addHighlight(orig.fileURI(), orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                    existingHighlights.add(sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
                 } else {
                     for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
                         if (orig.hasFile()) {
-                            existingHighlights.add(sv.addHighlight(orig.fileURI(), i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                            existingHighlights.add(sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
                         }
                     }
                 }

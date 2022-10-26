@@ -37,8 +37,6 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
 
-        System.out.println("[EXT-SOURCE-VIEW] Initializing");
-
         // add a listener for changes in the proof tree
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -58,8 +56,6 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
     }
 
     private void updateSourceview(MainWindow window, KeYMediator mediator) {
-        System.out.println("[EXT-SOURCE-VIEW] Update");
-
         var svc = mediator.getServices();
 
         var tb = svc.getTermBuilder();
