@@ -112,8 +112,7 @@ public class MSDUtil {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
-            java.util.List<OriginRef> to = t.getOriginRef().stream().collect(Collectors.toList());
-            if (to.size() == 0) {
+            if (t.getOriginRef() == null) {
                 if (poc.isTopLevel()) return t;
                 poc = poc.up();
                 continue;
@@ -126,12 +125,12 @@ public class MSDUtil {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            for (OriginRef o: term.getOriginRef()) r.add(o);
+            if (term.getOriginRef() != null) r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                for (OriginRef o: t.getOriginRef()) r.add(o);
+                if (t.getOriginRef() != null) r.add(t.getOriginRef());
                 r.addAll(getSubOriginRefs(t, false));
             }
         }

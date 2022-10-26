@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -665,25 +666,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
             Services services) {
         // "self != null"
         Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
-        selfNotNull = services.getTermFactory().appendOriginRef(selfNotNull, OriginRef.REQUIRES_SELFNOTNULL);
+        selfNotNull = services.getTermFactory().setOriginRefTypeRecursive(selfNotNull, OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL);
 
         // "self.<created> = TRUE"
         Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
-        selfCreated = services.getTermFactory().appendOriginRef(selfCreated, OriginRef.REQUIRES_SELFCREATED);
+        selfCreated = services.getTermFactory().setOriginRefTypeRecursive(selfCreated, OriginRefType.IMPLICIT_REQUIRES_SELFCREATED);
 
         // "MyClass::exactInstance(self) = TRUE"
         Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
-        selfExactType = services.getTermFactory().appendOriginRef(selfExactType, OriginRef.REQUIRES_SELFEXACTINSTANCE);
+        selfExactType = services.getTermFactory().setOriginRefTypeRecursive(selfExactType, OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
-        paramsOK = services.getTermFactory().appendOriginRef(paramsOK, OriginRef.REQUIRES_PARAMSOK);
+        paramsOK = services.getTermFactory().setOriginRefTypeRecursive(paramsOK, OriginRefType.IMPLICIT_REQUIRES_PARAMSOK);
 
         // initial value of measured_by clause
         Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
-        mbyAtPreDef = services.getTermFactory().appendOriginRef(mbyAtPreDef, OriginRef.REQUIRES_MEASUREDBY_INITIAL);
+        mbyAtPreDef = services.getTermFactory().setOriginRefTypeRecursive(mbyAtPreDef, OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL);
 
         // wellformed(heap)
         Term wellFormed = null;
@@ -695,7 +696,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
-        wellFormed = (wellFormed == null) ? null : services.getTermFactory().appendOriginRef(wellFormed, OriginRef.REQUIRES_WELLFORMEDHEAP);
+        wellFormed = (wellFormed == null) ? null : services.getTermFactory().setOriginRefTypeRecursive(wellFormed, OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP);
 
         Term result = tb.and(
                 wellFormed != null ? wellFormed : tb.tt(),

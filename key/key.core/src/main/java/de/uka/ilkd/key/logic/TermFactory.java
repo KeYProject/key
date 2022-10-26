@@ -5,6 +5,7 @@ import java.util.*;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -124,6 +125,25 @@ public final class TermFactory {
         }
 
         return newTerm;
+    }
+
+    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t) {
+
+        OriginRef origref = base.getOriginRef();
+        if (origref != null && origref.Type != t) {
+            origref = origref.WithType(t);
+        }
+
+        var subs = base.subs().toList();
+
+        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t));
+
+        return doCreateTerm(base.op(),
+                new ImmutableArray<>(subs),
+                base.boundVars(),
+                base.javaBlock(),
+                base.getLabels(),
+                origref);
     }
 
     //-------------------------------------------------------------------------

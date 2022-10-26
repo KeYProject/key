@@ -73,9 +73,12 @@ public class OriginRefView extends MSDebugTab {
 
             boolean anyRefs = false;
 
-            for (OriginRef o : MSDUtil.getParentWithOriginRef(pos).getOriginRef()) {
-                highlightOriginRef(sv, o);
-                anyRefs = true;
+            {
+                OriginRef o = MSDUtil.getParentWithOriginRef(pos).getOriginRef();
+                if (o != null) {
+                    highlightOriginRef(sv, o);
+                    anyRefs = true;
+                }
             }
 
             if (!anyRefs) {
@@ -119,17 +122,21 @@ public class OriginRefView extends MSDebugTab {
             if (t instanceof TermImpl) {
                 TermImpl term = (TermImpl)t;
 
-                for (OriginRef o : term.getOriginRef()) {
-                    txt += o.toString();
-                    txt += "\n";
+                {
+                    OriginRef o = term.getOriginRef();
+                    if(o != null) {
+                        txt += o.toString();
+                        txt += "\n";
+                    }
                 }
                 txt += "\n";
                 txt += "----------<SOURCE>----------";
                 txt += "\n";
                 txt += "\n";
 
-                for (OriginRef o : term.getOriginRef()) {
-                    if (o.hasFile()) {
+                {
+                    OriginRef o = term.getOriginRef();
+                    if (o != null && o.hasFile()) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = MSDUtil.getLines(mediator, o.File, i, i);
                             txt += str.stripTrailing() + "\n";
@@ -163,12 +170,15 @@ public class OriginRefView extends MSDebugTab {
             txt += "\n";
 
             Term parent = MSDUtil.getParentWithOriginRef(pos);
-            if (parent != pos.getPosInOccurrence().subTerm() && !parent.getOriginRef().isEmpty()) {
+            if (parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
                 txt += MSDUtil.TermToString(parent, proof.getServices()) + "\n";
                 txt += "\n";
-                for (OriginRef o : parent.getOriginRef()) {
-                    txt += o.toString();
-                    txt += "\n";
+                {
+                    OriginRef o = parent.getOriginRef();
+                    if (o != null) {
+                        txt += o.toString();
+                        txt += "\n";
+                    }
                 }
             }
 

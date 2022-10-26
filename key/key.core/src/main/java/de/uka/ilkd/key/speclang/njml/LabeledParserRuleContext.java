@@ -23,7 +23,7 @@ public class LabeledParserRuleContext {
     @Nullable
     public final TermLabel second;
     @Nullable
-    public final ImmutableSet<OriginRef> origin;
+    public final OriginRefType origin;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
         if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
@@ -44,14 +44,14 @@ public class LabeledParserRuleContext {
         if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = ctx;
         this.second = constructTermLabel(ctx, specType);
-        this.origin = constructOrigin(ctx, refType);
+        this.origin = refType;
     }
 
-    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel second, ImmutableSet<OriginRef> originRef) {
+    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel second, OriginRefType refType) {
         if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = ctx;
         this.second = second;
-        this.origin = originRef;
+        this.origin = refType;
     }
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
@@ -59,26 +59,5 @@ public class LabeledParserRuleContext {
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
         return new OriginTermLabel(origin);
-    }
-
-    private static ImmutableSet<OriginRef> constructOrigin(ParserRuleContext ctx, OriginRefType specType) {
-        String src = ctx.start.getTokenSource().getSourceName();
-
-        OriginRef originref = new OriginRef(
-                src,
-                ctx.start.getLine(),
-                ctx.stop.getLine(),
-                ctx.start.getCharPositionInLine(),
-                ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1),
-                specType
-        );
-
-        return ImmutableSet.singleton(originref);
-    }
-
-    public Term addOrigin(TermBuilder tb, Term term) {
-        if (origin == null) return term;
-
-        return tb.tf().appendOriginRef(term, origin);
     }
 }

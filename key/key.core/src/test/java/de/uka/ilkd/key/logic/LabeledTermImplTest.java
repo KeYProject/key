@@ -40,7 +40,7 @@ public class LabeledTermImplTest {
 						tf.createTerm(Junctor.TRUE),
 						tf.createTerm(Junctor.FALSE),
                         labels,
-                        OriginRef.EMPTY);
+                        null);
 
         assertNotEquals(labeledTerm, unlabeledTerm, "Labeled and unlabeled terms must not be equal");
         assertNotEquals(unlabeledTerm, labeledTerm, "Labeled and unlabeled terms must not be equal");

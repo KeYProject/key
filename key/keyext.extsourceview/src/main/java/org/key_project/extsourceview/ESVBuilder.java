@@ -144,7 +144,7 @@ public class ESVBuilder {
     public static boolean isExplicitRequires(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = term.getOriginRef();
+        var origin = getSubOriginRefs(term, true);
         if (origin.size() == 0) return false;
 
         // all origin-refs must be [REQUIRES_IMPLICT] | [REQUIRES]
@@ -152,13 +152,13 @@ public class ESVBuilder {
 
         var explicitRefs = 0;
         for(var o: origin) {
-            if (o.Type == OriginRefType.TERM) continue;
+            if (o.Type == OriginRefType.UNKNOWN) continue;
 
-            if (o.Type != OriginRefType.REQUIRES && o.Type != OriginRefType.REQUIRES_IMPLICT) {
+            if (!isExplicitRequires(o.Type) && !isImplicitRequires(o.Type)) {
                 return false;
             }
 
-            if (o.Type == OriginRefType.REQUIRES) {
+            if (isExplicitRequires(o.Type)) {
                 explicitRefs++;
             }
         }
@@ -169,7 +169,7 @@ public class ESVBuilder {
     public static boolean isImplicitRequires(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = term.getOriginRef();
+        var origin = getSubOriginRefs(term, true);
         if (origin.size() == 0) return false;
 
         // all origin-refs must be [REQUIRES_IMPLICT]
@@ -177,9 +177,9 @@ public class ESVBuilder {
         int implicitRefs = 0;
 
         for(var o: origin) {
-            if (o.Type == OriginRefType.TERM) continue;
+            if (o.Type == OriginRefType.UNKNOWN) continue;
 
-            if (o.Type == OriginRefType.REQUIRES_IMPLICT) {
+            if (isImplicitRequires(o.Type)) {
                 implicitRefs++;
             } else {
                 return false;
@@ -192,7 +192,7 @@ public class ESVBuilder {
     public static boolean isExplicitEnsures(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = term.getOriginRef();
+        var origin = getSubOriginRefs(term, true);
         if (origin.size() == 0) return false;
 
         // all origin-refs must be [ENSURES_IMPLICT] | [ENSURES]
@@ -200,13 +200,13 @@ public class ESVBuilder {
 
         var explicitRefs = 0;
         for(var o: origin) {
-            if (o.Type == OriginRefType.TERM) continue;
+            if (o.Type == OriginRefType.UNKNOWN) continue;
 
-            if (o.Type != OriginRefType.ENSURES && o.Type != OriginRefType.ENSURES_IMPLICT) {
+            if (!isExplicitEnsures(o.Type) && !isImplicitEnsures(o.Type)) {
                 return false;
             }
 
-            if (o.Type == OriginRefType.ENSURES) {
+            if (isExplicitEnsures(o.Type)) {
                 explicitRefs++;
             }
         }
@@ -217,7 +217,7 @@ public class ESVBuilder {
     public static boolean isImplicitEnsures(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = term.getOriginRef();
+        var origin = getSubOriginRefs(term, true);
         if (origin.size() == 0) return false;
 
         // all origin-refs must be [ENSURES_IMPLICT]
@@ -225,9 +225,9 @@ public class ESVBuilder {
         int implicitRefs = 0;
 
         for(var o: origin) {
-            if (o.Type == OriginRefType.TERM) continue;
+            if (o.Type == OriginRefType.UNKNOWN) continue;
 
-            if (o.Type == OriginRefType.ENSURES_IMPLICT) {
+            if (isImplicitEnsures(o.Type)) {
                 implicitRefs++;
             } else {
                 return false;
@@ -237,16 +237,40 @@ public class ESVBuilder {
         return implicitRefs > 0;
     }
 
+    public static boolean isExplicitRequires(OriginRefType t) {
+        return t == OriginRefType.JML_REQUIRES || t == OriginRefType.JML_REQUIRES_FREE;
+    }
+
+    public static boolean isExplicitEnsures(OriginRefType t) {
+        return t == OriginRefType.JML_ENSURES || t == OriginRefType.JML_ENSURES_FREE;
+    }
+
+    public static boolean isImplicitRequires(OriginRefType t) {
+        return t == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT ||
+               t == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK ||
+               t == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE ||
+               t == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP ||
+               t == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED ||
+               t == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL ||
+               t == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
+    }
+
+    public static boolean isImplicitEnsures(OriginRefType t) {
+        return t == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT ||
+               t == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE ||
+               t == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
+    }
+
     public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            for (OriginRef o: term.getOriginRef()) r.add(o);
+            if (term.getOriginRef() != null) r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                for (OriginRef o: t.getOriginRef()) r.add(o);
+                if (t.getOriginRef() != null) r.add(t.getOriginRef());
                 r.addAll(getSubOriginRefs(t, false));
             }
         }

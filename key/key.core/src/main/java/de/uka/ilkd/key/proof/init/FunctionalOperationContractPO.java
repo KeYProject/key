@@ -240,15 +240,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                 Term mod = getContract().getMod(heap, selfVar, paramVars, services);
                 // strictly pure have a different contract.
                 ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
-                if (ft.getOriginRef().isEmpty() && !mod.getOriginRef().isEmpty()) {
-                    ft = tb.tf().setOriginRef(ft, mod.getOriginRef());
-                }
             } else {
                 Term mod = getContract().getMod(heap, selfVar, paramVars, services);
                 ft = tb.frame(tb.var(heap), heapToAtPre, mod);
-                if (ft.getOriginRef().isEmpty() && !mod.getOriginRef().isEmpty()) {
-                    ft = tb.tf().setOriginRef(ft, mod.getOriginRef());
-                }
             }
 
             if(frameTerm == null) {

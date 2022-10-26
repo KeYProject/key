@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -443,23 +444,23 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (!pm.isConstructor()) {
                     final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
                     specCase.addClause(REQUIRES,
-                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRef.REQUIRES_SELFINVARIANT));
+                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     final ParserRuleContext ctx =
                             JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
                     specCase.addClause(REQUIRES,
-                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRef.REQUIRES_SELFINVARIANT));
+                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRef.ENSURES_SELFINVARIANT));
+                    specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT));
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     final ParserRuleContext ctx =
                             JmlFacade.parseClause(format("signals (Throwable e) %s;", invString));
                     specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
-                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRef.SIGNALS_SELFINVARIANT));
+                                       new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL, OriginRefType.IMPLICIT_SIGNALS_SELFINVARIANT));
                 }
             }
 
