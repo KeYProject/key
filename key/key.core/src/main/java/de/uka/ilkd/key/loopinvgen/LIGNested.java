@@ -78,6 +78,9 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		outerCompPreds = refinedOuterPreds.second;
 //		System.out.println("Outer Comp Preds" + outerCompPreds.toString());
 		Goal currentGoal = null;
+		boolean once = false; //the inner loop's invariant should only be calculated once
+		LoopStatement innerLoop = null;
+		LoopInvariantGenerationResult innerLI = null;
 		do {
 			outerItrNumber++;
 //			**		
@@ -91,10 +94,13 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 
 			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("Goals after unwind no "+outerItrNumber+" and BEFORE generationg inner LI: "+ goalsAfterUnwind);
-			LoopStatement innerLoop = null;
-			LoopInvariantGenerationResult innerLI = null;
+
 			boolean nested = false;
-			for (Goal g : goalsAfterUnwind) {
+			boolean firstApproach = true; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
+			// Second approach calculates th inner LI for each outer iteration.
+			// I should compare their speed and precision.
+			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());
 					if (formula.op() == Modality.DIA) {
@@ -108,32 +114,34 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 						if (activePE instanceof While) {
 //							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
-							innerLoop = (LoopStatement) activePE;
-							innerLI = innerLIComputation(g, outerItrNumber, activePE);
+							if(!once){
+								innerLoop = (LoopStatement) activePE;
+								SideProof innerLoopProof = new  SideProof(services,modifySeq(g));
+								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), outerItrNumber, activePE);//For now only taking the head goal
+								System.out.println("Inner Loop Inv:   " + innerLI);
+								once=true;
+							}
 						}
 						break;
 					}
 				}
-//				System.out.println("Goals after unwind no "+outerItrNumber+" and generationg inner LI: "+ goalsAfterUnwind);
-				//Take everything after the inner loop and before the outer, e.g. i++ and turn it to update and shift it.
-//				System.out.println("number of goals after Unwind no: "+ outerItrNumber+"  "+goalsAfterUnwind.size());
-				ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+
 //				System.out.println("Goals after unwind, generating Inner LI and shift no "+outerItrNumber +" : "+ goalsAfterShiftUpdate.head());
-				if (nested) {
+
+				if (nested && firstApproach) {
 					nested = false;
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
-//					System.out.println("Goals before : " + goalsAfterShiftUpdate.head());
+//					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
-//					System.out.println("Goals after nested: "+ goalsAfterNestedLoopUsecase);
+//					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
-//					System.out.println("Goals After Shifting the inner LI : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
-					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterShift);
-//					System.out.println("Goals After Shifting the Outer parts after the inner loop : "+ goalsAfterShiftUpdate.size()+ "  " + goalsAfterShiftUpdate);
+//					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
+//
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("goal for refinement: " + currentGoal);
+//			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
 							outerDepPreds, outerCompPreds,
@@ -154,6 +162,23 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
 		System.out.println("Outer loops invariant: " + outLoopInv.toString());
 		return outLoopInv;
+	}
+
+	private Sequent modifySeq(Goal g) {
+		Set<Term> initialFormulas= new HashSet<>();
+		initialFormulas.add(tb.geq(indexInner, lowInner));
+		initialFormulas.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		for (Term arr : arrays) {
+			initialFormulas.add(tb.noR(tb.arrayRange(arr, lowInner, highInner)));
+			initialFormulas.add(tb.noW(tb.arrayRange(arr, lowInner, highInner)));
+		}
+
+		SequentFormula newAnteFrm = new SequentFormula(tb.and(initialFormulas));
+		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
+		Sequent newSeq = Sequent.createSequent(new Semisequent(newAnteFrm) , g.sequent().succedent());
+
+//		System.out.println("seq for calculating the inner loop inv: " + newSeq);
+		return newSeq;
 	}
 
 	private void initialization() {
@@ -301,7 +326,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		Semisequent newSucc = new Semisequent(newSF);
 
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
-//		System.out.println("New Seq for inner loop:  "+ newSeq);
+		System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
 		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();

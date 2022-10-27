@@ -5,22 +5,21 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Provides means to perform side proofs required by the loop invariant generator.
@@ -185,6 +184,9 @@ public class SideProof {
 		return prove(pred, left, right);
 	}
 
+	public ImmutableList<Goal> retGoal(){
+		return this.services.getProof().openGoals();
+	}
 	private boolean prove(Function pred, Term ts1, Term ts2) {
 		Term fml = tb.func(pred, ts1, ts2);
 		Sequent sideSeq = prepareSideProof(ts1, ts2);

@@ -99,7 +99,7 @@ public class RuleApplication {
 //			} catch (IOException e) {
 //				e.printStackTrace();
 //			}
-//			ps.start(goals);
+			ps.start(goals);
 //			for(Goal g: goals){
 //				System.out.println("After Start:"+g.sequent());
 //			}
@@ -169,26 +169,18 @@ public class RuleApplication {
 
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
 //			System.out.println("SHIFT:"+ProofSaver.printAnything(currentGoal.sequent(), services));
-//			try {		
+			try {
 //			System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 //
-//			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-			ps.start(goals);
-
-//			try {		
-//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-
-//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-//			} catch (IOException e) {
-			// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//			ApplyStrategyInfo info =
+					ps.start(goals);
+//			System.out.println("INFO:"+info);
 			return ps.getProof().getSubtreeGoals(subtreeRoot);
-			// return currentGoal.proof().openGoals();
-//			return services.getProof().openEnabledGoals();
+
 		}
 		return null;
 	}
@@ -339,7 +331,7 @@ public class RuleApplication {
 					return g;
 				}
 			}
-//			System.out.println("Taclet loopUnwind is not applicable at " + g);
+			System.out.println("Taclet loopUnwind is not applicable at " + g);
 		}
 		return null;
 	}

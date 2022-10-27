@@ -39,9 +39,9 @@ public class NoInverseEventUpdate extends VariableConditionAdapter {
 		final Operator op = update.op();
 		
 		if(op instanceof ElementaryUpdate || 
-				op == UpdateJunctor.SKIP || op == EventUpdate.SINGLETON || op == AnonEventUpdate.SINGLETON|| op == InverseAnonEventUpdate.SINGLETON) {
+				op == UpdateJunctor.SKIP ) {
 			return false;
-		} else if (op==InverseEventUpdate.SINGLETON) {
+		} else if (op==InverseEventUpdate.SINGLETON|| op == EventUpdate.SINGLETON || op == AnonEventUpdate.SINGLETON|| op == InverseAnonEventUpdate.SINGLETON) {
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE || op == UpdateJunctor.SEQUENTIAL_UPDATE) {
 			return (checkForInverseEvent(update.sub(0)) || checkForInverseEvent(update.sub(1)));

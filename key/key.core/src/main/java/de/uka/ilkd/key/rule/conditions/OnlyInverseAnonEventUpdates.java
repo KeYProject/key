@@ -37,7 +37,9 @@ public class OnlyInverseAnonEventUpdates extends VariableConditionAdapter {
 	private boolean checkForInverseEvent(Term update) {
 		
 		final Operator op = update.op();
-		
+
+		return op == InverseAnonEventUpdate.SINGLETON;
+		/*
 		if (op instanceof ElementaryUpdate ||
 				op == UpdateJunctor.SKIP ||
 				op == EventUpdate.SINGLETON ||
@@ -53,7 +55,7 @@ public class OnlyInverseAnonEventUpdates extends VariableConditionAdapter {
 		}
 		Debug.fail("Forgotten update operator", op.getClass());
 
-		return false;
+		return false; */
 	}
 	
 	public String toString() {
