@@ -535,18 +535,23 @@ public final class IntegerLDT extends LDT {
         }
     }
 
-
-    public Function getJavaCast(Type t) {
+    /**
+     * Finds the cast to type `t`. This is intended for creating specification only.
+     *
+     * @param t the type
+     * @return the cast
+     */
+    public Function getSpecCast(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
-            return javaCastByte;
+            return moduloByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
-            return javaCastChar;
+            return moduloChar;
         } else if (t == PrimitiveType.JAVA_INT) {
-            return javaCastInt;
+            return moduloInt;
         } else if (t == PrimitiveType.JAVA_LONG) {
-            return javaCastLong;
+            return moduloLong;
         } else if (t == PrimitiveType.JAVA_SHORT) {
-            return javaCastShort;
+            return moduloShort;
         } else {
             return null;
         }
@@ -603,7 +608,7 @@ public final class IntegerLDT extends LDT {
             return isLong ? getJavaUnaryMinusLong()
                     : (isBigint ? getNegativeNumberSign() : getJavaUnaryMinusInt());
         } else if (op instanceof TypeCast) {
-            return getJavaCast(opReturnType);
+            return getSpecCast(opReturnType);
         } else {
             return null;
         }

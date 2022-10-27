@@ -706,7 +706,7 @@ public final class JmlTermFactory {
     private SLExpression buildIntCastExpression(KeYJavaType resultType, SLExpression a) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            Function cast = integerLDT.getJavaCast(resultType.getJavaType());
+            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
             if (cast != null)
                 return new SLExpression(tb.func(cast, a.getTerm()), resultType);
             else { // there is no cast to \bigint
