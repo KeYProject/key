@@ -426,15 +426,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 int nlen = name.length();
                 // the start of name must be a prefix (ending with '.')
                 if (tlen == nlen || name.charAt(tlen) == '.') {
-                    ReferencePrefix rp = imp.isStaticImport() ? tr : tr.getReferencePrefix(); // if
-                                                                                              // static,
-                                                                                              // tr
-                                                                                              // is
-                                                                                              // referenceprefix
-                                                                                              // of
-                                                                                              // the
-                                                                                              // static
-                                                                                              // identifier
+                    // if static, tr is referenceprefix of the static identifier
+                    ReferencePrefix rp = imp.isStaticImport() ? tr : tr.getReferencePrefix();
                     if (rp == null) {
                         // direct import of requested type
                         trname = name;

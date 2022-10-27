@@ -95,12 +95,8 @@ public class ReplaceEnums extends TwoPassTransformation {
                 new ASTArrayList<MemberDeclaration>(ed.getMembers().size());
             repl.setMembers(mlist);
             repl.setIdentifier(ed.getIdentifier().deepClone());
-            ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<FieldSpecification>(); // needed
-                                                                                                    // later
-                                                                                                    // for
-                                                                                                    // valueOf()
-                                                                                                    // and
-                                                                                                    // values()
+            // needed later for valueOf() and values()
+            ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<FieldSpecification>();
             for (int i = 0; i < ed.getMembers().size(); i++) {
                 MemberDeclaration md = ed.getMembers().get(i);
                 if (md instanceof EnumConstantDeclaration) {
