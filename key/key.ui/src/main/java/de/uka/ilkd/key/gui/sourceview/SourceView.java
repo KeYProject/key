@@ -4,6 +4,7 @@ import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -36,6 +38,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.EventListenerList;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
@@ -146,8 +149,8 @@ public final class SourceView extends JComponent {
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
 
-    /** The symbolic execution highlights. */
-    private final Set<SourceViewHighlight> symbExHighlights = new HashSet<>();
+    /** listenerList with to gui listeners */
+    private final EventListenerList listenerList = new EventListenerList();
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -418,10 +421,22 @@ public final class SourceView extends JComponent {
         tab.removeHighlights(newPatchedLine);
         tab.applyHighlights(newPatchedLine);
 
+        fireHighlightsChanged();
+
         return newHighlight;
     }
 
-    public List<SourceViewHighlight> getHighlightsByGroup(URI fileURI, String group) {
+    public List<SourceViewHighlight> listHighlights(URI fileURI) {
+        Tab tab = tabs.get(fileURI);
+
+        if (tab == null) {
+            return new ArrayList<>();
+        }
+
+        return tab.highlights.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    public List<SourceViewHighlight> listHighlights(URI fileURI, String group) {
         Tab tab = tabs.get(fileURI);
 
         if (tab == null) {
@@ -465,7 +480,19 @@ public final class SourceView extends JComponent {
 
         tab.markTabComponent();
 
+        fireHighlightsChanged();
+
         return result;
+    }
+
+    public void addHighlightsChangedListener(HighlightsChangedListener listener) {
+        listenerList.add(HighlightsChangedListener.class, listener);
+    }
+
+    public synchronized void fireHighlightsChanged() {
+        for (HighlightsChangedListener listener : listenerList.getListeners(HighlightsChangedListener.class)) {
+            listener.highlightsChanged();
+        }
     }
 
     /**
@@ -531,7 +558,7 @@ public final class SourceView extends JComponent {
         Tab tab = tabs.get(selectedFile);
         int pos = tab.textPane.viewToModel(point);
 
-        for (SourceViewHighlight h : symbExHighlights) {
+        for (SourceViewHighlight h : listHighlights(selectedFile, Tab.KEY_SYMB_EXEC_HL)) {
             // found matching highlight h: Is the mouse cursor inside the highlight?
             // we need < here, since viewToModel can not return a position after the last
             // char in a line
@@ -808,6 +835,32 @@ public final class SourceView extends JComponent {
         tab.refreshInsertions();
     }
 
+    public List<SourceViewInsertion> listInsertion(URI fileURI, String group) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        return  tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList());
+    }
+
+    public List<SourceViewInsertion> listInsertion(URI fileURI) throws IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        return new ArrayList<>(tab.insertions);
+    }
+
+    public void addInsertionChangedListener(InsertionChangedListener listener) {
+        listenerList.add(InsertionChangedListener.class, listener);
+    }
+
+    public synchronized void fireInsertionChanged() {
+        for (InsertionChangedListener listener : listenerList.getListeners(InsertionChangedListener.class)) {
+            listener.insertionsChanged();
+        }
+    }
+
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      * @param se the given SourceElement
@@ -1031,14 +1084,14 @@ public final class SourceView extends JComponent {
         }
 
         private void initTextPane(String fsource) {
-            for (MouseListener l: registeredListener) {
-                textPane.removeMouseListener(l);
-            }
-            registeredListener.clear();
+           //for (MouseListener l: registeredListener) {
+           //    textPane.removeMouseListener(l);
+           //}
+           //registeredListener.clear();
 
-            for (MouseMotionListener l: registeredMotionListener) {
-                textPane.removeMouseMotionListener(l);
-            }
+           //for (MouseMotionListener l: registeredMotionListener) {
+           //    textPane.removeMouseMotionListener(l);
+           //}
             registeredMotionListener.clear();
 
             this.cacheTranslateToSourcePos.clear();
@@ -1112,7 +1165,7 @@ public final class SourceView extends JComponent {
             textPane.addMouseMotionListener(mml2);
             registeredMotionListener.add(mml2);
 
-            MouseMotionListener mml3 = new MouseAdapter() {
+            MouseListener mml3 = new MouseAdapter() {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     synchronized(SourceView.this) {
@@ -1127,8 +1180,8 @@ public final class SourceView extends JComponent {
                     }
                 }
             };
-            textPane.addMouseMotionListener(mml3);
-            registeredMotionListener.add(mml3);
+            textPane.addMouseListener(mml3);
+            registeredListener.add(mml3);
 
             MouseAdapter adapter = new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
 
@@ -1196,6 +1249,8 @@ public final class SourceView extends JComponent {
                     highlight.setTag(null);
                 }
             }
+
+            SourceView.this.fireHighlightsChanged();
         }
 
         private void applyHighlights(int patchedLine) throws BadLocationException {
@@ -1225,11 +1280,9 @@ public final class SourceView extends JComponent {
          * highlighted with a different color.
          */
         private void paintSymbExHighlights() {
-            for (SourceViewHighlight hl : symbExHighlights) {
+            for (SourceViewHighlight hl : listHighlights(getSelectedFile(), KEY_SYMB_EXEC_HL)) {
                 removeHighlight(hl);
             }
-
-            symbExHighlights.clear();
 
             if (lines == null) {
                 return;
@@ -1247,19 +1300,19 @@ public final class SourceView extends JComponent {
                         // use a different color for most recent
                         if (i == 0) {
                             mostRecentLine = line;
-                            symbExHighlights.add(addHighlight(
+                            addHighlight(
                                     absoluteFileName,
                                     KEY_SYMB_EXEC_HL,
                                     line,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
-                                    0));
+                                    0);
                         } else if (line != mostRecentLine) {
-                            symbExHighlights.add(addHighlight(
+                            addHighlight(
                                     absoluteFileName,
                                     KEY_SYMB_EXEC_HL,
                                     line,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
-                                    0));
+                                    0);
                         }
                     }
                 }
@@ -1274,14 +1327,14 @@ public final class SourceView extends JComponent {
          * @param highlight the highlight to change
          */
         private void updateSelectionHighlight(Point p) {
-            if (p == null || getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL).size() > 1) {
-                for (SourceViewHighlight hl: getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL)) {
+            if (p == null || listHighlights(absoluteFileName, KEY_SELECTION_HL).size() > 1) {
+                for (SourceViewHighlight hl: listHighlights(absoluteFileName, KEY_SELECTION_HL)) {
                     removeHighlight(hl);
                 }
                 return;
             }
 
-            var selectionHL = getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL).stream().findFirst().orElse(null);
+            var selectionHL = listHighlights(absoluteFileName, KEY_SELECTION_HL).stream().findFirst().orElse(null);
 
             try {
                 int patchedPos = textPane.viewToModel(p);
@@ -1616,6 +1669,8 @@ public final class SourceView extends JComponent {
             int addLen = ins.getCleanText().length() + lineBreak.length();
 
             batchUpdateHighlights(-1, patchedLine, 1, addLen);
+
+            SourceView.this.fireInsertionChanged();
         }
 
         /**
@@ -1635,6 +1690,8 @@ public final class SourceView extends JComponent {
             int remLen = ins.getCleanText().length() + lineBreak.length();
 
             batchUpdateHighlights(patchedLine, patchedLine, -1, -remLen);
+
+            SourceView.this.fireInsertionChanged();
         }
 
         /**
@@ -1704,6 +1761,8 @@ public final class SourceView extends JComponent {
             if (remLine != -1) {
                 applyHighlights(remLine);
             }
+
+            SourceView.this.fireHighlightsChanged();
         }
     }
 

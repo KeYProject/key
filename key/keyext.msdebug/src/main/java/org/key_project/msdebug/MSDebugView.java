@@ -31,6 +31,7 @@ public class MSDebugView extends JTabbedPane implements TabPanel {
         {
             new OriginRefView(window, mediator),
             new SourceInsertionsView(window, mediator),
+            new SourceHighlightsView(window, mediator),
         };
     }
 

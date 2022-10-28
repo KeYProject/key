@@ -217,4 +217,12 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
     public int getPatchedLine() {
         return patchedLine;
     }
+
+    /**
+     *
+     * @return this group
+     */
+    public String getGroup() {
+        return group;
+    }
 }
