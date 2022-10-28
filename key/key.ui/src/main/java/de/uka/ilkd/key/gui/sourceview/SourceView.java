@@ -1274,7 +1274,7 @@ public final class SourceView extends JComponent {
          * @param highlight the highlight to change
          */
         private void updateSelectionHighlight(Point p) {
-            if (p == null) {
+            if (p == null || getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL).size() > 1) {
                 for (SourceViewHighlight hl: getHighlightsByGroup(absoluteFileName, KEY_SELECTION_HL)) {
                     removeHighlight(hl);
                 }

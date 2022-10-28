@@ -117,7 +117,7 @@ public class MSDUtil {
         return r;
     }
 
-    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom) {
+    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom, boolean returnNullOnTopLevel) {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
@@ -125,7 +125,7 @@ public class MSDUtil {
                 return t;
             }
 
-            if (poc.isTopLevel()) return t;
+            if (poc.isTopLevel()) return returnNullOnTopLevel ? null : t;
             poc = poc.up();
         }
     }

@@ -38,6 +38,10 @@ public class OriginRefView extends MSDebugTab {
     private boolean showSectionSource = true;
     private boolean showSectionChildren = true;
     private boolean showSectionParent = true;
+    private boolean highlightEnabled = true;
+    private boolean highlightOnlyAtoms = true;
+    private boolean highlightParents = true;
+    private boolean highlightAllChildren = true;
 
     private Tuple<PosInSequent, Term> shownTerm = null;
 
@@ -114,6 +118,26 @@ public class OriginRefView extends MSDebugTab {
             pnlConf.add(cbSec, gbc(1, 4));
             cbSec.addItemListener(e -> { OriginRefView.this.showSectionParent = cbSec.isSelected(); refreshShownTerm(window, mediator); });
         }
+        {
+            var cbSec = new JCheckBox("Enable Highlights", true);
+            pnlConf.add(cbSec, gbc(2, 0));
+            cbSec.addItemListener(e -> { OriginRefView.this.highlightEnabled = cbSec.isSelected(); });
+        }
+        {
+            var cbSec = new JCheckBox("Highlight Only Atoms", true);
+            pnlConf.add(cbSec, gbc(2, 1));
+            cbSec.addItemListener(e -> { OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected(); });
+        }
+        {
+            var cbSec = new JCheckBox("Search for Parent", true);
+            pnlConf.add(cbSec, gbc(2, 2));
+            cbSec.addItemListener(e -> { OriginRefView.this.highlightParents = cbSec.isSelected(); });
+        }
+        {
+            var cbSec = new JCheckBox("Highlight union of all children", true);
+            pnlConf.add(cbSec, gbc(2, 3));
+            cbSec.addItemListener(e -> { OriginRefView.this.highlightAllChildren = cbSec.isSelected(); });
+        }
 
         this.add(pnlConf, BorderLayout.NORTH);
     }
@@ -151,7 +175,25 @@ public class OriginRefView extends MSDebugTab {
             for (SourceViewHighlight h : existingHighlights) sv.removeHighlight(h);
             existingHighlights.clear();
 
-            for (OriginRef orig : MSDUtil.getSubOriginRefs(pos.getPosInOccurrence().subTerm(), true, true)) {
+            if (!highlightEnabled) return;
+
+            var originRefs = new ArrayList<OriginRef>();
+            if (highlightAllChildren) {
+                originRefs = MSDUtil.getSubOriginRefs(t, true, highlightOnlyAtoms);
+            } else {
+                if (t.getOriginRef() != null && (!highlightOnlyAtoms || t.getOriginRef().IsAtom)) {
+                    originRefs.add(t.getOriginRef());
+                }
+            }
+
+            if (originRefs.isEmpty() && highlightParents) {
+                var parentTerm = MSDUtil.getParentWithOriginRef(pos, true, true);
+                if (parentTerm != null) {
+                    originRefs.add(parentTerm.getOriginRef());
+                }
+            }
+
+            for (OriginRef orig : originRefs) {
                 if (!orig.hasFile()) continue;
 
                 if (!sv.hasFile(orig.fileURI())) continue;
@@ -252,8 +294,8 @@ public class OriginRefView extends MSDebugTab {
                 txt += "----------<PARENT>----------\n";
                 txt += "\n";
 
-                Term parent = MSDUtil.getParentWithOriginRef(pos, showOnlyAtoms);
-                if (parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
+                Term parent = MSDUtil.getParentWithOriginRef(pos, showOnlyAtoms, false);
+                if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
                     txt += "ToStr<OriginRef>: " + MSDUtil.TermToOrigString(parent, proof.getServices()) + "\n";
                     txt += "ToStr<Fallback>:  " + MSDUtil.TermToString(parent, proof.getServices(), true) + "\n";
                     txt += "\n";
