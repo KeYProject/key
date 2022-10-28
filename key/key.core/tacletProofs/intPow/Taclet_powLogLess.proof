@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Thu Sep 08 14:30:09 CEST 2022
+#Fri Oct 28 21:35:48 CEST 2022
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -12,7 +12,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L , finalFields-finalFields\\:immutable
+[Choice]DefaultChoices=assertions-assertions\\:safe , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , permissions-permissions\\:off , moreSeqRules-moreSeqRules\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , javaLoopTreatment-javaLoopTreatment\\:efficient , floatRules-floatRules\\:strictfpOnly , methodExpansion-methodExpansion\\:modularOnly , finalFields-finalFields\\:immutable
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -48,7 +48,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Thu Sep 08 14:30:09 CEST 2022
+#Fri Oct 28 21:35:48 CEST 2022
 name=powLogLess
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -59,8 +59,9 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (keyLog "2" (keyUser "Julian" ) (keyVersion "e1a85b31e7"))
 (keyLog "3" (keyUser "Julian" ) (keyVersion "2fe3118da0"))
 (keyLog "4" (keyUser "Julian" ) (keyVersion "2fe3118da0"))
+(keyLog "5" (keyUser "Julian" ) (keyVersion "15f798ada2"))
 
-(autoModeTime "4343")
+(autoModeTime "4893")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "f_base,f_exp"))
@@ -492,7 +493,12 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             )
          )
          (branch "log(f_base, quotient_0) >= 0 FALSE"
-            (rule "logPositiveConcrete" (formula "12"))
+            (rule "inEqSimp_geqRight" (formula "12"))
+            (rule "times_zero_1" (formula "1") (term "1,0,0"))
+            (rule "add_zero_right" (formula "1") (term "0,0"))
+            (rule "inEqSimp_sepPosMonomial0" (formula "1"))
+            (rule "mul_literals" (formula "1") (term "1"))
+            (rule "logPositiveConcrete" (formula "1"))
             (rule "inEqSimp_gtToGeq" (formula "12") (term "0"))
             (rule "mul_literals" (formula "12") (term "1,0,0,0"))
             (rule "add_literals" (formula "12") (term "0,0,0"))
@@ -511,10 +517,10 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                (rule "polySimp_addComm1" (formula "6") (term "0"))
                (rule "add_literals" (formula "6") (term "0,0"))
                (rule "add_zero_left" (formula "6") (term "0"))
-               (rule "inEqSimp_contradInEq1" (formula "6") (ifseqformula "8"))
-               (rule "qeq_literals" (formula "6") (term "0"))
-                (builtin "One Step Simplification" (formula "6"))
-               (rule "closeFalse" (formula "6"))
+               (rule "inEqSimp_contradInEq0" (formula "8") (ifseqformula "6"))
+               (rule "qeq_literals" (formula "8") (term "0"))
+                (builtin "One Step Simplification" (formula "8"))
+               (rule "closeFalse" (formula "8"))
             )
             (branch "log(f_base, quotient_0) >= -1 FALSE"
                (rule "inEqSimp_geqRight" (formula "13"))
