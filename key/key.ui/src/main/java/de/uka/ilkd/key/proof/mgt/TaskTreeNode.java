@@ -5,7 +5,7 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 
-public interface TaskTreeNode extends MutableTreeNode{
+public interface TaskTreeNode extends MutableTreeNode {
 
     public static final TaskTreeNode[] NO_CHILDREN = new TaskTreeNode[0];
 
@@ -19,7 +19,7 @@ public interface TaskTreeNode extends MutableTreeNode{
 
     void insertNode(TaskTreeModel model, MutableTreeNode parent);
 
-    TreeNode[] getPath() ;
+    TreeNode[] getPath();
 
     ProofStatus getStatus();
 

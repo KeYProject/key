@@ -53,16 +53,15 @@ public class JavaProfile extends AbstractProfile {
      * The default instance of this class.
      * </p>
      * <p>
-     * It is typically used in the {@link Thread} of the user interface.
-     * Other instances of this class are typically only required to
-     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * It is typically used in the {@link Thread} of the user interface. Other instances of this
+     * class are typically only required to use them in different {@link Thread}s (not the UI
+     * {@link Thread}).
      * </p>
      */
     public static JavaProfile defaultInstance;
     public static JavaProfile defaultInstancePermissions;
 
-    public static final StrategyFactory DEFAULT =
-        new JavaCardDLStrategyFactory();
+    public static final StrategyFactory DEFAULT = new JavaCardDLStrategyFactory();
 
     private boolean permissions = false;
 
@@ -88,75 +87,43 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
-                ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+            ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-                ImmutableSLList.<TermLabelRefactoring>nil().append(
-                        new OriginTermLabelRefactoring());
+            ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.ANON_HEAP_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.SELECT_SKOLEM_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)
-            ));
-        result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.SELF_COMPOSITION_LABEL)
-            ));
-        result = result.prepend(
-                new TermLabelConfiguration(
-                        ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.POST_CONDITION_LABEL)
-                ));
-        result = result.prepend(
-                new TermLabelConfiguration(
-                        OriginTermLabel.NAME,
-                        new OriginTermLabelFactory(),
-                        originTermLabelPolicyList,
-                        null,
-                        null,
-                        null,
-                        null,
-                        originTermLabelRefactorings,
-                        null
-                ));
-
+        result =
+            result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-                DefinedSymbolsHandler.TRIGGER_LABEL.name(),
+            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+            ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+            ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
+            new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
+            originTermLabelRefactorings, null));
+
+        result =
+            result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
                 new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
 
         return result;
@@ -175,20 +142,17 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
 
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
-                                   .prepend(LoopScopeInvariantRule.INSTANCE)
-                                   .prepend(BlockContractInternalRule.INSTANCE)
-                                   .prepend(BlockContractExternalRule.INSTANCE)
-                                   .prepend(LoopContractInternalRule.INSTANCE)
-                                   .prepend(LoopContractExternalRule.INSTANCE)
-                                   .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getOneStepSimpilifier())
-                                   .prepend(QueryExpand.INSTANCE)
-                                   .prepend(MergeRule.INSTANCE)
-                                   .prepend(LoopApplyHeadRule.INSTANCE)
-                                   .prepend(JmlAssertRule.ASSERT_INSTANCE)
-                                   .prepend(JmlAssertRule.ASSUME_INSTANCE);
+                .prepend(LoopScopeInvariantRule.INSTANCE)
+                .prepend(BlockContractInternalRule.INSTANCE)
+                .prepend(BlockContractExternalRule.INSTANCE)
+                .prepend(LoopContractInternalRule.INSTANCE)
+                .prepend(LoopContractExternalRule.INSTANCE)
+                .prepend(UseDependencyContractRule.INSTANCE).prepend(getOneStepSimpilifier())
+                .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
+                .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
+                .prepend(JmlAssertRule.ASSUME_INSTANCE);
 
-        //contract insertion rule, ATTENTION: ProofMgt relies on the fact
+        // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
         builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 
@@ -197,14 +161,14 @@ public class JavaProfile extends AbstractProfile {
 
     /**
      * <p>
-     * Returns the {@link OneStepSimplifier} instance which should be used
-     * in this {@link JavaProfile}. It is added to the build in rules via
-     * {@link #initBuiltInRules()}.
+     * Returns the {@link OneStepSimplifier} instance which should be used in this
+     * {@link JavaProfile}. It is added to the build in rules via {@link #initBuiltInRules()}.
      * </p>
      * <p>
-     * Sub profiles may exchange the {@link OneStepSimplifier} instance,
-     * for instance for site proofs used in the symbolic execution tree extraction.
+     * Sub profiles may exchange the {@link OneStepSimplifier} instance, for instance for site
+     * proofs used in the symbolic execution tree extraction.
      * </p>
+     *
      * @return The {@link OneStepSimplifier} instance to use.
      */
     public OneStepSimplifier getOneStepSimpilifier() {
@@ -217,26 +181,25 @@ public class JavaProfile extends AbstractProfile {
     }
 
     /**
-     * determines the justification of rule <code>r</code>. For a method contract rule it
-     * returns a new instance of a {@link ComplexRuleJustification} otherwise the rule
-     * justification determined by the super class is returned
+     * determines the justification of rule <code>r</code>. For a method contract rule it returns a
+     * new instance of a {@link ComplexRuleJustification} otherwise the rule justification
+     * determined by the super class is returned
      *
      * @param r the rule described above
      * @return justification for the given rule
      */
     @Override
     public RuleJustification getJustification(Rule r) {
-        return r == UseOperationContractRule.INSTANCE
-               || r == UseDependencyContractRule.INSTANCE
-               || r == BlockContractExternalRule.INSTANCE
-               || r == LoopContractExternalRule.INSTANCE
-               ? new ComplexRuleJustificationBySpec()
-               : super.getJustification(r);
+        return r == UseOperationContractRule.INSTANCE || r == UseDependencyContractRule.INSTANCE
+                || r == BlockContractExternalRule.INSTANCE || r == LoopContractExternalRule.INSTANCE
+                        ? new ComplexRuleJustificationBySpec()
+                        : super.getJustification(r);
     }
 
 
     /**
      * the name of the profile
+     *
      * @return the name
      */
     @Override
@@ -246,6 +209,7 @@ public class JavaProfile extends AbstractProfile {
 
     /**
      * the default strategy factory to be used
+     *
      * @return the default strategy factory
      */
     @Override
@@ -258,10 +222,11 @@ public class JavaProfile extends AbstractProfile {
      * Returns the default instance of this class.
      * </p>
      * <p>
-     * It is typically used in the {@link Thread} of the user interface.
-     * Other instances of this class are typically only required to
-     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * It is typically used in the {@link Thread} of the user interface. Other instances of this
+     * class are typically only required to use them in different {@link Thread}s (not the UI
+     * {@link Thread}).
      * </p>
+     *
      * @param perms boolean to decide whether we use permissions
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
@@ -292,8 +257,7 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
-        return app instanceof LoopInvariantBuiltInRuleApp ||
-                app instanceof AbstractContractRuleApp ||
-                app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
+        return app instanceof LoopInvariantBuiltInRuleApp || app instanceof AbstractContractRuleApp
+                || app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }
 }

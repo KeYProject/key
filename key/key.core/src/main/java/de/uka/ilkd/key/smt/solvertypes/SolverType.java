@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -23,11 +23,8 @@ import javax.annotation.Nullable;
 
 /**
  * This interface is used for modeling different solvers. It provides methods that encode
- * information about the concrete solver:
- * - name
- * - command for starting the solver
- * - parameters
- * - supported versions
+ * information about the concrete solver: - name - command for starting the solver - parameters -
+ * supported versions
  *
  * @author Alexander Weigl
  */
@@ -38,12 +35,11 @@ public interface SolverType {
      *
      * @param problem the SMT problem that is sent to the resulting SMT solver process
      * @param listener the listener for the solver process
-     * @param services services object to be used by the solver process, if needed
-     *                 (see for example {@link SMTObjTranslator})
+     * @param services services object to be used by the solver process, if needed (see for example
+     *        {@link SMTObjTranslator})
      * @return a concrete solver process of the type at hand
      */
-    SMTSolver createSolver(SMTProblem problem,
-                           SolverListener listener, Services services);
+    SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services);
 
     /**
      * @return the name of the solver.
@@ -51,19 +47,19 @@ public interface SolverType {
     String getName();
 
     /**
-     * Checks whether the solver is installed. If <code>recheck</code> is set to true
-     * the method should check for the path variable of the system and for the absolute path,
-     * otherwise it can return the result of the previous call.
+     * Checks whether the solver is installed. If <code>recheck</code> is set to true the method
+     * should check for the path variable of the system and for the absolute path, otherwise it can
+     * return the result of the previous call.
      *
      * @param recheck if this is true, the installation check will be done again instead of
-     *                returning the result from the previous call of this method
+     *        returning the result from the previous call of this method
      * @return whether the solver is installed (i.e. the command is an existing file)
      */
     boolean isInstalled(boolean recheck);
 
     /**
-     * Some specific information about the solver which can be presented. <code>null</code> means
-     * no information.
+     * Some specific information about the solver which can be presented. <code>null</code> means no
+     * information.
      *
      * @return the solver-type-specific information, null if there is none
      */
@@ -92,9 +88,8 @@ public interface SolverType {
 
     /**
      * The currently used command for starting the solver. For example "z3" if it is registered in
-     * the PATH variable, otherwise "ABSOLUTE_PATH/z3".
-     * Unless {@link #setSolverCommand(String)} has been called, this should be the same as
-     * {@link #getDefaultSolverCommand()}.
+     * the PATH variable, otherwise "ABSOLUTE_PATH/z3". Unless {@link #setSolverCommand(String)} has
+     * been called, this should be the same as {@link #getDefaultSolverCommand()}.
      *
      * @return the currently used solver command for starting solver processes
      */
@@ -113,8 +108,8 @@ public interface SolverType {
     String getDefaultSolverCommand();
 
     /**
-     * Unless {@link #setSolverTimeout(long)} has been called, this should be the same
-     * as {@link #getDefaultSolverTimeout()}.
+     * Unless {@link #setSolverTimeout(long)} has been called, this should be the same as
+     * {@link #getDefaultSolverTimeout()}.
      *
      * @return the currently set solver timeout, e.g. 2000L milliseconds
      */
@@ -139,8 +134,8 @@ public interface SolverType {
     SMTTranslator createTranslator();
 
     /**
-     * Message delimiters used by the solver to separate its messages sent to KeY.
-     * For example, those could be "\n".
+     * Message delimiters used by the solver to separate its messages sent to KeY. For example,
+     * those could be "\n".
      *
      * @return the delimiters of the messages that are sent from the solver to KeY.
      */
@@ -156,8 +151,7 @@ public interface SolverType {
     String modifyProblem(String problem);
 
     /**
-     * @return the parameter that can be used to gain the version of the solver when
-     * executing it.
+     * @return the parameter that can be used to gain the version of the solver when executing it.
      */
     String getVersionParameter();
 
@@ -167,14 +161,13 @@ public interface SolverType {
     String getMinimumSupportedVersion();
 
     /**
-     * @return the current version that is installed, if it has already been checked,
-     * otherwise null
+     * @return the current version that is installed, if it has already been checked, otherwise null
      */
     String getInstalledVersion();
 
     /**
-     * Retrieve the version string without check for support.
-     * Returns null if the solver is not installed.
+     * Retrieve the version string without check for support. Returns null if the solver is not
+     * installed.
      *
      * @return the installed version of the type at hand, if it is installed - null otherwise
      */
@@ -202,7 +195,7 @@ public interface SolverType {
      * Creates a new solver socket that can handle the communication for the given solver type.
      *
      * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
-     *              solvers this can be null)
+     *        solvers this can be null)
      * @return the newly created socket
      */
     @Nonnull

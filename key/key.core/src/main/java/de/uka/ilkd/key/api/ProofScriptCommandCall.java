@@ -15,4 +15,3 @@ public class ProofScriptCommandCall<T> {
         this.command = command;
     }
 }
-    

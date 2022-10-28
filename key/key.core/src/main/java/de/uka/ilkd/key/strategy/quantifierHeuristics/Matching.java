@@ -6,30 +6,27 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
 /**
- * Two kind of matching algorithm are coded in two nested classes BaseMatching
- * TwosideMatching 
+ * Two kind of matching algorithm are coded in two nested classes BaseMatching TwosideMatching
  */
 class Matching {
 
-    private Matching(){}
-    
+    private Matching() {}
+
     /**
      * matching <code>trigger</code> to <code>targetTerm</code> recursively
-     * @param trigger       a uni-trigger
-     * @param targetTerm    a gound term
+     *
+     * @param trigger a uni-trigger
+     * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    public static ImmutableSet<Substitution> basicMatching(Trigger trigger,
-                                                  Term targetTerm) {
-        return BasicMatching.getSubstitutions ( trigger.getTriggerTerm (),
-                                                targetTerm );
+    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm) {
+        return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm);
     }
 
-    public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger,
-                                                     Term targetTerm, 
-                                                     Services services) {
-        TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );
-        return tsm.getSubstitutions (services);
-    }      
-    
+    public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger, Term targetTerm,
+            Services services) {
+        TwoSidedMatching tsm = new TwoSidedMatching(trigger, targetTerm, services);
+        return tsm.getSubstitutions(services);
+    }
+
 }

@@ -18,8 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * This class holds the data and the state of proof exploration.
  * <p>
- * For every {@link de.uka.ilkd.key.core.KeYMediator} or {@link MainWindow}
- * should only exists one instance.
+ * For every {@link de.uka.ilkd.key.core.KeYMediator} or {@link MainWindow} should only exists one
+ * instance.
  *
  * @see ExplorationExtension
  */
@@ -33,14 +33,14 @@ public class ExplorationModeModel {
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
-     * Mode which rules to use in actions mode
-     * Default: whole application is shown
+     * Mode which rules to use in actions mode Default: whole application is shown
      */
     private @Nonnull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
 
     /**
-     * boolean flag indicating whether actions mode is turned on and special rules are shown to the user
+     * boolean flag indicating whether actions mode is turned on and special rules are shown to the
+     * user
      */
     private boolean explorationModeSelected = false;
 
@@ -57,7 +57,8 @@ public class ExplorationModeModel {
     public void setExplorationTacletAppState(ExplorationState explorationTacletAppState) {
         boolean old = this.explorationModeSelected;
         this.explorationTacletAppState = explorationTacletAppState;
-        changeSupport.firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old, explorationModeSelected);
+        changeSupport.firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old,
+            explorationModeSelected);
     }
 
     /**
@@ -71,6 +72,7 @@ public class ExplorationModeModel {
      * Set selection of Exploration mode.
      *
      * Triggers a property change event.
+     *
      * @see #PROP_EXPLORE_MODE
      */
     public void setExplorationModeSelected(boolean explorationModeSelected) {
@@ -83,7 +85,8 @@ public class ExplorationModeModel {
      * Returns whether the justification branch should be visible.
      */
     public boolean isShowInteractiveBranches() {
-        return !ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideInteractiveGoals();
+        return !ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .getHideInteractiveGoals();
     }
 
     /**
@@ -100,8 +103,9 @@ public class ExplorationModeModel {
      */
     public void setShowInteractiveBranches(boolean showInteractiveBranches) {
         GUIProofTreeModel delegateModel =
-                MainWindow.getInstance().getProofTreeView().getDelegateModel();
-        delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, !showInteractiveBranches);
+            MainWindow.getInstance().getProofTreeView().getDelegateModel();
+        delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
+            !showInteractiveBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -121,8 +125,8 @@ public class ExplorationModeModel {
     }
 
     /**
-     * State whether whole application (with shown second branch) or
-     * simplified with hidden branch app should be used
+     * State whether whole application (with shown second branch) or simplified with hidden branch
+     * app should be used
      */
     public enum ExplorationState {
         WHOLE_APP, SIMPLIFIED_APP

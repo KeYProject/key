@@ -35,16 +35,17 @@ public final class DiskFileRepo extends AbstractFileRepo {
     private Path tmpDir;
 
     /**
-     * Stores for each requested path the mapping to its concrete path in repo.
-     * Key and value paths are absolute, and even more, they are real paths.
+     * Stores for each requested path the mapping to its concrete path in repo. Key and value paths
+     * are absolute, and even more, they are real paths.
      */
     private HashMap<Path, Path> map = new HashMap<>();
 
     /**
      * Initializes a new empty DiskFileRepo. This creates a new temporary directory.
+     *
      * @param proofName name of the proof (used in the naming of the temporary directory)
-     * @throws IOException if an I/O error occurs, e.g. the user has not the right to create the
-     *      new temporary directory
+     * @throws IOException if an I/O error occurs, e.g. the user has not the right to create the new
+     *         temporary directory
      */
     public DiskFileRepo(String proofName) throws IOException {
         tmpDir = Files.createTempDirectory(proofName);
@@ -101,9 +102,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            LOGGER.debug("This type of URL is not supported by the FileRepo!" +
-                " Resource will not be copied to FileRepo!");
-            return url.openStream();    // fallback without a copy
+            LOGGER.debug("This type of URL is not supported by the FileRepo!"
+                + " Resource will not be copied to FileRepo!");
+            return url.openStream(); // fallback without a copy
         }
     }
 
@@ -127,17 +128,17 @@ public final class DiskFileRepo extends AbstractFileRepo {
             return new FileInputStream(norm.toFile());
         }
 
-        if (JAVA_MATCHER.matches(norm)) {                                    // .java
+        if (JAVA_MATCHER.matches(norm)) { // .java
             // copy to src/classpath/bootclasspath (depending on path)
             return getJavaFileInputStream(norm);
-        } else if (KEY_MATCHER.matches(norm)) {                              // .key/.proof
+        } else if (KEY_MATCHER.matches(norm)) { // .key/.proof
             // copy to top level
             // adapt file references
             return getKeyFileInputStream(norm);
-        } else if (ZIP_MATCHER.matches(norm)) {                              // .zip/.jar
+        } else if (ZIP_MATCHER.matches(norm)) { // .zip/.jar
             // extract to classpath folder (new folder with archive name)
             return getZipFileInputStream(norm);
-        } else if (CLASS_MATCHER.matches(norm)) {                            // .class
+        } else if (CLASS_MATCHER.matches(norm)) { // .class
             // copy to classpath
             return getClassFileInputStream(norm);
         }
@@ -152,14 +153,14 @@ public final class DiskFileRepo extends AbstractFileRepo {
         Path newFile = null;
 
         // Where is the file located (src, classpath, bootclasspath)?
-        if (isInJavaPath(javaFile)) {                                              // src
+        if (isInJavaPath(javaFile)) { // src
             newFile = resolveAndCopy(javaFile, getJavaPath(), Paths.get("src"));
-        } else if (isInBootClassPath(javaFile)) {                                  // bootclasspath
+        } else if (isInBootClassPath(javaFile)) { // bootclasspath
             newFile = resolveAndCopy(javaFile, getBootclasspath(), Paths.get("bootclasspath"));
-        } else if (getClasspath() != null) {                                       // classpath
+        } else if (getClasspath() != null) { // classpath
             // search for matching classpath in the list
             for (Path cp : getClasspath()) {
-                if (javaFile.startsWith(cp)) {         // only consider directories in classpath
+                if (javaFile.startsWith(cp)) { // only consider directories in classpath
                     // cp is always a directory
                     // -> we put the file into the corresponding subdir in our classpath folder
                     Path parent = cp.getParent();
@@ -209,7 +210,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         // class file may be in subdirectories
         // search for matching classpath in the list
         for (Path cp : getClasspath()) {
-            if (classFile.startsWith(cp)) {         // only consider directories in classpath
+            if (classFile.startsWith(cp)) { // only consider directories in classpath
                 // cp is always a directory
                 // -> we put the file into the corresponding subdir in our classpath folder
                 Path parent = cp.getParent();
@@ -221,7 +222,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         }
 
         if (newFile != null) {
-            //newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
+            // newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
             return new FileInputStream(newFile.toFile());
         }
         return null;
@@ -275,12 +276,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     protected Path getSaveName(Path path) {
-        /* assumption: a file with the given path has already been stored in the repo
-         *              (via getInputStream() or createOutputStream()) */
+        /*
+         * assumption: a file with the given path has already been stored in the repo (via
+         * getInputStream() or createOutputStream())
+         */
 
-        /* the given path is:
-         * 1. absolute                      -> lookup translation in map, relativize to tmpDir
-         * 2. relative to the base dir      -> nothing to do */
+        /*
+         * the given path is: 1. absolute -> lookup translation in map, relativize to tmpDir 2.
+         * relative to the base dir -> nothing to do
+         */
 
         if (path.isAbsolute()) {
             // lookup translation in map, make relative to tmpDir
@@ -294,9 +298,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
     @Override
     protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
-        if (p.isAbsolute()) {                   // p is absolute -> lookup in map
+        if (p.isAbsolute()) { // p is absolute -> lookup in map
             concrete = map.get(p.normalize());
-        } else {                                // p is relative -> interpret as relative to tmpDir
+        } else { // p is relative -> interpret as relative to tmpDir
             concrete = tmpDir.resolve(p.normalize());
         }
 
@@ -333,21 +337,21 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     /**
      * Deletes the temporary directory with all contents (if not already done).
+     *
      * @throws IOException if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            Files.walk(tmpDir)
-                 .sorted(Comparator.reverseOrder())
-                 //.map(Path::toFile)
-                 .forEach(path -> {
-                     try {
-                         Files.delete(path);
-                         //path.delete();
-                     } catch (IOException e) {
-                         e.printStackTrace();
-                     }
-                 });
+            Files.walk(tmpDir).sorted(Comparator.reverseOrder())
+                    // .map(Path::toFile)
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                            // path.delete();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
         }
     }
 }

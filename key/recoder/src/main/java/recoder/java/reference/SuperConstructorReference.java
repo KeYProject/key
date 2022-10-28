@@ -15,7 +15,8 @@ import recoder.list.generic.ASTList;
  * @author <TT>AutoDoc</TT>
  */
 
-public class SuperConstructorReference extends SpecialConstructorReference implements ReferenceSuffix {
+public class SuperConstructorReference extends SpecialConstructorReference
+        implements ReferenceSuffix {
 
     /**
      * serialization id
@@ -52,7 +53,7 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
     /**
      * Super constructor reference.
      *
-     * @param path      a reference prefix.
+     * @param path a reference prefix.
      * @param arguments an expression mutable list.
      */
 

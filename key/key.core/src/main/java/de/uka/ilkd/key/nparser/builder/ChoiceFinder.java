@@ -10,8 +10,8 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
- * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File}
- * and provide {@link ChoiceInformation}.
+ * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
+ * provide {@link ChoiceInformation}.
  *
  * @author Alexander Weigl
  * @version 1 (28.10.19)
@@ -54,9 +54,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
 
         seq().put(category, new HashSet<>(options));
         choiceInformation.setDefaultOption(category, options.get(0));
-        options.forEach(it ->
-                choices().add(new Choice(it, category))
-        );
+        options.forEach(it -> choices().add(new Choice(it, category)));
         return null;
     }
 
@@ -65,7 +63,8 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         String cat = ctx.cat.getText();
         String ch = ctx.choice_.getText();
         if (activatedChoicesCategories().contains(cat)) {
-            throw new IllegalArgumentException("You have already chosen a different option for " + cat);
+            throw new IllegalArgumentException(
+                "You have already chosen a different option for " + cat);
         }
         activatedChoicesCategories().add(cat);
         String name = cat + ":" + ch;
@@ -73,7 +72,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         if (c == null) {
             c = new Choice(ch, cat);
             choices().add(c);
-            //weigl: hitted  by several test caes:
+            // weigl: hitted by several test caes:
             // semanticError(ctx, "Choice %s not previously declared", name);
         }
         activatedChoices().add(c);
@@ -85,7 +84,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return choiceInformation;
     }
 
-    //region access functions
+    // region access functions
     private Set<Choice> activatedChoices() {
         return choiceInformation.getActivatedChoices();
     }
@@ -105,5 +104,5 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     private Map<String, Set<String>> seq() {
         return choiceInformation.getFoundChoicesAndOptions();
     }
-    //endregion
+    // endregion
 }

@@ -13,9 +13,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * Costs for the {@link MergeRule}; cheap if the first statement in the chosen
- * top-level formula is a {@link MergePointStatement}, otherwise, infinitely
- * expensive.
+ * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
+ * a {@link MergePointStatement}, otherwise, infinitely expensive.
  *
  * @author Dominic Scheurer
  */
@@ -27,17 +26,16 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term t = pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
             return TopRuleAppCost.INSTANCE;
         }
 
-        return JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(t)
-                .javaBlock()) instanceof MergePointStatement
-                        ? NumberRuleAppCost.create(0)
-                        : TopRuleAppCost.INSTANCE;
+        return JavaTools.getActiveStatement(
+            TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement
+                    ? NumberRuleAppCost.create(0)
+                    : TopRuleAppCost.INSTANCE;
     }
 
 }

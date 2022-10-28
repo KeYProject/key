@@ -19,10 +19,8 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
      */
     public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -31,18 +29,12 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
-     * @param ifInstantiations
-     *            if instantiations.
-     * @param statement
-     *            the statement which the applied contract belongs to.
-     * @param contract
-     *            the contract being applied.
-     * @param heaps
-     *            the heap context.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     * @param statement the statement which the applied contract belongs to.
+     * @param contract the contract being applied.
+     * @param heaps the heap context.
      */
     public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
@@ -60,7 +52,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -73,6 +65,6 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
         return (LoopContractExternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                LoopContractExternalRule.INSTANCE);
+            LoopContractExternalRule.INSTANCE);
     }
 }

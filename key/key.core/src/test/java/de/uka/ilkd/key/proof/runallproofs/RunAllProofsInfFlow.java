@@ -13,12 +13,14 @@ import java.util.stream.Stream;
  * <p>
  * The test case is controlled by the index file (see {@value #INDEX_FILE}).
  * <p>
- * If the property "{@value #SKIP_INF_FLOW_PROPERTY}" is set to true, then
- * no info-flow run-all-proof tests will be run.
+ * If the property "{@value #SKIP_INF_FLOW_PROPERTY}" is set to true, then no info-flow
+ * run-all-proof tests will be run.
  *
  * @author M. Ulbrich
  */
-@Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
+@Tag("slow")
+@Tag("owntest")
+@Tag("testRunAllProofs")
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";

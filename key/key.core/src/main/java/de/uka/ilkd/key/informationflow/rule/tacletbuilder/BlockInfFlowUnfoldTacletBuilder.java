@@ -38,18 +38,15 @@ public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTaclet
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " +
-                                           contract.getUniqueName());
+        return MiscTools
+                .toValidTacletName(UNFOLD + unfoldCounter + " of " + contract.getUniqueName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract,
-                                                   ifVars.c1, ifVars.c2,
-                                                   executionContext,
-                                                   services);
+        InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+            ifVars.c2, executionContext, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
     }
 }

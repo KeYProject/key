@@ -11,8 +11,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchBreakLabelParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     private final Label label;
 

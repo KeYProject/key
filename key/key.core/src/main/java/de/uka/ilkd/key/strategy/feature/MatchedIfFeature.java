@@ -5,16 +5,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * Binary features that returns zero iff the if-formulas of a Taclet are
- * instantiated or the Taclet does not have any if-formulas.
+ * Binary features that returns zero iff the if-formulas of a Taclet are instantiated or the Taclet
+ * does not have any if-formulas.
  */
 public final class MatchedIfFeature extends BinaryTacletAppFeature {
-    
-    public static final Feature INSTANCE = new MatchedIfFeature (); 
 
-    private MatchedIfFeature () {}
-    
-    protected boolean filter ( TacletApp app, PosInOccurrence pos, Goal goal ) {
+    public static final Feature INSTANCE = new MatchedIfFeature();
+
+    private MatchedIfFeature() {}
+
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         return app.ifInstsComplete();
     }
 

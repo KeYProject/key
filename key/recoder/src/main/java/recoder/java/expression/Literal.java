@@ -10,7 +10,8 @@ import recoder.java.*;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class Literal extends JavaProgramElement implements Expression, TerminalProgramElement {
+public abstract class Literal extends JavaProgramElement
+        implements Expression, TerminalProgramElement {
 
     /**
      * Expression parent.

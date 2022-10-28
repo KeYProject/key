@@ -16,7 +16,7 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<Upd
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {       
+    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
         return addInstantiation(subst, mc, services);
     }
 

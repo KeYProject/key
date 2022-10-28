@@ -12,10 +12,9 @@ import de.uka.ilkd.key.parser.ParserMode;
 /**
  * Inspects whether a given string can be translated into a formula.
  */
-public class InspectorForFormulas implements CheckedUserInputInspector{
+public class InspectorForFormulas implements CheckedUserInputInspector {
 
     private final Services services;
-
 
 
 
@@ -28,23 +27,23 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
 
     @Override
     public String check(String toBeChecked) {
-        if(toBeChecked.isEmpty()){
+        if (toBeChecked.isEmpty()) {
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        Term term = translate(services,toBeChecked);
+        Term term = translate(services, toBeChecked);
 
-       if(term == null){
-           return NO_USER_INPUT;
-       }
+        if (term == null) {
+            return NO_USER_INPUT;
+        }
 
-       if(term.sort() != Sort.FORMULA){
-           return "Not a formula.";
-       }
-       return null;
+        if (term.sort() != Sort.FORMULA) {
+            return "Not a formula.";
+        }
+        return null;
 
     }
 
-    public static Term translate(Services services, String toBeChecked){
+    public static Term translate(Services services, String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

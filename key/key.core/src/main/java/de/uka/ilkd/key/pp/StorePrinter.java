@@ -7,8 +7,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 
 /**
- * This class is used by LogicPrinter.java to print out store-terms, i.e. terms
- * of the following form: store(heap, object, field, value)
+ * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following
+ * form: store(heap, object, field, value)
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -19,8 +19,8 @@ class StorePrinter extends FieldPrinter {
     }
 
     /*
-     * Common code for all pretty-printed store variants.
-     * This section is executed at the beginning of pretty-printing.
+     * Common code for all pretty-printed store variants. This section is executed at the beginning
+     * of pretty-printing.
      */
     private void initPrettyPrint(final Term heapTerm) throws IOException {
         lp.startTerm(4);
@@ -39,8 +39,8 @@ class StorePrinter extends FieldPrinter {
     }
 
     /*
-     * Common code for all pretty-printed store variants.
-     * This section is executed at the end of pretty-printing.
+     * Common code for all pretty-printed store variants. This section is executed at the end of
+     * pretty-printing.
      */
     private void finishPrettyPrint(final Term valueTerm, boolean closingBrace) throws IOException {
         lp.layouter.print(" := ");
@@ -71,9 +71,11 @@ class StorePrinter extends FieldPrinter {
             if (isStaticFieldConstant(objectTerm, fieldTerm)) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                    closingBrace);
             } else if (isJavaFieldConstant(fieldTerm)) {
-                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                    closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else {
@@ -87,7 +89,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents an array element.
      */
-    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -111,7 +114,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -129,7 +133,8 @@ class StorePrinter extends FieldPrinter {
         finishPrettyPrint(valueTerm, closingBrace);
     }
 
-    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -149,7 +154,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm,
+            final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

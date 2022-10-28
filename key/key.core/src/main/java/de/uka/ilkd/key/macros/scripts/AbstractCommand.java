@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * <p><b>Inheritance:</b></p>
+ * <p>
+ * <b>Inheritance:</b>
+ * </p>
  *
  * @param <T>
  * @author Alexander Weigl
@@ -66,7 +68,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         try {
             execute(args);
         } finally {
-            //preventing memory leak
+            // preventing memory leak
             proof = null;
             service = null;
             state = null;

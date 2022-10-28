@@ -23,8 +23,7 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
 
     /**
      *
-     * @param contract
-     *            a block contract.
+     * @param contract a block contract.
      */
     FunctionalBlockContract(BlockContract contract) {
         super(contract);
@@ -32,10 +31,8 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
 
     /**
      *
-     * @param contract
-     *            a block contract.
-     * @param id
-     *            an ID.
+     * @param contract a block contract.
+     * @param id an ID.
      */
     FunctionalBlockContract(BlockContract contract, int id) {
         super(contract, id);

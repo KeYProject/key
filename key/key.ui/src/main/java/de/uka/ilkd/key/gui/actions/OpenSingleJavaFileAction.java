@@ -23,7 +23,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
     public OpenSingleJavaFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Open Single Java File...");
-        //setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
+        // setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load a single Java file without classpath.");
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         lookupAcceleratorKey();
@@ -43,9 +43,8 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
             mainWindow.addRecentFile(file.getAbsolutePath());
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
-            ProblemLoader pl = ui.getProblemLoader(file,
-                    Collections.emptyList(), null, Collections.emptyList(),
-                    ui.getMediator());
+            ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,
+                Collections.emptyList(), ui.getMediator());
             pl.setLoadSingleJavaFile(true);
             pl.runAsynchronously();
         }

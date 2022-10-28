@@ -21,46 +21,43 @@ public final class InStrictFp extends VariableConditionAdapter {
     public InStrictFp(boolean negation) {
         this.negated = negation;
     }
-    
-    public boolean isNegated(){
-	return negated;
+
+    public boolean isNegated() {
+        return negated;
     }
-    
+
     @Override
-    public boolean check(SchemaVariable var, 
-			 SVSubstitute instCandidate,
-			 SVInstantiations instMap, 
-			 Services services) {
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+            Services services) {
 
-	ExecutionContext ec = instMap.getExecutionContext();
+        ExecutionContext ec = instMap.getExecutionContext();
 
-	if (ec == null) {
-	    return negated;
-	} else {
-	    IProgramMethod methodContext = ec.getMethodContext();
-	    boolean strictfpClass = true;
+        if (ec == null) {
+            return negated;
+        } else {
+            IProgramMethod methodContext = ec.getMethodContext();
+            boolean strictfpClass = true;
 
-	    try {
-		Type t = ec.getTypeReference().getKeYJavaType().getJavaType();
-		if (t instanceof ClassDeclaration) {
-		    strictfpClass = ((ClassDeclaration)t).isStrictFp();
-		} else {
-		    strictfpClass = false;
-		}
-	    } catch (NullPointerException e) {
-		    strictfpClass = false;
-	    }
-	    
-	    final boolean isInStrictFp = strictfpClass ||
-					 methodContext.isStrictFp();
-	    return negated ? !isInStrictFp : isInStrictFp;
-	}
+            try {
+                Type t = ec.getTypeReference().getKeYJavaType().getJavaType();
+                if (t instanceof ClassDeclaration) {
+                    strictfpClass = ((ClassDeclaration) t).isStrictFp();
+                } else {
+                    strictfpClass = false;
+                }
+            } catch (NullPointerException e) {
+                strictfpClass = false;
+            }
+
+            final boolean isInStrictFp = strictfpClass || methodContext.isStrictFp();
+            return negated ? !isInStrictFp : isInStrictFp;
+        }
     }
-    
-    
+
+
     @Override
-    public String toString() {      
+    public String toString() {
         String prefix = negated ? "\\not" : "";
-	return prefix + "\\isStrictFp";
+        return prefix + "\\isStrictFp";
     }
 }

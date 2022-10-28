@@ -4,8 +4,7 @@ import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 /**
- *  Member declaration.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Member declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
 public interface MemberDeclaration extends Declaration, NonTerminalProgramElement {

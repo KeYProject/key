@@ -27,12 +27,12 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        
+
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) { 
+        if (result != null) {
             termPosition.gotoNextSibling();
         }
-        
+
         return result;
     }
 

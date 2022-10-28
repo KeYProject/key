@@ -42,27 +42,26 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
- * Rule for closing a partner goal after a merge operation. It does so by adding
- * a formula corresponding to the new merge node as an implicative premise to
- * the goal to close; if the merge rule is sound, the such manipulated goal
- * should be closable by KeY. This particular way for closing partner goals
- * should ensure that proofs can only be closed for sound merge rules, i.e.
+ * Rule for closing a partner goal after a merge operation. It does so by adding a formula
+ * corresponding to the new merge node as an implicative premise to the goal to close; if the merge
+ * rule is sound, the such manipulated goal should be closable by KeY. This particular way for
+ * closing partner goals should ensure that proofs can only be closed for sound merge rules, i.e.
  * rules producing merge states that are weakenings of the parent states.
  * <p>
- * 
- * TODO: If a user attempts to prune away a "closed" partner node, he/she should
- * also be asked whether the corresponding merge node should also be pruned.
- * Otherwise, the user might accidentally make it harder to close the whole
- * proof (Add this to the bug tracker after merging the merge branch into
- * master).
- * 
+ *
+ * TODO: If a user attempts to prune away a "closed" partner node, he/she should also be asked
+ * whether the corresponding merge node should also be pruned. Otherwise, the user might
+ * accidentally make it harder to close the whole proof (Add this to the bug tracker after merging
+ * the merge branch into master).
+ *
  * @author Dominic Scheurer
  */
 public class CloseAfterMerge implements BuiltInRule {
 
-    public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG = "mergeGenerateIsWeakeningGoal";
-    public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON = MERGE_GENERATE_IS_WEAKENING_GOAL_CFG
-            + ":on";
+    public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG =
+        "mergeGenerateIsWeakeningGoal";
+    public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
+        MERGE_GENERATE_IS_WEAKENING_GOAL_CFG + ":on";
     private static final String MERGED_NODE_IS_WEAKENING_TITLE = "Merged node is weakening";
 
     private static final String DISPLAY_NAME = "CloseAfterMerge";
@@ -95,24 +94,21 @@ public class CloseAfterMerge implements BuiltInRule {
         final TermLabelState termLabelState = new TermLabelState();
 
         assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : //
-        "Rule app for CloseAfterMerge has to be an instance of CloseAfterMergeRuleBuiltInRuleApp";
+                "Rule app for CloseAfterMerge has to be an instance of CloseAfterMergeRuleBuiltInRuleApp";
 
         CloseAfterMergeRuleBuiltInRuleApp closeApp = (CloseAfterMergeRuleBuiltInRuleApp) ruleApp;
 
-        final boolean generateIsWeakeningGoal = goal.proof().getSettings()
-                .getChoiceSettings().getDefaultChoices()
-                .containsKey(MERGE_GENERATE_IS_WEAKENING_GOAL_CFG)
-                && goal.proof().getSettings().getChoiceSettings()
-                        .getDefaultChoices()
+        final boolean generateIsWeakeningGoal = goal.proof().getSettings().getChoiceSettings()
+                .getDefaultChoices().containsKey(MERGE_GENERATE_IS_WEAKENING_GOAL_CFG)
+                && goal.proof().getSettings().getChoiceSettings().getDefaultChoices()
                         .get(MERGE_GENERATE_IS_WEAKENING_GOAL_CFG)
                         .equals(MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON);
 
-        ImmutableList<Goal> jpNewGoals = goal
-                .split(generateIsWeakeningGoal ? 2 : 1);
+        ImmutableList<Goal> jpNewGoals = goal.split(generateIsWeakeningGoal ? 2 : 1);
 
         final Goal linkedGoal = jpNewGoals.head();
-        linkedGoal.setBranchLabel("Merged with node "
-                + closeApp.getCorrespondingMergeNode().parent().serialNr());
+        linkedGoal.setBranchLabel(
+            "Merged with node " + closeApp.getCorrespondingMergeNode().parent().serialNr());
         linkedGoal.setLinkedGoal(goal);
 
         // Add a listener to close this node if the associated merge
@@ -146,51 +142,44 @@ public class CloseAfterMerge implements BuiltInRule {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(MERGED_NODE_IS_WEAKENING_TITLE);
 
-            Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp,
-                    ruleIsWeakeningGoal);
-            isWeakeningForm = TermLabelManager.refactorTerm(termLabelState,
-                    services, null, isWeakeningForm, this, ruleIsWeakeningGoal,
-                    FINAL_WEAKENING_TERM_HINT, null);
+            Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
+            isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
+                isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
-            ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
-                    false, true);
-            TermLabelManager.refactorGoal(termLabelState, services,
-                    ruleApp.posInOccurrence(), this, ruleIsWeakeningGoal, null,
-                    null);
+            ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
+            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
+                ruleIsWeakeningGoal, null, null);
         }
 
         return jpNewGoals;
     }
 
     /**
-     * Constructs the actual syntactic weakening formula \phi(s1, s2) expressing
-     * that s2 is a weakening of s1.
-     * 
-     * @param closeApp
-     *            The rule application containing the required data.
-     * @param isWeakeningGoal
-     *            The {@link Proof} {@link Goal} for the logical weakening
-     *            formula.
-     * 
+     * Constructs the actual syntactic weakening formula \phi(s1, s2) expressing that s2 is a
+     * weakening of s1.
+     *
+     * @param closeApp The rule application containing the required data.
+     * @param isWeakeningGoal The {@link Proof} {@link Goal} for the logical weakening formula.
+     *
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    private Term getSyntacticWeakeningFormula(
-            CloseAfterMergeRuleBuiltInRuleApp closeApp, Goal isWeakeningGoal) {
+    private Term getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
+            Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
-        allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getPartnerSEState().getSymbolicState()));
-        allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getMergeState().getSymbolicState()));
-        allLocs = allLocs.union(getLocationVariables(
-                closeApp.getPartnerSEState().getPathCondition(), services));
-        allLocs = allLocs.union(getLocationVariables(
-                closeApp.getMergeState().getPathCondition(), services));
+        allLocs = allLocs
+                .union(getUpdateLeftSideLocations(closeApp.getPartnerSEState().getSymbolicState()));
+        allLocs =
+            allLocs.union(getUpdateLeftSideLocations(closeApp.getMergeState().getSymbolicState()));
+        allLocs = allLocs.union(
+            getLocationVariables(closeApp.getPartnerSEState().getPathCondition(), services));
+        allLocs = allLocs
+                .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
         final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
 
@@ -205,69 +194,55 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
 
-        final Function predicateSymb = new Function(predicateSymbName,
-                Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+        final Function predicateSymb =
+            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
 
-        final Goal mergedGoal = services.getProof()
-                .getGoal(closeApp.getMergeState().getCorrespondingNode());
+        final Goal mergedGoal =
+            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
-        isWeakeningGoal.getLocalNamespaces()
-                .add(mergedGoal.getLocalNamespaces());
-        isWeakeningGoal.getLocalNamespaces()
-                .add(mergedGoal.getLocalNamespaces().getParent());
+        isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
+        isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces().getParent());
 
         // Create the predicate term
-        final Term predTerm = tb.func(predicateSymb,
-                origQfdVarTerms.toArray(new Term[] {}));
+        final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
 
         // Obtain set of new Skolem constants in merge state
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
-                .map(name -> isWeakeningGoal.getLocalNamespaces().functions()
-                        .lookup(name))
-                .collect(Collectors
-                        .toCollection(() -> new LinkedHashSet<Function>()));
+                .map(name -> isWeakeningGoal.getLocalNamespaces().functions().lookup(name))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<Function>()));
 
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
         //@formatter:on
         Term result = tb.imp(
-                allClosure(
-                        tb.imp(closeApp.getMergeState().getPathCondition(),
-                                tb.apply(closeApp.getMergeState()
-                                        .getSymbolicState(), predTerm)),
-                        newConstants, services),
-                tb.imp(closeApp.getPartnerSEState().getPathCondition(),
-                        tb.apply(
-                                closeApp.getPartnerSEState().getSymbolicState(),
-                                predTerm)));
+            allClosure(
+                tb.imp(closeApp.getMergeState().getPathCondition(),
+                    tb.apply(closeApp.getMergeState().getSymbolicState(), predTerm)),
+                newConstants, services),
+            tb.imp(closeApp.getPartnerSEState().getPathCondition(),
+                tb.apply(closeApp.getPartnerSEState().getSymbolicState(), predTerm)));
 
         return result;
     }
 
     /**
-     * Universally closes all logical variables in the given term. Before, all
-     * Skolem constants in the term are replaced by fresh logical variables,
-     * where multiple occurrences of the same constant are replaced by the same
-     * variable.
-     * 
-     * @param term
-     *            Term to universally close.
-     * @param constsToReplace
-     *            Skolem constants to replace before the universal closure.
-     * @param services
-     *            The services object.
-     * @return A new term which is equivalent to the universal closure of the
-     *         argument term, with Skolem constants in constsToReplace having
-     *         been replaced by fresh variables before.
+     * Universally closes all logical variables in the given term. Before, all Skolem constants in
+     * the term are replaced by fresh logical variables, where multiple occurrences of the same
+     * constant are replaced by the same variable.
+     *
+     * @param term Term to universally close.
+     * @param constsToReplace Skolem constants to replace before the universal closure.
+     * @param services The services object.
+     * @return A new term which is equivalent to the universal closure of the argument term, with
+     *         Skolem constants in constsToReplace having been replaced by fresh variables before.
      */
-    private Term allClosure(final Term term,
-            final HashSet<Function> constsToReplace, Services services) {
+    private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
+            Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term termWithReplConstants = substConstantsByFreshVars(term,
-                constsToReplace, new HashMap<Function, LogicVariable>(),
-                services);
+        Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
+            new HashMap<Function, LogicVariable>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
     }
@@ -283,43 +258,31 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pos);
     }
 
     /**
      * Creates a complete CloseAfterMergeBuiltInRuleApp.
      *
-     * @param pio
-     *            Position of the Update-ProgramCounter formula.
-     * @param thePartnerNode
-     *            The partner node to close.
-     * @param correspondingMergeNode
-     *            The corresponding merge node that is not closed. This is
-     *            needed to add a reference to its parent in the partner goal at
-     *            the place of this rule application.
-     * @param mergeNodeState
-     *            The SE state for the merge node; needed for adding an
-     *            implicative premise ensuring the soundness of merge rules.
-     * @param partnerState
-     *            The SE state for the partner node.
-     * @param pc
-     *            The program counter common to the two states -- a formula of
-     *            the form U\<{...}\> PHI, where U is an update in normal form
-     *            and PHI is a DL formula).
-     * @param newNames
-     *            The set of new names (of Skolem constants) introduced in the
-     *            merge.
+     * @param pio Position of the Update-ProgramCounter formula.
+     * @param thePartnerNode The partner node to close.
+     * @param correspondingMergeNode The corresponding merge node that is not closed. This is needed
+     *        to add a reference to its parent in the partner goal at the place of this rule
+     *        application.
+     * @param mergeNodeState The SE state for the merge node; needed for adding an implicative
+     *        premise ensuring the soundness of merge rules.
+     * @param partnerState The SE state for the partner node.
+     * @param pc The program counter common to the two states -- a formula of the form U\<{...}\>
+     *        PHI, where U is an update in normal form and PHI is a DL formula).
+     * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio,
-            Node thePartnerNode, Node correspondingMergeNode,
-            SymbolicExecutionState mergeNodeState,
+    public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
+            Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
-                correspondingMergeNode, mergeNodeState, partnerState, pc,
-                newNames);
+            correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }
 
 }

@@ -15,20 +15,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 /**
- * Final SolverType implementation that uses building blocks for the various methods.
- * This can be used to modify a ModifiableSolverType object using .props files only,
- * for example (see {@link SolverPropertiesLoader}).
+ * Final SolverType implementation that uses building blocks for the various methods. This can be
+ * used to modify a ModifiableSolverType object using .props files only, for example (see
+ * {@link SolverPropertiesLoader}).
  *
- * The building blocks that can be modified on creation are:
- * - The various String parameters such as default command, params and the name
- * - The solver type's default timeout
- * - The message delimiters used by solver processes of the created solver type
- * - The {@link AbstractSolverSocket} used to interpret messages by solver processes of the
- *      created type
- * - The {@link SMTTranslator} used to translate messages for processes of the created solver type
- * - The {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by the translator
- *      (if {@link ModularSMTLib2Translator} is used)
- * - The preamble file used for translations for the solver type
+ * The building blocks that can be modified on creation are: - The various String parameters such as
+ * default command, params and the name - The solver type's default timeout - The message delimiters
+ * used by solver processes of the created solver type - The {@link AbstractSolverSocket} used to
+ * interpret messages by solver processes of the created type - The {@link SMTTranslator} used to
+ * translate messages for processes of the created solver type - The
+ * {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by the translator (if
+ * {@link ModularSMTLib2Translator} is used) - The preamble file used for translations for the
+ * solver type
  *
  * @author Alicia Appelhagen
  */
@@ -102,13 +100,13 @@ public final class SolverTypeImplementation implements SolverType {
     private long timeout;
 
     /*
-     * Booleans signalling whether the support/installation of the
-     * created solver type as an actual program has been checked.
+     * Booleans signalling whether the support/installation of the created solver type as an actual
+     * program has been checked.
      */
 
     /**
-     * Has the support of the solver version of solvers(/solver processes) of this type
-     * already been checked?
+     * Has the support of the solver version of solvers(/solver processes) of this type already been
+     * checked?
      */
     private boolean supportHasBeenChecked = false;
 
@@ -140,21 +138,19 @@ public final class SolverTypeImplementation implements SolverType {
     private final String[] handlerNames;
 
     /**
-     * Arbitrary options for the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by
-     * this solver type's {@link #translator}
-     * (only takes effect for {@link ModularSMTLib2Translator}).
+     * Arbitrary options for the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by this solver
+     * type's {@link #translator} (only takes effect for {@link ModularSMTLib2Translator}).
      */
     private final String[] handlerOptions;
 
     /**
-     * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
-     * to be created with {@link #getSocket(ModelExtractor)}.
+     * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket} to be created
+     * with {@link #getSocket(ModelExtractor)}.
      */
     private final Class<?> solverSocketClass;
 
     /**
-     * The class of the {@link SMTTranslator} to be created with
-     * {@link #createTranslator()}.
+     * The class of the {@link SMTTranslator} to be created with {@link #createTranslator()}.
      */
     private final Class<?> translatorClass;
 
@@ -165,8 +161,8 @@ public final class SolverTypeImplementation implements SolverType {
     private final String preamble;
 
     /**
-     * Used for creation of new sockets as well as modifying problem Strings.
-     * Should not be returned to outside classes.
+     * Used for creation of new sockets as well as modifying problem Strings. Should not be returned
+     * to outside classes.
      */
     private final AbstractSolverSocket solverSocket;
 
@@ -176,36 +172,34 @@ public final class SolverTypeImplementation implements SolverType {
     private final SMTTranslator translator;
 
     /**
-     * Instantiate the solver type object with all its default values.
-     * The changeable values such as {@link #command} and {@link #params}
-     * are initially the same as their default values.
+     * Instantiate the solver type object with all its default values. The changeable values such as
+     * {@link #command} and {@link #params} are initially the same as their default values.
+     *
      * @param name the name, e.g. "Z3"
      * @param info some information about the solver type
      * @param defaultParams the default command line PARAMETERS used to start the actual solver
-     *                      program
+     *        program
      * @param defaultCommand the default command line COMMAND used to start the actual solver
-     *                       program
+     *        program
      * @param versionParameter the command line parameter used to get the versionParameter of the
-     *                       actual solver program
-     * @param minimumSupportedVersion the minimum supported versionParameter of the solver type
-     *                                at hand
+     *        actual solver program
+     * @param minimumSupportedVersion the minimum supported versionParameter of the solver type at
+     *        hand
      * @param defaultTimeout the default solver timeout for SMT processes using this solver type
      * @param delimiters the message delimiters used by the actual solver program
      * @param translatorClass the {@link SMTTranslator} class used by this solver type
-     * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to
-     *                     be used by the {@link SMTTranslator} created by this solver type
+     * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be
+     *        used by the {@link SMTTranslator} created by this solver type
      * @param handlerOptions arbitrary String options used by the SMTHandlers
      * @param solverSocketClass the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
-     *                          class used by the solver type at hand
+     *        class used by the solver type at hand
      * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */
     public SolverTypeImplementation(String name, String info, String defaultParams,
-                                    String defaultCommand, String versionParameter,
-                                    String minimumSupportedVersion,
-                                    long defaultTimeout, String[] delimiters,
-                                    Class<?> translatorClass,
-                                    String[] handlerNames, String[] handlerOptions,
-                                    Class<?> solverSocketClass, String preamble) {
+            String defaultCommand, String versionParameter, String minimumSupportedVersion,
+            long defaultTimeout, String[] delimiters, Class<?> translatorClass,
+            String[] handlerNames, String[] handlerOptions, Class<?> solverSocketClass,
+            String preamble) {
         this.name = name;
         this.info = info;
         this.defaultParams = defaultParams;
@@ -234,10 +228,9 @@ public final class SolverTypeImplementation implements SolverType {
                     .newInstance(name, null);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.warn(
-                    String.format(
-                            "Using default Z3Socket for solver communication due to exception:%s%s",
-                            System.lineSeparator(), e.getMessage()));
+            LOGGER.warn(String.format(
+                "Using default Z3Socket for solver communication due to exception:%s%s",
+                System.lineSeparator(), e.getMessage()));
             return new Z3Socket(name, null);
         }
     }
@@ -249,22 +242,21 @@ public final class SolverTypeImplementation implements SolverType {
                     .newInstance(handlerNames, handlerOptions, preamble);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.warn(String.format(
-                    "Using default ModularSMTLib2Translator for SMT translation due to" +
-                            " exception: %n %s", e.getMessage()));
+            LOGGER.warn(
+                String.format("Using default ModularSMTLib2Translator for SMT translation due to"
+                    + " exception: %n %s", e.getMessage()));
             return new ModularSMTLib2Translator();
         }
     }
 
     /**
-     * Returns false whenever cmd is null or empty, otherwise the environment variables are
-     * checked for the command and if no file with the command's name is found in any of those
-     * paths, the cmd itself is used as the pathname.
-     * If all of these fail, the cmd is also not installed.
+     * Returns false whenever cmd is null or empty, otherwise the environment variables are checked
+     * for the command and if no file with the command's name is found in any of those paths, the
+     * cmd itself is used as the pathname. If all of these fail, the cmd is also not installed.
      *
      * @param cmd the command whose existence will be checked
      * @return true iff the command is a non-empty String and a file with the command's name or with
-     *          the command as pathname can be found in the file system.
+     *         the command as pathname can be found in the file system.
      */
     public static boolean isInstalled(@Nullable String cmd) {
         if (cmd == null || cmd.isEmpty()) {
@@ -401,8 +393,8 @@ public final class SolverTypeImplementation implements SolverType {
     public @Nullable String getRawVersion() {
         // Don't let the version String be empty because that will lead to the solver run
         if (isInstalled(true)) {
-            String version = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),
-                    getVersionParameter());
+            String version =
+                VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
             if (version == null) {
                 version = "unknown version";
             }
@@ -421,13 +413,13 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     /**
-     * Note that the actual version is only compared to the minimum version lexicographically.
-     * This is a temporary solution as it may lead to weird behaviour, for example shorter
-     * Strings will be before longer Strings and 1.14.1 will be before 1.8.10 even though
-     * they have the same length.
+     * Note that the actual version is only compared to the minimum version lexicographically. This
+     * is a temporary solution as it may lead to weird behaviour, for example shorter Strings will
+     * be before longer Strings and 1.14.1 will be before 1.8.10 even though they have the same
+     * length.
      *
-     * If that lexicographical comparison is not possible, you may have to
-     * modify the SolverTypeImplementation class and change SolverPropertiesLoader accordingly.
+     * If that lexicographical comparison is not possible, you may have to modify the
+     * SolverTypeImplementation class and change SolverPropertiesLoader accordingly.
      *
      * TODO Find better solution
      */

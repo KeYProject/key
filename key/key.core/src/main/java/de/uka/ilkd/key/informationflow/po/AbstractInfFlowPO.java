@@ -19,31 +19,23 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         super(initConfig, name);
     }
 
-    public Proof createProof(String proofName,
-                             Term poTerm,
-                             InitConfig proofConfig) {        
+    public Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
-        StrategyInfoUndoMethod undo =
-                new StrategyInfoUndoMethod() {
+        StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
             @Override
-            public void undo(
-                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+            public void undo(de.uka.ilkd.key.util.properties.Properties strategyInfos) {
                 strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
             }
         };
-        proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
+        proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true,
+            undo);
 
         return proof;
     }
 
-    public InfFlowProof createProofObject(String proofName,
-                                   String proofHeader,
-                                   Term poTerm,
-                                   InitConfig proofConfig) {
-        final InfFlowProof proof = new InfFlowProof(proofName,
-                poTerm,
-                proofHeader,
-                proofConfig);
+    public InfFlowProof createProofObject(String proofName, String proofHeader, Term poTerm,
+            InitConfig proofConfig) {
+        final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);
 
         return proof;
     }

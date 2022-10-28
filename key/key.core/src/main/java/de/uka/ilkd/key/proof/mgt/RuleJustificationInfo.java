@@ -13,18 +13,19 @@ import de.uka.ilkd.key.rule.RuleKey;
 public class RuleJustificationInfo {
 
     private Map<RuleKey, RuleJustification> rule2justif =
-            new LinkedHashMap<RuleKey, RuleJustification>();
+        new LinkedHashMap<RuleKey, RuleJustification>();
 
     public void addJustification(Rule r, RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
         if (rule2justif.containsKey(ruleKey)) {
-            // TODO: avoid double registration of certain class axioms and remove then the below check so that 
+            // TODO: avoid double registration of certain class axioms and remove then the below
+            // check so that
             // always an exception will be thrown
             for (RuleKey key : rule2justif.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
-                    //FIXME weigl: hack
-                    //throw new IllegalArgumentException("A rule named " + r.name()
-                    //        + "has already been registered.");
+                    // FIXME weigl: hack
+                    // throw new IllegalArgumentException("A rule named " + r.name()
+                    // + "has already been registered.");
 
                 }
             }

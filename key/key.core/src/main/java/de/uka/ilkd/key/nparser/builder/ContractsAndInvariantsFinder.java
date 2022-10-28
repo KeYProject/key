@@ -61,7 +61,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_contract(KeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
-        //for program variable declarations
+        // for program variable declarations
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
@@ -70,12 +70,12 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                    dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiesClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());
         }
-        //dump local program variable declarations
+        // dump local program variable declarations
         namespaces().setProgramVariables(oldProgVars);
         return null;
     }

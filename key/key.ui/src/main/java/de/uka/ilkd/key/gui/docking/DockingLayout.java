@@ -31,15 +31,10 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (15.05.19)
  */
-@KeYGuiExtension.Info(name = "Docking Helpers",
-        optional = false,
-        experimental = false,
-        priority = 1)
-public final class DockingLayout
-        implements KeYGuiExtension,
-        KeYGuiExtension.Startup,
-        KeYGuiExtension.MainMenu,
-        KeYGuiExtension.Toolbar {
+@KeYGuiExtension.Info(name = "Docking Helpers", optional = false, experimental = false,
+    priority = 1)
+public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
+        KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar {
 
     public static float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
@@ -56,29 +51,29 @@ public final class DockingLayout
         Priority p = Priority.CLIENT;
 
         icons.setIcon("locationmanager.normalize", p,
-                IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_RESTORE, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_RESTORE, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.maximize", p,
-                IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MAXIMIZE, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MAXIMIZE, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.minimize", p,
-                IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MINIMIZE, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MINIMIZE, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.externalize", p,
-                IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_SQUARE_ALT, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_SQUARE_ALT, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.unexternalize", p,
-                new ImageIcon(IconFontSwing.buildImage(FontAwesomeSolid.EXTERNAL_LINK_ALT,
-                        SIZE_ICON_DOCK, Color.black, Math.PI)));
+            new ImageIcon(IconFontSwing.buildImage(FontAwesomeSolid.EXTERNAL_LINK_ALT,
+                SIZE_ICON_DOCK, Color.black, Math.PI)));
 
         icons.setIcon("locationmanager.unmaximize_externalized", p,
-                IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT, SIZE_ICON_DOCK));
 
         icons.setIcon("screen.maximize", p,
-                IconFontSwing.buildIcon(FontAwesomeRegular.EDIT, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeRegular.EDIT, SIZE_ICON_DOCK));
 
         icons.setIcon("close", p,
-                IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, SIZE_ICON_DOCK));
+            IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, SIZE_ICON_DOCK));
     }
 
     private static void loadLayouts(CControl globalPort) {
@@ -133,8 +128,7 @@ public final class DockingLayout
 
     private void setLayout(String layout) {
         CControl globalPort = window.getDockControl();
-        boolean defaultLayoutDefined =
-                Arrays.asList(globalPort.layouts()).contains(layout);
+        boolean defaultLayoutDefined = Arrays.asList(globalPort.layouts()).contains(layout);
         if (defaultLayoutDefined) {
             globalPort.load(layout);
         }
@@ -175,7 +169,8 @@ public final class DockingLayout
         }
 
         toolBar.add(new JLabel("Layouts: "));
-        for (String s : LAYOUT_NAMES) comboLayouts.addItem(s);
+        for (String s : LAYOUT_NAMES)
+            comboLayouts.addItem(s);
         toolBar.add(comboLayouts);
         toolBar.add(new LoadAction(mainWindow));
         toolBar.add(new SaveAction(mainWindow));
@@ -204,10 +199,9 @@ class SaveLayoutAction extends MainWindowAction {
         setMenuPath("View.Layout.Save");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
-                    InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
         }
-        KeyStrokeManager.lookupAndOverride(this,
-                getClass().getName() + "$" + layoutName);
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
     }
 
     @Override
@@ -216,6 +210,7 @@ class SaveLayoutAction extends MainWindowAction {
         mainWindow.setStatusLine("Save layout as " + layoutName);
     }
 }
+
 
 class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
@@ -229,15 +224,14 @@ class LoadLayoutAction extends MainWindowAction {
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
         }
-        KeyStrokeManager.lookupAndOverride(this,
-                getClass().getName() + "$" + layoutName);
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
         setMenuPath("View.Layout.Load");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean defaultLayoutDefined = Arrays.asList(mainWindow.getDockControl().layouts())
-                .contains(layoutName);
+        boolean defaultLayoutDefined =
+            Arrays.asList(mainWindow.getDockControl().layouts()).contains(layoutName);
         if (defaultLayoutDefined) {
             mainWindow.getDockControl().load(layoutName);
             mainWindow.setStatusLine("Layout " + layoutName + " loaded");
@@ -246,6 +240,7 @@ class LoadLayoutAction extends MainWindowAction {
         }
     }
 }
+
 
 class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;

@@ -9,18 +9,18 @@ import java.util.Set;
 public abstract class AbstractProperties implements Properties {
 
     private final Map<Property<?>, Set<PropertyListener>> listenerMap =
-            new IdentityHashMap<Property<?>, Set<PropertyListener>>();
+        new IdentityHashMap<Property<?>, Set<PropertyListener>>();
 
     private final Set<PropertyListener> globalListeners =
-            new HashSet<Properties.PropertyListener>();
+        new HashSet<Properties.PropertyListener>();
 
     @Override
     public void addPropertyListener(Property<?> property, PropertyListener listener) {
-        if(property == null) {
+        if (property == null) {
             globalListeners.add(listener);
         } else {
             Set<PropertyListener> list = listenerMap.get(property);
-            if(list == null) {
+            if (list == null) {
                 list = new HashSet<PropertyListener>();
                 listenerMap.put(property, list);
             }
@@ -30,11 +30,11 @@ public abstract class AbstractProperties implements Properties {
 
     @Override
     public void removePropertyListener(Property<?> property, PropertyListener listener) {
-        if(property == null) {
+        if (property == null) {
             globalListeners.remove(listener);
         } else {
             Set<PropertyListener> list = listenerMap.get(property);
-            if(list != null) {
+            if (list != null) {
                 list.remove(listener);
             }
         }
@@ -49,9 +49,9 @@ public abstract class AbstractProperties implements Properties {
     }
 
     protected <T> void firePropertyChange(Property<T> property, T oldValue, T newValue) {
-        if(oldValue == null || !oldValue.equals(newValue)) {
+        if (oldValue == null || !oldValue.equals(newValue)) {
             Set<PropertyListener> list = listenerMap.get(property);
-            if(list != null) {
+            if (list != null) {
                 for (PropertyListener listener : list) {
                     listener.propertyChanged(property, oldValue, newValue);
                 }

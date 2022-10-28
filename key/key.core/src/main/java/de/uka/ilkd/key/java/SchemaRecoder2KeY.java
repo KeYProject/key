@@ -33,11 +33,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /** caches constructor access for reflection */
     private final static HashMap<?, ?> recClass2schemakeyClassCons =
-            new LinkedHashMap<Object, Object>(400);
+        new LinkedHashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
     private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
-            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+        new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -49,9 +49,8 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     }
 
     /**
-     * returns the hashmap of a concrete RecodeR class to the constructor of its
-     * corresponding KeY class. Speeds up reflection. Attention must be
-     * overwritten by subclasses!
+     * returns the hashmap of a concrete RecodeR class to the constructor of its corresponding KeY
+     * class. Speeds up reflection. Attention must be overwritten by subclasses!
      */
     protected HashMap<?, ?> getKeYClassConstructorCache() {
         return recClass2schemakeyClassCons;
@@ -67,30 +66,27 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /**
      * creates an empty RECODER compilation unit
-     * 
+     *
      * @return the recoder.java.CompilationUnit
      */
     public Context createEmptyContext() {
         return new Context(schemaServConf, new recoder.java.CompilationUnit(),
-                schemaServConf.getProgramFactory().createClassDeclaration(null,
-                        new ImplicitIdentifier("<KeYSpecialParsing>"), null,
-                        null, null));	
+            schemaServConf.getProgramFactory().createClassDeclaration(null,
+                new ImplicitIdentifier("<KeYSpecialParsing>"), null, null, null));
     }
 
     /**
      * wraps a RECODER ClassDeclaration in a compilation unit
-     * 
-     * @param classDecl
-     *            the recoder.java.ClassDeclaration to wrap
-     * @param context
-     *            the Context containing the recoder.java.CompilationUnit where the class is wrapped
+     *
+     * @param classDecl the recoder.java.ClassDeclaration to wrap
+     * @param context the Context containing the recoder.java.CompilationUnit where the class is
+     *        wrapped
      * @return the enclosing recoder.java.CompilationUnit
      */
     protected recoder.java.CompilationUnit embedClass(
             recoder.java.declaration.ClassDeclaration classDecl, Context context) {
 
-        recoder.java.CompilationUnit cUnit = context
-        .getCompilationUnitContext();
+        recoder.java.CompilationUnit cUnit = context.getCompilationUnitContext();
 
         // add class to compilation unit
         ASTList<TypeDeclaration> typeDecls = cUnit.getDeclarations();
@@ -112,54 +108,47 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     }
 
     /**
-     * parses a given JavaBlock using the context to determine the right
-     * references and returns a statement block of recoder.
-     * 
-     * @param block
-     *            a String describing a java block
-     * @param context
-     *            recoder.java.CompilationUnit in which the block has to be
-     *            interpreted
+     * parses a given JavaBlock using the context to determine the right references and returns a
+     * statement block of recoder.
+     *
+     * @param block a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be interpreted
      * @return the parsed and resolved recoder statement block
      */
-    protected recoder.java.StatementBlock recoderBlock(String block,
-            Context context) {
+    protected recoder.java.StatementBlock recoderBlock(String block, Context context) {
         recoder.java.StatementBlock bl = null;
 
-        SchemaJavaProgramFactory factory = (SchemaJavaProgramFactory) schemaServConf
-        .getProgramFactory();
+        SchemaJavaProgramFactory factory =
+            (SchemaJavaProgramFactory) schemaServConf.getProgramFactory();
         factory.setSVNamespace(svns);
         Reader br = null;
         try {
             br = new BufferedReader(new StringReader(block));
-            try { 
+            try {
                 bl = factory.parseStatementBlock(br);
             } finally {
                 br.close();
             }
         } catch (recoder.ParserException e) {
-            LOGGER.debug("readSchemaJavaBlock(Reader,CompilationUnit)"
-                    + " caused the " + "exception:\n", e);
+            LOGGER.debug(
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n", e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown Exception:"
-                    + e, e);
+                + "\n **** END ****\n failed. Thrown Exception:" + e, e);
         } catch (IOException ioe) {
-            LOGGER.debug("readSchemaJavaBlock(Reader,CompilationUnit)"
-                    + " caused the IO exception:", ioe);
-            throw new ConvertException(
-                    "IO Error when parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown IOException:"
-                    + ioe, ioe);
-        } 
-        
+            LOGGER.debug(
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the IO exception:", ioe);
+            throw new ConvertException("IO Error when parsing: \n **** BEGIN ****\n " + block
+                + "\n **** END ****\n failed. Thrown IOException:" + ioe, ioe);
+        }
+
         embedClass(embedMethod(embedBlock(bl), context), context);
 
         return bl;
     }
 
     /**
-     * there is no need to parse special classes in this case, so
-     * this is empty
+     * there is no need to parse special classes in this case, so this is empty
+     *
      * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
      */
     public void parseSpecialClasses() {

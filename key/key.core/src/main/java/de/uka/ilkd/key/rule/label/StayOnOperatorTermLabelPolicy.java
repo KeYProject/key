@@ -14,30 +14,21 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
- * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long
- * the new {@link Term} has the same {@link Operator} as the
- * previous best matching {@link Term} from which it was created.
+ * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link Term} has the
+ * same {@link Operator} as the previous best matching {@link Term} from which it was created.
+ *
  * @author Martin Hentschel
  */
 public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public TermLabel keepLabel(TermLabelState state,
-                              Services services,
-                              PosInOccurrence applicationPosInOccurrence,
-                              Term applicationTerm,
-                              Rule rule,
-                              Goal goal,
-                              Object hint,
-                              Term tacletTerm,
-                              Operator newTermOp,
-                              ImmutableArray<Term> newTermSubs,
-                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                              JavaBlock newTermJavaBlock,
-                              ImmutableArray<TermLabel> newTermOriginalLabels,
-                              TermLabel label) {
-      return applicationTerm != null && newTermOp == applicationTerm.op() ? label : null;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TermLabel keepLabel(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
+            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
+            ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
+        return applicationTerm != null && newTermOp == applicationTerm.op() ? label : null;
+    }
 }

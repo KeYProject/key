@@ -23,7 +23,8 @@ import java.text.Format;
  * <p>
  * This panel provides a header and center pane.
  * <p>
- * The header already contains a two labels {@link #lblHead} and {@link #lblSubhead} with appropriate fonts.
+ * The header already contains a two labels {@link #lblHead} and {@link #lblSubhead} with
+ * appropriate fonts.
  * <p>
  * The {@link #pCenter} can be used to add create a settings dialog.
  * <p>
@@ -34,7 +35,8 @@ import java.text.Format;
 public class SimpleSettingsPanel extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSettingsPanel.class);
-    private static final ColorSettings.ColorProperty COLOR_ERROR = ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
+    private static final ColorSettings.ColorProperty COLOR_ERROR =
+        ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
     protected Box pNorth = new Box(BoxLayout.Y_AXIS);
@@ -81,7 +83,8 @@ public class SimpleSettingsPanel extends JPanel {
         component.setToolTipText(error);
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value, final @Nullable Validator<Boolean> validator) {
+    protected JCheckBox createCheckBox(String title, boolean value,
+            final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
@@ -111,7 +114,7 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected JFormattedTextField createNumberFormattedTextField(Format format,
-                                                                 final @Nullable Validator<String> validator) {
+            final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
@@ -119,14 +122,12 @@ public class SimpleSettingsPanel extends JPanel {
 
     /**
      * Create a new JSpinner for numbers in [min, max] using the given step size for its arrow
-     * buttons.
-     * The min and max values have to be comparable and min will be set as the initial value, so
-     * it has to be subclassing the Number class, in order to be handled correctly by the
-     * SpinnerNumberModel.
-     * Note that min will also determine the Number class into which the JSpinner's NumberFormatter
-     * will format entered Strings
-     * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
-     * Entered values have to be Numbers, otherwise the Number-Validator will fail.
+     * buttons. The min and max values have to be comparable and min will be set as the initial
+     * value, so it has to be subclassing the Number class, in order to be handled correctly by the
+     * SpinnerNumberModel. Note that min will also determine the Number class into which the
+     * JSpinner's NumberFormatter will format entered Strings (see
+     * {@link javax.swing.text.NumberFormatter#stringToValue(String)}). Entered values have to be
+     * Numbers, otherwise the Number-Validator will fail.
      *
      * @param min the minimum value of the JSpinner
      * @param max the maximum value of the JSpinner
@@ -135,29 +136,29 @@ public class SimpleSettingsPanel extends JPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(
-            T min, Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(T min,
+            Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
     protected JSpinner createNumberTextField(SpinnerModel model,
-                                             final @Nullable Validator<Number> validator) {
+            final @Nullable Validator<Number> validator) {
         // create a new spinner that delegates background color changes/requests to its TextField
         JSpinner spinner = new JSpinner(model) {
             @Override
             public void setBackground(Color bg) {
-                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor)getEditor();
+                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) getEditor();
                 editor.getTextField().setBackground(bg);
             }
 
             @Override
             public Color getBackground() {
-                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor)getEditor();
+                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) getEditor();
                 return editor.getTextField().getBackground();
             }
         };
-        spinner.setBackground(Color.WHITE);     // without this, the background would be gray ...
+        spinner.setBackground(Color.WHITE); // without this, the background would be gray ...
         spinner.addChangeListener(new ValidatorSpinnerAdapter<>(spinner, validator));
         return spinner;
     }
@@ -167,14 +168,12 @@ public class SimpleSettingsPanel extends JPanel {
             s = "";
         else {
             String brokenLines = StringUtil.wrapLines(s);
-            s = "<html>" +
-                brokenLines.replace("<", "&lt;").
-                            replace(">", "&gt;").
-                            replace("\n", "<br>");
+            s = "<html>"
+                + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
         }
 
-        JLabel infoButton = new JLabel(
-                IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        JLabel infoButton =
+            new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
         return infoButton;
     }
@@ -210,7 +209,8 @@ public class SimpleSettingsPanel extends JPanel {
         private final JTextComponent field;
         private final @Nullable Validator<String> validator;
 
-        private DocumentValidatorAdapter(JTextComponent field, @Nullable Validator<String> validator) {
+        private DocumentValidatorAdapter(JTextComponent field,
+                @Nullable Validator<String> validator) {
             this.field = field;
             this.validator = validator;
         }

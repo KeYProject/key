@@ -9,7 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 public final class AbandonTaskAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 915588190956945751L;
 
@@ -25,11 +25,10 @@ public final class AbandonTaskAction extends MainWindowAction {
     }
 
     public synchronized void actionPerformed(ActionEvent e) {
-    	boolean removalConfirmed =
-                getMediator().getUI().confirmTaskRemoval("Are you sure?");
+        boolean removalConfirmed = getMediator().getUI().confirmTaskRemoval("Are you sure?");
         if (removalConfirmed) {
-           getMediator().getSelectedProof().dispose();
+            getMediator().getSelectedProof().dispose();
         }
     }
-    
+
 }

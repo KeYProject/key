@@ -22,18 +22,13 @@ public final class ModelMethodExecution extends ClassAxiom {
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
 
-    public ModelMethodExecution(String name,
-                                IObserverFunction target,
-                                KeYJavaType kjt,
-                                VisibilityModifier visibility) {
-        this(name,null,target,kjt,visibility);
+    public ModelMethodExecution(String name, IObserverFunction target, KeYJavaType kjt,
+            VisibilityModifier visibility) {
+        this(name, null, target, kjt, visibility);
     }
 
-    public ModelMethodExecution(String name,
-                                String displayName,
-                                IObserverFunction target,
-                                KeYJavaType kjt,
-                                VisibilityModifier visibility) {
+    public ModelMethodExecution(String name, String displayName, IObserverFunction target,
+            KeYJavaType kjt, VisibilityModifier visibility) {
 
         assert name != null;
         assert kjt != null;
@@ -52,31 +47,36 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-       if (o == null || this.getClass() != o.getClass()) return false;
-       final ModelMethodExecution other = (ModelMethodExecution) o;
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        final ModelMethodExecution other = (ModelMethodExecution) o;
 
-       if (!name.equals(other.name)) return false;
-       if (!target.equals(other.target)) return false;
-       if (!kjt.equals(other.kjt)) return false;
+        if (!name.equals(other.name))
+            return false;
+        if (!target.equals(other.target))
+            return false;
+        if (!kjt.equals(other.kjt))
+            return false;
 
-       return true;
+        return true;
     }
 
     @Override
     public int hashCode() {
-       return 17*(name.hashCode() + 17 * target.hashCode());
+        return 17 * (name.hashCode() + 17 * target.hashCode());
     }
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+            Services services) {
 
-      // Name tacletName = MiscTools.toValidTacletName(name);
-      //  TacletGenerator TG = TacletGenerator.getInstance();
+        // Name tacletName = MiscTools.toValidTacletName(name);
+        // TacletGenerator TG = TacletGenerator.getInstance();
         return null;
-//            return TG.generateModelMethodExecutionTaclets(tacletName,
-//                                                          kjt,
-//                                                          target,
-//                                                          services);
+        // return TG.generateModelMethodExecutionTaclets(tacletName,
+        // kjt,
+        // target,
+        // services);
     }
 
     @Override

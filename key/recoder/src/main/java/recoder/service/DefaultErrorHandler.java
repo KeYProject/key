@@ -39,36 +39,36 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     /**
-     * Redefine this method to indicate that the specified element refers to
-     * unavailable code. This suppresses corresponding unresolved reference
-     * errors. The default implementation returns <CODE>false</CODE>.
+     * Redefine this method to indicate that the specified element refers to unavailable code. This
+     * suppresses corresponding unresolved reference errors. The default implementation returns
+     * <CODE>false</CODE>.
      */
     protected boolean isReferingUnavailableCode(@SuppressWarnings("unused") ModelElement me) {
         return false;
     }
 
     /**
-     * Redefine this method to indicate that the specified element belongs to a
-     * code template. This suppresses corresponding unresolved reference errors.
-     * The default implementation returns <CODE>false</CODE>.
+     * Redefine this method to indicate that the specified element belongs to a code template. This
+     * suppresses corresponding unresolved reference errors. The default implementation returns
+     * <CODE>false</CODE>.
      */
     protected boolean isTemplateCode(@SuppressWarnings("unused") ProgramElement pe) {
         return false;
     }
 
     /**
-     * Redefine this method to filter exceptions that are not considered as an
-     * error. The default implementation checks for
-     * {@link recoder.service.UnresolvedReferenceException}s and returns <CODE>
-     * true</CODE> if the cause is either part of an incomplete model or
-     * contained in template code.
+     * Redefine this method to filter exceptions that are not considered as an error. The default
+     * implementation checks for {@link recoder.service.UnresolvedReferenceException}s and returns
+     * <CODE>
+     * true</CODE> if the cause is either part of an incomplete model or contained in template code.
      *
      * @see #isReferingUnavailableCode
      * @see #isTemplateCode
      */
     protected boolean isIgnorable(Exception e) {
         if (e instanceof UnresolvedReferenceException) {
-            ProgramElement unresolvedReference = ((UnresolvedReferenceException) e).getUnresolvedReference();
+            ProgramElement unresolvedReference =
+                ((UnresolvedReferenceException) e).getUnresolvedReference();
             if (isReferingUnavailableCode(unresolvedReference)) {
                 return true;
             }
@@ -78,8 +78,8 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     /**
-     * Issues a warning message when the specified exception is ignored. The
-     * default implementation writes a note to stderr.
+     * Issues a warning message when the specified exception is ignored. The default implementation
+     * writes a note to stderr.
      */
     protected void warningMessage(Exception e) {
         String className = e.getClass().getName();
@@ -90,9 +90,8 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     /**
-     * Issues an error message when the specified exception is not ignored, but
-     * the system will continue to find further errors. The default
-     * implementation writes a note to stderr.
+     * Issues an error message when the specified exception is not ignored, but the system will
+     * continue to find further errors. The default implementation writes a note to stderr.
      */
     protected void errorMessage(Exception e) {
         String className = e.getClass().getName();
@@ -103,9 +102,9 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     /**
-     * Called when too many errors occurred or the model update has finished and
-     * there were non-ignorable errors. The default implementation writes a
-     * message to stderr and throws a model exception.
+     * Called when too many errors occurred or the model update has finished and there were
+     * non-ignorable errors. The default implementation writes a message to stderr and throws a
+     * model exception.
      */
     protected void exitAction() {
         String msg = "" + errorCount + " errors have occured - aborting.";

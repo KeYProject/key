@@ -11,13 +11,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * The axiom command takes one argument: a formula to which the command is
- * applied.
+ * The axiom command takes one argument: a formula to which the command is applied.
  *
  * @see AssumeCommand The assume command is a synonym for the axiom command.
  */
-public class AxiomCommand
-        extends AbstractCommand<AxiomCommand.FormulaParameter> {
+public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter> {
     private static final Name TACLET_NAME = new Name("introduceAxiom");
 
     public AxiomCommand() {
@@ -25,10 +23,9 @@ public class AxiomCommand
     }
 
     @Override
-    public FormulaParameter evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new FormulaParameter(),
-                arguments);
+    public FormulaParameter evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
 
     @Override
@@ -37,15 +34,14 @@ public class AxiomCommand
     }
 
     @Override
-    public void execute(FormulaParameter parameter)
-            throws ScriptException, InterruptedException {
-        Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(TACLET_NAME);
+    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
+        Taclet cut =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula,
-                state.getProof().getServices(), true);
+        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+            true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

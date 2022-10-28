@@ -28,8 +28,8 @@ public abstract class ByteCodeElement implements ProgramModelElement {
     }
 
     /**
-     * Returns the name of the byte code element. Strings are interned so that
-     * they can be compared by identity.
+     * Returns the name of the byte code element. Strings are interned so that they can be compared
+     * by identity.
      */
     public final String getName() {
         return name;

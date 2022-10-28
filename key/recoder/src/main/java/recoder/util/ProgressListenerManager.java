@@ -1,9 +1,8 @@
 package recoder.util;
 
 /**
- * Helper class that handles progress listener registration and broadcasts.
- * Caches and reuses the event object, so listeners should not store the event
- * object.
+ * Helper class that handles progress listener registration and broadcasts. Caches and reuses the
+ * event object, so listeners should not store the event object.
  *
  * @author AL
  * @since 0.72

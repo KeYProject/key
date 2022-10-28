@@ -8,16 +8,16 @@ public class ProgramPrefixUtil {
     public static class ProgramPrefixInfo {
         private final int length;
         private final MethodFrame mf;
-        
+
         public ProgramPrefixInfo(int length, MethodFrame mf) {
             this.length = length;
             this.mf = mf;
         }
-    
+
         public int getLength() {
             return length;
         }
-        
+
         public MethodFrame getInnerMostMethodFrame() {
             return mf;
         }
@@ -29,9 +29,9 @@ public class ProgramPrefixUtil {
         while (prefix.hasNextPrefixElement()) {
             prefix = prefix.getNextPrefixElement();
             if (prefix instanceof MethodFrame) {
-                mf = (MethodFrame) prefix;                
+                mf = (MethodFrame) prefix;
             }
-            length++;            
+            length++;
         }
         return new ProgramPrefixUtil.ProgramPrefixInfo(length, mf);
     }

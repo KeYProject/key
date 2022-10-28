@@ -4,18 +4,20 @@ import recoder.java.Expression;
 
 /**
  * Sequence getter operation.
+ *
  * @author bruns
  * @since 1.7.2119
  */
 public class SeqGet extends ADTPrefixConstruct {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -421447886220796576L;
 
     /**
      * Creates a sequence getter operator.
+     *
      * @param seq Sequence to operate on
      * @param idx Index position (from 0 to length-1)
      */
@@ -31,25 +33,25 @@ public class SeqGet extends ADTPrefixConstruct {
     }
 
 
-    @Override    
+    @Override
     public SeqGet deepClone() {
         return new SeqGet(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
         return 2;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return POSTFIX;
     }
-    
+
     @Override
-    public String toSource(){
-        return children.get(0).toSource()+"["+children.get(1).toSource()+"]";
+    public String toSource() {
+        return children.get(0).toSource() + "[" + children.get(1).toSource() + "]";
     }
 }

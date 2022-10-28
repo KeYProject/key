@@ -16,7 +16,8 @@ public class FieldInfo extends MemberInfo implements Field {
 
     protected List<TypeArgumentInfo> typeArgs;
 
-    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue, List<TypeArgumentInfo> typeArgs) {
+    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue,
+            List<TypeArgumentInfo> typeArgs) {
         super(accessFlags, name, cf);
         this.type = type;
         this.constantValue = constantValue;

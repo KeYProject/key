@@ -34,10 +34,11 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      *
      * @param importStatement1 the first import found to be ambiguous.
      * @param importStatement2 the second import found to be ambiguous.
-     * @param version1         the first possible field.
-     * @param version2         the second possible field.
+     * @param version1 the first possible field.
+     * @param version2 the second possible field.
      */
-    public AmbiguousStaticFieldImportException(Import importStatement1, Import importStatement2, Variable version1, Variable version2) {
+    public AmbiguousStaticFieldImportException(Import importStatement1, Import importStatement2,
+            Variable version1, Variable version2) {
         this.importStatement1 = importStatement1;
         this.importStatement2 = importStatement2;
         this.version1 = version1;
@@ -47,12 +48,13 @@ public class AmbiguousStaticFieldImportException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s               an explanation.
+     * @param s an explanation.
      * @param importStatement the import found to be ambiguous.
-     * @param version1        the first possible type.
-     * @param version2        the second possible type.
+     * @param version1 the first possible type.
+     * @param version2 the second possible type.
      */
-    public AmbiguousStaticFieldImportException(String s, Import importStatement1, Import importStatement2, Field version1, Field version2) {
+    public AmbiguousStaticFieldImportException(String s, Import importStatement1,
+            Import importStatement2, Field version1, Field version2) {
         super(s);
         this.importStatement1 = importStatement1;
         this.importStatement2 = importStatement2;

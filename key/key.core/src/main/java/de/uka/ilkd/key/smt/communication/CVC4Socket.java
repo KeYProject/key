@@ -36,17 +36,17 @@ public class CVC4Socket extends AbstractSolverSocket {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             }
         }
     }

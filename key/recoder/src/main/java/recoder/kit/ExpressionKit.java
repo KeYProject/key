@@ -29,15 +29,14 @@ public class ExpressionKit {
     }
 
     /**
-     * Query deciding if the given expression tree contains statements as a
-     * conservative estimate if it has side effects. An expression that contains
-     * no statements (method calls, assignments) cannot have any side-effects.
-     * Parenthesized expressions are not considered statements in this context,
-     * even though they technically may appear as such.
+     * Query deciding if the given expression tree contains statements as a conservative estimate if
+     * it has side effects. An expression that contains no statements (method calls, assignments)
+     * cannot have any side-effects. Parenthesized expressions are not considered statements in this
+     * context, even though they technically may appear as such.
      *
      * @param expr an expression.
-     * @return <CODE>true</CODE>, if the expression contains expressions,
-     * <CODE>false</CODE> if it does not.
+     * @return <CODE>true</CODE>, if the expression contains expressions, <CODE>false</CODE> if it
+     *         does not.
      */
     public static boolean containsStatements(Expression expr) {
         if (expr instanceof Statement) {
@@ -57,15 +56,14 @@ public class ExpressionKit {
     }
 
     /**
-     * Non-updating query deciding if the given expression is used as a
-     * left-hand value ("L-value"). L-values are either variables, or array
-     * references. As there are no call-by-reference output parameters in Java,
-     * L-value references must occur as first argument of an assigment operator
+     * Non-updating query deciding if the given expression is used as a left-hand value ("L-value").
+     * L-values are either variables, or array references. As there are no call-by-reference output
+     * parameters in Java, L-value references must occur as first argument of an assigment operator
      * such as <CODE>=</CODE> or <CODE>++</CODE>.
      *
      * @param r an expression.
-     * @return <CODE>true</CODE> if the specified expression is an L-value,
-     * <CODE>false</CODE> otherwise.
+     * @return <CODE>true</CODE> if the specified expression is an L-value, <CODE>false</CODE>
+     *         otherwise.
      * @since 0.63
      */
     public static boolean isLValue(Expression r) {
@@ -77,8 +75,8 @@ public class ExpressionKit {
     }
 
     /**
-     * Query that collects all expressions that are evaluated before the given
-     * expression in its statement or initializer in the correct order.
+     * Query that collects all expressions that are evaluated before the given expression in its
+     * statement or initializer in the correct order.
      *
      * @param x an expression as part of a statement or an initializer.
      * @return a mutable list of expressions that preceed the given one.
@@ -125,7 +123,9 @@ public class ExpressionKit {
                     i += 1;
                 }
             } else {
-                for (int i = parent.getExpressionCount() - 1; (expr = parent.getExpressionAt(i)) != x; i -= 1) {
+                for (int i =
+                    parent.getExpressionCount() - 1; (expr = parent.getExpressionAt(i)) != x; i -=
+                        1) {
                     dest.add(expr);
                 }
             }
@@ -137,31 +137,28 @@ public class ExpressionKit {
     }
 
     /**
-     * Transformation that ensures that the given expression is evaluated first
-     * during execution of the resulting statement, while preserving the
-     * behavior. The method changes all statement expressions (which might have
-     * side-effects) that are evaluated before the given expression into
-     * initializations of temporary variables. These will preceed the statement
-     * the given expression is located within. If the expression is contained in
-     * a statement, a statement block is inserted if needed. If the expression
-     * is part of a field initializer, a new class initializer with appropriate
-     * modifier executing the initialization code is inserted before the field.
-     * <BR>
-     * To obtain the statement the expression is located in, a parent traversal
-     * beginning at the given expression (which is relocated) and ending at the
-     * first non-expression statement is sufficient. In case of the field
-     * specification, the expression is contained within the assignment to the
-     * field in the newly created class or object initializer block.
+     * Transformation that ensures that the given expression is evaluated first during execution of
+     * the resulting statement, while preserving the behavior. The method changes all statement
+     * expressions (which might have side-effects) that are evaluated before the given expression
+     * into initializations of temporary variables. These will preceed the statement the given
+     * expression is located within. If the expression is contained in a statement, a statement
+     * block is inserted if needed. If the expression is part of a field initializer, a new class
+     * initializer with appropriate modifier executing the initialization code is inserted before
+     * the field. <BR>
+     * To obtain the statement the expression is located in, a parent traversal beginning at the
+     * given expression (which is relocated) and ending at the first non-expression statement is
+     * sufficient. In case of the field specification, the expression is contained within the
+     * assignment to the field in the newly created class or object initializer block.
      *
      * @param si the source info service.
-     * @param x  the expression that shall be accessed first in its statement
-     *           or initializer.
+     * @param x the expression that shall be accessed first in its statement or initializer.
      * @param ch the change history service (may be <CODE>null</CODE>).
      * @return <CODE>true</CODE> if the shift has been necessary, <CODE>false
      * </CODE> otherwise.
      * @deprecated replaced by transformation
      */
-    public static boolean shiftPreceedingStatementExpressions(SourceInfo si, Expression x, ChangeHistory ch) {
+    public static boolean shiftPreceedingStatementExpressions(SourceInfo si, Expression x,
+            ChangeHistory ch) {
 
         // get all expressions that are executed before x
         List<Expression> exprs = collectPreceedingExpressions(x);
@@ -190,7 +187,8 @@ public class ExpressionKit {
             Type t = exTypes[i];
             TypeReference minTypeRef = TypeKit.createTypeReference(si, t, sde);
             String varName = varNames[i];
-            LocalVariableDeclaration lvd = f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
+            LocalVariableDeclaration lvd =
+                f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
             lvd.getVariables().get(0).setInitializer(ex);
             // lvd.makeAllParentRolesValid(); done later
             tempVarDecls.add(lvd);
@@ -212,7 +210,8 @@ public class ExpressionKit {
         do {
             NonTerminalProgramElement parent = pe.getASTParent();
             Debug.assertNonnull(parent);
-            if ((parent instanceof Statement) && (((Statement) parent).getStatementContainer() != null)) {
+            if ((parent instanceof Statement)
+                    && (((Statement) parent).getStatementContainer() != null)) {
                 Statement parentStatement = (Statement) parent;
                 destination = StatementKit.prepareStatementMutableList(parentStatement, ch);
                 destParent = parentStatement.getStatementContainer();
@@ -251,8 +250,8 @@ public class ExpressionKit {
                     ch.detached(init, initIndex);
                     // parent link is still valid
                 }
-                CopyAssignment ca = f.createCopyAssignment(f.createVariableReference(f.createIdentifier(fs.getName())),
-                        init);
+                CopyAssignment ca = f.createCopyAssignment(
+                    f.createVariableReference(f.createIdentifier(fs.getName())), init);
                 ca.makeAllParentRolesValid();
                 destination.add(ca); // add to end of body list
                 // we already reported ci (parent of ca) as attached
@@ -274,15 +273,14 @@ public class ExpressionKit {
     }
 
     /**
-     * Factory method that creates the default literal to a given type. For
-     * non-primitive type, the result is a
-     * {@link recoder.java.expression.literal.NullLiteral}, for primitive types
-     * their corresponding default value (<CODE>0</CODE>,<CODE>false
+     * Factory method that creates the default literal to a given type. For non-primitive type, the
+     * result is a {@link recoder.java.expression.literal.NullLiteral}, for primitive types their
+     * corresponding default value (<CODE>0</CODE>,<CODE>false
      * </CODE>,<CODE>'\0'</CODE>).
      *
-     * @param f  the program factory for the literal to create.
+     * @param f the program factory for the literal to create.
      * @param ni the name info defining the primitive type objects.
-     * @param t  the type to create a default value for.
+     * @param t the type to create a default value for.
      * @return a new literal object widening to the given type.
      */
     public static Literal createDefaultValue(ProgramFactory f, NameInfo ni, Type t) {

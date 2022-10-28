@@ -29,12 +29,10 @@ public class ScriptNode {
     public void addNode(ScriptNode node) {
         children.add(node);
     }
-    
+
     public void dump(int indent) {
-        LOGGER.debug("{} {} {}",
-                " ".repeat(indent),
-                proofNode == null ? "xxx" : proofNode.serialNr(),
-                command);
+        LOGGER.debug("{} {} {}", " ".repeat(indent),
+            proofNode == null ? "xxx" : proofNode.serialNr(), command);
         for (ScriptNode child : children) {
             child.dump(indent + 1);
         }
@@ -63,7 +61,7 @@ public class ScriptNode {
     public int getToPos() {
         return toPos;
     }
-    
+
     public void clearChildren() {
         children.clear();
     }
@@ -75,10 +73,12 @@ public class ScriptNode {
     public void setEncounteredException(Throwable encounteredException) {
         this.encounteredException = encounteredException;
     }
-    public ScriptNode getParent(){
+
+    public ScriptNode getParent() {
         return parent;
     }
-    public boolean isRoot(){
+
+    public boolean isRoot() {
         return (parent == null);
     }
 

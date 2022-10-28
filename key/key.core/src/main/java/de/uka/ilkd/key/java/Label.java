@@ -1,4 +1,5 @@
-/** represents a java label
+/**
+ * represents a java label
  */
 package de.uka.ilkd.key.java;
 

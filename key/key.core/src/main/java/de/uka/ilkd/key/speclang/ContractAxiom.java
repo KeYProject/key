@@ -36,36 +36,21 @@ public final class ContractAxiom extends ClassAxiom {
     private final ProgramVariable originalSelfVar;
     private final ProgramVariable originalResultVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
-    private final Map<LocationVariable,ProgramVariable> atPreVars;
+    private final Map<LocationVariable, ProgramVariable> atPreVars;
 
-    public ContractAxiom(String name,
-                         IObserverFunction target,
-                         KeYJavaType kjt,
-                         VisibilityModifier visibility,
-                         Term pre,
-                         Term freePre,
-                         Term post,
-                         Term freePost,
-                         Term mby,
-                         Map<LocationVariable,ProgramVariable> atPreVars,
-                         ProgramVariable selfVar,
-                         ProgramVariable resultVar,
-                         ImmutableList<ProgramVariable> paramVars) {
-        this(name,null,target,kjt,visibility,pre,freePre,post,freePost,mby,atPreVars,selfVar,resultVar,paramVars);
+    public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
+            VisibilityModifier visibility, Term pre, Term freePre, Term post, Term freePost,
+            Term mby, Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
+            ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
+        this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
+            selfVar, resultVar, paramVars);
     }
 
-    public ContractAxiom(String name,
-            String displayName,
-            IObserverFunction target,
-                KeYJavaType kjt,
-                VisibilityModifier visibility,
-                Term originalPre,
-                Term originalFreePre,
-                Term originalPost,
-                Term originalFreePost,
-                Term originalMby,
-                Map<LocationVariable,ProgramVariable> atPreVars,
-                ProgramVariable selfVar, ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
+    public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
+            VisibilityModifier visibility, Term originalPre, Term originalFreePre,
+            Term originalPost, Term originalFreePost, Term originalMby,
+            Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
+            ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
 
         assert name != null;
         assert kjt != null;
@@ -91,16 +76,15 @@ public final class ContractAxiom extends ClassAxiom {
 
     @Override
     public ContractAxiom map(UnaryOperator<Term> op, Services services) {
-        return new ContractAxiom(
-                name, displayName, target, kjt, visibility,
-                op.apply(originalPre), op.apply(originalFreePre),
-                op.apply(originalPost), op.apply(originalFreePost),
-                op.apply(originalMby),
-                atPreVars, originalSelfVar, originalResultVar, originalParamVars);
+        return new ContractAxiom(name, displayName, target, kjt, visibility, op.apply(originalPre),
+            op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
+            op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,
+            originalParamVars);
     }
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+            Services services) {
 
         final boolean satisfiabilityGuard = true; // XXX
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
@@ -108,45 +92,39 @@ public final class ContractAxiom extends ClassAxiom {
 
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
-        return TG.generateContractAxiomTaclets(tacletName,
-                                               originalPre,
-                                               originalFreePre,
-                                               originalPost,
-                                               originalFreePost,
-                                               originalMby,
-                                               kjt,
-                                               target,
-                                               heaps,
-                                               self,
-                                               originalResultVar,
-                                               atPreVars,
-                                               originalParamVars,
-                                               toLimit,
-                                               satisfiabilityGuard,
-                                               services);
+        return TG.generateContractAxiomTaclets(tacletName, originalPre, originalFreePre,
+            originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
+            originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard,
+            services);
     }
 
     @Override
     public boolean equals(Object o) {
-       if (o == null || this.getClass() != o.getClass()) return false;
-       final ContractAxiom other = (ContractAxiom) o;
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        final ContractAxiom other = (ContractAxiom) o;
 
-       if (!name.equals(other.name)) return false;
-       if (!target.equals(other.target)) return false;
-       if (!kjt.equals(other.kjt)) return false;
+        if (!name.equals(other.name))
+            return false;
+        if (!target.equals(other.target))
+            return false;
+        if (!kjt.equals(other.kjt))
+            return false;
 
-       return true;
+        return true;
     }
 
     @Override
     public int hashCode() {
-       return 17*(name.hashCode() + 17 * target.hashCode());
+        return 17 * (name.hashCode() + 17 * target.hashCode());
     }
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        return MiscTools.collectObservers(originalPre).union(MiscTools.collectObservers(originalPost))
-                .union(MiscTools.collectObservers(originalFreePre)).union(MiscTools.collectObservers(originalFreePost));
+        return MiscTools.collectObservers(originalPre)
+                .union(MiscTools.collectObservers(originalPost))
+                .union(MiscTools.collectObservers(originalFreePre))
+                .union(MiscTools.collectObservers(originalFreePost));
     }
 
     @Override

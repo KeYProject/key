@@ -45,21 +45,20 @@ public class SExprs {
     /**
      * Produce a conjunction of SExprs.
      *
-     * There is some optimisation regarding the nature of the list of expressions:
-     * If it is empty, the result is "true". If it is a singleton, it is this
-     * single expression.
+     * There is some optimisation regarding the nature of the list of expressions: If it is empty,
+     * the result is "true". If it is a singleton, it is this single expression.
      *
      * @param clauses non-null list of boolean expression
      * @return an SExpr equivalent to the conjunction of the clauses.
      */
     public static SExpr and(List<SExpr> clauses) {
         switch (clauses.size()) {
-            case 0:
-                return TRUE;
-            case 1:
-                return clauses.get(0);
-            default:
-                return new SExpr("and", Type.BOOL, clauses);
+        case 0:
+            return TRUE;
+        case 1:
+            return clauses.get(0);
+        default:
+            return new SExpr("and", Type.BOOL, clauses);
         }
     }
 
@@ -68,17 +67,16 @@ public class SExprs {
      * <p>
      * There is some optimisation if there are constants involved.
      * <p>
-     * If the assumption is false, the result is true. If the assumption is
-     * true, the result is the conclusion. If the conclusion is true, the result
-     * is true. If the conclusion is false, the result is the negation of the
-     * assumption.
+     * If the assumption is false, the result is true. If the assumption is true, the result is the
+     * conclusion. If the conclusion is true, the result is true. If the conclusion is false, the
+     * result is the negation of the assumption.
      *
      * @param ante a boolean expression
      * @param cons a boolean expression
      * @return a boolean expression equivalent to the implication {@code (=> ante concl)}
      */
     public static SExpr imp(SExpr ante, SExpr cons) {
-        if(ante.equals(TRUE)) {
+        if (ante.equals(TRUE)) {
             return cons;
         }
         if (cons.equals(FALSE)) {
@@ -92,6 +90,7 @@ public class SExprs {
 
     /**
      * Produce a logical negation
+     *
      * @param se a boolean expression
      * @return a boolean expresion
      */
@@ -102,15 +101,14 @@ public class SExprs {
     /**
      * Produce a universal quantification.
      *
-     * If vars is empty:
-     * no quantifiers are produced and
-     * if the matrix has a pattern, the pattern is removed.
+     * If vars is empty: no quantifiers are produced and if the matrix has a pattern, the pattern is
+     * removed.
      *
      * @param vars a list of variable declarations {@code (var Type)}
      * @param matrix a boolean expression
      * @return
      */
-    public static SExpr forall(List<SExpr> vars, SExpr matrix)  throws SMTTranslationException {
+    public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
         if (vars.isEmpty()) {
             if (matrix.getName().equals("!")) {
                 return matrix.getChildren().get(0);
@@ -123,6 +121,7 @@ public class SExprs {
 
     /**
      * Takes an SExpression and converts it to the given type, if possible.
+     *
      * @param exp the SExpression to convert
      * @param type the desired type
      * @return The same SExpr, but with the desired type
@@ -142,7 +141,8 @@ public class SExprs {
         if (type == Type.UNIVERSE) {
             // Use the injection to go to universe
             if (orgType.injection == null) {
-                throw new SMTTranslationException("Cannot inject from " + orgType + " into U: " + exp);
+                throw new SMTTranslationException(
+                    "Cannot inject from " + orgType + " into U: " + exp);
             }
             return new SExpr(orgType.injection, type, exp);
         }
@@ -155,13 +155,13 @@ public class SExprs {
             return new SExpr(type.projection, type, exp);
         }
 
-        throw new SMTTranslationException("Cannot coerce from " + orgType +
-                " to " + type + ": " + exp);
+        throw new SMTTranslationException(
+            "Cannot coerce from " + orgType + " to " + type + ": " + exp);
     }
 
     /**
-     * Takes a list of {@link SExpr}s and converts it to a list of the given
-     * type, if possible.
+     * Takes a list of {@link SExpr}s and converts it to a list of the given type, if possible.
+     *
      * @param exprs the list to convert
      * @param type the desired target type
      * @return A fresh list with the same SExpr, but with the desired type
@@ -185,7 +185,7 @@ public class SExprs {
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
-       return patternSExpr(e, Arrays.asList(patterns));
+        return patternSExpr(e, Arrays.asList(patterns));
     }
 
     /**
@@ -210,8 +210,7 @@ public class SExprs {
     }
 
     /**
-     * Turn a KeY sort into an SMT sort (by prefixing
-     * {@link #SORT_PREFIX}.
+     * Turn a KeY sort into an SMT sort (by prefixing {@link #SORT_PREFIX}.
      *
      * @param sort the sort to translate to SMT
      * @return an SEXpr representing the sort (of type T)
@@ -222,6 +221,7 @@ public class SExprs {
 
     /**
      * Produce a cast expression
+     *
      * @param sortExp the sort as an SExpr
      * @param exp the expression to cast
      * @return a cast of type exp to sort sortExp
@@ -245,21 +245,22 @@ public class SExprs {
     }
 
     /**
-     * Collects the :pattern annations from any nesting depth in a term and
-     * brings it to toplevel.
+     * Collects the :pattern annations from any nesting depth in a term and brings it to toplevel.
      *
      * Example:
+     *
      * <pre>
      *     (and (! (.A.) :pattern ((p1))) (! (.B.) :pattern ((p2))) )
      * </pre>
+     *
      * yields
+     *
      * <pre>
      *     (! (and (.A.) (.B:)) :pattern ((p1)(p2)))
      * </pre>
      *
      * @param matrix the SExpr to pull the patterns from
-     * @return either matrix (if no patterns present) or a
-     * term (!... :pattern ...)
+     * @return either matrix (if no patterns present) or a term (!... :pattern ...)
      */
     public static SExpr pullOutPatterns(SExpr matrix) {
         Set<SExpr> collected = new HashSet<>();
@@ -273,7 +274,7 @@ public class SExprs {
 
     private static SExpr filterAndCollectPatterns(SExpr matrix, Set<SExpr> collected) {
         List<SExpr> orgChildren = matrix.getChildren();
-        if(matrix.getName().equals("!")) {
+        if (matrix.getName().equals("!")) {
             collected.addAll(orgChildren.get(2).getChildren());
             return filterAndCollectPatterns(orgChildren.get(0), collected);
         }
@@ -287,7 +288,7 @@ public class SExprs {
                 children.set(i, repl);
             }
         }
-        if(children == null) {
+        if (children == null) {
             return matrix;
         }
         return new SExpr(matrix.getName(), matrix.getType(), children);
@@ -300,18 +301,18 @@ public class SExprs {
     }
 
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr(">=", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr(">=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
+            SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<=", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
+            SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
+            SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
@@ -319,20 +320,18 @@ public class SExprs {
     }
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("-", IntegerOpHandler.INT,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("-", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
+            SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("+", IntegerOpHandler.INT,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("+", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
+            SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
-        return new SExpr("ite", Type.UNIVERSE,
-                SExprs.coerce(cond, Type.BOOL),
-                SExprs.coerce(_then, Type.UNIVERSE),
-                SExprs.coerce(_else, Type.UNIVERSE));
+        return new SExpr("ite", Type.UNIVERSE, SExprs.coerce(cond, Type.BOOL),
+            SExprs.coerce(_then, Type.UNIVERSE), SExprs.coerce(_else, Type.UNIVERSE));
     }
 
     public static SExpr let(String var, SExpr val, SExpr in) {

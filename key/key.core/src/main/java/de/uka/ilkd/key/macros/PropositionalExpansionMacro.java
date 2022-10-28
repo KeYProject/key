@@ -3,8 +3,8 @@ package de.uka.ilkd.key.macros;
 import java.util.Set;
 
 /**
- * The macro PropositionalExpansionMacro apply rules to decompose propositional
- * toplevel formulas; but does not split the goal.
+ * The macro PropositionalExpansionMacro apply rules to decompose propositional toplevel formulas;
+ * but does not split the goal.
  *
  * The rules that are applied can be set in {@link #ADMITTED_RULES}.
  *
@@ -19,8 +19,8 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
 
     @Override
     public String getDescription() {
-        return "Apply rules to decompose propositional toplevel formulas; " +
-                "does not split the goal.";
+        return "Apply rules to decompose propositional toplevel formulas; "
+            + "does not split the goal.";
     }
 
     @Override
@@ -28,10 +28,8 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
         return "nosplit-prop";
     }
 
-    private static final String[] ADMITTED_RULES = {
-        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
-        "closeTrue", "closeFalse", "true_left", "false_right"
-    };
+    private static final String[] ADMITTED_RULES = { "andLeft", "orRight", "impRight", "notLeft",
+        "notRight", "close", "closeTrue", "closeFalse", "true_left", "false_right" };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 

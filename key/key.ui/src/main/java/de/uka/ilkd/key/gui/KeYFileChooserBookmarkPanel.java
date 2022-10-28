@@ -33,7 +33,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     private final @Nonnull JFileChooser chooser;
 
     private final ViewSettings viewSettings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
 
     private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
     private final JList<File> listBookmarks = new JList<>(bookmarks);
@@ -50,10 +50,10 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
      */
     public KeYFileChooserBookmarkPanel(@Nonnull JFileChooser chooser) {
         this.chooser = chooser;
-        //register ad the given file chooser
+        // register ad the given file chooser
         chooser.setAccessory(this);
 
-        //listen for current directory of the file chooser
+        // listen for current directory of the file chooser
         chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, e -> {
             File selected = chooser.getCurrentDirectory();
             listBookmarks.setSelectedValue(selected, true);
@@ -102,8 +102,8 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
     private void loadBookmarks() {
         viewSettings.getFolderBookmarks().forEach(it ->
-                //make absolute? .getAbsoluteFile())
-                bookmarks.addElement(new File(it)));
+        // make absolute? .getAbsoluteFile())
+        bookmarks.addElement(new File(it)));
     }
 
     private void saveBookmarks() {
@@ -140,16 +140,15 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends File> list, File value,
-                                                      int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
+                int index, boolean isSelected, boolean cellHasFocus) {
             String val;
             if (value.getAbsolutePath().length() <= LIMIT) {
                 val = value.getAbsolutePath();
             } else {
                 val = toString(value);
             }
-            return renderer.getListCellRendererComponent(list, val, index,
-                    isSelected, cellHasFocus);
+            return renderer.getListCellRendererComponent(list, val, index, isSelected,
+                cellHasFocus);
         }
     }
 

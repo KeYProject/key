@@ -9,8 +9,6 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  */
 interface InfFlowFactoryMethod {
 
-    Term produce(BasicSnippetData d,
-                 ProofObligationVars poVars1,
-                 ProofObligationVars poVars2)
+    Term produce(BasicSnippetData d, ProofObligationVars poVars1, ProofObligationVars poVars2)
             throws UnsupportedOperationException;
 }

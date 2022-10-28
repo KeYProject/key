@@ -33,8 +33,7 @@ public class TermLabelSettings implements Settings, Cloneable {
      * @see #addSettingsListener(SettingsListener)
      * @see #removeSettingsListener(SettingsListener)
      */
-    private final LinkedList<SettingsListener> listenerList =
-        new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     @Override
     public void readSettings(Properties props) {
@@ -43,10 +42,8 @@ public class TermLabelSettings implements Settings, Cloneable {
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
-            LOGGER.debug(
-                    "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"." +
-                    "Using the default value: true." +
-                    "The string read was: {}", str);
+            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
+                + "Using the default value: true." + "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }

@@ -23,41 +23,32 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
  * when a {@link WhileInvariantRule} is applied.
+ *
  * @author Martin Hentschel
  */
 public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpdate {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImmutableList<Name> getSupportedRuleNames() {
+        return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void updateLabels(TermLabelState state,
-                            Services services,
-                            PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
-                            Term modalityTerm,
-                            Rule rule,
-                            RuleApp ruleApp,
-                            Object hint,
-                            Term tacletTerm,
-                            Operator newTermOp,
-                            ImmutableArray<Term> newTermSubs,
-                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            JavaBlock newTermJavaBlock,
-                            Set<TermLabel> labels) {
-      if (rule instanceof WhileInvariantRule &&
-          "LoopBodyImplication".equals(hint) &&
-          SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-         if (!labels.contains(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL)) {
-            labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
-         }
-      }
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLabels(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
+            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
+            JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
+        if (rule instanceof WhileInvariantRule && "LoopBodyImplication".equals(hint)
+                && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
+            if (!labels.contains(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL)) {
+                labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
+            }
+        }
+    }
 }

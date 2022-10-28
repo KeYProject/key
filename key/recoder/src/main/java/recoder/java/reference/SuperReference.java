@@ -10,8 +10,8 @@ import recoder.java.*;
  * @author <TT>AutoDoc</TT>
  */
 
-public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression, ReferencePrefix,
-        ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
+public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression,
+        ReferencePrefix, ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
      * serialization id
@@ -177,8 +177,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -212,10 +211,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -236,10 +234,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public TypeReference getTypeReferenceAt(int index) {
@@ -250,11 +247,10 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

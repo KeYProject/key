@@ -46,15 +46,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return "Finish auxiliary computation.";
     }
 
-    static Term calculateResultingTerm(Proof proof,
-                                       IFProofObligationVars ifVars,
-                                       Goal initGoal) {
+    static Term calculateResultingTerm(Proof proof, IFProofObligationVars ifVars, Goal initGoal) {
         final Term[] goalFormulas1 =
-                buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
-                               proof.openGoals(), initGoal);
+            buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1), proof.openGoals(), initGoal);
         final Term[] goalFormulas2 =
-                buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2),
-                               proof.openGoals(), initGoal);
+            buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2), proof.openGoals(), initGoal);
         final TermBuilder tb = proof.getServices().getTermBuilder();
         Term composedStates = tb.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
@@ -92,23 +88,17 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         }
     }
 
-    private static Term[] buildExecution(ProofObligationVars c,
-                                         Map<Term, Term> vsMap,
-                                         ImmutableList<Goal> symbExecGoals,
-                                         Goal initGoal) {
+    private static Term[] buildExecution(ProofObligationVars c, Map<Term, Term> vsMap,
+            ImmutableList<Goal> symbExecGoals, Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
-        final InfFlowProgVarRenamer renamer =
-                        new InfFlowProgVarRenamer(goalFormulas, vsMap,
-                                                  c.postfix, initGoal,
-                                                  services.getOverlay(initGoal.getLocalNamespaces()));
-        final Term[] renamedGoalFormulas =
-                renamer.renameVariablesAndSkolemConstants();
+        final InfFlowProgVarRenamer renamer = new InfFlowProgVarRenamer(goalFormulas, vsMap,
+            c.postfix, initGoal, services.getOverlay(initGoal.getLocalNamespaces()));
+        final Term[] renamedGoalFormulas = renamer.renameVariablesAndSkolemConstants();
         Term[] result = new Term[renamedGoalFormulas.length];
         final TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
-            result[i] =
-                    tb.applyElementary(c.pre.heap, renamedGoalFormulas[i]);
+            result[i] = tb.applyElementary(c.pre.heap, renamedGoalFormulas[i]);
         }
         return result;
     }
@@ -137,12 +127,10 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    protected static void addContractApplicationTaclets(Goal initiatingGoal,
-                                                        Proof symbExecProof) {
+    protected static void addContractApplicationTaclets(Goal initiatingGoal, Proof symbExecProof) {
         final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
         for (final Goal openGoal : openGoals) {
-            final Set<NoPosTacletApp> ruleApps =
-                    openGoal.indexOfTaclets().allNoPosTacletApps();
+            final Set<NoPosTacletApp> ruleApps = openGoal.indexOfTaclets().allNoPosTacletApps();
             for (final NoPosTacletApp ruleApp : ruleApps) {
                 final Taclet t = ruleApp.taclet();
                 if (t.getSurviveSymbExec()) {

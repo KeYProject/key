@@ -11,8 +11,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchContinueParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchContinueParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     public CcatchContinueParameterDeclaration(ExtList children) {
     }

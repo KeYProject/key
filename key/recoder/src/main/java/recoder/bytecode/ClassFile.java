@@ -134,8 +134,8 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     public boolean isOrdinaryInterface() {
-        return (accessFlags & AccessFlags.INTERFACE) != 0 &&
-                (accessFlags & AccessFlags.ANNOTATION) == 0;
+        return (accessFlags & AccessFlags.INTERFACE) != 0
+                && (accessFlags & AccessFlags.ANNOTATION) == 0;
     }
 
     public boolean isAnnotationType() {
@@ -147,8 +147,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     public boolean isOrdinaryClass() {
-        return (accessFlags & AccessFlags.INTERFACE) == 0 &&
-                (accessFlags & AccessFlags.ENUM) == 0;
+        return (accessFlags & AccessFlags.INTERFACE) == 0 && (accessFlags & AccessFlags.ENUM) == 0;
     }
 
     public final List<ClassType> getSupertypes() {

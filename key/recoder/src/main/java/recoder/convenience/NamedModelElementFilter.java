@@ -6,8 +6,7 @@ import recoder.ModelElement;
 import recoder.NamedModelElement;
 
 /**
- * Filter predicate for named model elements. Can search for certain names and
- * types (optionally).
+ * Filter predicate for named model elements. Can search for certain names and types (optionally).
  *
  * @author AL
  */
@@ -28,13 +27,12 @@ public class NamedModelElementFilter implements ModelElementFilter {
     }
 
     /**
-     * Create a filter that accepts any named model element with the given name
-     * and type.
+     * Create a filter that accepts any named model element with the given name and type.
      *
      * @param type the most general type to accept.
      * @param name the name that is accepted.
      * @throws IllegalArgumentException if the type is not a subtype of
-     *                                  {@link recoder.NamedModelElement}.
+     *         {@link recoder.NamedModelElement}.
      */
     public NamedModelElementFilter(Class type, String name) {
         if (!NamedModelElement.class.isAssignableFrom(type)) {

@@ -35,8 +35,7 @@ public class CcatchContinueWildcardParameterDeclaration
     @Override
     public void accept(SourceVisitor v) {
         if (v instanceof SourceVisitorExtended) {
-            ((SourceVisitorExtended) v)
-                    .visitCcatchContinueWildcardParameterDeclaration(this);
+            ((SourceVisitorExtended) v).visitCcatchContinueWildcardParameterDeclaration(this);
         } else {
             // throw new IllegalStateException(
             // "Method 'accept' not implemented in Ccatch");

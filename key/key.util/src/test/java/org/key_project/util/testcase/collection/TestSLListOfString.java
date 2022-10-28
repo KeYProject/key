@@ -18,30 +18,25 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
-    String[] str = new String[]{"Dies", "ist", "ein", "Test"};
+    String[] str = new String[] { "Dies", "ist", "ein", "Test" };
 
-    ImmutableList<String> a;   // "A" "B" "C"
-    ImmutableList<String> a1;  // "A" "B" "C"
-    ImmutableList<String> b;   // "A" "B"
-    ImmutableList<String> c;   // "A" "B" "C" "D"
-    ImmutableList<String> d;   // "A" "B" "A"
-    ImmutableList<String> e;   // "A" "B" null
-    ImmutableList<String> e1;   // "A" "B" null
+    ImmutableList<String> a; // "A" "B" "C"
+    ImmutableList<String> a1; // "A" "B" "C"
+    ImmutableList<String> b; // "A" "B"
+    ImmutableList<String> c; // "A" "B" "C" "D"
+    ImmutableList<String> d; // "A" "B" "A"
+    ImmutableList<String> e; // "A" "B" null
+    ImmutableList<String> e1; // "A" "B" null
 
 
     @BeforeEach
     public void setUp() {
         a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
-        a1 = ImmutableSLList.<String>nil()
-                .prepend("C").prepend("B").prepend("A");
-        b = ImmutableSLList.<String>nil()
-                .prepend("B").prepend("A");
-        c = ImmutableSLList.<String>nil()
-                .prepend("D").prepend("C").prepend("B").prepend("A");
-        d = ImmutableSLList.<String>nil()
-                .prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<String>nil()
-                .prepend((String) null).prepend("B").prepend("A");
+        a1 = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
+        b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
+        c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
+        d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
+        e = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
         e1 = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
     }
 
@@ -61,10 +56,10 @@ public class TestSLListOfString {
             int size = newList[i].size();
             if (i > 0) { // list should have elements
                 assertTrue(it.hasNext());
-				assertEquals(size, i);
+                assertEquals(size, i);
             } else { // list is empty
-				assertFalse(it.hasNext());
-				assertEquals(0, size);
+                assertFalse(it.hasNext());
+                assertEquals(0, size);
             }
             int nr = 0;
             while (it.hasNext()) {
@@ -72,11 +67,11 @@ public class TestSLListOfString {
                 nr++;
             }
             // list has right length
-			assertEquals(nr, size);
+            assertEquals(nr, size);
         }
         // prepend two lists
         ImmutableList<String> prepList = newList[1].prepend(newList[2]);
-		assertEquals(3, prepList.size());
+        assertEquals(3, prepList.size());
         // right order
         assertEquals(str[1], prepList.head());
         assertEquals(str[0], prepList.tail().head());
@@ -99,10 +94,10 @@ public class TestSLListOfString {
             int size = newList[i].size();
             if (i > 0) { // list should have elements
                 assertTrue(it.hasNext());
-				assertEquals(size, i);
+                assertEquals(size, i);
             } else { // list is empty
-				assertFalse(it.hasNext());
-				assertEquals(0, size);
+                assertFalse(it.hasNext());
+                assertEquals(0, size);
             }
             int nr = 0;
             while (it.hasNext()) {
@@ -110,12 +105,12 @@ public class TestSLListOfString {
                 nr++;
             }
             // list has right length
-			assertEquals(nr, size);
+            assertEquals(nr, size);
         }
 
         // append two lists
         ImmutableList<String> appList = newList[2].append(newList[1]);
-		assertEquals(3, appList.size());
+        assertEquals(3, appList.size());
         // right order
         assertEquals(str[0], appList.head());
         assertEquals(str[1], appList.tail().head());
@@ -165,7 +160,7 @@ public class TestSLListOfString {
         }
         newList = newList.append(str[0]);
         newList = newList.removeAll(str[0]);
-		assertFalse(newList.contains(str[0]), "str[0] should have been removed");
+        assertFalse(newList.contains(str[0]), "str[0] should have been removed");
 
     }
 
@@ -182,25 +177,27 @@ public class TestSLListOfString {
         newList = newList.removeFirst(str[0]);
 
 
-        assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1, "Only first occurrence should have been removed");
+        assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1,
+            "Only first occurrence should have been removed");
 
         newList = newList.removeFirst(str[0]);
-		assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");
+        assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");
         newList = newList.removeFirst(str[0]);
 
-        assertTrue(!(newList.contains(str[0])) && newList.size() == oldSize - 3, "Only first occurrence should have been removed");
+        assertTrue(!(newList.contains(str[0])) && newList.size() == oldSize - 3,
+            "Only first occurrence should have been removed");
 
     }
 
     @Test
     public void testEquals() {
-		assertEquals(a, a1, "a==a1");
-		assertNotEquals(a, b, "a!=b");
-		assertNotEquals(a, c, "a!=c");
-		assertNotEquals(a, d, "a!=d");
-		assertNotEquals(a, e, "a!=e");
-		assertNotEquals(e, a, "e!=a");
-		assertEquals(e, e1, "e==e1");
+        assertEquals(a, a1, "a==a1");
+        assertNotEquals(a, b, "a!=b");
+        assertNotEquals(a, c, "a!=c");
+        assertNotEquals(a, d, "a!=d");
+        assertNotEquals(a, e, "a!=e");
+        assertNotEquals(e, a, "e!=a");
+        assertEquals(e, e1, "e==e1");
     }
 
 

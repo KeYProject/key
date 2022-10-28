@@ -23,7 +23,8 @@ public class KeyboardTacletTest {
         assertEquals(0, KeyboardTacletModel.getPrefixLength("andLeft", "impRight"));
 
 
-        List<String> keywords = Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
+        List<String> keywords =
+            Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
 
         assertEquals(3, KeyboardTacletModel.getClashFreePrefix("impLeft", keywords));
 

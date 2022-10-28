@@ -12,11 +12,11 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    SequentFormula getFilteredFormula   ();
+    SequentFormula getFilteredFormula();
 
     /**
      * Original formula from sequent
      */
-    SequentFormula getOriginalFormula   ();
+    SequentFormula getOriginalFormula();
 
 }

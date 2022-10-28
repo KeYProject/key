@@ -26,10 +26,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
- * This class is implemented by visitors/walkers.
- * Each AST node implements a visit(Visitor) method that
- * calls the  doActionAt<NodeType> method. Similar to the pretty print
- * mechanism.
+ * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
+ * that calls the doActionAt<NodeType> method. Similar to the pretty print mechanism.
  */
 public interface Visitor {
 
@@ -171,8 +169,7 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification
-        (ImplicitFieldSpecification x);
+    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -206,8 +203,7 @@ public interface Visitor {
 
     void performActionOnTimesAssignment(TimesAssignment x);
 
-    void performActionOnUnsignedShiftRightAssignment(
-        UnsignedShiftRightAssignment x);
+    void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x);
 
     void performActionOnBinaryNot(BinaryNot x);
 
@@ -336,34 +332,28 @@ public interface Visitor {
     void performActionOnLoopContract(LoopContract x);
 
     /**
-     * Adds block contract for new statement block to block contract
-     * of old block statement.
+     * Adds block contract for new statement block to block contract of old block statement.
      *
      * @param oldBlock the old block
      * @param newBlock the new block
      */
-    void performActionOnBlockContract(final StatementBlock oldBlock,
-                                      final StatementBlock newBlock);
+    void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
-     * Adds block contract for new statement block to block contract
-     * of old block statement.
+     * Adds block contract for new statement block to block contract of old block statement.
      *
      * @param oldBlock the old block
      * @param newBlock the new block
      */
-    void performActionOnLoopContract(final StatementBlock oldBlock,
-                                     final StatementBlock newBlock);
+    void performActionOnLoopContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
-     * Adds loop contract for new loop statement to loop contract
-     * of old loop statement.
+     * Adds loop contract for new loop statement to loop contract of old loop statement.
      *
      * @param oldLoop the old loop statement
      * @param newLoop the new loop statement
      */
-    void performActionOnLoopContract(final LoopStatement oldLoop,
-                                     final LoopStatement newLoop);
+    void performActionOnLoopContract(final LoopStatement oldLoop, final LoopStatement newLoop);
 
     void performActionOnMergeContract(MergeContract x);
 
@@ -416,8 +406,8 @@ public interface Visitor {
      * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
      * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
      *
-     * @param cond the condition to perform an action on
-     *             (may be {@code null} if the JML assert wasn't finished)
+     * @param cond the condition to perform an action on (may be {@code null} if the JML assert
+     *        wasn't finished)
      */
     void performActionOnJmlAssertCondition(final Term cond);
 }

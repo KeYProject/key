@@ -9,24 +9,25 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**
- * BinaryFeature that return zero if all the operator is quantifier from root 
- * to position it point to.
+ * BinaryFeature that return zero if all the operator is quantifier from root to position it point
+ * to.
  */
 public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
-    public final static Feature INSTANCE = new OnlyInScopeOfQuantifiersFeature ();
+    public final static Feature INSTANCE = new OnlyInScopeOfQuantifiersFeature();
 
     private OnlyInScopeOfQuantifiersFeature() {}
-    
+
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final PIOPathIterator it = pos.iterator ();
-        while ( it.next () != -1 ) {
-            final Term subterm = it.getSubTerm ();
-            if ( ! ( subterm.op () instanceof Quantifier ) ) return false;
+        final PIOPathIterator it = pos.iterator();
+        while (it.next() != -1) {
+            final Term subterm = it.getSubTerm();
+            if (!(subterm.op() instanceof Quantifier))
+                return false;
         }
-        
+
         return true;
     }
 }

@@ -15,12 +15,11 @@ import java.util.List;
 
 
 /**
- * This visitor evaluates all secondary (level 1) declarations.
- * This includes:
+ * This visitor evaluates all secondary (level 1) declarations. This includes:
  * <ul>
- *     <li>Predicates</li>
- *     <li>Functions</li>
- *     <li>Transformers</li>
+ * <li>Predicates</li>
+ * <li>Functions</li>
+ * <li>Transformers</li>
  * </ul>
  * <p>
  * These information are registered into the given {@link NamespaceSet}.
@@ -62,22 +61,15 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
-                p = SortDependingFunction.createFirstInstance(
-                        (GenericSort) genSort,
-                        new Name(baseName),
-                        Sort.FORMULA,
-                        argSorts.toArray(new Sort[0]),
-                        false);
+                p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name),
-                    Sort.FORMULA,
-                    argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    false);
+            p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 
         if (lookup(p.name()) == null) {
@@ -107,21 +99,14 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             String baseName = func_name.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
-                f = SortDependingFunction.createFirstInstance(
-                        (GenericSort) genSort,
-                        new Name(baseName),
-                        retSort,
-                        argSorts.toArray(new Sort[0]),
-                        unique);
+                f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+                    new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
             }
         }
 
         if (f == null) {
-            f = new Function(new Name(func_name),
-                    retSort,
-                    argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    unique);
+            f = new Function(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 
         if (lookup(f.name()) == null) {
@@ -143,9 +128,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         Sort retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId()));
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
-        Transformer t = new Transformer(new Name(trans_name),
-                retSort,
-                new ImmutableArray<>(argSorts));
+        Transformer t =
+            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }

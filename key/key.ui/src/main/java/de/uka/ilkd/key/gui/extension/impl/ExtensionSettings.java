@@ -8,7 +8,8 @@ import java.util.TreeSet;
 
 public class ExtensionSettings extends AbstractPropertiesSettings {
     public final static String KEY_DISABLED = "[Extensions]disabled";
-    private final PropertyEntry<Set<String>> forbiddenClasses = createStringSetProperty(KEY_DISABLED, "");
+    private final PropertyEntry<Set<String>> forbiddenClasses =
+        createStringSetProperty(KEY_DISABLED, "");
 
     public Collection<String> getForbiddenClasses() {
         return forbiddenClasses.get();

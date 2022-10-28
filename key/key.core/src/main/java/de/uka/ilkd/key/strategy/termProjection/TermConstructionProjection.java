@@ -8,36 +8,35 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * Term projection for constructing a bigger term from a sequence of direct
- * subterms and an operator.
- * 
- * NB: this is a rather restricted version of term construction, one can think
- * of also allowing bound variables, etc to be specified
+ * Term projection for constructing a bigger term from a sequence of direct subterms and an
+ * operator.
+ *
+ * NB: this is a rather restricted version of term construction, one can think of also allowing
+ * bound variables, etc to be specified
  */
 public class TermConstructionProjection implements ProjectionToTerm {
 
-    private final Operator               op;
-    private final ProjectionToTerm[]     subTerms;
-    
+    private final Operator op;
+    private final ProjectionToTerm[] subTerms;
+
 
     private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
-	assert !(op instanceof Modality); //XXX
+        assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
-        assert op.arity () == subTerms.length;
+        assert op.arity() == subTerms.length;
     }
 
-    public static ProjectionToTerm create(Operator op,
-                                          ProjectionToTerm[] subTerms) {
-        return new TermConstructionProjection ( op, subTerms );
+    public static ProjectionToTerm create(Operator op, ProjectionToTerm[] subTerms) {
+        return new TermConstructionProjection(op, subTerms);
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term[] subs = new Term[subTerms.length];
-        for ( int i = 0; i != subTerms.length; ++i ) {
-            subs[i] = subTerms[i].toTerm ( app, pos, goal );           
+        for (int i = 0; i != subTerms.length; ++i) {
+            subs[i] = subTerms[i].toTerm(app, pos, goal);
         }
-        return goal.proof().getServices().getTermFactory().createTerm ( op, subs, null, null );
+        return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
     }
-    
+
 }

@@ -13,24 +13,24 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     }
 
     private Name svName;
-    
+
     protected SVNeedsInstantiation(Name svName) {
         super(svName);
         this.svName = svName;
     }
-    
+
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         boolean res = super.filter(app, pos, goal);
         if (res == false) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {
-                if (sv.name().equals(svName)) { 
+                if (sv.name().equals(svName)) {
                     return true;
                 }
             }
         }
         return false;
     }
-    
-    
+
+
 }

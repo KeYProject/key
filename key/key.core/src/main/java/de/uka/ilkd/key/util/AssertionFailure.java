@@ -5,16 +5,16 @@ public class AssertionFailure extends RuntimeException {
 
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -235001842777133987L;
 
     public AssertionFailure() {
-	super();
+        super();
     }
 
     public AssertionFailure(String msg) {
-	super(msg);
+        super(msg);
     }
 
 

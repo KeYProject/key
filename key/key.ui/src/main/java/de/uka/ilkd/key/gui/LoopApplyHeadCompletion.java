@@ -7,20 +7,18 @@ import de.uka.ilkd.key.rule.LoopApplyHeadBuiltInRuleApp;
 /**
  * Interactive completion for {@link LoopApplyHeadBuiltInRuleApp}.
  */
-public class LoopApplyHeadCompletion
-        implements InteractiveRuleApplicationCompletion {
-    
-    LoopApplyHeadCompletion(MainWindow mainWindow){ }
+public class LoopApplyHeadCompletion implements InteractiveRuleApplicationCompletion {
+
+    LoopApplyHeadCompletion(MainWindow mainWindow) {}
 
     @Override
-    public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
-            final Goal goal, final boolean force) {
-        LoopApplyHeadBuiltInRuleApp result =
-                (LoopApplyHeadBuiltInRuleApp) application;
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
+            final boolean force) {
+        LoopApplyHeadBuiltInRuleApp result = (LoopApplyHeadBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
-        
+
         result.tryToInstantiate(goal);
         return result;
     }

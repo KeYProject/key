@@ -15,8 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * Creates an <tt>Type::instance(..)</tt> term for the component type of the
- * array. The component type has to be a reference type.
+ * Creates an <tt>Type::instance(..)</tt> term for the component type of the array. The component
+ * type has to be a reference type.
  */
 public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
@@ -25,18 +25,17 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
     }
 
     /**
-     * returns an <tt>G::instance(term.sub(1))</tt> term for the element sort of 
-     * the given array . It is assumed that <tt>term.sub(0)</tt> is either a term of 
-     * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
-     * depending on a reference array sort.
+     * returns an <tt>G::instance(term.sub(1))</tt> term for the element sort of the given array .
+     * It is assumed that <tt>term.sub(0)</tt> is either a term of reference array sort or a term
+     * with an <tt>exactInstance</tt> symbol as top level depending on a reference array sort.
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 
         final Sort arraySort;
-        if(array.op() instanceof SortDependingFunction
-           && ((SortDependingFunction)array.op()).getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+        if (array.op() instanceof SortDependingFunction && ((SortDependingFunction) array.op())
+                .getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
             arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
@@ -46,11 +45,10 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol
-            =  arrayElementSort.getInstanceofSymbol(services);
-        Debug.assertTrue(instanceofSymbol != null,
-                "Instanceof symbol not found for ", arrayElementSort);
-        
+        Function instanceofSymbol = arrayElementSort.getInstanceofSymbol(services);
+        Debug.assertTrue(instanceofSymbol != null, "Instanceof symbol not found for ",
+            arrayElementSort);
+
         return services.getTermFactory().createTerm(instanceofSymbol, element);
     }
 

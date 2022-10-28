@@ -26,12 +26,13 @@ public class WalkPositionTest extends TestCase {
                 ProgramElement pe = tw.getProgramElement();
                 Position newPos = pe.getFirstElement().getStartPosition();
                 if (newPos.equals(Position.UNDEFINED)) {
-                    System.err.println("Position undefined: " + Format.toString("%c @%p in %u", pe));
+                    System.err
+                            .println("Position undefined: " + Format.toString("%c @%p in %u", pe));
                 }
-                if (newPos.getLine() < oldPos.getLine()
-                        || (newPos.getLine() == oldPos.getLine() && newPos.getColumn() < newPos.getColumn())) {
+                if (newPos.getLine() < oldPos.getLine() || (newPos.getLine() == oldPos.getLine()
+                        && newPos.getColumn() < newPos.getColumn())) {
                     Assert.fail("Position mismatch: " + Format.toString("%c @%p in %u", oldPe) + "/"
-                            + Format.toString("%c @%p", pe));
+                        + Format.toString("%c @%p", pe));
                 }
                 oldPos = newPos;
                 oldPe = pe;

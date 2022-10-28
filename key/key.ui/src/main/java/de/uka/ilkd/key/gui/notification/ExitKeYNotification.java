@@ -15,62 +15,56 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This task takes care for a notification when exiting KeY.
- * 
+ *
  * @author bubel
  */
 public class ExitKeYNotification extends NotificationTask {
-   private static final Logger LOGGER = LoggerFactory.getLogger(ExitKeYNotification.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExitKeYNotification.class);
 
-   /**
-    * overwritten as invokeAndWait is taken called to execute the notification
-    * task, but this method only takes care that we are in the even dispatcher
-    * thread
-    * 
-    * @param manager
-    *           the NotificationManager to which this tasks belongs to
-    * @param event
-    *           the NotificationEvent triggering this task
-    */
-   @Override
-   public void execute(NotificationEvent event, NotificationManager manager) {
-      // if we are in automode execute task only if it is
-      // automode enabled
-      if (manager.inAutoMode() && !automodeEnabledTask()) {
-         return;
-      }
-      // notify thread safe
+    /**
+     * overwritten as invokeAndWait is taken called to execute the notification task, but this
+     * method only takes care that we are in the even dispatcher thread
+     *
+     * @param manager the NotificationManager to which this tasks belongs to
+     * @param event the NotificationEvent triggering this task
+     */
+    @Override
+    public void execute(NotificationEvent event, NotificationManager manager) {
+        // if we are in automode execute task only if it is
+        // automode enabled
+        if (manager.inAutoMode() && !automodeEnabledTask()) {
+            return;
+        }
+        // notify thread safe
 
-      if (SwingUtilities.isEventDispatchThread()) {
-         executeActions(event, manager);
-      }
-      else {
-         final NotificationEvent eventObject = event;
-         final NotificationManager notManager = manager;
-         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-               @Override
-               public void run() {
-                  executeActions(eventObject, notManager);
-               }
-            });
-         }
-         catch (InterruptedException e) {
-            LOGGER.debug("unexpected exception during notification");
-         }
-         catch (InvocationTargetException e) {
-            LOGGER.debug("unexpected exception during notification");
-         }
-      }
-   }
+        if (SwingUtilities.isEventDispatchThread()) {
+            executeActions(event, manager);
+        } else {
+            final NotificationEvent eventObject = event;
+            final NotificationManager notManager = manager;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        executeActions(eventObject, notManager);
+                    }
+                });
+            } catch (InterruptedException e) {
+                LOGGER.debug("unexpected exception during notification");
+            } catch (InvocationTargetException e) {
+                LOGGER.debug("unexpected exception during notification");
+            }
+        }
+    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
-    */
-   @Override
-   public NotificationEventID getEventID() {
-      return NotificationEventID.EXIT_KEY;
-   }
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
+     */
+    @Override
+    public NotificationEventID getEventID() {
+        return NotificationEventID.EXIT_KEY;
+    }
 
 }

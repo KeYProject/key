@@ -9,8 +9,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- * This variable condition checks if a given type denotes an abstract class or
- * interface type.
+ * This variable condition checks if a given type denotes an abstract class or interface type.
  */
 public final class AbstractOrInterfaceType extends VariableConditionAdapter {
 
@@ -21,32 +20,29 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
         this.resolver = tr;
         this.negated = negation;
     }
-    
-    public boolean isNegated(){
-	return negated;
+
+    public boolean isNegated() {
+        return negated;
     }
-    
-    public TypeResolver getTypeResolver(){
-	return resolver;
+
+    public TypeResolver getTypeResolver() {
+        return resolver;
     }
-    
+
     @Override
-    public boolean check(SchemaVariable var, 
-	    		 SVSubstitute instCandidate,
-	    		 SVInstantiations instMap, 
-	    		 Services services) {
-        final Sort sort = 
-            resolver.resolveSort(var, instCandidate, instMap, services);
-                        
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+            Services services) {
+        final Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
+
         final boolean isAbstractOrInterface = sort.isAbstract();
-        
+
         return negated ? !isAbstractOrInterface : isAbstractOrInterface;
     }
-    
-    
+
+
     @Override
-    public String toString() {      
+    public String toString() {
         String prefix = negated ? "\\not" : "";
-        return prefix+"\\isAbstractOrInterface (" + resolver + ")";
+        return prefix + "\\isAbstractOrInterface (" + resolver + ")";
     }
 }

@@ -53,10 +53,11 @@ public class IncludeFinder extends AbstractBuilder<Void> {
             filename += ".key";
 
         if (relativePath) {
-            filename = filename.replace('/', File.separatorChar); // Not required for Windows, but whatsoever
+            filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
+                                                                  // whatsoever
             filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
             URL path = new URL(base.getProtocol(), base.getHost(), base.getPort(),
-                    basePath + "/" + filename);
+                basePath + "/" + filename);
             source = RuleSourceFactory.initRuleFile(path);
         } else {
             source = RuleSourceFactory.fromDefaultLocation(filename);

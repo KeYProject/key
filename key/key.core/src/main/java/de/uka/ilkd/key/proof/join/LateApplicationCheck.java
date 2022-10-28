@@ -10,8 +10,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 
 /**
- * Methods for computing conflicts affecting a delayed cut application. Relies
- * on the given {@link ApplicationCheck} object.
+ * Methods for computing conflicts affecting a delayed cut application. Relies on the given
+ * {@link ApplicationCheck} object.
  *
  * @see ApplicationCheck
  * @author Benjamin Niedermann
@@ -23,8 +23,7 @@ public enum LateApplicationCheck {
         return check(check, node.sequent(), cutNode);
     }
 
-    private List<String> check(ApplicationCheck check, Sequent sequent,
-            Node cutNode) {
+    private List<String> check(ApplicationCheck check, Sequent sequent, Node cutNode) {
         List<String> conflicts = new LinkedList<String>();
         for (Iterator<SequentFormula> it = sequent.iterator(); it.hasNext();) {
             SequentFormula sf = it.next();

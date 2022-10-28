@@ -13,7 +13,8 @@ import recoder.java.TerminalProgramElement;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class Modifier extends JavaProgramElement implements DeclarationSpecifier, TerminalProgramElement {
+public abstract class Modifier extends JavaProgramElement
+        implements DeclarationSpecifier, TerminalProgramElement {
 
     /**
      * Parent.

@@ -10,40 +10,39 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 
 /**
- * Binary feature that returns zero iff the find-formula of the concerned rule
- * app was introduced by a certain kind rule of rule (described via a
- * <code>RuleFilter</code>)
+ * Binary feature that returns zero iff the find-formula of the concerned rule app was introduced by
+ * a certain kind rule of rule (described via a <code>RuleFilter</code>)
  */
 public class FormulaAddedByRuleFeature extends BinaryFeature {
 
     private final RuleFilter filter;
-    
-    private FormulaAddedByRuleFeature (RuleFilter p_filter) {
+
+    private FormulaAddedByRuleFeature(RuleFilter p_filter) {
         filter = p_filter;
     }
 
-    public static Feature create (RuleFilter p_filter) {
-        return new FormulaAddedByRuleFeature ( p_filter );
+    public static Feature create(RuleFilter p_filter) {
+        return new FormulaAddedByRuleFeature(p_filter);
     }
 
-    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final SequentFormula cfma = pos.sequentFormula ();
-        final boolean antec = pos.isInAntec ();
-        
-        Node node = goal.node ();
-        
-        while ( !node.root () ) {
-            final Node par = node.parent ();
-            final Sequent pseq = par.sequent ();
+        final SequentFormula cfma = pos.sequentFormula();
+        final boolean antec = pos.isInAntec();
 
-            if ( !( antec ? pseq.antecedent () : pseq.succedent () ).contains ( cfma ) )
-                return filter.filter ( par.getAppliedRuleApp ().rule () );
-            
+        Node node = goal.node();
+
+        while (!node.root()) {
+            final Node par = node.parent();
+            final Sequent pseq = par.sequent();
+
+            if (!(antec ? pseq.antecedent() : pseq.succedent()).contains(cfma))
+                return filter.filter(par.getAppliedRuleApp().rule());
+
             node = par;
         }
-        
+
         return false;
     }
 

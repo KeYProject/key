@@ -33,8 +33,7 @@ import java.util.List;
  * This transformation does not work yet!
  * <p>
  * <p>
- * uses type casts instead of co-variant return types.
- * Does not work with primitive types yet.
+ * uses type casts instead of co-variant return types. Does not work with primitive types yet.
  *
  * @author Tobias Gutzmann
  */
@@ -45,7 +44,8 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     /**
      *
      */
-    public RemoveCoVariantReturnTypes(CrossReferenceServiceConfiguration sc, NonTerminalProgramElement root) {
+    public RemoveCoVariantReturnTypes(CrossReferenceServiceConfiguration sc,
+            NonTerminalProgramElement root) {
         super(sc);
         this.root = root;
     }
@@ -62,7 +62,8 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 if (returnType == null || returnType instanceof PrimitiveType)
                     continue;
                 List<Method> ml = MethodKit.getRedefinedMethods(md);
-                if (ml.size() == 0) continue;
+                if (ml.size() == 0)
+                    continue;
                 List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
                 for (int i = 0; i < ml.size(); i++) {
                     Type rt = getSourceInfo().getReturnType(ml.get(i));
@@ -74,16 +75,16 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 ctml_copy.addAll(ctml);
                 TypeKit.removeCoveredSubtypes(getSourceInfo(), ctml);
                 if (ctml.size() != 1) {
-//					System.err.println("<>1 common supertypes:");
-//					for (int i = 0; i < ctml.size(); i++) {
-//						System.err.println(ctml.getClassType(i).getFullName());
-//					}
-//					System.err.println("Was:");
-//					System.err.println(t.getFullName());
-//					System.err.println(md.getFullName());
-//					for (int i = 0; i < ctml_copy.size(); i++) {
-//						System.err.println(ctml_copy.getClassType(i).getFullName());
-//					}
+                    // System.err.println("<>1 common supertypes:");
+                    // for (int i = 0; i < ctml.size(); i++) {
+                    // System.err.println(ctml.getClassType(i).getFullName());
+                    // }
+                    // System.err.println("Was:");
+                    // System.err.println(t.getFullName());
+                    // System.err.println(md.getFullName());
+                    // for (int i = 0; i < ctml_copy.size(); i++) {
+                    // System.err.println(ctml_copy.getClassType(i).getFullName());
+                    // }
                     // TODO look into this
                     if (ctml.size() == 0 && returnType instanceof ArrayType)
                         continue;
@@ -98,19 +99,22 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 }
                 if (originalType != returnType) {
                     // covariant return type...
-                    TypeReference originalTypeReference = TypeKit.createTypeReference(getProgramFactory(), originalType);
-                    TypeReference castToReference = TypeKit.createTypeReference(getProgramFactory(), returnType);
-                    ASTList<TypeArgumentDeclaration> targs = md.getTypeReference().getTypeArguments();
+                    TypeReference originalTypeReference =
+                        TypeKit.createTypeReference(getProgramFactory(), originalType);
+                    TypeReference castToReference =
+                        TypeKit.createTypeReference(getProgramFactory(), returnType);
+                    ASTList<TypeArgumentDeclaration> targs =
+                        md.getTypeReference().getTypeArguments();
                     if (targs != null && targs.size() > 0)
                         castToReference.setTypeArguments(targs.deepClone());
                     if (originalType instanceof ParameterizedType) {
-                        recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) originalType;
+                        recoder.abstraction.ParameterizedType pt =
+                            (recoder.abstraction.ParameterizedType) originalType;
                         targs = TypeKit.makeTypeArgRef(getProgramFactory(), pt.getTypeArgs());
                         originalTypeReference.setTypeArguments(targs);
                     }
                     items.add(new Item(md, getCrossReferenceSourceInfo().getReferences(md),
-                            originalTypeReference,
-                            castToReference));
+                        originalTypeReference, castToReference));
                 }
             }
         }
@@ -121,16 +125,19 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         if (originalType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) originalType;
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
-            ASTList<TypeArgumentDeclaration> targs = new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
+            ASTList<TypeArgumentDeclaration> targs =
+                new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
             for (TypeArgument ta : pt.getTypeArgs()) {
                 targs.add(makeSomething1(ta));
             }
             return new ParameterizedType(baseType, targs);
-        } else return makeSomething0(originalType);
+        } else
+            return makeSomething0(originalType);
     }
 
     private Type makeSomething0(Type originalType) {
-        if (!(originalType instanceof TypeParameter)) return originalType;
+        if (!(originalType instanceof TypeParameter))
+            return originalType;
         TypeParameter tp = (TypeParameter) originalType;
         if (tp.getBoundCount() == 0)
             originalType = getNameInfo().getJavaLangObject();
@@ -148,7 +155,8 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         TypeArgumentDeclaration res = new TypeArgumentDeclaration();
         res.setTypeReference(TypeKit.createTypeReference(getProgramFactory(), ta.getTypeName()));
         if (ta.getTypeArguments() != null && ta.getTypeArguments().size() > 0) {
-            ASTList<TypeArgumentDeclaration> targs = new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
+            ASTList<TypeArgumentDeclaration> targs =
+                new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
             for (TypeArgument t : ta.getTypeArguments()) {
                 targs.add(makeSomething1(t));
             }
@@ -167,7 +175,8 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
             for (int i = 0; i < it.mrl.size(); i++) {
                 MethodReference mr = (MethodReference) it.mrl.get(i);
                 // TODO the parenthesis aren't always needed - find out, when !
-                replace(mr, f.createParenthesizedExpression(f.createTypeCast(mr.deepClone(), it.t.deepClone())));
+                replace(mr, f.createParenthesizedExpression(
+                    f.createTypeCast(mr.deepClone(), it.t.deepClone())));
             }
         }
     }

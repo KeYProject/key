@@ -11,10 +11,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * The constructor call meta construct is used to handle a allocation expression
- * like <code>new Class(...)</code>. Thereby it replaces the allocation
- * expression by a method reference to an implict method called
- * <code>&lt;init&gt;</code> that is mainly the constructor but in its
+ * The constructor call meta construct is used to handle a allocation expression like
+ * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
+ * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
 public class SpecialConstructorCall extends ProgramTransformer {
@@ -22,13 +21,12 @@ public class SpecialConstructorCall extends ProgramTransformer {
     /**
      * The normal form identifier {@link ProgramElementName}.
      */
-    private static final ProgramElementName NORMALFORM_IDENTIFIER = new ProgramElementName(
-        de.uka.ilkd.key.java.recoderext.//
+    private static final ProgramElementName NORMALFORM_IDENTIFIER =
+        new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
                 ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
-     * @param consRef
-     *            The constructor reference.
+     * @param consRef The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
         super(new Name("special-constructor-call"), consRef);
@@ -47,8 +45,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
             prefix = KeYJavaASTFactory.superReference();
         }
 
-        return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix,
-            NORMALFORM_IDENTIFIER, constructorReference.getArguments()) };
+        return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
+            constructorReference.getArguments()) };
     }
 
 }

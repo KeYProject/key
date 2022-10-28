@@ -16,30 +16,26 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_INSTANCE_ALLOCATE = "<allocate>";
 
-    public InstanceAllocationMethodBuilder(
-            CrossReferenceServiceConfiguration services, TransformerCache cache) {
+    public InstanceAllocationMethodBuilder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
         super(services, cache);
     }
 
 
     /**
-     * creates a method declaration with no implementation. The methods intention is
-     * to allocate a new object of the type it is declared in and to return it.
-     * The functionality will be described using taclets
+     * creates a method declaration with no implementation. The methods intention is to allocate a
+     * new object of the type it is declared in and to return it. The functionality will be
+     * described using taclets
      */
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
         modifiers.add(new Public());
-        modifiers.add(new Static());    
-        
+        modifiers.add(new Static());
+
         ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<>(1);
-        
-        MethodDeclaration md =  new MethodDeclaration
-            (modifiers, 
-             new TypeReference(getId(type)), 
-             new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), 
-             pdal, 
-             null, null);
+
+        MethodDeclaration md = new MethodDeclaration(modifiers, new TypeReference(getId(type)),
+            new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), pdal, null, null);
         md.makeAllParentRolesValid();
         return md;
     }
@@ -47,8 +43,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
     protected void makeExplicit(TypeDeclaration td) {
         if (td instanceof ClassDeclaration) {
-            attach(createAllocateMethod((ClassDeclaration)td), td, 
-                    td.getMembers().size());
+            attach(createAllocateMethod((ClassDeclaration) td), td, td.getMembers().size());
         }
     }
 

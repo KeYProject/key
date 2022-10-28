@@ -28,8 +28,9 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered antecedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered antecedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
@@ -38,8 +39,9 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered succcedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered succcedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered succcedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
@@ -58,6 +60,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * constructor
+         *
          * @param originalFormula the original formula to be filtered
          */
         IdentityFilterEntry(SequentFormula originalFormula) {
@@ -66,6 +69,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * Formula to display
+         *
          * @return the original formula
          */
         public SequentFormula getFilteredFormula() {
@@ -74,6 +78,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * Original formula from sequent
+         *
          * @return the original formula
          */
         public SequentFormula getOriginalFormula() {

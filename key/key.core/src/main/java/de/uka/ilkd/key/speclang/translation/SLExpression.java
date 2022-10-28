@@ -5,8 +5,8 @@ import de.uka.ilkd.key.logic.Term;
 import javax.annotation.Nonnull;
 
 /**
- * This class represents the translation of an expression of an arbitrary
- * specification language, which in the KeY world is either a term or a type.
+ * This class represents the translation of an expression of an arbitrary specification language,
+ * which in the KeY world is either a term or a type.
  */
 public final class SLExpression {
     private final Term term;
@@ -17,7 +17,7 @@ public final class SLExpression {
     public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type, boolean isTerm) {
         if (term.sort() != type.getSort())
             throw new IllegalArgumentException(
-                    String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
+                String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
         this.term = term;
         this.type = type;
         this.isTerm = isTerm;

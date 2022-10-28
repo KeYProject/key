@@ -14,8 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
 /**
- * Walks through a java AST in depth-left-fist-order. This walker is used to
- * transform a program according to the given SVInstantiations.
+ * Walks through a java AST in depth-left-fist-order. This walker is used to transform a program
+ * according to the given SVInstantiations.
  */
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
@@ -26,15 +26,11 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     /**
      * create the ProgramReplaceVisitor
      *
-     * @param root
-     *            the ProgramElement where to begin
-     * @param services
-     *            The Services object.
-     * @param svi
-     *            Schema Variable Instantiations
+     * @param root the ProgramElement where to begin
+     * @param services The Services object.
+     * @param svi Schema Variable Instantiations
      */
-    public ProgramReplaceVisitor(ProgramElement root, Services services,
-            SVInstantiations svi) {
+    public ProgramReplaceVisitor(ProgramElement root, Services services, SVInstantiations svi) {
         super(root, false, services);
         svinsts = svi;
     }
@@ -75,8 +71,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
 
     /**
-     * the implemented default action is called if a program element is, and if
-     * it has children all its children too are left unchanged
+     * the implemented default action is called if a program element is, and if it has children all
+     * its children too are left unchanged
      */
     @Override
     protected void doDefaultAction(SourceElement x) {
@@ -92,17 +88,13 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             @SuppressWarnings("unchecked")
             final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
             // the assertion ensures the intended instanceof check from above
-            assert instArray.size() == 0
-                    || instArray.last() instanceof ProgramElement;
+            assert instArray.size() == 0 || instArray.last() instanceof ProgramElement;
             addChildren(instArray);
-        } else if (inst instanceof Term
-                && ((Term) inst).op() instanceof ProgramInLogic) {
-            addChild(services.getTypeConverter()
-                    .convertToProgramElement((Term) inst));
+        } else if (inst instanceof Term && ((Term) inst).op() instanceof ProgramInLogic) {
+            addChild(services.getTypeConverter().convertToProgramElement((Term) inst));
         } else {
             throw new IllegalStateException(
-                "programreplacevisitor: Instantiation missing "
-                        + "for schema variable " + sv);
+                "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
         }
         changed();
     }
@@ -121,15 +113,13 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         assert body != null : "A program transformer without program to transform?";
 
         final ProgramElement[] transformResult = //
-                x.transform(body, services, svinsts);
+            x.transform(body, services, svinsts);
         if (transformResult == null) {
             /*
-             * NOTE (DS, 2018-10-19): This is awkward... But there are
-             * transformers returning null since "no work is needed" (see
-             * StaticInitialization transformer). And obviously, addChild(null)
-             * has a different behavior than addChildren(<emptyArray>), since in
-             * the first case, a null value is added to the stack. So we add
-             * null on top.
+             * NOTE (DS, 2018-10-19): This is awkward... But there are transformers returning null
+             * since "no work is needed" (see StaticInitialization transformer). And obviously,
+             * addChild(null) has a different behavior than addChildren(<emptyArray>), since in the
+             * first case, a null value is added to the stack. So we add null on top.
              */
             addChild(null);
         } else {
@@ -139,8 +129,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    public void performActionOnAbstractProgramElement(
-            AbstractProgramElement x) {
+    public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
         addChild(x.getConcreteProgramElement(services));
         changed();
     }

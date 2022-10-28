@@ -13,41 +13,32 @@ import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.util.pp.Backend;
 
 /**
- * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for
- * pretty-printing should be put in here, so that code of {@link LogicPrinter}
- * stays independent of GUI as much as possible.
+ * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be
+ * put in here, so that code of {@link LogicPrinter} stays independent of GUI as much as possible.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewLogicPrinter extends LogicPrinter {
 
-    /* 
+    /*
      * This object is used to determine the TermLabels, which will be printed out.
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
-            NotationInfo notationInfo,
-            Services services,
-            VisibleTermLabels visibleTermLabels) {
+    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+            Services services, VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, services);
         this.visibleTermLabels = visibleTermLabels;
     }
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
-            NotationInfo notationInfo,
-            Services services,
-            boolean purePrint,
-            VisibleTermLabels visibleTermLabels) {
+    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+            Services services, boolean purePrint, VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, services, purePrint);
         this.visibleTermLabels = visibleTermLabels;
     }
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
-            NotationInfo notationInfo,
-            Backend backend,
-            Services services,
-            boolean purePrint,
+    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+            Backend backend, Services services, boolean purePrint,
             VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, backend, services, purePrint);
         this.visibleTermLabels = visibleTermLabels;
@@ -58,11 +49,11 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
         List<TermLabel> termLabelList = new LinkedList<TermLabel>();
         if (visibleTermLabels != null) {
-           for (TermLabel label : t.getLabels()) {
-              if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
-                  termLabelList.add(label);
-              }
-          }
+            for (TermLabel label : t.getLabels()) {
+                if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
+                    termLabelList.add(label);
+                }
+            }
         }
 
         return new ImmutableArray<TermLabel>(termLabelList);
@@ -70,7 +61,8 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
     @Override
     public void printClassName(String className) throws IOException {
-        final boolean hidePP = notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
+        final boolean hidePP =
+            notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
         if (hidePP) {
             className = className.substring(className.lastIndexOf('.') + 1);
         }

@@ -24,11 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Data structure for .key-files that will be tested during
- * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
- * and a {@link #path} String for the file location. Method
- * {@link #runKey()} will verify {@link #testProperty}
- * for the given file.
+ * Data structure for .key-files that will be tested during {@link RunAllProofsTest} execution. It
+ * consists of a {@link #testProperty} and a {@link #path} String for the file location. Method
+ * {@link #runKey()} will verify {@link #testProperty} for the given file.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -44,15 +42,13 @@ public class TestFile implements Serializable {
     public final RunAllProofsDirectories directories;
 
     /**
-     * In order to ensure that the implementation is independent of working
-     * directory, this method can be used to return an absolute {@link File}
-     * object.
+     * In order to ensure that the implementation is independent of working directory, this method
+     * can be used to return an absolute {@link File} object.
      *
-     * @param baseDirectory Base directory that will be used as start location in case given
-     *                      path name is a relative path.
-     * @param pathName      Path whose associated {@link File} object will be returned.
-     * @return {@link File} object pointing to given path name relative to given
-     * base directory.
+     * @param baseDirectory Base directory that will be used as start location in case given path
+     *        name is a relative path.
+     * @param pathName Path whose associated {@link File} object will be returned.
+     * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
 
@@ -60,14 +56,12 @@ public class TestFile implements Serializable {
          * Caller of this method must provide an absolute path as base directory.
          */
         if (!baseDirectory.isAbsolute()) {
-            throw new RuntimeException("Expecting an absolute path but found: "
-                    + baseDirectory);
+            throw new RuntimeException("Expecting an absolute path but found: " + baseDirectory);
         }
 
         if (!baseDirectory.isDirectory()) {
             throw new RuntimeException(
-                    "Given file system location is not a directory: "
-                            + baseDirectory);
+                "Given file system location is not a directory: " + baseDirectory);
         }
 
         /*
@@ -84,41 +78,37 @@ public class TestFile implements Serializable {
         return ret;
     }
 
-    protected TestFile(TestProperty testProperty, String path,
-                       ProofCollectionSettings settings, RunAllProofsDirectories directories) {
+    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
+            RunAllProofsDirectories directories) {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
         this.directories = directories;
     }
 
-    public static TestFile createInstance(
-            TestProperty testProperty, String path,
+    public static TestFile createInstance(TestProperty testProperty, String path,
             ProofCollectionSettings settings) {
-        return new TestFile(testProperty, path,
-                settings, new RunAllProofsDirectories(settings.runStart));
+        return new TestFile(testProperty, path, settings,
+            new RunAllProofsDirectories(settings.runStart));
     }
 
     /**
-     * Returns a {@link File} object that points to the .key file that will be
-     * tested.
+     * Returns a {@link File} object that points to the .key file that will be tested.
      *
-     * @throws IOException Is thrown in case given .key-file is not a directory or does
-     *                     not exist.
+     * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
      */
     public File getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
         File keyFile = getAbsoluteFile(baseDirectory, path);
 
         if (keyFile.isDirectory()) {
-            String exceptionMessage = "Expecting a file, but found a directory: "
-                    + keyFile.getAbsolutePath();
+            String exceptionMessage =
+                "Expecting a file, but found a directory: " + keyFile.getAbsolutePath();
             throw new IOException(exceptionMessage);
         }
 
         if (!keyFile.exists()) {
-            String exceptionMessage = "The given file does not exist: "
-                    + keyFile.getAbsolutePath();
+            String exceptionMessage = "The given file does not exist: " + keyFile.getAbsolutePath();
             throw new IOException(exceptionMessage);
         }
 
@@ -127,24 +117,20 @@ public class TestFile implements Serializable {
 
     private TestResult getRunAllProofsTestResult(boolean success) throws IOException {
         String message = String.format("%s: Verifying property \"%s\"%sfor file: %s",
-                success ? "pass" : "FAIL",
-                testProperty.toString().toLowerCase(),
-                success ? " was successful " : " failed ",
-                getKeYFile().toString());
+            success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
+            success ? " was successful " : " failed ", getKeYFile().toString());
         return new TestResult(message, success);
     }
 
     /**
-     * Use KeY to verify that given {@link #testProperty} holds for KeY file that
-     * is at file system location specified by {@link #path} string.
+     * Use KeY to verify that given {@link #testProperty} holds for KeY file that is at file system
+     * location specified by {@link #path} string.
      *
-     * @return Returns a {@link TestResult} object, which consists of a boolean
-     * value indicating whether test run was successful and a message
-     * string that can be printed out on command line to inform the user
-     * about the test result.
-     * @throws Exception Any exception that may occur during KeY execution will be
-     *                   converted into an {@link Exception} object with original
-     *                   exception as cause.
+     * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
+     *         whether test run was successful and a message string that can be printed out on
+     *         command line to inform the user about the test result.
+     * @throws Exception Any exception that may occur during KeY execution will be converted into an
+     *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
 
@@ -169,7 +155,8 @@ public class TestFile implements Serializable {
         boolean success;
         try {
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+                load(keyFile);
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
@@ -182,7 +169,8 @@ public class TestFile implements Serializable {
                     LOGGER.info("... success: loading failed");
                     return getRunAllProofsTestResult(true);
                 }
-                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
+                assertTrue(replayResult.hasErrors(),
+                    "Loading problem file succeded but it shouldn't");
                 LOGGER.info("... success: loading failed");
                 return getRunAllProofsTestResult(true);
             }
@@ -220,8 +208,8 @@ public class TestFile implements Serializable {
             }
 
             /*
-             * Testing proof reloading now. Saving and reloading proof only in case
-             * it was closed and test property is PROVABLE.
+             * Testing proof reloading now. Saving and reloading proof only in case it was closed
+             * and test property is PROVABLE.
              */
             reload(verbose, proofFile, loadedProof, success);
         } catch (Throwable t) {
@@ -257,11 +245,11 @@ public class TestFile implements Serializable {
     }
 
     /**
-     * By overriding this method we can change the way how we invoke automode,
-     * for instance if we want to use a different strategy.
+     * By overriding this method we can change the way how we invoke automode, for instance if we
+     * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            Pair<String, Location> script) throws Exception {
+            Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -276,23 +264,22 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile)
-            throws ProblemLoaderException {
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+            File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
     }
 
     /**
-     * Reload proof that was previously saved at the location corresponding to
-     * the given {@link File} object.
+     * Reload proof that was previously saved at the location corresponding to the given
+     * {@link File} object.
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
     private void reloadProof(File proofFile) throws Exception {
         /*
-         * Reload proof and dispose corresponding KeY environment immediately
-         * afterwards. If no exception is thrown it is assumed that loading works
-         * properly.
+         * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
+         * exception is thrown it is assumed that loading works properly.
          */
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
@@ -312,8 +299,7 @@ public class TestFile implements Serializable {
             assertTrue(reloadedProof.closed(), "Reloaded proof did not close: " + proofFile);
         } catch (Throwable t) {
             throw new Exception(
-                    "Exception while loading proof (see cause for details): "
-                            + proofFile, t);
+                "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();

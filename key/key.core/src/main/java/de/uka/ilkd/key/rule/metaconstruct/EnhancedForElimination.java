@@ -186,8 +186,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      *      SVInstantiations)
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe,
-            Services services, SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
         EnhancedFor enhancedFor = (EnhancedFor) pe;
@@ -198,8 +198,8 @@ public class EnhancedForElimination extends ProgramTransformer {
             if (execContextSV == null) {
                 execContext = svInst.getContextInstantiation().activeStatementContext();
             } else {
-                execContext = (ExecutionContext) svInst
-                        .getInstantiation((SchemaVariable) execContextSV);
+                execContext =
+                    (ExecutionContext) svInst.getInstantiation((SchemaVariable) execContextSV);
             }
         }
 
@@ -259,7 +259,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Checks if an expression has an array type.
      *
      * @param expression the expression to check
-     * @param services   the services for lookups
+     * @param services the services for lookups
      * @return true, if expression's type is a subtype of Iterable
      */
     private boolean isArrayType(Expression expression, Services services) {
@@ -280,8 +280,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // T[] arr = exp;
         final KeYJavaType arrayType = expression.getKeYJavaType(services, execContext);
-        final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services,
-                ARR, arrayType);
+        final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services, ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
 
         head = KeYJavaASTFactory.block(arrAssignment);
@@ -290,24 +289,24 @@ public class EnhancedForElimination extends ProgramTransformer {
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         indexVariable = KeYJavaASTFactory.localVariable(services, INDEX, intType);
         final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, indexVariable);
-        final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(
-                ji, indexVariable, arrayVar);
+        final IGuard guard =
+            KeYJavaASTFactory.lessThanArrayLengthGuard(ji, indexVariable, arrayVar);
         final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(indexVariable);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
-        assert programVariable instanceof ProgramVariable :
-            "Since this is a concrete program, the spec must not be schematic";
+        assert programVariable instanceof ProgramVariable
+                : "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable) programVariable;
         final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
         // a = arr[i];
         // assign element of the current iteration to the enhanced for-loop iterator variable
-        final Statement getNextElement = KeYJavaASTFactory.assignArrayField(
-                lvdVar, arrayVar, indexVariable);
-        loop = KeYJavaASTFactory.forLoop(inits, guard,
-                updates, declArrayElemVar, getNextElement, body);
+        final Statement getNextElement =
+            KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, indexVariable);
+        loop = KeYJavaASTFactory.forLoop(inits, guard, updates, declArrayElemVar, getNextElement,
+            body);
 
         setInvariant(enhancedFor, loop, indexVariable, Optional.empty(), services);
 
@@ -324,37 +323,35 @@ public class EnhancedForElimination extends ProgramTransformer {
     private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
         final Expression iterableExpr = enhancedFor.getGuardExpression();
         final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, execContext);
-        final IProgramMethod iteratorMethod = services.getJavaInfo().getProgramMethod(
-                iterableType, ITERATOR_METHOD_NAME,
+        final IProgramMethod iteratorMethod =
+            services.getJavaInfo().getProgramMethod(iterableType, ITERATOR_METHOD_NAME,
                 ImmutableSLList.nil(), execContext.getTypeReference().getKeYJavaType());
 
         // local variable "it"
         final KeYJavaType iteratorType = iteratorMethod.getReturnType();
-        ProgramVariable iteratorVariable = KeYJavaASTFactory.localVariable(services,
-                IT, iteratorType);
+        ProgramVariable iteratorVariable =
+            KeYJavaASTFactory.localVariable(services, IT, iteratorType);
 
         // local variable "values"
-        final KeYJavaType seqType = services.getTypeConverter()
-                .getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        final KeYJavaType seqType =
+            services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         valuesVariable = KeYJavaASTFactory.localVariable(services, VALUES, seqType);
 
         // ghost \seq values = \seq_empty
-        final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
-                valuesVariable, EmptySeqLiteral.INSTANCE, seqType);
+        final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(), valuesVariable,
+            EmptySeqLiteral.INSTANCE, seqType);
 
         // Iterator itVar = expression.iterator();
-        final Statement itinit = KeYJavaASTFactory.declareMethodCall(
-                iteratorType, iteratorVariable, new ParenthesizedExpression(
-                        enhancedFor.getGuardExpression()),
-                ITERATOR_METHOD_NAME);
+        final Statement itinit = KeYJavaASTFactory.declareMethodCall(iteratorType, iteratorVariable,
+            new ParenthesizedExpression(enhancedFor.getGuardExpression()), ITERATOR_METHOD_NAME);
 
         // create the method call itVar.hasNext();
-        final Expression itGuard = KeYJavaASTFactory
-                .methodCall(iteratorVariable, HAS_NEXT_METHOD_NAME);
+        final Expression itGuard =
+            KeYJavaASTFactory.methodCall(iteratorVariable, HAS_NEXT_METHOD_NAME);
 
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
-        final StatementBlock block = makeBlock(
-                iteratorVariable, valuesVariable, lvd, enhancedFor.getBody());
+        final StatementBlock block =
+            makeBlock(iteratorVariable, valuesVariable, lvd, enhancedFor.getBody());
 
         // while
         loop = new While(itGuard, block, null, new ExtList());
@@ -371,20 +368,17 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "; <body>"
      */
-    private StatementBlock makeBlock(ProgramVariable itVar,
-            ProgramVariable valuesVar, LocalVariableDeclaration lvd,
-            Statement body) {
+    private StatementBlock makeBlock(ProgramVariable itVar, ProgramVariable valuesVar,
+            LocalVariableDeclaration lvd, Statement body) {
         // create the variable declaration <Type> lvd = itVar.next();
-        final VariableSpecification varSpec = lvd.getVariableSpecifications()
-                .get(0);
+        final VariableSpecification varSpec = lvd.getVariableSpecifications().get(0);
         final LocalVariableDeclaration varDecl = KeYJavaASTFactory
                 .declareMethodCall(varSpec.getProgramVariable(), itVar, NEXT_METHOD_NAME);
 
         // ATTENTION: in order for the invariant rule to work correctly,
         // the update to values needs to appear at the _second_ entry of the
         // loop
-        return KeYJavaASTFactory.block(varDecl,
-                makeValuesUpdate(valuesVar, lvd), body);
+        return KeYJavaASTFactory.block(varDecl, makeValuesUpdate(valuesVar, lvd), body);
     }
 
     /*
@@ -393,8 +387,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd) {
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
-        assert element instanceof ProgramVariable :
-            "Since this is a concrete program, the spec must not be schematic";
+        assert element instanceof ProgramVariable
+                : "Since this is a concrete program, the spec must not be schematic";
         final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
         final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
@@ -405,13 +399,12 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Transfer the invariant from <code>original</code> enhanced loop to the
      * <code>transformed</code> while or for loop.
      *
-     * @param original    original loop.
+     * @param original original loop.
      * @param transformed transformed loop.
-     * @param services    services.
+     * @param services services.
      */
     private void setInvariant(EnhancedFor original, LoopStatement transformed,
-            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar,
-            Services services) {
+            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
         LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
@@ -421,86 +414,66 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /**
-     * Replaces the function symbols "index" and "values" by actual program
-     * entities. The index function symbol is a placeholder which stems from
-     * translating the <code>\index</code> keyword from JML. The values function
-     * symbol is a placeholder which stems from translating the
+     * Replaces the function symbols "index" and "values" by actual program entities. The index
+     * function symbol is a placeholder which stems from translating the <code>\index</code> keyword
+     * from JML. The values function symbol is a placeholder which stems from translating the
      * <code>\values</code> keyword from JML.
      *
-     * @param rawInv
-     *            The "raw" invariant.
-     * @param loopIdxVar
-     *            The actual program variable for the index placeholder.
-     * @param maybeValuesVar
-     *            Optional actual program variable for the values placeholder.
-     * @param services
-     *            The {@link Services} object.
+     * @param rawInv The "raw" invariant.
+     * @param loopIdxVar The actual program variable for the index placeholder.
+     * @param maybeValuesVar Optional actual program variable for the values placeholder.
+     * @param services The {@link Services} object.
      *
-     * @return The updated {@link LoopSpecification}, or null if the supplied
-     *         invariant is null.
+     * @return The updated {@link LoopSpecification}, or null if the supplied invariant is null.
      */
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
-            ProgramVariable loopIdxVar,
-            Optional<ProgramVariable> maybeValuesVar, Services services) {
+            ProgramVariable loopIdxVar, Optional<ProgramVariable> maybeValuesVar,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         if (rawInv == null) {
             return null;
         }
 
-        Optional<Term> maybeVariant = Optional
-                .ofNullable(rawInv.getInternalVariant());
+        Optional<Term> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
         final Map<LocationVariable, Term> newInvs = //
-                new LinkedHashMap<LocationVariable, Term>(
-                        rawInv.getInternalInvariants());
+            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalInvariants());
         final Map<LocationVariable, Term> newFreeInvs = //
-                new LinkedHashMap<LocationVariable, Term>(
-                        rawInv.getInternalFreeInvariants());
+            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalFreeInvariants());
 
         // replace index
         updateInvs(newInvs, tb.index(), loopIdxVar, services);
         updateInvs(newFreeInvs, tb.index(), loopIdxVar, services);
 
         maybeVariant = maybeVariant.map(v -> GenericTermReplacer.replace(v,
-                t -> t.equals(tb.index()), t -> tb.var(loopIdxVar), services));
+            t -> t.equals(tb.index()), t -> tb.var(loopIdxVar), services));
 
         // replace values
-        maybeValuesVar
-            .ifPresent(v -> updateInvs(newInvs, tb.values(), v, services));
+        maybeValuesVar.ifPresent(v -> updateInvs(newInvs, tb.values(), v, services));
         if (maybeValuesVar.isPresent()) {
-            maybeVariant = maybeVariant
-                    .map(variant -> GenericTermReplacer.replace(variant,
-                            t -> t.equals(tb.values()),
-                            t -> tb.var(maybeValuesVar.get()), services));
+            maybeVariant = maybeVariant.map(variant -> GenericTermReplacer.replace(variant,
+                t -> t.equals(tb.values()), t -> tb.var(maybeValuesVar.get()), services));
         }
 
-        return rawInv.instantiate(newInvs, newFreeInvs,
-                maybeVariant.orElse(null));
+        return rawInv.instantiate(newInvs, newFreeInvs, maybeVariant.orElse(null));
     }
 
     /**
-     * Updates the given invariants (map from heap to a single invariant) by
-     * replacing in them termToReplace by a term containing replaceWith.
+     * Updates the given invariants (map from heap to a single invariant) by replacing in them
+     * termToReplace by a term containing replaceWith.
      *
-     * @param invs
-     *            The invariants in which to replace.
-     * @param termToReplace
-     *            The term to replace.
-     * @param replaceWith
-     *            The program variable from which to create the replacement
-     *            term.
-     * @param services
-     *            The {@link Services} object.
+     * @param invs The invariants in which to replace.
+     * @param termToReplace The term to replace.
+     * @param replaceWith The program variable from which to create the replacement term.
+     * @param services The {@link Services} object.
      */
-    private void updateInvs(final Map<LocationVariable, Term> invs,
-            final Term termToReplace, final ProgramVariable replaceWith,
-            final Services services) {
+    private void updateInvs(final Map<LocationVariable, Term> invs, final Term termToReplace,
+            final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
-            .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
-                GenericTermReplacer.replace(entry.getValue(),
-                        termToReplace::equals, t -> tb.var(replaceWith),
-                        services)))
-            .forEach(p -> invs.put(p.first, p.second));
+                .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
+                    GenericTermReplacer.replace(entry.getValue(), termToReplace::equals,
+                        t -> tb.var(replaceWith), services)))
+                .forEach(p -> invs.put(p.first, p.second));
     }
 }

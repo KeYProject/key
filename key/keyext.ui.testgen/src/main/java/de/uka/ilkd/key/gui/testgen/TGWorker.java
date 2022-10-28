@@ -78,9 +78,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 /**
  * Registers created {@link Proof}s in the {@link MainWindow} visible to the user.
  * <p>
- * <b>This class provides only the user interface and no test generation
- * logic which is implemented by the
- * {@link AbstractTestGenerator}</b>.
+ * <b>This class provides only the user interface and no test generation logic which is implemented
+ * by the {@link AbstractTestGenerator}</b>.
  */
 class MainWindowTestGenerator extends AbstractTestGenerator {
     /**
@@ -93,11 +92,13 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param mediator         The {@link KeYMediator} to use.
-     * @param originalProof    The {@link Proof} to generate test cases for.
-     * @param showInMainWindow Defines if created {@link Proof}s are visible in the {@link MainWindow} or not.
+     * @param mediator The {@link KeYMediator} to use.
+     * @param originalProof The {@link Proof} to generate test cases for.
+     * @param showInMainWindow Defines if created {@link Proof}s are visible in the
+     *        {@link MainWindow} or not.
      */
-    public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof, boolean showInMainWindow) {
+    public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof,
+            boolean showInMainWindow) {
         super(mediator.getUI(), originalProof);
         this.mediator = mediator;
         this.showInMainWindow = showInMainWindow;
@@ -128,14 +129,12 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      * {@inheritDoc}
      */
     @Override
-    protected Proof createProof(UserInterfaceControl ui,
-                                Proof oldProof, String newName,
-                                Sequent newSequent) throws ProofInputException {
+    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
+            Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
             final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(),
-                    initConfig.createBuiltInRuleIndex(),
-                    initConfig.deepCopy());
+                initConfig.createBuiltInRuleIndex(), initConfig.deepCopy());
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());
 

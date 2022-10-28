@@ -5,11 +5,11 @@ package de.uka.ilkd.key.smt;
  *
  */
 public class IllegalResultException extends RuntimeException {
-    
 
-	    private static final long serialVersionUID = 1L;
 
-	    IllegalResultException(String msg) {
-		super(msg);
-	    }
+    private static final long serialVersionUID = 1L;
+
+    IllegalResultException(String msg) {
+        super(msg);
+    }
 }

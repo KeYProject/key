@@ -14,8 +14,7 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 
 public class DoubleHandler extends LDTHandler {
 
-    private final Map<JMLOperator, Operator> opMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> opMap = new EnumMap<>(JMLOperator.class);
 
     public DoubleHandler(Services services) {
         super(services);
@@ -36,7 +35,7 @@ public class DoubleHandler extends LDTHandler {
 
     @Override
     protected Map<JMLOperator, Operator> getOperatorMap(Type promotedType) {
-        if(promotedType == PrimitiveType.JAVA_DOUBLE) {
+        if (promotedType == PrimitiveType.JAVA_DOUBLE) {
             return opMap;
         } else {
             return null;
