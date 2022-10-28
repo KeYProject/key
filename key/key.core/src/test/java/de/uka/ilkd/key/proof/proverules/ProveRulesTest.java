@@ -56,7 +56,7 @@ public class ProveRulesTest {
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet,
             "Proof file " + proofFile + " claims that it contains a proof for taclet " + tacletName
-                + " but corresponding taclet seems to be unavailable.");
+                + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
         assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
             "Found a taclet proof for taclet " + tacletName
                 + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
