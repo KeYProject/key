@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Oct 10 11:22:08 CEST 2022
+# Date: Fri Oct 28 23:13:44 CEST 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -10590,7 +10590,7 @@ Choices: true}
 -----------------------------------------------------
 == logMonoConcrete (logMonoConcrete) =========================================
 logMonoConcrete {
-\find(==>leq(log(base,x),log(base,x_2)))
+\find(leq(log(base,x_2),add(Z(neglit(1(#))),log(base,x)))==>)
 \replacewith([]==>[and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#))))]) 
 \heuristics(simplify)
 Choices: true}
@@ -10604,7 +10604,7 @@ Choices: true}
 -----------------------------------------------------
 == logPositiveConcrete (logPositiveConcrete) =========================================
 logPositiveConcrete {
-\find(==>geq(log(base,x),Z(0(#))))
+\find(leq(log(base,x),Z(neglit(1(#))))==>)
 \replacewith([]==>[and(gt(base,Z(1(#))),geq(x,Z(1(#))))]) 
 \heuristics(simplify)
 Choices: true}
@@ -10637,7 +10637,7 @@ logProdIdentityConcrete {
 \find(log(base,bprod{i (variable)}(Z(0(#)),exp,base)))
 \varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
 \replacewith(if-then-else(gt(base,Z(1(#))),if-then-else(lt(exp,Z(0(#))),Z(0(#)),exp),undefinedLog(base,bprod{i (variable)}(Z(0(#)),exp,base)))) 
-
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == logProduct (logProduct) =========================================
@@ -12226,7 +12226,7 @@ Choices: true}
 -----------------------------------------------------
 == powGeq1Concrete (powGeq1Concrete) =========================================
 powGeq1Concrete {
-\find(==>geq(pow(base,exp),Z(1(#))))
+\find(leq(pow(base,exp),Z(0(#)))==>)
 \replacewith([]==>[and(geq(exp,Z(0(#))),gt(base,Z(1(#))))]) 
 \heuristics(simplify)
 Choices: true}
@@ -12317,14 +12317,7 @@ Choices: true}
 -----------------------------------------------------
 == powMonoConcrete (powMonoConcrete) =========================================
 powMonoConcrete {
-\find(==>leq(pow(base,exp),pow(base,exp_2)))
-\replacewith([]==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),gt(base,Z(1(#))))]) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== powMonoConcreteRev (powMonoConcreteRev) =========================================
-powMonoConcreteRev {
-\find(==>geq(pow(base,exp_2),pow(base,exp)))
+\find(leq(pow(base,exp_2),add(Z(neglit(1(#))),pow(base,exp)))==>)
 \replacewith([]==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),gt(base,Z(1(#))))]) 
 \heuristics(simplify)
 Choices: true}
@@ -12338,7 +12331,7 @@ Choices: true}
 -----------------------------------------------------
 == powPositiveConcrete (powPositiveConcrete) =========================================
 powPositiveConcrete {
-\find(==>geq(pow(base,exp),Z(0(#))))
+\find(leq(pow(base,exp),Z(neglit(1(#))))==>)
 \replacewith([]==>[and(geq(exp,Z(0(#))),gt(base,Z(1(#))))]) 
 \heuristics(simplify)
 Choices: true}
@@ -12348,69 +12341,6 @@ powSplitFactor {
 \find(pow(base,exp))
 \replacewith(if-then-else(geq(exp,Z(0(#))),if-then-else(geq(exp,Z(1(#))),mul(base,pow(base,sub(exp,Z(1(#))))),Z(1(#))),undefinedPow(base,exp))) 
 
-Choices: true}
------------------------------------------------------
-== powIsInfinite1 (powIsInfinite1) =========================================
-powIsInfinite1 {
-\find(powDouble(arg1,arg2))
-\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsInfinite2 (powIsInfinite2) =========================================
-powIsInfinite2 {
-\find(powDouble(arg1,arg2))
-\add [imp(or(and(eqDouble(arg1,DFP(0(#))),ltDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),gtDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsNaN1 (powIsNaN1) =========================================
-powIsNaN1 {
-\find(powDouble(arg1,arg2))
-\add [imp(doubleIsNaN(arg2),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsNaN2 (powIsNaN2) =========================================
-powIsNaN2 {
-\find(powDouble(arg1,arg2))
-\add [imp(and(doubleIsNaN(arg1),not(equals(arg2,DFP(0(#))))),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsNaN3 (powIsNaN3) =========================================
-powIsNaN3 {
-\find(powDouble(arg1,arg2))
-\add [imp(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsNotNaN (powIsNotNaN) =========================================
-powIsNotNaN {
-\find(powDouble(arg1,arg2))
-\add [imp(and(not(doubleIsNaN(arg1)),equals(arg2,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),equals(powDouble(arg1,arg2),arg1))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsOne (powIsOne) =========================================
-powIsOne {
-\find(powDouble(arg1,arg2))
-\add [imp(equals(arg2,DFP(0(#))),equals(powDouble(arg1,arg2),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsZero1 (powIsZero1) =========================================
-powIsZero1 {
-\find(powDouble(arg1,arg2))
-\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
-\heuristics(userTaclets1)
-Choices: true}
------------------------------------------------------
-== powIsZero2 (powIsZero2) =========================================
-powIsZero2 {
-\find(powDouble(arg1,arg2))
-\add [imp(or(and(eqDouble(arg1,DFP(0(#))),gtDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),ltDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
-\heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == pow_literals (pow_literals) =========================================
