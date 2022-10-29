@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Oct 28 23:13:44 CEST 2022
+# Date: Sat Oct 29 20:27:01 CEST 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -8600,14 +8600,14 @@ Choices: true}
 ifthenelse_equals_1 {
 \find(equals(if-then-else(b,TRUE,FALSE),c))
 \replacewith(equiv(b,equals(c,TRUE))) 
-\heuristics(concrete)
+
 Choices: true}
 -----------------------------------------------------
 == ifthenelse_equals_2 (ifthenelse_equals_2) =========================================
 ifthenelse_equals_2 {
 \find(equals(b,if-then-else(c,TRUE,FALSE)))
 \replacewith(equiv(equals(b,TRUE),c)) 
-\heuristics(concrete)
+
 Choices: true}
 -----------------------------------------------------
 == ifthenelse_false (ifthenelse_false) =========================================
