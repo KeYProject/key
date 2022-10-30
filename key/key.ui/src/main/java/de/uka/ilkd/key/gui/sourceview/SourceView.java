@@ -377,6 +377,10 @@ public final class SourceView extends JComponent {
         return result;
     }
 
+    public void removeHighlightsForJMLStatements() {
+        removeHighlights(Tab.KEY_JML_HL);
+    }
+
     /**
      * Moves an existing highlight to another line.
      *
@@ -424,6 +428,16 @@ public final class SourceView extends JComponent {
         fireHighlightsChanged();
 
         return newHighlight;
+    }
+
+    public List<SourceViewHighlight> listHighlights(String group) {
+        return tabs.
+                values().
+                stream().
+                flatMap(p -> p.highlights.values().stream()).
+                flatMap(Collection::stream).
+                filter(p -> p.group.equals(group)).
+                collect(Collectors.toList());
     }
 
     public List<SourceViewHighlight> listHighlights(URI fileURI) {
@@ -483,6 +497,18 @@ public final class SourceView extends JComponent {
         fireHighlightsChanged();
 
         return result;
+    }
+
+    public void removeHighlights(String group) {
+        for (SourceViewHighlight h: listHighlights(group)) {
+            removeHighlight(h);
+        }
+    }
+
+    public void removeHighlights(URI fileUri, String group) {
+        for (SourceViewHighlight h: listHighlights(fileUri, group)) {
+            removeHighlight(h);
+        }
     }
 
     public void addHighlightsChangedListener(HighlightsChangedListener listener) {
@@ -835,12 +861,21 @@ public final class SourceView extends JComponent {
         tab.refreshInsertions();
     }
 
+    public List<SourceViewInsertion> listInsertion(String group) {
+        return tabs.
+                values().
+                stream().
+                flatMap(p -> p.insertions.stream()).
+                filter(p -> p.Group.equals(group)).
+                collect(Collectors.toList());
+    }
+
     public List<SourceViewInsertion> listInsertion(URI fileURI, String group) throws IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
 
-        return  tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList());
+        return tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList());
     }
 
     public List<SourceViewInsertion> listInsertion(URI fileURI) throws IOException {
@@ -1280,9 +1315,7 @@ public final class SourceView extends JComponent {
          * highlighted with a different color.
          */
         private void paintSymbExHighlights() {
-            for (SourceViewHighlight hl : listHighlights(getSelectedFile(), KEY_SYMB_EXEC_HL)) {
-                removeHighlight(hl);
-            }
+            SourceView.this.removeHighlights(getSelectedFile(), KEY_SYMB_EXEC_HL);
 
             if (lines == null) {
                 return;
@@ -1327,11 +1360,12 @@ public final class SourceView extends JComponent {
          * @param highlight the highlight to change
          */
         private void updateSelectionHighlight(Point p) {
-            if (p == null || listHighlights(absoluteFileName, KEY_SELECTION_HL).size() > 1) {
-                for (SourceViewHighlight hl: listHighlights(absoluteFileName, KEY_SELECTION_HL)) {
-                    removeHighlight(hl);
-                }
+            if (p == null) {
+                SourceView.this.removeHighlights(absoluteFileName, KEY_SELECTION_HL);
                 return;
+            }
+            if (listHighlights(absoluteFileName, KEY_SELECTION_HL).size() > 1) {
+                SourceView.this.removeHighlights(absoluteFileName, KEY_SELECTION_HL);
             }
 
             var selectionHL = listHighlights(absoluteFileName, KEY_SELECTION_HL).stream().findFirst().orElse(null);

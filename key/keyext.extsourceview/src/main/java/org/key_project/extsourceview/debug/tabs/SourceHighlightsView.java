@@ -28,7 +28,9 @@ public class SourceHighlightsView extends DebugTab {
         var dlm = new DefaultListModel<String>();
         var list = new JList<>(dlm);
 
-        Runnable refresh = () -> {
+        list.setFont(Font.getFont("Courier New"));
+
+        sv.addHighlightsChangedListener(() -> {
             try {
                 var data = this.sourceView.listHighlights(this.sourceView.getSelectedFile()).
                         stream().
@@ -40,11 +42,7 @@ public class SourceHighlightsView extends DebugTab {
                 dlm.clear();
                 dlm.addElement(ex.toString());
             }
-        };
-
-        list.setFont(Font.getFont("Courier New"));
-
-        sv.addHighlightsChangedListener(refresh::run);
+        });
 
         add(new JScrollPane(list), BorderLayout.CENTER);
     }

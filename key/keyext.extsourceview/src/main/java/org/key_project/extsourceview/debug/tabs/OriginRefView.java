@@ -28,9 +28,9 @@ public class OriginRefView extends DebugTab {
 
     private final static String HL_KEY = "OriginRefView::highlight";
 
-    private JTextArea taSource;
-
     private final static int HIGHTLIGHT_LEVEL = 11;
+
+    private JTextArea taSource;
 
     private boolean showOnlyAtoms = true;
     private boolean triggerOnClick = false;
@@ -169,13 +169,11 @@ public class OriginRefView extends DebugTab {
         return "TermOrigin Inspector";
     }
 
-    private final ArrayList<SourceViewHighlight> existingHighlights = new ArrayList<>();
-
     private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
-            for (SourceViewHighlight h : existingHighlights) sv.removeHighlight(h);
-            existingHighlights.clear();
+
+            sv.removeHighlights(HL_KEY);
 
             if (!highlightEnabled) return;
 
@@ -201,11 +199,11 @@ public class OriginRefView extends DebugTab {
                 if (!sv.hasFile(orig.fileURI())) continue;
 
                 if (orig.LineStart == orig.LineEnd) {
-                    existingHighlights.add(sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                    sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
                 } else {
                     for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
                         if (orig.hasFile()) {
-                            existingHighlights.add(sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL));
+                            sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
                         }
                     }
                 }
@@ -217,9 +215,7 @@ public class OriginRefView extends DebugTab {
     }
 
     private void unhighlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        SourceView sv = window.getSourceViewFrame().getSourceView();
-        for (SourceViewHighlight h: existingHighlights) sv.removeHighlight(h);
-        existingHighlights.clear();
+        window.getSourceViewFrame().getSourceView().removeHighlights(HL_KEY);
     }
 
     private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
@@ -228,19 +224,19 @@ public class OriginRefView extends DebugTab {
         var proof = mediator.getSelectedProof();
 
         try {
-            String txt = "";
+            StringBuilder txt = new StringBuilder();
 
             if (showSectionRepr) {
-                txt += "----------<TOSTRING>----------\n";
-                txt += "\n";
-                txt += "ToStr<OriginRef>: " + Utils.TermToOrigString(t, proof.getServices()) + "\n";
-                txt += "ToStr<Fallback>:  " + Utils.TermToString(t, proof.getServices(), true) + "\n";
-                txt += "\n";
+                txt.append("----------<TOSTRING>----------\n");
+                txt.append("\n");
+                txt.append("ToStr<OriginRef>: ").append(Utils.TermToOrigString(t, proof.getServices())).append("\n");
+                txt.append("ToStr<Fallback>:  ").append(Utils.TermToString(t, proof.getServices(), true)).append("\n");
+                txt.append("\n");
             }
 
             if (showSectionSelf) {
-                txt += "----------<SELF>----------\n";
-                txt += "\n";
+                txt.append("----------<SELF>----------\n");
+                txt.append("\n");
 
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl)t;
@@ -248,17 +244,17 @@ public class OriginRefView extends DebugTab {
                     {
                         OriginRef o = term.getOriginRef();
                         if(o != null) {
-                            txt += o.toString();
-                            txt += "\n";
+                            txt.append(o.toString());
+                            txt.append("\n");
                         }
                     }
                 }
-                txt += "\n";
+                txt.append("\n");
             }
 
             if (showSectionSource) {
-                txt += "----------<SOURCE>----------\n";
-                txt += "\n";
+                txt.append("----------<SOURCE>----------\n");
+                txt.append("\n");
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl) t;
 
@@ -266,54 +262,54 @@ public class OriginRefView extends DebugTab {
                     if (o != null && o.hasFile()) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = Utils.getLines(mediator, o.File, i, i);
-                            txt += str.stripTrailing() + "\n";
+                            txt.append(str.stripTrailing()).append("\n");
                             str = " ".repeat(o.ColumnStart - 1) + "[" + Utils.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]" + " ".repeat(o.ColumnEnd - 1);
-                            txt += str + "\n";
-                            txt += "\n";
+                            txt.append(str).append("\n");
+                            txt.append("\n");
                         }
                     }
                 }
             }
 
             if (showSectionChildren) {
-                txt += "----------<CHILDREN>----------\n";
-                txt += "\n";
+                txt.append("----------<CHILDREN>----------\n");
+                txt.append("\n");
 
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl)t;
 
                     for (OriginRef o : Utils.getSubOriginRefs(term, false, showOnlyAtoms)) {
-                        txt += o.toString();
-                        txt += "\n";
+                        txt.append(o.toString());
+                        txt.append("\n");
                     }
 
                 }
 
-                txt += "\n";
+                txt.append("\n");
             }
 
             if (showSectionParent) {
-                txt += "----------<PARENT>----------\n";
-                txt += "\n";
+                txt.append("----------<PARENT>----------\n");
+                txt.append("\n");
 
                 Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
-                    txt += "ToStr<OriginRef>: " + Utils.TermToOrigString(parent, proof.getServices()) + "\n";
-                    txt += "ToStr<Fallback>:  " + Utils.TermToString(parent, proof.getServices(), true) + "\n";
-                    txt += "\n";
+                    txt.append("ToStr<OriginRef>: ").append(Utils.TermToOrigString(parent, proof.getServices())).append("\n");
+                    txt.append("ToStr<Fallback>:  ").append(Utils.TermToString(parent, proof.getServices(), true)).append("\n");
+                    txt.append("\n");
                     {
                         OriginRef o = parent.getOriginRef();
                         if (o != null) {
-                            txt += o.toString();
-                            txt += "\n";
+                            txt.append(o.toString());
+                            txt.append("\n");
                         }
                     }
                 }
 
-                txt += "\n";
+                txt.append("\n");
             }
 
-            taSource.setText(txt);
+            taSource.setText(txt.toString());
         } catch (IOException | URISyntaxException e) {
             taSource.setText(e.toString());
         }

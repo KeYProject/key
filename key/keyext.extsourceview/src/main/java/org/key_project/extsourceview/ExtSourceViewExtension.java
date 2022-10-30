@@ -24,7 +24,6 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        // add a listener for changes in the proof tree
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {

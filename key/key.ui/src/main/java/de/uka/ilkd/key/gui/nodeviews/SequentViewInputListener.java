@@ -57,13 +57,6 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                 "Color for highlighting origin of subterms of selected term in source view",
                 new Color(252, 228, 169));
 
-    /**
-     * The current origin highlights.
-     *
-     * @see #highlightOriginInSourceView(PosInSequent)
-     */
-    private Set<SourceViewHighlight> originHighlights = new HashSet<>();
-
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;
 
@@ -174,8 +167,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         SourceView sourceView = SourceView.getSourceView(sequentView.getMainWindow());
 
-        originHighlights.forEach(sourceView::removeHighlight);
-        originHighlights.clear();
+        sourceView.removeHighlightsForJMLStatements();
 
         if (pos == null || pos.getPosInOccurrence() == null) {
             return;
@@ -203,20 +195,20 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         try {
             if (origin != null) {
-                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
+                sourceView.addHighlightsForJMLStatement(
                         origin.fileName,
                         origin.line,
                         ORIGIN_HIGHLIGHT_COLOR.get(),
-                        20));
+                        20);
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
-                    originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
+                    sourceView.addHighlightsForJMLStatement(
                             subtermOrigin.fileName,
                             subtermOrigin.line,
                             SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),
-                            10));
+                            10);
                 }
             }
         } catch (BadLocationException | IOException e) {
