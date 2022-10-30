@@ -1,4 +1,4 @@
-package org.key_project.msdebug;
+package org.key_project.extsourceview.debug.tabs;
 
 import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
+import org.key_project.extsourceview.Utils;
+import org.key_project.extsourceview.debug.DebugTab;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -19,7 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-public class OriginRefView extends MSDebugTab {
+public class OriginRefView extends DebugTab {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
@@ -179,7 +181,7 @@ public class OriginRefView extends MSDebugTab {
 
             var originRefs = new ArrayList<OriginRef>();
             if (highlightAllChildren) {
-                originRefs = MSDUtil.getSubOriginRefs(t, true, highlightOnlyAtoms);
+                originRefs = Utils.getSubOriginRefs(t, true, highlightOnlyAtoms);
             } else {
                 if (t.getOriginRef() != null && (!highlightOnlyAtoms || t.getOriginRef().IsAtom)) {
                     originRefs.add(t.getOriginRef());
@@ -187,7 +189,7 @@ public class OriginRefView extends MSDebugTab {
             }
 
             if (originRefs.isEmpty() && highlightParents) {
-                var parentTerm = MSDUtil.getParentWithOriginRef(pos, true, true);
+                var parentTerm = Utils.getParentWithOriginRef(pos, true, true);
                 if (parentTerm != null) {
                     originRefs.add(parentTerm.getOriginRef());
                 }
@@ -231,8 +233,8 @@ public class OriginRefView extends MSDebugTab {
             if (showSectionRepr) {
                 txt += "----------<TOSTRING>----------\n";
                 txt += "\n";
-                txt += "ToStr<OriginRef>: " + MSDUtil.TermToOrigString(t, proof.getServices()) + "\n";
-                txt += "ToStr<Fallback>:  " + MSDUtil.TermToString(t, proof.getServices(), true) + "\n";
+                txt += "ToStr<OriginRef>: " + Utils.TermToOrigString(t, proof.getServices()) + "\n";
+                txt += "ToStr<Fallback>:  " + Utils.TermToString(t, proof.getServices(), true) + "\n";
                 txt += "\n";
             }
 
@@ -263,9 +265,9 @@ public class OriginRefView extends MSDebugTab {
                     OriginRef o = term.getOriginRef();
                     if (o != null && o.hasFile()) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                            var str = MSDUtil.getLines(mediator, o.File, i, i);
+                            var str = Utils.getLines(mediator, o.File, i, i);
                             txt += str.stripTrailing() + "\n";
-                            str = " ".repeat(o.ColumnStart - 1) + "[" + MSDUtil.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]" + " ".repeat(o.ColumnEnd - 1);
+                            str = " ".repeat(o.ColumnStart - 1) + "[" + Utils.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]" + " ".repeat(o.ColumnEnd - 1);
                             txt += str + "\n";
                             txt += "\n";
                         }
@@ -280,7 +282,7 @@ public class OriginRefView extends MSDebugTab {
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl)t;
 
-                    for (OriginRef o : MSDUtil.getSubOriginRefs(term, false, showOnlyAtoms)) {
+                    for (OriginRef o : Utils.getSubOriginRefs(term, false, showOnlyAtoms)) {
                         txt += o.toString();
                         txt += "\n";
                     }
@@ -294,10 +296,10 @@ public class OriginRefView extends MSDebugTab {
                 txt += "----------<PARENT>----------\n";
                 txt += "\n";
 
-                Term parent = MSDUtil.getParentWithOriginRef(pos, showOnlyAtoms, false);
+                Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
-                    txt += "ToStr<OriginRef>: " + MSDUtil.TermToOrigString(parent, proof.getServices()) + "\n";
-                    txt += "ToStr<Fallback>:  " + MSDUtil.TermToString(parent, proof.getServices(), true) + "\n";
+                    txt += "ToStr<OriginRef>: " + Utils.TermToOrigString(parent, proof.getServices()) + "\n";
+                    txt += "ToStr<Fallback>:  " + Utils.TermToString(parent, proof.getServices(), true) + "\n";
                     txt += "\n";
                     {
                         OriginRef o = parent.getOriginRef();

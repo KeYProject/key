@@ -25,7 +25,6 @@ dependencies {
 
     runtimeOnly project(":keyext.ui.testgen")
     runtimeOnly project(":keyext.exploration")
-    runtimeOnly project(":keyext.msdebug")
     runtimeOnly project(":keyext.extsourceview")
 }
 

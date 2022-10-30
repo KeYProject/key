@@ -1,16 +1,16 @@
-package org.key_project.msdebug;
+package org.key_project.extsourceview.debug.tabs;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import org.key_project.extsourceview.debug.DebugTab;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
 
-public class SourceHighlightsView extends MSDebugTab {
+public class SourceHighlightsView extends DebugTab {
 
     private final SourceView sourceView;
 

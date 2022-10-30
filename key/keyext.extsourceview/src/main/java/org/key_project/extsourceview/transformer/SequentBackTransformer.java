@@ -1,4 +1,4 @@
-package org.key_project.extsourceview;
+package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -21,9 +21,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ESVBuilder {
+public class SequentBackTransformer {
 
-    public static ESVInsertionSet extractParts(TermBuilder tb, Sequent sequent) {
+    public static InsertionSet extractParts(TermBuilder tb, Sequent sequent) {
 
         var ante = sequent.antecedent().asList().toList();
         var succ = sequent.succedent().asList().toList();
@@ -92,7 +92,7 @@ public class ESVBuilder {
         //TODO fail if multiple succ blocks (?)
         //     or return some kind of either-or thingy
 
-        return new ESVInsertionSet(ImmutableList.fromList(extInsertions));
+        return new InsertionSet(ImmutableList.fromList(extInsertions));
     }
 
     public static List<InsertionTerm> extractSuccedent(Term t) {

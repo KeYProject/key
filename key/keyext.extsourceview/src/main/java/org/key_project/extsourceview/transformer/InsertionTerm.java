@@ -1,4 +1,4 @@
-package org.key_project.extsourceview;
+package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
 
@@ -14,6 +14,6 @@ public class InsertionTerm {
     }
 
     public String toJMLString(Services svc) throws IOException {
-        return ESVBuilder.TermToString(Term, svc); //TODO convert-term-to-jml method
+        return SequentBackTransformer.TermToString(Term, svc); //TODO convert-term-to-jml method
     }
 }

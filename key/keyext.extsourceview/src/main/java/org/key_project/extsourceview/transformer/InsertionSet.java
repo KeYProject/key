@@ -1,4 +1,4 @@
-package org.key_project.extsourceview;
+package org.key_project.extsourceview.transformer;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ESVInsertionSet {
+public class InsertionSet {
     public final ImmutableList<InsertionTerm> Insertions;
 
-    public ESVInsertionSet(ImmutableList<InsertionTerm> ins) {
+    public InsertionSet(ImmutableList<InsertionTerm> ins) {
         Insertions = ins;
     }
 

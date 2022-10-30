@@ -1,4 +1,4 @@
-package org.key_project.extsourceview;
+package org.key_project.extsourceview.transformer;
 
 public enum InsertionType {
 
@@ -11,7 +11,7 @@ public enum InsertionType {
 
     private final String name;
 
-    private InsertionType(String name) {
+    InsertionType(String name) {
         this.name = name;
     }
 
