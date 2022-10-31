@@ -25,47 +25,6 @@ import java.util.List;
 
 public class Utils {
 
-    public static String TermToOrigString(Term t, Services svc) {
-        OriginRef or = t.getOriginRef();
-        if (or == null) {
-            return "";
-        }
-        return or.sourceString();
-    }
-
-    public static String TermToString(Term t, Services svc, boolean singleLine) throws IOException {
-        //return t.toString();
-
-        if (svc == null) {
-            svc = new Services(AbstractProfile.getDefaultProfile());
-        }
-
-        var ni = new NotationInfo();
-
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), ni, svc);
-        ni.refresh(svc, true, false);
-
-        t = removeLabelRecursive(svc.getTermFactory(), t);
-
-        printer.printTerm(t);
-
-        var v = printer.toString();
-
-        if (singleLine) v = v.replaceAll("\\r", "").replaceAll("\\n", " ");
-
-        return v;
-    }
-
-    public static Term removeLabelRecursive(TermFactory tf, Term term) {
-        // Update children
-        List<Term> newSubs = new LinkedList<>();
-        for (Term oldSub : term.subs()) {
-            newSubs.add(removeLabelRecursive(tf, oldSub));
-        }
-
-        return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(), null, term.getOriginRef());
-    }
-
     public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart, int lineEnd) throws URISyntaxException, IOException {
         List<String> lines = Files.readAllLines(Path.of(file));
 
@@ -112,4 +71,5 @@ public class Utils {
 
         return str.substring(start, end);
     }
+
 }

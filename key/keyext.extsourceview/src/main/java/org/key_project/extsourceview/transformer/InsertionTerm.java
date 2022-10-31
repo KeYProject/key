@@ -12,8 +12,4 @@ public class InsertionTerm {
         Type = type;
         Term = term;
     }
-
-    public String toJMLString(Services svc) throws IOException {
-        return SequentBackTransformer.TermToString(Term, svc); //TODO convert-term-to-jml method
-    }
 }

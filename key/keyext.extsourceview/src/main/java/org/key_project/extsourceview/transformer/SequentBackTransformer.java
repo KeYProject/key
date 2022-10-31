@@ -1,267 +1,147 @@
 package org.key_project.extsourceview.transformer;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import org.key_project.util.collection.ImmutableArray;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.IOException;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class SequentBackTransformer {
 
-    public static InsertionSet extractParts(TermBuilder tb, Sequent sequent) {
+    private final Services svc;
+    private final Proof proof;
+    private final Node node;
+    private final Sequent sequent;
 
-        var ante = sequent.antecedent().asList().toList();
-        var succ = sequent.succedent().asList().toList();
-
-        var extInsertions = new ArrayList<InsertionTerm>();
-
-        // all antecedents become asserts
-        for (var sf: ante) {
-            var t = sf.formula();
-
-            if (!t.containsJavaBlockRecursive() && isExplicitRequires(t)) {
-                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, t));
-                continue;
-            }
-
-            if (!t.containsJavaBlockRecursive() && isImplicitRequires(t)) {
-                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, t));
-                continue;
-            }
-
-            //TODO fail if we can't identify a term (or ignore?)
-        }
-
-        int realSuccTerms = 0;
-
-        // all assumes are either asserts after [notLeft] or java+<assumes>
-        for (var sf: succ) {
-
-            var t = sf.formula();
-
-            // an requires after [notLeft]
-            if (isExplicitRequires(t)) {
-                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_EXPLICT, tb.not(t)));
-                continue;
-            }
-
-            // an requires after [notLeft]
-            if (isImplicitRequires(t)) {
-                extInsertions.add(new InsertionTerm(InsertionType.REQUIRES_IMPLICT, tb.not(t)));
-                continue;
-            }
-
-            if (t.containsJavaBlockRecursive()) { // TODO: remove this, we dont actually support modalities for now
-                var ins = extractSuccedent(t);
-                if (ins.size() > 0) {
-                    extInsertions.addAll(ins);
-                    realSuccTerms++;
-                }
-                continue;
-            }
-
-            {
-                var ins = extractSuccedent(t);
-                if (ins.size() > 0) {
-                    extInsertions.addAll(ins);
-                    realSuccTerms++;
-                }
-                continue;
-
-            }
-
-            //TODO fail if we can't identify a term (or ignore?)
-
-        }
-
-        //TODO fail if multiple succ blocks (?)
-        //     or return some kind of either-or thingy
-
-        return new InsertionSet(ImmutableList.fromList(extInsertions));
+    public SequentBackTransformer(Services svc, Proof proof, Node node) {
+        this.svc = svc;
+        this.proof = proof;
+        this.node = node;
+        this.sequent = node.sequent();
     }
 
-    public static List<InsertionTerm> extractSuccedent(Term t) {
+    public InsertionSet extract() throws TransformException {
+        var ante = extractAntecedentTerms();
+        var succ = extractSuccedentTerms();
 
-        // simple case
-        if (isExplicitEnsures(t)) {
-            return Collections.singletonList(new InsertionTerm(InsertionType.ENSURES_EXPLICT, t));
+        var result = new ArrayList<InsertionTerm>();
+        result.addAll(ante);
+        result.addAll(succ);
+
+        return new InsertionSet(ImmutableList.fromList(result));
+
+    }
+
+    public PositionMap generatePositionMap() throws TransformException {
+
+        ContractPO contractPO = svc.getSpecificationRepository().getPOForProof(proof);
+
+        if (!(contractPO instanceof FunctionalOperationContractPO)) {
+            throw new TransformException("Can only work on functional contracts");
         }
 
-        // simple case
-        if (isImplicitEnsures(t)) {
-            return Collections.singletonList(new InsertionTerm(InsertionType.ENSURES_IMPLICT, t));
-        }
+        FunctionalOperationContractPO funContractPO = (FunctionalOperationContractPO)contractPO;
 
-        if (t.op() == UpdateApplication.UPDATE_APPLICATION) {
-            return extractSuccedent(t.sub(1)); //TODO handle updates
-        }
+        FunctionalOperationContract contract = funContractPO.getContract();
 
-        if (t.op() == Modality.DIA && !t.javaBlock().isEmpty()) {
-            var result = new ArrayList<InsertionTerm>();
-            for (var ensTerm: splitFormula(t.sub(0), Junctor.AND)) {
-                if (isExplicitEnsures(ensTerm)) {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_EXPLICT, ensTerm));
-                } else if (isImplicitEnsures(ensTerm)) {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_IMPLICT, ensTerm));
+        IProgramMethod progrMethod = contract.getTarget();
+
+        PositionInfo pos = progrMethod.getPositionInfo();
+
+        return new PositionMap(pos);
+    }
+
+    private ArrayList<InsertionTerm> extractAntecedentTerms() throws TransformException {
+        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
+
+        for (SequentFormula sf: sequent.antecedent()) {
+
+            Term topTerm = sf.formula();
+
+            if (topTerm.containsJavaBlockRecursive()) throw new TransformException("Cannot transform antecedent formula with modularities");
+
+            var split = splitFormula(topTerm, Junctor.AND);
+
+            for (var term: split) {
+                if (isRequires(term)) {
+                    result.add(new InsertionTerm(InsertionType.REQUIRES, term));
                 } else {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_UNKNOWN, ensTerm)); //TOOD what do here?
+                    throw new TransformException("Failed to categorize antecedent-term '"+term+"'");
                 }
             }
-            return result;
         }
 
-        {
-            var result = new ArrayList<InsertionTerm>();
-            for (var ensTerm : splitFormula(t, Junctor.AND)) {
-                if (isExplicitEnsures(ensTerm)) {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_EXPLICT, ensTerm));
-                } else if (isImplicitEnsures(ensTerm)) {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_IMPLICT, ensTerm));
+        return result;
+    }
+
+    private ArrayList<InsertionTerm> extractSuccedentTerms() throws TransformException {
+        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
+
+        TermBuilder tb = svc.getTermBuilder();
+
+        boolean ensuresInResult = false;
+        for (SequentFormula sf: sequent.succedent()) {
+
+            Term topTerm = sf.formula();
+
+            if (topTerm.containsJavaBlockRecursive()) throw new TransformException("Cannot transform succedent formula with modularities");
+
+            var split = splitFormula(topTerm, Junctor.AND);
+
+            boolean ensuresInSplit = false;
+            for (var term: split) {
+                if (isRequires(term)) {
+                    result.add(new InsertionTerm(InsertionType.REQUIRES, tb.not(term)));
+                } else if (isEnsures(term)) {
+                    if (ensuresInResult) {
+                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
+                    }
+                    result.add(new InsertionTerm(InsertionType.ENSURES, term));
+                    ensuresInSplit = true;
                 } else {
-                    result.add(new InsertionTerm(InsertionType.ENSURES_UNKNOWN, ensTerm)); //TOOD what do here?
+                    throw new TransformException("Failed to categorize succedent-term '"+term+"'");
                 }
             }
-            return result;
+            if (ensuresInSplit) {
+                ensuresInResult = true;
+            }
         }
 
+        return result;
     }
 
-    public static boolean isExplicitRequires(Term term) {
+    private boolean isRequires(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = getSubOriginRefs(term, true);
-        if (origin.size() == 0) return false;
+        var origins = getSubOriginRefs(term, true);
+        if (origins.size() == 0) return false;
 
-        // all origin-refs must be [REQUIRES_IMPLICT] | [REQUIRES]
-        // at least one must be [REQUIRES]
-
-        var explicitRefs = 0;
-        for(var o: origin) {
-            if (o.Type == OriginRefType.UNKNOWN) continue;
-
-            if (!isExplicitRequires(o.Type) && !isImplicitRequires(o.Type)) {
-                return false;
-            }
-
-            if (isExplicitRequires(o.Type)) {
-                explicitRefs++;
-            }
-        }
-
-        return explicitRefs > 0;
+        return origins.stream().allMatch(p -> p.Type.isRequires());
     }
 
-    public static boolean isImplicitRequires(Term term) {
+    private boolean isEnsures(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origin = getSubOriginRefs(term, true);
-        if (origin.size() == 0) return false;
+        var origins = getSubOriginRefs(term, true);
+        if (origins.size() == 0) return false;
 
-        // all origin-refs must be [REQUIRES_IMPLICT]
-
-        int implicitRefs = 0;
-
-        for(var o: origin) {
-            if (o.Type == OriginRefType.UNKNOWN) continue;
-
-            if (isImplicitRequires(o.Type)) {
-                implicitRefs++;
-            } else {
-                return false;
-            }
-        }
-
-        return implicitRefs > 0;
+        return origins.stream().allMatch(p -> p.Type.isEnsures());
     }
 
-    public static boolean isExplicitEnsures(Term term) {
-        if (term.containsJavaBlockRecursive()) return false;
-
-        var origin = getSubOriginRefs(term, true);
-        if (origin.size() == 0) return false;
-
-        // all origin-refs must be [ENSURES_IMPLICT] | [ENSURES]
-        // at least one must be [ENSURES]
-
-        var explicitRefs = 0;
-        for(var o: origin) {
-            if (o.Type == OriginRefType.UNKNOWN) continue;
-
-            if (!isExplicitEnsures(o.Type) && !isImplicitEnsures(o.Type)) {
-                return false;
-            }
-
-            if (isExplicitEnsures(o.Type)) {
-                explicitRefs++;
-            }
-        }
-
-        return explicitRefs > 0;
-    }
-
-    public static boolean isImplicitEnsures(Term term) {
-        if (term.containsJavaBlockRecursive()) return false;
-
-        var origin = getSubOriginRefs(term, true);
-        if (origin.size() == 0) return false;
-
-        // all origin-refs must be [ENSURES_IMPLICT]
-
-        int implicitRefs = 0;
-
-        for(var o: origin) {
-            if (o.Type == OriginRefType.UNKNOWN) continue;
-
-            if (isImplicitEnsures(o.Type)) {
-                implicitRefs++;
-            } else {
-                return false;
-            }
-        }
-
-        return implicitRefs > 0;
-    }
-
-    public static boolean isExplicitRequires(OriginRefType t) {
-        return t == OriginRefType.JML_REQUIRES || t == OriginRefType.JML_REQUIRES_FREE;
-    }
-
-    public static boolean isExplicitEnsures(OriginRefType t) {
-        return t == OriginRefType.JML_ENSURES || t == OriginRefType.JML_ENSURES_FREE;
-    }
-
-    public static boolean isImplicitRequires(OriginRefType t) {
-        return t == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT ||
-               t == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK ||
-               t == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE ||
-               t == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP ||
-               t == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED ||
-               t == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL ||
-               t == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
-    }
-
-    public static boolean isImplicitEnsures(OriginRefType t) {
-        return t == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT ||
-               t == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE ||
-               t == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
-    }
-
-    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
+    private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
@@ -278,55 +158,15 @@ public class SequentBackTransformer {
         return r;
     }
 
-    //TODO remove me
-    public static String TermToString(Term t, Services svc) throws IOException {
-        //return t.toString();
-
-        if (svc == null) {
-            svc = new Services(AbstractProfile.getDefaultProfile());
-        }
-
-        var ni = new NotationInfo();
-
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), ni, svc);
-        ni.refresh(svc, true, false);
-
-        t = removeLabelRecursive(svc.getTermFactory(), t);
-
-        printer.printTerm(t);
-
-        var v = printer.toString();
-
-        return v.replaceAll("\r", "").replaceAll("\n", " ").trim();
-    }
-
-    //TODO remove me
-    public static Term removeLabelRecursive(TermFactory tf, Term term) {
-        // Update children
-        List<Term> newSubs = new LinkedList<>();
-        for (Term oldSub : term.subs()) {
-            newSubs.add(removeLabelRecursive(tf, oldSub));
-        }
-
-        return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(), null, term.getOriginRef());
-    }
-
-    public static List<Term> splitFormula(Term f, Operator j)  {
+    private List<Term> splitFormula(Term f, Operator j)  {
         var r = new ArrayList<Term>();
 
         if (f.op() == j) {
-
-            for (var f0: splitFormula(f.sub(0), j)) {
-                r.add(f0);
-            }
-            for (var f1: splitFormula(f.sub(1), j)) {
-                r.add(f1);
-            }
-
+            r.addAll(splitFormula(f.sub(0), j));
+            r.addAll(splitFormula(f.sub(1), j));
         } else {
             r.add(f);
         }
-
 
         return r;
     }

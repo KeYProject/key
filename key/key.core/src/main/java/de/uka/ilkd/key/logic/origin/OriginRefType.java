@@ -46,4 +46,25 @@ public enum OriginRefType {
     public String toString() {
         return name;
     }
+
+    public boolean isRequires() {
+        return this == OriginRefType.JML_REQUIRES ||
+               this == OriginRefType.JML_REQUIRES_FREE ||
+               this == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT ||
+               this == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK ||
+               this == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE ||
+               this == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP ||
+               this == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED ||
+               this == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL ||
+               this == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
+    }
+
+    public boolean isEnsures() {
+        return this == OriginRefType.JML_ENSURES ||
+               this == OriginRefType.JML_ENSURES_FREE ||
+               this == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT ||
+               this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE ||
+               this == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
+    }
+
 }

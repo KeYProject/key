@@ -13,7 +13,12 @@ import javax.swing.*;
 
 public class DebugView extends JTabbedPane implements TabPanel {
 
-    private DebugTab[] tabs = new DebugTab[0];
+    private final DebugTab[] tabs;
+
+    public final OriginRefView OriginRefView;
+    public final SourceInsertionsView SourceInsertionsView;
+    public final SourceHighlightsView SourceHighlightsView;
+    public final BackTransformationView BackTransformationView;
 
     private JTabbedPane pnlMain;
 
@@ -22,10 +27,10 @@ public class DebugView extends JTabbedPane implements TabPanel {
 
         tabs = new DebugTab[]
         {
-            new OriginRefView(window, mediator),
-            new SourceInsertionsView(window, mediator),
-            new SourceHighlightsView(window, mediator),
-            new BackTransformationView(window, mediator),
+            OriginRefView = new OriginRefView(window, mediator),
+            SourceInsertionsView = new SourceInsertionsView(window, mediator),
+            SourceHighlightsView = new SourceHighlightsView(window, mediator),
+            BackTransformationView = new BackTransformationView(window, mediator),
         };
     }
 
@@ -47,6 +52,8 @@ public class DebugView extends JTabbedPane implements TabPanel {
             for (DebugTab t: tabs) {
                 pnlMain.addTab(t.getTitle(), t);
             }
+
+            pnlMain.setSelectedIndex(3);
         }
         return pnlMain;
     }

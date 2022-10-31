@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
+import org.key_project.extsourceview.transformer.TermTranslator;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -223,14 +224,16 @@ public class OriginRefView extends DebugTab {
 
         var proof = mediator.getSelectedProof();
 
+        var translator = new TermTranslator(mediator.getServices());
+
         try {
             StringBuilder txt = new StringBuilder();
 
             if (showSectionRepr) {
                 txt.append("----------<TOSTRING>----------\n");
                 txt.append("\n");
-                txt.append("ToStr<OriginRef>: ").append(Utils.TermToOrigString(t, proof.getServices())).append("\n");
-                txt.append("ToStr<Fallback>:  ").append(Utils.TermToString(t, proof.getServices(), true)).append("\n");
+                txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(t)).append("\n");
+                txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(t, true)).append("\n");
                 txt.append("\n");
             }
 
@@ -294,8 +297,8 @@ public class OriginRefView extends DebugTab {
 
                 Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
-                    txt.append("ToStr<OriginRef>: ").append(Utils.TermToOrigString(parent, proof.getServices())).append("\n");
-                    txt.append("ToStr<Fallback>:  ").append(Utils.TermToString(parent, proof.getServices(), true)).append("\n");
+                    txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
+                    txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true)).append("\n");
                     txt.append("\n");
                     {
                         OriginRef o = parent.getOriginRef();

@@ -4,17 +4,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import org.key_project.extsourceview.transformer.InsertionTerm;
-import org.key_project.extsourceview.transformer.SequentBackTransformer;
-import org.key_project.extsourceview.transformer.InsertionType;
+import org.key_project.extsourceview.transformer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,64 +27,42 @@ public class SourceViewPatcher {
 
     private final static int HIGHTLIGHT_LEVEL = 11;
 
-    public static void updateSourceview(MainWindow window, KeYMediator mediator) {
-        Services svc = mediator.getServices();
-
-        TermBuilder tb = svc.getTermBuilder();
+    public static void updateSourceview(MainWindow window, KeYMediator mediator) throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
-
-        Proof proof = mediator.getSelectedProof();
-
-        Node node = mediator.getSelectedNode();
-
-        Sequent sequent = node.sequent();
+        URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
 
         try {
-            URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
-
-            var contractPO = (FunctionalOperationContractPO)svc.getSpecificationRepository().getPOForProof(proof); //TODO type check
-
-            var contract = contractPO.getContract();
-
-            var progrMethod = contract.getTarget();
-
-            var posStart = progrMethod.getPositionInfo().getStartPosition();
-            var posEnd   = progrMethod.getPositionInfo().getEndPosition();
-
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);
-
-            var parts = SequentBackTransformer.extractParts(tb, sequent);
-
-            for (var term: parts.get(InsertionType.REQUIRES_IMPLICT)) {
-                addInsertion(sourceView, fileUri, posEnd.getLine(), term, "//@ assume " + term.toJMLString(svc) + "; //(impl)");
-            }
-
-            sourceView.addInsertion(fileUri, new SourceViewInsertion(INSERTION_GROUP, posStart.getLine()+1, "", Color.BLACK, Color.WHITE));
-
-            for (var term: parts.get(InsertionType.REQUIRES_EXPLICT)) {
-                addInsertion(sourceView, fileUri, posEnd.getLine(), term, "//@ assume " + term.toJMLString(svc) + ";");
-            }
-
-            for (var term: parts.get(InsertionType.ENSURES_IMPLICT)) {
-                addInsertion(sourceView, fileUri, posEnd.getLine(), term, "//@ assert " + term.toJMLString(svc) + "; //(impl)");
-            }
-
-            sourceView.addInsertion(fileUri, new SourceViewInsertion(INSERTION_GROUP, posEnd.getLine(), "", Color.BLACK, Color.WHITE));
-
-            for (var term: parts.get(InsertionType.ENSURES_EXPLICT)) {
-                addInsertion(sourceView, fileUri, posEnd.getLine(), term, "//@ assert " + term.toJMLString(svc) + ";");
-            }
-
         } catch (IOException | BadLocationException e) {
-            //TODO poper error handling
-            LOGGER.error("Failed to update ExtSourceView", e);
+            throw new InternTransformException("Failed to clear existing insertions", e);
         }
 
+        SequentBackTransformer transformer = new SequentBackTransformer(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+
+        TermTranslator translator = new TermTranslator(mediator.getServices());
+
+        InsertionSet parts = transformer.extract();
+
+        PositionMap posmap = transformer.generatePositionMap();
+
+        for (var iterm: parts.get()) {
+
+            int line = posmap.getLineForInsTerm(iterm);
+
+            int indentation = posmap.getLineIndent(line);
+
+            String jmlstr = " ".repeat(indentation) + translator.translateWithOrigin(iterm.Term);
+
+            try {
+                addInsertion(sourceView, fileUri, line, iterm, jmlstr);
+            } catch (IOException | BadLocationException e) {
+                throw new InternTransformException("Failed to add insertion", e);
+            }
+        }
     }
 
-    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String termstr) throws IOException, BadLocationException {
-        String str = "        " + termstr; //TODO determine indentation
+    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
         Color bkg = new Color(222, 222, 222);
         SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, bkg);
