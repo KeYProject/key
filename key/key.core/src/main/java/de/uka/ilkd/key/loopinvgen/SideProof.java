@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -104,6 +105,9 @@ public class SideProof {
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
+
+
+
 		return ps.start();
 	}
 
@@ -136,6 +140,12 @@ public class SideProof {
 		ApplyStrategyInfo info;
 		try {
 			info = isProvableHelper(seq2prove, maxRuleApp, false, stopAtFirstUncloseableGoal, services);
+
+//			if (!info.getProof().closed() && info.getProof().openGoals().size() == 1) {
+//				System.out.println(LogicPrinter.quickPrintSequent(info.getProof().openGoals().head().sequent(), services));
+//
+//			}
+
 		} catch (ProofInputException pie) {
 			pie.printStackTrace();
 			return false;

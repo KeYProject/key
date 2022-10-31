@@ -89,7 +89,7 @@ public class NestedLoopUsecaseRuleImp{
             Term updatedLeft = tb.apply(anonUpdAndEv, tb.and(innerLI, tb.not(guard)));
             goal.addFormula(new SequentFormula(updatedLeft), true, true);
             //Succ:
-            SequentFormula programFormula = null;// hand the sequentformula over and remove the code below
+            SequentFormula programFormula = null;// hand the sequent formula over and remove the code below
             for (SequentFormula sf : goal.sequent().succedent()) {
                 if ((tb.goBelowUpdates(sf.formula()).op() instanceof Modality)) { // FIX check for correct formula
                     programFormula = sf;

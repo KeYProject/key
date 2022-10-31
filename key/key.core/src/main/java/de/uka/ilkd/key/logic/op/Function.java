@@ -30,7 +30,7 @@ public class Function extends AbstractSortedOperator {
              boolean isRigid,
              boolean isSkolemConstant) {
 	super(name, argSorts, sort, whereToBind, isRigid);
-
+    
 	this.unique = unique;
 	skolemConstant = isSkolemConstant;
 	assert sort != Sort.UPDATE;

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
@@ -57,7 +58,9 @@ public abstract class PredicateRefiner {
 //        System.out.println("sequentImpliesPredicate is called for: "+pred);
 
         final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
+
         final boolean provable = sProof.isProvable(sideSeq, services);//SideProof.isProvable(sideSeq, 100000, true, services);
+
 //        if(!provable)
 //            System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
 //        System.out.println(provable);
