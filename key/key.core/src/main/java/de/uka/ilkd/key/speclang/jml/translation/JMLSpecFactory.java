@@ -489,6 +489,7 @@ public class JMLSpecFactory {
 
                 final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList.<LabeledParserRuleContext>nil().append(getAssignableNothing());
                 Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing);
+                term = tb.tf().setOriginRefTypeRecursive(term, OriginRefType.JML_ASSIGNABLE, true);
                 clauses.assignables.put(heap, term);
             } else if (mod.isEmpty()) {
                 // no assignable clauses exist
@@ -500,6 +501,7 @@ public class JMLSpecFactory {
                 // some assignable clauses are set
 
                 Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, mod);
+                term = tb.tf().setOriginRefTypeRecursive(term, OriginRefType.JML_ASSIGNABLE, true);
                 clauses.assignables.put(heap, term);
             }
         }

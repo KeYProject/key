@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -106,6 +107,10 @@ public class TermImpl implements Term {
                 ? JavaBlock.EMPTY_JAVABLOCK
                         : javaBlock;
         this.originRef = originRef;
+
+        if (subs.stream().anyMatch(p -> p.toString().contains("output")) && subs.stream().anyMatch(p -> p.toString().contains("all{"))) {
+            System.out.println("|@| " + op + " --> " + (subs.stream().map(Object::toString).collect(Collectors.joining(" ++ "))).replaceAll("\\n", " "));
+        }
     }
 
 

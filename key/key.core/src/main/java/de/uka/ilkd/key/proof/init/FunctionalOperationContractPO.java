@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -240,9 +241,19 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                 Term mod = getContract().getMod(heap, selfVar, paramVars, services);
                 // strictly pure have a different contract.
                 ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                ft = tb.tf().atomize(ft);
+                ft = tb.tf().setOriginRefTypeRecursive(ft, OriginRefType.JML_ASSIGNABLE, true);
             } else {
                 Term mod = getContract().getMod(heap, selfVar, paramVars, services);
                 ft = tb.frame(tb.var(heap), heapToAtPre, mod);
+                ft = tb.tf().atomize(ft);
+
+                if (mod.getOriginRef() != null && mod.getOriginRef().Type == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE) {
+                    ft = tb.tf().setOriginRefTypeRecursive(ft, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, true);
+                } else {
+                    ft = tb.tf().setOriginRefTypeRecursive(ft, OriginRefType.JML_ASSIGNABLE, true);
+                }
+
             }
 
             if(frameTerm == null) {
