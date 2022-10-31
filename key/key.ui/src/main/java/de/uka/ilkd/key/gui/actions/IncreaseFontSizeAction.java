@@ -14,21 +14,22 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      * generated sUID
      */
     private static final long serialVersionUID = 1670432514230642280L;
-    
+
     /**
      * creates the action to increase the font size of the sequent and proof view
+     *
      * @param mainWindow the main window
      */
     public IncreaseFontSizeAction(MainWindow mainWindow) {
         super(mainWindow);
-	
+
         setName("Larger");
         setIcon(IconFactory.plus(16));
 
         Config.DEFAULT.addConfigChangeListener(this);
         lookupAcceleratorKey();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Config.DEFAULT.larger();

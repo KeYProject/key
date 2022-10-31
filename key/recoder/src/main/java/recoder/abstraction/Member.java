@@ -15,8 +15,7 @@ public interface Member extends ProgramModelElement {
     /**
      * Checks if this member is final.
      *
-     * @return <CODE>true</CODE> if this member is final, <CODE>false</CODE>
-     * otherwise.
+     * @return <CODE>true</CODE> if this member is final, <CODE>false</CODE> otherwise.
      */
     boolean isFinal();
 

@@ -28,17 +28,20 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+            Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+            Services services, ExecutionContext ec) {
         return false;
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub, de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+            de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
         return false;
     }
 

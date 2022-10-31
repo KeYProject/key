@@ -25,10 +25,10 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
- * Rule application class for merge rule applications. Is complete iff the
- * mergePartners field as well as the concrete {@link MergeProcedure} to be used
- * have been set by the corresponding setter function.
- * 
+ * Rule application class for merge rule applications. Is complete iff the mergePartners field as
+ * well as the concrete {@link MergeProcedure} to be used have been set by the corresponding setter
+ * function.
+ *
  * @author Dominic Scheurer
  */
 public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
@@ -44,8 +44,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
-    public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio) {
+    public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
@@ -56,11 +55,9 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
-            ImmutableList<MergePartner> mergePartners,
-            MergeProcedure concreteRule,
+            ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
-            ImmutableList<SymbolicExecutionState> mergePartnerStates,
-            Term distForm,
+            ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
             ArrayList<MergeRuleProgressListener> progressListeners) {
         super(rule, pio, ifInsts);
         this.mergeNode = mergeNode;
@@ -90,38 +87,34 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // merging is still possible, but then this method shouldn't be called
         // (completion task is done by the corresponding visual dialogs).
 
-        final ImmutableList<MergePartner> mergePartners = MergeRule
-                .findPotentialMergePartners(goal, pio);
+        final ImmutableList<MergePartner> mergePartners =
+            MergeRule.findPotentialMergePartners(goal, pio);
 
         if (mergePartners.isEmpty()) {
             return this;
         }
 
         final MergePointStatement mps = (MergePointStatement) JavaTools
-                .getActiveStatement(
-                        TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+                .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
 
         final Services services = goal.proof().getServices();
-        final MergeContract mc = services.getSpecificationRepository()
-                .getMergeContracts(mps).iterator().next();
+        final MergeContract mc =
+            services.getSpecificationRepository().getMergeContracts(mps).iterator().next();
 
         final Node node = goal.node();
 
-        return new MergeRuleBuiltInRuleApp(super.builtInRule, super.pio,
-                super.ifInsts, node, mergePartners,
-                mc.getInstantiatedMergeProcedure(services),
-                MergeRuleUtils.sequentToSETriple(node, pio, services),
-                MergeRuleUtils.sequentsToSEPairs(mergePartners), null,
-                new ArrayList<>());
+        return new MergeRuleBuiltInRuleApp(super.builtInRule, super.pio, super.ifInsts, node,
+            mergePartners, mc.getInstantiatedMergeProcedure(services),
+            MergeRuleUtils.sequentToSETriple(node, pio, services),
+            MergeRuleUtils.sequentsToSEPairs(mergePartners), null, new ArrayList<>());
     }
 
     @Override
     public boolean complete() {
         // We do not check for the suitability of the distinguishing formula
         // since this has already been dealt with in MergeRuleCompletion.
-        return mergePartners != null && !mergePartners.isEmpty()
-                && concreteRule != null && mergeNode != null
-                && distinguishablePathConditionsRequirement();
+        return mergePartners != null && !mergePartners.isEmpty() && concreteRule != null
+                && mergeNode != null && distinguishablePathConditionsRequirement();
     }
 
     private boolean distinguishablePathConditionsRequirement() {
@@ -138,17 +131,15 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // the concrete lattice.
         if (concreteRule.requiresDistinguishablePathConditions()
                 || concreteRule instanceof MergeWithLatticeAbstraction) {
-            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList
-                    .nil();
+            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
             allStates = allStates.prepend(mergePartnerStates);
-            allStates = allStates
-                    .prepend(thisSEState.toSymbolicExecutionState());
+            allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
 
             for (SymbolicExecutionState state1 : allStates) {
                 for (SymbolicExecutionState state2 : allStates) {
                     if (state1 != state2) {
-                        if (!MergeRuleUtils.pathConditionsAreDistinguishable(
-                                state1.second, state2.second, services)) {
+                        if (!MergeRuleUtils.pathConditionsAreDistinguishable(state1.second,
+                            state2.second, services)) {
                             return false;
                         }
                     }
@@ -186,8 +177,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public void setMergeNode(Node mergeNode) {
         this.mergeNode = mergeNode;
-        this.thisSEState = MergeRuleUtils.sequentToSETriple(mergeNode,
-                super.pio, mergeNode.proof().getServices());
+        this.thisSEState =
+            MergeRuleUtils.sequentToSETriple(mergeNode, super.pio, mergeNode.proof().getServices());
     }
 
     public void setDistinguishingFormula(Term distForm) {
@@ -211,8 +202,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return mergePartnerStates;
     }
 
-    public void registerProgressListener(
-            MergeRule.MergeRuleProgressListener listener) {
+    public void registerProgressListener(MergeRule.MergeRuleProgressListener listener) {
         progressListeners.add(listener);
     }
 
@@ -220,8 +210,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         progressListeners = new ArrayList<>();
     }
 
-    public boolean removeProgressListener(
-            MergeRule.MergeRuleProgressListener listener) {
+    public boolean removeProgressListener(MergeRule.MergeRuleProgressListener listener) {
         return progressListeners.remove(listener);
     }
 

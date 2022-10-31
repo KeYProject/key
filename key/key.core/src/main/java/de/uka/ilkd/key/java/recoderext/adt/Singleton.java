@@ -6,37 +6,37 @@ import recoder.java.Expression;
 public class Singleton extends ADTPrefixConstruct {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 5549648259903299451L;
 
 
     public Singleton(Expression lhs) {
-	super(lhs);
-	makeParentRoleValid();
+        super(lhs);
+        makeParentRoleValid();
     }
 
 
     protected Singleton(Singleton proto) {
-	super(proto);
-	makeParentRoleValid();
+        super(proto);
+        makeParentRoleValid();
     }
-    
 
-    @Override    
+
+    @Override
     public Singleton deepClone() {
-	return new Singleton(this);
+        return new Singleton(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
-	return 1;
+        return 1;
     }
 
-    
-    @Override    
+
+    @Override
     public int getNotation() {
-	return PREFIX;
+        return PREFIX;
     }
 }

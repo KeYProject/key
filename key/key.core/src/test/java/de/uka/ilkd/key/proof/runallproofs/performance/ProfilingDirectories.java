@@ -19,8 +19,7 @@ public class ProfilingDirectories extends RunAllProofsDirectories {
     public ProfilingDirectories(Date runStart) {
         super(runStart);
 
-        SimpleDateFormat format = new SimpleDateFormat(
-                "dd.MMM_yyyy____HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("dd.MMM_yyyy____HH:mm:ss");
         String date = format.format(runStart);
         runDir = new File(RUNALLPROOFS_DIR, "run-" + date);
 

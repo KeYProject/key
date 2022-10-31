@@ -51,7 +51,8 @@ public final class IOUtil {
             throw new IOException("Can't compute MD5 without a File.");
         }
         if (!file.isFile()) {
-            throw new IOException("Can't compute MD5, because \"" + file + "\" is not an existing file.");
+            throw new IOException(
+                "Can't compute MD5, because \"" + file + "\" is not an existing file.");
         }
         return computeMD5(new FileInputStream(file));
     }
@@ -59,7 +60,8 @@ public final class IOUtil {
     /**
      * Computes the MD5 checksum of the given {@link InputStream} and closes it.
      *
-     * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The {@link InputStream} will be closed.
+     * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The
+     *        {@link InputStream} will be closed.
      * @return The computed MD5 checksum.
      * @throws IOException Occurred Exception.
      */
@@ -125,7 +127,8 @@ public final class IOUtil {
     /**
      * Returns the file name without file extension for the given file name with extension.
      *
-     * @param fileName The file name with extension for that the file name without extension is needed.
+     * @param fileName The file name with extension for that the file name without extension is
+     *        needed.
      * @return The file name without extension or {@code null} if it was not possible to compute it.
      */
     public static String getFileNameWithoutExtension(String fileName) {
@@ -179,7 +182,8 @@ public final class IOUtil {
      * Reads the complete content from the {@link File}.
      *
      * @param file The {@link File} to read from.
-     * @return The read content or {@code null} if the {@link File} is {@code null} or not an existing file.
+     * @return The read content or {@code null} if the {@link File} is {@code null} or not an
+     *         existing file.
      * @throws IOException Occurred Exception.
      */
     public static String readFrom(File file) throws IOException {
@@ -214,10 +218,10 @@ public final class IOUtil {
     }
 
     /**
-     * Writes the given content into the given {@link OutputStream} and closes it.
-     * Nothing will be written if the content is {@code null}, but the stream will be closed.
+     * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
+     * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out     The {@link OutputStream} to write to.
+     * @param out The {@link OutputStream} to write to.
      * @param content The content to write.
      * @throws IOException Occurred Exception.
      */
@@ -226,57 +230,64 @@ public final class IOUtil {
     }
 
     /**
-     * Writes the given content into the given {@link OutputStream} and closes it.
-     * Nothing will be written if the content is {@code null}, but the stream will be closed.
+     * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
+     * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out     The {@link OutputStream} to write to.
+     * @param out The {@link OutputStream} to write to.
      * @param content The content to write.
      * @throws IOException Occurred Exception.
      */
-    public static void writeTo(OutputStream out, String content, Charset encoding) throws IOException {
+    public static void writeTo(OutputStream out, String content, Charset encoding)
+            throws IOException {
         writeTo(out, content, encoding != null ? encoding.displayName() : null);
     }
 
     /**
-     * Writes the given content into the given {@link OutputStream} and closes it.
-     * Nothing will be written if the content is {@code null}, but the stream will be closed.
+     * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
+     * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out      The {@link OutputStream} to write to.
-     * @param content  The content to write.
+     * @param out The {@link OutputStream} to write to.
+     * @param content The content to write.
      * @param encoding The encoding to use.
      * @throws IOException Occurred Exception.
      */
-    public static void writeTo(OutputStream out, String content, String encoding) throws IOException {
-        if (out == null || content == null) return;
+    public static void writeTo(OutputStream out, String content, String encoding)
+            throws IOException {
+        if (out == null || content == null)
+            return;
 
-        try (PrintStream printStream = encoding != null ?
-                new PrintStream(out, false, encoding) :
-                new PrintStream(out)) {
+        try (PrintStream printStream =
+            encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
             printStream.print(content);
         }
     }
 
     /**
      * <p>
-     * Computes line information for each text line in the given {@link File}.
-     * A {@link LineInformation} consists of the offset from the beginning of the
-     * file for each line and the indices of tabs {@code '\t'} in each line.
+     * Computes line information for each text line in the given {@link File}. A
+     * {@link LineInformation} consists of the offset from the beginning of the file for each line
+     * and the indices of tabs {@code '\t'} in each line.
      * </p>
      * <p>
      * Example content, line break is '\n':
+     *
      * <pre>
      * Line 1
      * Line 2: With some text
      *
      * Line 4
      * </pre>
+     *
      * Computed line start indices:
-     * <pre><code>
+     *
+     * <pre>
+     * <code>
      * result[0] = new LineInformation(0, new int[0]);
      * result[1] = new LineInformation(7, new int[] {7});
      * result[2] = new LineInformation(30, new int[0]);
      * result[3] = new LineInformation(31, new int[0]);
-     * </code></pre>
+     * </code>
+     * </pre>
      * </p>
      *
      * @param file The given {@link File}.
@@ -293,25 +304,30 @@ public final class IOUtil {
 
     /**
      * <p>
-     * Computes line information for each text line in the given {@link InputStream}.
-     * A {@link LineInformation} consists of the offset from the beginning of the
-     * file for each line and the indices of tabs {@code '\t'} in each line.
+     * Computes line information for each text line in the given {@link InputStream}. A
+     * {@link LineInformation} consists of the offset from the beginning of the file for each line
+     * and the indices of tabs {@code '\t'} in each line.
      * </p>
      * <p>
      * Example content, line break is '\n':
+     *
      * <pre>
      * Line 1
      * Line 2:\tWith some text
      *
      * Line 4
      * </pre>
+     *
      * Computed line start indices:
-     * <pre><code>
+     *
+     * <pre>
+     * <code>
      * result[0] = new LineInformation(0, new int[0]);
      * result[1] = new LineInformation(7, new int[] {7});
      * result[2] = new LineInformation(30, new int[0]);
      * result[3] = new LineInformation(31, new int[0]);
-     * </code></pre>
+     * </code>
+     * </pre>
      * </p>
      *
      * @param in The given {@link File}.
@@ -319,7 +335,8 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
-        if (in == null) return new LineInformation[0];
+        if (in == null)
+            return new LineInformation[0];
 
         try (InputStreamReader reader = new InputStreamReader(in)) {
             List<LineInformation> result = new LinkedList<>();
@@ -371,7 +388,8 @@ public final class IOUtil {
                                 tabIndices.clear();
                             }
                         } else {
-                            // Can't check for line break with "\r\n", do check after reading next content
+                            // Can't check for line break with "\r\n", do check after reading next
+                            // content
                             lastSignWasRBreakIndex = lastIndex;
                             lastIndex = startIndex + i + 1;
                         }
@@ -416,7 +434,7 @@ public final class IOUtil {
         /**
          * Constructor.
          *
-         * @param offset     The offset of the line from beginning of the file.
+         * @param offset The offset of the line from beginning of the file.
          * @param tabIndices The indices of all tabs in the line.
          */
         public LineInformation(int offset, List<Integer> tabIndices) {
@@ -454,13 +472,14 @@ public final class IOUtil {
 
         /**
          * <p>
-         * Computes for the given column index (a tab represents multiple columns)
-         * in this line information the normalized column index in that each tab character
-         * represents only one sign.
+         * Computes for the given column index (a tab represents multiple columns) in this line
+         * information the normalized column index in that each tab character represents only one
+         * sign.
          * </p>
          * <p>
          * Example line: {@code AB\tCD EF GH\t\tIJ\t.}<br>
          * Example normalizations:
+         *
          * <pre>
          * normalizeColumn(0, 3) = 0 which is character 'A'
          * normalizeColumn(1, 3) = 1 which is character 'B'
@@ -492,9 +511,10 @@ public final class IOUtil {
          * </pre>
          * </p>
          *
-         * @param column   The column where tabs represents multiple characters.
-         *                 If the column is negative this value is returned.
-         * @param tabWidth The tab width which must be greater as {@code 1}, otherwise the column index is returned.
+         * @param column The column where tabs represents multiple characters. If the column is
+         *        negative this value is returned.
+         * @param tabWidth The tab width which must be greater as {@code 1}, otherwise the column
+         *        index is returned.
          * @return The normalized column where tabs represents only one character.
          */
         public int normalizeColumn(int column, int tabWidth) {
@@ -510,8 +530,8 @@ public final class IOUtil {
                     }
                 }
                 if (i - 1 >= 0 && i - 1 < tabIndices.length) {
-                    if (column - (i - 1) * (tabWidth - 1) >= tabIndices[i - 1]
-                            && column - (i - 1) * (tabWidth - 1) < tabIndices[i - 1] + tabWidth - 1) {
+                    if (column - (i - 1) * (tabWidth - 1) >= tabIndices[i - 1] && column
+                            - (i - 1) * (tabWidth - 1) < tabIndices[i - 1] + tabWidth - 1) {
                         result += column - (i - 1) * (tabWidth - 1) - tabIndices[i - 1];
                     }
                 }
@@ -525,10 +545,10 @@ public final class IOUtil {
     /**
      * Creates a temporary directory with help of {@link File#createTempFile(String, String)}.
      *
-     * @param prefix The prefix string to be used in generating the file's name;
-     *               must be at least three characters long.
-     * @param suffix The suffix string to be used in generating the file's name; may be null,
-     *               in which case the suffix ".tmp" will be used.
+     * @param prefix The prefix string to be used in generating the file's name; must be at least
+     *        three characters long.
+     * @param suffix The suffix string to be used in generating the file's name; may be null, in
+     *        which case the suffix ".tmp" will be used.
      * @return Created temporary directory.
      * @throws IOException Occurred Exception.
      */
@@ -544,11 +564,12 @@ public final class IOUtil {
     }
 
     /**
-     * Searches recursive in the given {@link File} all {@link File}s accepted
-     * by the given {@link IFilter}.
+     * Searches recursive in the given {@link File} all {@link File}s accepted by the given
+     * {@link IFilter}.
      *
-     * @param file   The {@link File} to start search in.
-     * @param filter An optional {@link IFilter} used to accept files. Without a filter all {@link File}s are accepted.
+     * @param file The {@link File} to start search in.
+     * @param filter An optional {@link IFilter} used to accept files. Without a filter all
+     *        {@link File}s are accepted.
      * @return The accepted {@link File}s.
      * @throws IOException Occurred Exception
      */
@@ -570,7 +591,7 @@ public final class IOUtil {
     /**
      * Visits recursive all files and folders.
      *
-     * @param file    The {@link File} to start in.
+     * @param file The {@link File} to start in.
      * @param visitor The {@link IFileVisitor} which does something with the visited files
      * @throws IOException Occurred Exception
      */
@@ -623,9 +644,9 @@ public final class IOUtil {
      * Checks if at least one given parent {@link File} contains (recursive) the child {@link File}.
      *
      * @param parents The parent {@link File}.
-     * @param child   The child {@link File} to check for containment in parents.
-     * @return {@code true} child is contained (recursive) in at least one parent,
-     * {@code false} child is not contained in any parent.
+     * @param child The child {@link File} to check for containment in parents.
+     * @return {@code true} child is contained (recursive) in at least one parent, {@code false}
+     *         child is not contained in any parent.
      */
     public static boolean contains(Iterable<File> parents, File child) {
         boolean contains = false;
@@ -642,8 +663,9 @@ public final class IOUtil {
      * Checks if the given parent {@link File} contains (recursive) the child {@link File}.
      *
      * @param parent The parent {@link File}.
-     * @param child  The child {@link File} to check for containment in parent.
-     * @return {@code true} child is contained (recursive) in parent, {@code false} child is not contained in parent.
+     * @param child The child {@link File} to check for containment in parent.
+     * @return {@code true} child is contained (recursive) in parent, {@code false} child is not
+     *         contained in parent.
      */
     public static boolean contains(File parent, File child) {
         boolean contains = false;
@@ -690,8 +712,8 @@ public final class IOUtil {
     }
 
     /**
-     * Copies the content from the {@link InputStream} to the {@link OutputStream}
-     * and closes both streams.
+     * Copies the content from the {@link InputStream} to the {@link OutputStream} and closes both
+     * streams.
      *
      * @param source The {@link InputStream} to read from.
      * @param target The {@link OutputStream} to write to.
@@ -770,12 +792,11 @@ public final class IOUtil {
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
-                        !StringUtil.isEmpty(userInfo) ? userInfo : null,
-                        !StringUtil.isEmpty(host) ? host : null,
-                        url.getPort(),
-                        !StringUtil.isEmpty(path) ? path : null,
-                        !StringUtil.isEmpty(query) ? query : null,
-                        !StringUtil.isEmpty(ref) ? ref : null);
+                    !StringUtil.isEmpty(userInfo) ? userInfo : null,
+                    !StringUtil.isEmpty(host) ? host : null, url.getPort(),
+                    !StringUtil.isEmpty(path) ? path : null,
+                    !StringUtil.isEmpty(query) ? query : null,
+                    !StringUtil.isEmpty(ref) ? ref : null);
             } else {
                 return null;
             }
@@ -803,9 +824,8 @@ public final class IOUtil {
     }
 
     /**
-     * Ensures that the segment is a valid OS independent path segment meaning
-     * that it is a valid file/folder name. Each invalid sign will be replaced
-     * by {@code '_'}.
+     * Ensures that the segment is a valid OS independent path segment meaning that it is a valid
+     * file/folder name. Each invalid sign will be replaced by {@code '_'}.
      *
      * @param name The segment to validate.
      * @return The validated OS independent path segment in which each invalid sign is replaced.
@@ -817,10 +837,12 @@ public final class IOUtil {
             char[] numerals = StringUtil.NUMERALS.toCharArray();
             char[] content = name.toCharArray();
             for (int i = 0; i < content.length; i++) {
-                if (Arrays.binarySearch(latinBig, content[i]) < 0 &&
-                        Arrays.binarySearch(latinSmall, content[i]) < 0 &&
-                        Arrays.binarySearch(numerals, content[i]) < 0 &&
-                        Arrays.binarySearch(StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS, content[i]) < 0) {
+                if (Arrays.binarySearch(latinBig, content[i]) < 0
+                        && Arrays.binarySearch(latinSmall, content[i]) < 0
+                        && Arrays.binarySearch(numerals, content[i]) < 0
+                        && Arrays.binarySearch(
+                            StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS,
+                            content[i]) < 0) {
                     content[i] = '_';
                 }
             }
@@ -833,10 +855,10 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
-     * @param archive   the ZIP archive to extract
+     * @param archive the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
-     * @throws IOException  if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static void extractZip(Path archive, Path targetDir) throws IOException {
         if (archive == null || targetDir == null) {
@@ -848,8 +870,10 @@ public final class IOUtil {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 if (entry.isDirectory()) {
-                    /* we use createDirectories instead of createDirectory in case the parent
-                     * directory does not exist */
+                    /*
+                     * we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist
+                     */
                     Files.createDirectories(targetDir.resolve(entry.getName()));
                 } else {
                     // create nonexistent parent directories and then extract the file

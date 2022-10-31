@@ -7,18 +7,21 @@ import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
 
 /**
  * Observes changes on a {@link SideProofStore}.
+ *
  * @author Martin Hentschel
  */
 public interface ISideProofStoreListener extends EventListener {
-   /**
-    * When new {@link Entry}s are added.
-    * @param e The {@link SideProofStoreEvent}.
-    */
-   public void entriesAdded(SideProofStoreEvent e);
-   
-   /**
-    * When existing {@link Entry}s were removed.
-    * @param e The {@link SideProofStoreEvent}.
-    */
-   public void entriesRemoved(SideProofStoreEvent e);
+    /**
+     * When new {@link Entry}s are added.
+     *
+     * @param e The {@link SideProofStoreEvent}.
+     */
+    public void entriesAdded(SideProofStoreEvent e);
+
+    /**
+     * When existing {@link Entry}s were removed.
+     *
+     * @param e The {@link SideProofStoreEvent}.
+     */
+    public void entriesRemoved(SideProofStoreEvent e);
 }

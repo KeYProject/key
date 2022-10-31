@@ -25,7 +25,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
 
     /** This action's tooltip. */
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"
-            + " sequent view will show a tooltip with additional information.";
+        + " sequent view will show a tooltip with additional information.";
 
     private static final long serialVersionUID = -3352122484627890921L;
 
@@ -47,7 +47,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
         setName(NAME);
         setTooltip(TOOL_TIP);
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-            .addSettingsListener(viewSettingsListener);
+                .addSettingsListener(viewSettingsListener);
         updateSelectedState();
     }
 
@@ -56,8 +56,8 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
      * {@link ViewSettings#isShowSequentViewTooltips()}
      */
     protected void updateSelectedState() {
-        final boolean setting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .isShowSequentViewTooltips();
+        final boolean setting =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isShowSequentViewTooltips();
         setSelected(setting);
     }
 
@@ -65,6 +65,6 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-            .setShowSequentViewTooltips(selected);
+                .setShowSequentViewTooltips(selected);
     }
 }

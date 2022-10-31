@@ -11,12 +11,11 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicDependsSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
-                        ProofObligationVars poVars)
+    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.DEPENDENS) == null) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "depends-term for a contract without dependencies.");
+            throw new UnsupportedOperationException(
+                "Tried to produce a " + "depends-term for a contract without dependencies.");
         }
         assert Term.class.equals(BasicSnippetData.Key.DEPENDENS.getType());
         Term origDep = (Term) d.get(BasicSnippetData.Key.DEPENDENS);

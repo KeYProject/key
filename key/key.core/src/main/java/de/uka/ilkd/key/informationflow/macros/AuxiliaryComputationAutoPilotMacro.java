@@ -25,9 +25,8 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Start auxiliary computation" +
-               "<li>Finish symbolic execution" +
-               "<li>Try to close as many goals as possible</ol>";
+        return "<html><ol><li>Start auxiliary computation" + "<li>Finish symbolic execution"
+            + "<li>Try to close as many goals as possible</ol>";
     }
 
 
@@ -35,17 +34,18 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
     ProofMacro getProofMacro() {
         return new SequentialOnLastGoalProofMacro() {
             /**
-             * The number of proof steps that should be run by the
-             * {@link TryCloseMacro} before retracting. This overrides the
-             * strategy setting.
+             * The number of proof steps that should be run by the {@link TryCloseMacro} before
+             * retracting. This overrides the strategy setting.
              */
             private final int NUMBER_OF_TRY_STEPS =
-                    Integer.getInteger("key.autopilot.closesteps", 1000);
+                Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
             public String getName() { return ""; }
+
             @Override
             public String getCategory() { return null; }
+
             @Override
             public String getDescription() { return "Anonymous Macro"; }
 
@@ -54,23 +54,25 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 // The FinishSymbolicExecutionMacro and the TryCloseMacro shall be
                 // started at the same node. Therefore they are encapsulated in an
                 // own (anonymous) SequentialProofMacro.
-                SequentialProofMacro finishSymbExecAndTryToClose =
-                        new SequentialProofMacro() {
+                SequentialProofMacro finishSymbExecAndTryToClose = new SequentialProofMacro() {
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[]{ new FinishSymbolicExecutionMacro(),
-                                                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
+                        return new ProofMacro[] { new FinishSymbolicExecutionMacro(),
+                            new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
                     }
+
                     @Override
                     public String getName() { return ""; }
+
                     @Override
                     public String getCategory() { return null; }
+
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                 };
 
-                return new ProofMacro[]{ new StartAuxiliaryComputationMacro(),
-                                         finishSymbExecAndTryToClose };
+                return new ProofMacro[] { new StartAuxiliaryComputationMacro(),
+                    finishSymbExecAndTryToClose };
             }
         };
     }

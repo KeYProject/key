@@ -7,13 +7,12 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class LoopCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     @Override
-    String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block,
-                                 LoopSpecification loopInv) {
-        final String nameString =
-                MiscTools.toValidTacletName("RELATED_BY_LOOP_" + "at_line_" +
-                                            loopInv.getLoop().getStartPosition().getLine() +
-                                            "_in_" + pm.getUniqueName()).toString();
+    String generatePredicateName(IProgramMethod pm, StatementBlock block,
+            LoopSpecification loopInv) {
+        final String nameString = MiscTools
+                .toValidTacletName("RELATED_BY_LOOP_" + "at_line_"
+                    + loopInv.getLoop().getStartPosition().getLine() + "_in_" + pm.getUniqueName())
+                .toString();
         return nameString;
     }
 }

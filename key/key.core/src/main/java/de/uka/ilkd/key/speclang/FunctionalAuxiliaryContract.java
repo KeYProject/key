@@ -61,8 +61,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     /**
      *
-     * @param contract
-     *            a block contract.
+     * @param contract a block contract.
      */
     FunctionalAuxiliaryContract(T contract) {
         this(contract, Contract.INVALID_ID);
@@ -70,10 +69,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     /**
      *
-     * @param contract
-     *            a block contract.
-     * @param id
-     *            an ID.
+     * @param contract a block contract.
+     * @param id an ID.
      */
     FunctionalAuxiliaryContract(T contract, int id) {
         this.contract = contract;
@@ -83,26 +80,25 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             contract.setFunctionalContract(this);
         }
 
-        name = generateName(contract.getBaseName(), str -> ContractFactory.generateContractName(str,
-                getKJT(), getTarget(), getKJT(), id));
-        displayName = generateName(contract.getBaseName(), str -> ContractFactory
-                .generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
-        typeName = generateName(contract.getBaseName(), str -> ContractFactory
-                .generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+        name = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+        displayName = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+        typeName = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
     /**
      *
-     * @param baseName
-     *            a base name.
-     * @param generator
-     *            a name generator.
+     * @param baseName a base name.
+     * @param generator a name generator.
      * @return the generated name.
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
-                .map(generator).reduce((acc, curr) -> acc
-                        + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                .map(generator)
+                .reduce(
+                    (acc, curr) -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
 
@@ -173,14 +169,12 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         @SuppressWarnings("unchecked")
-        Map<LocationVariable, ProgramVariable> atPreVars0
-                = (Map<LocationVariable, ProgramVariable>) atPreVars;
-        return contract.getPrecondition(heap, selfVar,
-                atPreVars0.entrySet().stream().collect(
-                        MapUtil.<Map.Entry<LocationVariable, ProgramVariable>,
-                        LocationVariable, LocationVariable>collector(
-                                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
-                services);
+        Map<LocationVariable, ProgramVariable> atPreVars0 =
+            (Map<LocationVariable, ProgramVariable>) atPreVars;
+        return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
+            MapUtil.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable>collector(
+                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
+            services);
     }
 
     @Override
@@ -217,8 +211,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         Term result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p
-                    = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+            final Term p =
+                getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
             if (result == null) {
                 result = p;
@@ -325,8 +319,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
      * at all, i.e., iff it is "strictly pure."
      *
-     * @param heap
-     *            the heap to use.
+     * @param heap the heap to use.
      * @return <code>true</code> iff this contract is strictly pure.
      * @see AuxiliaryContract#hasModifiesClause(LocationVariable)
      */

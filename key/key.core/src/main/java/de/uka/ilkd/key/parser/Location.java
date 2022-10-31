@@ -12,14 +12,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-/** 
- * This class represents a location in a file.  It consists of a
- * filename, a line number and a column number. The filename may be
- * null, if the file is unknown (e.g. standard input). The class is
+/**
+ * This class represents a location in a file. It consists of a filename, a line number and a column
+ * number. The filename may be null, if the file is unknown (e.g. standard input). The class is
  * mainly used for parser exceptions.
  *
- * <p>Both line and column numbers are assumed to be 1-based.
- * That is the first character is on line 1, column 1.
+ * <p>
+ * Both line and column numbers are assumed to be 1-based. That is the first character is on line 1,
+ * column 1.
  *
  * @author Hubert Schmid
  */
@@ -41,6 +41,7 @@ public final class Location {
     /**
      * Legacy constructor for creating a new Location from a String denoting the file path and line
      * and column number, tries to convert the path given as String into a URL.
+     *
      * @param filename path to the resource of the Location
      * @param line line of the Location
      * @param column column of the Location
@@ -54,6 +55,7 @@ public final class Location {
 
     /**
      * Creates a new Location with the given resource location, line and column numbers.
+     *
      * @param url location of the resource
      * @param line line of the Location
      * @param column column of the Location
@@ -65,9 +67,9 @@ public final class Location {
     }
 
     /**
-     * This factory method can be used to create a Location for a RecognitionException.
-     * A possibly thrown MalformedURLException is caught and printed to debug output,
-     *  null is returned instead.
+     * This factory method can be used to create a Location for a RecognitionException. A possibly
+     * thrown MalformedURLException is caught and printed to debug output, null is returned instead.
+     *
      * @param re the RecognitionException to create a Location for
      * @return the created Location or null if creation failed
      */
@@ -76,7 +78,8 @@ public final class Location {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Location could not be created from String: " + re.input.getSourceName(), e);
+            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
+                e);
             return null;
         }
     }

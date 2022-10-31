@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Helper class for are visitor that requires a namespaces and services.
- * Also it provides the evaluation of some basic {@link ParserRuleContext}s.
- * This builder provides lookup functions for the namespace set and also namespace for {@link SchemaVariable}.
- * But it does not evaluate schemaVariables, or other declarations.
+ * Helper class for are visitor that requires a namespaces and services. Also it provides the
+ * evaluation of some basic {@link ParserRuleContext}s. This builder provides lookup functions for
+ * the namespace set and also namespace for {@link SchemaVariable}. But it does not evaluate
+ * schemaVariables, or other declarations.
  *
  * @author weigl
  * @version 1
@@ -35,7 +35,8 @@ import java.util.ResourceBundle;
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
+    private static ResourceBundle bundle =
+        ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
     protected final NamespaceSet nss;
@@ -81,8 +82,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     protected Named lookup(Name n) {
-        final Namespace[] lookups = {
-                programVariables(), variables(), schemaVariables(), functions()};
+        final Namespace[] lookups =
+            { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
@@ -103,16 +104,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         namespaces().setVariables(orig);
     }
 
-    /*@Override
-    public Integer visitLocation_ident(KeYParser.Location_identContext ctx) {
-        var id = accept(ctx.simple_ident());
-        if ("Location".equals(id)) {
-            return LOCATION_MODIFIER;
-        } else if (!"Location".equals(id)) {
-            semanticError(ctx, "%s Attribute of a Non Rigid Function can only be 'Location'", id);
-        }
-        return NORMAL_NONRIGID;
-    }*/
+    /*
+     * @Override public Integer visitLocation_ident(KeYParser.Location_identContext ctx) { var id =
+     * accept(ctx.simple_ident()); if ("Location".equals(id)) { return LOCATION_MODIFIER; } else if
+     * (!"Location".equals(id)) { semanticError(ctx,
+     * "%s Attribute of a Non Rigid Function can only be 'Location'", id); } return NORMAL_NONRIGID;
+     * }
+     */
 
     @Override
     public List<Sort> visitArg_sorts_or_formula(KeYParser.Arg_sorts_or_formulaContext ctx) {
@@ -127,29 +125,26 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             return (Sort) accept(ctx.sortId());
     }
 
-    /*@Override
-    public Sort visitAny_sortId(KeYParser.Any_sortIdContext ctx) {
-        Pair<Sort, Type> p = accept(ctx.any_sortId_help());
-        return toArraySort(p, ctx.EMPTYBRACKETS().size());
-    }*/
+    /*
+     * @Override public Sort visitAny_sortId(KeYParser.Any_sortIdContext ctx) { Pair<Sort, Type> p =
+     * accept(ctx.any_sortId_help()); return toArraySort(p, ctx.EMPTYBRACKETS().size()); }
+     */
 
     /**
-     * looks up a function, (program) variable or static query of the
-     * given name varfunc_id and the argument terms args in the namespaces
-     * and java info.
+     * looks up a function, (program) variable or static query of the given name varfunc_id and the
+     * argument terms args in the namespaces and java info.
      *
      * @param varfuncName the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName, Sort sort) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
+            Sort sort) {
         Name name = new Name(varfuncName);
-        Operator[] operators = new Operator[]{
-                schemaVariables().lookup(name),
-                variables().lookup(name),
+        Operator[] operators =
+            new Operator[] { schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                functions().lookup(name),
-                AbstractTermTransformer.name2metaop(varfuncName),
+                functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
 
-        };
+            };
 
         for (Operator op : operators) {
             if (op != null) {
@@ -158,14 +153,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
 
         if (sort != null || sortName != null) {
-            Name fqName = new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
-            operators = new Operator[]{
-                    schemaVariables().lookup(fqName),
-                    variables().lookup(fqName),
+            Name fqName =
+                new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
+            operators =
+                new Operator[] { schemaVariables().lookup(fqName), variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
                     functions().lookup(fqName),
-                    AbstractTermTransformer.name2metaop(fqName.toString())
-            };
+                    AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {
                 if (op != null) {
@@ -174,7 +168,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
 
             SortDependingFunction firstInstance =
-                    SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
+                SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
             if (firstInstance != null) {
                 SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
@@ -189,12 +183,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
         if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
-            Sort sort = ArraySort.getArraySortForDim(p.first,
-                    p.second,
-                    numOfDimensions,
-                    ji.objectSort(),
-                    ji.cloneableSort(),
-                    ji.serializableSort());
+            Sort sort = ArraySort.getArraySortForDim(p.first, p.second, numOfDimensions,
+                ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
             Sort s = sort;
             do {
                 final ArraySort as = (ArraySort) s;
@@ -208,18 +198,18 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /**
-     * looks up and returns the sort of the given name or null if none has been found.
-     * If the sort is not found for the first time, the name is expanded with "java.lang."
-     * and the look up restarts
+     * looks up and returns the sort of the given name or null if none has been found. If the sort
+     * is not found for the first time, the name is expanded with "java.lang." and the look up
+     * restarts
      */
     protected Sort lookupSort(String name) {
         Sort result = sorts().lookup(new Name(name));
         if (result == null) {
             if (name.equals(NullSort.NAME.toString())) {
-                Sort objectSort
-                        = sorts().lookup(new Name("java.lang.Object"));
+                Sort objectSort = sorts().lookup(new Name("java.lang.Object"));
                 if (objectSort == null) {
-                    semanticError(null, "Null sort cannot be used before java.lang.Object is declared");
+                    semanticError(null,
+                        "Null sort cannot be used before java.lang.Object is declared");
                 }
                 result = new NullSort(objectSort);
                 sorts().add(result);
@@ -295,7 +285,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
 
     @Override
-    public Object visitSimple_ident_dots_comma_list(KeYParser.Simple_ident_dots_comma_listContext ctx) {
+    public Object visitSimple_ident_dots_comma_list(
+            KeYParser.Simple_ident_dots_comma_listContext ctx) {
         return mapOf(ctx.simple_ident_dots());
     }
 
@@ -324,12 +315,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitSortId(KeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
-        //Special handling for byte, char, short, long:
-        //these are *not* sorts, but they are nevertheless valid
-        //prefixes for array sorts such as byte[], char[][][].
-        //Thus, we consider them aliases for the "int" sort, and remember
-        //the corresponding Java type for the case that an array sort
-        //is being declared.
+        // Special handling for byte, char, short, long:
+        // these are *not* sorts, but they are nevertheless valid
+        // prefixes for array sorts such as byte[], char[][][].
+        // Thus, we consider them aliases for the "int" sort, and remember
+        // the corresponding Java type for the case that an array sort
+        // is being declared.
         Type t = null;
         if (primitiveName.equals(PrimitiveType.JAVA_BYTE.getName())) {
             t = PrimitiveType.JAVA_BYTE;
@@ -371,7 +362,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
         KeYJavaType kjt = getJavaInfo().getKeYJavaType(type);
 
-        //expand to "java.lang"
+        // expand to "java.lang"
         if (kjt == null) {
             try {
                 String guess = "java.lang." + type;
@@ -381,19 +372,18 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        //arrays
+        // arrays
         if (kjt == null && array) {
             try {
                 JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
-                kjt = ((VariableDeclaration)
-                        ((StatementBlock) jb.program()).getChildAt(0)).
-                        getTypeReference().getKeYJavaType();
+                kjt = ((VariableDeclaration) ((StatementBlock) jb.program()).getChildAt(0))
+                        .getTypeReference().getKeYJavaType();
             } catch (Exception e) {
                 kjt = null;
             }
         }
 
-        //try as sort without Java type (neede e.g. for "Heap")
+        // try as sort without Java type (neede e.g. for "Heap")
         if (kjt == null) {
             Sort sort = lookupSort(type);
             if (sort != null) {

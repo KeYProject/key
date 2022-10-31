@@ -29,9 +29,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 /**
- * The methods of class TacletDescriber have been extracted from class
- * {@link InnerNodeView}. They compute the text to show for a rule application
- * which consists of the sequent including the applied rule.
+ * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
+ * compute the text to show for a rule application which consists of the sequent including the
+ * applied rule.
  */
 class TacletDescriber {
 
@@ -59,8 +59,7 @@ class TacletDescriber {
         }
     }
 
-    private static void writeTacletSchemaVariable(StringBuffer out,
-            SchemaVariable schemaVar) {
+    private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV) {
             final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
             String sep = "";
@@ -90,22 +89,19 @@ class TacletDescriber {
         writeSVModifiers(out, schemaVar);
 
         /*
-         * TODO: Add an explanation for the following if-statement.
-         * (Kai Wallisch 01/2015)
+         * TODO: Add an explanation for the following if-statement. (Kai Wallisch 01/2015)
          */
-        if (!(schemaVar instanceof FormulaSV
-                || schemaVar instanceof UpdateSV
+        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV
                 || schemaVar instanceof TermLabelSV)) {
             out.append(" ").append(schemaVar.sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }
 
-    private static void writeTacletSchemaVariablesHelper(StringBuffer out,
-            final Taclet t) {
+    private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
-        for (final NewVarcond nvc: t.varsNew()) {
+        for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
         }
 
@@ -130,12 +126,11 @@ class TacletDescriber {
 
     /**
      * <p>
-     * Computes the text to show in this {@link JTextArea} which consists of the
-     * sequent including the applied rule.
+     * Computes the text to show in this {@link JTextArea} which consists of the sequent including
+     * the applied rule.
      * </p>
      * <p>
-     * This information is also relevant for other tools like the Symbolic
-     * Execution Debugger.
+     * This information is also relevant for other tools like the Symbolic Execution Debugger.
      * </p>
      *
      * @param mediator The {@link KeYMediator} to use.
@@ -143,8 +138,7 @@ class TacletDescriber {
      * @param filter The {@link SequentPrintFilter} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator,
-            Node node,
+    public static String getTacletDescription(KeYMediator mediator, Node node,
             SequentPrintFilter filter) {
 
         RuleApp app = node.getAppliedRuleApp();
@@ -153,11 +147,9 @@ class TacletDescriber {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
-                        mediator.getNotationInfo(),
-                        mediator.getServices(),
-                        true,
-                        getVisibleTermLabels());
+                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(
+                    new ProgramPrinter(null), mediator.getNotationInfo(), mediator.getServices(),
+                    true, getVisibleTermLabels());
                 logicPrinter.printTaclet((Taclet) (app.rule()));
                 s += logicPrinter;
             } else {
@@ -166,11 +158,10 @@ class TacletDescriber {
 
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
-                if (tapp.instantiations().getGenericSortInstantiations()
-                        != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
+                if (tapp.instantiations()
+                        .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s = s + "\n\nWith sorts:\n";
-                    s = s
-                            + tapp.instantiations().getGenericSortInstantiations();
+                    s = s + tapp.instantiations().getGenericSortInstantiations();
                 }
 
                 StringBuffer sb = new StringBuffer("\n\n");
@@ -178,9 +169,9 @@ class TacletDescriber {
                 s = s + sb;
             }
 
-//                  s = s + "\n\nApplication justified by: ";
-//                  s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                      .getJustification(app, mediator.getServices())+"\n";
+            // s = s + "\n\nApplication justified by: ";
+            // s = s + mediator.getSelectedProof().env().getJustifInfo()
+            // .getJustification(app, mediator.getServices())+"\n";
         } else {
             // Is this case possible?
             s += "No rule was applied on this node.";

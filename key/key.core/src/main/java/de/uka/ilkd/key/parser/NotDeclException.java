@@ -17,7 +17,7 @@ public class NotDeclException extends KeYSemanticException {
      * Returns a clean error message (no line number/column information)
      */
     private static String getMessage(String cat, String undeclaredSymbol, String addtl) {
-        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared "+addtl;
+        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared " + addtl;
     }
 
 }

@@ -19,8 +19,7 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement o,
-            NameAbstractionTable nat) {
+    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
         return o == this;
     }
 

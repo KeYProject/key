@@ -6,8 +6,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
- * A JML axiom declaration in textual form.
- * According to Sect. 8 of the JML reference manual, axioms may not have any modifiers.
+ * A JML axiom declaration in textual form. According to Sect. 8 of the JML reference manual, axioms
+ * may not have any modifiers.
  */
 public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     private final LabeledParserRuleContext inv;
@@ -16,16 +16,18 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * new textual representation.
      *
      * @param mods modifiers (are currently ignored)
-     * @param inv  the expression in this clause
+     * @param inv the expression in this clause
      */
     public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv) {
-        super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8 of reference manual)
+        super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8
+                                              // of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv, String name) {
+    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv,
+            String name) {
         this(mods, inv);
         this.name = name;
     }

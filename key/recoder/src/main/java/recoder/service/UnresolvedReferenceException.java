@@ -6,8 +6,7 @@ import recoder.ModelException;
 import recoder.java.ProgramElement;
 
 /**
- * Exception indicating that a particular reference (or reference prefix) could
- * not be resolved.
+ * Exception indicating that a particular reference (or reference prefix) could not be resolved.
  *
  * @author AL.
  */

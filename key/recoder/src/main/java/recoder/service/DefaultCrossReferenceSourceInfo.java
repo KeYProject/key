@@ -26,15 +26,16 @@ import java.util.*;
  *
  * @author AL
  */
-public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implements CrossReferenceSourceInfo {
+public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
+        implements CrossReferenceSourceInfo {
 
     /**
      * Cache mapping elements to known references.
      */
-//    private final MutableMap/* <ProgramModelElement, Set <Reference>> */
-//    element2references = new IdentityHashTable(256);
-    private final Map<ProgramModelElement, Set<Reference>>
-            element2references = new HashMap<ProgramModelElement, Set<Reference>>(256);
+    // private final MutableMap/* <ProgramModelElement, Set <Reference>> */
+    // element2references = new IdentityHashTable(256);
+    private final Map<ProgramModelElement, Set<Reference>> element2references =
+        new HashMap<ProgramModelElement, Set<Reference>>(256);
 
     /**
      * Creates a new service.
@@ -112,10 +113,12 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                             reset(true);
                             return;
                         }
-                    } else if (pe instanceof ProgramModelElement || pe instanceof VariableDeclaration) {
+                    } else if (pe instanceof ProgramModelElement
+                            || pe instanceof VariableDeclaration) {
                         // We would have to revalidate all references to
                         // this element.
-                        // TODO deleting a single constructor which takes no parameters can be improved! (regardless of visibility)
+                        // TODO deleting a single constructor which takes no parameters can be
+                        // improved! (regardless of visibility)
                         reset(true);
                         return;
                     } else if (pe instanceof InheritanceSpecification) {
@@ -152,7 +155,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                     } else if (pe instanceof Reference) {
                         // TODO we can most probably handle AnnotationUse more efficiently
                         if (pe instanceof Expression &&
-                                // var ref, field ref, method ref, constr ref
+                        // var ref, field ref, method ref, constr ref
                                 !isPossiblyShowingRippleEffect(tc)) {
                             // nothing bad may happen
                         } else {
@@ -161,7 +164,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                             reset(true);
                             return;
                         }
-                    } else if (pe instanceof ProgramModelElement || pe instanceof VariableDeclaration) {
+                    } else if (pe instanceof ProgramModelElement
+                            || pe instanceof VariableDeclaration) {
                         // We would have to find out whether this element
                         // hides some other element that is already referred to.
                         // If so, we must revalidate those elements.
@@ -169,7 +173,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                         // Program model elements in subtrees are not relevant
                         // as they must be in an inner scope (really?) and
                         // cannot have been referred to.
-                        // TODO replacing a default constructor can be improved, if proper visibility
+                        // TODO replacing a default constructor can be improved, if proper
+                        // visibility
                         reset(true);
                         return;
                     } else if (pe instanceof InheritanceSpecification) {
@@ -200,21 +205,17 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     private boolean isPossiblyShowingRippleEffect(TreeChange tc) {
         // triggers a bug
         /*
-         * NonTerminalProgramElement q = tc.getChangeRootParent(); // enclosed in statement and no ref or decl in the way
-         * do {
-         *   if (q instanceof Reference || q instanceof Declaration) { return true; }
-         *   if (q instanceof Statement) { // no Reference!
-         * 		return false;
-         *   }
-         *   q = q.getASTParent();
-         * } while (q != null);
+         * NonTerminalProgramElement q = tc.getChangeRootParent(); // enclosed in statement and no
+         * ref or decl in the way do { if (q instanceof Reference || q instanceof Declaration) {
+         * return true; } if (q instanceof Statement) { // no Reference! return false; } q =
+         * q.getASTParent(); } while (q != null);
          */
         return true;
     }
 
     /**
-     * Retrieves the list of references to a given method (or constructor). The
-     * references stem from all known compilation units.
+     * Retrieves the list of references to a given method (or constructor). The references stem from
+     * all known compilation units.
      *
      * @param m a method.
      * @return a possibly empty list of references to the given method.
@@ -238,8 +239,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Retrieves the list of references to a given constructor. The references
-     * stem from all known compilation units.
+     * Retrieves the list of references to a given constructor. The references stem from all known
+     * compilation units.
      *
      * @param c a constructor.
      * @return a possibly empty list of references to the given constructor.
@@ -263,8 +264,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Retrieves the list of references to a given variable. The references stem
-     * from all known compilation units.
+     * Retrieves the list of references to a given variable. The references stem from all known
+     * compilation units.
      *
      * @param v a variable.
      * @return a possibly empty list of references to the given variable.
@@ -288,8 +289,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Retrieves the list of references to a given field. The references stem
-     * from all known compilation units.
+     * Retrieves the list of references to a given field. The references stem from all known
+     * compilation units.
      *
      * @param f a field.
      * @return a possibly empty list of references to the given field.
@@ -313,8 +314,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Retrieves the list of references to a given type. The references stem
-     * from all known compilation units.
+     * Retrieves the list of references to a given type. The references stem from all known
+     * compilation units.
      *
      * @param t a type.
      * @return a possibly empty list of references to the given type.
@@ -338,8 +339,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Retrieves the list of references to a given package. The references stem
-     * from all known compilation units.
+     * Retrieves the list of references to a given package. The references stem from all known
+     * compilation units.
      *
      * @param p a package.
      * @return a possibly empty list of references to the given package.
@@ -365,7 +366,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     private void registerReference(Reference ref, ProgramModelElement pme) {
         Set<Reference> set = element2references.get(pme);
         if (set == null) {
-            element2references.put(pme, set = new HashSet<Reference>(TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
+            element2references.put(pme, set = new HashSet<Reference>(
+                TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
         }
         set.add(ref);
     }
@@ -386,8 +388,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /**
-     * Collects all Method-, Constructor-, Variable- and TypeReferences in the
-     * subtree.
+     * Collects all Method-, Constructor-, Variable- and TypeReferences in the subtree.
      */
     private void analyzeReferences(ProgramElement pe) {
         if (pe instanceof NonTerminalProgramElement) {
@@ -403,9 +404,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                 try {
                     pe = resolveURQ((UncollatedReferenceQualifier) pe);
                 } catch (ClassCastException cce) {
-                    getErrorHandler().reportError(
-                            new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG, pe),
-                                    pe));
+                    getErrorHandler().reportError(new UnresolvedReferenceException(
+                        Format.toString("Could not resolve " + ELEMENT_LONG, pe), pe));
                     // this might have been a field or class or package
                     // we have to let this URQ remain alive
                 }
@@ -415,9 +415,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                 VariableReference vr = (VariableReference) pe;
                 Variable v = getVariable(vr);
                 if (v == null) {
-                    getErrorHandler().reportError(
-                            new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG, vr),
-                                    vr));
+                    getErrorHandler().reportError(new UnresolvedReferenceException(
+                        Format.toString("Could not resolve " + ELEMENT_LONG, vr), vr));
                     v = getNameInfo().getUnknownField();
                 }
                 registerReference(vr, v);
@@ -466,23 +465,20 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     }
 
     /*
-     * public TypeDeclarationList getSubtypes(ClassType ct) { Debug.assert(ct);
-     * updateModel(); TypeReferenceList refs = getReferences(ct); if (refs ==
-     * null) { return TypeDeclarationList.EMPTY_LIST; }
-     * TypeDeclarationMutableList result = new TypeDeclarationArrayList(); for
-     * (int i = refs.size() - 1; i >= 0; i -= 1) { TypeReference tr =
-     * refs.getTypeReference(i); ProgramElement parent = tr.getASTParent(); if
-     * (parent instanceof InheritanceSpecification) { InheritanceSpecification
-     * is = (InheritanceSpecification)parent; result.add(is.getParent()); } }
-     * return result; }
+     * public TypeDeclarationList getSubtypes(ClassType ct) { Debug.assert(ct); updateModel();
+     * TypeReferenceList refs = getReferences(ct); if (refs == null) { return
+     * TypeDeclarationList.EMPTY_LIST; } TypeDeclarationMutableList result = new
+     * TypeDeclarationArrayList(); for (int i = refs.size() - 1; i >= 0; i -= 1) { TypeReference tr
+     * = refs.getTypeReference(i); ProgramElement parent = tr.getASTParent(); if (parent instanceof
+     * InheritanceSpecification) { InheritanceSpecification is = (InheritanceSpecification)parent;
+     * result.add(is.getParent()); } } return result; }
      *
-     * public TypeDeclarationList getAllSubtypes(ClassType ct) {
-     * ClassTypeTopSort ctts = new SubTypeTopSort(); List<ClassType> ctl =
-     * ctts.getAllTypes(ct); int s = ctl.size(); TypeDeclarationMutableList
-     * result = new TypeDeclarationArrayList(s - 1); // begin at second entry -
-     * the top sort includes the input class for (int i = 1; i < s; i += 1) {
-     * ClassType t = ctl.getClassType(i); if (t instanceof TypeDeclaration) {
-     * result.add((TypeDeclaration)t); } } return result; }
+     * public TypeDeclarationList getAllSubtypes(ClassType ct) { ClassTypeTopSort ctts = new
+     * SubTypeTopSort(); List<ClassType> ctl = ctts.getAllTypes(ct); int s = ctl.size();
+     * TypeDeclarationMutableList result = new TypeDeclarationArrayList(s - 1); // begin at second
+     * entry - the top sort includes the input class for (int i = 1; i < s; i += 1) { ClassType t =
+     * ctl.getClassType(i); if (t instanceof TypeDeclaration) { result.add((TypeDeclaration)t); } }
+     * return result; }
      */
 
     public String information() {
@@ -504,7 +500,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                     r2 += size;
                 }
             } else if (pme instanceof Type) {
-                //	System.err.println(Format.toString("%N %i", pme));
+                // System.err.println(Format.toString("%N %i", pme));
                 c4 += 1;
                 r4 += size;
             } else if (pme instanceof Package) {
@@ -512,37 +508,33 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                 r5 += size;
             }
         }
-        return "" + c1 + " variables with " + r1 + " references\n" + c2 + " methods with " + r2 + " references\n" + c3
-                + " constructors with " + r3 + " references\n" + c4 + " types with " + r4 + " references\n" + c5
-                + " packages with " + r5 + " references";
+        return "" + c1 + " variables with " + r1 + " references\n" + c2 + " methods with " + r2
+            + " references\n" + c3 + " constructors with " + r3 + " references\n" + c4
+            + " types with " + r4 + " references\n" + c5 + " packages with " + r5 + " references";
     }
 
     /*
-     * private void dumpTable(MutableMap table, PrintStream out) { int size =
-     * table.size(); ProgramModelElement[] refs = new ProgramModelElement[size];
-     * java.util.Enumeration e = table.keys(); for (int i = 0; i < size; i++) {
-     * refs[i] = (ProgramModelElement)e.nextElement(); } Sorting.heapSort(refs,
-     * NamedModelElement.LEXICAL_ORDER); for (int j = 0; j < size; j++) {
-     * ProgramModelElement x = refs[j]; ProgramElementList list =
-     * (ProgramElementList)table.get(x); out.print(Format.toString("%N <- ",
-     * x)); for (int i = 0, s = (list == null) ? 0 : list.size(); i < s; i++) {
-     * out.print(Format.toString("%p ", list.getProgramElement(i))); }
+     * private void dumpTable(MutableMap table, PrintStream out) { int size = table.size();
+     * ProgramModelElement[] refs = new ProgramModelElement[size]; java.util.Enumeration e =
+     * table.keys(); for (int i = 0; i < size; i++) { refs[i] =
+     * (ProgramModelElement)e.nextElement(); } Sorting.heapSort(refs,
+     * NamedModelElement.LEXICAL_ORDER); for (int j = 0; j < size; j++) { ProgramModelElement x =
+     * refs[j]; ProgramElementList list = (ProgramElementList)table.get(x);
+     * out.print(Format.toString("%N <- ", x)); for (int i = 0, s = (list == null) ? 0 :
+     * list.size(); i < s; i++) { out.print(Format.toString("%p ", list.getProgramElement(i))); }
      * out.println(); } }
      */
 
     /*
-     * public long checksum() { int size = element2references.size();
-     * ProgramModelElement[] elem = new ProgramModelElement[size]; Enumeration
-     * enum = element2references.keys(); for (int i = size - 1; i >= 0; i -= 1) {
-     * elem[i] = (ProgramModelElement)enum.nextElement(); }
-     * Sorting.heapSort(elem, ProgramModelElement.LEXICAL_ORDER);
-     * java.util.zip.CRC32 chksum = new java.util.zip.CRC32(); for (int j = size -
-     * 1; j >= 0; j -= 1) { ProgramModelElement pme = elem[j]; StringBuffer buf =
-     * new StringBuffer(Format.toString("%N:", pme)); Map list =
-     * (Map)element2references.get(pme); if (list != null) { int lsize =
-     * list.size(); String[] str = new String[lsize]; for (int i = lsize - 1; i >=
-     * 0; i -= 1) { str[i] = Format.toString("%p(%u) ",
-     * (ProgramElement)list.getObject(i)); } Sorting.heapSort(str,
+     * public long checksum() { int size = element2references.size(); ProgramModelElement[] elem =
+     * new ProgramModelElement[size]; Enumeration enum = element2references.keys(); for (int i =
+     * size - 1; i >= 0; i -= 1) { elem[i] = (ProgramModelElement)enum.nextElement(); }
+     * Sorting.heapSort(elem, ProgramModelElement.LEXICAL_ORDER); java.util.zip.CRC32 chksum = new
+     * java.util.zip.CRC32(); for (int j = size - 1; j >= 0; j -= 1) { ProgramModelElement pme =
+     * elem[j]; StringBuffer buf = new StringBuffer(Format.toString("%N:", pme)); Map list =
+     * (Map)element2references.get(pme); if (list != null) { int lsize = list.size(); String[] str =
+     * new String[lsize]; for (int i = lsize - 1; i >= 0; i -= 1) { str[i] =
+     * Format.toString("%p(%u) ", (ProgramElement)list.getObject(i)); } Sorting.heapSort(str,
      * Order.LEXICAL); for (int i = 0; i < lsize; i += 1) { buf.append(str[i]); } }
      * chksum.update(buf.toString().getBytes()); } return chksum.getValue(); }
      */

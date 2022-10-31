@@ -5,8 +5,7 @@ package recoder.kit;
 import recoder.abstraction.Method;
 
 /**
- * Problem report indicating that a static method has been overwritten with a
- * non-static version.
+ * Problem report indicating that a static method has been overwritten with a non-static version.
  */
 public class NonStaticOverwrite extends Conflict {
 

@@ -13,10 +13,9 @@ import recoder.java.StatementContainer;
 public abstract class Assignment extends Operator implements ExpressionStatement {
 
     /**
-     * either statementParent or expressionParent is null, in case of
-     * ambiguities (e.g. Assignment as a parent), prefer an ExpressionContainer
-     * as parent. We could resolve these problems by introduction of an
-     * AssignmentContainer as supertype of StatementContainer and
+     * either statementParent or expressionParent is null, in case of ambiguities (e.g. Assignment
+     * as a parent), prefer an ExpressionContainer as parent. We could resolve these problems by
+     * introduction of an AssignmentContainer as supertype of StatementContainer and
      * ExpressionContainer.
      */
 
@@ -96,8 +95,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     }
 
     /**
-     * Checks if this operator is left or right associative. Assignments are
-     * right associative.
+     * Checks if this operator is left or right associative. Assignments are right associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.

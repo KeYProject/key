@@ -44,7 +44,7 @@ public class Do extends LoopStatement {
      * Do.
      *
      * @param guard an expression.
-     * @param body  a statement.
+     * @param body a statement.
      */
 
     public Do(Expression guard, Statement body) {

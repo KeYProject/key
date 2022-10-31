@@ -15,24 +15,25 @@ public class MethodStackInfo implements NameCreationInfo {
     }
 
     private final ProgramElement element;
-    
-        
+
+
     public MethodStackInfo(ProgramElement element) {
         this.element = element;
     }
-    
+
     /**
-     * returns the method call stack 
+     * returns the method call stack
      */
     public ImmutableList<IProgramMethod> getMethodStack() {
-        ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();        
+        ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();
         if (element instanceof ProgramPrefix) {
-            final ImmutableArray<ProgramPrefix> prefix = ((ProgramPrefix) element).getPrefixElements(); 
-            for (int i = prefix.size() - 1; i>=0; i--) {
-                if(prefix.get(i) instanceof MethodFrame) {
-                    final MethodFrame frame = (MethodFrame)prefix.get(i);
+            final ImmutableArray<ProgramPrefix> prefix =
+                ((ProgramPrefix) element).getPrefixElements();
+            for (int i = prefix.size() - 1; i >= 0; i--) {
+                if (prefix.get(i) instanceof MethodFrame) {
+                    final MethodFrame frame = (MethodFrame) prefix.get(i);
                     IProgramMethod method = frame.getProgramMethod();
-                    if(method != null) {
+                    if (method != null) {
                         list = list.prepend(method);
                     }
                 }
@@ -41,7 +42,7 @@ public class MethodStackInfo implements NameCreationInfo {
         return list;
     }
 
-    
+
     public String infoAsString() {
         String result = "Method stack:\n";
 
@@ -49,7 +50,8 @@ public class MethodStackInfo implements NameCreationInfo {
             result += "- " + method.getProgramElementName().toString() + "\n";
         }
 
-	if(result.length() < 1) return "";
+        if (result.length() < 1)
+            return "";
 
         result = result.substring(0, result.length() - 1);
 

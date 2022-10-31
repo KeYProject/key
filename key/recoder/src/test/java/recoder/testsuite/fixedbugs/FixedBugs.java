@@ -21,8 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
- * @author Tobias Gutzmann
- * created on 19.10.2007
+ * @author Tobias Gutzmann created on 19.10.2007
  */
 public class FixedBugs {
     @Test
@@ -30,24 +29,23 @@ public class FixedBugs {
         ServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         CompilationUnit cu = f.parseCompilationUnit(
-                "public class Test\n{\nTest s;\npublic Test(Test s)" +
-                        "\n{\nthis.s = s;\n}\n}");
+            "public class Test\n{\nTest s;\npublic Test(Test s)" + "\n{\nthis.s = s;\n}\n}");
         sc.getChangeHistory().attached(cu);
-        assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test").getConstructors().get(0)).getStartPosition().getLine());
+        assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test")
+                .getConstructors().get(0)).getStartPosition().getLine());
 
     }
 
     /**
-     * Test for absence of a bug in PrettyPrinter that, after transformation, may
-     * mess up single line comments.
-     * Bug reported and testcase submitted by M.Ullbrich
+     * Test for absence of a bug in PrettyPrinter that, after transformation, may mess up single
+     * line comments. Bug reported and testcase submitted by M.Ullbrich
      */
     @Test
     public void testComments() throws ParserException {
         ServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
-        CompilationUnit cu = f.parseCompilationUnit("class A {\n\n\n" +
-                "//some comment\r\nA a; } class B {}");
+        CompilationUnit cu =
+            f.parseCompilationUnit("class A {\n\n\n" + "//some comment\r\nA a; } class B {}");
         sc.getChangeHistory().attached(cu);
         FieldDeclaration fd = (FieldDeclaration) cu.getDeclarations().get(0).getMembers().get(0);
         TypeReference oldType = fd.getTypeReference();
@@ -66,7 +64,8 @@ public class FixedBugs {
         CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
 
-        CompilationUnit cu = f.parseCompilationUnit("class B { } class G<E> { E field;   void m() { B b; b = new G<B>().field; } }");
+        CompilationUnit cu = f.parseCompilationUnit(
+            "class B { } class G<E> { E field;   void m() { B b; b = new G<B>().field; } }");
         sc.getChangeHistory().attached(cu);
         sc.getChangeHistory().updateModel();
 

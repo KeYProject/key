@@ -6,6 +6,7 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * A JML initially clause declaration in textual form.
+ *
  * @author Daniel Bruns
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
@@ -23,23 +24,23 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     public LabeledParserRuleContext getInv() {
         return inv;
     }
-    
+
     @Override
     public String toString() {
         return inv.first.getText();
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLInitially)) {
+        if (!(o instanceof TextualJMLInitially)) {
             return false;
         }
         TextualJMLInitially ci = (TextualJMLInitially) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return mods.hashCode() + inv.hashCode();

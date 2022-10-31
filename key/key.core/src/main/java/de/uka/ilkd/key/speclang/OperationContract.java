@@ -21,8 +21,8 @@ public interface OperationContract extends Contract {
     public OperationContract map(UnaryOperator<Term> op, Services services);
 
     /**
-     * Returns <code>true</code> iff the method (according to the contract) does
-     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
+     * at all, i.e., iff it is "strictly pure."
      *
      * @return whether this contract is strictly pure.
      */
@@ -31,47 +31,36 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar   the heap variable.
-     * @param selfVar   the self variable.
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
-     * @param services  the services object.
+     * @param services the services object.
      * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
-                       ImmutableList<ProgramVariable> paramVars,
-                       Services services);
+            ImmutableList<ProgramVariable> paramVars, Services services);
 
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar    the heap variable
-     * @param heapTerm   the heap variable term.
-     * @param selfTerm   the self variable term.
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
-     * @param services   the services object.
+     * @param services the services object.
      * @return the modifies clause.
      */
-    public Term getMod(LocationVariable heapVar, Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Services services);
+    public Term getMod(LocationVariable heapVar, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services);
 
-    public Term getFreePre(LocationVariable heap,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                           Services services);
+    public Term getFreePre(LocationVariable heap, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
 
-    public Term getFreePre(List<LocationVariable> heapContext,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                           Services services);
+    public Term getFreePre(List<LocationVariable> heapContext, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
 
-    public Term getFreePre(LocationVariable heap,
-                           Term heapTerm,
-                           Term selfTerm,
-                           ImmutableList<Term> paramTerms,
-                           Map<LocationVariable,Term> atPres,
-                           Services services);
+    public Term getFreePre(LocationVariable heap, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
 }

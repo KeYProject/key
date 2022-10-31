@@ -3,8 +3,8 @@
 package recoder.service;
 
 /**
- * Model change listener interface. All change history listeners are informed of
- * changes of the syntactical program model.
+ * Model change listener interface. All change history listeners are informed of changes of the
+ * syntactical program model.
  *
  * @author AL
  * @since 0.5

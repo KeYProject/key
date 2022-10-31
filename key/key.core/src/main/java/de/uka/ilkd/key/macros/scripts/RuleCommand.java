@@ -39,12 +39,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * Command that applies a calculus rule All parameters are passed as strings and
- * converted by the command. The parameters are:
+ * Command that applies a calculus rule All parameters are passed as strings and converted by the
+ * command. The parameters are:
  * <ol>
  * <li>#2 = <String>rule name</String></li>
- * <li>on= key.core.logic.Term on which the rule should be applied to as String
- * (find part of the rule)</li>
+ * <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the
+ * rule)</li>
  * <li>formula= toplevel formula in which term appears in</li>
  * <li>occ = occurrence number</li>
  * <li>inst_= instantiation</li>
@@ -62,15 +62,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args,
-            EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+            throws ScriptException, InterruptedException {
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
@@ -83,30 +82,25 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         g.apply(theApp);
     }
 
-    private RuleApp makeRuleApp(Parameters p, EngineState state)
-            throws ScriptException {
+    private RuleApp makeRuleApp(Parameters p, EngineState state) throws ScriptException {
 
         final Proof proof = state.getProof();
-        final Optional<BuiltInRule> maybeBuiltInRule = proof.getInitConfig()
-                .getProfile().getStandardRules().getStandardBuiltInRules()
-                .stream().filter(r -> r.name().toString().equals(p.rulename))
-                .findAny();
+        final Optional<BuiltInRule> maybeBuiltInRule =
+            proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules().stream()
+                    .filter(r -> r.name().toString().equals(p.rulename)).findAny();
 
-        final Optional<Taclet> maybeTaclet = Optional
-                .ofNullable(proof.getEnv().getInitConfigForEnvironment()
-                        .lookupActiveTaclet(new Name(p.rulename)));
+        final Optional<Taclet> maybeTaclet = Optional.ofNullable(
+            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
 
         if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
             /*
-             * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by
-             * hide_left etc.
+             * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */
-            final Optional<TacletApp> maybeApp = Optional
-                    .ofNullable(state.getFirstOpenAutomaticGoal()
-                            .indexOfTaclets().lookup(p.rulename));
+            final Optional<TacletApp> maybeApp = Optional.ofNullable(
+                state.getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
 
-            TacletApp app = maybeApp.orElseThrow(() -> new ScriptException(
-                    "Taclet '" + p.rulename + "' not known."));
+            TacletApp app = maybeApp.orElseThrow(
+                () -> new ScriptException("Taclet '" + p.rulename + "' not known."));
 
             if (app.taclet() instanceof FindTaclet) {
                 app = findTacletApp(p, state);
@@ -126,24 +120,21 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return instantiateTacletApp(p, state, proof, theApp);
         } else {
             IBuiltInRuleApp builtInRuleApp = //
-                    builtInRuleApp(p, state, maybeBuiltInRule.get());
+                builtInRuleApp(p, state, maybeBuiltInRule.get());
             if (builtInRuleApp.isSufficientlyComplete()) {
-                builtInRuleApp = builtInRuleApp
-                        .forceInstantiate(state.getFirstOpenAutomaticGoal());
+                builtInRuleApp = builtInRuleApp.forceInstantiate(state.getFirstOpenAutomaticGoal());
             }
             return builtInRuleApp;
         }
     }
 
-    private TacletApp instantiateTacletApp(final Parameters p,
-            final EngineState state, final Proof proof, final TacletApp theApp)
-            throws ScriptException {
+    private TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
+            final Proof proof, final TacletApp theApp) throws ScriptException {
         TacletApp result = theApp;
 
         Services services = proof.getServices();
         ImmutableList<TacletApp> assumesCandidates = theApp
-                .findIfFormulaInstantiations(
-                        state.getFirstOpenAutomaticGoal().sequent(), services);
+                .findIfFormulaInstantiations(state.getFirstOpenAutomaticGoal().sequent(), services);
 
         assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
 
@@ -154,23 +145,21 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         result = assumesCandidates.head();
 
         /*
-         * NOTE (DS, 2019-02-22): If we change something by instantiating the
-         * app as much as possible, it might happen that the match conditions
-         * (those which are not really conditions, but which change the
-         * instantiations based on others that are yet to be added) have to be
-         * evaluated again, since the second call to tryToInstantiate won't do
-         * this if everything already has been instantiated. That's a little sad
-         * and a border case, but I had that problem.
+         * NOTE (DS, 2019-02-22): If we change something by instantiating the app as much as
+         * possible, it might happen that the match conditions (those which are not really
+         * conditions, but which change the instantiations based on others that are yet to be added)
+         * have to be evaluated again, since the second call to tryToInstantiate won't do this if
+         * everything already has been instantiated. That's a little sad and a border case, but I
+         * had that problem.
          */
         boolean recheckMatchConditions;
         {
             /*
-             * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
-             * apply taclets with "\newPV", Skolem terms etc.
+             * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot apply taclets with
+             * "\newPV", Skolem terms etc.
              */
-            final TacletApp maybeInstApp = result
-                    .tryToInstantiateAsMuchAsPossible(services.getOverlay(state
-                            .getFirstOpenAutomaticGoal().getLocalNamespaces()));
+            final TacletApp maybeInstApp = result.tryToInstantiateAsMuchAsPossible(
+                services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
             if (maybeInstApp != null) {
                 result = maybeInstApp;
@@ -186,8 +175,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (result.isInstantiationRequired(sv)) {
                 Term inst = p.instantiations.get(sv.name().toString());
                 if (inst == null) {
-                    throw new ScriptException(
-                            "missing instantiation for " + sv);
+                    throw new ScriptException("missing instantiation for " + sv);
                 }
 
                 result = result.addInstantiation(sv, inst, true, services);
@@ -195,16 +183,16 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         // try to instantiate remaining symbols
-        result = result.tryToInstantiate(services.getOverlay(
-                state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+        result = result.tryToInstantiate(
+            services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
         if (result == null) {
             throw new ScriptException("Cannot instantiate this rule");
         }
 
         if (recheckMatchConditions) {
-            final MatchConditions appMC = result.taclet().getMatcher()
-                    .checkConditions(result.matchConditions(), services);
+            final MatchConditions appMC =
+                result.taclet().getMatcher().checkConditions(result.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
@@ -220,12 +208,11 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return app;
     }
 
-    private IBuiltInRuleApp builtInRuleApp(Parameters p, EngineState state,
-            BuiltInRule rule) throws ScriptException {
+    private IBuiltInRuleApp builtInRuleApp(Parameters p, EngineState state, BuiltInRule rule)
+            throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
-                findBuiltInRuleApps(p, state).stream()
-                        .filter(r -> r.rule().name().equals(rule.name()))
-                        .collect(Collectors.toList());
+            findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
+                    .collect(Collectors.toList());
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -233,24 +220,21 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         if (p.occ < 0) {
             if (matchingApps.size() > 1) {
-                throw new ScriptException(
-                        "More than one applicable occurrence");
+                throw new ScriptException("More than one applicable occurrence");
             }
 
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                        + " has been specified, but there are only "
-                        + matchingApps.size() + " hits.");
+                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
             return matchingApps.get(p.occ);
         }
     }
 
-    private TacletApp findTacletApp(Parameters p, EngineState state)
-            throws ScriptException {
+    private TacletApp findTacletApp(Parameters p, EngineState state) throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         List<TacletApp> matchingApps = filterList(p, allApps);
@@ -261,28 +245,25 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         if (p.occ < 0) {
             if (matchingApps.size() > 1) {
-                throw new ScriptException(
-                        "More than one applicable occurrence");
+                throw new ScriptException("More than one applicable occurrence");
             }
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                        + " has been specified, but there are only "
-                        + matchingApps.size() + " hits.");
+                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
         }
     }
 
-    private ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(Parameters p,
-            EngineState state) throws ScriptException {
+    private ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(Parameters p, EngineState state)
+            throws ScriptException {
         final Services services = state.getProof().getServices();
         assert services != null;
 
         final Goal g = state.getFirstOpenAutomaticGoal();
-        final BuiltInRuleAppIndex index = g.ruleAppIndex()
-                .builtInRuleAppIndex();
+        final BuiltInRuleAppIndex index = g.ruleAppIndex().builtInRuleAppIndex();
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
@@ -290,8 +271,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 continue;
             }
 
-            allApps = allApps.append(index.getBuiltInRule(g,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+            allApps = allApps.append(
+                index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -299,15 +280,15 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 continue;
             }
 
-            allApps = allApps.append(index.getBuiltInRule(g,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+            allApps = allApps.append(
+                index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
         }
 
         return allApps;
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
-            EngineState state) throws ScriptException {
+    private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
+            throws ScriptException {
         Services services = state.getProof().getServices();
         assert services != null;
         TacletFilter filter = new TacletNameFilter(p.rulename);
@@ -322,8 +303,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                    services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -332,8 +312,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                    services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
 
         return allApps;
@@ -341,35 +320,30 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
     /**
      * Returns true iff the given {@link SequentFormula} either matches the
-     * {@link Parameters#formula} parameter or its String representation matches
-     * the {@link Parameters#matches} regex. If both parameters are not
-     * supplied, always returns true.
+     * {@link Parameters#formula} parameter or its String representation matches the
+     * {@link Parameters#matches} regex. If both parameters are not supplied, always returns true.
      *
-     * @param p
-     *            The {@link Parameters} object.
-     * @param sf
-     *            The {@link SequentFormula} to check.
+     * @param p The {@link Parameters} object.
+     * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf,
-            Services services) throws ScriptException {
-        final boolean satisfiesFormulaParameter = p.formula != null
-                && sf.formula().equalsModRenaming(p.formula);
+    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
+            throws ScriptException {
+        final boolean satisfiesFormulaParameter =
+            p.formula != null && sf.formula().equalsModRenaming(p.formula);
 
         final boolean satisfiesMatchesParameter = p.matches != null
-                && formatTermString(
-                        LogicPrinter.quickPrintTerm(sf.formula(), services))
-                                .matches(".*" + p.matches + ".*");
+                && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
+                        .matches(".*" + p.matches + ".*");
 
-        return (p.formula == null && p.matches == null)
-                || satisfiesFormulaParameter || satisfiesMatchesParameter;
+        return (p.formula == null && p.matches == null) || satisfiesFormulaParameter
+                || satisfiesMatchesParameter;
     }
 
     /**
      * Removes spaces and line breaks from the string representation of a term.
      *
-     * @param str
-     *            The string to "clean up".
+     * @param str The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {
@@ -381,21 +355,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p,
-            ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                boolean add = p.on == null
-                        || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+                boolean add =
+                    p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
                     SchemaVariable sv = it.next();
                     Term userInst = p.instantiations.get(sv.name().toString());
-                    Object ptaInst
-                        = pta.instantiations().getInstantiationEntry(sv).getInstantiation();
+                    Object ptaInst =
+                        pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
                     add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
                 }
@@ -418,9 +391,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         @Option(value = "occ", required = false)
         public int occ = -1;
         /**
-         * Represents a part of a formula (may use Java regular expressions as
-         * long as supported by proof script parser). Rule is applied to the
-         * sequent formula which matches that string.
+         * Represents a part of a formula (may use Java regular expressions as long as supported by
+         * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
         @Option(value = "matches", required = false)
         public String matches = null;

@@ -14,14 +14,13 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Stores the given {@link Statement}, after substitution of
- * {@link SchemaVariable}s, into the given {@link ProgramSV} for later use in
- * other conditions and transformers. The arguments are a {@link ProgramSV} and
- * a {@link Term}, where the {@link Term} must contain a {@link JavaBlock} with
- * a {@link StatementBlock} containing <emph>a single statement</emph> (that
- * works, e.g., when passing an expression like
- * <code>\modality{#allmodal}{ while (#e) #body }\endmodality(post)</code>);
- * this statement is then stored (in the example the while statement).
+ * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
+ * {@link ProgramSV} for later use in other conditions and transformers. The arguments are a
+ * {@link ProgramSV} and a {@link Term}, where the {@link Term} must contain a {@link JavaBlock}
+ * with a {@link StatementBlock} containing <emph>a single statement</emph> (that works, e.g., when
+ * passing an expression like
+ * <code>\modality{#allmodal}{ while (#e) #body }\endmodality(post)</code>); this statement is then
+ * stored (in the example the while statement).
  *
  * @author Dominic Steinhoefel
  */
@@ -44,7 +43,7 @@ public class StoreStmtInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-                new LightweightSyntacticalReplaceVisitor(svInst, services);
+            new LightweightSyntacticalReplaceVisitor(svInst, services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 
@@ -56,15 +55,14 @@ public class StoreStmtInCondition implements VariableCondition {
         assert ((StatementBlock) instantiatedTerm.javaBlock().program()).getChildCount() == 1;
 
         return matchCond.setInstantiations(//
-                svInst.add(storeInSV,
-                        (Statement) instantiatedTerm.javaBlock().program().getFirstElement(),
-                        services));
+            svInst.add(storeInSV,
+                (Statement) instantiatedTerm.javaBlock().program().getFirstElement(), services));
     }
 
     @Override
     public String toString() {
         return String.format( //
-                "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
+            "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
     }
 
 }

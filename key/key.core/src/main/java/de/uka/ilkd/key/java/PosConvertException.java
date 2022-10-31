@@ -33,8 +33,8 @@ public class PosConvertException extends ConvertException implements HasLocation
      * Instantiates a new exception with position information.
      *
      * @param message the message, not null
-     * @param line    the line to point to
-     * @param column  the column to point to
+     * @param line the line to point to
+     * @param column the column to point to
      */
     public PosConvertException(String message, int line, int column) {
         super(message);
@@ -45,8 +45,8 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * Instantiates a new exception with position information.
      *
-     * @param cause  the exception causing this instance.
-     * @param line   the line to point to
+     * @param cause the exception causing this instance.
+     * @param line the line to point to
      * @param column the column to point to
      */
     public PosConvertException(Throwable cause, int line, int column) {

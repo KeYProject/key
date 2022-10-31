@@ -12,11 +12,10 @@ public final class NetworkUtils {
 
     private static final URL KEY_URL = getURL("http://key-project.org/");
     // private static final URL LATEST_VERSION_URL =
-    //         getURL("http://key-project.org/download/latest");
+    // getURL("http://key-project.org/download/latest");
 
     /**
-     * Tests whether the KeY Project home page is
-     * accessible over the internet.
+     * Tests whether the KeY Project home page is accessible over the internet.
      */
     public static boolean homePageAvailable() {
         BufferedReader in = null;
@@ -35,40 +34,43 @@ public final class NetworkUtils {
             return false;
         } finally {
             if (in != null)
-                try {in.close();} catch (IOException e) {}
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
         }
     }
 
     // THIS METHOD PHONES HOME.
     // 1) It makes KeY freeze if key-project.org is unavailable or
-    //    the line is busy. (That has happened)
+    // the line is busy. (That has happened)
     // 2) It reveals information about who uses KeY (IP) though
-    //    we did not ask for permission.
-//    /**
-//     * Tries to read the latest stable version number of KeY
-//     * from the KeY home page.
-//     * It must be contained in file <a href="http://key-project.org/download/latest">
-//     * download/latest</a> in a single line.
-//     */
-//    public static String getLatestVersion() {
-//        BufferedReader in = null;
-//        try {
-//            in = new BufferedReader(new InputStreamReader(LATEST_VERSION_URL.openStream()));
-//            // just read one single line
-//            String version = in.readLine();
-//            in.close();
-//            return version;
-//        } catch (IOException e) {
-//            // something went wrong
-//            if (in != null)
-//                try {in.close();} catch (IOException e1) {}
-//            return new String("0.0.0");
-//        }
-//    }
+    // we did not ask for permission.
+    // /**
+    // * Tries to read the latest stable version number of KeY
+    // * from the KeY home page.
+    // * It must be contained in file <a href="http://key-project.org/download/latest">
+    // * download/latest</a> in a single line.
+    // */
+    // public static String getLatestVersion() {
+    // BufferedReader in = null;
+    // try {
+    // in = new BufferedReader(new InputStreamReader(LATEST_VERSION_URL.openStream()));
+    // // just read one single line
+    // String version = in.readLine();
+    // in.close();
+    // return version;
+    // } catch (IOException e) {
+    // // something went wrong
+    // if (in != null)
+    // try {in.close();} catch (IOException e1) {}
+    // return new String("0.0.0");
+    // }
+    // }
 
     /**
-     * Create an URL without raising {@link MalformedURLException},
-     * but {@link AssertionError} instead. Use with care.
+     * Create an URL without raising {@link MalformedURLException}, but {@link AssertionError}
+     * instead. Use with care.
      */
     public static URL getURL(String urlString) {
         try {

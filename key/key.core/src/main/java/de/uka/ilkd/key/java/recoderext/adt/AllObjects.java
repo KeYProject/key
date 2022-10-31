@@ -6,38 +6,38 @@ import recoder.java.Expression;
 public class AllObjects extends ADTPrefixConstruct {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3940415948467542340L;
 
 
     public AllObjects(Expression lhs) {
-	super(lhs);
-	makeParentRoleValid();
+        super(lhs);
+        makeParentRoleValid();
     }
 
 
     protected AllObjects(AllObjects proto) {
-	super(proto);
-	makeParentRoleValid();
+        super(proto);
+        makeParentRoleValid();
     }
-    
 
-    @Override    
+
+    @Override
     public AllObjects deepClone() {
-	return new AllObjects(this);
+        return new AllObjects(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
-	return 1;
+        return 1;
     }
 
-    
-    @Override    
+
+    @Override
     public int getNotation() {
-	return PREFIX;
+        return PREFIX;
     }
-   
+
 }

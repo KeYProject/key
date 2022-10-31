@@ -45,17 +45,17 @@ public class CVC5Socket extends AbstractSolverSocket {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-                //pipe.close();
+                // pipe.close();
             } else if (msg.contains("sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-                //pipe.close();
+                // pipe.close();
             } else if (msg.contains("unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-                //pipe.close();
+                // pipe.close();
             }
         }
     }

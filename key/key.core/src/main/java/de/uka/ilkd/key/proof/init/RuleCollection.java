@@ -32,8 +32,7 @@ public class RuleCollection {
 
     /** toString */
     public String toString() {
-        return "Taclets: "+standardTaclets.toString()+
-        "\n BuiltIn:"+standardBuiltInRules;
+        return "Taclets: " + standardTaclets.toString() + "\n BuiltIn:" + standardBuiltInRules;
     }
 
 }

@@ -19,74 +19,72 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 
 /**
- * Represents an application of a contract rule. Currently, this is only 
- * used for applications read in from a proof file; fresh applications are 
- * represented as regular BuiltInRuleApps. (yes, I know that this is ugly - BW) 
+ * Represents an application of a contract rule. Currently, this is only used for applications read
+ * in from a proof file; fresh applications are represented as regular BuiltInRuleApps. (yes, I know
+ * that this is ugly - BW)
  */
 public class ContractRuleApp extends AbstractContractRuleApp {
 
     private List<LocationVariable> heapContext;
 
     ContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
-    	this(rule,	pio, null);
-    }   
+        this(rule, pio, null);
+    }
 
-    private ContractRuleApp(BuiltInRule rule, 
-    		PosInOccurrence pio, Contract instantiation) {
-    	super(rule, pio, instantiation);
+    private ContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract instantiation) {
+        super(rule, pio, instantiation);
     }
-    
+
     public ContractRuleApp replacePos(PosInOccurrence newPos) {
-	    return new ContractRuleApp(rule(), newPos, instantiation);
+        return new ContractRuleApp(rule(), newPos, instantiation);
     }
-    
+
     public ContractRuleApp setContract(Contract contract) {
         return new ContractRuleApp(rule(), posInOccurrence(), contract);
     }
-    
+
     public UseOperationContractRule rule() {
-    	return (UseOperationContractRule) super.rule();
+        return (UseOperationContractRule) super.rule();
     }
 
     public boolean isSufficientlyComplete() {
-        return pio != null;      
+        return pio != null;
     }
-    
+
     @Override
     public ContractRuleApp tryToInstantiate(Goal goal) {
-    	if (complete()) {
-    		return this;
-    	}
-    	Services services = goal.proof().getServices();
-    	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
-    	        .getApplicableContracts(
-    	                UseOperationContractRule.computeInstantiation(
-    	                        posInOccurrence().subTerm(), services),
-	                        services);
-	if (contracts.size() !=1) return this; // incomplete app;
-	Modality m = (Modality)programTerm().op();
-	boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-	heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
-	return setContract(contracts.iterator().next());
+        if (complete()) {
+            return this;
+        }
+        Services services = goal.proof().getServices();
+        ImmutableSet<FunctionalOperationContract> contracts =
+            UseOperationContractRule.getApplicableContracts(UseOperationContractRule
+                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                services);
+        if (contracts.size() != 1)
+            return this; // incomplete app;
+        Modality m = (Modality) programTerm().op();
+        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
+        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        return setContract(contracts.iterator().next());
     }
 
     @Override
     public ContractRuleApp forceInstantiate(Goal goal) {
-	if (complete()) {
-		return this;
-	}
-	Services services = goal.proof().getServices();
-	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
-	.getApplicableContracts(
-			UseOperationContractRule.computeInstantiation(
-					posInOccurrence().subTerm(), services),
-					services);
-	Modality m = (Modality)programTerm().op();
-	boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-	heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
-	final FunctionalOperationContract combinedContract = services.getSpecificationRepository()
-	.combineOperationContracts(contracts);
-	return setContract(combinedContract);
+        if (complete()) {
+            return this;
+        }
+        Services services = goal.proof().getServices();
+        ImmutableSet<FunctionalOperationContract> contracts =
+            UseOperationContractRule.getApplicableContracts(UseOperationContractRule
+                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                services);
+        Modality m = (Modality) programTerm().op();
+        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
+        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final FunctionalOperationContract combinedContract =
+            services.getSpecificationRepository().combineOperationContracts(contracts);
+        return setContract(combinedContract);
     }
 
     @Override
@@ -97,7 +95,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     @Override
     public List<LocationVariable> getHeapContext() {
-      return heapContext;
+        return heapContext;
     }
 
     public Term programTerm() {
@@ -106,11 +104,11 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         }
         return null;
     }
-    
+
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        return UseOperationContractRule.computeInstantiation(
-                    posInOccurrence().subTerm(), services).pm;
+        return UseOperationContractRule.computeInstantiation(posInOccurrence().subTerm(),
+            services).pm;
     }
 
 }

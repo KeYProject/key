@@ -41,16 +41,16 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * This visitor creates expression from {@link de.uka.ilkd.key.nparser.KeyAst.Term}.
- * You should use the facade {@link de.uka.ilkd.key.nparser.KeyIO#parseExpression(String)}
- * for term parsing.
+ * This visitor creates expression from {@link de.uka.ilkd.key.nparser.KeyAst.Term}. You should use
+ * the facade {@link de.uka.ilkd.key.nparser.KeyIO#parseExpression(String)} for term parsing.
  *
  * @author weigl
  */
 public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
 
-    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
+        "Expecting select term before '@', not: ";
 
     /**
      * The current abbreviation used for resolving "@name" terms.
@@ -76,7 +76,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         this(services, nss, new Namespace<>());
     }
 
-    public ExpressionBuilder(Services services, NamespaceSet nss, Namespace<SchemaVariable> schemaNamespace) {
+    public ExpressionBuilder(Services services, NamespaceSet nss,
+            Namespace<SchemaVariable> schemaNamespace) {
         super(services, nss);
         setSchemaVariables(schemaNamespace);
     }
@@ -84,8 +85,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     public static Term updateOrigin(Term t, ParserRuleContext ctx) {
         try {
             TermImpl ti = (TermImpl) t;
-            ti.setOrigin(ctx.start.getTokenSource().getSourceName()
-                    + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
+            ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
+                + ":" + ctx.start.getCharPositionInLine());
         } catch (ClassCastException ignored) {
         }
         return t;
@@ -106,13 +107,20 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         int end = raw.length() - (raw.endsWith("\\endmodality") ? "\\endmodality".length() : 0);
         int start = 0;
-        if (raw.startsWith("\\throughout_transaction")) start = "\\throughout_transaction".length();
-        else if (raw.startsWith("\\diamond_transaction")) start = "\\diamond_transaction".length();
-        else if (raw.startsWith("\\diamond")) start = "\\diamond".length();
-        else if (raw.startsWith("\\box_transaction")) start = "\\box_transaction".length();
-        else if (raw.startsWith("\\box")) start = "\\box".length();
-        else if (raw.startsWith("\\throughout")) start = "\\throughout".length();
-        else if (raw.startsWith("\\modality")) start = raw.indexOf("}") + 1;
+        if (raw.startsWith("\\throughout_transaction"))
+            start = "\\throughout_transaction".length();
+        else if (raw.startsWith("\\diamond_transaction"))
+            start = "\\diamond_transaction".length();
+        else if (raw.startsWith("\\diamond"))
+            start = "\\diamond".length();
+        else if (raw.startsWith("\\box_transaction"))
+            start = "\\box_transaction".length();
+        else if (raw.startsWith("\\box"))
+            start = "\\box".length();
+        else if (raw.startsWith("\\throughout"))
+            start = "\\throughout".length();
+        else if (raw.startsWith("\\modality"))
+            start = raw.indexOf("}") + 1;
         return raw.substring(start, end);
     }
 
@@ -129,12 +137,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (raw.startsWith("\\[")) {
             return "box";
         }
-        if (raw.startsWith("\\diamond_transaction")) return "diamond_transaction";
-        if (raw.startsWith("\\box_transaction")) return "box_transaction";
-        if (raw.startsWith("\\diamond")) return "diamond";
-        if (raw.startsWith("\\box")) return "box";
-        if (raw.startsWith("\\throughout_transaction")) return "throughout_transaction";
-        if (raw.startsWith("\\throughout")) return "throughout";
+        if (raw.startsWith("\\diamond_transaction"))
+            return "diamond_transaction";
+        if (raw.startsWith("\\box_transaction"))
+            return "box_transaction";
+        if (raw.startsWith("\\diamond"))
+            return "diamond";
+        if (raw.startsWith("\\box"))
+            return "box";
+        if (raw.startsWith("\\throughout_transaction"))
+            return "throughout_transaction";
+        if (raw.startsWith("\\throughout"))
+            return "throughout";
         if (raw.startsWith("\\modality")) {
             int start = raw.indexOf('{') + 1;
             int end = raw.indexOf('}');
@@ -175,7 +189,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
-        if (ctx.b.isEmpty()) return a;
+        if (ctx.b.isEmpty())
+            return a;
 
         Term cur = a;
         for (KeYParser.Implication_termContext context : ctx.b) {
@@ -190,7 +205,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (right == null) {
             return updateOrigin(left, ctx);
         }
-        return capsulateTf(ctx, () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx));
+        return capsulateTf(ctx,
+            () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx));
     }
 
     @Override
@@ -216,8 +232,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             t = binaryTerm(ctx, Junctor.AND, t, accept(c));
         }
         return t;
-        //Term termR = accept(ctx.b);
-        //return binaryTerm(ctx, Junctor.AND, termL, termR);
+        // Term termR = accept(ctx.b);
+        // return binaryTerm(ctx, Junctor.AND, termL, termR);
     }
 
     @Override
@@ -227,12 +243,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.MINUS() != null) {
             Operator Z = functions().lookup("Z");
             if (result.op() == Z) {
-                //weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
-                //       This mimics the old KeyParser behaviour. Unknown if necessary.
+                // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
+                // This mimics the old KeyParser behaviour. Unknown if necessary.
                 final Function neglit = functions().lookup("neglit");
                 final Term num = result.sub(0);
-                return capsulateTf(ctx, () -> getTermFactory().createTerm(Z,
-                        getTermFactory().createTerm(neglit, num)));
+                return capsulateTf(ctx,
+                    () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
             } else if (result.sort() != Sort.FORMULA) {
                 Sort sort = result.sort();
                 if (sort == null) {
@@ -244,7 +260,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
                 Function op = ldt.getFunctionFor("neg", services);
-                if(op == null) {
+                if (op == null) {
                     semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(op, result));
@@ -260,8 +276,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termL = accept(ctx.sub);
         if (ctx.NOT() != null) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
-        }
-        else return termL;
+        } else
+            return termL;
     }
 
     @Override
@@ -280,7 +296,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termL = accept(ctx.a);
         Term termR = accept(ctx.b);
 
-        if(termR == null) {
+        if (termR == null) {
             return updateOrigin(termL, ctx);
         }
 
@@ -327,7 +343,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             ldt = services.getTypeConverter().getIntegerLDT();
         }
         Function op = ldt.getFunctionFor(opname, services);
-        if(op == null) {
+        if (op == null) {
             semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
         }
         return binaryTerm(ctx, op, last, cur);
@@ -352,7 +368,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
         Term termL = accept(ctx.a);
-        if (ctx.b == null) return termL;
+        if (ctx.b == null)
+            return termL;
 
         Term termR = accept(ctx.b);
         String opName = ctx.SLASH() != null ? "div" : "mod";
@@ -363,7 +380,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             return termSupplier.get();
         } catch (TermCreationException e) {
-            throw new BuildingException(ctx, String.format("Could not build term on: %s", ctx.getText()), e);
+            throw new BuildingException(ctx,
+                String.format("Could not build term on: %s", ctx.getText()), e);
         }
     }
 
@@ -378,50 +396,36 @@ public class ExpressionBuilder extends DefaultBuilder {
                 t = replaceHeap(t, accept(heap), heap);
             }
         }
-        if (ctx.attribute().isEmpty()) return t;
+        if (ctx.attribute().isEmpty())
+            return t;
         return handleAttributes(t, ctx.attribute());
     }
 
-    /*@Override
-    public String visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
-        //TODO weigl: this rule is a total grammar blower.
-        String attrReference = ctx.id.getText();
-        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
-            attrReference += "[]";
-        }
-
-        /*KeYJavaType kjt = null;
-        kjt = getTypeByClassName(attrReference);
-        if (kjt == null) {
-            throwEx(new NotDeclException(input, "Class", attrReference));
-        }
-        attrReference = kjt.getSort().name().toString();
-        match(input, DOT, null);
-            attrReference += "::" + input.LT(1).getText();
-            match(input, IDENT, null);
-            if(savedGuessing > -1) {
-                state.backtracking = savedGuessing;
-                savedGuessing = -1;
-            }*/
-    //  return attrReference;
+    /*
+     * @Override public String
+     * visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
+     * //TODO weigl: this rule is a total grammar blower. String attrReference = ctx.id.getText();
+     * for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) { attrReference += "[]"; }
+     *
+     * /*KeYJavaType kjt = null; kjt = getTypeByClassName(attrReference); if (kjt == null) {
+     * throwEx(new NotDeclException(input, "Class", attrReference)); } attrReference =
+     * kjt.getSort().name().toString(); match(input, DOT, null); attrReference += "::" +
+     * input.LT(1).getText(); match(input, IDENT, null); if(savedGuessing > -1) { state.backtracking
+     * = savedGuessing; savedGuessing = -1; }
+     */
+    // return attrReference;
     // }
 
-    /*@Override
-    public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext ctx) {
-        Operator v = null;
-        String attributeName = accept(ctx.staticAttributeOrQueryReference());
-        String className;
-        if (attributeName.indexOf(':') != -1) {
-            className =
-                    attributeName.substring(0, attributeName.indexOf(':'));
-        } else {
-            className =
-                    attributeName.substring(0, attributeName.lastIndexOf("."));
-        }
-        v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName);
-        return createAttributeTerm(null, v, ctx);
-    }
-    */
+    /*
+     * @Override public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext
+     * ctx) { Operator v = null; String attributeName =
+     * accept(ctx.staticAttributeOrQueryReference()); String className; if
+     * (attributeName.indexOf(':') != -1) { className = attributeName.substring(0,
+     * attributeName.indexOf(':')); } else { className = attributeName.substring(0,
+     * attributeName.lastIndexOf(".")); } v =
+     * getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName); return
+     * createAttributeTerm(null, v, ctx); }
+     */
 
     private LogicVariable bindVar(String id, Sort s) {
         LogicVariable v = new LogicVariable(new Name(id), s);
@@ -463,19 +467,16 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Term toZNotation(BigInteger bi, Namespace<Function> functions) {
         boolean negative = bi.signum() < 0;
         String s = bi.abs().toString();
-        Term result = getTermFactory()
-                .createTerm(functions.lookup(new Name("#")));
+        Term result = getTermFactory().createTerm(functions.lookup(new Name("#")));
 
         for (int i = 0; i < s.length(); i++)
-            result = getTermFactory().createTerm(
-                    functions.lookup(new Name(s.substring(i, i + 1))), result);
+            result = getTermFactory().createTerm(functions.lookup(new Name(s.substring(i, i + 1))),
+                result);
 
         if (negative) {
-            result = getTermFactory().createTerm(
-                    functions.lookup(new Name("neglit")), result);
+            result = getTermFactory().createTerm(functions.lookup(new Name("neglit")), result);
         }
-        return getTermFactory().createTerm(
-                functions.lookup(new Name("Z")), result);
+        return getTermFactory().createTerm(functions.lookup(new Name("Z")), result);
     }
 
     @Override
@@ -501,15 +502,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
             Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = ant.insertFirst(
-                    new SequentFormula(head)).semisequent();
+            ant = ant.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(ant, ss);
         }
         if (head != null && s != null) {
-            // A sequent.  Prepend head to the antecedent.
+            // A sequent. Prepend head to the antecedent.
             Semisequent newAnt = s.antecedent();
-            newAnt = newAnt.insertFirst(
-                    new SequentFormula(head)).semisequent();
+            newAnt = newAnt.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(newAnt, s.succedent());
         }
         if (ss != null) {
@@ -549,11 +548,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         try {
             try {
-                if (javaSchemaModeAllowed) {//TEST
+                if (javaSchemaModeAllowed) {// TEST
                     SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
                     jr.setSVNamespace(schemaVariables());
                     try {
-                        sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
+                        sjb.javaBlock =
+                            jr.readBlockWithProgramVariables(programVariables(), cleanJava);
                     } catch (Exception e) {
                         sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
                     }
@@ -598,18 +598,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
-            /*if (!inSchemaMode()) {
-                semanticError(null, "Schemavariables may only occur inside taclets.");
-            }*/
+            /*
+             * if (!inSchemaMode()) { semanticError(null,
+             * "Schemavariables may only occur inside taclets."); }
+             */
             SchemaVariable sv = (SchemaVariable) attribute;
             if (sv.sort() instanceof ProgramSVSort
                     || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError(null, "Cannot use schema variable " + sv + " as an attribute");
             }
             result = getServices().getTermBuilder().select(sv.sort(),
-                    getServices().getTermBuilder().getBaseHeap(),
-                    prefix,
-                    capsulateTf(ctx, () -> getTermFactory().createTerm(attribute)));
+                getServices().getTermBuilder().getBaseHeap(), prefix,
+                capsulateTf(ctx, () -> getTermFactory().createTerm(attribute)));
         } else {
             if (attribute instanceof LogicVariable) {
                 Term attrTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
@@ -618,14 +618,12 @@ public class ExpressionBuilder extends DefaultBuilder {
                 result = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
             } else if (attribute == getServices().getJavaInfo().getArrayLength()) {
                 Term finalResult = result;
-                result = capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
+                result =
+                    capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
-                Function fieldSymbol
-                        = getServices().getTypeConverter()
-                        .getHeapLDT()
-                        .getFieldSymbolForPV((LocationVariable) pv,
-                                getServices());
+                Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
+                        .getFieldSymbolForPV((LocationVariable) pv, getServices());
                 if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
                 } else {
@@ -640,7 +638,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         final JavaInfo javaInfo = getJavaInfo();
 
         Operator result = schemaVariables().lookup(new Name(attributeName));
-        //if (result == null) {
+        // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
 
@@ -660,17 +658,20 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {
-                semanticError(null, "Could not find type '" + prefixSort + "'. Maybe mispelled or " +
-                        "you use an array or object type in a .key-file with missing " +
-                        "\\javaSource section.");
+                semanticError(null,
+                    "Could not find type '" + prefixSort + "'. Maybe mispelled or "
+                        + "you use an array or object type in a .key-file with missing "
+                        + "\\javaSource section.");
             }
 
-            ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+            ProgramVariable var =
+                javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
             if (var == null) {
-                LogicVariable logicalvar = (LogicVariable) namespaces().variables().lookup(attributeName);
+                LogicVariable logicalvar =
+                    (LogicVariable) namespaces().variables().lookup(attributeName);
                 if (logicalvar == null) {
-                    semanticError(null, "There is no attribute '%s' declared in type '%s' and no logical variable of that name.",
-                            attributeName, prefixSort);
+                    semanticError(null, "There is no attribute '%s' declared in type '%s' and no "
+                        + "logical variable of that name.", attributeName, prefixSort);
                 } else {
                     result = logicalvar;
                 }
@@ -678,7 +679,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 result = var;
             }
         }
-        //}
+        // }
 
         if (result == null && !("length".equals(attributeName))) {
             throwEx(new NotDeclException(null, "Attribute ", attributeName));
@@ -686,10 +687,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    /*@Override
-    public String visitAttrid(KeYParser.AttridContext ctx) {
-        return ctx.getText();
-    }*/
+    /*
+     * @Override public String visitAttrid(KeYParser.AttridContext ctx) { return ctx.getText(); }
+     */
 
     private String unescapeString(String string) {
         char[] chars = string.toCharArray();
@@ -697,27 +697,27 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                    case 'n':
-                        sb.append("\n");
-                        break;
-                    case 'f':
-                        sb.append("\f");
-                        break;
-                    case 'r':
-                        sb.append("\r");
-                        break;
-                    case 't':
-                        sb.append("\t");
-                        break;
-                    case 'b':
-                        sb.append("\b");
-                        break;
-                    case ':':
-                        sb.append("\\:");
-                        break; // this is so in KeY ...
-                    default:
-                        sb.append(chars[i]);
-                        break; // this more relaxed than before, \a becomes a ...
+                case 'n':
+                    sb.append("\n");
+                    break;
+                case 'f':
+                    sb.append("\f");
+                    break;
+                case 'r':
+                    sb.append("\r");
+                    break;
+                case 't':
+                    sb.append("\t");
+                    break;
+                case 'b':
+                    sb.append("\b");
+                    break;
+                case ':':
+                    sb.append("\\:");
+                    break; // this is so in KeY ...
+                default:
+                    sb.append(chars[i]);
+                    break; // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);
@@ -729,8 +729,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitString_literal(KeYParser.String_literalContext ctx) {
         String s = unescapeString(ctx.id.getText());
-        return getServices().getTypeConverter()
-                .convertToLogicElement(new StringLiteral(s));
+        return getServices().getTypeConverter().convertToLogicElement(new StringLiteral(s));
     }
 
     @Override
@@ -744,12 +743,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         Sort objectSort = getServices().getJavaInfo().objectSort();
         if (s == null) {
             semanticError(ctx, "Tried to cast to unknown type.");
-        } else if (objectSort != null
-                && !s.extendsTrans(objectSort)
+        } else if (objectSort != null && !s.extendsTrans(objectSort)
                 && result.sort().extendsTrans(objectSort)) {
-            semanticError(ctx, "Illegal cast from " + result.sort() +
-                    " to sort " + s +
-                    ". Casts between primitive and reference types are not allowed. ");
+            semanticError(ctx, "Illegal cast from " + result.sort() + " to sort " + s
+                + ". Casts between primitive and reference types are not allowed. ");
         }
         assert s != null;
         SortDependingFunction castSymbol = s.getCastSymbol(getServices());
@@ -762,29 +759,17 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-    private Term createStaticAttributeOrMethod(JavaQuery jq, KeYParser.AccesstermContext ctx) {
-        final var kjt = jq.kjt;
-        String mn = jq.attributeNames;
-        if (jq.maybeAttr != null) {
-            ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt);
-            if (maybeAttr != null) {
-                var op = getAttributeInPrefixSort(kjt.getSort(), mn);
-                return createAttributeTerm(null, op, ctx);
-            }
-        } else {
-            var suffix = ctx.atom_suffix(ctx.atom_suffix().size() - 1);
-            for (IProgramMethod pm : getJavaInfo().getAllProgramMethods(kjt)) {
-                if (pm != null && pm.isStatic() && pm.name().toString().equals(kjt.getFullName() + "::" + mn)) {
-                    List<Term> arguments = mapOf(suffix.attribute_or_query_suffix().result.args.argument());
-                    Term[] args = arguments.toArray(new Term[0]);
-                    return getJavaInfo().getStaticProgramMethodTerm(mn, args, kjt.getFullName());
-                }
-            }
-        }
-        assert false;
-        return null;
-    }
-    */
+     * private Term createStaticAttributeOrMethod(JavaQuery jq, KeYParser.AccesstermContext ctx) {
+     * final var kjt = jq.kjt; String mn = jq.attributeNames; if (jq.maybeAttr != null) {
+     * ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt); if (maybeAttr != null) { var
+     * op = getAttributeInPrefixSort(kjt.getSort(), mn); return createAttributeTerm(null, op, ctx);
+     * } } else { var suffix = ctx.atom_suffix(ctx.atom_suffix().size() - 1); for (IProgramMethod pm
+     * : getJavaInfo().getAllProgramMethods(kjt)) { if (pm != null && pm.isStatic() &&
+     * pm.name().toString().equals(kjt.getFullName() + "::" + mn)) { List<Term> arguments =
+     * mapOf(suffix.attribute_or_query_suffix().result.args.argument()); Term[] args =
+     * arguments.toArray(new Term[0]); return getJavaInfo().getStaticProgramMethodTerm(mn, args,
+     * kjt.getFullName()); } } } assert false; return null; }
+     */
 
     @Override
     public Object visitBracket_access_heap_update(KeYParser.Bracket_access_heap_updateContext ctx) {
@@ -824,18 +809,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term rangeFrom = toZNotation("0", functions());
         Term lt = getServices().getTermBuilder().dotLength(reference);
         Term one = toZNotation("1", functions());
-        Term rangeTo = getTermFactory().createTerm(
-                functions().lookup(new Name("sub")), lt, one);
-        //TODO construct
+        Term rangeTo = getTermFactory().createTerm(functions().lookup(new Name("sub")), lt, one);
+        // TODO construct
         return null;
     }
 
     @Override
     public Object visitBracket_access_indexrange(KeYParser.Bracket_access_indexrangeContext ctx) {
-        //  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
+        // | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET
+        // #bracket_access_indexrange
         Term term = pop();
         boolean sequenceAccess = term.sort().name().toString().equalsIgnoreCase("seq");
-        //boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
+        // boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
 
         if (sequenceAccess) {
             if (ctx.rangeTo != null) {
@@ -844,8 +829,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             Term indexTerm = accept(ctx.indexTerm);
             assert indexTerm != null;
             if (!isIntTerm(indexTerm))
-                semanticError(ctx, "Expecting term of sort %s as index of sequence %s, but found: %s",
-                        IntegerLDT.NAME, term, indexTerm);
+                semanticError(ctx,
+                    "Expecting term of sort %s as index of sequence %s, but found: %s",
+                    IntegerLDT.NAME, term, indexTerm);
             return getServices().getTermBuilder().seqGet(Sort.ANY, term, indexTerm);
         }
 
@@ -854,18 +840,23 @@ public class ExpressionBuilder extends DefaultBuilder {
             Term rangeTo = accept(ctx.rangeTo);
             if (rangeTo != null) {
                 if (quantifiedArrayGuard == null) {
-                    semanticError(ctx, "Quantified array expressions are only allowed in locations.");
+                    semanticError(ctx,
+                        "Quantified array expressions are only allowed in locations.");
                 }
-                LogicVariable indexVar = new LogicVariable(new Name("i"),
-                        sorts().lookup(new Name("int")));
+                LogicVariable indexVar =
+                    new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
                 Term indexTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(indexVar));
 
                 Function leq = functions().lookup(new Name("leq"));
-                Term fromTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
-                Term toTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(leq, indexTerm, rangeTo));
-                Term guardTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm));
-                quantifiedArrayGuard = capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm));
-                //TODO check quantifiedArrayGuard!
+                Term fromTerm =
+                    capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
+                Term toTerm =
+                    capsulateTf(ctx, () -> getTermFactory().createTerm(leq, indexTerm, rangeTo));
+                Term guardTerm = capsulateTf(ctx,
+                    () -> getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm));
+                quantifiedArrayGuard = capsulateTf(ctx, () -> getTermFactory()
+                        .createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm));
+                // TODO check quantifiedArrayGuard!
             }
         }
         Term indexTerm = accept(ctx.indexTerm);
@@ -917,9 +908,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 label = (TermLabel) var;
             }
             if (label == null) {
-                label = getServices().getProfile()
-                        .getTermLabelManager()
-                        .parseLabel(labelName, parameters, getServices());
+                label = getServices().getProfile().getTermLabelManager().parseLabel(labelName,
+                    parameters, getServices());
             }
         } catch (Exception ex) {
             throw new BuildingException(ctx, ex);
@@ -945,7 +935,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         Term thenT = (Term) ctx.thenT.accept(this);
         Term elseT = (Term) ctx.elseT.accept(this);
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
+        return capsulateTf(ctx,
+            () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
     }
 
 
@@ -960,12 +951,9 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         Term thenT = accept(ctx.thenT);
         Term elseT = accept(ctx.elseT);
-        ImmutableArray<QuantifiableVariable> exVarsArray
-                = new ImmutableArray<>(exVars);
+        ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
         Term result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
-                new Term[]{condF, thenT, elseT},
-                exVarsArray,
-                null);
+            new Term[] { condF, thenT, elseT }, exVarsArray, null);
         unbindVars(orig);
         return result;
     }
@@ -980,10 +968,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = Quantifier.EX;
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.sub);
-        Term a = getTermFactory().createTerm(op,
-                new ImmutableArray<>(a1),
-                new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
-                null);
+        Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
+            new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])), null);
         unbindVars(orig);
         return a;
     }
@@ -1015,7 +1001,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term a1 = accept(ctx.replacement);
         Term a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
         try {
-            Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
+            Term result =
+                getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
             return result;
         } catch (Exception e) {
             throw new BuildingException(ctx, e);
@@ -1027,15 +1014,15 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
         Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
-        if (ctx.u.isEmpty()) return t;
+        if (ctx.u.isEmpty())
+            return t;
         Term u = accept(ctx.u);
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
         List<QuantifiableVariable> seq = ctx.one_bound_variable().stream()
-                .map(it -> (QuantifiableVariable) it.accept(this))
-                .collect(Collectors.toList());
+                .map(it -> (QuantifiableVariable) it.accept(this)).collect(Collectors.toList());
         return seq;
     }
 
@@ -1047,7 +1034,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         SchemaVariable ts = schemaVariables().lookup(new Name(id));
         if (ts != null) {
             if (!(ts instanceof VariableSV)) {
-                semanticError(ctx, ts + " is not allowed in a quantifier. Note, that you can't "
+                semanticError(ctx,
+                    ts + " is not allowed in a quantifier. Note, that you can't "
                         + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
                         + " in taclets. You have to define the variable as a schema variable"
                         + " and use the syntax \"\\exists i;\" instead.");
@@ -1066,14 +1054,16 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitModality_term(KeYParser.Modality_termContext ctx) {
         Term a1 = accept(ctx.sub);
-        if (ctx.MODALITY() == null) return a1;
+        if (ctx.MODALITY() == null)
+            return a1;
 
         PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
         Operator op;
         if (sjb.opName.charAt(0) == '#') {
-            /*if (!inSchemaMode()) {
-                semanticError(ctx, "No schema elements allowed outside taclet declarations (" + sjb.opName + ")");
-            }*/
+            /*
+             * if (!inSchemaMode()) { semanticError(ctx,
+             * "No schema elements allowed outside taclet declarations (" + sjb.opName + ")"); }
+             */
             op = schemaVariables().lookup(new Name(sjb.opName));
         } else {
             op = Modality.getModality(sjb.opName);
@@ -1082,7 +1072,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
         }
 
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock));
+        return capsulateTf(ctx,
+            () -> getTermFactory().createTerm(op, new Term[] { a1 }, null, sjb.javaBlock));
     }
 
     @Override
@@ -1103,9 +1094,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "'" + s + "' is not a valid character.");
             }
         }
-        return getTermFactory().createTerm(
-                functions().lookup(new Name("C")),
-                toZNotation("" + intVal, functions()).sub(0));
+        return getTermFactory().createTerm(functions().lookup(new Name("C")),
+            toZNotation("" + intVal, functions()).sub(0));
     }
 
     public boolean isClass(String p) {
@@ -1124,14 +1114,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
-        if (ctx.name.INT_LITERAL() != null) {//number
+        if (ctx.name.INT_LITERAL() != null) {// number
             return toZNotation(ctx.name.INT_LITERAL().getText(), functions());
         }
 
         assert parts != null && varfuncid != null;
 
-        boolean javaReference = parts.size() > 1
-                && (isPackage(parts.get(0)) || isClass(parts.get(0)));
+        boolean javaReference =
+            parts.size() > 1 && (isPackage(parts.get(0)) || isClass(parts.get(0)));
 
         if (javaReference) {
             return splitJava(parts);
@@ -1144,7 +1134,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         Operator op;
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
-            op = lookupVarfuncId(ctx, varfuncid, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+            op = lookupVarfuncId(ctx, varfuncid,
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1152,11 +1143,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            String firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.INT_LITERAL().getText()
-                    : ctx.name.simple_ident(0).getText();
-            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+            String firstName =
+                ctx.name.simple_ident().size() == 0 ? ctx.name.INT_LITERAL().getText()
+                        : ctx.name.simple_ident(0).getText();
+            op = lookupVarfuncId(ctx, firstName,
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
-                List<KeYParser.Simple_identContext> otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+                List<KeYParser.Simple_identContext> otherParts =
+                    ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
                 ProgramVariable v = (ProgramVariable) op;
                 Term tv = getServices().getTermFactory().createTerm(v);
                 String memberName = otherParts.get(0).getText();
@@ -1164,8 +1158,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(tv);
                     } else {
-                        semanticError(ctx,
-                                "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
+                        semanticError(ctx, "There is no attribute '%s'for sequences (Seq), only "
+                            + "'length' is supported.", memberName);
                     }
                 }
                 memberName = StringUtil.trim(memberName, "()");
@@ -1179,40 +1173,47 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Term visitAccesstermAsJava(KeYParser.AccesstermContext ctx) {
         String firstName = accept(ctx.firstName);
         if (isPackage(firstName) || isClass(firstName)) {
-            //consume suffix as long as it is part of a java class or package
+            // consume suffix as long as it is part of a java class or package
             String javaPackage = isPackage(firstName) ? firstName : "";
             boolean startWithPackage = isPackage(firstName);
             String javaClass = isClass(firstName) ? firstName : "";
 
             int currentSuffix = 0;
 
-            //region split up package and class name
-            while (startWithPackage && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null) break; //No heap on java package allowed
-                @Nullable Object cur = accept(a.id);
+            // region split up package and class name
+            while (startWithPackage
+                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
+                KeYParser.Attribute_simpleContext a =
+                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                if (a.heap != null)
+                    break; // No heap on java package allowed
+                @Nullable
+                Object cur = accept(a.id);
                 if (isPackage(javaPackage + "." + cur)) {
                     javaPackage += "." + cur;
                     currentSuffix++;
-                } else break;
+                } else
+                    break;
             }
 
             while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null) break; //No heap on java Class name allowed
+                KeYParser.Attribute_simpleContext a =
+                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                if (a.heap != null)
+                    break; // No heap on java Class name allowed
                 String cur = accept(a.id);
                 String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
-                if (isClass(
-                        javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
+                if (isClass(javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
                     javaClass = candidate;
                     currentSuffix++;
                 } else {
                     break;
                 }
             }
-            //endregion
+            // endregion
 
-            KeYJavaType kjt = getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
+            KeYJavaType kjt =
+                getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
             if (ctx.call() != null) {
                 addWarning("Call of package or class");
@@ -1224,9 +1225,10 @@ public class ExpressionBuilder extends DefaultBuilder {
                 boolean isLast = i == ctx.attribute().size() - 1;
 
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
-                    KeYParser.Attribute_simpleContext simpleContext = (KeYParser.Attribute_simpleContext) attrib;
+                    KeYParser.Attribute_simpleContext simpleContext =
+                        (KeYParser.Attribute_simpleContext) attrib;
                     boolean isCall = simpleContext.call() != null;
-                    ParserRuleContext heap = simpleContext.heap; //TODO?
+                    ParserRuleContext heap = simpleContext.heap; // TODO?
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                     if (maybeAttr != null) {
@@ -1236,20 +1238,23 @@ public class ExpressionBuilder extends DefaultBuilder {
                         IProgramMethod pm = getStaticQuery(kjt, attributeName);
                         if (pm != null) {
                             Term[] args = visitArguments(simpleContext.call().argument_list());
-                            current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args, kjt.getFullName());
+                            current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args,
+                                kjt.getFullName());
                         } else {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
                         }
-                        //TODO If not last attribute:
+                        // TODO If not last attribute:
                         addWarning("");
                         return current;
                     }
                 } else if (attrib instanceof KeYParser.Attribute_complexContext) {
-                    KeYParser.Attribute_complexContext attrid = (KeYParser.Attribute_complexContext) attrib;
+                    KeYParser.Attribute_complexContext attrid =
+                        (KeYParser.Attribute_complexContext) attrib;
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
                     Term[] args = visitArguments(attrid.call().argument_list());
-                    current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName, args, className);
+                    current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName,
+                        args, className);
                     if (current == null) {
                         final Sort sort = lookupSort(className);
                         if (sort == null) {
@@ -1257,13 +1262,13 @@ public class ExpressionBuilder extends DefaultBuilder {
                         }
                         kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                         if (kjt == null) {
-                            semanticError(ctx, "Found logic sort for " + className +
-                                    " but no corresponding java type!");
+                            semanticError(ctx, "Found logic sort for " + className
+                                + " but no corresponding java type!");
                         }
                     }
                     return current;
                 } else if (attrib instanceof KeYParser.Attribute_starContext) {
-                    //TODO
+                    // TODO
                 }
             }
             return current;
@@ -1292,16 +1297,16 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
                 return current;
             } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext attrid = (KeYParser.Attribute_simpleContext) ctxSuffix;
+                KeYParser.Attribute_simpleContext attrid =
+                    (KeYParser.Attribute_simpleContext) ctxSuffix;
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(current);
                     } else {
-                        semanticError(ctxSuffix,
-                                "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
-                                memberName);
+                        semanticError(ctxSuffix, "There is no attribute '%s'for sequences (Seq), "
+                            + "only 'length' is supported.", memberName);
                     }
                 } else {
                     boolean isCall = attrid.call() != null;
@@ -1309,11 +1314,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                     Term heap = accept(attrid.heap);
                     if (isCall) {
                         String classRef = current.sort().name().toString();
-                        KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
-                        if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                        KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of
+                                                                        // Sort?
+                        if (kjt == null)
+                            semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                         assert kjt != null;
                         classRef = kjt.getFullName();
-                        current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, true);
+                        current = getServices().getJavaInfo().getProgramMethodTerm(current,
+                            memberName, sfxargs, classRef, true);
                     } else {
                         Operator attr = getAttributeInPrefixSort(current.sort(), memberName);
                         current = createAttributeTerm(current, attr, ctxSuffix);
@@ -1323,21 +1331,24 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                KeYParser.Attribute_complexContext attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
+                KeYParser.Attribute_complexContext attrid =
+                    (KeYParser.Attribute_complexContext) ctxSuffix;
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
                 boolean isCall = attrid.call() != null;
                 Term[] sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
                 if (isCall) {
-                    KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
-                    if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                    KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of Sort?
+                    if (kjt == null)
+                        semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                     assert kjt != null;
                     classRef = kjt.getFullName();
-                    current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, false);
+                    current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName,
+                        sfxargs, classRef, false);
                 } else {
                     Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
-                            classRef + "::" + memberName);
+                        classRef + "::" + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
 
@@ -1348,7 +1359,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                     KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                     if (kjt == null) {
-                        semanticError(ctxSuffix, "Found logic sort for %s but no corresponding java type!", classRef);
+                        semanticError(ctxSuffix,
+                            "Found logic sort for %s but no corresponding java type!", classRef);
                     }
                 }
                 if (heap != null)
@@ -1369,9 +1381,10 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         Term t = visitAccesstermAsJava(ctx);
-        if (t != null) return t;
+        if (t != null)
+            return t;
 
-        //weigl: I am unsure if this is wise.
+        // weigl: I am unsure if this is wise.
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
         String firstName = accept(ctx.simple_ident());
 
@@ -1381,9 +1394,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.call() != null) {
             orig = variables();
             List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
-            boundVars = bv != null
-                    ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
-                    : null;
+            boundVars =
+                bv != null ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0])) : null;
             args = visitArguments(ctx.call().argument_list());
             if (boundVars != null) {
                 unbindVars(orig);
@@ -1397,7 +1409,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+            op = lookupVarfuncId(ctx, firstName,
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1405,7 +1418,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+            op = lookupVarfuncId(ctx, firstName,
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
         }
 
         Term current;
@@ -1422,22 +1436,25 @@ public class ExpressionBuilder extends DefaultBuilder {
                 Term[] finalArgs = args;
                 current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
             } else {
-                //sanity check
+                // sanity check
                 assert op instanceof Function;
                 for (int i = 0; i < args.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
                         for (QuantifiableVariable qv : args[i].freeVars()) {
                             if (boundVars.contains(qv)) {
-                                semanticError(ctx, "Building function term " + op + " with bound variables failed: "
-                                        + "Variable " + qv + " must not occur free in subterm " + args[i]);
+                                semanticError(ctx,
+                                    "Building function term " + op
+                                        + " with bound variables failed: " + "Variable " + qv
+                                        + " must not occur free in subterm " + args[i]);
                             }
                         }
                     }
                 }
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
-                //create term
+                // create term
                 Term[] finalArgs1 = args;
-                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
+                current = capsulateTf(ctx,
+                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
             }
         }
         current = handleAttributes(current, ctx.attribute());
@@ -1479,29 +1496,25 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term toZNotation(String number) {
-        return getTermFactory().createTerm(
-                functions().lookup(new Name("Z")), toNum(number));
+        return getTermFactory().createTerm(functions().lookup(new Name("Z")), toNum(number));
     }
 
     private Term toCNotation(String number) {
-        return getTermFactory().createTerm(
-                functions().lookup(new Name("C")), toNum(number));
+        return getTermFactory().createTerm(functions().lookup(new Name("C")), toNum(number));
     }
 
     private Term toFPNotation(String number) {
-        String decBitString = Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
-        return getTermFactory().createTerm(
-                functions().lookup(new Name("FP")),
-                toNum(decBitString)
-        ); // toNum("0")); // soon to disappear
+        String decBitString =
+            Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
+        // toNum("0")); // soon to disappear
+        return getTermFactory().createTerm(functions().lookup(new Name("FP")), toNum(decBitString));
     }
 
     private Term toDFPNotation(String number) {
-        String decBitString = Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
-        return getTermFactory().createTerm(
-                functions().lookup(new Name("DFP")),
-                toNum(decBitString)
-        ); // toNum("0")); // soon to disappear
+        String decBitString =
+            Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
+        return getTermFactory().createTerm(functions().lookup(new Name("DFP")),
+            toNum(decBitString)); // toNum("0")); // soon to disappear
     }
 
     private Term toNum(String number) {
@@ -1510,18 +1523,19 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (negative) {
             s = number.substring(1, s.length());
         }
-        if(s.startsWith("0x")) {
+        if (s.startsWith("0x")) {
             try {
-                BigInteger bi = new BigInteger(s.substring(2),16);
+                BigInteger bi = new BigInteger(s.substring(2), 16);
                 s = bi.toString();
-            } catch(NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
             }
         }
         Term result = getTermFactory().createTerm(functions().lookup(new Name("#")));
 
-        for(int i = 0; i<s.length(); i++){
-            result = getTermFactory().createTerm(functions().lookup(new Name(s.substring(i,i+1))), result);
+        for (int i = 0; i < s.length(); i++) {
+            result = getTermFactory()
+                    .createTerm(functions().lookup(new Name(s.substring(i, i + 1))), result);
         }
 
         if (negative) {
@@ -1531,24 +1545,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    /*private Term makeBinaryTerm(String opName, Term a, Term a1) {
-        LDT ldt = services.getTypeConverter().getLDTFor(a.sort());
-        if (ldt != null) {
-            Function op = ldt.getFunctionFor(opName, services);
-            if (op == null) {
-                semanticError("Cannot resolve symbol '" + opName + "' for sort " + a.sort());
-            } else {
-                a = getTermFactory().createTerm(op, a, a1);
-                return a;
-            }
-        }
-        Function op = (Function) functions().lookup(new Name(opName));
-        if(op == null) {
-            semanticError("Function symbol '" + opName + "' not found.");
-        }
-        a = getTermFactory().createTerm(op, a, a1);
-        return a;
-    }*/
+    /*
+     * private Term makeBinaryTerm(String opName, Term a, Term a1) { LDT ldt =
+     * services.getTypeConverter().getLDTFor(a.sort()); if (ldt != null) { Function op =
+     * ldt.getFunctionFor(opName, services); if (op == null) {
+     * semanticError("Cannot resolve symbol '" + opName + "' for sort " + a.sort()); } else { a =
+     * getTermFactory().createTerm(op, a, a1); return a; } } Function op = (Function)
+     * functions().lookup(new Name(opName)); if(op == null) { semanticError("Function symbol '" +
+     * opName + "' not found."); } a = getTermFactory().createTerm(op, a, a1); return a; }
+     */
 
 
     private Term termForParsedVariable(ParsableVariable v, ParserRuleContext ctx) {
@@ -1594,7 +1599,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         final Iterator<ProgramVariable> it = vars.iterator();
         while (it.hasNext()) {
             result.append(it.next().getContainerType().getFullName());
-            if (it.hasNext()) result.append(", ");
+            if (it.hasNext())
+                result.append(", ");
         }
         return result.toString();
     }
@@ -1620,8 +1626,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     protected boolean isHeapTerm(Term term) {
-        return term != null && term.sort() ==
-                getServices().getTypeConverter().getHeapLDT().targetSort();
+        return term != null
+                && term.sort() == getServices().getTypeConverter().getHeapLDT().targetSort();
     }
 
     private boolean isSequenceTerm(Term reference) {
@@ -1632,7 +1638,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }
 
-    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) {
+    private ImmutableSet<Modality> lookupOperatorSV(String opName,
+            ImmutableSet<Modality> modalities) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
         if (sv == null || !(sv instanceof ModalOperatorSV)) {
             semanticError(null, "Schema variable " + opName + " not defined.");
@@ -1647,8 +1654,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /**
-     * Guard for {@link #replaceHeap0(Term, Term, ParserRuleContext)}
-     * to protect the double application of {@code @heap}.
+     * Guard for {@link #replaceHeap0(Term, Term, ParserRuleContext)} to protect the double
+     * application of {@code @heap}.
      *
      * @param term
      * @param heap
@@ -1656,7 +1663,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      * @return
      */
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
-        if (explicitHeap.contains(term)) return term;
+        if (explicitHeap.contains(term))
+            return term;
         Term t = replaceHeap0(term, heap, ctx);
         markHeapAsExplicit(t);
         return t;
@@ -1665,14 +1673,17 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Term replaceHeap0(Term term, Term heap, ParserRuleContext ctx) {
         if (isSelectTerm(term)) {
             if (!isImplicitHeap(term.sub(0))) {
-                //semanticError(null, "Expecting program variable heap as first argument of: %s", term);
+                // semanticError(null, "Expecting program variable heap as first argument of: %s",
+                // term);
                 return term;
             }
-            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2)};
-            return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
+            Term[] params = new Term[] { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            return capsulateTf(ctx,
+                () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {
             if (!isImplicitHeap(term.sub(0))) {
-                semanticError(null, "Expecting program variable heap as first argument of: %s", term);
+                semanticError(null, "Expecting program variable heap as first argument of: %s",
+                    term);
             }
 
             Term[] params = new Term[term.arity()];
@@ -1682,7 +1693,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 params[i] = term.sub(i);
             }
 
-            return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
+            return capsulateTf(ctx,
+                () -> getServices().getTermFactory().createTerm(term.op(), params));
 
         }
         return term;
@@ -1693,7 +1705,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     protected Term heapSelectionSuffix(Term term, Term heap, ParserRuleContext ctx) {
         if (!isHeapTerm(heap)) {
-            semanticError(null, "Expecting term of type Heap but sort is %s for term %s", heap.sort(), term);
+            semanticError(null, "Expecting term of type Heap but sort is %s for term %s",
+                heap.sort(), term);
         }
         Term result = replaceHeap(term, heap, ctx);
         return result;
@@ -1735,9 +1748,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         final long packageEnd = i - 1;
         for (i = 0; i < parts.size(); i++) {
             String test = parts.stream()
-                    //.skip(packageEnd)
-                    .limit(i + packageEnd)
-                    .collect(Collectors.joining("."));
+                    // .skip(packageEnd)
+                    .limit(i + packageEnd).collect(Collectors.joining("."));
             kjt = getTypeByClassName(test);
             if (kjt != null) {
                 className = test;
@@ -1760,22 +1772,16 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private static class PairOfStringAndJavaBlock {
-    String opName;
-    JavaBlock javaBlock;
-}
+        String opName;
+        JavaBlock javaBlock;
+    }
 
-    /*private boolean isStaticAttribute(String dotName) {
-        final JavaInfo javaInfo = getJavaInfo();
-        String[] javaParts = splitJava(dotName);
-        KeYJavaType kjt = getTypeByClassName(javaParts[1]);
-        if (kjt != null) {
-            ProgramVariable maybeAttr = javaInfo.getAttribute(javaParts[2], kjt);
-            if (maybeAttr != null) {
-                return true;
-            }
-        }
-        return false;
-    }*/
+    /*
+     * private boolean isStaticAttribute(String dotName) { final JavaInfo javaInfo = getJavaInfo();
+     * String[] javaParts = splitJava(dotName); KeYJavaType kjt = getTypeByClassName(javaParts[1]);
+     * if (kjt != null) { ProgramVariable maybeAttr = javaInfo.getAttribute(javaParts[2], kjt); if
+     * (maybeAttr != null) { return true; } } return false; }
+     */
 }
 
 

@@ -12,37 +12,35 @@ public class ParserConfig {
     private Services services;
     private NamespaceSet nss;
 
-    
-    public ParserConfig(Services services, 
-			NamespaceSet nss) {
-	this.services = services;
-	this.nss      = nss;
+
+    public ParserConfig(Services services, NamespaceSet nss) {
+        this.services = services;
+        this.nss = nss;
     }
 
 
     public Services services() {
-	return services;
+        return services;
     }
 
     public NamespaceSet namespaces() {
-	return nss;
+        return nss;
     }
 
     public JavaInfo javaInfo() {
-	return services.getJavaInfo();
+        return services.getJavaInfo();
     }
 
     public KeYRecoderMapping keyRecoderMapping() {
-	return services.getJavaInfo().rec2key();
+        return services.getJavaInfo().rec2key();
     }
 
     public TypeConverter typeConverter() {
-	return services.getTypeConverter();
+        return services.getTypeConverter();
     }
 
     public KeYCrossReferenceServiceConfiguration serviceConfiguration() {
-	return services.getJavaInfo().
-	    getKeYProgModelInfo().getServConf();
+        return services.getJavaInfo().getKeYProgModelInfo().getServConf();
     }
 
 }

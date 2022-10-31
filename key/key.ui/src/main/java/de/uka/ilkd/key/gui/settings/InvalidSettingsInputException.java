@@ -16,25 +16,29 @@ public class InvalidSettingsInputException extends Exception {
         this.focusable = focusable;
     }
 
-    public InvalidSettingsInputException(String message, SettingsProvider panel, JComponent focusable) {
+    public InvalidSettingsInputException(String message, SettingsProvider panel,
+            JComponent focusable) {
         super(message);
         this.panel = panel;
         this.focusable = focusable;
     }
 
-    public InvalidSettingsInputException(String message, Throwable cause, SettingsProvider panel, JComponent focusable) {
+    public InvalidSettingsInputException(String message, Throwable cause, SettingsProvider panel,
+            JComponent focusable) {
         super(message, cause);
         this.panel = panel;
         this.focusable = focusable;
     }
 
-    public InvalidSettingsInputException(Throwable cause, SettingsProvider panel, JComponent focusable) {
+    public InvalidSettingsInputException(Throwable cause, SettingsProvider panel,
+            JComponent focusable) {
         super(cause);
         this.panel = panel;
         this.focusable = focusable;
     }
 
-    public InvalidSettingsInputException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, SettingsProvider panel, JComponent focusable) {
+    public InvalidSettingsInputException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace, SettingsProvider panel, JComponent focusable) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.panel = panel;
         this.focusable = focusable;

@@ -68,9 +68,9 @@ public class ExceptionDialog extends JDialog {
         ItemListener detailsBoxListener = e -> {
             Container contentPane = getContentPane();
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                contentPane.add(stScroll, new GridBagConstraints(0, 3, 1, 1, 1., 10.,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 0), 0, 0));
+                contentPane.add(stScroll,
+                    new GridBagConstraints(0, 3, 1, 1, 1., 10., GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
             } else {
                 contentPane.remove(stScroll);
             }
@@ -91,7 +91,7 @@ public class ExceptionDialog extends JDialog {
         detailsBox.addItemListener(detailsBoxListener);
 
         JPanel bPanel = new JPanel();
-//        bPanel.add(reloadButton); // XXX useful for debugging
+        // bPanel.add(reloadButton); // XXX useful for debugging
 
         JButton sendFeedbackButton = new JButton(new SendFeedbackAction(this, exception));
         bPanel.add(sendFeedbackButton);
@@ -148,20 +148,16 @@ public class ExceptionDialog extends JDialog {
         if (location != null) {
             // read the content via URLs openStream() method
             try (InputStream is = IOUtil.openStream(location.getFileURL().toString());
-                 InputStreamReader isr = new InputStreamReader(is);
-                 BufferedReader br = new BufferedReader(isr)) {
+                    InputStreamReader isr = new InputStreamReader(is);
+                    BufferedReader br = new BufferedReader(isr)) {
 
                 List<String> list = br.lines()
                         // optimization: read only as far as necessary
-                        .limit(location.getLine())
-                        .collect(Collectors.toList());
+                        .limit(location.getLine()).collect(Collectors.toList());
                 String line = list.get(location.getLine() - 1);
                 String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
-                message.append(StringUtil.NEW_LINE).
-                        append(StringUtil.NEW_LINE).
-                        append(line).
-                        append(StringUtil.NEW_LINE).
-                        append(pointLine);
+                message.append(StringUtil.NEW_LINE).append(StringUtil.NEW_LINE).append(line)
+                        .append(StringUtil.NEW_LINE).append(pointLine);
             } catch (IOException e) {
                 LOGGER.error("Creating an error line did not work for {}", location, e);
             }
@@ -219,23 +215,19 @@ public class ExceptionDialog extends JDialog {
         Container cp = getContentPane();
         cp.setLayout(new GridBagLayout());
 
-        cp.add(createExcTextAreaScroll(),
-                new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 0), 0, 0));
+        cp.add(createExcTextAreaScroll(), new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel locationPanel = createLocationPanel();
 
         if (locationPanel != null) {
             cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                    0, 0, 0, 0), 0, 0));
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
         }
 
         JPanel buttonPanel = createButtonPanel();
-        cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                0, 0, 0, 0), 0, 0));
+        cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0., GridBagConstraints.CENTER,
+            GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         stTextArea = createStacktraceTextArea();
         stScroll = createStacktraceTextAreaScroll();

@@ -109,9 +109,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     }
 
     /**
-     * Set text. The text becomes internalized such that
-     * x.getText().equals(y.getText()) is equivalent to x.getText()==y.getText()
-     * except for null Strings.
+     * Set text. The text becomes internalized such that x.getText().equals(y.getText()) is
+     * equivalent to x.getText()==y.getText() except for null Strings.
      *
      * @param text a string.
      */

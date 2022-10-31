@@ -25,8 +25,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /*
- * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel.
- * Might be used for additional search bars.
+ * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
+ * search bars.
  */
 public abstract class SearchBar extends JPanel {
 
@@ -39,8 +39,7 @@ public abstract class SearchBar extends JPanel {
     private JButton next;
     private JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
-            ColorSettings.define("[searchBar]alert", "",
-                    new Color(255, 178, 178));
+        ColorSettings.define("[searchBar]alert", "", new Color(255, 178, 178));
 
     public SearchBar() {
         prev = new JButton(IconFactory.previous(16));
@@ -79,10 +78,10 @@ public abstract class SearchBar extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        searchField.getDocument()
-                .addDocumentListener(new DocumentListener() {
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 search();
             }
@@ -95,23 +94,21 @@ public abstract class SearchBar extends JPanel {
                 search();
             }
         });
-        
+
         // prepare search buttons
-        
+
         Font font = prev.getFont().deriveFont(20.0f);
         prev.setFont(font);
         next.setFont(font);
         close.setFont(font);
-        
+
         prev.setToolTipText("Jump to previous match");
         next.setToolTipText("Jump to next match");
         close.setToolTipText("Close search bar");
-        
+
         Insets insets = new Insets(0, 4, 0, 4);
-        Border border = new CompoundBorder(
-                new LineBorder(Color.GRAY, 1),
-                new EmptyBorder(insets));
-        
+        Border border = new CompoundBorder(new LineBorder(Color.GRAY, 1), new EmptyBorder(insets));
+
         prev.setBorder(border);
         next.setBorder(border);
         close.setBorder(border);
@@ -133,8 +130,8 @@ public abstract class SearchBar extends JPanel {
 
     public abstract void searchNext();
 
-    /* The boolean return value of this function indicates,
-     * whether search was successful or not.
+    /*
+     * The boolean return value of this function indicates, whether search was successful or not.
      */
     public abstract boolean search(String s);
 
@@ -147,18 +144,18 @@ public abstract class SearchBar extends JPanel {
         }
     }
 
-    /* Override this method in case you want a custom UI
-     * for the search bar.
+    /*
+     * Override this method in case you want a custom UI for the search bar.
      */
     public void createUI() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         add(new JLabel("Search: "));
         add(searchField);
         add(prev);
-        prev.setMargin(new java.awt.Insets(2,1,2,1));
+        prev.setMargin(new java.awt.Insets(2, 1, 2, 1));
         add(next);
-        next.setMargin(new java.awt.Insets(2,1,2,1));
+        next.setMargin(new java.awt.Insets(2, 1, 2, 1));
         add(close);
-        close.setMargin(new java.awt.Insets(2,1,2,1));
+        close.setMargin(new java.awt.Insets(2, 1, 2, 1));
     }
 }

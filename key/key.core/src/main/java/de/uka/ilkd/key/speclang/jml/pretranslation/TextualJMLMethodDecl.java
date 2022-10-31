@@ -17,30 +17,26 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
 
     public TextualJMLMethodDecl(ImmutableList<String> mods,
-                                JmlParser.Method_declarationContext methodDefinition) {
+            JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
     }
 
     public String getParsableDeclaration() {
-        String m = mods.stream()
-                .map(it -> {
-                    if (JMLTransformer.javaMods.contains(it)) {
-                        return it;
-                    } else {
-                        return StringUtil.repeat(" ", it.length());
-                    }
-                })
-                .collect(Collectors.joining(" "));
+        String m = mods.stream().map(it -> {
+            if (JMLTransformer.javaMods.contains(it)) {
+                return it;
+            } else {
+                return StringUtil.repeat(" ", it.length());
+            }
+        }).collect(Collectors.joining(" "));
 
-        String paramsString = methodDefinition.param_list().param_decl()
-                .stream()
-                .map(it -> it.typespec().getText() +
-                        " " + it.p.getText() + StringUtil.repeat("[]", it.LBRACKET().size()))
+        String paramsString = methodDefinition.param_list().param_decl().stream()
+                .map(it -> it.typespec().getText() + " " + it.p.getText()
+                    + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
-        return String.format("%s %s %s (%s);",
-                m, methodDefinition.typespec().getText(),
-                getMethodName(), paramsString);
+        return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
+            getMethodName(), paramsString);
     }
 
     public JmlParser.Method_declarationContext getDecl() {
@@ -62,8 +58,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }

@@ -38,8 +38,8 @@ public class SettingsManager {
 
     static SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();
-        KeYGuiExtensionFacade.getSettingsProvider().forEach(it ->
-                sm.settingsProviders.add(it.getSettings()));
+        KeYGuiExtensionFacade.getSettingsProvider()
+                .forEach(it -> sm.settingsProviders.add(it.getSettings()));
         return sm;
     }
 
@@ -47,11 +47,11 @@ public class SettingsManager {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
             INSTANCE.add(STANDARD_UI_SETTINGS);
-            //INSTANCE.add(SHORTCUT_SETTINGS);
+            // INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
-            //INSTANCE.add(COLOR_SETTINGS);
+            // INSTANCE.add(COLOR_SETTINGS);
         }
         return INSTANCE;
     }
@@ -82,11 +82,11 @@ public class SettingsManager {
 
     public static ChoiceSettings getChoiceSettings(MainWindow window) {
         return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-/*        if (null != window.getMediator().getSelectedProof()) {
-            return window.getMediator().getSelectedProof().getSettings().getChoiceSettings();
-        } else {
-            return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        }*/
+        /*
+         * if (null != window.getMediator().getSelectedProof()) { return
+         * window.getMediator().getSelectedProof().getSettings().getChoiceSettings(); } else {
+         * return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings(); }
+         */
     }
 
     public static Properties loadProperties(File settingsFile) {
@@ -120,8 +120,8 @@ public class SettingsManager {
     }
 
     /**
-     * ensures that every given setting provider can update its model based on the current mainWindow.
-     * This also includes the children of the settings.
+     * ensures that every given setting provider can update its model based on the current
+     * mainWindow. This also includes the children of the settings.
      *
      * @param providers
      * @param mainWindow

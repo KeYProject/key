@@ -17,33 +17,30 @@ import de.uka.ilkd.key.proof.Node;
  * <li>#2: STRING the number of the branch which should be closed</li>
  * </ul>
  *
- * If #2 is not given or not a number, the TryClose macro is applied to all open
- * goals.
+ * If #2 is not given or not a number, the TryClose macro is applied to all open goals.
  */
-public class TryCloseCommand
-        extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
+public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
     public TryCloseCommand() {
         super(TryCloseArguments.class);
     }
 
-    @Override public TryCloseArguments evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override
+    public TryCloseArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         return ValueInjector.injection(this, new TryCloseArguments(), arguments);
     }
 
-    @Override public void execute(TryCloseArguments args)
-            throws ScriptException, InterruptedException {
+    @Override
+    public void execute(TryCloseArguments args) throws ScriptException, InterruptedException {
 
-        TryCloseMacro macro = args.steps == null ?
-                new TryCloseMacro() :
-                new TryCloseMacro(args.steps);
+        TryCloseMacro macro =
+            args.steps == null ? new TryCloseMacro() : new TryCloseMacro(args.steps);
 
         boolean branch = "branch".equals(args.branch);
         Node target;
         if (branch) {
             target = state.getFirstOpenAutomaticGoal().node();
-        }
-        else {
+        } else {
             try {
                 int num = Integer.parseInt(args.branch);
                 ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
@@ -60,18 +57,16 @@ public class TryCloseCommand
         try {
             macro.applyTo(uiControl, target, null, uiControl);
             if (args.assertClosed && !target.isClosed()) {
-                throw new ScriptException(
-                        "Could not close subtree of node " + target.serialNr());
+                throw new ScriptException("Could not close subtree of node " + target.serialNr());
             }
-        }
-        catch (Exception e) {
-            throw new ScriptException(
-                    "tryclose caused an exception: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ScriptException("tryclose caused an exception: " + e.getMessage(), e);
         }
 
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "tryclose";
     }
 

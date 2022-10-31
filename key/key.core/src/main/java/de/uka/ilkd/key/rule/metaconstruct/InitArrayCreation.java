@@ -30,9 +30,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Split an array creation expression with explicit array initializer, creating
- * a creation expression with dimension expression and a list of assignments (->
- * Java language specification, 15.10)
+ * Split an array creation expression with explicit array initializer, creating a creation
+ * expression with dimension expression and a list of assignments (-> Java language specification,
+ * 15.10)
  *
  * This meta construct delivers the creation expression
  */
@@ -41,32 +41,26 @@ public class InitArrayCreation extends InitArray {
     private final SchemaVariable newObjectSV;
     private final static String createArrayName = "<createArray>";
 
-    public InitArrayCreation(SchemaVariable newObjectSV,
-            ProgramElement newExpr) {
+    public InitArrayCreation(SchemaVariable newObjectSV, ProgramElement newExpr) {
         super("init-array-creation", newExpr);
         this.newObjectSV = newObjectSV;
     }
 
     /**
      * trying to create an array of negative length causes a
-     * {@link java.lang.NegativeArraySizeException} to be thrown. The if
-     * statement implementing this behaviour is created by this method.
+     * {@link java.lang.NegativeArraySizeException} to be thrown. The if statement implementing this
+     * behaviour is created by this method.
      *
-     * @param cond
-     *            the Expression representing the guard checking if the given
-     *            length is negative or not
-     * @param services
-     *            the Services offering access to the type model
-     * @return an if statement throwing a NegativeArraySizeException if cond is
-     *         evaluated to false
+     * @param cond the Expression representing the guard checking if the given length is negative or
+     *        not
+     * @param services the Services offering access to the type model
+     * @return an if statement throwing a NegativeArraySizeException if cond is evaluated to false
      */
     private If checkNegativeDimension(Expression cond, Services services) {
         final New exception = KeYJavaASTFactory.newOperator(
-            services.getJavaInfo()
-                    .getKeYJavaType("java.lang.NegativeArraySizeException"));
+            services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"));
 
-        return KeYJavaASTFactory.ifThen(cond,
-            KeYJavaASTFactory.throwClause(exception));
+        return KeYJavaASTFactory.ifThen(cond, KeYJavaASTFactory.throwClause(exception));
     }
 
     /**
@@ -76,45 +70,35 @@ public class InitArrayCreation extends InitArray {
      * <li>
      * <li>check if a dimension is non-negative</li>
      * </ol>
-     * and adds them to given list of statements. Further more the new declared
-     * program variables initialised with the evaluated dimension expressions
-     * are returned
+     * and adds them to given list of statements. Further more the new declared program variables
+     * initialised with the evaluated dimension expressions are returned
      *
-     * @param bodyStmnts
-     *            the LinkedList of statements where the new statements are
-     *            inserted
-     * @param dimExpr
-     *            the ArrayOf<Expression> which describe the array's dimensions
-     * @param services
-     *            the Services object
+     * @param bodyStmnts the LinkedList of statements where the new statements are inserted
+     * @param dimExpr the ArrayOf<Expression> which describe the array's dimensions
+     * @param services the Services object
      */
-    private ProgramVariable[] evaluateAndCheckDimensionExpressions(
-            LinkedList<Statement> bodyStmnts,
+    private ProgramVariable[] evaluateAndCheckDimensionExpressions(LinkedList<Statement> bodyStmnts,
             ImmutableArray<Expression> dimExpr, Services services) {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
         final VariableNamer varNamer = services.getVariableNamer();
-        final KeYJavaType intType = services.getJavaInfo()
-                .getKeYJavaType(PrimitiveType.JAVA_INT);
+        final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 
         for (int i = 0; i < pvars.length; i++) {
-            final ProgramElementName name = varNamer
-                    .getTemporaryNameProposal("dim" + i);
+            final ProgramElementName name = varNamer.getTemporaryNameProposal("dim" + i);
 
-            final LocalVariableDeclaration argDecl = KeYJavaASTFactory
-                    .declare(name, dimExpr.get(i), intType);
-            pvars[i] = (ProgramVariable) argDecl.getVariables().get(0)
-                    .getProgramVariable();
+            final LocalVariableDeclaration argDecl =
+                KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
+            pvars[i] = (ProgramVariable) argDecl.getVariables().get(0).getProgramVariable();
 
             bodyStmnts.add(argDecl);
-            final LessThan negativeDimension = KeYJavaASTFactory
-                    .lessThanZeroOperator(pvars[i]);
+            final LessThan negativeDimension = KeYJavaASTFactory.lessThanZeroOperator(pvars[i]);
             if (i == 0) {
                 checkDimensions = negativeDimension;
             } else {
-                checkDimensions = KeYJavaASTFactory
-                        .logicalOrOperator(checkDimensions, negativeDimension);
+                checkDimensions =
+                    KeYJavaASTFactory.logicalOrOperator(checkDimensions, negativeDimension);
             }
         }
 
@@ -126,46 +110,40 @@ public class InitArrayCreation extends InitArray {
     /**
      * creates an array of dimension <code>dimensions.length</code>
      */
-    private void createNDimensionalArray(LinkedList<Statement> bodyStmnts,
-            Expression resultVar, KeYJavaType arrayType,
-            ProgramVariable[] dimensions, Services services) {
+    private void createNDimensionalArray(LinkedList<Statement> bodyStmnts, Expression resultVar,
+            KeYJavaType arrayType, ProgramVariable[] dimensions, Services services) {
         assert dimensions.length > 0;
-        bodyStmnts.add(KeYJavaASTFactory.assign(resultVar, KeYJavaASTFactory
-                .methodCall(arrayType, createArrayName, dimensions[0])));
+        bodyStmnts.add(KeYJavaASTFactory.assign(resultVar,
+            KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
 
         if (dimensions.length > 1) {
             Expression[] baseDim = new Expression[dimensions.length - 1];
             System.arraycopy(dimensions, 1, baseDim, 0, dimensions.length - 1);
             final VariableNamer varNamer = services.getVariableNamer();
-            final KeYJavaType intType = services.getJavaInfo()
-                    .getKeYJavaType(PrimitiveType.JAVA_INT);
-            final ProgramElementName name = varNamer
-                    .getTemporaryNameProposal("i");
-            final LocalVariableDeclaration forInit = KeYJavaASTFactory
-                    .declare(name, KeYJavaASTFactory.zeroLiteral(), intType);
+            final KeYJavaType intType =
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            final ProgramElementName name = varNamer.getTemporaryNameProposal("i");
+            final LocalVariableDeclaration forInit =
+                KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(), intType);
 
-            final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
-                    .get(0).getProgramVariable();
+            final ProgramVariable pv =
+                (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
-            TypeReference baseTypeRef = ((ArrayType) arrayType.getJavaType())
-                    .getBaseType();
+            TypeReference baseTypeRef = ((ArrayType) arrayType.getJavaType()).getBaseType();
             final KeYJavaType baseType = baseTypeRef.getKeYJavaType();
 
             for (int i = 0; i < dimensions.length - 1; i++) {
-                ArrayType at = (ArrayType) baseTypeRef.getKeYJavaType()
-                        .getJavaType();
+                ArrayType at = (ArrayType) baseTypeRef.getKeYJavaType().getJavaType();
                 baseTypeRef = at.getBaseType();
             }
 
-            final For forLoop = KeYJavaASTFactory.forLoop(
-                KeYJavaASTFactory.loopInit(forInit),
+            final For forLoop = KeYJavaASTFactory.forLoop(KeYJavaASTFactory.loopInit(forInit),
                 KeYJavaASTFactory.lessThanGuard(pv, dimensions[0]),
                 KeYJavaASTFactory.postIncrementForUpdates(pv),
                 KeYJavaASTFactory.assign(
-                    KeYJavaASTFactory
-                            .arrayFieldAccess((ReferencePrefix) resultVar, pv),
-                    KeYJavaASTFactory.newArray(baseTypeRef,
-                        dimensions.length - 1, baseDim, baseType)));
+                    KeYJavaASTFactory.arrayFieldAccess((ReferencePrefix) resultVar, pv),
+                    KeYJavaASTFactory.newArray(baseTypeRef, dimensions.length - 1, baseDim,
+                        baseType)));
 
             bodyStmnts.add(forLoop);
         }
@@ -174,18 +152,17 @@ public class InitArrayCreation extends InitArray {
     /**
      * executes an array creation without initializers involved
      */
-    private ProgramElement arrayCreationWithoutInitializers(
-            Expression newObject, NewArray na, Services services) {
+    private ProgramElement arrayCreationWithoutInitializers(Expression newObject, NewArray na,
+            Services services) {
 
         final LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();
 
-        final ProgramVariable[] dimensions = evaluateAndCheckDimensionExpressions(
-            bodyStmnts, na.getArguments(), services);
+        final ProgramVariable[] dimensions =
+            evaluateAndCheckDimensionExpressions(bodyStmnts, na.getArguments(), services);
 
         final KeYJavaType arrayType = na.getKeYJavaType(services);
 
-        createNDimensionalArray(bodyStmnts, newObject, arrayType, dimensions,
-            services);
+        createNDimensionalArray(bodyStmnts, newObject, arrayType, dimensions, services);
 
         return KeYJavaASTFactory.block(bodyStmnts);
     }
@@ -194,8 +171,7 @@ public class InitArrayCreation extends InitArray {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
-        final Expression array = (Expression) svInst
-                .getInstantiation(newObjectSV);
+        final Expression array = (Expression) svInst.getInstantiation(newObjectSV);
 
         NewArray na = null;
 
@@ -206,8 +182,7 @@ public class InitArrayCreation extends InitArray {
                     arrayCreationWithoutInitializers(array, na, services) };
             }
         } else if (pe instanceof ArrayInitializer) {
-            final KeYJavaType kjt = array.getKeYJavaType(services,
-                svInst.getExecutionContext());
+            final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
             final ArrayInitializer init = (ArrayInitializer) pe;
             ArrayType arrayType = null;
             try {
@@ -237,11 +212,9 @@ public class InitArrayCreation extends InitArray {
         final Statement[] body = new Statement[2 * arrayLength + 1];
         final ProgramVariable[] vars = evaluateInitializers(body, na, services);
 
-        body[arrayLength] = KeYJavaASTFactory.assign(array,
-            createArrayCreation(na));
+        body[arrayLength] = KeYJavaASTFactory.assign(array, createArrayCreation(na));
 
-        createArrayAssignments(arrayLength + 1, body, vars,
-            (ReferencePrefix) array, na);
+        createArrayAssignments(arrayLength + 1, body, vars, (ReferencePrefix) array, na);
 
         return new ProgramElement[] { KeYJavaASTFactory.block(body) };
     }

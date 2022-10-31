@@ -12,14 +12,12 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
- * Takes care of providing the whole ProofMacro interface by only making it
- * necessary to implement to most general application methods for a given
- * list of goals and translating the less general versions (firstly for a
- * given node and secondly having neither any goals nor a node). Although
- * all these methods can be redefined by inheritance, this is usually not
- * necessary, unless you know <tt>exactly</tt> what you are doing.
- * The exception is {@link #finishAfterMacro()} for compound macros
- * (see description in {@link ProofMacro#finishAfterMacro()}).
+ * Takes care of providing the whole ProofMacro interface by only making it necessary to implement
+ * to most general application methods for a given list of goals and translating the less general
+ * versions (firstly for a given node and secondly having neither any goals nor a node). Although
+ * all these methods can be redefined by inheritance, this is usually not necessary, unless you know
+ * <tt>exactly</tt> what you are doing. The exception is {@link #finishAfterMacro()} for compound
+ * macros (see description in {@link ProofMacro#finishAfterMacro()}).
  *
  * @author Michael Kirsten
  */
@@ -37,8 +35,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     /**
      * {@inheritDoc}
      *
-     * By default, proof macros do not support scripts, thus <code>null</code>
-     * is returned.
+     * By default, proof macros do not support scripts, thus <code>null</code> is returned.
      */
     @Override
     public String getScriptCommandName() {
@@ -51,11 +48,10 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public void setParameter(String paramName, String paramValue)
-            throws IllegalArgumentException {
+    public void setParameter(String paramName, String paramValue) throws IllegalArgumentException {
         throw new IllegalArgumentException(
-                String.format("There is no parameter of name %s in macro %s",
-                        paramName, this.getClass().getSimpleName()));
+            String.format("There is no parameter of name %s in macro %s", paramName,
+                this.getClass().getSimpleName()));
     }
 
     @Override
@@ -63,33 +59,29 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Node node,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Node node,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
+            PosInOccurrence posInOcc, ProverTaskListener listener)
+            throws InterruptedException, Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 
     /**
-     * Gets the maximum number of rule applications allowed for a macro. The
-     * implementation is the maximum amount of proof steps for automatic mode.
+     * Gets the maximum number of rule applications allowed for a macro. The implementation is the
+     * maximum amount of proof steps for automatic mode.
      *
      * @return the maximum number of rule applications allowed for this macro
      */
     final protected int getMaxSteps(Proof proof) {
         final int steps;
         if (proof != null) {
-            steps = proof.getSettings()
-                         .getStrategySettings().getMaxSteps();
+            steps = proof.getSettings().getStrategySettings().getMaxSteps();
         } else {
-            steps = ProofSettings.DEFAULT_SETTINGS
-                    .getStrategySettings().getMaxSteps();
+            steps = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
         return steps;
     }

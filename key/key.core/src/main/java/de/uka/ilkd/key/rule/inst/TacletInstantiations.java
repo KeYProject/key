@@ -7,36 +7,32 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
-/** 
- * this class contains a Taclet together with its suggested
- * instantiations. 
+/**
+ * this class contains a Taclet together with its suggested instantiations.
  */
 public class TacletInstantiations {
 
     /** the rule */
     private Taclet rule;
     /** the instantations */
-    private ImmutableMap<SchemaVariable,Term> instantiations;
+    private ImmutableMap<SchemaVariable, Term> instantiations;
 
-    public TacletInstantiations(Taclet rule,
-			      ImmutableMap<SchemaVariable,Term> instantiations) 
-    {
-	this.rule=rule;
-	this.instantiations=instantiations;
+    public TacletInstantiations(Taclet rule, ImmutableMap<SchemaVariable, Term> instantiations) {
+        this.rule = rule;
+        this.instantiations = instantiations;
     }
 
     public Taclet taclet() {
-	return rule;
+        return rule;
     }
 
-    public ImmutableMap<SchemaVariable,Term> instantiations()
-    {
-	return instantiations;
+    public ImmutableMap<SchemaVariable, Term> instantiations() {
+        return instantiations;
     }
 
     public String toString() {
-	return "rule: "+taclet()+ "; instantiation: "+instantiations();
+        return "rule: " + taclet() + "; instantiation: " + instantiations();
     }
 
-    
+
 }

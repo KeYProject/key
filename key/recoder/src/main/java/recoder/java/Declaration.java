@@ -26,7 +26,7 @@ public interface Declaration extends NonTerminalProgramElement {
      *
      * @param m the new (original) list of modifiers.
      */
-    //void setModifiers(ModifierMutableList m);
+    // void setModifiers(ModifierMutableList m);
 
     ASTList<DeclarationSpecifier> getDeclarationSpecifiers();
 

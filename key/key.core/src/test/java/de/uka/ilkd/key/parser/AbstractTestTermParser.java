@@ -54,9 +54,7 @@ public class AbstractTestTermParser {
     }
 
     public void parseDecls(String content) throws IOException {
-        io.load(content).parseFile()
-                .loadDeclarations()
-                .loadSndDegreeDeclarations();
+        io.load(content).parseFile().loadDeclarations().loadSndDegreeDeclarations();
     }
 
     public Term parseProblem(String s) {
@@ -94,69 +92,67 @@ public class AbstractTestTermParser {
      * Remove whitespaces before executing
      * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
      */
-    protected static void  assertEqualsIgnoreWhitespaces(String expected, String actual) {
+    protected static void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
-    protected static void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
-        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""),
-                message);
+    protected static void assertEqualsIgnoreWhitespaces(String message, String expected,
+            String actual) {
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""), message);
     }
 
-    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult)
+            throws IOException {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
-        String message = "\nAssertion failed while pretty-printing a term:\n"
-                + expectedParseResult
-                + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
-                + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
-                + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        String message = "\nAssertion failed while pretty-printing a term:\n" + expectedParseResult
+            + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
+            + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
+            + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
-    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) throws Exception {
+    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax)
+            throws Exception {
         // check whether parsing pretty-syntax produces the correct term
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
-        String message = "\nAssertion failed while parsing pretty syntax. "
-                + "Parsed string \"" + expectedPrettySyntax + "\", which results in term:\n"
-                + parsedPrettySyntax + "\nBut expected parse result is:\n"
-                + expectedParseResult + "\n";
+        String message = "\nAssertion failed while parsing pretty syntax. " + "Parsed string \""
+            + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
+            + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
         assertEquals(expectedParseResult, parsedPrettySyntax, message);
     }
 
     /**
-     * Takes two different String representations for the same term and checks
-     * whether they result in the same {@link Term} after parsing. Subsequently,
-     * the {@link Term} is printed back to a {@link String} and compared with
-     * the first argument. The first argument is expected to be in
+     * Takes two different String representations for the same term and checks whether they result
+     * in the same {@link Term} after parsing. Subsequently, the {@link Term} is printed back to a
+     * {@link String} and compared with the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax                  {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax                 {@link Term} in verbose syntax.
-     * @param optionalStringRepresentations Optionally, additional String
-     *                                      representations will be tested for correct parsing.
+     * @param prettySyntax {@link Term} representation in pretty-syntax.
+     * @param verboseSyntax {@link Term} in verbose syntax.
+     * @param optionalStringRepresentations Optionally, additional String representations will be
+     *        tested for correct parsing.
      * @throws IOException
      */
-    protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
-                                                           String... optionalStringRepresentations) throws Exception {
+    protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
+            String verboseSyntax, String... optionalStringRepresentations) throws Exception {
         Term expectedParseResult = parseTerm(verboseSyntax);
-        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
+        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult,
+            optionalStringRepresentations);
     }
 
     /**
-     * Takes a {@link String} and a {@link Term} and checks whether they can be
-     * transformed into each other by the operations parsing and printing.
+     * Takes a {@link String} and a {@link Term} and checks whether they can be transformed into
+     * each other by the operations parsing and printing.
      *
-     * @param prettySyntax                  Expected result after pretty-printing
-     *                                      {@code expectedParseResult}.
-     * @param expectedParseResult           Expected result after parsing
-     *                                      {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String
-     *                                      representations will be tested for correct parsing.
+     * @param prettySyntax Expected result after pretty-printing {@code expectedParseResult}.
+     * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations Optionally, additional String representations will be
+     *        tested for correct parsing.
      * @throws IOException
      */
-    protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
-                                                                        String... optionalStringRepresentations) throws Exception {
+    protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
+            Term expectedParseResult, String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);
         verifyPrettyPrinting(prettySyntax, expectedParseResult);
@@ -170,8 +166,8 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-                + File.separator + "termParser" + File.separator + "parserTest.key");
+        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+            + "termParser" + File.separator + "parserTest.key");
         return HelperClassForTests.createServices(keyFile);
     }
 

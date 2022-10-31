@@ -11,35 +11,36 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Returns zero iff the position of a rule application is not in the scope of a
- * modal operator (a program block or an update). Note that terms and formulas
- * within (but not behind) updates are not in the scope of the update
+ * Returns zero iff the position of a rule application is not in the scope of a modal operator (a
+ * program block or an update). Note that terms and formulas within (but not behind) updates are not
+ * in the scope of the update
  */
 public class NotInScopeOfModalityFeature extends BinaryFeature {
 
-    public static final Feature INSTANCE = new NotInScopeOfModalityFeature ();
+    public static final Feature INSTANCE = new NotInScopeOfModalityFeature();
 
-    private NotInScopeOfModalityFeature () {}
-    
+    private NotInScopeOfModalityFeature() {}
+
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+        Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
-        return !inScopeOfModality ( pos );
+        return !inScopeOfModality(pos);
     }
 
-    private boolean inScopeOfModality (PosInOccurrence pos) {
-        final PIOPathIterator it = pos.iterator ();
+    private boolean inScopeOfModality(PosInOccurrence pos) {
+        final PIOPathIterator it = pos.iterator();
 
-        while ( it.next () != -1 ) {
-            final Operator op = it.getSubTerm ().op();
-            
-            if ( op instanceof Modality ) return true;
-            if ( op instanceof UpdateApplication ) {
-                if ( it.getChild () == UpdateApplication.targetPos () ) return true;
+        while (it.next() != -1) {
+            final Operator op = it.getSubTerm().op();
+
+            if (op instanceof Modality)
+                return true;
+            if (op instanceof UpdateApplication) {
+                if (it.getChild() == UpdateApplication.targetPos())
+                    return true;
             }
         }
-        
+
         return false;
     }
 

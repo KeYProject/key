@@ -43,7 +43,7 @@ public class While extends LoopStatement {
      * While.
      *
      * @param guard an expression.
-     * @param body  a statement.
+     * @param body a statement.
      */
 
     public While(Expression guard, Statement body) {

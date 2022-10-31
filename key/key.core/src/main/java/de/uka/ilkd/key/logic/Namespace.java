@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 
 /**
- * A Namespace keeps track of already used {@link Name}s and the objects
- * carrying these names. These objects have to implement the interface
- * {@link Named}. It is possible to have nested namespaces in order to
- * represent different visibility scopes.
+ * A Namespace keeps track of already used {@link Name}s and the objects carrying these names. These
+ * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
+ * in order to represent different visibility scopes.
  */
 public class Namespace<E extends Named> implements java.io.Serializable {
 
@@ -29,14 +28,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     private Namespace<E> parent;
 
     /**
-     * The map that maps a name to a symbols of that name if it is defined in
-     * this Namespace.
+     * The map that maps a name to a symbols of that name if it is defined in this Namespace.
      */
     private Map<Name, E> symbols;
 
     /**
-     * A namespace can be made immutable, this is called "sealing". This flag
-     * indicates whether this namespace has been sealed or not.
+     * A namespace can be made immutable, this is called "sealing". This flag indicates whether this
+     * namespace has been sealed or not.
      */
     private boolean sealed;
 
@@ -48,42 +46,41 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /**
-     * Construct a Namespace that uses <code>parent</code> as a fallback
-     * for finding symbols not defined in this one.
+     * Construct a Namespace that uses <code>parent</code> as a fallback for finding symbols not
+     * defined in this one.
      */
     public Namespace(Namespace<E> parent) {
         this.parent = parent;
     }
 
     /**
-     * Adds the object <code>sym</code> to this Namespace.
-     * If an object with the same name is already there, it is quietly
-     * replaced by <code>sym</code>. Use addSafely() instead if possible.
+     * Adds the object <code>sym</code> to this Namespace. If an object with the same name is
+     * already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
+     * possible.
      *
-     * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.
-     *   (This is no longer self-explanatory. mu 2016)
+     * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
+     * no longer self-explanatory. mu 2016)
      *
-     * If the local table is empty, then the new symbol is added as
-     * "singleton map". This has been adapted from an earlier
-     * implementation, done for memory efficiency reasons: Many namespaces
-     * only contain a single element; no need to allocate a hash map.
-     * The hash map is only created when the 2nd element is added.
+     * If the local table is empty, then the new symbol is added as "singleton map". This has been
+     * adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
+     * only contain a single element; no need to allocate a hash map. The hash map is only created
+     * when the 2nd element is added.
      *
      * This is not threadsafe.
      */
     public void add(E sym) {
 
-        if(sealed) {
+        if (sealed) {
             LOGGER.warn("Namespace is SEALED");
-            throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
+            throw new IllegalStateException(
+                "This namespace has been sealed; addition is not possible.");
         }
 
-        /* TODO ulbrich: Investigate in a future version
-        Named old = lookup(sym.name());
-        if(old != null && old != sym) {
-            LOGGER.warn("Clash! Name already used: " + sym.name().toString());
-        }
-        */
+        /*
+         * TODO ulbrich: Investigate in a future version Named old = lookup(sym.name()); if(old !=
+         * null && old != sym) { LOGGER.warn("Clash! Name already used: " + sym.name().toString());
+         * }
+         */
 
         if (symbols == null) {
             symbols = Collections.singletonMap(sym.name(), sym);
@@ -107,15 +104,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /**
-     * Adds the object <code>sym</code> to this namespace.
-     * Throws a runtime exception if an object with the same name is
-     * already there.
+     * Adds the object <code>sym</code> to this namespace. Throws a runtime exception if an object
+     * with the same name is already there.
      */
     public void addSafely(E sym) {
         Named old = lookup(sym.name());
-        if(old != null && old != sym) {
-            throw new RuntimeException("Name already in namespace: "
-                                       + sym.name());
+        if (old != null && old != sym) {
+            throw new RuntimeException("Name already in namespace: " + sym.name());
         }
 
         add(sym);
@@ -134,13 +129,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      *
      * @param name non-null name whose symbol is to be removed.
      */
-    public void remove(Name name){
-        if(symbols != null){
+    public void remove(Name name) {
+        if (symbols != null) {
             symbols.remove(name);
         }
     }
 
-    protected E lookupLocally(Name name){
+    protected E lookupLocally(Name name) {
         if (symbols != null) {
             return symbols.get(name);
         } else {
@@ -149,8 +144,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
 
-    /** creates a new Namespace that has this as parent, and contains
-     * an entry for <code>sym</code>.
+    /**
+     * creates a new Namespace that has this as parent, and contains an entry for <code>sym</code>.
+     *
      * @return the new Namespace
      */
     public Namespace<E> extended(E sym) {
@@ -163,13 +159,12 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         return result;
     }
 
-   /**
-    * looks if a registered object is declared in this namespace, if
-    * negative it asks its parent
-    * @param name a Name representing the name of the symbol to look for
-    * @return Object with name "name" or null if no such an object
-    * has been found
-    */
+    /**
+     * looks if a registered object is declared in this namespace, if negative it asks its parent
+     *
+     * @param name a Name representing the name of the symbol to look for
+     * @return Object with name "name" or null if no such an object has been found
+     */
     public @Nullable E lookup(Name name) {
         E symbol = lookupLocally(name);
         if (symbol != null) {
@@ -184,49 +179,53 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /** Convenience method to look up. */
-    public E lookup(String name){
+    public E lookup(String name) {
         return lookup(new Name(name));
     }
 
-    /** returns list of the elements (not the keys) in this
-     * namespace (not about the one of the parent)
+    /**
+     * returns list of the elements (not the keys) in this namespace (not about the one of the
+     * parent)
+     *
      * @return the list of the named objects
      */
     public Collection<E> elements() {
-        if(symbols == null) {
+        if (symbols == null) {
             return Collections.emptyList();
         } else {
-        return Collections.unmodifiableCollection(symbols.values());
-    }
+            return Collections.unmodifiableCollection(symbols.values());
+        }
     }
 
 
     public Collection<E> allElements() {
-	if (parent==null) {
-	    return new ArrayList<>(elements());
-	} else {
-	    Collection<E> result = parent().allElements();
-	    result.addAll(elements());
-	    return result;
-	}
+        if (parent == null) {
+            return new ArrayList<>(elements());
+        } else {
+            Collection<E> result = parent().allElements();
+            result.addAll(elements());
+            return result;
+        }
     }
 
-    /** returns the fall-back Namespace of this Namespace, i.e. the one
-     * where symbols are looked up that are not found in this one.
+    /**
+     * returns the fall-back Namespace of this Namespace, i.e. the one where symbols are looked up
+     * that are not found in this one.
      */
     public Namespace<E> parent() {
-	return parent;
+        return parent;
     }
 
     public String toString() {
-	String res="Namespace: [local:" + symbols;
-	if (parent!=null) res=res+"; parent:"+parent;
-	return res+"]";
+        String res = "Namespace: [local:" + symbols;
+        if (parent != null)
+            res = res + "; parent:" + parent;
+        return res + "]";
     }
 
     public Namespace<E> copy() {
         Namespace<E> copy = new Namespace<>(parent);
-        if(symbols != null)
+        if (symbols != null)
             copy.add(symbols.values());
 
         return copy;
@@ -281,7 +280,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         for (E element : elements()) {
             parent.add(element);
         }
-//      all symbols are contained in parent now ... we are empty again.
+        // all symbols are contained in parent now ... we are empty again.
         symbols = null;
     }
 

@@ -90,8 +90,8 @@ public class Positive extends Operator {
     }
 
     /**
-     * Checks if this operator is left or right associative. Ordinary unary
-     * operators are right associative.
+     * Checks if this operator is left or right associative. Ordinary unary operators are right
+     * associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.

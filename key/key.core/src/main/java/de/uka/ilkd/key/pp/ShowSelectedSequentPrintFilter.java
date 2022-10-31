@@ -28,7 +28,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     }
 
     @Override
-    protected void filterSequent() { }
+    protected void filterSequent() {}
 
     @Override
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
@@ -52,8 +52,8 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
      * An Entry in {@link accessibility} {@link ShowSelectedSequentPrintFilter}.
      *
      * The only entry created for such a filter contains the sub-term at the specified position as
-     * filtered term ({@link #getFilteredFormula()}) and that sub-term's top-level term as
-     * the original ({@link #getOriginalFormula()}).
+     * filtered term ({@link #getFilteredFormula()}) and that sub-term's top-level term as the
+     * original ({@link #getOriginalFormula()}).
      *
      * @author lanzinger
      */

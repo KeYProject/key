@@ -7,6 +7,7 @@ public interface NodeChange {
 
     /**
      * provides position information about the change
+     *
      * @return position of change
      */
     PosInOccurrence getPos();

@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
- *  The JML modifier "two_state".
+ * The JML modifier "two_state".
  */
 public class TwoState extends Modifier {
 
@@ -14,7 +14,7 @@ public class TwoState extends Modifier {
 
 
     public TwoState(ExtList children) {
-        super (children);
+        super(children);
     }
 
 

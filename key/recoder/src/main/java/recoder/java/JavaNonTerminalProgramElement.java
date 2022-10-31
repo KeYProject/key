@@ -11,7 +11,8 @@ import recoder.convenience.TreeWalker;
  * @author AL
  */
 
-public abstract class JavaNonTerminalProgramElement extends JavaProgramElement implements NonTerminalProgramElement {
+public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
+        implements NonTerminalProgramElement {
 
     /**
      * Java program element.
@@ -40,8 +41,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
     }
 
     /**
-     * Defaults to attempt a depth-first traversal using a
-     * {@link recoder.convenience.TreeWalker}.
+     * Defaults to attempt a depth-first traversal using a {@link recoder.convenience.TreeWalker}.
      */
 
     public void makeAllParentRolesValid() {
@@ -54,12 +54,10 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
     /**
      * Extracts the index of a child from its position code.
      * <p>
-     * This method does not return the child index as received by
-     * getIndexOfChild(), but rather the index within internal data
-     * structure representation.
+     * This method does not return the child index as received by getIndexOfChild(), but rather the
+     * index within internal data structure representation.
      * <p>
-     * Therefore it is common that
-     * <code>getIndexOfChild(getChildPositionCode(aChild))
+     * Therefore it is common that <code>getIndexOfChild(getChildPositionCode(aChild))
      * != getIndexOfChild(aChild)</code>
      * <p>
      * This method is deprecated as of 0.75
@@ -85,8 +83,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
     }
 
     /**
-     * Returns the index of the given child, or <CODE>-1</CODE> if there is no
-     * such child. The child is searched for by identity: <CODE>
+     * Returns the index of the given child, or <CODE>-1</CODE> if there is no such child. The child
+     * is searched for by identity: <CODE>
      * getChildAt(getIndexOfChild(x)) == x</CODE>.
      *
      * @param child the exact child to look for.

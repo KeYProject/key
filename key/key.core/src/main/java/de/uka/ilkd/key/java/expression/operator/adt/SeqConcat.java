@@ -30,10 +30,10 @@ public class SeqConcat extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSeqConcat(this);
+        v.performActionOnSeqConcat(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqConcat(this);
     }

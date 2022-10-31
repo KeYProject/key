@@ -9,7 +9,8 @@ import java.beans.PropertyChangeListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-class SequentViewChangeListener implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
+class SequentViewChangeListener
+        implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
 
     private final SequentView sequentView;
 
@@ -21,7 +22,8 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
         // reprint sequent
         int lw = sequentView.computeLineWidth();
         if (lw != SequentView.getLineWidth()) {
-            // When switching sequents, ancestorResized is called while the sequentView has an empty rect
+            // When switching sequents, ancestorResized is called while the sequentView has an empty
+            // rect
             // Skip this repaint
             if (!sequentView.getVisibleRect().isEmpty()) {
                 SequentView.setLineWidth(lw);

@@ -9,21 +9,17 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public final class AddCast extends AbstractTermTransformer {
-    
+
     public AddCast() {
         super(new Name("#addCast"), 2);
     }
-    
+
 
     @Override
-    public Term transform(Term term, 
-	    		  SVInstantiations svInst, 
-	    		  Services services ) {
-	Term sub = term.sub(0);
-	Sort sort = term.sub(1).sort();
-	
-	return sub.sort().extendsTrans(sort) 
-	       ? sub 
-	       : services.getTermBuilder().cast(sort, sub);
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
+        Term sub = term.sub(0);
+        Sort sort = term.sub(1).sort();
+
+        return sub.sort().extendsTrans(sort) ? sub : services.getTermBuilder().cast(sort, sub);
     }
 }

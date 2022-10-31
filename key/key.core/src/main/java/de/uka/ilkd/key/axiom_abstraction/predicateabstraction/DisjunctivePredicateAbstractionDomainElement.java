@@ -6,29 +6,29 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
 /**
- * An abstract domain element for a predicate abstraction lattice based on the
- * disjunction of predicates.
+ * An abstract domain element for a predicate abstraction lattice based on the disjunction of
+ * predicates.
  *
  * @author Dominic Scheurer
  */
-public class DisjunctivePredicateAbstractionDomainElement extends
-        AbstractPredicateAbstractionDomainElement {
+public class DisjunctivePredicateAbstractionDomainElement
+        extends AbstractPredicateAbstractionDomainElement {
 
     /**
      * The bottom element of any predicate abstraction lattice.
      */
     public static final DisjunctivePredicateAbstractionDomainElement BOTTOM =
-            new DisjunctivePredicateAbstractionDomainElement(false);
+        new DisjunctivePredicateAbstractionDomainElement(false);
 
     /**
      * The top element of any predicate abstraction lattice.
      */
     public static final DisjunctivePredicateAbstractionDomainElement TOP =
-            new DisjunctivePredicateAbstractionDomainElement(true);
+        new DisjunctivePredicateAbstractionDomainElement(true);
 
     /**
-     * Constructs a new {@link DisjunctivePredicateAbstractionDomainElement}
-     * from a given list of abstraction predicates.
+     * Constructs a new {@link DisjunctivePredicateAbstractionDomainElement} from a given list of
+     * abstraction predicates.
      */
     public DisjunctivePredicateAbstractionDomainElement(
             final ImmutableSet<AbstractionPredicate> predicates) {
@@ -36,9 +36,8 @@ public class DisjunctivePredicateAbstractionDomainElement extends
     }
 
     /**
-     * Constructs a new {@link DisjunctivePredicateAbstractionDomainElement}
-     * that is a top element if isTopElem is set to true; otherwise, it is a
-     * bottom element.
+     * Constructs a new {@link DisjunctivePredicateAbstractionDomainElement} that is a top element
+     * if isTopElem is set to true; otherwise, it is a bottom element.
      */
     private DisjunctivePredicateAbstractionDomainElement(boolean isTopElem) {
         super(isTopElem);
@@ -56,17 +55,15 @@ public class DisjunctivePredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
         return obj instanceof DisjunctivePredicateAbstractionDomainElement
-                && (this != TOP || obj == TOP)
-                && (this != BOTTOM || obj == BOTTOM)
+                && (this != TOP || obj == TOP) && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(
-                        ((DisjunctivePredicateAbstractionDomainElement) obj)
-                                .getPredicates());
+                    ((DisjunctivePredicateAbstractionDomainElement) obj).getPredicates());
     }
 
     @Override

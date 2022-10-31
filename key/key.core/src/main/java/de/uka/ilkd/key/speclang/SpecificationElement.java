@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 
 
 /**
- * Common superinterface of all constructs created by the specification
- * language front ends and managed by SpecificationRepository.
+ * Common superinterface of all constructs created by the specification language front ends and
+ * managed by SpecificationRepository.
  */
 public interface SpecificationElement {
 
@@ -33,8 +33,8 @@ public interface SpecificationElement {
 
 
     /**
-     * Returns the KeYJavaType representing the class/interface to which the
-     * specification element belongs.
+     * Returns the KeYJavaType representing the class/interface to which the specification element
+     * belongs.
      */
     public KeYJavaType getKJT();
 

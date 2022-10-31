@@ -17,18 +17,18 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * <p>
- *  A UI component showing additional information about a {@link Node} in the current {@link Proof}.
+ * A UI component showing additional information about a {@link Node} in the current {@link Proof}.
  * </p>
  *
  * @author lanzinger
  */
-public abstract class NodeInfoVisualizer
-        extends JComponent implements Comparable<NodeInfoVisualizer> {
+public abstract class NodeInfoVisualizer extends JComponent
+        implements Comparable<NodeInfoVisualizer> {
     private static final long serialVersionUID = 4205276651552216532L;
 
     /** @see #getInstances(Node) */
     private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
-            new HashMap<>();
+        new HashMap<>();
 
     /**
      * @see #addListener(NodeInfoVisualizerListener)
@@ -61,12 +61,12 @@ public abstract class NodeInfoVisualizer
     }
 
     /**
-     * Returns {@code true} iff there are any open {@code NodeInfoWindow}s
-     * associated with the specified node.
+     * Returns {@code true} iff there are any open {@code NodeInfoWindow}s associated with the
+     * specified node.
      *
      * @param node a node.
-     * @return {@code true} iff there are any open {@code NodeInfoWindow}s
-     *  associated with the specified node.
+     * @return {@code true} iff there are any open {@code NodeInfoWindow}s associated with the
+     *         specified node.
      */
     public static boolean hasInstances(Node node) {
         return !getInstances(node).isEmpty();
@@ -79,9 +79,9 @@ public abstract class NodeInfoVisualizer
      * @return the set of open {@code NodeInfoWindow}s associated with the specified node.
      */
     public static SortedSet<NodeInfoVisualizer> getInstances(Node node) {
-        return Collections.unmodifiableSortedSet(instances
-                .getOrDefault(node.proof().name(), Collections.emptyMap())
-                .getOrDefault(node.serialNr(), Collections.emptySortedSet()));
+        return Collections.unmodifiableSortedSet(
+            instances.getOrDefault(node.proof().name(), Collections.emptyMap())
+                    .getOrDefault(node.serialNr(), Collections.emptySortedSet()));
     }
 
     /**

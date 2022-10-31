@@ -13,8 +13,7 @@ public class Trigger {
     private final SchemaVariable triggerVar;
 
 
-    public Trigger(SchemaVariable triggerVar, Term trigger,  
-            ImmutableList<Term> avoidConditions) {
+    public Trigger(SchemaVariable triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
         assert triggerVar != null;
         assert trigger != null;
         assert avoidConditions != null;

@@ -6,25 +6,23 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
- * Feature that returns zero iff one term is smaller than another term in the
- * current term ordering
+ * Feature that returns zero iff one term is smaller than another term in the current term ordering
  */
 public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm left, right;
 
     public static Feature create(ProjectionToTerm left, ProjectionToTerm right) {
-        return new TermSmallerThanFeature ( left, right );
+        return new TermSmallerThanFeature(left, right);
     }
-    
+
     private TermSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right) {
         this.left = left;
         this.right = right;
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return lessThan ( left.toTerm ( app, pos, goal ),
-                          right.toTerm ( app, pos, goal ), pos, goal );
+        return lessThan(left.toTerm(app, pos, goal), right.toTerm(app, pos, goal), pos, goal);
     }
 
 }

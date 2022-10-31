@@ -11,11 +11,11 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
- * Displays a string in a {@link javax.swing.JOptionPane} information 
- * message window.
+ * Displays a string in a {@link javax.swing.JOptionPane} information message window.
+ *
  * @author bubel
  */
-public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane{
+public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane {
 
     /**
      */
@@ -23,24 +23,22 @@ public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane{
         super(parentComponent);
     }
 
-    /** 
-     * @see 
-     * de.uka.ilkd.key.gui.notification.NotificationAction#execute(NotificationEvent)
+    /**
+     * @see de.uka.ilkd.key.gui.notification.NotificationAction#execute(NotificationEvent)
      */
     @Override
-   public boolean execute(NotificationEvent event) {       
+    public boolean execute(NotificationEvent event) {
         final String title;
-        if (event instanceof GeneralInformationEvent) {          
-            setMessage(((GeneralInformationEvent)event).getMessage());            
-            title = ((GeneralInformationEvent)event).getContext();
+        if (event instanceof GeneralInformationEvent) {
+            setMessage(((GeneralInformationEvent) event).getMessage());
+            title = ((GeneralInformationEvent) event).getContext();
         } else {
             setMessage("Info: " + event);
             title = "Information";
         }
-        JOptionPane.showMessageDialog
-            (parentComponent, getMessage(), 
-                    title, JOptionPane.INFORMATION_MESSAGE);              
-        return true;      
+        JOptionPane.showMessageDialog(parentComponent, getMessage(), title,
+            JOptionPane.INFORMATION_MESSAGE);
+        return true;
     }
 
 }

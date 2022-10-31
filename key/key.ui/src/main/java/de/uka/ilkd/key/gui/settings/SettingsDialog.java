@@ -89,9 +89,8 @@ public class SettingsDialog extends JDialog {
         if (!apply.isEmpty()) {
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
-            JOptionPane.showMessageDialog(this, msg,
-                    "Error in Settings",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, msg, "Error in Settings",
+                JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

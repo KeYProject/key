@@ -19,15 +19,15 @@ public class PropertiesUtil {
         StringBuilder sb = new StringBuilder();
 
         while ((line = br.readLine()) != null) {
-            if(line.startsWith("#")) {
+            if (line.startsWith("#")) {
                 continue;
-            } else if(line.startsWith(" ") || line.startsWith("\t")) {
-                if(sb.length() > 0) {
+            } else if (line.startsWith(" ") || line.startsWith("\t")) {
+                if (sb.length() > 0) {
                     sb.append("\n");
                 }
                 sb.append(line.trim());
             } else {
-                if(sb.length() > 0) {
+                if (sb.length() > 0) {
                     if (currentKey == null) {
                         throw new IOException("No key defined");
                     }
@@ -36,7 +36,7 @@ public class PropertiesUtil {
                 }
             }
         }
-        if(sb.length() > 0) {
+        if (sb.length() > 0) {
             if (currentKey == null) {
                 throw new IOException("No key defined");
             }

@@ -6,12 +6,12 @@ import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
- * Occurs in a constructor declaration as the first statement as this(...) or
- * super(...) reference. The Reference knows the constructor declaration it
- * refers to.
+ * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
+ * The Reference knows the constructor declaration it refers to.
  */
 
-public abstract class SpecialConstructorReference extends JavaNonTerminalProgramElement implements ConstructorReference {
+public abstract class SpecialConstructorReference extends JavaNonTerminalProgramElement
+        implements ConstructorReference {
 
     /**
      * Parent.
@@ -110,8 +110,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -136,10 +135,9 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -150,11 +148,10 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

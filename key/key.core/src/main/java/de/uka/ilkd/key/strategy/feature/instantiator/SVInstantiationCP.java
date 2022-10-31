@@ -20,11 +20,10 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Feature representing a <code>ChoicePoint</code> for instantiating a schema
- * variable of a taclet with the term that is returned by a
- * <code>ProjectionToTerm</code>. This feature is useful in particular
- * combined with <code>ForEachCP</code>. Although the feature formally is a
- * choice point, it will always have exactly one branch
+ * Feature representing a <code>ChoicePoint</code> for instantiating a schema variable of a taclet
+ * with the term that is returned by a <code>ProjectionToTerm</code>. This feature is useful in
+ * particular combined with <code>ForEachCP</code>. Although the feature formally is a choice point,
+ * it will always have exactly one branch
  */
 public class SVInstantiationCP implements Feature {
 
@@ -33,58 +32,56 @@ public class SVInstantiationCP implements Feature {
     private final Name svToInstantiate;
     private final ProjectionToTerm value;
 
-    public static Feature create(Name svToInstantiate,
-                                 ProjectionToTerm value,
-                                 BackTrackingManager manager) {
-        return new SVInstantiationCP ( svToInstantiate, value, manager );
+    public static Feature create(Name svToInstantiate, ProjectionToTerm value,
+            BackTrackingManager manager) {
+        return new SVInstantiationCP(svToInstantiate, value, manager);
     }
 
     public static Feature createTriggeredVarCP(ProjectionToTerm value,
-                                               BackTrackingManager manager) {
-        return new SVInstantiationCP ( null, value, manager );
+            BackTrackingManager manager) {
+        return new SVInstantiationCP(null, value, manager);
     }
 
-    
-    private SVInstantiationCP(Name svToInstantiate,
-                              ProjectionToTerm value,
-                              BackTrackingManager manager) {
+
+    private SVInstantiationCP(Name svToInstantiate, ProjectionToTerm value,
+            BackTrackingManager manager) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
         this.manager = manager;
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        manager.passChoicePoint ( new CP (app, pos, goal), this );
+        manager.passChoicePoint(new CP(app, pos, goal), this);
         return NumberRuleAppCost.getZeroCost();
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {
-        
+
         if (svToInstantiate == null) {
             return app.taclet().getTrigger().getTriggerVar();
         }
-        
-        final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars ();
+
+        final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
         for (SchemaVariable var : vars) {
             final SchemaVariable svt = var;
-            if (svt.name().equals(svToInstantiate)) return svt;
+            if (svt.name().equals(svToInstantiate))
+                return svt;
         }
-        
-        Debug.fail ( "Did not find schema variable "
-                     + svToInstantiate + " that I was supposed to instantiate\n" +
-                     "(taclet " + app.taclet().name() + ")\n" +
-                     "Either the name of the variable is wrong, or the variable\n" +
-                     "has already been instantiated." );
+
+        Debug.fail("Did not find schema variable " + svToInstantiate
+            + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
+            + "Either the name of the variable is wrong, or the variable\n"
+            + "has already been instantiated.");
         return null;
     }
 
-    
+
     private class CP implements ChoicePoint {
-        
+
         private final PosInOccurrence pos;
-        private final RuleApp         app;
-        private final Goal            goal;
-    
+        private final RuleApp app;
+        private final Goal goal;
+
         private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
             this.pos = pos;
             this.app = app;
@@ -92,27 +89,25 @@ public class SVInstantiationCP implements Feature {
         }
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            if ( ! ( oldApp instanceof TacletApp ) )
-                Debug.fail ( "Instantiation feature is only applicable to " +
-                             "taclet apps, but got " + oldApp );
-            final TacletApp tapp = (TacletApp)oldApp;
-            
-            final SchemaVariable sv = findSVWithName ( tapp );
-            final Term instTerm = value.toTerm ( app, pos, goal );
+            if (!(oldApp instanceof TacletApp))
+                Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got "
+                    + oldApp);
+            final TacletApp tapp = (TacletApp) oldApp;
+
+            final SchemaVariable sv = findSVWithName(tapp);
+            final Term instTerm = value.toTerm(app, pos, goal);
 
             final RuleApp newApp =
-                tapp.addCheckedInstantiation ( sv,
-                                               instTerm,
-                                               goal.proof ().getServices (),
-                                               true );
+                tapp.addCheckedInstantiation(sv, instTerm, goal.proof().getServices(), true);
 
-            final CPBranch branch = new CPBranch () {
+            final CPBranch branch = new CPBranch() {
                 public void choose() {}
+
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
-            
-            return ImmutableSLList.<CPBranch>nil().prepend ( branch ).iterator ();
+
+            return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();
         }
-        
+
     }
 }

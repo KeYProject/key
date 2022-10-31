@@ -50,21 +50,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * This class creates the <code>&lt;createArray&gt;</code> method for array
- * creation and in particular its helper method
- * <code>&lt;createArrayHelper&gt;</code>. This class should be replaced by a
- * recoder transformation as soon as we port our array data structures to
- * RecodeR.
+ * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
+ * particular its helper method <code>&lt;createArrayHelper&gt;</code>. This class should be
+ * replaced by a recoder transformation as soon as we port our array data structures to RecodeR.
  */
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
-    public static final String  IMPLICIT_ARRAY_CREATE                    = "<createArray>";
+    public static final String IMPLICIT_ARRAY_CREATE = "<createArray>";
 
-    public static final String  IMPLICIT_ARRAY_CREATION_HELPER           = "<createArrayHelper>";
+    public static final String IMPLICIT_ARRAY_CREATION_HELPER = "<createArrayHelper>";
 
     // as these methods are thought to be only preliminary(we cache some
     // information here)
-    private final Map<String, ProgramVariable> cache = 
+    private final Map<String, ProgramVariable> cache =
         new LinkedHashMap<String, ProgramVariable>(3);
 
     /**
@@ -76,18 +74,16 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * stores the currently used object type
      */
     private final KeYJavaType objectType;
-    
+
     private final Sort heapSort;
-    
+
     private final int heapCount;
-    
-    
+
+
 
     /** create the method builder for array implict creation methods */
-    public CreateArrayMethodBuilder(KeYJavaType integerType,
-            			    KeYJavaType objectType,
-            			    Sort heapSort,
-            			    int heapCount) {
+    public CreateArrayMethodBuilder(KeYJavaType integerType, KeYJavaType objectType, Sort heapSort,
+            int heapCount) {
         this.integerType = integerType;
         this.objectType = objectType;
         this.heapSort = heapSort;
@@ -95,11 +91,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     }
 
     /**
-     * creates the statements which take the next object out of the list of
-     * available objects
-     * 
-     * @return the statements which take the next object out of the list of
-     *         available objects
+     * creates the statements which take the next object out of the list of available objects
+     *
+     * @return the statements which take the next object out of the list of available objects
      */
     protected List<Statement> createArray(ImmutableList<Field> fields) {
         LinkedList<Statement> result = new LinkedList<Statement>();
@@ -109,24 +103,20 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         ProgramVariable initialized = findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED);
         if (initialized == null) {
             // only if createObject for Object is called
-            initialized = find(ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-                    implicitFields);
-        } 
+            initialized = find(ImplicitFieldAdder.IMPLICIT_INITIALIZED, implicitFields);
+        }
 
-        result.addLast(assign(attribute(new ThisReference(), initialized),
-                BooleanLiteral.FALSE));
+        result.addLast(assign(attribute(new ThisReference(), initialized), BooleanLiteral.FALSE));
         return result;
     }
 
     /**
-     * extracts all field specifications out of the given list. Therefore it
-     * descends into field declarations.
-     * 
-     * @param list
-     *            the ArrayOf<MemberDeclaration> with the members of a type
-     *            declaration
-     * @return a IList<Field> the includes all field specifications found int the
-     *         field declaration of the given list
+     * extracts all field specifications out of the given list. Therefore it descends into field
+     * declarations.
+     *
+     * @param list the ArrayOf<MemberDeclaration> with the members of a type declaration
+     * @return a IList<Field> the includes all field specifications found int the field declaration
+     *         of the given list
      */
     protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
@@ -141,12 +131,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     /**
      * extracts all fields out of fielddeclaration
-     * 
-     * @param field
-     *            the FieldDeclaration of which the field specifications have to
-     *            be extracted
-     * @return a IList<Field> the includes all field specifications found int the
-     *         field declaration of the given list
+     *
+     * @param field the FieldDeclaration of which the field specifications have to be extracted
+     * @return a IList<Field> the includes all field specifications found int the field declaration
+     *         of the given list
      */
     protected final ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
@@ -159,10 +147,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     /**
      * extracts all implicit field specifications out of the given list
-     * 
-     * @param list
-     *            the IList<Field> from which the implicit ones have to be
-     *            selected
+     *
+     * @param list the IList<Field> from which the implicit ones have to be selected
      * @return a list with all implicit fields found in 'list'
      */
     protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
@@ -178,18 +164,15 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     /**
      * retrieves a field with the given name out of the list
-     * 
-     * @param name
-     *            a String with the name of the field to be looked for
-     * @param fields
-     *            the IList<Field> where we have to look for the field
+     *
+     * @param name a String with the name of the field to be looked for
+     * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
     protected ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
-            final ProgramVariable fieldVar = (ProgramVariable) field
-                    .getProgramVariable();
+            final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
             if (name.equals(fieldVar.getProgramElementName().getProgramName())) {
                 return fieldVar;
             }
@@ -200,10 +183,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     protected ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
-            final ImmutableList<Field> objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
-                    .getJavaType()).getMembers()));
-//            final ListOfField objectFields = filterField(((ClassDeclaration) objectType
-//                    .getJavaType()).getMembers());
+            final ImmutableList<Field> objectFields = filterImplicitFields(
+                filterField(((ClassDeclaration) objectType.getJavaType()).getMembers()));
+            // final ListOfField objectFields = filterField(((ClassDeclaration) objectType
+            // .getJavaType()).getMembers());
             var = find(name, objectFields);
             if (var != null) { // may be null if object is currently created
                 cache.put(name, var);
@@ -215,65 +198,49 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     // ================ HELPER METHODS =========================
 
     /**
-     * creates the implicit method <code>&lt;allocate&gt;</code> which is a
-     * stump and given meaning by a contract
+     * creates the implicit method <code>&lt;allocate&gt;</code> which is a stump and given meaning
+     * by a contract
      */
-    public IProgramMethod getArrayInstanceAllocatorMethod(
-            TypeReference arrayTypeReference) {
+    public IProgramMethod getArrayInstanceAllocatorMethod(TypeReference arrayTypeReference) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private(),
-                new Static() };
+        final Modifier[] modifiers = new Modifier[] { new Private(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
-        
-        final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType, true);
 
-        final ParameterDeclaration param = new ParameterDeclaration(
-                new Modifier[0], new TypeRef(integerType),
-                new VariableSpecification(paramLength), false);
+        final ProgramVariable paramLength =
+            new LocationVariable(new ProgramElementName("length"), integerType, true);
 
-        final MethodDeclaration md = new MethodDeclaration(
-                modifiers,
-                arrayTypeReference,
-                new ProgramElementName(
-                        InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                new ParameterDeclaration[]{param}, null, null, false);
+        final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
+            new TypeRef(integerType), new VariableSpecification(paramLength), false);
 
-        return new ProgramMethod(md, 
-        			 arrayType, 
-        			 arrayType,
-        			 PositionInfo.UNDEFINED,
-        			 heapSort,
-        			 heapCount);
+        final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
+            new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+            new ParameterDeclaration[] { param }, null, null, false);
+
+        return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
+            heapCount);
     }
 
     protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
-             ProgramVariable paramLength) {
+            ProgramVariable paramLength) {
 
-        
-        
-        final LocalVariableDeclaration local = 
+
+
+        final LocalVariableDeclaration local =
             declare(new ProgramElementName("newObject"), arrayRef);
-        final ProgramVariable newObject = (ProgramVariable) local
-                .getVariables().get(0)
-                .getProgramVariable();
+        final ProgramVariable newObject =
+            (ProgramVariable) local.getVariables().get(0).getProgramVariable();
         final LinkedList<Statement> body = new LinkedList<Statement>();
 
         body.addLast(local);
-        body.addLast(assign(
-                        newObject,
-                        new MethodReference(
-                                new ImmutableArray<Expression>(paramLength),
-                                new ProgramElementName(
-                                        InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                                arrayRef)));
-       
-        body.add(new MethodReference(
-                        new ImmutableArray<Expression>(),
-                        new ProgramElementName(
-                                CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
-                        newObject));
+        body.addLast(assign(newObject,
+            new MethodReference(new ImmutableArray<Expression>(paramLength),
+                new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                arrayRef)));
+
+        body.add(new MethodReference(new ImmutableArray<Expression>(),
+            new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
+            newObject));
 
         body.add(new Return(newObject));
 
@@ -282,20 +249,16 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     /**
      * creates the body of method <code>&lt;createArrayHelper(int
-     * paramLength)&gt;</code>
-     * therefore it first adds the statements responsible to take the correct
-     * one out of the list, then the arrays length attribute is set followed by
-     * a call to <code>&lt;prepare&gt;()</code> setting the arrays fields on
-     * their default value.
-     * 
-     * @param length
-     *            the final public ProgramVariable
-     *            <code>length</length> of the array 
-     * @param fields the IList<Fields> of the current array
-     * @param createTransient a boolean indicating if a transient array has 
+     * paramLength)&gt;</code> therefore it first adds the statements responsible to take the
+     * correct one out of the list, then the arrays length attribute is set followed by a call to
+     * <code>&lt;prepare&gt;()</code> setting the arrays fields on their default value.
+     *
+     * @param length the final public ProgramVariable <code>length</length> of the array
+     * &#64;param fields the IList<Fields> of the current array
+     * &#64;param createTransient a boolean indicating if a transient array has
      * to be created (this is special to JavaCard)
-     * @param transientType a ProgramVariable identifying the kind of transient
-     * @return the StatementBlock which is the method's body <br></br>
+     * &#64;param transientType a ProgramVariable identifying the kind of transient
+     * &#64;return the StatementBlock which is the method's body <br></br>
      *     <code>
      *  {
      *    this.<nextToCreate> = this.<nextToCreate>.;
@@ -309,90 +272,71 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *   </code>
      */
     protected StatementBlock getCreateArrayHelperBody(ProgramVariable length,
-            ImmutableList<Field> fields,
-            boolean createTransient, ProgramVariable transientType) {
-	assert !createTransient;
+            ImmutableList<Field> fields, boolean createTransient, ProgramVariable transientType) {
+        assert !createTransient;
 
         final ThisReference thisRef = new ThisReference();
 
         final List<Statement> body = createArray(fields);
 
         body.add(new MethodReference(new ImmutableArray<Expression>(),
-                new ProgramElementName(
-                        PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
+            new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
 
-        body.add(assign(attribute(thisRef,
-                findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
+        body.add(
+            assign(attribute(thisRef, findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
-        
+
         body.add(new Return(thisRef));
 
         return new StatementBlock(body.toArray(new Statement[body.size()]));
     }
 
     /**
-     * create the method declaration of the
-     * <code>&lt;createArrayHelper&gt;</code> method
+     * create the method declaration of the <code>&lt;createArrayHelper&gt;</code> method
      */
-    public IProgramMethod getCreateArrayHelperMethod(
-            TypeReference arrayTypeReference, ProgramVariable length,
-            ImmutableList<Field> fields) {
+    public IProgramMethod getCreateArrayHelperMethod(TypeReference arrayTypeReference,
+            ProgramVariable length, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private()};
+        final Modifier[] modifiers = new Modifier[] { new Private() };
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
-        final MethodDeclaration md = new MethodDeclaration(modifiers,
-                arrayTypeReference, new ProgramElementName(
-                        IMPLICIT_ARRAY_CREATION_HELPER),
-                new ParameterDeclaration[0], null,
-                getCreateArrayHelperBody(length, fields, false,
-                        null), false);
+        final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
+            new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER), new ParameterDeclaration[0],
+            null, getCreateArrayHelperBody(length, fields, false, null), false);
 
-        return new ProgramMethod(md, 
-        			 arrayType, 
-        			 arrayType,
-        			 PositionInfo.UNDEFINED,
-        			 heapSort,
-        			 heapCount);
+        return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
+            heapCount);
     }
 
     /**
-     * creates the implicit method <code>&lt;createArray&gt;</code> it
-     * fulfills a similar purpose as <code>&lt;createObject&gt;</code> in
-     * addition it sets the arrays length and calls the prepare method
+     * creates the implicit method <code>&lt;createArray&gt;</code> it fulfills a similar purpose as
+     * <code>&lt;createObject&gt;</code> in addition it sets the arrays length and calls the prepare
+     * method
      */
     public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
             IProgramMethod prepare, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Protected(),
-                new Static() };
+        final Modifier[] modifiers = new Modifier[] { new Protected(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
-        final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType);
+        final ProgramVariable paramLength =
+            new LocationVariable(new ProgramElementName("length"), integerType);
 
-        final ParameterDeclaration param = new ParameterDeclaration(
-                new Modifier[0], new TypeRef(integerType),
-                new VariableSpecification(paramLength), false);
+        final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
+            new TypeRef(integerType), new VariableSpecification(paramLength), false);
 
-        final MethodDeclaration md = new MethodDeclaration(modifiers,
-                arrayTypeReference, new ProgramElementName(
-                        IMPLICIT_ARRAY_CREATE),
-                new ParameterDeclaration[] { param }, null,                 
-                getCreateArrayBody(arrayTypeReference, paramLength), false);
+        final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
+            new ProgramElementName(IMPLICIT_ARRAY_CREATE), new ParameterDeclaration[] { param },
+            null, getCreateArrayBody(arrayTypeReference, paramLength), false);
 
-        return new ProgramMethod(md, 
-        			 arrayType, 
-        			 arrayType,
-        			 PositionInfo.UNDEFINED,
-        			 heapSort,
-        			 heapCount);
+        return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
+            heapCount);
     }
 
     /**
      * returns the default value of the given type according to JLS \S 4.5.5
-     * 
+     *
      * @return the default value of the given type according to JLS \S 4.5.5
      */
     protected Expression getDefaultValue(Type type) {
@@ -403,44 +347,35 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     }
 
     /**
-     * returns the prepare method for arrays initialising all array fields with
-     * their default value
+     * returns the prepare method for arrays initialising all array fields with their default value
      */
-    public IProgramMethod getPrepareArrayMethod(TypeRef arrayRef,
-            ProgramVariable length, Expression defaultValue, ImmutableList<Field> fields) {
+    public IProgramMethod getPrepareArrayMethod(TypeRef arrayRef, ProgramVariable length,
+            Expression defaultValue, ImmutableList<Field> fields) {
 
         final KeYJavaType arrayType = arrayRef.getKeYJavaType();
 
         final IntLiteral zero = new IntLiteral(0);
 
-        
-        final LocalVariableDeclaration forInit = KeYJavaASTFactory.
-        declare(new ProgramElementName("i"), zero, integerType);
 
-        final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
-                .get(0).getProgramVariable();
+        final LocalVariableDeclaration forInit =
+            KeYJavaASTFactory.declare(new ProgramElementName("i"), zero, integerType);
 
-        final For forLoop =
-                new For(new LoopInitializer[] { forInit },
-                        new LessThan(pv, new FieldReference(length, new ThisReference())),
-                        new Expression[] { new PostIncrement(pv) },
-                        assign(new ArrayReference(new ThisReference(),
-                                new Expression[] { pv }), defaultValue));
+        final ProgramVariable pv =
+            (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
-        final StatementBlock body = new StatementBlock(
-                new Statement[] { forLoop });
+        final For forLoop = new For(new LoopInitializer[] { forInit },
+            new LessThan(pv, new FieldReference(length, new ThisReference())),
+            new Expression[] { new PostIncrement(pv) },
+            assign(new ArrayReference(new ThisReference(), new Expression[] { pv }), defaultValue));
 
-        final MethodDeclaration md = new MethodDeclaration(
-                new Modifier[] { new Private()}, arrayRef,
-                new ProgramElementName(
-                        PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
-                new ParameterDeclaration[0], null, body, false);
+        final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
 
-        return new ProgramMethod(md, 
-        	                 arrayType, 
-        			 KeYJavaType.VOID_TYPE,
-        			 PositionInfo.UNDEFINED,
-        			 heapSort);
+        final MethodDeclaration md = new MethodDeclaration(new Modifier[] { new Private() },
+            arrayRef, new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
+            new ParameterDeclaration[0], null, body, false);
+
+        return new ProgramMethod(md, arrayType, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
+            heapSort);
     }
 
 }

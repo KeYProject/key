@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleProofObligationSelector implements ProofObligationSelector {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
 
     public static final String TAB = "   ";
 
@@ -39,9 +40,10 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     }
 
     private void initializeContractsArray() {
-        ImmutableSet<Contract> contracts = initConfig.getServices().getSpecificationRepository().getAllContracts();
+        ImmutableSet<Contract> contracts =
+            initConfig.getServices().getSpecificationRepository().getAllContracts();
         this.contracts = new ArrayList<>();
-        //int i = 0;
+        // int i = 0;
 
         for (Contract c : contracts) {
 
@@ -70,9 +72,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     protected ProofOblInput createPOForSelectedContract() {
         final Contract contract = selectContract();
         LOGGER.info("Contract: " + contract);
-        return contract == null
-                ? null
-                : contract.createProofObl(initConfig, contract);
+        return contract == null ? null : contract.createProofObl(initConfig, contract);
     }
 
     protected void findOrStartProof(ProofOblInput po) {
@@ -80,10 +80,9 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
         Proof proof = findPreferablyClosedProof(po);
 
-        //LOGGER.info("Proof: "+proof);
+        // LOGGER.info("Proof: "+proof);
         if (proof == null) {
-            ProblemInitializer pi =
-                    new ProblemInitializer(ui, initConfig.getServices(), ui);
+            ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
             try {
 
                 final ProofAggregate pl = pi.startProver(initConfig, po);
@@ -103,27 +102,28 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
-        ImmutableSet<Proof> proofs = initConfig.getServices().getSpecificationRepository().getProofs(po);
+        ImmutableSet<Proof> proofs =
+            initConfig.getServices().getSpecificationRepository().getProofs(po);
 
-        //no proofs?
+        // no proofs?
         if (proofs.isEmpty()) {
             return null;
         }
 
-        //try to find closed proof
+        // try to find closed proof
         for (Proof proof : proofs) {
             if (proof.mgt().getStatus().getProofClosed()) {
                 return proof;
             }
         }
 
-        //just take any proof
+        // just take any proof
         return proofs.iterator().next();
     }
 
     public boolean selectProofObligation() {
         ProofOblInput po = createPOForSelectedContract();
-        //LOGGER.info("PO: "+po.getPO().getProofs().length);
+        // LOGGER.info("PO: "+po.getPO().getProofs().length);
         findOrStartProof(po);
         return true;
     }

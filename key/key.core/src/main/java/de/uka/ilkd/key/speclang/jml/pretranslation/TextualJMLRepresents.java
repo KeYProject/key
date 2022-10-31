@@ -18,7 +18,8 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents, String name) {
+    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents,
+            String name) {
         this(mods, represents);
         this.name = name;
     }

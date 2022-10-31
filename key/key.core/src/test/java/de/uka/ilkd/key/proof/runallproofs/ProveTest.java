@@ -23,14 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * This class provides an API for running proves in JUnit test cases.
  * <p>
- * It is not intended to use this class outside of JUnit tests.
- * The API mimics the same behavior as run-all-proves.
- * So {@link #assertLoadability(String)}, {@link #assertLoadability(String)},
- * and {@link #assertUnProvability(String)}
- * correspond to the commands in the proof collection file.
+ * It is not intended to use this class outside of JUnit tests. The API mimics the same behavior as
+ * run-all-proves. So {@link #assertLoadability(String)}, {@link #assertLoadability(String)}, and
+ * {@link #assertUnProvability(String)} correspond to the commands in the proof collection file.
  * <p>
- * Use the the member variables to configure the execution. Their meaning is identical to the variable in
- * {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
+ * Use the the member variables to configure the execution. Their meaning is identical to the
+ * variable in {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
  * <p>
  * This class is used by generated unit tests from the proof collections.
  *
@@ -89,7 +87,8 @@ public class ProveTest {
         boolean success;
         try {
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+                load(keyFile);
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
@@ -103,7 +102,8 @@ public class ProveTest {
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
-                assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
+                assertTrue(replayResult.hasErrors(),
+                    "Loading problem file succeded but it shouldn't");
                 success = true;
             } else {
                 assertFalse(replayResult.hasErrors(), "Loading problem file failed");
@@ -132,10 +132,8 @@ public class ProveTest {
         }
 
         String message = String.format("%sVerifying property \"%s\"%sfor file: %s",
-                success ? "pass: " : "FAIL: ",
-                testProperty.toString().toLowerCase(),
-                success ? " was successful " : " failed ",
-                keyFile);
+            success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
+            success ? " was successful " : " failed ", keyFile);
 
         if (!success) {
             fail(message);
@@ -153,17 +151,17 @@ public class ProveTest {
             boolean reloadedClosed = reloadProof(proofFile);
 
             assertEquals(loadedProof.closed(), reloadedClosed,
-                    "Reloaded proof did not close: " + proofFile);
+                "Reloaded proof did not close: " + proofFile);
             debugOut("... success: reloaded.");
         }
     }
 
     /**
-     * By overriding this method we can change the way how we invoke automode,
-     * for instance if we want to use a different strategy.
+     * By overriding this method we can change the way how we invoke automode, for instance if we
+     * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                          Pair<String, Location> script) throws Exception {
+            Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -178,23 +176,22 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile)
-            throws ProblemLoaderException {
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+            File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
     }
 
     /**
-     * Reload proof that was previously saved at the location corresponding to
-     * the given {@link File} object.
+     * Reload proof that was previously saved at the location corresponding to the given
+     * {@link File} object.
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
     private boolean reloadProof(File proofFile) throws Exception {
         /*
-         * Reload proof and dispose corresponding KeY environment immediately
-         * afterwards. If no exception is thrown it is assumed that loading works
-         * properly.
+         * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
+         * exception is thrown it is assumed that loading works properly.
          */
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
@@ -214,8 +211,7 @@ public class ProveTest {
             return reloadedProof.closed();
         } catch (Throwable t) {
             throw new Exception(
-                    "Exception while loading proof (see cause for details): "
-                            + proofFile, t);
+                "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();

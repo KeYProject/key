@@ -48,14 +48,9 @@ public class ResolveGenerics extends TwoPassTransformation {
 
     }
 
-    private static void analyze(
-            ProgramFactory f,
-            CrossReferenceSourceInfo ci,
-            List<TypeParameterDeclaration> typeParams,
-            List<ProgramElement> stuffToBeRemoved,
-            List<IntroduceCast> casts,
-            List<TypeParamRefReplacement> typeParamReferences
-    ) {
+    private static void analyze(ProgramFactory f, CrossReferenceSourceInfo ci,
+            List<TypeParameterDeclaration> typeParams, List<ProgramElement> stuffToBeRemoved,
+            List<IntroduceCast> casts, List<TypeParamRefReplacement> typeParamReferences) {
         // deal with type parameter uses in own Type Declaration first
         for (int i = 0, s = typeParams.size(); i < s; i++) {
             TypeParameterDeclaration tpd = typeParams.get(i);
@@ -63,21 +58,25 @@ public class ResolveGenerics extends TwoPassTransformation {
             ClassType resolvedType;
             if (tpd.getBounds() == null || tpd.getBounds().size() == 0) {
                 resolvedType = ci.getServiceConfiguration().getNameInfo().getJavaLangObject();
-                repl = TypeKit.createTypeReference(ci, resolvedType, tpd); // in rare cases where another type named "Object" is used (e.g. Corba applications)
+                repl = TypeKit.createTypeReference(ci, resolvedType, tpd); // in rare cases where
+                                                                           // another type named
+                                                                           // "Object" is used (e.g.
+                                                                           // Corba applications)
             } else {
                 resolvedType = (ClassType) ci.getType(tpd.getBounds().get(0));
                 repl = makeReplacement(f, tpd);
             }
             Type rt = tpd;
             // TODO wtf is this intended to do ????
-//			int dim = 0;
+            // int dim = 0;
             do {
                 List<TypeReference> tprl = ci.getReferences(rt);
                 for (int j = 0, t = tprl.size(); j < t; j++) {
                     TypeReference tr = tprl.get(j);
                     if (!(tr.getASTParent() instanceof TypeArgumentDeclaration))
                         typeParamReferences.add(new TypeParamRefReplacement(tr, repl.deepClone()));
-                    else stuffToBeRemoved.add(tr.getASTParent());
+                    else
+                        stuffToBeRemoved.add(tr.getASTParent());
 
                     boolean alwaysCast = false;
                     while (tr.getASTParent() instanceof TypeArgumentDeclaration) {
@@ -99,8 +98,10 @@ public class ResolveGenerics extends TwoPassTransformation {
                                 do {
                                     // need to deal with reference suffixes, too!
                                     ClassType target = ci.getMethod(pr).getContainingClassType();
-                                    if (target != null && !(target instanceof TypeParameter) && (!ci.isSubtype(tmpResolved, target) || alwaysCast)) {
-                                        casts.add(new IntroduceCast(mr, TypeKit.createTypeReference(ci, target, parent)));
+                                    if (target != null && !(target instanceof TypeParameter)
+                                            && (!ci.isSubtype(tmpResolved, target) || alwaysCast)) {
+                                        casts.add(new IntroduceCast(mr,
+                                            TypeKit.createTypeReference(ci, target, parent)));
                                     }
                                     if (pr.getReferenceSuffix() instanceof MethodReference) {
                                         Type tmp = ci.getType(pr);
@@ -109,32 +110,40 @@ public class ResolveGenerics extends TwoPassTransformation {
                                         tmpResolved = (ClassType) tmp;
                                         mr = pr;
                                         pr = (MethodReference) pr.getReferenceSuffix();
-                                    } else break;
+                                    } else
+                                        break;
                                 } while (true);
-                            } else if (parent instanceof Expression || parent instanceof VariableSpecification || parent instanceof Return) {
+                            } else if (parent instanceof Expression
+                                    || parent instanceof VariableSpecification
+                                    || parent instanceof Return) {
                                 Type target;
                                 if (parent instanceof Return) {
-                                    while (!(parent instanceof MethodDeclaration)) parent = parent.getASTParent();
+                                    while (!(parent instanceof MethodDeclaration))
+                                        parent = parent.getASTParent();
                                     target = ((MethodDeclaration) parent).getReturnType();
                                 } else {
                                     target = ci.getType(parent);
                                 }
-                                if (!(target instanceof PrimitiveType) && !ci.isSubtype(resolvedType, (ClassType) target) && !(target instanceof TypeParameter)) {
+                                if (!(target instanceof PrimitiveType)
+                                        && !ci.isSubtype(resolvedType, (ClassType) target)
+                                        && !(target instanceof TypeParameter)) {
                                     // type cast needed
-                                    casts.add(new IntroduceCast(mr, TypeKit.createTypeReference(ci, target, mr)));
+                                    casts.add(new IntroduceCast(mr,
+                                        TypeKit.createTypeReference(ci, target, mr)));
                                 }
                                 // may also need to cast rhs of assignment
                                 if (parent instanceof Assignment) {
                                     Assignment as = (Assignment) parent;
                                     if (as.getExpressionAt(0) == mr)
-                                        casts.add(new IntroduceCast(as, TypeKit.createTypeReference(ci, target, as.getExpressionAt(1))));
+                                        casts.add(new IntroduceCast(as, TypeKit.createTypeReference(
+                                            ci, target, as.getExpressionAt(1))));
                                 }
                             }
                         }
                     }
                 }
                 rt = ci.getServiceConfiguration().getNameInfo().getArrayType(rt);
-//				dim++;
+                // dim++;
                 repl.setDimensions(repl.getDimensions() + 1);
             } while (rt != null);
         }
@@ -166,11 +175,13 @@ public class ResolveGenerics extends TwoPassTransformation {
             ProgramElement pe = tw.getProgramElement();
             NonTerminalProgramElement parent = pe.getASTParent();
             if (pe instanceof TypeDeclaration && !(pe instanceof TypeParameterDeclaration)) {
-                ResolveSingleGenericType p = new ResolveSingleGenericType(getServiceConfiguration(), (TypeDeclaration) pe);
+                ResolveSingleGenericType p =
+                    new ResolveSingleGenericType(getServiceConfiguration(), (TypeDeclaration) pe);
                 if (p.analyze() != IDENTITY)
                     parts.add(p);
             } else if (pe instanceof MethodDeclaration) {
-                ResolveGenericMethod p = new ResolveGenericMethod(getServiceConfiguration(), (MethodDeclaration) pe);
+                ResolveGenericMethod p =
+                    new ResolveGenericMethod(getServiceConfiguration(), (MethodDeclaration) pe);
                 if (p.analyze() != IDENTITY)
                     parts.add(p);
             } else if (pe instanceof TypeReference) {
@@ -178,11 +189,13 @@ public class ResolveGenerics extends TwoPassTransformation {
                 TypeReference tr = (TypeReference) pe;
                 if (parent instanceof MethodDeclaration) {
                     MethodDeclaration md = (MethodDeclaration) parent;
-                    if (md.getTypeReference() != tr) continue; // argument, not return type
+                    if (md.getTypeReference() != tr)
+                        continue; // argument, not return type
                     Type t = getSourceInfo().getType(tr);
                     if (t instanceof TypeDeclaration && !(t instanceof TypeParameterDeclaration)) {
                         CompilationUnit tcu = UnitKit.getCompilationUnit((TypeDeclaration) t);
-                        if (tcu == cu) continue;
+                        if (tcu == cu)
+                            continue;
                     }
                     p = new ResolveMethodReturnType(getServiceConfiguration(), md);
                 } else if (parent instanceof VariableDeclaration) {
@@ -196,18 +209,21 @@ public class ResolveGenerics extends TwoPassTransformation {
                     VariableDeclaration vd = (VariableDeclaration) parent;
                     p = new ResolveSingleVariableDeclaration(getServiceConfiguration(), vd);
                 } else if (parent instanceof InheritanceSpecification) {
-                    //InheritanceSpecification is = (InheritanceSpecification)parent;
+                    // InheritanceSpecification is = (InheritanceSpecification)parent;
                     Type t = getSourceInfo().getType(tr);
                     if (t instanceof TypeParameterDeclaration)
                         continue; // will be taken care of by ResolveSingleGenericType
-                    if (tr.getTypeArguments() == null) continue;
+                    if (tr.getTypeArguments() == null)
+                        continue;
                     // need to introduce type cast in every (inherited) method which
                     // is not defined incurrent CU and has generic return type
                     // TODO fields !!
-                    List<? extends Method> ml = ((InheritanceSpecification) parent).getParent().getAllMethods();
+                    List<? extends Method> ml =
+                        ((InheritanceSpecification) parent).getParent().getAllMethods();
                     for (int i = 0; i < ml.size(); i++) {
                         Method m = ml.get(i);
-                        if (m instanceof MethodInfo || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
+                        if (m instanceof MethodInfo
+                                || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
                             p = new ResolveMethodReturnType(getServiceConfiguration(), m);
                             if (p.analyze() != IDENTITY)
                                 trParts.add(p);
@@ -215,13 +231,17 @@ public class ResolveGenerics extends TwoPassTransformation {
                     }
                     stuffToBeRemoved.addAll(tr.getTypeArguments());
                     continue;
-                } else if (parent instanceof MethodReference && parent.getASTParent() instanceof MethodReference) {
+                } else if (parent instanceof MethodReference
+                        && parent.getASTParent() instanceof MethodReference) {
                     // reference to static member
                     Method m = getSourceInfo().getMethod((MethodReference) parent.getASTParent());
-                    if (m instanceof MethodInfo || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
+                    if (m instanceof MethodInfo
+                            || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
                         p = new ResolveMethodReturnType(getServiceConfiguration(), m);
-                    } else continue;
-                } else continue;
+                    } else
+                        continue;
+                } else
+                    continue;
                 if (p.analyze() != IDENTITY)
                     trParts.add(p);
             } else if (pe instanceof New) {
@@ -294,7 +314,8 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
-            ResolveGenerics.analyze(getProgramFactory(), ci, typeParams, stuffToBeRemoved, casts, typeParamReferences);
+            ResolveGenerics.analyze(getProgramFactory(), ci, typeParams, stuffToBeRemoved, casts,
+                typeParamReferences);
 
             // now deal with type references using type arguments (no need to deal with raw types)
             List<TypeReference> trl = ci.getReferences(td);
@@ -320,7 +341,8 @@ public class ResolveGenerics extends TwoPassTransformation {
             for (IntroduceCast c : casts) {
                 MiscKit.unindent(c.toBeCasted);
                 if (!(c.toBeCasted.getASTParent() instanceof StatementContainer))
-                    replace(c.toBeCasted, f.createParenthesizedExpression(f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
+                    replace(c.toBeCasted, f.createParenthesizedExpression(
+                        f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
             }
             for (TypeParamRefReplacement t : typeParamReferences) {
                 MiscKit.unindent(t.replacement);
@@ -359,7 +381,8 @@ public class ResolveGenerics extends TwoPassTransformation {
             typeParamReferences = new ArrayList<TypeParamRefReplacement>();
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
-            ResolveGenerics.analyze(f, ci, typeParams, stuffToBeRemoved, casts, typeParamReferences);
+            ResolveGenerics.analyze(f, ci, typeParams, stuffToBeRemoved, casts,
+                typeParamReferences);
 
             // now deal with type references using type arguments (no need to deal with raw types)
             List<MemberReference> mrl = ci.getReferences(md);
@@ -385,7 +408,8 @@ public class ResolveGenerics extends TwoPassTransformation {
             for (IntroduceCast c : casts) {
                 MiscKit.unindent(c.toBeCasted);
                 if (!(c.toBeCasted.getASTParent() instanceof StatementContainer))
-                    replace(c.toBeCasted, f.createParenthesizedExpression(f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
+                    replace(c.toBeCasted, f.createParenthesizedExpression(
+                        f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
             }
             for (TypeParamRefReplacement t : typeParamReferences) {
                 MiscKit.unindent(t.replacement);
@@ -416,7 +440,8 @@ public class ResolveGenerics extends TwoPassTransformation {
         @Override
         public ProblemReport analyze() {
             Type returnType = md.getReturnType();
-            if (!(returnType instanceof ParameterizedType) && !(returnType instanceof TypeParameter))
+            if (!(returnType instanceof ParameterizedType)
+                    && !(returnType instanceof TypeParameter))
                 return IDENTITY;
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
@@ -438,7 +463,8 @@ public class ResolveGenerics extends TwoPassTransformation {
                     if (!(ty instanceof ClassType))
                         break;
                     if (!(ty instanceof TypeParameter))
-                        casts.add(new IntroduceCast(vr, TypeKit.createTypeReference(ci, getSourceInfo().getType(vr), parent)));
+                        casts.add(new IntroduceCast(vr,
+                            TypeKit.createTypeReference(ci, getSourceInfo().getType(vr), parent)));
                     parent = ((MethodReference) parent).getReferenceSuffix();
                 }
             }
@@ -452,7 +478,8 @@ public class ResolveGenerics extends TwoPassTransformation {
                 MiscKit.unindent(c.toBeCasted);
                 if (c.toBeCasted.getASTParent().getIndexOfChild(c.toBeCasted) != -1
                         && !(c.toBeCasted.getASTParent() instanceof StatementContainer))
-                    replace(c.toBeCasted, f.createParenthesizedExpression(f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
+                    replace(c.toBeCasted, f.createParenthesizedExpression(
+                        f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
             }
             if (md instanceof MethodDeclaration) {
                 for (ProgramElement pe : stuffToBeRemoved) {
@@ -469,7 +496,8 @@ public class ResolveGenerics extends TwoPassTransformation {
         private List<ProgramElement> stuffToBeRemoved;
         private List<IntroduceCast> casts;
 
-        public ResolveSingleVariableDeclaration(CrossReferenceServiceConfiguration sc, VariableDeclaration vd) {
+        public ResolveSingleVariableDeclaration(CrossReferenceServiceConfiguration sc,
+                VariableDeclaration vd) {
             super(sc);
             this.vd = vd;
             this.tr = vd.getTypeReference();
@@ -500,7 +528,8 @@ public class ResolveGenerics extends TwoPassTransformation {
                         if (!(ty instanceof ClassType))
                             break;
                         if (!(ty instanceof TypeParameter))
-                            casts.add(new IntroduceCast((MethodReference) parent, TypeKit.createTypeReference(ci, ty, parent)));
+                            casts.add(new IntroduceCast((MethodReference) parent,
+                                TypeKit.createTypeReference(ci, ty, parent)));
                         parent = ((MethodReference) parent).getReferenceSuffix();
                     }
                 }
@@ -515,7 +544,8 @@ public class ResolveGenerics extends TwoPassTransformation {
                 MiscKit.unindent(c.toBeCasted);
                 if (c.toBeCasted.getASTParent().getIndexOfChild(c.toBeCasted) != -1
                         && !(c.toBeCasted.getASTParent() instanceof StatementContainer))
-                    replace(c.toBeCasted, f.createParenthesizedExpression(f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
+                    replace(c.toBeCasted, f.createParenthesizedExpression(
+                        f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
             }
             for (ProgramElement pe : stuffToBeRemoved) {
                 if (pe.getASTParent().getIndexOfChild(pe) != -1)

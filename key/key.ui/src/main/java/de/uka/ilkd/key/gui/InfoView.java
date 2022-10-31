@@ -36,7 +36,8 @@ public class InfoView extends JSplitPane implements TabPanel {
      *
      */
     private static final long serialVersionUID = -6944612837850368411L;
-    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+    public static final Icon INFO_ICON =
+        IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -122,12 +123,11 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             private void checkPopup(MouseEvent e) {
-                if(e.isPopupTrigger()) {
+                if (e.isPopupTrigger()) {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                            DefaultContextMenuKind.TACLET_INFO, selected,
-                            mediator);
-                    if(menu.getComponentCount()>0) {
+                        DefaultContextMenuKind.TACLET_INFO, selected, mediator);
+                    if (menu.getComponentCount() > 0) {
                         menu.show(InfoView.this, e.getX(), e.getY());
                     }
                 }
@@ -140,7 +140,8 @@ public class InfoView extends JSplitPane implements TabPanel {
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
 
-        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
+            KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
 
     public InfoView(MainWindow window, KeYMediator mediator) {

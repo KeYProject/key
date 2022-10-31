@@ -56,10 +56,8 @@ public class JmlAssert extends JavaStatement {
      * @param positionInfo the position information for this statement
      * @param services needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind,
-                     LabeledParserRuleContext condition,
-                     PositionInfo positionInfo,
-                     Services services) {
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition,
+            PositionInfo positionInfo, Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
@@ -127,9 +125,9 @@ public class JmlAssert extends JavaStatement {
         }
         replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, vars.atPres, services);
         replacementMap.replaceRemembranceLocalVariables(vars.atBeforeVars, vars.atBefores,
-                services);
-        final OpReplacer replacer = new OpReplacer(
-                replacementMap, termFactory, services.getProof());
+            services);
+        final OpReplacer replacer =
+            new OpReplacer(replacementMap, termFactory, services.getProof());
         return replacer.replace(cond);
     }
 
@@ -148,12 +146,8 @@ public class JmlAssert extends JavaStatement {
             throw new IllegalStateException("condition can only be set once");
         }
         this.vars = pv;
-        jmlIo.selfVar(pv.selfVar)
-                .parameters(pv.paramVars)
-                .resultVariable(pv.resultVar)
-                .exceptionVariable(pv.excVar)
-                .atPres(pv.atPres)
-                .atBefore(pv.atBefores);
+        jmlIo.selfVar(pv.selfVar).parameters(pv.paramVars).resultVariable(pv.resultVar)
+                .exceptionVariable(pv.excVar).atPres(pv.atPres).atBefore(pv.atBefores);
         this.cond = jmlIo.translateTermAsFormula(condition);
         condition = null;
     }
@@ -166,11 +160,10 @@ public class JmlAssert extends JavaStatement {
         if (!super.equals(o)) {
             return false;
         }
-        //super.equals() check classes
+        // super.equals() check classes
         final JmlAssert jmlAssert = (JmlAssert) o;
-        return kind == jmlAssert.kind &&
-                Objects.equals(condition, jmlAssert.condition) &&
-                Objects.equals(cond, jmlAssert.cond);
+        return kind == jmlAssert.kind && Objects.equals(condition, jmlAssert.condition)
+                && Objects.equals(cond, jmlAssert.cond);
     }
 
     // hashCode() caches the result of computeHashCode()
@@ -206,6 +199,7 @@ public class JmlAssert extends JavaStatement {
 
     /**
      * updates this statement with prestate renaming
+     *
      * @param atPres prestate renaming
      * @param services services
      */
@@ -213,8 +207,8 @@ public class JmlAssert extends JavaStatement {
         final TermFactory termFactory = services.getTermFactory();
         final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
         replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
-        final OpReplacer replacer = new OpReplacer(
-                replacementMap, termFactory, services.getProof());
+        final OpReplacer replacer =
+            new OpReplacer(replacementMap, termFactory, services.getProof());
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 

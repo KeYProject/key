@@ -18,8 +18,10 @@ public class MapProperties extends AbstractProperties {
     public MapProperties(MapProperties original) {
         map = (IdentityHashMap<Object, Object>) original.map.clone();
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     *
      * @see jatc.util.Properties#put(jatc.util.MapProperties.Property, T)
      */
     @Override
@@ -31,7 +33,9 @@ public class MapProperties extends AbstractProperties {
         firePropertyChange(property, oldValue, value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see jatc.util.Properties#get(jatc.util.MapProperties.Property)
      */
     @Override
@@ -44,7 +48,9 @@ public class MapProperties extends AbstractProperties {
         return map.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see jatc.util.Properties#remove(jatc.util.MapProperties.Property)
      */
     @Override

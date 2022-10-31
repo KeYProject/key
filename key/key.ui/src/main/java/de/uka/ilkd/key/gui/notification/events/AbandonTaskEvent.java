@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
 /**
  * Emitted after removing a proof task
+ *
  * @author bubel
  */
 public class AbandonTaskEvent extends NotificationEvent {
@@ -15,7 +16,7 @@ public class AbandonTaskEvent extends NotificationEvent {
      * creates an event
      */
     public AbandonTaskEvent() {
-        super(NotificationEventID.TASK_ABANDONED);        
+        super(NotificationEventID.TASK_ABANDONED);
     }
 
 }

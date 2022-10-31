@@ -11,13 +11,12 @@ import javax.swing.event.PopupMenuListener;
 /**
  * Listener for a {@link SequentView}.
  *
- * Reacts on mouse events to highlight the selected part of the sequent and it
- * pops up a menu showing all applicable actions at the highlighted position.
+ * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
+ * showing all applicable actions at the highlighted position.
  *
  * @param <T> the type of the object this listener is listening to.
  */
-abstract class SequentViewListener<T extends SequentView>
-        implements MouseListener {
+abstract class SequentViewListener<T extends SequentView> implements MouseListener {
 
     /**
      * The delay after closing a popup menu before another menu may be opened.

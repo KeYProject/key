@@ -9,8 +9,9 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Int literal.
- *  @author <TT>AutoDoc</TT>
+ * Int literal.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class IntLiteral extends AbstractIntegerLiteral {
@@ -33,6 +34,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
 
     /**
      * Creates a new IntLiteral representing the given int.
+     *
      * @param value the int value represented by the literal
      */
     public IntLiteral(int value) {
@@ -48,9 +50,9 @@ public class IntLiteral extends AbstractIntegerLiteral {
      *
      * @param valStr the String that contains the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *         literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public IntLiteral(String valStr) {
         this.value = parseFromString(valStr);
@@ -63,7 +65,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * @param children the children of this AST element as KeY classes, may contain: Comments
      * @param valStr the value of the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *         literal or represents a value out of int range
      */
     public IntLiteral(ExtList children, String valStr) {
         super(children);
@@ -97,20 +99,19 @@ public class IntLiteral extends AbstractIntegerLiteral {
     }
 
     /**
-     * Parses the String and extracts the actual value of the literal.
-     * This method is able to parse literals as described in the Java 8 Language Specification:
-     * hexadecimal (beginning with '0x'), decimal, octal (beginning with '0'), and binary
-     * (beginning with '0b') literals. In addition, underscores are allowed as separators inside
-     * the literal. All values parsed by this method are checked for range correctly, particularly
-     * considering the asymmetric range of int.
+     * Parses the String and extracts the actual value of the literal. This method is able to parse
+     * literals as described in the Java 8 Language Specification: hexadecimal (beginning with
+     * '0x'), decimal, octal (beginning with '0'), and binary (beginning with '0b') literals. In
+     * addition, underscores are allowed as separators inside the literal. All values parsed by this
+     * method are checked for range correctly, particularly considering the asymmetric range of int.
      * Hexadecimal, octal and binary literals are converted using two's complement.
      *
      * @param sourceStr the String containing the value
      * @return the parsed value as a long
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
+     *         literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     protected int parseFromString(final String sourceStr) throws NumberFormatException {
 
@@ -131,15 +132,15 @@ public class IntLiteral extends AbstractIntegerLiteral {
         valStr = valStr.replace("_", "");
 
         // remove prefix indicating the radix
-        if (valStr.startsWith("0x") || valStr.startsWith("0X")) {        // hex
+        if (valStr.startsWith("0x") || valStr.startsWith("0X")) { // hex
             radix = 16;
-            valStr = valStr.substring(2);     // cut of '0x'
+            valStr = valStr.substring(2); // cut of '0x'
         } else if (valStr.startsWith("0b") || valStr.startsWith("0B")) { // bin
             radix = 2;
-            valStr = valStr.substring(2);     // cut of '0b'
-        } else if (valStr.startsWith("0") && valStr.length() > 1) {      // oct
+            valStr = valStr.substring(2); // cut of '0b'
+        } else if (valStr.startsWith("0") && valStr.length() > 1) { // oct
             radix = 8;
-            valStr = valStr.substring(1);     // cut of leading '0'
+            valStr = valStr.substring(1); // cut of leading '0'
         }
 
         // add minus sign again
@@ -150,8 +151,9 @@ public class IntLiteral extends AbstractIntegerLiteral {
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */
 
-        /* the raw long converted from the input String without considering
-         * allowed value range or two's complement
+        /*
+         * the raw long converted from the input String without considering allowed value range or
+         * two's complement
          */
         long val = 0;
         try {
@@ -174,12 +176,14 @@ public class IntLiteral extends AbstractIntegerLiteral {
 
         // check if literal is in valid range
         if (val > maxValue || val < minValue) {
-            //raiseError("Number constant out of bounds: " + literalString, n);
+            // raiseError("Number constant out of bounds: " + literalString, n);
             throw new NumberFormatException("Number constant out of bounds: " + valStr);
         }
 
-        /* perform the actual conversion (two's complement for bin, oct and hex!) of the
-         * BigInteger to a String containing the real (checked valid) value of the literal */
-        return (int)val;    // the cast does the two's complement conversion
+        /*
+         * perform the actual conversion (two's complement for bin, oct and hex!) of the BigInteger
+         * to a String containing the real (checked valid) value of the literal
+         */
+        return (int) val; // the cast does the two's complement conversion
     }
 }

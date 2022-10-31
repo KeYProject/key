@@ -8,8 +8,8 @@ package recoder.bytecode;
 
 
 /**
- * This is a container class for references to enum constants, which may
- * appear in bytecode annotations.
+ * This is a container class for references to enum constants, which may appear in bytecode
+ * annotations.
  *
  * @author Tobias Gutzmann
  */

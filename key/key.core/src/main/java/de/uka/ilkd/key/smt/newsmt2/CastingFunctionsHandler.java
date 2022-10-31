@@ -12,6 +12,7 @@ import java.util.Properties;
 /**
  * This SMT translation handler takes care of those sort-depending functions f whose return type is
  * coerced, i.e.
+ *
  * <pre>
  *     T::f(params) = T::cast(any::f(params))
  * </pre>
@@ -28,7 +29,7 @@ public class CastingFunctionsHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
         this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);

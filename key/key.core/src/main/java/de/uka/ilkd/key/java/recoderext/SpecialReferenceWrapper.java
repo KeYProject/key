@@ -23,8 +23,7 @@ public class SpecialReferenceWrapper extends ThisReference
     }
 
 
-    public SpecialReferenceWrapper(TypeReference typeRef,
-                                   ReferencePrefix myprefix) {
+    public SpecialReferenceWrapper(TypeReference typeRef, ReferencePrefix myprefix) {
         this.typeRef = typeRef;
         this.myprefix = myprefix;
         expressionParent = null;
@@ -70,7 +69,7 @@ public class SpecialReferenceWrapper extends ThisReference
         expressionParent = c;
     }
 
-    //don't think we need it
+    // don't think we need it
     public void accept(SourceVisitor v) {
     }
 

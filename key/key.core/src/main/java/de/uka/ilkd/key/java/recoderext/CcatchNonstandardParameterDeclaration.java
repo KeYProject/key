@@ -8,8 +8,7 @@ import recoder.java.ParameterContainer;
  *
  * @author Dominic Steinhöfel
  */
-public abstract class CcatchNonstandardParameterDeclaration
-        extends JavaNonTerminalProgramElement {
+public abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {
     private static final long serialVersionUID = 1L;
 
     private ParameterContainer parent;

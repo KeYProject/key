@@ -38,8 +38,7 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *            the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
         super("#evaluate-arguments", pe);
@@ -48,24 +47,19 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * TODO Comment.
      *
-     * @param e
-     *            TODO
-     * @param l
-     *            TODO
-     * @param services
-     *            TODO
-     * @param ec
-     *            TODO
+     * @param e TODO
+     * @param l TODO
+     * @param services TODO
+     * @param ec TODO
      * @return TODO
      */
-    public static ProgramVariable evaluate(Expression e,
-            List<? super LocalVariableDeclaration> l, Services services,
-            ExecutionContext ec) {
+    public static ProgramVariable evaluate(Expression e, List<? super LocalVariableDeclaration> l,
+            Services services, ExecutionContext ec) {
 
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType t = e.getKeYJavaType(services, ec);
-        final ProgramElementName name = VariableNamer.parseName(
-            varNamer.getSuggestiveNameProposalForSchemaVariable(e));
+        final ProgramElementName name =
+            VariableNamer.parseName(varNamer.getSuggestiveNameProposalForSchemaVariable(e));
         final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);
 
         l.add(KeYJavaASTFactory.declare(pv, e, t));
@@ -80,19 +74,16 @@ public class EvaluateArgs extends ProgramTransformer {
         final ExecutionContext ec = svInst.getExecutionContext();
 
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
-            (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1)
-                    : pe);
+        (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1) : pe);
 
         List<Statement> evalstat = new LinkedList<Statement>();
 
         final ReferencePrefix newCalled;
         final ReferencePrefix invocationTarget = mr.getReferencePrefix();
 
-        if (invocationTarget instanceof Expression
-                && !(invocationTarget instanceof ThisReference
-                        || invocationTarget instanceof SuperReference)) {
-            newCalled = evaluate((Expression) invocationTarget, evalstat,
-                services, ec);
+        if (invocationTarget instanceof Expression && !(invocationTarget instanceof ThisReference
+                || invocationTarget instanceof SuperReference)) {
+            newCalled = evaluate((Expression) invocationTarget, evalstat, services, ec);
         } else {
             newCalled = mr.getReferencePrefix();
         }
@@ -111,14 +102,13 @@ public class EvaluateArgs extends ProgramTransformer {
 
         final MethodOrConstructorReference resMR;
         if (mr instanceof MethodReference) {
-            resMR = KeYJavaASTFactory.methodCall(newCalled,
-                ((MethodReference) mr).getMethodName(), newArgs);
+            resMR = KeYJavaASTFactory.methodCall(newCalled, ((MethodReference) mr).getMethodName(),
+                newArgs);
         } else if (mr instanceof New) {
             resMR = KeYJavaASTFactory.newOperator(mr.getReferencePrefix(),
                 ((New) mr).getTypeReference(), newArgs);
         } else if (mr instanceof SuperConstructorReference) {
-            resMR = KeYJavaASTFactory.superConstructor(mr.getReferencePrefix(),
-                newArgs);
+            resMR = KeYJavaASTFactory.superConstructor(mr.getReferencePrefix(), newArgs);
         } else if (mr instanceof ThisConstructorReference) {
             resMR = KeYJavaASTFactory.thisConstructor(newArgs);
         } else {
@@ -127,8 +117,8 @@ public class EvaluateArgs extends ProgramTransformer {
         }
 
         if (pe instanceof CopyAssignment) {
-            res[res.length - 1] = KeYJavaASTFactory.assign(
-                ((CopyAssignment) pe).getExpressionAt(0), (Expression) resMR);
+            res[res.length - 1] = KeYJavaASTFactory.assign(((CopyAssignment) pe).getExpressionAt(0),
+                (Expression) resMR);
         } else {
             res[res.length - 1] = resMR;
         }

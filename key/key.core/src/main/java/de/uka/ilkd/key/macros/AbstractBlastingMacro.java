@@ -129,8 +129,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt,
-            ClassAxiom c, LogicVariable o, LogicVariable h, Services services) {
+    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+            LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
@@ -189,7 +189,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 f = tb.all(h, tb.all(o, f));
                 result.add(new SequentFormula(f));
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
     }
 
     private class SemanticsBlastingStrategy implements Strategy {

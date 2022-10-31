@@ -11,14 +11,13 @@ package recoder.abstraction;
  */
 public interface ElementValuePair {
     /**
-     * Returns the value.
-     * Can be either of
+     * Returns the value. Can be either of
      * <ul>
-     * <li> any boxed primitive type
-     * <li> java.lang.String
-     * <li> any subtype of java.lang.Class
+     * <li>any boxed primitive type
+     * <li>java.lang.String
+     * <li>any subtype of java.lang.Class
      * <li>
-     * <li> a one-dimensional array of any of the above.
+     * <li>a one-dimensional array of any of the above.
      * </ul>
      *
      * @return
@@ -27,5 +26,5 @@ public interface ElementValuePair {
 
     String getElementName();
 
-    //String getFullNameOfContainingAnnotation();
+    // String getFullNameOfContainingAnnotation();
 }

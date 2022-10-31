@@ -9,18 +9,19 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Generate term "self != null".
  * <p/>
+ *
  * @author christoph
  */
 class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block,
-                                 LoopSpecification loopInv) {
+    String generatePredicateName(IProgramMethod pm, StatementBlock block,
+            LoopSpecification loopInv) {
         final String nameString =
-                MiscTools.toValidTacletName("RELATED_BY_BLOCK_" + "at_line_" +
-                                            block.getStartPosition().getLine() +
-                                            "_in_" + pm.getUniqueName()).toString();
+            MiscTools
+                    .toValidTacletName("RELATED_BY_BLOCK_" + "at_line_"
+                        + block.getStartPosition().getLine() + "_in_" + pm.getUniqueName())
+                    .toString();
         return nameString;
     }
 }

@@ -21,17 +21,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Each class is prepared before it is initialised. The preparation of
- * a class consists of pre-initialising the class fields with their
- * default values. This class creates the implicit method
- * <code>&lt;clprepare&gt;</code> responsible for the class
- * preparation.
+ * Each class is prepared before it is initialised. The preparation of a class consists of
+ * pre-initialising the class fields with their default values. This class creates the implicit
+ * method <code>&lt;clprepare&gt;</code> responsible for the class preparation.
  */
-public class ClassInitializeMethodBuilder
-        extends RecoderModelTransformer {
+public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
 
-    public static final String
-            CLASS_INITIALIZE_IDENTIFIER = "<clinit>";
+    public static final String CLASS_INITIALIZE_IDENTIFIER = "<clinit>";
 
     /**
      * maps a class to its static NON CONSTANT fields
@@ -47,34 +43,31 @@ public class ClassInitializeMethodBuilder
 
 
     /**
-     * Creates an instance of the class preparation method model
-     * transformer. Information about the current recoder model can be
-     * accessed via the given service configuration. The implicit
-     * preparation method is created and added for all classes,
-     * which are declared in one of the given compilation units.
+     * Creates an instance of the class preparation method model transformer. Information about the
+     * current recoder model can be accessed via the given service configuration. The implicit
+     * preparation method is created and added for all classes, which are declared in one of the
+     * given compilation units.
      *
-     * @param services the CrossReferenceServiceConfiguration with the
-     *                 information about the recoder model
-     * @param cache    a cache object that stores information which is needed by
-     *                 and common to many transformations. it includes the
-     *                 compilation units, the declared classes, and information
-     *                 for local classes.
+     * @param services the CrossReferenceServiceConfiguration with the information about the recoder
+     *        model
+     * @param cache a cache object that stores information which is needed by and common to many
+     *        transformations. it includes the compilation units, the declared classes, and
+     *        information for local classes.
      */
-    public ClassInitializeMethodBuilder(CrossReferenceServiceConfiguration services, TransformerCache cache) {
+    public ClassInitializeMethodBuilder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
         super(services, cache);
         class2initializers = new LinkedHashMap<>(10 * getUnits().size());
         class2super = new LinkedHashMap<>(2 * getUnits().size());
     }
 
     /**
-     * returns true if the given fieldspecification denotes a constant
-     * field. A constant field is declared as final and static and
-     * initialised with a time constant, which is not prepared or
-     * initialised here.  ATTENTION: this is a derivation from the JLS
-     * but the obtained behaviour is equivalent as we only consider
-     * completely compiled programs and not partial compilations. The
-     * reason for preparation and initialisation of comnpile time
-     * constant fields is due to binary compatibility reasons.
+     * returns true if the given fieldspecification denotes a constant field. A constant field is
+     * declared as final and static and initialised with a time constant, which is not prepared or
+     * initialised here. ATTENTION: this is a derivation from the JLS but the obtained behaviour is
+     * equivalent as we only consider completely compiled programs and not partial compilations. The
+     * reason for preparation and initialisation of comnpile time constant fields is due to binary
+     * compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
         boolean result = spec.isStatic() && spec.isFinal();
@@ -96,29 +89,25 @@ public class ClassInitializeMethodBuilder
      * creates the package reference java.lang
      */
     private PackageReference createJavaLangPackageReference() {
-        return new PackageReference
-                (new PackageReference(new Identifier("java")),
-                        new Identifier("lang"));
+        return new PackageReference(new PackageReference(new Identifier("java")),
+            new Identifier("lang"));
     }
 
 
     /**
-     * iterates through the given field declaration and creates for each
-     * specification that contains an initializer a corresponding copy
-     * assignment. Thereby only non-constant fields are considered.
+     * iterates through the given field declaration and creates for each specification that contains
+     * an initializer a corresponding copy assignment. Thereby only non-constant fields are
+     * considered.
      */
-    private ASTList<Statement>
-    fieldInitializersToAssignments(FieldDeclaration fd) {
+    private ASTList<Statement> fieldInitializersToAssignments(FieldDeclaration fd) {
 
         ASTList<FieldSpecification> specs = fd.getFieldSpecifications();
-        ASTList<Statement> result =
-                new ASTArrayList<>(specs.size());
+        ASTList<Statement> result = new ASTArrayList<>(specs.size());
 
         for (FieldSpecification fs : specs) {
             if (fs.isStatic() && fs.getInitializer() != null && !isConstantField(fs)) {
-                result.add(
-                        assign(passiveFieldReference(
-                                fs.getIdentifier().deepClone()), fs.getInitializer().deepClone()));
+                result.add(assign(passiveFieldReference(fs.getIdentifier().deepClone()),
+                    fs.getInitializer().deepClone()));
             }
         }
 
@@ -128,8 +117,8 @@ public class ClassInitializeMethodBuilder
 
 
     /**
-     * retrieves all static non-constant fields and returns a list of
-     * copy assignment pre-initialising them with their default values
+     * retrieves all static non-constant fields and returns a list of copy assignment
+     * pre-initialising them with their default values
      * <p>
      * some special settings for implicit fields are performed here as well
      *
@@ -138,16 +127,15 @@ public class ClassInitializeMethodBuilder
      */
     private ASTList<Statement> getInitializers(TypeDeclaration typeDeclaration) {
 
-        ASTList<Statement> result = new ASTArrayList<>
-                (typeDeclaration.getChildCount());
+        ASTList<Statement> result = new ASTArrayList<>(typeDeclaration.getChildCount());
 
         for (int i = 0; i < typeDeclaration.getChildCount(); i++) {
             if (typeDeclaration.getChildAt(i) instanceof ClassInitializer) {
-                result.add(((ClassInitializer) typeDeclaration.
-                        getChildAt(i)).getBody().deepClone());
+                result.add(
+                    ((ClassInitializer) typeDeclaration.getChildAt(i)).getBody().deepClone());
             } else if (typeDeclaration.getChildAt(i) instanceof FieldDeclaration) {
-                result.addAll(fieldInitializersToAssignments
-                        ((FieldDeclaration) typeDeclaration.getChildAt(i)));
+                result.addAll(fieldInitializersToAssignments(
+                    (FieldDeclaration) typeDeclaration.getChildAt(i)));
             }
         }
         return result;
@@ -166,9 +154,8 @@ public class ClassInitializeMethodBuilder
                 if (cd.getExtendedTypes() != null) {
                     superType = cd.getExtendedTypes().getTypeReferenceAt(0).deepClone();
                 } else {
-                    superType =
-                            new TypeReference(createJavaLangPackageReference(),
-                                    new Identifier("Object"));
+                    superType = new TypeReference(createJavaLangPackageReference(),
+                        new Identifier("Object"));
                 }
                 class2super.put(cd, superType);
             }
@@ -208,8 +195,7 @@ public class ClassInitializeMethodBuilder
 
 
     /**
-     * creates the following catch clause
-     * <code>
+     * creates the following catch clause <code>
      * catch (<i>caughtType</i> <i>caughtParam</i>) {
      * &lt;classInitializationInProgress&gt;=false;
      * &lt;classClassErroneous&gt;=true;
@@ -217,28 +203,23 @@ public class ClassInitializeMethodBuilder
      * }
      * </code>
      */
-    private Catch createCatchClause
-    (String caughtType, String caughtParam, Throw t) {
+    private Catch createCatchClause(String caughtType, String caughtParam, Throw t) {
 
         ASTList<Statement> catcher = new ASTArrayList<>(3);
 
-        CopyAssignment resetInitInProgress =
-                assign(passiveFieldReference
-                                (new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
-                        new BooleanLiteral(false));
+        CopyAssignment resetInitInProgress = assign(
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+            new BooleanLiteral(false));
 
-        CopyAssignment markErroneous =
-                assign(passiveFieldReference
-                                (new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
-                        new BooleanLiteral(true));
+        CopyAssignment markErroneous = assign(
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
+            new BooleanLiteral(true));
 
-        ParameterDeclaration param =
-                new ParameterDeclaration
-                        (new TypeReference(createJavaLangPackageReference(),
-                                new Identifier(caughtType)),
-                                new Identifier(caughtParam));
+        ParameterDeclaration param = new ParameterDeclaration(
+            new TypeReference(createJavaLangPackageReference(), new Identifier(caughtType)),
+            new Identifier(caughtParam));
 
 
         catcher.add(resetInitInProgress.deepClone());
@@ -251,9 +232,8 @@ public class ClassInitializeMethodBuilder
 
 
     /**
-     * around the initializers there is a try block that catches
-     * eventually thrown errors or exceptions and handles them in a
-     * special way
+     * around the initializers there is a try block that catches eventually thrown errors or
+     * exceptions and handles them in a special way
      */
     private Try createInitializerExecutionTryBlock(TypeDeclaration td) {
 
@@ -267,12 +247,9 @@ public class ClassInitializeMethodBuilder
 
         if (td instanceof ClassDeclaration && td != javaLangObject) {
             ClassDeclaration cd = (ClassDeclaration) td;
-            initializerExecutionBody.add
-                    (0, new PassiveExpression
-                            (new MethodReference
-                                    (class2super.get(cd).deepClone(),
-                                            new ImplicitIdentifier
-                                                    (ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
+            initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
+                class2super.get(cd).deepClone(),
+                new ImplicitIdentifier(ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
         }
 
         // catch clauses
@@ -280,27 +257,21 @@ public class ClassInitializeMethodBuilder
 
         ASTList<Branch> catchClauses = new ASTArrayList<>(2);
 
-        catchClauses.add
-                (createCatchClause
-                        ("Error", "err",
-                                new Throw(new VariableReference(new Identifier("err")))));
+        catchClauses.add(createCatchClause("Error", "err",
+            new Throw(new VariableReference(new Identifier("err")))));
 
-        ASTList<Expression> exceptionInInitializerArguments =
-                new ASTArrayList<>(1);
-        exceptionInInitializerArguments.add
-                (new VariableReference(new Identifier("twa")));
+        ASTList<Expression> exceptionInInitializerArguments = new ASTArrayList<>(1);
+        exceptionInInitializerArguments.add(new VariableReference(new Identifier("twa")));
 
-        Throw t = new Throw
-                (new New(null,
-                        new TypeReference
-                                (createJavaLangPackageReference(),
-                                        new Identifier("ExceptionInInitializerError")),
-                        exceptionInInitializerArguments));
+        Throw t =
+            new Throw(new New(null,
+                new TypeReference(createJavaLangPackageReference(),
+                    new Identifier("ExceptionInInitializerError")),
+                exceptionInInitializerArguments));
 
         catchClauses.add(createCatchClause("Throwable", "twa", t));
 
-        return new Try(new StatementBlock(initializerExecutionBody),
-                catchClauses);
+        return new Try(new StatementBlock(initializerExecutionBody), catchClauses);
     }
 
 
@@ -314,81 +285,65 @@ public class ClassInitializeMethodBuilder
         ASTList<Statement> clInitNotInProgressBody = new ASTArrayList<>(20);
 
         ASTList<Statement> clNotPreparedBody = new ASTArrayList<>(1);
-        clNotPreparedBody.add
-                (new PassiveExpression
-                        (new MethodReference
-                                (new ImplicitIdentifier
-                                        (ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER))));
+        clNotPreparedBody.add(new PassiveExpression(new MethodReference(
+            new ImplicitIdentifier(ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER))));
 
-        If isClassPrepared = new If
-                (new LogicalNot(passiveFieldReference
-                        (new ImplicitIdentifier(ImplicitFieldAdder.
-                                IMPLICIT_CLASS_PREPARED))),
-                        new Then(new StatementBlock(clNotPreparedBody)));
+        If isClassPrepared = new If(
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
+            new Then(new StatementBlock(clNotPreparedBody)));
 
 
         clInitNotInProgressBody.add(isClassPrepared);
 
 
         ASTList<Statement> clErroneousBody = new ASTArrayList<>(1);
-        clErroneousBody.add
-                (new Throw(new New(null,
-                        new TypeReference
-                                (createJavaLangPackageReference(),
-                                        new Identifier("NoClassDefFoundError")),
-                        null)));
-        If isClassErroneous = new If
-                (passiveFieldReference
-                        (new ImplicitIdentifier(ImplicitFieldAdder.
-                                IMPLICIT_CLASS_ERRONEOUS)),
-                        new Then(new StatementBlock(clErroneousBody)));
+        clErroneousBody
+                .add(new Throw(new New(null, new TypeReference(createJavaLangPackageReference(),
+                    new Identifier("NoClassDefFoundError")), null)));
+        If isClassErroneous = new If(
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
+            new Then(new StatementBlock(clErroneousBody)));
 
 
         clInitNotInProgressBody.add(isClassErroneous);
 
 
         // @(CLASS_INIT_IN_PROGRESS) = true
-        clInitNotInProgressBody.add
-                (assign(passiveFieldReference
-                                (new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
-                        new BooleanLiteral(true)));
+        clInitNotInProgressBody.add(assign(
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+            new BooleanLiteral(true)));
 
 
         // create try block in initialize method
         clInitNotInProgressBody.add(createInitializerExecutionTryBlock(td));
-        clInitNotInProgressBody.add
-                (assign
-                        (passiveFieldReference((new ImplicitIdentifier
-                                        (ImplicitFieldAdder.
-                                                IMPLICIT_CLASS_INIT_IN_PROGRESS))),
-                                new BooleanLiteral(false)));
-        clInitNotInProgressBody.add
-                (assign
-                        (passiveFieldReference((new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
-                                new BooleanLiteral(false)));
-        clInitNotInProgressBody.add
-                (assign
-                        (passiveFieldReference((new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
-                                new BooleanLiteral(true)));
+        clInitNotInProgressBody.add(assign(
+            passiveFieldReference(
+                (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
+            new BooleanLiteral(false)));
+        clInitNotInProgressBody.add(assign(
+            passiveFieldReference(
+                (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
+            new BooleanLiteral(false)));
+        clInitNotInProgressBody.add(assign(
+            passiveFieldReference(
+                (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
+            new BooleanLiteral(true)));
 
 
-        If isClassInitializationInProgress = new If
-                (new LogicalNot
-                        (passiveFieldReference
-                                (new ImplicitIdentifier(ImplicitFieldAdder.
-                                        IMPLICIT_CLASS_INIT_IN_PROGRESS))),
-                        new Then(new StatementBlock(clInitNotInProgressBody)));
+        If isClassInitializationInProgress = new If(
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
+            new Then(new StatementBlock(clInitNotInProgressBody)));
 
 
         clInitializeBody.add(isClassInitializationInProgress);
-        If isClassInitialized = new If
-                (new LogicalNot(passiveFieldReference
-                        (new ImplicitIdentifier(ImplicitFieldAdder.
-                                IMPLICIT_CLASS_INITIALIZED))),
-                        new Then(new StatementBlock(clInitializeBody)));
+        If isClassInitialized = new If(
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
+            new Then(new StatementBlock(clInitializeBody)));
 
         methodBody.add(isClassInitialized);
 
@@ -397,24 +352,18 @@ public class ClassInitializeMethodBuilder
 
 
     /**
-     * creates the static method <code>&lt;clprepare&gt;</code> for the
-     * given type declaration
+     * creates the static method <code>&lt;clprepare&gt;</code> for the given type declaration
      *
-     * @param td the TypeDeclaration to which the new created method
-     *           will be attached
+     * @param td the TypeDeclaration to which the new created method will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createInitializeMethod(TypeDeclaration td) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
         modifiers.add(new Static());
         modifiers.add(new Public());
-        return new MethodDeclaration(modifiers,
-                null,  // return type is void
-                new ImplicitIdentifier
-                        (CLASS_INITIALIZE_IDENTIFIER),
-                new ASTArrayList<>(0),
-                null, // no declared throws
-                createInitializeMethodBody(td));
+        return new MethodDeclaration(modifiers, null,
+            new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER), new ASTArrayList<>(0), null,
+            createInitializeMethodBody(td));
     }
 
 

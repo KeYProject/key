@@ -23,11 +23,10 @@ public class Package implements ClassTypeContainer {
     private ProgramModelInfo pmi;
 
     /**
-     * Creates a new package with the given name, organized by the given program
-     * model info.
+     * Creates a new package with the given name, organized by the given program model info.
      *
      * @param name the name of the package.
-     * @param pmi  the program model info responsible for this package.
+     * @param pmi the program model info responsible for this package.
      */
     public Package(String name, ProgramModelInfo pmi) {
         Debug.assertNonnull(name);
@@ -54,8 +53,7 @@ public class Package implements ClassTypeContainer {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -64,8 +62,7 @@ public class Package implements ClassTypeContainer {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param service the program model info for this element.
      */
@@ -83,19 +80,21 @@ public class Package implements ClassTypeContainer {
     }
 
     /**
-     * Returns the list of RuntimeInvisibleAnnotations retrieved from package-info.class,
-     * or the list of AnnotationUseSpecification retrieved from package-info.java, respectively.
-     * Returns <code>null</code> if neither file is present or no package annotations are specified.
+     * Returns the list of RuntimeInvisibleAnnotations retrieved from package-info.class, or the
+     * list of AnnotationUseSpecification retrieved from package-info.java, respectively. Returns
+     * <code>null</code> if neither file is present or no package annotations are specified.
      *
      * @return
      * @since 0.80
      */
     public List<? extends AnnotationUse> getPackageAnnotations() {
-        CompilationUnit cl = pmi.getServiceConfiguration().getSourceFileRepository().getCompilationUnit(getFullName() + ".package-info");
+        CompilationUnit cl = pmi.getServiceConfiguration().getSourceFileRepository()
+                .getCompilationUnit(getFullName() + ".package-info");
         if (cl != null) {
             return cl.getPackageSpecification().getAnnotations();
         }
-        ClassFile cf = pmi.getServiceConfiguration().getClassFileRepository().getClassFile(getFullName() + ".package-info");
+        ClassFile cf = pmi.getServiceConfiguration().getClassFileRepository()
+                .getClassFile(getFullName() + ".package-info");
         if (cf != null) {
             return cf.getAnnotations();
         }

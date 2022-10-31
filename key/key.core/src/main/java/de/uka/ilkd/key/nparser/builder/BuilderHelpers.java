@@ -10,15 +10,15 @@ import javax.annotation.Nullable;
  */
 public final class BuilderHelpers {
     public static String getPosition(@Nullable ParserRuleContext node) {
-        if (node == null) return " pos n/a";
+        if (node == null)
+            return " pos n/a";
         return getPosition(node.start);
     }
 
     public static String getPosition(@Nullable Token t) {
-        return t == null
-                ? " pos n/a"
-                : String.format(" %s:%d#%d",
-                t.getInputStream().getSourceName(), t.getLine(), t.getCharPositionInLine());
+        return t == null ? " pos n/a"
+                : String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(),
+                    t.getCharPositionInLine());
     }
 
 }

@@ -212,8 +212,8 @@ public class KeYSelectionModel {
     }
 
     /**
-     * selects the first goal in the goal list of proof if available if not it
-     * selects a leaf of the proof tree
+     * selects the first goal in the goal list of proof if available if not it selects a leaf of the
+     * proof tree
      */
     public void defaultSelection() {
         Goal g = null;
@@ -228,8 +228,8 @@ public class KeYSelectionModel {
         }
 
         /*
-         * Order of preference: 1. Not yet closable goals 2. Goals which are not closed
-         * for all metavariable instantiations 3. The first node of the tree
+         * Order of preference: 1. Not yet closable goals 2. Goals which are not closed for all
+         * metavariable instantiations 3. The first node of the tree
          */
         if (g != null) {
             setSelectedGoal(g);
@@ -243,9 +243,9 @@ public class KeYSelectionModel {
     }
 
     /**
-     * selects the first open goal below the given node <tt>old</tt> if no open goal
-     * is available node <tt>old</tt> is selected. In case that <tt>old</tt> has
-     * been removed from the proof the proof root is selected
+     * selects the first open goal below the given node <tt>old</tt> if no open goal is available
+     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof the
+     * proof root is selected
      *
      * @param old the Node to start looking for open goals
      */
@@ -272,14 +272,12 @@ public class KeYSelectionModel {
     }
 
     /**
-     * retrieves the first open goal below the given node, i.e. the goal containing
-     * the first leaf of the subtree starting at <code>n</code> which is not already
-     * closed
+     * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
+     * of the subtree starting at <code>n</code> which is not already closed
      *
      * @param n the Node where to start from
-     * @return the goal containing the first leaf of the subtree starting at
-     *         <code>n</code>, which is not already closed. <code>null</code> is
-     *         returned if no such goal exists.
+     * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
+     *         is not already closed. <code>null</code> is returned if no such goal exists.
      */
     private Goal getFirstOpenGoalBelow(Node n) {
         final Iterator<Node> it = n.leavesIterator();
@@ -294,7 +292,7 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            if(!listenerList.contains(listener)) {
+            if (!listenerList.contains(listener)) {
                 addKeYSelectionListener(listener);
             }
         }
@@ -302,14 +300,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Adding {}", listener.getClass());
+            LOGGER.debug("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Removing {}",  listener.getClass());
+            LOGGER.debug("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }

@@ -39,11 +39,10 @@ public class AnalysisReportTest {
     /**
      * Report format:
      * <p>
-     * line/column of a new position capital letters abbreviation of class name
-     * "name of compilation unit" if CU :type if typed expression, either
-     * symbolic or line number of TD ==value if compile-time-constant expression
-     * ->destination if reference, either symbolic or line number of definition
-     * sample:
+     * line/column of a new position capital letters abbreviation of class name "name of compilation
+     * unit" if CU :type if typed expression, either symbolic or line number of TD ==value if
+     * compile-time-constant expression ->destination if reference, either symbolic or line number
+     * of definition sample:
      *
      * <PRE>
      * <p>
@@ -52,14 +51,12 @@ public class AnalysisReportTest {
      *
      * </PRE>
      * <p>
-     * read: on line 54, column 8 there is a super constructor reference
-     * pointing to a runtime exception constructor with argument on column 14
-     * there is a variable reference of type String and defined by the 112th
-     * element of this report at the same position there is an Identifier at
-     * line 11, column 0 there is a compilation unit with logical name
-     * java.lang.dictionary (the first lines are comments, obviously) at the
-     * same position there is a package specification (the first "real" entry of
-     * the unit)
+     * read: on line 54, column 8 there is a super constructor reference pointing to a runtime
+     * exception constructor with argument on column 14 there is a variable reference of type String
+     * and defined by the 112th element of this report at the same position there is an Identifier
+     * at line 11, column 0 there is a compilation unit with logical name java.lang.dictionary (the
+     * first lines are comments, obviously) at the same position there is a package specification
+     * (the first "real" entry of the unit)
      */
     @Test
     public void testAnalysisReport() throws IOException {
@@ -126,7 +123,8 @@ public class AnalysisReportTest {
 
     protected void createReport(Writer out) throws IOException {
 
-        List<CompilationUnit> units = BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
+        List<CompilationUnit> units =
+            BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
         // sort by name
         CompilationUnit[] uarray = new CompilationUnit[units.size()];
         for (int i = 0; i < uarray.length; i++) {
@@ -153,8 +151,8 @@ public class AnalysisReportTest {
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                //line.append(number);
-                //line.append(' ');
+                // line.append(number);
+                // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
                 if (!pos.equals(oldPos)) {
                     line.append(pos);
@@ -181,7 +179,8 @@ public class AnalysisReportTest {
                         } else {
                             line.append(Format.toString("%N", t));
                         }
-                        if (BasicTestsSuite.getConfig().getConstantEvaluator().isCompileTimeConstant((Expression) pe, res)) {
+                        if (BasicTestsSuite.getConfig().getConstantEvaluator()
+                                .isCompileTimeConstant((Expression) pe, res)) {
                             line.append(" ==").append(res);
                         }
                     }

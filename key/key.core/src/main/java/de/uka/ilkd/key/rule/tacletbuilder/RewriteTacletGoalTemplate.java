@@ -12,55 +12,53 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
-/** this class inherits from TacletGoalTemplate. It is used if there is a
- * replacewith in the ruleGoals that replaces a term by another
- * term. For a sequent {@link AntecSuccTacletGoalTemplate}
+/**
+ * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
+ * ruleGoals that replaces a term by another term. For a sequent {@link AntecSuccTacletGoalTemplate}
  */
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
     private Term replacewith;
 
-    /** creates new Goaldescription 
-     *@param addedSeq new Sequent to be added
-     *@param addedRules IList<Taclet> contains the new allowed rules
-     * at this branch 
-     *@param replacewith the Term that replaces another one
-     *@param pvs the set of schema variables
+    /**
+     * creates new Goaldescription
+     *
+     * @param addedSeq new Sequent to be added
+     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
+     * @param replacewith the Term that replaces another one
+     * @param pvs the set of schema variables
      */
-    public RewriteTacletGoalTemplate(Sequent             addedSeq,
-				     ImmutableList<Taclet>        addedRules,				     
-				     Term                replacewith,
-				     ImmutableSet<SchemaVariable> pvs) {
-	super(addedSeq, addedRules, pvs);
-	TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
-	this.replacewith = replacewith;
+    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+            Term replacewith, ImmutableSet<SchemaVariable> pvs) {
+        super(addedSeq, addedRules, pvs);
+        TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
+        this.replacewith = replacewith;
     }
 
-    public RewriteTacletGoalTemplate(Sequent addedSeq,
-			   ImmutableList<Taclet> addedRules,
-			   Term replacewith) {
-	this(addedSeq, addedRules, replacewith,
-	     DefaultImmutableSet.<SchemaVariable>nil());
+    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+            Term replacewith) {
+        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.<SchemaVariable>nil());
     }
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-	this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(),
-             replacewith);
+        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(), replacewith);
     }
 
 
-    /** a Taclet may replace a Term by another. The new Term is returned.     
+    /**
+     * a Taclet may replace a Term by another. The new Term is returned.
+     *
      * @return Term being paramter in the rule goal replacewith(Seq)
      */
     public Term replaceWith() {
-	return replacewith;
+        return replacewith;
     }
-    
+
     /**
-     * rertieves and returns all variables that are bound in the 
-     * goal template
+     * rertieves and returns all variables that are bound in the goal template
+     *
      * @return all variables that occur bound in this goal template
      */
     @Override
@@ -69,40 +67,40 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
     }
-    
+
     /**
      * @return Term being paramter in the rule goal replacewith(term)
      */
     @Override
     public Object replaceWithExpressionAsObject() {
-	return replacewith;
+        return replacewith;
     }
 
 
     @Override
     public boolean equals(Object o) {
-       if (!super.equals(o)) {
-          return false;
-       }
-       final RewriteTacletGoalTemplate other = (RewriteTacletGoalTemplate) o;
-       return replacewith.equals(other.replacewith);
-    }
-    
-    @Override
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result * super.hashCode();
-    	result = 37 * result * replacewith.hashCode();
-    	return result;
+        if (!super.equals(o)) {
+            return false;
+        }
+        final RewriteTacletGoalTemplate other = (RewriteTacletGoalTemplate) o;
+        return replacewith.equals(other.replacewith);
     }
 
-    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result * super.hashCode();
+        result = 37 * result * replacewith.hashCode();
+        return result;
+    }
+
+
     /** toString */
     @Override
     public String toString() {
-	String result=super.toString();
-	result+="\\replacewith("+replaceWith()+") ";       
-	return result;
+        String result = super.toString();
+        result += "\\replacewith(" + replaceWith() + ") ";
+        return result;
     }
 
 }

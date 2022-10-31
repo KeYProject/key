@@ -14,11 +14,10 @@ import recoder.java.reference.TypeReference;
 /**
  * Creates JavaBean compliant setter/getter access methods.
  * <p>
- * Wishlist: - should always make the field private - options for setter/getter
- * for visibility modifier; usually getter should be more public that setter -
- * option to allow insertion of NullPointerException for non-primitive types -
- * option to forbid creation of indexed property methods - create entries for
- * manifest
+ * Wishlist: - should always make the field private - options for setter/getter for visibility
+ * modifier; usually getter should be more public that setter - option to allow insertion of
+ * NullPointerException for non-primitive types - option to forbid creation of indexed property
+ * methods - create entries for manifest
  */
 public class Property implements DesignPattern {
 
@@ -42,8 +41,8 @@ public class Property implements DesignPattern {
         String fieldName = field.getVariables().get(0).getName();
         String typeName = typeRef.toString();
         String className = Naming.createClassName(fieldName);
-        String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this." + fieldName + "="
-                + fieldName + ";}";
+        String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this."
+            + fieldName + "=" + fieldName + ";}";
         try {
             setter = factory.parseMethodDeclaration(source);
             source = "public " + typeName + " get" + className + "(){return " + fieldName + ";}";
@@ -51,10 +50,11 @@ public class Property implements DesignPattern {
             if (typeRef.getDimensions() > 0) {
                 // cut last "[]"
                 typeName = typeName.substring(0, typeName.length() - 2);
-                source = "public void set" + className + "(int index, " + typeName + " " + fieldName + ") { this."
-                        + fieldName + "[index] = " + fieldName + "; }";
+                source = "public void set" + className + "(int index, " + typeName + " " + fieldName
+                    + ") { this." + fieldName + "[index] = " + fieldName + "; }";
                 indexedSetter = factory.parseMethodDeclaration(source);
-                source = "public " + typeName + " get" + className + "(int index){return " + fieldName + "[index];}";
+                source = "public " + typeName + " get" + className + "(int index){return "
+                    + fieldName + "[index];}";
                 indexedGetter = factory.parseMethodDeclaration(source);
             }
         } catch (ParserException pe) {
@@ -138,12 +138,13 @@ public class Property implements DesignPattern {
     }
 
     /**
-     * Checks that at least one getter or one setter is available and that the
-     * types of the participants match.
+     * Checks that at least one getter or one setter is available and that the types of the
+     * participants match.
      */
     public void validate() throws ModelException {
         if (setter == null && getter == null) {
-            throw new InconsistentPatternException("Properties must have at least a setter or a getter method");
+            throw new InconsistentPatternException(
+                "Properties must have at least a setter or a getter method");
         }
         String gtype = null, stype = null, ftype = null;
         if (getter != null) {
@@ -160,10 +161,9 @@ public class Property implements DesignPattern {
             throw new InconsistentPatternException("Property types do not match!");
         }
         /*
-         * Extensions: Should checked indexed access methods, should compare
-         * complete type reference path, not only the last part (a returned by
-         * getName), or even better check the logical types for equality (as
-         * names could be qualified partially).
+         * Extensions: Should checked indexed access methods, should compare complete type reference
+         * path, not only the last part (a returned by getName), or even better check the logical
+         * types for equality (as names could be qualified partially).
          */
     }
 }

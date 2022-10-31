@@ -40,9 +40,9 @@ public class ModelGenerator implements SolverLauncherListener {
     private int count;
 
 
-    //models that have been found until now
+    // models that have been found until now
     private final List<Model> models;
-    //how many models we are looking for
+    // how many models we are looking for
     private final int target;
 
 
@@ -66,40 +66,41 @@ public class ModelGenerator implements SolverLauncherListener {
         launcher.addListener(this);
         launcher.launch(problem, services, solver);
     }
+
     /**
      * Creates a SolverLauncher with the appropriate settings.
+     *
      * @return
      */
     private SolverLauncher prepareLauncher() {
         final TestGenerationSettings settings = TestGenerationSettings.getInstance();
-        final ProofIndependentSMTSettings piSettings = ProofIndependentSettings
-                .DEFAULT_INSTANCE.getSMTSettings().clone();
+        final ProofIndependentSMTSettings piSettings =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
 
 
         piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
-        final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings
-                .getDefaultSettingsData();
+        final ProofDependentSMTSettings pdSettings =
+            ProofDependentSMTSettings.getDefaultSettingsData();
         pdSettings.invariantForall = settings.invariantForAll();
         // invoke z3 for counterexamples
-        final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings,
-                piSettings, new NewSMTTranslationSettings(), null);
+        final DefaultSMTSettings smtsettings =
+            new DefaultSMTSettings(pdSettings, piSettings, new NewSMTTranslationSettings(), null);
         return new SolverLauncher(smtsettings);
     }
 
     @Override
-    public void launcherStopped(SolverLauncher launcher,
-                                Collection<SMTSolver> finishedSolvers) {
+    public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
 
-        for(SMTSolver solver : finishedSolvers) {
+        for (SMTSolver solver : finishedSolvers) {
             SMTSolverResult result = solver.getFinalResult();
-            if(result.isValid().equals(SMTSolverResult.ThreeValuedTruth.FALSIFIABLE)
+            if (result.isValid().equals(SMTSolverResult.ThreeValuedTruth.FALSIFIABLE)
                     && models.size() < target) {
                 Model model = solver.getSocket().getQuery().getModel();
                 models.add(model);
                 addModelToTerm(model);
 
 
-                if(models.size() >= target) {
+                if (models.size() >= target) {
                     finish();
                 } else {
                     launch();
@@ -115,10 +116,9 @@ public class ModelGenerator implements SolverLauncherListener {
 
 
     /**
-     * Changes the term such that when evaluated again with z3 another model will be generated.
-     * If we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ...
-     * are integer constants we change the term t to the following form:
-     * t & !(c1=v1 & c2 = v2 & ...)
+     * Changes the term such that when evaluated again with z3 another model will be generated. If
+     * we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ... are integer constants we change the
+     * term t to the following form: t & !(c1=v1 & c2 = v2 & ...)
      *
      * @param m the model
      * @return true if the term has been changed
@@ -127,14 +127,14 @@ public class ModelGenerator implements SolverLauncherListener {
         TermBuilder tb = services.getTermBuilder();
         Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
         Term tmodel = tb.tt();
-        for(String c : m.getConstants().keySet()) {
+        for (String c : m.getConstants().keySet()) {
 
             SMTSort sort = m.getTypes().getTypeForConstant(c);
 
-            if(sort != null && sort.getId().equals(SMTObjTranslator.BINT_SORT)) {
+            if (sort != null && sort.getId().equals(SMTObjTranslator.BINT_SORT)) {
                 String val = m.getConstants().get(c);
                 int value = Integer.parseInt(val);
-                ProgramVariable v = (ProgramVariable)variables.lookup(c);
+                ProgramVariable v = (ProgramVariable) variables.lookup(c);
                 Term termConst = tb.var(v);
                 Term termVal = tb.zTerm(value);
                 Term termEquals = tb.equals(termConst, termVal);
@@ -143,7 +143,7 @@ public class ModelGenerator implements SolverLauncherListener {
         }
 
 
-        if(!tmodel.equals(tb.tt())) {
+        if (!tmodel.equals(tb.tt())) {
             Term notTerm = tb.not(tmodel);
             SequentFormula sf = new SequentFormula(notTerm);
             goal.addFormula(sf, true, true);
@@ -155,14 +155,14 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private void finish() {
         LOGGER.info("Finished: found {}", models.size());
-        for(Model m :  models) {
+        for (Model m : models) {
             LOGGER.info("\t{}", m.toString());
         }
     }
 
     @Override
-    public void launcherStarted(Collection<SMTProblem> problems,
-                                Collection<SolverType> solverTypes, SolverLauncher launcher) {
+    public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
+            SolverLauncher launcher) {
     }
 
     public Term sequentToTerm(Sequent s) {

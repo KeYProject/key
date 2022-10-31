@@ -7,20 +7,21 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Throw.
+ * Throw.
  */
 
 public class Throw extends ExpressionJumpStatement {
 
     /**
- *      Throw.
+     * Throw.
      */
 
     public Throw() {}
 
     /**
- *      Throw.
- *      @param expr an expression.
+     * Throw.
+     *
+     * @param expr an expression.
      */
 
     public Throw(Expression expr) {
@@ -31,20 +32,23 @@ public class Throw extends ExpressionJumpStatement {
     }
 
     /**
- *      Throw.
- *      @param children an ExtList with all children
+     * Throw.
+     *
+     * @param children an ExtList with all children
      */
 
     public Throw(ExtList children) {
         super(children);
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnThrow(this);
+        v.performActionOnThrow(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

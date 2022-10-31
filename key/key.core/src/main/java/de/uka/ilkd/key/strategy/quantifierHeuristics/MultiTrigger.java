@@ -29,12 +29,12 @@ class MultiTrigger implements Trigger {
     }
 
     @Override
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-            ImmutableSet<Term> targetTerms, Services services) {
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
+            Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
 
-        ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
-                targetTerms, services);
+        ImmutableSet<Substitution> mulsubs =
+            setMultiSubstitution(triggers.iterator(), targetTerms, services);
 
         for (Substitution sub : mulsubs) {
             if (sub.isTotalOn(qvs)) {
@@ -46,14 +46,12 @@ class MultiTrigger implements Trigger {
     }
 
     /** help function for getMultiSubstitution */
-    private ImmutableSet<Substitution> setMultiSubstitution(
-            Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
+    private ImmutableSet<Substitution> setMultiSubstitution(Iterator<? extends Trigger> ts,
+            ImmutableSet<Term> terms, Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
         if (ts.hasNext()) {
-            ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
-                    terms, services);
-            ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms,
-                    services);
+            ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(terms, services);
+            ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms, services);
             if (nextSubs.isEmpty()) {
                 return subi;
             } else if (subi.isEmpty()) {
@@ -73,9 +71,8 @@ class MultiTrigger implements Trigger {
     }
 
     /**
-     * unify two substitution, if same variable are bound with same term return
-     * a new substitution with all universal quantifiable variables in two
-     * substituition, otherwise return null
+     * unify two substitution, if same variable are bound with same term return a new substitution
+     * with all universal quantifiable variables in two substituition, otherwise return null
      */
     private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
         final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();

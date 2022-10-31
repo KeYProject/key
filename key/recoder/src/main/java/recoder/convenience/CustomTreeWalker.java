@@ -6,9 +6,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
 /**
- * A tree walker that allows to customize the traversal. The walker can report
- * elements during ascending, and may skip the traversal of certain subtrees on
- * demand.
+ * A tree walker that allows to customize the traversal. The walker can report elements during
+ * ascending, and may skip the traversal of certain subtrees on demand.
  *
  * @author AL
  */
@@ -35,25 +34,23 @@ public class CustomTreeWalker extends TreeWalker {
     }
 
     /**
-     * Checks whether non terminal elements are reported when returning from
-     * recursion. Default is false (no report).
+     * Checks whether non terminal elements are reported when returning from recursion. Default is
+     * false (no report).
      */
     public boolean isReportingReturns() {
         return isReportingReturns;
     }
 
     /**
-     * Decide whether non terminal elements should be reported when returning
-     * from recursion.
+     * Decide whether non terminal elements should be reported when returning from recursion.
      */
     public void setReportingReturns(boolean yes) {
         isReportingReturns = yes;
     }
 
     /**
-     * Returns true if the current element is left. This element will not be
-     * reported any longer. If return reporting is switched off, only terminal
-     * elements will be reported as returning.
+     * Returns true if the current element is left. This element will not be reported any longer. If
+     * return reporting is switched off, only terminal elements will be reported as returning.
      *
      * @see #isReportingReturns
      */
@@ -62,9 +59,9 @@ public class CustomTreeWalker extends TreeWalker {
     }
 
     /**
-     * Set a filter that decides whether the children of a non terminal should
-     * be reported, or not. This setting takes effect beginning at the next call
-     * to {@link #next()}. It does not affect reports of returning nodes.
+     * Set a filter that decides whether the children of a non terminal should be reported, or not.
+     * This setting takes effect beginning at the next call to {@link #next()}. It does not affect
+     * reports of returning nodes.
      */
     public void setParentFilter(ModelElementFilter filter) {
         parentFilter = filter;
@@ -105,7 +102,8 @@ public class CustomTreeWalker extends TreeWalker {
             NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
             int s = nt.getChildCount();
             if (count + s + 2 >= stack.length) {
-                ProgramElement[] newStack = new ProgramElement[Math.max(stack.length * 2, count + s + 2)];
+                ProgramElement[] newStack =
+                    new ProgramElement[Math.max(stack.length * 2, count + s + 2)];
                 System.arraycopy(stack, 0, newStack, 0, count);
                 stack = newStack;
             }

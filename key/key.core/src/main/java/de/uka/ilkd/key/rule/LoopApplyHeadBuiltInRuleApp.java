@@ -32,10 +32,8 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param pio
-     *            the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
@@ -43,12 +41,9 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param pio
-     *            the position at which the rule is applied.
-     * @param contracts
-     *            the contracts on which the rule is applied.
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
+     * @param contracts the contracts on which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableSet<LoopContract> contracts) {
@@ -89,7 +84,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         instantiation = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-                goal.proof().getServices()).instantiate();
+            goal.proof().getServices()).instantiate();
 
         Services services = goal.proof().getServices();
 

@@ -20,7 +20,9 @@ public class ImplicitEnumValueOf extends ImplicitEnumMethod {
         super(ownerClass);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {

@@ -6,7 +6,24 @@
             <pattern>%date|%level|%thread|%logger|%file:%line|%msg|%ex|%n</pattern>
             <outputPatternAsHeader>true</outputPatternAsHeader>
         </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>key-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>5</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
     </appender>
+
+    <appender name="HTML" class="ch.qos.logback.core.FileAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%relative%date%thread%mdc%level%logger%msg</pattern>
+            </layout>
+        </encoder>
+        <file>key.log.html</file>
+    </appender>
+
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -17,13 +34,14 @@
         </filter>
     </appender>
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
 
     <!--
-        A logger for development, also print to CONSOLE
+        A logger for development, also print to CONSOLE. This logger is not restricted by any command line options.
+        You should not use this code on the master branch.
     -->
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

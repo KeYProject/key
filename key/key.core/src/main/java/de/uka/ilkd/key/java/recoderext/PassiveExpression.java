@@ -4,12 +4,11 @@ import recoder.java.Expression;
 import recoder.java.expression.ParenthesizedExpression;
 
 
-public class PassiveExpression
-    extends ParenthesizedExpression {
+public class PassiveExpression extends ParenthesizedExpression {
 
-        
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4916068787633267648L;
 
@@ -17,21 +16,21 @@ public class PassiveExpression
      * creates a newly generated passive expression
      */
     public PassiveExpression() {
-	super();
+        super();
     }
 
     /**
      * creates a newly generated passive expression
      */
     public PassiveExpression(Expression e) {
-	super(e);
+        super(e);
     }
 
     public PassiveExpression(PassiveExpression proto) {
-	super(proto);
+        super(proto);
     }
-	   
+
     public PassiveExpression deepClone() {
-	return new PassiveExpression(this);
+        return new PassiveExpression(this);
     }
 }

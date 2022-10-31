@@ -6,14 +6,15 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
 
 /**
  * <p>
- * A node in the symbolic execution tree which represents a loop.
- * e.g. {@code while(x >= 0)}. The loop condition ({@code x >= 0}) itself 
- * is represented as {@link IExecutionLoopCondition} instance.
+ * A node in the symbolic execution tree which represents a loop. e.g. {@code while(x >= 0)}. The
+ * loop condition ({@code x >= 0}) itself is represented as {@link IExecutionLoopCondition}
+ * instance.
  * </p>
  * <p>
- * The default implementation is {@link ExecutionLoopStatement} which
- * is instantiated via a {@link SymbolicExecutionTreeBuilder} instance.
+ * The default implementation is {@link ExecutionLoopStatement} which is instantiated via a
+ * {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
+ *
  * @author Martin Hentschel
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopStatement

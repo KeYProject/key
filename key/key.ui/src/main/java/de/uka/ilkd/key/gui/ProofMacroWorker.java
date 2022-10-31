@@ -22,22 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Class ProofMacroWorker is a swing worker for the application of proof
- * macros.
+ * The Class ProofMacroWorker is a swing worker for the application of proof macros.
  * <p>
- * It decouples proof macros from the GUI event thread. It registers with the
- * mediator to receive Stop-Button events
+ * It decouples proof macros from the GUI event thread. It registers with the mediator to receive
+ * Stop-Button events
  */
-public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> implements InterruptListener {
+public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
+        implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofMacroWorker.class);
 
     /**
-     * This flag decides whether after a macro an open is selected or not.
-     * If the macro closed all goals under the current pio, selection remains
-     * where it was.
+     * This flag decides whether after a macro an open is selected or not. If the macro closed all
+     * goals under the current pio, selection remains where it was.
      */
     private static final boolean SELECT_GOAL_AFTER_MACRO =
-            Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
+        Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
      * The {@link Node} to start macro at.
@@ -57,7 +56,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
      */
     private final PosInOccurrence posInOcc;
     /**
-     * The resulting information of the task or null if the task was cancelled an exception was thrown
+     * The resulting information of the task or null if the task was cancelled an exception was
+     * thrown
      */
     private ProofMacroFinishedInfo info;
     /**
@@ -69,12 +69,13 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     /**
      * Instantiates a new proof macro worker.
      *
-     * @param node     the {@link Node} to start macro at.
-     * @param macro    the macro, not null
+     * @param node the {@link Node} to start macro at.
+     * @param macro the macro, not null
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
-    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator,
+            PosInOccurrence posInOcc) {
         assert macro != null;
         assert mediator != null;
         this.node = node;
@@ -88,13 +89,14 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
-        ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+        ptl.taskStarted(
+            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
-            LOGGER.debug("Proof macro has been interrupted:",exception);
+            LOGGER.debug("Proof macro has been interrupted:", exception);
             info = new ProofMacroFinishedInfo(macro, selectedProof, true);
             this.exception = exception;
         } catch (final Exception exception) {
@@ -114,7 +116,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     protected void done() {
         synchronized (macro) {
             mediator.removeInterruptedListener(this);
-            if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not report this
+            if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
+                                                       // report this
                 // This should actually never happen.
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
@@ -132,8 +135,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
         }
     }
 
-    protected void emitProofMacroFinished(Node node, ProofMacro macro,
-                                          PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
+    protected void emitProofMacroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+            ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }
 
@@ -146,9 +149,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     }
 
     /**
-     * Select a goal below the currently selected node.
-     * Does not do anything if that is not available.
-     * Only enabled goals are considered.
+     * Select a goal below the currently selected node. Does not do anything if that is not
+     * available. Only enabled goals are considered.
      */
     private void selectOpenGoalBelow() {
         Node selectedNode = mediator.getSelectedNode();

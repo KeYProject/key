@@ -25,7 +25,7 @@ public class LogicalVariableHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         // nothing to be done
     }
 
@@ -40,7 +40,7 @@ public class LogicalVariableHandler implements SMTHandler {
     }
 
     public static SExpr makeVarDecl(String name, Sort sort) {
-        if(sort.name().equals(IntegerLDT.NAME)) {
+        if (sort.name().equals(IntegerLDT.NAME)) {
             // Special casing integer quantification: Avoid conversion to "U".
             // Caution: Must be in sync with quantifier treatment.
             return new SExpr(VAR_PREFIX + name, new SExpr("Int"));
@@ -50,7 +50,7 @@ public class LogicalVariableHandler implements SMTHandler {
     }
 
     public static SExpr makeVarRef(String name, Sort sort) {
-        if(sort.name().equals(IntegerLDT.NAME)) {
+        if (sort.name().equals(IntegerLDT.NAME)) {
             // Special casing integer quantification: Avoid conversion to "U".
             // Caution: Must be in sync with quantifier treatment.
             return new SExpr(VAR_PREFIX + name, IntegerOpHandler.INT);

@@ -14,11 +14,10 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
         super(window);
         setName("Use Syntax Highlighting");
         setTooltip("Uses regular expressions-based syntax highlighting. "
-                + "This helps to understand sequents, but may "
-                + "slow down the rendering of longer ones.");
+            + "This helps to understand sequents, but may "
+            + "slow down the rendering of longer ones.");
         final boolean useSyntaxHighlighting =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .isUseSyntaxHighlighting();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting();
         setSelected(useSyntaxHighlighting);
     }
 

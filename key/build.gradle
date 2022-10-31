@@ -23,7 +23,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "5.17.0"
+    id "com.diffplug.spotless" version "6.11.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -62,22 +62,6 @@ sonarqube {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
@@ -102,7 +86,7 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:1.7.32")
-        testImplementation("org.slf4j:slf4j-simple:1.7.32")
+        testImplementation("ch.qos.logback:logback-classic:1.2.10")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
@@ -336,14 +320,16 @@ subprojects {
             //target '*.gradle', '*.md', '.gitignore'
             target 'src/main/resources/**/*.key'
             trimTrailingWhitespace()
-            indentWithSpaces(4)
+            //indentWithSpaces(4)       // this does not really work
             endWithNewline()
-            licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
+            // TODO: license headers are problematic at the moment,
+            //  see https://git.key-project.org/key/key/-/wikis/KaKeY%202022-09-30
+            //licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
         }
 
         antlr4 {
             target 'src/*/antlr4/**/*.g4' // default value, you can change if you want
-            licenseHeaderFile "$rootDir/gradle/header"
+            //licenseHeaderFile "$rootDir/gradle/header"
         }
 
         java {
@@ -353,6 +339,9 @@ subprojects {
             // We ignore the build folder to avoid double checks and checks of generated code.
             targetExclude 'build/**'
 
+            // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            toggleOffOn()
+
             eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
@@ -360,7 +349,7 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            //licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
         }
     }
 

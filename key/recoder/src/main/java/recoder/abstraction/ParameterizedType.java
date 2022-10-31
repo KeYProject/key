@@ -12,8 +12,8 @@ import recoder.service.ProgramModelInfo;
 import java.util.List;
 
 /**
- * A parameterized type, meaning a generic type plus actual type arguments.
- * All query calls are forwarded to the generic type.
+ * A parameterized type, meaning a generic type plus actual type arguments. All query calls are
+ * forwarded to the generic type.
  *
  * @author Tobias Gutzmann
  */
@@ -27,8 +27,10 @@ public class ParameterizedType implements ClassType {
      */
     public ParameterizedType(ClassType genericType, List<? extends TypeArgument> typeArgs) {
         super();
-        if (genericType == null) throw new NullPointerException();
-        if (typeArgs == null) throw new NullPointerException();
+        if (genericType == null)
+            throw new NullPointerException();
+        if (typeArgs == null)
+            throw new NullPointerException();
         this.genericType = genericType;
         this.typeArgs = typeArgs;
     }
@@ -41,35 +43,47 @@ public class ParameterizedType implements ClassType {
         return typeArgs;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getFullName()
      */
     public String getFullName() {
         return genericType.getFullName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return genericType.getProgramModelInfo();
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
-        throw new UnsupportedOperationException(pmi.getClass().getName() + " should not be set for Parameterized Types!");
+        throw new UnsupportedOperationException(
+            pmi.getClass().getName() + " should not be set for Parameterized Types!");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {
         return genericType.getName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.ModelElement#validate()
      */
     public void validate() throws ModelException {

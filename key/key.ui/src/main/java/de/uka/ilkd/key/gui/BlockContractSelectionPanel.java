@@ -21,8 +21,8 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
     public BlockContractSelectionPanel(final Services services, final boolean multipleSelection) {
         super(services, multipleSelection);
     }
-    
-    
+
+
     /**
      * The static access is used e.g. by the eclipse plugins.
      * <p>
@@ -31,25 +31,24 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
+     *
      * @param services The {@link Services}
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
-    public static BlockContract computeBlockContract(
-            Services services, List<BlockContract> selection) {
+    public static BlockContract computeBlockContract(Services services,
+            List<BlockContract> selection) {
         if (selection.isEmpty()) {
             return null;
-        }
-        else if (selection.size() == 1) {
+        } else if (selection.size() == 1) {
             return selection.get(0);
-        }
-        else {
+        } else {
             ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
             for (BlockContract contract : selection) {
                 contracts = contracts.add(contract);
             }
             return BlockContractImpl.combine(contracts, services);
-        }        
+        }
     }
 
     /**
@@ -59,13 +58,13 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
+     *
      * @param services The {@link Services}
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     @Override
-    public BlockContract computeContract(
-            Services services, List<BlockContract> selection) {
-      return computeBlockContract(services, selection);
+    public BlockContract computeContract(Services services, List<BlockContract> selection) {
+        return computeBlockContract(services, selection);
     }
 }

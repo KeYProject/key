@@ -16,17 +16,16 @@ import de.uka.ilkd.key.logic.Name;
 public class EmptySetLiteral extends Literal {
 
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
-    
-    
+
+
     @Override
-    public boolean equalsModRenaming(SourceElement o, 
-                                     NameAbstractionTable nat) {
-	return o == this;
+    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
+        return o == this;
     }
 
 
     public void visit(Visitor v) {
-	v.performActionOnEmptySetLiteral(this);
+        v.performActionOnEmptySetLiteral(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -35,8 +34,8 @@ public class EmptySetLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	PrimitiveType type = PrimitiveType.JAVA_LOCSET;
-	return javaServ.getJavaInfo().getKeYJavaType(type);
+        PrimitiveType type = PrimitiveType.JAVA_LOCSET;
+        return javaServ.getJavaInfo().getKeYJavaType(type);
     }
 
     @Override

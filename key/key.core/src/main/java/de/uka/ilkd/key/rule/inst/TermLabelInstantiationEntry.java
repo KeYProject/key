@@ -5,8 +5,8 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
- * 
- * 
+ *
+ *
  */
 public class TermLabelInstantiationEntry extends InstantiationEntry<ImmutableArray<TermLabel>> {
 

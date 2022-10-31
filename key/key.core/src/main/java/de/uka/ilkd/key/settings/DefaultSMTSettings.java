@@ -23,9 +23,8 @@ public class DefaultSMTSettings implements SMTSettings {
 
 
     public DefaultSMTSettings(ProofDependentSMTSettings pdSettings,
-                              ProofIndependentSMTSettings piSettings,
-                              NewSMTTranslationSettings newTransSettings,
-                              Proof proof) {
+            ProofIndependentSMTSettings piSettings, NewSMTTranslationSettings newTransSettings,
+            Proof proof) {
         super();
         this.pdSettings = pdSettings;
         this.piSettings = piSettings;
@@ -68,8 +67,7 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public String getSMTTemporaryFolder() {
-        return PathConfig.getKeyConfigDir()
-                + File.separator + "smt_formula";
+        return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
     }
 
     @Override

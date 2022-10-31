@@ -5,9 +5,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 
 public class SLWarningException extends SLTranslationException {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 699191378589840435L;
 
@@ -16,12 +16,12 @@ public class SLWarningException extends SLTranslationException {
         super(text, fileName, pos);
     }
 
-    
+
     public SLWarningException(PositionedString warning) {
         this(warning.text, warning.fileName, warning.pos);
     }
 
-    
+
     public PositionedString getWarning() {
         return new PositionedString(getMessage(), getFileName(), getPosition());
     }
