@@ -871,6 +871,7 @@ public class JMLSpecFactory {
                 if (clauses.ensures.get(heap) != null) {
                     Term excNull = tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()), ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
                     excNull = tb.addLabelToAllSubs(excNull, new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    excNull = tb.tf().atomize(excNull);
                     excNull = tb.tf().setOriginRefTypeRecursive(excNull, OriginRefType.IMPLICIT_ENSURES_EXCNULL, true);
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))

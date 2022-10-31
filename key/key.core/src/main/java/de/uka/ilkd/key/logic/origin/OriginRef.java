@@ -195,4 +195,8 @@ public class OriginRef {
     public OriginRef WithType(OriginRefType t) {
         return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm);
     }
+
+    public OriginRef WithIsAtom(boolean a) {
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm);
+    }
 }

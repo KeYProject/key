@@ -666,24 +666,29 @@ public abstract class AbstractOperationPO extends AbstractPO {
             Services services) {
         // "self != null"
         Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
+        selfNotNull = services.getTermFactory().atomize(selfNotNull);
         selfNotNull = services.getTermFactory().setOriginRefTypeRecursive(selfNotNull, OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL, true);
 
         // "self.<created> = TRUE"
         Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
+        selfCreated = services.getTermFactory().atomize(selfCreated);
         selfCreated = services.getTermFactory().setOriginRefTypeRecursive(selfCreated, OriginRefType.IMPLICIT_REQUIRES_SELFCREATED, true);
 
         // "MyClass::exactInstance(self) = TRUE"
         Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
+        selfExactType = services.getTermFactory().atomize(selfExactType);
         selfExactType = services.getTermFactory().setOriginRefTypeRecursive(selfExactType, OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE, true);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
+        paramsOK = services.getTermFactory().atomize(paramsOK);
         paramsOK = services.getTermFactory().setOriginRefTypeRecursive(paramsOK, OriginRefType.IMPLICIT_REQUIRES_PARAMSOK, true);
 
         // initial value of measured_by clause
         Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
+        mbyAtPreDef = services.getTermFactory().atomize(mbyAtPreDef);
         mbyAtPreDef = services.getTermFactory().setOriginRefTypeRecursive(mbyAtPreDef, OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL, true);
 
         // wellformed(heap)
@@ -696,6 +701,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
+        wellFormed = (wellFormed == null) ? null : services.getTermFactory().atomize(wellFormed);
         wellFormed = (wellFormed == null) ? null : services.getTermFactory().setOriginRefTypeRecursive(wellFormed, OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP, true);
 
         Term result = tb.and(

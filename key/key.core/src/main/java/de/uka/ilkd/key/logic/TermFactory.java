@@ -6,12 +6,12 @@ import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
+import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors
@@ -148,6 +148,53 @@ public final class TermFactory {
                 base.javaBlock(),
                 base.getLabels(),
                 origref);
+    }
+
+    /***
+     * ensure that the OriginRefs of teh term and all subterms are set and have the correct IsAtom / IsBooleanTerm flags
+     * This does happen autom. on normal parsed JML but can be neccessary on manually created terms
+     */
+    public @Nonnull Term atomize(Term term) {
+
+        Sort sort = term.op().sort(term.subs());
+
+        boolean boolterm = sort.name().toString().equals("Formula");
+
+        List<Term> subs = term.subs().toList();
+        subs.replaceAll(this::atomize);
+
+        term = doCreateTerm(
+                term.op(),
+                createSubtermArray(subs.toArray(new Term[0])),
+                term.boundVars(),
+                term.javaBlock(),
+                term.getLabels(),
+                term.getOriginRef());
+
+        boolean hasAtomChilds = termHasAtomChilds(term);
+
+        boolean shouldBeAtom = (!hasAtomChilds && boolterm);
+
+        if (term.getOriginRef() != null) {
+
+            OriginRef or = term.getOriginRef();
+
+            if (!or.IsAtom && shouldBeAtom) {
+                return setOriginRef(term, or.WithIsAtom(true));
+            } else {
+                return term;
+            }
+
+        } else {
+
+            return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm));
+
+        }
+    }
+
+    private boolean termHasAtomChilds(Term t) {
+        return t.subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom) ||
+               t.subs().stream().anyMatch(this::termHasAtomChilds);
     }
 
     //-------------------------------------------------------------------------
