@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
 
+import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
+
 public class SourceInsertionsView extends DebugTab {
 
     private final SourceView sourceView;
@@ -73,32 +75,6 @@ public class SourceInsertionsView extends DebugTab {
         sv.addInsertionChangedListener(refresh::run);
 
         add(new JScrollPane(list), BorderLayout.CENTER);
-    }
-
-    private static GridBagConstraints gbc(int x, int y) {
-        return new GridBagConstraints
-                (
-                        x, y,
-                        1, 1,
-                        1.0 , 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(2, 2, 2, 2),
-                        0, 0
-                );
-    }
-
-    private static GridBagConstraints gbc(int x, int y,int sx, int sy) {
-        return new GridBagConstraints
-                (
-                        x, y,
-                        sx, sy,
-                        1.0 , 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(2, 2, 2, 2),
-                        0, 0
-                );
     }
 
     private void clearInsertions(String grp) {

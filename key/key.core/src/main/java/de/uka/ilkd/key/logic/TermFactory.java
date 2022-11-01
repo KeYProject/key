@@ -158,7 +158,7 @@ public final class TermFactory {
 
         Sort sort = term.op().sort(term.subs());
 
-        boolean boolterm = sort.name().toString().equals("Formula");
+        boolean boolterm = (sort == Sort.FORMULA);
 
         List<Term> subs = term.subs().toList();
         subs.replaceAll(this::atomize);

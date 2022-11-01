@@ -139,4 +139,18 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	public final Sort sort() {
 		return sort;
 	}
+
+
+	@Override
+	public int hashCode() {
+		int hashcode = super.hashCode();
+
+		hashcode = hashcode * 17 + sort.hashCode();
+		hashcode = hashcode * 17 + argSorts.hashCode();
+
+		if(hashcode == -1) {
+			hashcode = 0;
+		}
+		return hashcode;
+	}
 }

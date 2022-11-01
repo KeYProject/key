@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
+
 public class OriginRefView extends DebugTab {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
@@ -143,19 +145,6 @@ public class OriginRefView extends DebugTab {
         }
 
         this.add(pnlConf, BorderLayout.NORTH);
-    }
-
-    private static GridBagConstraints gbc(int x, int y) {
-        return new GridBagConstraints
-        (
-            x, y,
-            1, 1,
-            1.0 , 1.0,
-            GridBagConstraints.CENTER,
-            GridBagConstraints.BOTH,
-            new Insets(0, 0, 0, 0),
-            0, 0
-        );
     }
 
     private void refreshShownTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {

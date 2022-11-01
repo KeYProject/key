@@ -77,7 +77,7 @@ public class SequentBackTransformer {
 
             for (var term: split) {
                 if (isRequires(term)) {
-                    result.add(new InsertionTerm(InsertionType.REQUIRES, term));
+                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
                 } else {
                     throw new TransformException("Failed to categorize antecedent-term '"+term+"'");
                 }
@@ -104,12 +104,12 @@ public class SequentBackTransformer {
             boolean ensuresInSplit = false;
             for (var term: split) {
                 if (isRequires(term)) {
-                    result.add(new InsertionTerm(InsertionType.REQUIRES, tb.not(term)));
+                    result.add(new InsertionTerm(InsertionType.ASSUME, tb.not(term)));
                 } else if (isEnsures(term)) {
                     if (ensuresInResult) {
                         throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
                     }
-                    result.add(new InsertionTerm(InsertionType.ENSURES, term));
+                    result.add(new InsertionTerm(InsertionType.ASSERT, term));
                     ensuresInSplit = true;
                 } else if (isAssignable(term)) {
                     if (ensuresInResult) {

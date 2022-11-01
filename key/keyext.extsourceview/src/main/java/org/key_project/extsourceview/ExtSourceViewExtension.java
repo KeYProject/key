@@ -6,7 +6,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.java.KeYProgModelInfo;
 import org.key_project.extsourceview.debug.DebugView;
 import org.key_project.extsourceview.transformer.InternTransformException;
 import org.key_project.extsourceview.transformer.TransformException;
@@ -27,8 +26,13 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtSourceViewExtension.class);
 
+    public static ExtSourceViewExtension Inst;
+
     private DebugView view;
 
+    public ExtSourceViewExtension() {
+        Inst = this;
+    }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
@@ -57,7 +61,7 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
         return Collections.singleton(view);
     }
 
-    private void update(MainWindow window, KeYMediator mediator) {
+    public void update(MainWindow window, KeYMediator mediator) {
         try {
             SourceViewPatcher.updateSourceview(window, mediator);
             view.BackTransformationView.clearStatus();

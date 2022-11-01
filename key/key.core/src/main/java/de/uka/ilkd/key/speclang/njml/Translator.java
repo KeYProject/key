@@ -258,7 +258,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         Sort sort = expr.getTerm().op().sort(expr.getTerm().subs());
 
-        boolean boolterm = sort.name().toString().equals("Formula");
+        boolean boolterm = (sort == Sort.FORMULA);
 
         boolean hasAtomSubs = expr.getTerm().subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom);
 

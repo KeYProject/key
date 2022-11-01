@@ -26,20 +26,16 @@ public class OriginRef {
     public final boolean IsBooleanTerm;
     public final boolean IsAtom;
 
-    public final int TermCoreHash;
+    public final Term SourceTerm;
 
     private String sourceStringCache = null;
     private boolean cached= false;
 
     public OriginRef(OriginRefType type, boolean isatom, boolean isbool, Term t) {
-        this(null, 0, 0, 0, 0, type, isatom, isbool, t.hashCodeCore());
+        this(null, 0, 0, 0, 0, type, isatom, isbool, t);
     }
 
-    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, Term t) {
-        this(file, lineStart, lineEnd, colStart, colEnd, type, isatom, isbool, t.hashCodeCore());
-    }
-
-    private OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, int hashcode) {
+    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, Term term) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
@@ -57,7 +53,7 @@ public class OriginRef {
         IsAtom = isatom;
         IsBooleanTerm = isbool;
         Type = type;
-        TermCoreHash = hashcode;
+        SourceTerm = term;
     }
 
     @Override
@@ -201,10 +197,10 @@ public class OriginRef {
     }
 
     public OriginRef WithType(OriginRefType t) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm, TermCoreHash);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm, SourceTerm);
     }
 
     public OriginRef WithIsAtom(boolean a) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm, TermCoreHash);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm, SourceTerm);
     }
 }

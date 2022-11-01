@@ -64,19 +64,6 @@ public class SourceHighlightsView extends DebugTab {
                 );
     }
 
-    private static GridBagConstraints gbc(int x, int y,int sx, int sy) {
-        return new GridBagConstraints
-                (
-                        x, y,
-                        sx, sy,
-                        1.0 , 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(2, 2, 2, 2),
-                        0, 0
-                );
-    }
-
     @Nonnull
     @Override
     public String getTitle() {

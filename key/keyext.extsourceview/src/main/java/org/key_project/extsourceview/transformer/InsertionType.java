@@ -2,9 +2,9 @@ package org.key_project.extsourceview.transformer;
 
 public enum InsertionType {
 
-    REQUIRES("requires"),   // @requires clause
-    ENSURES("ensures"),     // @ensures clause
-    ASSIGNABLE("assignable");     // @ensures clause
+    ASSUME("assume"),         // @assume            clause
+    ASSERT("assert"),         // @assert            clause
+    ASSIGNABLE("assignable"); // @assert_assignable clause
 
     private final String name;
 

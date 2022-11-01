@@ -1,10 +1,13 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -63,12 +66,12 @@ public class TermTranslator {
     }
 
     public String translate(InsertionTerm iterm) throws TransformException {
-        if (iterm.Type == InsertionType.ENSURES) {
+        if (iterm.Type == InsertionType.ASSUME) {
             return "// @assume " + translate(iterm.Term) + ";";
-        } else if (iterm.Type == InsertionType.REQUIRES) {
+        } else if (iterm.Type == InsertionType.ASSERT) {
             return "// @assert " + translate(iterm.Term) + ";";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
-            return "// @assignable (TODO);";
+            return "// @assignable (TODO);"; //TODO assignables
         } else {
             throw  new TransformException("Unknown value for InsertionType");
         }
@@ -87,17 +90,65 @@ public class TermTranslator {
 
         // simple case - use origin directly
 
-        if (origin != null && origin.TermCoreHash == term.hashCodeCore()) {
-            if (origin.hasFile()) {
-                var r = origin.sourceString();
-                if (r.isEmpty()) {
-                    throw new TransformException("Failed to get origin of term");
-                }
-                return r.get();
-            } else {
-                throw new TransformException("TermOrigin is not from input");
+        if (origin != null && unmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
+            var r = origin.sourceString();
+            if (r.isEmpty()) {
+                throw new TransformException("Failed to get origin of term");
             }
+            return r.get();
         }
+
+        // remove heap expressions
+
+        if (term.op() instanceof Function && term.op().name().toString().equals("store") && term.arity() == 4 && term.sub(0).op().name().toString().equals("heap") && term.sub(1).op().name().toString().equals("self")) {
+            return translate(term.sub(0));
+        }
+
+        // remove updates
+        //TODO
+
+        // handle annoying special cases
+
+        if (term.op().name().toString().equals("wellFormed") &&
+            term.arity() == 1 &&
+            term.sub(0).op().name().toString().equals("heap")) {
+            return "\\wellFormed(heap)"; //TODO not valid JML
+        }
+
+        if (term.op() == Equality.EQUALS &&
+            term.sub(1).op().name().toString().equals("TRUE") &&
+            term.sub(0).op().name().toString().equals("boolean::select") &&
+            term.sub(0).arity() == 3 &&
+            term.sub(0).sub(0).op().name().toString().equals("heap") &&
+            term.sub(0).sub(1).op().name().toString().equals("self") &&
+            term.sub(0).sub(2).op().name().toString().equals("java.lang.Object::<created>")) {
+            return "\\created(heap)"; //TODO not valid JML
+        }
+
+        if (term.op() == Equality.EQUALS &&
+            term.sub(1).op().name().toString().equals("TRUE") &&
+            term.sub(0).op().name().toString().endsWith("::exactInstance") &&
+            term.sub(0).arity() == 1 &&
+            term.sub(0).sub(0).op().name().toString().equals("self")) {
+            return "\\exactInstance(self)"; //TODO not valid JML
+        }
+
+        if (term.op().name().toString().equals("measuredByEmpty")) {
+            return "\\measuredByEmpty()"; //TODO not valid JML
+        }
+
+        if (term.op() == Equality.EQUALS &&
+            term.sub(0).op().name().toString().equals("self") &&
+            term.sub(1).op().name().toString().equals("null")) {
+            return "this == null";
+        }
+
+        if (term.op().name().toString().equals("java.lang.Object::<inv>") &&
+            term.sub(1).op().name().toString().equals("self")) {
+            return "\\invariant_for(this)"; //TODO hacky
+        }
+
+        // try to manually build the JML
 
         if (term.op() == Junctor.OR) return String.format("(%s) || (%s)", translate(term.sub(0)), translate(term.sub(1)));
         if (term.op() == Junctor.AND) return String.format("(%s) && (%s)", translate(term.sub(0)), translate(term.sub(1)));
@@ -108,6 +159,48 @@ public class TermTranslator {
         if (term.op() == Equality.EQUALS) return String.format("(%s) == (%s)", translate(term.sub(0)), translate(term.sub(1)));
         if (term.op() == Equality.EQV) return String.format("(%s) <-> (%s)", translate(term.sub(0)), translate(term.sub(1)));
 
-        throw new TransformException("Failed to translate term (unsupported op)");
+        // all hope is lost - error out
+
+        unmodifiedTerm(origin.SourceTerm, term);
+
+        throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
+    }
+
+    private static boolean unmodifiedTerm(Term a, Term b) {
+        if (a == b) return true;
+
+        //TODO improve me
+
+        // remove heap expressions
+        while (a.op() instanceof Function && a.op().name().toString().equals("store") && a.arity() == 4 && a.sub(0).op().name().toString().equals("heap") && a.sub(1).op().name().toString().equals("self")) {
+            a = a.sub(0);
+        }
+        while (b.op() instanceof Function && b.op().name().toString().equals("store") && b.arity() == 4 && b.sub(0).op().name().toString().equals("heap") && b.sub(1).op().name().toString().equals("self")) {
+            b = b.sub(0);
+        }
+
+        // remove updates
+        while (a.op() instanceof UpdateSV) {
+            a = a.sub(0);
+        }
+        while (b.op() instanceof UpdateSV) {
+            b = b.sub(0);
+        }
+
+        if (a.op().hashCode() != b.op().hashCode()) return false;
+
+        if (a.arity() != b.arity()) return false;
+
+        if (a.javaBlock() != b.javaBlock()) return false;
+
+        if (a.boundVars() != b.boundVars()) return false;
+
+        for (int i = 0; i < a.arity(); i++) {
+
+            if (!unmodifiedTerm(a.sub(i), b.sub(i))) return false;
+
+        }
+
+        return true;
     }
 }

@@ -159,4 +159,18 @@ public class Function extends AbstractSortedOperator {
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
     }
+
+
+    @Override
+    public int hashCode() {
+        int hashcode = super.hashCode();
+
+        hashcode = hashcode * 17 + (unique?1:0);
+        hashcode = hashcode * 17 + (skolemConstant?1:0);
+
+        if(hashcode == -1) {
+            hashcode = 0;
+        }
+        return hashcode;
+    }
 }

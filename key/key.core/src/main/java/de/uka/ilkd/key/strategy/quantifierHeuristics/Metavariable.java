@@ -75,4 +75,16 @@ public final class Metavariable extends AbstractSortedOperator
     public boolean isTemporaryVariable () {
         return isTemporaryVariable;
     }
+
+    @Override
+    public int hashCode() {
+        int hashcode = super.hashCode();
+
+        hashcode = hashcode * 17 + serial;
+
+        if(hashcode == -1) {
+            hashcode = 0;
+        }
+        return hashcode;
+    }
 }

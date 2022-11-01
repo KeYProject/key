@@ -133,11 +133,6 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public boolean equalsModRenaming(Term o);
 
-    /***
-     * like hashCode(), but does not include labels or originrefs
-     */
-    public int hashCodeCore();
-
     /**
      * returns true if the term is labeled
      */

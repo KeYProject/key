@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import org.key_project.extsourceview.ExtSourceViewExtension;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.InternTransformException;
 import org.key_project.extsourceview.transformer.TransformException;
@@ -13,6 +14,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
 
+import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
+
 public class BackTransformationView extends DebugTab {
 
     private JTextArea taSource;
@@ -20,10 +23,10 @@ public class BackTransformationView extends DebugTab {
     public BackTransformationView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
-        initGUI();
+        initGUI(window, mediator);
     }
 
-    private void initGUI() {
+    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         var pnlConf = new JPanel(new GridBagLayout());
@@ -31,12 +34,17 @@ public class BackTransformationView extends DebugTab {
         {
             var ctrl = new JRadioButton("Position at Start+End", true);
             pnlConf.add(ctrl, gbc(0, 0));
-            ctrl.addItemListener(e -> { /* TODO */ });
+            ctrl.addActionListener(e -> { /* TODO */ });
         }
         {
             var ctrl = new JRadioButton("Position at logical pos", false);
             pnlConf.add(ctrl, gbc(0, 1));
-            ctrl.addItemListener(e -> { /* TODO */ });
+            ctrl.addActionListener(e -> { /* TODO */ });
+        }
+        {
+            var ctrl = new JButton("Retry");
+            pnlConf.add(ctrl, gbc(2, 0, 1, 2));
+            ctrl.addActionListener(e -> ExtSourceViewExtension.Inst.update(window, mediator));
         }
 
         this.add(pnlConf, BorderLayout.NORTH);
@@ -47,19 +55,6 @@ public class BackTransformationView extends DebugTab {
         taSource.setLineWrap(true);
 
         this.add(new JScrollPane(taSource), BorderLayout.CENTER);
-    }
-
-    private static GridBagConstraints gbc(int x, int y) {
-        return new GridBagConstraints
-        (
-            x, y,
-            1, 1,
-            1.0 , 1.0,
-            GridBagConstraints.CENTER,
-            GridBagConstraints.BOTH,
-            new Insets(0, 0, 0, 0),
-            0, 0
-        );
     }
 
     @Nonnull

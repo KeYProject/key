@@ -50,4 +50,16 @@ public abstract class AbstractSV extends AbstractSortedOperator
     public final boolean isStrict() {
 	return isStrict;
     }
+
+    @Override
+    public int hashCode() {
+	int hashcode = super.hashCode();
+
+	hashcode = hashcode * 17 + (isStrict?1:0);
+
+	if(hashcode == -1) {
+		    hashcode = 0;
+	}
+	return hashcode;
+    }
 }

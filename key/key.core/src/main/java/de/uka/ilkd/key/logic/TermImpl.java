@@ -631,22 +631,6 @@ public class TermImpl implements Term {
         return hashcode;
     }
 
-    /***
-     * like hashCode(), but does not include labels or originrefs
-     */
-    public int hashCodeCore() {
-        int hashcode = 5;
-        hashcode = hashcode * 17 + op().hashCode();
-        hashcode = hashcode * 17 + subs().hashCode();
-        hashcode = hashcode * 17 + boundVars().hashCode();
-        hashcode = hashcode * 17 + javaBlock().hashCode();
-
-        if(hashcode == -1) {
-            hashcode = 0;
-        }
-        return hashcode;
-    }
-
     /**
      * returns a linearized textual representation of this term
      */
