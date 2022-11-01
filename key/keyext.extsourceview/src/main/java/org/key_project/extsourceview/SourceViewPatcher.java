@@ -52,7 +52,7 @@ public class SourceViewPatcher {
 
             int indentation = posmap.getLineIndent(line);
 
-            String jmlstr = " ".repeat(indentation) + translator.translateWithOrigin(iterm.Term);
+            String jmlstr = " ".repeat(indentation) + translator.translate(iterm);
 
             try {
                 addInsertion(sourceView, fileUri, line, iterm, jmlstr);

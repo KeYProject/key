@@ -266,6 +266,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         assert !(isatom && hasAtomSubs) : "Every Atom must be at the lowest level (no sub-atoms)";
 
+        Term term = expr.getTerm();
+
         OriginRef origin = new OriginRef(
                 src,
                 ctx.start.getLine(),
@@ -274,10 +276,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1),
                 OriginRefType.UNKNOWN,
                 isatom,
-                boolterm
+                boolterm,
+                term
         );
 
-        Term term = expr.getTerm();
         term = tb.tf().setOriginRef(term, origin);
 
         if (expr.getType() == null) {

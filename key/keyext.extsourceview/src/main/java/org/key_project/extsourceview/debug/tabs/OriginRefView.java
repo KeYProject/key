@@ -232,6 +232,7 @@ public class OriginRefView extends DebugTab {
             if (showSectionRepr) {
                 txt.append("----------<TOSTRING>----------\n");
                 txt.append("\n");
+                txt.append("ToStr<Translate>: ").append(translator.translateSafe(t)).append("\n");
                 txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(t)).append("\n");
                 txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(t, true)).append("\n");
                 txt.append("\n");
@@ -297,6 +298,7 @@ public class OriginRefView extends DebugTab {
 
                 Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
+                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent)).append("\n");
                     txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
                     txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true)).append("\n");
                     txt.append("\n");

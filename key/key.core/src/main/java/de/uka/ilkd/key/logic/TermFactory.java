@@ -135,7 +135,7 @@ public final class TermFactory {
         }
 
         if (origref == null && force) {
-            origref = new OriginRef(t, false, true);
+            origref = new OriginRef(t, false, true, base);
         }
 
         var subs = base.subs().toList();
@@ -187,7 +187,7 @@ public final class TermFactory {
 
         } else {
 
-            return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm));
+            return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm, term));
 
         }
     }

@@ -1,13 +1,15 @@
 package de.uka.ilkd.key.logic.origin;
 
+import de.uka.ilkd.key.logic.Term;
+
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public class OriginRef {
 
@@ -24,14 +26,20 @@ public class OriginRef {
     public final boolean IsBooleanTerm;
     public final boolean IsAtom;
 
+    public final int TermCoreHash;
+
     private String sourceStringCache = null;
     private boolean cached= false;
 
-    public OriginRef(OriginRefType type, boolean isatom, boolean isbool) {
-        this(null, 0, 0, 0, 0, type, isatom, isbool);
+    public OriginRef(OriginRefType type, boolean isatom, boolean isbool, Term t) {
+        this(null, 0, 0, 0, 0, type, isatom, isbool, t.hashCodeCore());
     }
 
-    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool) {
+    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, Term t) {
+        this(file, lineStart, lineEnd, colStart, colEnd, type, isatom, isbool, t.hashCodeCore());
+    }
+
+    private OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, int hashcode) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
@@ -49,6 +57,7 @@ public class OriginRef {
         IsAtom = isatom;
         IsBooleanTerm = isbool;
         Type = type;
+        TermCoreHash = hashcode;
     }
 
     @Override
@@ -101,7 +110,7 @@ public class OriginRef {
         return (File != null);
     }
 
-    public @Nonnull String sourceString() {
+    public @Nonnull Optional<String> sourceString() {
         if (!cached) {
 
             if (File != null) {
@@ -129,18 +138,17 @@ public class OriginRef {
                     sourceStringCache = r.toString();
                     cached = true;
                 } catch (IOException e) {
-                    sourceStringCache = "";
+                    sourceStringCache = null;
                     cached = true;
                 }
             } else {
-                sourceStringCache = "";
+                sourceStringCache = null;
                 cached = true;
             }
 
         }
 
-
-        return sourceStringCache;
+        return (sourceStringCache == null) ? Optional.empty() : Optional.of(sourceStringCache);
     }
 
     private static String safeSubstring(String str, int start, int end) {
@@ -193,10 +201,10 @@ public class OriginRef {
     }
 
     public OriginRef WithType(OriginRefType t) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm, TermCoreHash);
     }
 
     public OriginRef WithIsAtom(boolean a) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm, TermCoreHash);
     }
 }
