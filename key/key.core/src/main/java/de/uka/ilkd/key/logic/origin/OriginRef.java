@@ -9,6 +9,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class OriginRef {
@@ -29,7 +30,7 @@ public class OriginRef {
     public final Term SourceTerm;
 
     private String sourceStringCache = null;
-    private boolean cached= false;
+    private boolean cached = false;
 
     public OriginRef(OriginRefType type, boolean isatom, boolean isbool, Term t) {
         this(null, 0, 0, 0, 0, type, isatom, isbool, t);
@@ -62,11 +63,14 @@ public class OriginRef {
 
         final OriginRef cmp = (OriginRef) o;
 
-        return this.Type        ==  cmp.Type        &&
-               this.LineStart   ==  cmp.LineStart   &&
-               this.LineEnd     ==  cmp.LineEnd     &&
-               this.ColumnStart ==  cmp.ColumnStart &&
-               this.ColumnEnd   ==  cmp.ColumnEnd;
+        return this.Type          ==  cmp.Type          &&
+               this.LineStart     ==  cmp.LineStart     &&
+               this.LineEnd       ==  cmp.LineEnd       &&
+               this.ColumnStart   ==  cmp.ColumnStart   &&
+               this.ColumnEnd     ==  cmp.ColumnEnd     &&
+               this.IsAtom        ==  cmp.IsAtom        &&
+               this.IsBooleanTerm ==  cmp.IsBooleanTerm &&
+               Objects.equals(this.SourceTerm, cmp.SourceTerm);
     }
 
     private int hashcode = -1;
@@ -88,6 +92,9 @@ public class OriginRef {
         hash += 7 * this.LineEnd;
         hash += 7 * this.ColumnStart;
         hash += 7 * this.ColumnEnd;
+        hash += 7 * (this.IsAtom ? 0 : 1);
+        hash += 7 * (this.IsBooleanTerm ? 0 : 1);
+        hash += 7 * (this.SourceTerm == null ? 0 : this.SourceTerm.hashCode());
         return hash;
     }
 

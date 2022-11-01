@@ -18,6 +18,7 @@ import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SequentBackTransformer {
 
@@ -169,7 +170,7 @@ public class SequentBackTransformer {
     private boolean isRequires(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origins = getSubOriginRefs(term, true);
+        var origins = getSubOriginRefs(term, true).stream().filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN).collect(Collectors.toList());
         if (origins.size() == 0) return false;
 
         return origins.stream().allMatch(p -> p.Type.isRequires());
@@ -178,7 +179,7 @@ public class SequentBackTransformer {
     private boolean isEnsures(Term term) {
         if (term.containsJavaBlockRecursive()) return false;
 
-        var origins = getSubOriginRefs(term, true);
+        var origins = getSubOriginRefs(term, true).stream().filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN).collect(Collectors.toList());
         if (origins.size() == 0) return false;
 
         return origins.stream().allMatch(p -> p.Type.isEnsures());
