@@ -17,6 +17,9 @@ public class PositionMap {
         if (iterm.Type == InsertionType.REQUIRES) {
             return methodPosition.getStartPosition().getLine() + 1;
         }
+        if (iterm.Type == InsertionType.ASSIGNABLE) {
+            return methodPosition.getStartPosition().getLine() + 1;
+        }
         throw new InternTransformException("unknown InsertionTerm.Type");
     }
 

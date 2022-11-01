@@ -111,6 +111,12 @@ public class SequentBackTransformer {
                     }
                     result.add(new InsertionTerm(InsertionType.ENSURES, term));
                     ensuresInSplit = true;
+                } else if (isAssignable(term)) {
+                    if (ensuresInResult) {
+                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
+                    }
+                    result.add(new InsertionTerm(InsertionType.ASSIGNABLE, term));
+                    ensuresInSplit = true;
                 } else {
                     throw new TransformException("Failed to categorize succedent-term '"+term+"'");
                 }
@@ -139,6 +145,19 @@ public class SequentBackTransformer {
         if (origins.size() == 0) return false;
 
         return origins.stream().allMatch(p -> p.Type.isEnsures());
+    }
+
+    private boolean isAssignable(Term term) {
+        if (term.containsJavaBlockRecursive()) return false;
+
+        var origin = term.getOriginRef();
+        if (origin == null) return false;
+        if (origin.Type != OriginRefType.JML_ASSIGNABLE && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE) return false;
+
+        if (term.op() != Quantifier.ALL) return false;
+        if (term.sub(0).op() != Quantifier.ALL) return false;
+
+        return true;
     }
 
     private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
