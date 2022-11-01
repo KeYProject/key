@@ -27,7 +27,7 @@ public class SourceViewPatcher {
 
     private final static int HIGHTLIGHT_LEVEL = 11;
 
-    public static void updateSourceview(MainWindow window, KeYMediator mediator, boolean hideNonRelevant) throws TransformException, InternTransformException {
+    public static void updateSourceview(MainWindow window, KeYMediator mediator, boolean hideNonRelevant, boolean continueOnError) throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
         URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
@@ -42,7 +42,7 @@ public class SourceViewPatcher {
 
         TermTranslator translator = new TermTranslator(mediator.getServices());
 
-        InsertionSet parts = transformer.extract();
+        InsertionSet parts = transformer.extract(continueOnError);
 
         PositionMap posmap = transformer.generatePositionMap();
 
@@ -54,7 +54,7 @@ public class SourceViewPatcher {
 
             int indentation = posmap.getLineIndent(line);
 
-            String jmlstr = " ".repeat(indentation) + translator.translate(iterm);
+            String jmlstr = " ".repeat(indentation) + ( continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
                 addInsertion(sourceView, fileUri, line, iterm, jmlstr);
@@ -67,6 +67,11 @@ public class SourceViewPatcher {
     private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
         Color bkg = new Color(222, 222, 222);
+
+        if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
+            col = new Color(0xCC0000);
+        }
+
         SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, bkg);
 
         var originRefs = Utils.getSubOriginRefs(ins.Term, true, true);

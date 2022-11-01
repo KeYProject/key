@@ -1,7 +1,6 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -69,12 +68,24 @@ public class TermTranslator {
     public String translate(InsertionTerm iterm) throws TransformException {
         if (iterm.Type == InsertionType.ASSUME) {
             return "// @assume " + translate(iterm.Term) + ";";
+        } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
+            return "// @assume (ERROR);";
         } else if (iterm.Type == InsertionType.ASSERT) {
             return "// @assert " + translate(iterm.Term) + ";";
+        } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
+            return "// @assert (ERROR);";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
             return "// @assignable (TODO);"; //TODO assignables
         } else {
             throw  new TransformException("Unknown value for InsertionType");
+        }
+    }
+
+    public String translateSafe(InsertionTerm iterm) {
+        try {
+            return translate(iterm);
+        } catch (TransformException e) {
+            return "// @unknown (TRANSLATE-ERROR);";
         }
     }
 
@@ -164,6 +175,10 @@ public class TermTranslator {
         if (term.op() == Equality.EQV) return String.format("(%s) <-> (%s)", translate(term.sub(0)), translate(term.sub(1)));
 
         // all hope is lost - error out
+
+        if (origin != null) {
+            unmodifiedTerm(origin.SourceTerm, term);
+        }
 
         throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
     }

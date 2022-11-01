@@ -14,10 +14,16 @@ public class PositionMap {
         if (iterm.Type == InsertionType.ASSUME) {
             return methodPosition.getStartPosition().getLine() + 1;
         }
+        if (iterm.Type == InsertionType.ASSUME_ERROR) {
+            return methodPosition.getStartPosition().getLine() + 1;
+        }
         if (iterm.Type == InsertionType.ASSERT) {
             return methodPosition.getEndPosition().getLine();
         }
         if (iterm.Type == InsertionType.ASSIGNABLE) {
+            return methodPosition.getEndPosition().getLine();
+        }
+        if (iterm.Type == InsertionType.ASSERT_ERROR) {
             return methodPosition.getEndPosition().getLine();
         }
         throw new InternTransformException("unknown InsertionTerm.Type");

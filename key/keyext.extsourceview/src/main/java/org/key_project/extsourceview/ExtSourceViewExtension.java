@@ -31,6 +31,7 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
     private DebugView view;
 
     public boolean HideNonRelevantTerms = true;
+    public boolean ContinueInError = false;
 
     public ExtSourceViewExtension() {
         Inst = this;
@@ -65,7 +66,7 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
     public void update(MainWindow window, KeYMediator mediator) {
         try {
-            SourceViewPatcher.updateSourceview(window, mediator, HideNonRelevantTerms);
+            SourceViewPatcher.updateSourceview(window, mediator, HideNonRelevantTerms, ContinueInError);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent

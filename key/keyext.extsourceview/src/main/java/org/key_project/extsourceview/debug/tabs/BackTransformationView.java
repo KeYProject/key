@@ -43,9 +43,17 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Show all InsTerms", false);
-            pnlConf.add(cbx, gbc(0, 2));
+            pnlConf.add(cbx, gbc(1, 0));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
+                ExtSourceViewExtension.Inst.update(window, mediator);
+            });
+        }
+        {
+            var cbx = new JCheckBox("Fail on unknown terms", true);
+            pnlConf.add(cbx, gbc(1, 1));
+            cbx.addItemListener(e -> {
+                ExtSourceViewExtension.Inst.ContinueInError = !cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
             });
         }
