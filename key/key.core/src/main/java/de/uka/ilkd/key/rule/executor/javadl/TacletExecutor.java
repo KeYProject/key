@@ -159,6 +159,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         Term term = applicationPosInOccurrence.subTerm();
         if (term.getOriginRef() != null && term.getOriginRef().IsAtom && instantiatedFormula.getOriginRef() == null) {
             instantiatedFormula = services.getTermFactory().setOriginRef(instantiatedFormula, term.getOriginRef());
+            instantiatedFormula = services.getTermFactory().atomize(instantiatedFormula);
         }
 
         return new SequentFormula(instantiatedFormula);

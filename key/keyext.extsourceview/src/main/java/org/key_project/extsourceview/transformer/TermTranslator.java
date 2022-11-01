@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -98,24 +99,17 @@ public class TermTranslator {
             return r.get();
         }
 
-        // remove heap expressions
-
-        if (term.op() instanceof Function && term.op().name().toString().equals("store") && term.arity() == 4 && term.sub(0).op().name().toString().equals("heap") && term.sub(1).op().name().toString().equals("self")) {
-            return translate(term.sub(0));
-        }
-
-        // remove updates
-        //TODO
-
         // handle annoying special cases
 
-        if (term.op().name().toString().equals("wellFormed") &&
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP &&
+            term.op().name().toString().equals("wellFormed") &&
             term.arity() == 1 &&
             term.sub(0).op().name().toString().equals("heap")) {
             return "\\wellFormed(heap)"; //TODO not valid JML
         }
 
-        if (term.op() == Equality.EQUALS &&
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED &&
+            term.op() == Equality.EQUALS &&
             term.sub(1).op().name().toString().equals("TRUE") &&
             term.sub(0).op().name().toString().equals("boolean::select") &&
             term.sub(0).arity() == 3 &&
@@ -125,7 +119,8 @@ public class TermTranslator {
             return "\\created(heap)"; //TODO not valid JML
         }
 
-        if (term.op() == Equality.EQUALS &&
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE &&
+            term.op() == Equality.EQUALS &&
             term.sub(1).op().name().toString().equals("TRUE") &&
             term.sub(0).op().name().toString().endsWith("::exactInstance") &&
             term.sub(0).arity() == 1 &&
@@ -133,17 +128,26 @@ public class TermTranslator {
             return "\\exactInstance(self)"; //TODO not valid JML
         }
 
-        if (term.op().name().toString().equals("measuredByEmpty")) {
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL &&
+            term.op().name().toString().equals("measuredByEmpty")) {
             return "\\measuredByEmpty()"; //TODO not valid JML
         }
 
-        if (term.op() == Equality.EQUALS &&
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL &&
+            term.op() == Equality.EQUALS &&
             term.sub(0).op().name().toString().equals("self") &&
             term.sub(1).op().name().toString().equals("null")) {
             return "this == null";
         }
 
-        if (term.op().name().toString().equals("java.lang.Object::<inv>") &&
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT &&
+            term.op().name().toString().equals("java.lang.Object::<inv>") &&
+            term.sub(1).op().name().toString().equals("self")) {
+            return "\\invariant_for(this)"; //TODO hacky
+        }
+
+        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT &&
+            term.op().name().toString().equals("java.lang.Object::<inv>") &&
             term.sub(1).op().name().toString().equals("self")) {
             return "\\invariant_for(this)"; //TODO hacky
         }
@@ -160,8 +164,6 @@ public class TermTranslator {
         if (term.op() == Equality.EQV) return String.format("(%s) <-> (%s)", translate(term.sub(0)), translate(term.sub(1)));
 
         // all hope is lost - error out
-
-        unmodifiedTerm(origin.SourceTerm, term);
 
         throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
     }

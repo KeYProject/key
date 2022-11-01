@@ -79,6 +79,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
 
         if (term.getOriginRef() != null && term.getOriginRef().IsAtom && with.getOriginRef() == null) {
             with = services.getTermFactory().setOriginRef(with, term.getOriginRef());
+            with = services.getTermFactory().atomize(with);
         }
 
         return with;

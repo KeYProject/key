@@ -203,4 +203,8 @@ public class OriginRef {
     public OriginRef WithIsAtom(boolean a) {
         return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm, SourceTerm);
     }
+
+    public OriginRef WithMetadata(boolean atom, boolean booltype) {
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, atom, booltype, SourceTerm);
+    }
 }

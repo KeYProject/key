@@ -42,8 +42,16 @@ public class BackTransformationView extends DebugTab {
             ctrl.addActionListener(e -> { /* TODO */ });
         }
         {
+            var cbx = new JCheckBox("Show all InsTerms", false);
+            pnlConf.add(cbx, gbc(0, 2));
+            cbx.addItemListener(e -> {
+                ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
+                ExtSourceViewExtension.Inst.update(window, mediator);
+            });
+        }
+        {
             var ctrl = new JButton("Retry");
-            pnlConf.add(ctrl, gbc(2, 0, 1, 2));
+            pnlConf.add(ctrl, gbc(2, 0, 1, 3));
             ctrl.addActionListener(e -> ExtSourceViewExtension.Inst.update(window, mediator));
         }
 

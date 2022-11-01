@@ -27,7 +27,7 @@ public class SourceViewPatcher {
 
     private final static int HIGHTLIGHT_LEVEL = 11;
 
-    public static void updateSourceview(MainWindow window, KeYMediator mediator) throws TransformException, InternTransformException {
+    public static void updateSourceview(MainWindow window, KeYMediator mediator, boolean hideNonRelevant) throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
         URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
@@ -47,6 +47,8 @@ public class SourceViewPatcher {
         PositionMap posmap = transformer.generatePositionMap();
 
         for (var iterm: parts.get()) {
+
+            if (!iterm.IsRevelant() && hideNonRelevant) continue;
 
             int line = posmap.getLineForInsTerm(iterm);
 

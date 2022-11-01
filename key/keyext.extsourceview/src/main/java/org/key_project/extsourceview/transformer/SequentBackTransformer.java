@@ -90,8 +90,6 @@ public class SequentBackTransformer {
     private ArrayList<InsertionTerm> extractSuccedentTerms() throws TransformException {
         ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
 
-        TermBuilder tb = svc.getTermBuilder();
-
         boolean ensuresInResult = false;
         for (SequentFormula sf: sequent.succedent()) {
 
@@ -104,7 +102,7 @@ public class SequentBackTransformer {
             boolean ensuresInSplit = false;
             for (var term: split) {
                 if (isRequires(term)) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME, tb.not(term)));
+                    result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
                 } else if (isEnsures(term)) {
                     if (ensuresInResult) {
                         throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
@@ -124,6 +122,16 @@ public class SequentBackTransformer {
             if (ensuresInSplit) {
                 ensuresInResult = true;
             }
+        }
+
+        return result;
+    }
+
+    private Term termNot(Term term) {
+        Term result = svc.getTermBuilder().not(term);
+
+        if (term.getOriginRef() != null && result.getOriginRef() == null) {
+            result = svc.getTermFactory().setOriginRef(result, term.getOriginRef().WithMetadata(false, true));
         }
 
         return result;
