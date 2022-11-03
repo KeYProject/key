@@ -69,15 +69,15 @@ public class TermTranslator {
 
     public String translate(InsertionTerm iterm) throws TransformException {
         if (iterm.Type == InsertionType.ASSUME) {
-            return "// @assume " + translate(iterm.Term) + ";";
+            return "//@ assume " + translate(iterm.Term) + ";";
         } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
-            return "// @assume (ERROR);";
+            return "//@ assume (ERROR);";
         } else if (iterm.Type == InsertionType.ASSERT) {
-            return "// @assert " + translate(iterm.Term) + ";";
+            return "//@ assert " + translate(iterm.Term) + ";";
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
-            return "// @assert (ERROR);";
+            return "//@ assert (ERROR);";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
-            return "// @assignable (TODO);"; // TODO assignables
+            return "//@ assignable (TODO);"; // TODO assignables
         } else {
             throw new TransformException("Unknown value for InsertionType");
         }
