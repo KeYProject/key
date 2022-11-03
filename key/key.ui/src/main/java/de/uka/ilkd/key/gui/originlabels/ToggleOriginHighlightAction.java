@@ -26,28 +26,28 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         super(mainWindow);
         setIcon(IconFactory.ORIGIN_HIGHLIGHT_ICON.get());
         setEnabled(true);
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-                .getViewSettings().isHighlightOrigin());
+        setSelected(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin());
 
         setMenuPath("Origin Tracking");
         setName("Highlight Origins");
         setTooltip("When moving the mouse over a term in the sequent view,"
-                + "highlight its origin in the source view.");
+            + "highlight its origin in the source view.");
         putValue(KeyAction.CHECKBOX, true);
 
-        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addSettingsListener(
-            event -> {
-                boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
-                    .getTermLabelSettings().getUseOriginLabels();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .addSettingsListener(event -> {
+                    boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
+                            .getTermLabelSettings().getUseOriginLabels();
 
-                setEnabled(useOriginLabels);
-            });
+                    setEnabled(useOriginLabels);
+                });
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean oldValue = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getViewSettings().isHighlightOrigin();
+        boolean oldValue =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHighlightOrigin(!oldValue);
     }
 }

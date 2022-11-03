@@ -12,14 +12,12 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * This class completes the instantiations of the loop invariant rule
- * applications.
- * 
- * If in forced mode then the loop invariant dialog will not be shown if the
- * supplied invariant is complete.
+ * This class completes the instantiations of the loop invariant rule applications.
+ *
+ * If in forced mode then the loop invariant dialog will not be shown if the supplied invariant is
+ * complete.
  */
-public class LoopInvariantRuleCompletion implements
-        InteractiveRuleApplicationCompletion {
+public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
@@ -28,7 +26,7 @@ public class LoopInvariantRuleCompletion implements
         services = services.getOverlay(goal.getLocalNamespaces());
 
         LoopInvariantBuiltInRuleApp loopApp =
-                ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
+            ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
         Term progPost = loopApp.programTerm();
@@ -36,34 +34,30 @@ public class LoopInvariantRuleCompletion implements
 
         LoopSpecification inv = loopApp.getSpec();
         if (inv == null) { // no invariant present, get it interactively
-            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
-                                                               services);
-            inv = new LoopSpecImpl(loop,
-                                        mf == null ?
-                                                null : mf.getProgramMethod(),
-                                        mf == null || mf.getProgramMethod() == null ?
-                                                null : mf.getProgramMethod().getContainerType(),
-                                        mf == null ? null : MiscTools
-                                                .getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                                                progPost.javaBlock(), services),
-                                                             services),
-                                        null);
+            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
+            inv = new LoopSpecImpl(loop, mf == null ? null : mf.getProgramMethod(),
+                mf == null || mf.getProgramMethod() == null ? null
+                        : mf.getProgramMethod().getContainerType(),
+                mf == null ? null
+                        : MiscTools.getSelfTerm(
+                            JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services),
+                            services),
+                null);
             try {
-                inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                        services, false, loopApp.getHeapContext());
+                inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services, false,
+                    loopApp.getHeapContext());
             } catch (RuleAbortException e) {
                 return null;
             }
         } else { // in interactive mode and there is an invariant in the
-            // repository            
-            boolean requiresVariant = loopApp.variantRequired()
-                    && !loopApp.variantAvailable();
+            // repository
+            boolean requiresVariant = loopApp.variantRequired() && !loopApp.variantAvailable();
             // Check if a variant is required
             if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
                 // get invariant or variant interactively
                 try {
-                    inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                            inv, services, requiresVariant, loopApp.getHeapContext());
+                    inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services,
+                        requiresVariant, loopApp.getHeapContext());
                 } catch (RuleAbortException e) {
                     return null;
                 }
@@ -84,8 +78,8 @@ public class LoopInvariantRuleCompletion implements
     }
 
     /**
-     * Checks if the app is supported. This functionality is also used by the
-     * Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
         return app.rule() instanceof WhileInvariantRule

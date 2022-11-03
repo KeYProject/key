@@ -13,8 +13,8 @@ import recoder.testsuite.basic.BasicTestsSuite;
 import java.util.List;
 
 /**
- * Erases all compilation units, checks if the model is "empty", undoes the
- * change and checks if the model report is still valid.
+ * Erases all compilation units, checks if the model is "empty", undoes the change and checks if the
+ * model report is still valid.
  *
  * @author AL
  * @since 0.72
@@ -41,11 +41,13 @@ public class ModelRebuildTest extends AnalysisReportTest {
 
         // model should be cleared now except for byte code and implicitly
         // defined stuff
-        Assert.assertEquals(BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(), 0);
+        Assert.assertEquals(
+            BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(),
+            0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
             Assert.assertTrue("Syntax tree left in an emptied model",
-                    !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
+                !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
         }
 
         ch.rollback(clearAll);

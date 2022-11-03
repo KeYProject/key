@@ -5,8 +5,7 @@ import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 
-public class CcatchSVWrapper extends Ccatch
-        implements KeYRecoderExtension, SVWrapper {
+public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWrapper {
     private static final long serialVersionUID = -1;
     protected SchemaVariable sv;
 
@@ -17,8 +16,7 @@ public class CcatchSVWrapper extends Ccatch
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv
-     *            the SchemaVariable
+     * @param sv the SchemaVariable
      */
     @Override
     public void setSV(SchemaVariable sv) {
@@ -59,8 +57,7 @@ public class CcatchSVWrapper extends Ccatch
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement p1,
-            recoder.java.ProgramElement p2) {
+    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
         return false;
     }
 

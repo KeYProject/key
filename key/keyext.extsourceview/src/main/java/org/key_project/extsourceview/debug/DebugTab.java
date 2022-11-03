@@ -20,5 +20,6 @@ public abstract class DebugTab extends JPanel {
     public DebugTab() {
     }
 
-    @Nonnull public abstract String getTitle();
+    @Nonnull
+    public abstract String getTitle();
 }

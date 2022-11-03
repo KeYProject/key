@@ -21,10 +21,9 @@ public abstract class AbstractService implements Service {
     }
 
     /**
-     * Called by the service configuration indicating that all services are
-     * known. Services may now start communicating or linking among their
-     * configuration partners. The service configuration can be memorized if it
-     * has not been passed in by a constructor already. The default
+     * Called by the service configuration indicating that all services are known. Services may now
+     * start communicating or linking among their configuration partners. The service configuration
+     * can be memorized if it has not been passed in by a constructor already. The default
      * implementation does nothing.
      *
      * @param cfg the service configuration this services has been assigned to.

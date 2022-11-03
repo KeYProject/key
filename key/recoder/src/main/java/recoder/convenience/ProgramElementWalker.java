@@ -12,8 +12,8 @@ import recoder.java.ProgramElement;
 public interface ProgramElementWalker {
 
     /**
-     * Proceeds to the next element, if available. Returns <CODE>true</CODE>,
-     * if there is one, <CODE>false</CODE> otherwise.
+     * Proceeds to the next element, if available. Returns <CODE>true</CODE>, if there is one,
+     * <CODE>false</CODE> otherwise.
      *
      * @return <CODE>true</CODE> if the iterator points to an object.
      */

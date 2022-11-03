@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * The Class TacletProofObligationInput is a special purpose proof obligations
- * for taclet proofs.
+ * The Class TacletProofObligationInput is a special purpose proof obligations for taclet proofs.
  * <p>
- * A proof for a KeY system-taclet can thus be reloaded and checked against the
- * current environment.
+ * A proof for a KeY system-taclet can thus be reloaded and checked against the current environment.
  *
  * @author mattias ulbrich
  */
@@ -41,8 +39,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     private String baseDir;
 
     /**
-     * This filter is used to filter out precisely that taclet which has the
-     * required name.
+     * This filter is used to filter out precisely that taclet which has the required name.
      */
     private final TacletFilter filter = new TacletFilter() {
         @Override
@@ -145,24 +142,22 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(environmentConfig.getProfile());
+                new ProblemInitializer(environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                    new File(baseDir, tacletFile),
-                    fileCollection(axiomFiles), environmentConfig);
+                new File(baseDir, tacletFile), fileCollection(axiomFiles), environmentConfig);
         }
 
         ProofEnvironment proofEnv = createProofEnvironment();
         InitConfig initConfig = proofEnv.getInitConfigForEnvironment();
 
         TacletSoundnessPOLoader poloader =
-                new TacletSoundnessPOLoader(listener, filter, true, loader,
-                        initConfig, true);
+            new TacletSoundnessPOLoader(listener, filter, true, loader, initConfig, true);
 
         poloader.startSynchronously();
         if (proofObligation == null) {
-            throw new ProofInputException("Cannot instantiate the proof obligation for taclet '" +
-                    tacletName + "'. Is it defined (in the specified tacletFile?)");
+            throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
+                + tacletName + "'. Is it defined (in the specified tacletFile?)");
         }
     }
 
@@ -184,8 +179,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     @Override
     public ProofAggregate getPO() throws ProofInputException {
-        assert proofObligation != null :
-                "readProblem should have been called first";
+        assert proofObligation != null : "readProblem should have been called first";
         return proofObligation;
     }
 
@@ -201,13 +195,14 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             LOGGER.info("Proof obligation for taclet: {}", tacletName);
         }
         TacletProofObligationInput proofOblInput =
-                new TacletProofObligationInput(tacletName, initConfig);
+            new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);
         return new LoadedPOContainer(proofOblInput);
     }
 
     private void setLoadInfo(Properties properties) {
-        this.baseDir = new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
+        this.baseDir =
+            new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
         this.tacletFile = properties.getProperty("tacletFile");
         this.definitionFile = properties.getProperty("definitionFile");
         List<String> axioms = new ArrayList<>();
@@ -221,8 +216,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = axioms.toArray(new String[0]);
     }
 
-    public void setLoadInfo(File tacletFile, File definitionFile,
-                            Collection<File> axiomFiles) {
+    public void setLoadInfo(File tacletFile, File definitionFile, Collection<File> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];

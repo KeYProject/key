@@ -34,12 +34,14 @@ public class BackTransformationView extends DebugTab {
         {
             var ctrl = new JRadioButton("Position at Start+End", true);
             pnlConf.add(ctrl, gbc(0, 0));
-            ctrl.addActionListener(e -> { /* TODO */ });
+            ctrl.addActionListener(e -> {
+                /* TODO */ });
         }
         {
             var ctrl = new JRadioButton("Position at logical pos", false);
             pnlConf.add(ctrl, gbc(0, 1));
-            ctrl.addActionListener(e -> { /* TODO */ });
+            ctrl.addActionListener(e -> {
+                /* TODO */ });
         }
         {
             var cbx = new JCheckBox("Show all InsTerms", false);
@@ -86,11 +88,14 @@ public class BackTransformationView extends DebugTab {
 
     public void setStatusFailure(TransformException e) {
         taSource.setBackground(new Color(255, 208, 121));
-        taSource.setText(String.format("[FAILED TO TRANSFORM]\n\n%s\n\n--------------------------------\n\n%s", e.getMessage(), e));
+        taSource.setText(
+            String.format("[FAILED TO TRANSFORM]\n\n%s\n\n--------------------------------\n\n%s",
+                e.getMessage(), e));
     }
 
     public void setStatusException(InternTransformException e) {
         taSource.setBackground(new Color(255, 125, 125));
-        taSource.setText(String.format("[EXCEPTION]\n\n%s\n\n--------------------------------\n\n%s", e.getMessage(), e));
+        taSource.setText(String.format(
+            "[EXCEPTION]\n\n%s\n\n--------------------------------\n\n%s", e.getMessage(), e));
     }
 }

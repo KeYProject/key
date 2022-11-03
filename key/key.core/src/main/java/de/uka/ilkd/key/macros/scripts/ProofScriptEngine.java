@@ -122,9 +122,9 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
-            if (commandMonitor != null && stateMap.isEchoOn() && !Optional
-                    .ofNullable(argMap.get(ScriptLineParser.COMMAND_KEY))
-                    .orElse("").startsWith(SYSTEM_COMMAND_PREFIX)) {
+            if (commandMonitor != null && stateMap.isEchoOn()
+                    && !Optional.ofNullable(argMap.get(ScriptLineParser.COMMAND_KEY)).orElse("")
+                            .startsWith(SYSTEM_COMMAND_PREFIX)) {
                 commandMonitor.update(null, cmd);
             }
 
@@ -134,7 +134,8 @@ public class ProofScriptEngine {
                     throw new ScriptException("No command");
                 }
 
-                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
+                ProofScriptCommand<Object> command =
+                    (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name);
                 }
@@ -152,25 +153,26 @@ public class ProofScriptEngine {
             } catch (ProofAlreadyClosedException e) {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
-                            String.format("Proof already closed while trying to fetch next goal.\n"
-                                    + "This error can be suppressed by setting '@failonclosed off'.\n\n"
-                                    + "Command: %s\nLine:%d\n",
-                                    argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                            initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                        String.format(
+                            "Proof already closed while trying to fetch next goal.\n"
+                                + "This error can be suppressed by setting '@failonclosed off'.\n\n"
+                                + "Command: %s\nLine:%d\n",
+                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
+                        initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
                 } else {
                     LOGGER.info(
-                            "Proof already closed at command \"{}\" at line %d, terminating in line {}",
-                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
+                        "Proof already closed at command \"{}\" at line %d, terminating in line {}",
+                        argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
                     break;
                 }
             } catch (Exception e) {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
-                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
+                proof.getSubtreeGoals(stateMap.getProof().root())
+                        .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: %s\n\nCommand: %s",
-                                e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
-                        initialLocation.getFileURL(), mlp.getLine(),
-                        mlp.getColumn(), e);
+                    String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
+                        argMap.get(ScriptLineParser.LITERAL_KEY)),
+                    initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
             }
         }
     }
@@ -180,11 +182,9 @@ public class ProofScriptEngine {
     }
 
     /**
-     * Set the routine that is executed before every successfully executed
-     * command.
+     * Set the routine that is executed before every successfully executed command.
      *
-     * @param monitor
-     *            the monitor to set
+     * @param monitor the monitor to set
      */
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;

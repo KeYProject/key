@@ -13,6 +13,6 @@ public class ParseFilesTest {
     @Test
     public void testParseFiles() throws IOException, ParserException {
         getConfig().getSourceFileRepository().getCompilationUnitsFromFiles(
-                new DefaultProjectFileIO(getConfig(), getProjectFile()).load());
+            new DefaultProjectFileIO(getConfig(), getProjectFile()).load());
     }
 }

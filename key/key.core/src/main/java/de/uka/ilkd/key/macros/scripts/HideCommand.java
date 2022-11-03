@@ -27,12 +27,12 @@ import java.util.function.Function;
  * Proof script command to hide a formula from the sequent.
  *
  * Usage:
+ *
  * <pre>
  *     hide "f1, f2 ==> f3, f4"
  * </pre>
  *
- * All formulas in the parameter sequent are hidden using hide_left or using
- * hide_right.
+ * All formulas in the parameter sequent are hidden using hide_left or using hide_right.
  *
  * @author Mattias Ulbrich
  */
@@ -46,44 +46,44 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        Taclet hideLeft = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_LEFT);
+        Taclet hideLeft =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
         for (SequentFormula s : args.sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true), service);
+            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
+                service);
             goal.apply(app);
         }
 
-        Taclet hideRight = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_RIGHT);
+        Taclet hideRight =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
         for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false), service);
+            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
+                service);
             goal.apply(app);
         }
     }
 
     private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if(s.formula().equalsModTermLabels(sf.formula())) {
+            if (s.formula().equalsModTermLabels(sf.formula())) {
                 return s;
             }
         }

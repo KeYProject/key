@@ -10,7 +10,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a taclet application.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class TacletAppIntermediate extends AppIntermediate {
@@ -26,17 +26,16 @@ public class TacletAppIntermediate extends AppIntermediate {
      * Constructs a new intermediate taclet application.
      *
      * @param tacletName Name of the taclet.
-     * @param posInfo Position information (Integer representing position
-     *   of the target formula, PosInTerm for relevant term inside the formula).
+     * @param posInfo Position information (Integer representing position of the target formula,
+     *        PosInTerm for relevant term inside the formula).
      * @param insts Schema variable instantiations.
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
      */
-    public TacletAppIntermediate(String tacletName,
-            Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
-            ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,
-            ImmutableList<Name> newNames) {
+    public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
+            LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
+            ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
@@ -66,7 +65,9 @@ public class TacletAppIntermediate extends AppIntermediate {
         return ifDirectFormulaList;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override

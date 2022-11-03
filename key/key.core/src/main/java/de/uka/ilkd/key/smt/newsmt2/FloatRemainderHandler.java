@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * This handler is a fallback handler that introduces a new uninterpreted
- * function symbol with prefix "uf_" for all FP expressions.
+ * This handler is a fallback handler that introduces a new uninterpreted function symbol with
+ * prefix "uf_" for all FP expressions.
  *
  * This is used in floating point only translation.
  *
@@ -32,7 +32,7 @@ public class FloatRemainderHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
@@ -43,7 +43,7 @@ public class FloatRemainderHandler implements SMTHandler {
 
     @Override
     public Capability canHandle(Term term) {
-        if(term.sort() == floatSort || term.sort() == doubleSort) {
+        if (term.sort() == floatSort || term.sort() == doubleSort) {
             return Capability.YES_THIS_INSTANCE;
         }
         return Capability.UNABLE;
@@ -64,13 +64,13 @@ public class FloatRemainderHandler implements SMTHandler {
         }
 
         SExpr alreadySeen = map.get(term);
-        if(alreadySeen != null) {
+        if (alreadySeen != null) {
             return alreadySeen;
         }
 
         Type type;
         String smtType;
-        if(term.sort() == floatSort) {
+        if (term.sort() == floatSort) {
             type = FloatHandler.FLOAT;
             smtType = "Float32";
         } else {

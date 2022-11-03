@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 /**
- * Writeable objects have the possibility to be written to a
- * {@link StringBuilder}.
+ * Writeable objects have the possibility to be written to a {@link StringBuilder}.
  *
- * This avoids to explicitly invoke {@link #toString()} on larger objects which
- * might be inefficient.
+ * This avoids to explicitly invoke {@link #toString()} on larger objects which might be
+ * inefficient.
  *
  * Most prominent subclass is {@link SExpr}.
  *

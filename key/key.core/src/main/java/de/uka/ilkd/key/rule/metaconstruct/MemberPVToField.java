@@ -12,31 +12,28 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 
-public final class MemberPVToField extends AbstractTermTransformer {  
+public final class MemberPVToField extends AbstractTermTransformer {
 
     public MemberPVToField() {
         super(new Name("#memberPVToField"), 1);
     }
-    
+
 
     @Override
-    public Term transform(Term term, 
-	    		  SVInstantiations svInst, 
-	    		  Services services ) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
- 	
- 	    
- 	Operator op = term.sub(0).op();
-	if(op instanceof LocationVariable) {
-	    LocationVariable fieldPV = (LocationVariable) term.sub(0).op();
-	    Function fieldSymbol 
-	    	= heapLDT.getFieldSymbolForPV(fieldPV, services);
-	    return services.getTermBuilder().func(fieldSymbol);
-	} else if(heapLDT.getSortOfSelect(op) != null) {
-	    return term.sub(0).sub(2);
-	} else {
-	    assert false;
-	    return null;
-	}
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+
+        Operator op = term.sub(0).op();
+        if (op instanceof LocationVariable) {
+            LocationVariable fieldPV = (LocationVariable) term.sub(0).op();
+            Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
+            return services.getTermBuilder().func(fieldSymbol);
+        } else if (heapLDT.getSortOfSelect(op) != null) {
+            return term.sub(0).sub(2);
+        } else {
+            assert false;
+            return null;
+        }
     }
 }

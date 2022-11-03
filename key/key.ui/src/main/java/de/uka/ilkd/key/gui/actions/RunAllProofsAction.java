@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 /**
  * This class provides an action for KeY UI which runs a set of specified proof files automatically.
- * The intent of this class is to have a massive test feature for the quality assurance of the KeY during the
- * release preparation.
+ * The intent of this class is to have a massive test feature for the quality assurance of the KeY
+ * during the release preparation.
  * <p>
- * The used proofs can be given by the environment {@link #ENV_VARIABLE}.
- * If this variable is not set, this class use the default {@code de/uka/ilkd/key/gui/actions/runallproofsui.txt}.
- * See method {@link #loadFiles()} for more details.
+ * The used proofs can be given by the environment {@link #ENV_VARIABLE}. If this variable is not
+ * set, this class use the default {@code de/uka/ilkd/key/gui/actions/runallproofsui.txt}. See
+ * method {@link #loadFiles()} for more details.
  *
  * @author weigl
  */
@@ -61,14 +61,14 @@ public class RunAllProofsAction extends MainWindowAction {
 
 
     /**
-     * Loads the key file given in the file by environment variable {@link #ENV_VARIABLE}.
-     * If the content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null,
-     * then {@link #DEFAULT_FILE} is used.
+     * Loads the key file given in the file by environment variable {@link #ENV_VARIABLE}. If the
+     * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
+     * {@link #DEFAULT_FILE} is used.
      */
     @Nonnull
     private List<File> loadFiles() throws IOException {
-        LOGGER.info("Use 'export {}=<...>' to set the input file for {}.",
-                ENV_VARIABLE, getClass().getSimpleName());
+        LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
+            getClass().getSimpleName());
 
         InputStream stream;
         if (RUN_ALL_PROOFS_UI == null) {
@@ -82,9 +82,9 @@ public class RunAllProofsAction extends MainWindowAction {
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
-            return in.lines()
-                    .filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
-                    .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it)).getAbsoluteFile())
+            return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
+                    .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
+                            .getAbsoluteFile())
                     .collect(Collectors.toList());
         }
     }
@@ -103,7 +103,8 @@ public class RunAllProofsAction extends MainWindowAction {
         }
 
         setName("Run all proofs");
-        setTooltip("Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
+        setTooltip(
+            "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
     }
 
     @Override
@@ -118,7 +119,8 @@ public class RunAllProofsAction extends MainWindowAction {
             for (File absFile : files) {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
-                ProblemLoader problemLoader = ui.getProblemLoader(absFile, null, null, null, getMediator());
+                ProblemLoader problemLoader =
+                    ui.getProblemLoader(absFile, null, null, null, getMediator());
                 problemLoader.runSynchronously();
                 LOGGER.info("Loaded: {}", absFile);
 

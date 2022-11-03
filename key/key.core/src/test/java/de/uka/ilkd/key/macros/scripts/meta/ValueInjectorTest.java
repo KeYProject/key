@@ -36,8 +36,8 @@ public class ValueInjectorTest {
         Map<String, String> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
-        assertThrows(ArgumentRequiredException.class, () ->
-                ValueInjector.injection(new LetCommand(), pp, args));
+        assertThrows(ArgumentRequiredException.class,
+            () -> ValueInjector.injection(new LetCommand(), pp, args));
     }
 
     @Test

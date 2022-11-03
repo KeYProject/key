@@ -14,13 +14,11 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter (Term t, Services services) {
-        return  // the heap term is an anon heap symbol
-                // (for instance an anonHeap function)
-                t.hasLabels() &&
-                t.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL) &&
-                t.op().arity() == 0 &&
-                t.op() instanceof Function;
+    protected boolean filter(Term t, Services services) {
+        return // the heap term is an anon heap symbol
+               // (for instance an anonHeap function)
+        t.hasLabels() && t.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)
+                && t.op().arity() == 0 && t.op() instanceof Function;
     }
 
 }

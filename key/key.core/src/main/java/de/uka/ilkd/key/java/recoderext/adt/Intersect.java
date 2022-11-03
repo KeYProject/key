@@ -6,43 +6,43 @@ import recoder.java.Expression;
 public class Intersect extends ADTPrefixConstruct {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8777658515734186914L;
 
 
     public Intersect(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
-	makeParentRoleValid();
+        super(lhs, rhs);
+        makeParentRoleValid();
     }
 
 
     protected Intersect(Intersect proto) {
-	super(proto);
-	makeParentRoleValid();
+        super(proto);
+        makeParentRoleValid();
     }
-    
 
-    @Override    
+
+    @Override
     public Intersect deepClone() {
-	return new Intersect(this);
+        return new Intersect(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
-	return 2;
+        return 2;
     }
 
-    
-    @Override    
+
+    @Override
     public int getPrecedence() {
-	return 0;
+        return 0;
     }
 
-    
-    @Override    
+
+    @Override
     public int getNotation() {
-	return PREFIX;
+        return PREFIX;
     }
 }

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  * @author christoph
  */
 class TopLevelChecker implements Checker {
-    
+
     @Override
     public boolean check(PosInOccurrence pio) {
         return pio.isTopLevel();

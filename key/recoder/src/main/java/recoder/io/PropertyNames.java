@@ -13,10 +13,9 @@ public interface PropertyNames {
      * Property <TT>output.path</TT>.
      * <p>
      * <p>
-     * Defines the output path used by the
-     * {@link recoder.io.SourceFileRepository}to write back changed or new
-     * compilation units. Defaults to the corresponding environment variable or
-     * if there is none, the current user directory.
+     * Defines the output path used by the {@link recoder.io.SourceFileRepository}to write back
+     * changed or new compilation units. Defaults to the corresponding environment variable or if
+     * there is none, the current user directory.
      */
     String OUTPUT_PATH = "output.path";
 
@@ -24,12 +23,10 @@ public interface PropertyNames {
      * Property <TT>input.path</TT>.
      * <p>
      * <p>
-     * Defines the search path list used by the
-     * {@link recoder.io.ClassFileRepository}and
-     * {@link recoder.io.SourceFileRepository}to load new classes. Defaults to
-     * the corresponding environment variable or if there is none, the current
-     * class path, or if there is none, ".". The system should at least define
-     * the java.lang-classes.
+     * Defines the search path list used by the {@link recoder.io.ClassFileRepository}and
+     * {@link recoder.io.SourceFileRepository}to load new classes. Defaults to the corresponding
+     * environment variable or if there is none, the current class path, or if there is none, ".".
+     * The system should at least define the java.lang-classes.
      */
     String INPUT_PATH = "input.path";
 
@@ -38,8 +35,8 @@ public interface PropertyNames {
      * <p>
      * <p>
      * Defines the global behavior of the parser and lexer: If set, <CODE>
-     * assert</CODE> is considered a keyword, otherwise no assert statement can
-     * be parsed. The setting defaults to <CODE>true</CODE>
+     * assert</CODE> is considered a keyword, otherwise no assert statement can be parsed. The
+     * setting defaults to <CODE>true</CODE>
      */
     String JDK1_4 = "jdk1.4";
 
@@ -49,20 +46,18 @@ public interface PropertyNames {
      * <p>
      * Defines the global behavior of the parser and lexer: If set, <CODE>
      * Java 5 language features (like generics, autoboxing, ...) are accepted.
-     * Setting this property to <CODE>true</CODE> automatically sets the
-     * property <TT>JDK1_4</TT> to <CODE>true</CODE>.
-     * The setting defaults to <CODE>true</CODE>
+     * Setting this property to <CODE>true</CODE> automatically sets the property <TT>JDK1_4</TT> to
+     * <CODE>true</CODE>. The setting defaults to <CODE>true</CODE>
      */
     String JAVA_5 = "java5";
 
     /**
      * Property <TT>ADD_NEWLINE_AT_END_OF_FILE</TT>
      * <p>
-     * If set to <CODE>true</CODE>, adds an extra newline at end of each
-     * source file, which allows to parse files that end with a single
-     * line comment (without a newline feed). While those are not valid .java-files,
-     * most compilers accept these files.
-     * The setting defaults to <CODE>true</CODE>
+     * If set to <CODE>true</CODE>, adds an extra newline at end of each source file, which allows
+     * to parse files that end with a single line comment (without a newline feed). While those are
+     * not valid .java-files, most compilers accept these files. The setting defaults to
+     * <CODE>true</CODE>
      */
     String ADD_NEWLINE_AT_END_OF_FILE = "extra_newline_at_end_of_file";
 
@@ -70,8 +65,8 @@ public interface PropertyNames {
      * Property <TT>error.threshold</TT>.
      * <p>
      * <p>
-     * Defines the maximum number of errors the error handler accepts before
-     * falling back to a safe state.
+     * Defines the maximum number of errors the error handler accepts before falling back to a safe
+     * state.
      */
     String ERROR_THRESHOLD = "error.threshold";
 
@@ -79,11 +74,9 @@ public interface PropertyNames {
      * Property <TT>class.search.mode</TT>.
      * <p>
      * <p>
-     * Defines the search mode of the {@link recoder.service.NameInfo}. Valid
-     * values consist of a combination of at most one of each mode indicators
-     * <CODE>'s'</CODE>,<CODE>'c'</CODE> and <CODE>'r'</CODE> (or
-     * uppercase versions).
-     * <DL COMPACT>
+     * Defines the search mode of the {@link recoder.service.NameInfo}. Valid values consist of a
+     * combination of at most one of each mode indicators <CODE>'s'</CODE>,<CODE>'c'</CODE> and
+     * <CODE>'r'</CODE> (or uppercase versions). <DL COMPACT>
      * <DT><CODE>'s'</CODE>
      * <DD>look for source files
      * <DT><CODE>'c'</CODE>
@@ -93,8 +86,7 @@ public interface PropertyNames {
      * </DL>
      * <p>
      * Examples: <BR>
-     * <CODE>"sc"</CODE>- default setting, looks for source files, then class
-     * files. <BR>
+     * <CODE>"sc"</CODE>- default setting, looks for source files, then class files. <BR>
      * <CODE>"scr"</CODE>- use reflection as a last resort. <BR>
      * <CODE>""</CODE>- do not reload classes at all.
      */
@@ -104,8 +96,8 @@ public interface PropertyNames {
      * Property <TT>overwriteParsePositions</TT>.
      * <p>
      * <p>
-     * If set, global parse positions of source elements are reset by the pretty
-     * printer according to the new positions. Default is <TT>false</TT>.
+     * If set, global parse positions of source elements are reset by the pretty printer according
+     * to the new positions. Default is <TT>false</TT>.
      */
     String OVERWRITE_PARSE_POSITIONS = "overwriteParsePositions";
 
@@ -113,8 +105,8 @@ public interface PropertyNames {
      * Property <TT>overwriteIndentation</TT>.
      * <p>
      * <p>
-     * If set, indentations are always set by the pretty printer, even if they
-     * already are defined. Default is <TT>false</TT>.
+     * If set, indentations are always set by the pretty printer, even if they already are defined.
+     * Default is <TT>false</TT>.
      */
     String OVERWRITE_INDENTATION = "overwriteIndentation";
 
@@ -167,8 +159,8 @@ public interface PropertyNames {
      * Property <TT>glueStatementBlocks</TT>.
      * <p>
      * <p>
-     * If set, the opening bracket of a statement block follows immediately
-     * after the parent instruction. Default is <TT>true</TT>.
+     * If set, the opening bracket of a statement block follows immediately after the parent
+     * instruction. Default is <TT>true</TT>.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -208,10 +200,9 @@ public interface PropertyNames {
      * Property <TT>glueSequentialBranches</TT>.
      * <p>
      * <p>
-     * If set, branches Else, Catch, Default, Catch and Finally follows
-     * immediately after the closing bracket of the previous branch or the
-     * enclosing statement. Default is <TT>true</TT>. If set, the property
-     * <TT>glueStatementBlocks</TT> should also be set.
+     * If set, branches Else, Catch, Default, Catch and Finally follows immediately after the
+     * closing bracket of the previous branch or the enclosing statement. Default is <TT>true</TT>.
+     * If set, the property <TT>glueStatementBlocks</TT> should also be set.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -253,8 +244,8 @@ public interface PropertyNames {
      * Property <TT>glueControlExpressions</TT>.
      * <p>
      * <p>
-     * If set, the boolean condition of a conditional statement follows
-     * immediately after the statement keyword. Default is <TT>false</TT>.
+     * If set, the boolean condition of a conditional statement follows immediately after the
+     * statement keyword. Default is <TT>false</TT>.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -289,9 +280,9 @@ public interface PropertyNames {
      * Property <TT>glueParameterLists</TT>.
      * <p>
      * <p>
-     * If set, the parameter list of a method declaration as well as a method
-     * call and exception catch clauses follows immediately after the method
-     * name or the catch symbol. Default is <TT>true</TT>.
+     * If set, the parameter list of a method declaration as well as a method call and exception
+     * catch clauses follows immediately after the method name or the catch symbol. Default is
+     * <TT>true</TT>.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -330,8 +321,8 @@ public interface PropertyNames {
      * Property <TT>glueParameters</TT>.
      * <p>
      * <p>
-     * If set, the parameters of a method declaration as well as the arguments
-     * of a method call follows immediately after the comma. Default is <TT>
+     * If set, the parameters of a method declaration as well as the arguments of a method call
+     * follows immediately after the comma. Default is <TT>
      * false</TT>.
      * <p>
      * <TABLE BORDER>
@@ -367,8 +358,8 @@ public interface PropertyNames {
      * Property <TT>glueParameterParentheses</TT>.
      * <p>
      * <p>
-     * If set, the parameters of a method declaration as well as a method call
-     * follow / end immediately after / before the parantheses. Default is <TT>
+     * If set, the parameters of a method declaration as well as a method call follow / end
+     * immediately after / before the parantheses. Default is <TT>
      * true</TT>.
      * <p>
      * <TABLE BORDER>
@@ -404,8 +395,8 @@ public interface PropertyNames {
      * Property <TT>glueExpressionParentheses</TT>.
      * <p>
      * <p>
-     * If set, expressions in parentheses follow / end immediately after /
-     * before the parantheses. Default is <TT>true</TT>.
+     * If set, expressions in parentheses follow / end immediately after / before the parantheses.
+     * Default is <TT>true</TT>.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -438,8 +429,8 @@ public interface PropertyNames {
      * Property <TT>glueInitializerParentheses</TT>.
      * <p>
      * <p>
-     * If set, expressions in initializer blocks follow / end immediately after /
-     * before the brackets. Default is <TT>false</TT>.
+     * If set, expressions in initializer blocks follow / end immediately after / before the
+     * brackets. Default is <TT>false</TT>.
      * <p>
      * <TABLE BORDER>
      * <TR>
@@ -529,7 +520,7 @@ public interface PropertyNames {
      * <TD>
      *
      * <PRE>
-     * - (a ++)
+     * -(a++)
      * </PRE>
      *
      * </TD>

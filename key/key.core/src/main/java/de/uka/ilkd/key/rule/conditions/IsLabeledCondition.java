@@ -15,8 +15,8 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Checks whether the given statement is labeled, i.e., actual a
- * LabeledStatement. This information is obtained from the program prefix.
+ * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
+ * is obtained from the program prefix.
  *
  * @author Dominic Steinhoefel
  */
@@ -38,7 +38,7 @@ public class IsLabeledCondition implements VariableCondition {
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
-                (ProgramPrefix) svInst.getContextInstantiation().contextProgram();
+            (ProgramPrefix) svInst.getContextInstantiation().contextProgram();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {

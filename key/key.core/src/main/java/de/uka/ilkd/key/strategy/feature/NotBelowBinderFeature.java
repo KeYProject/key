@@ -9,31 +9,31 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Returns zero iff the position of a rule application is not below any
- * operators that bind variables
+ * Returns zero iff the position of a rule application is not below any operators that bind
+ * variables
  */
 public class NotBelowBinderFeature extends BinaryFeature {
 
-    public static final Feature INSTANCE = new NotBelowBinderFeature ();
+    public static final Feature INSTANCE = new NotBelowBinderFeature();
 
-    private NotBelowBinderFeature () {}
-    
-    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+    private NotBelowBinderFeature() {}
 
-        return !belowBinder ( pos );
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+        Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
+
+        return !belowBinder(pos);
     }
 
-    private boolean belowBinder (PosInOccurrence pos) {
-        final PIOPathIterator it = pos.iterator ();
+    private boolean belowBinder(PosInOccurrence pos) {
+        final PIOPathIterator it = pos.iterator();
 
-        while ( it.next () != -1 ) {
-            final Term t = it.getSubTerm ();
+        while (it.next() != -1) {
+            final Term t = it.getSubTerm();
 
-            if ( t.varsBoundHere ( it.getChild () ).size () > 0 ) return true;
+            if (t.varsBoundHere(it.getChild()).size() > 0)
+                return true;
         }
-        
+
         return false;
     }
 

@@ -29,12 +29,8 @@ public class AutoDismissDialog {
     private final int steps;
 
 
-    public AutoDismissDialog(Frame parent,
-                             String message,
-                             final int delay,
-                             final int rate,
-                             final int delayStartToDispose,
-                             final int delayDisposeToEnd) {
+    public AutoDismissDialog(Frame parent, String message, final int delay, final int rate,
+            final int delayStartToDispose, final int delayDisposeToEnd) {
         dialog = new JDialog(parent, "Message", false);
         messagePanel = new JPanel();
         messagePanel.add(new JLabel(message));
@@ -50,10 +46,9 @@ public class AutoDismissDialog {
     }
 
 
-    public AutoDismissDialog(Frame parent,
-                             String message) {
-        this(parent, message, DEFAULT_DELAY, DEFAULT_RATE,
-             DEFAULT_DELAY_START_TO_DISPOSE, DEFAULT_DELAY_DISPOSE_TO_END);
+    public AutoDismissDialog(Frame parent, String message) {
+        this(parent, message, DEFAULT_DELAY, DEFAULT_RATE, DEFAULT_DELAY_START_TO_DISPOSE,
+            DEFAULT_DELAY_DISPOSE_TO_END);
     }
 
 
@@ -85,22 +80,22 @@ public class AutoDismissDialog {
         }, delayStartToDispose, rate);
         dialog.setVisible(true);
     }
-//    private void setPosition() {
-//        if (dialog.getParent() != null
-//                    && dialog.getParent().getBounds() != null) {
-//                Container parent = dialog.getParent();
-//                // dimension of scroll pane minus frame dimension
-//                int x = parent.getBounds().width - INIT_SIZE.width;
-//                int y = parent.getBounds().height - INIT_SIZE.height;
-//                // plus parent positions
-//                parent = parent.getParent();
-//                while (parent != null) {
-//                    x += parent.getBounds().x;
-//                    y += parent.getBounds().y;
-//                    parent = parent.getParent();
-//                }
-//                setLocation(x, y);
-//                pack();
-//            }
-//    }
+    // private void setPosition() {
+    // if (dialog.getParent() != null
+    // && dialog.getParent().getBounds() != null) {
+    // Container parent = dialog.getParent();
+    // // dimension of scroll pane minus frame dimension
+    // int x = parent.getBounds().width - INIT_SIZE.width;
+    // int y = parent.getBounds().height - INIT_SIZE.height;
+    // // plus parent positions
+    // parent = parent.getParent();
+    // while (parent != null) {
+    // x += parent.getBounds().x;
+    // y += parent.getBounds().y;
+    // parent = parent.getParent();
+    // }
+    // setLocation(x, y);
+    // pack();
+    // }
+    // }
 }

@@ -11,8 +11,10 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
-/** Miscellaneous static methods related to Java blocks or statements in KeY.
- * Mostly moved from key.util.MiscTools here.
+/**
+ * Miscellaneous static methods related to Java blocks or statements in KeY. Mostly moved from
+ * key.util.MiscTools here.
+ *
  * @author bruns
  *
  */
@@ -25,10 +27,8 @@ public final class JavaTools {
         assert jb.program() != null;
 
         SourceElement result = jb.program().getFirstElement();
-        while ((result instanceof ProgramPrefix
-                || result instanceof CatchAllStatement)
-                && !(result instanceof StatementBlock
-                        && ((StatementBlock) result).isEmpty())) {
+        while ((result instanceof ProgramPrefix || result instanceof CatchAllStatement)
+                && !(result instanceof StatementBlock && ((StatementBlock) result).isEmpty())) {
             if (result instanceof LabeledStatement) {
                 result = ((LabeledStatement) result).getChildAt(1);
             } else if (result instanceof CatchAllStatement) {
@@ -43,12 +43,10 @@ public final class JavaTools {
     /**
      * Returns the passed java block without its active statement.
      */
-    public static JavaBlock removeActiveStatement(JavaBlock jb,
-            Services services) {
+    public static JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
-        Statement newProg = (Statement)
-            (new CreatingASTVisitor(jb.program(), false, services) {
+        Statement newProg = (Statement) (new CreatingASTVisitor(jb.program(), false, services) {
             private boolean done = false;
 
             public ProgramElement go() {
@@ -70,8 +68,7 @@ public final class JavaTools {
             }
         }).go();
 
-        StatementBlock newSB = newProg instanceof StatementBlock
-                ? (StatementBlock) newProg
+        StatementBlock newSB = newProg instanceof StatementBlock ? (StatementBlock) newProg
                 : new StatementBlock(newProg);
         return JavaBlock.createJavaBlock(newSB);
     }
@@ -79,8 +76,7 @@ public final class JavaTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
-            Services services) {
+    public static MethodFrame getInnermostMethodFrame(ProgramElement pe, Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
 
@@ -106,18 +102,13 @@ public final class JavaTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(JavaBlock jb,
-            Services services) {
+    public static MethodFrame getInnermostMethodFrame(JavaBlock jb, Services services) {
         return getInnermostMethodFrame(jb.program(), services);
     }
 
-    public static ExecutionContext getInnermostExecutionContext(
-        						JavaBlock jb, 
-            Services services) {
+    public static ExecutionContext getInnermostExecutionContext(JavaBlock jb, Services services) {
         final MethodFrame frame = getInnermostMethodFrame(jb, services);
-    return frame == null 
-               ? null
-                : (ExecutionContext) frame.getExecutionContext();
+        return frame == null ? null : (ExecutionContext) frame.getExecutionContext();
     }
 
 }

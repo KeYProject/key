@@ -14,7 +14,8 @@ public class InsertionSet {
     }
 
     public List<InsertionTerm> get(InsertionType... types) {
-        return Insertions.stream().filter(p -> Arrays.stream(types).anyMatch(q -> p.Type == q)).collect(Collectors.toList());
+        return Insertions.stream().filter(p -> Arrays.stream(types).anyMatch(q -> p.Type == q))
+                .collect(Collectors.toList());
     }
 
     public List<InsertionTerm> get() {

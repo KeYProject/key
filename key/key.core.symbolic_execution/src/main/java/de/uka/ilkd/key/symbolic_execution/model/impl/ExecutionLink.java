@@ -5,42 +5,44 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
  * The default implementation of {@link IExecutionLink}.
+ *
  * @author Martin Hentschel
  */
 public class ExecutionLink implements IExecutionLink {
-   /**
-    * The source {@link IExecutionNode}.
-    */
-   private final IExecutionNode<?> source;
-   
-   /**
-    * The target {@link IExecutionNode}.
-    */
-   private final IExecutionNode<?> target;
+    /**
+     * The source {@link IExecutionNode}.
+     */
+    private final IExecutionNode<?> source;
 
-   /**
-    * Constructor.
-    * @param source The source {@link IExecutionNode}.
-    * @param target The target {@link IExecutionNode}.
-    */
-   public ExecutionLink(IExecutionNode<?> source, IExecutionNode<?> target) {
-      this.source = source;
-      this.target = target;
-   }
+    /**
+     * The target {@link IExecutionNode}.
+     */
+    private final IExecutionNode<?> target;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IExecutionNode<?> getSource() {
-      return source;
-   }
+    /**
+     * Constructor.
+     *
+     * @param source The source {@link IExecutionNode}.
+     * @param target The target {@link IExecutionNode}.
+     */
+    public ExecutionLink(IExecutionNode<?> source, IExecutionNode<?> target) {
+        this.source = source;
+        this.target = target;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IExecutionNode<?> getTarget() {
-      return target;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExecutionNode<?> getSource() {
+        return source;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExecutionNode<?> getTarget() {
+        return target;
+    }
 }

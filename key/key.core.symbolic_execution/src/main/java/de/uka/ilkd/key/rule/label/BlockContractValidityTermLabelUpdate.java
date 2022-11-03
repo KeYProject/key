@@ -25,50 +25,42 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Makes sure that {@link BlockContractValidityTermLabel} is introduced
- * when a {@link BlockContractInternalRule} is applied.
+ * Makes sure that {@link BlockContractValidityTermLabel} is introduced when a
+ * {@link BlockContractInternalRule} is applied.
+ *
  * @author Martin Hentschel
  */
 public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImmutableList<Name> getSupportedRuleNames() {
+        return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void updateLabels(TermLabelState state,
-                            Services services,
-                            PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
-                            Term modalityTerm,
-                            Rule rule,
-                            RuleApp ruleApp,
-                            Object hint,
-                            Term tacletTerm,
-                            Operator newTermOp,
-                            ImmutableArray<Term> newTermSubs,
-                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            JavaBlock newTermJavaBlock,
-                            Set<TermLabel> labels) {
-       if ((rule instanceof BlockContractInternalRule
-    		   || rule instanceof LoopContractInternalRule)
-    		   && ((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()
-    		   		!= null 
-               && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-           if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
-               @Override
-               public boolean select(TermLabel element) {
-                   return element instanceof BlockContractValidityTermLabel;
-               }
-           }) == null) {
-               labels.add(new BlockContractValidityTermLabel(((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()));
-           }
-      }
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLabels(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
+            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
+            JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
+        if ((rule instanceof BlockContractInternalRule || rule instanceof LoopContractInternalRule)
+                && ((BlockContractInternalRule.BlockContractHint) hint)
+                        .getExceptionalVariable() != null
+                && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
+            if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
+                @Override
+                public boolean select(TermLabel element) {
+                    return element instanceof BlockContractValidityTermLabel;
+                }
+            }) == null) {
+                labels.add(new BlockContractValidityTermLabel(
+                    ((BlockContractInternalRule.BlockContractHint) hint).getExceptionalVariable()));
+            }
+        }
+    }
 }

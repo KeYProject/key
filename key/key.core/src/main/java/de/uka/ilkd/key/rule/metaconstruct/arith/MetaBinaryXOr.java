@@ -7,13 +7,13 @@ import de.uka.ilkd.key.logic.Name;
 
 public final class MetaBinaryXOr extends MetaArithBitMaskOp {
 
-	public MetaBinaryXOr() {
-		super(new Name("#BinaryXOr"));
-	}
+    public MetaBinaryXOr() {
+        super(new Name("#BinaryXOr"));
+    }
 
 
-	@Override
+    @Override
     protected BigInteger bitmaskOp(BigInteger left, BigInteger right) {
-		return left.xor(right);
-	}
+        return left.xor(right);
+    }
 }

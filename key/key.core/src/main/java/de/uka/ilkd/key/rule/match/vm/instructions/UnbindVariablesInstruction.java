@@ -7,8 +7,8 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 public class UnbindVariablesInstruction implements MatchInstruction {
 
     @Override
-    public MatchConditions match(TermNavigator termPosition,
-            MatchConditions matchConditions, Services services) {
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+            Services services) {
         return matchConditions.shrinkRenameTable();
     }
 

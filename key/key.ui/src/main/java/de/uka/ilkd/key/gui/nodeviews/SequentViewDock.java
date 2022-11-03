@@ -68,10 +68,8 @@ public class SequentViewDock extends DefaultMultipleCDockable {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (node != null) //TODO Check if also proof needs to be set!
-                sequentView.getMainWindow()
-                        .getMediator().getSelectionModel()
-                        .setSelectedNode(node);
+            if (node != null) // TODO Check if also proof needs to be set!
+                sequentView.getMainWindow().getMediator().getSelectionModel().setSelectedNode(node);
         }
     }
 }

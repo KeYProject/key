@@ -8,58 +8,42 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * Abstract base class for schema variables.
  */
-public abstract class AbstractSV extends AbstractSortedOperator 
-                          implements SchemaVariable {   
-    
-    private final boolean isStrict;
-    
-    
-    protected AbstractSV(Name name, 
-	                 ImmutableArray<Sort> argSorts, 
-	                 Sort sort,
-	                 boolean isRigid,
-	                 boolean isStrict) {
-	super(name, argSorts, sort, isRigid);
-	this.isStrict = isStrict;
-    }
-    
-    
-    protected AbstractSV(Name name, 
-	                 Sort[] argSorts, 
-	                 Sort sort,
-	                 boolean isRigid,
-	                 boolean isStrict) {
-	this(name, new ImmutableArray<Sort>(argSorts), sort, isRigid, isStrict);
-    }
-    
-    
-    protected AbstractSV(Name name,  
-	                 Sort sort,
-	                 boolean isRigid,
-	                 boolean isStrict) {
-	this(name,(ImmutableArray<Sort>) null, sort, isRigid, isStrict);
-    }    
-        
-    
-    protected final String toString(String sortSpec) {
-	return name() +" (" + sortSpec + ")"; 
-    }    
+public abstract class AbstractSV extends AbstractSortedOperator implements SchemaVariable {
 
-    
+    private final boolean isStrict;
+
+    protected AbstractSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
+            boolean isStrict) {
+        super(name, argSorts, sort, isRigid);
+        this.isStrict = isStrict;
+    }
+
+    protected AbstractSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid, boolean isStrict) {
+        this(name, new ImmutableArray<Sort>(argSorts), sort, isRigid, isStrict);
+    }
+
+    protected AbstractSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
+        this(name, (ImmutableArray<Sort>) null, sort, isRigid, isStrict);
+    }
+
+    protected final String toString(String sortSpec) {
+        return name() + " (" + sortSpec + ")";
+    }
+
     @Override
     public final boolean isStrict() {
-	return isStrict;
+        return isStrict;
     }
 
     @Override
     public int hashCode() {
-	int hashcode = super.hashCode();
+        int hashcode = super.hashCode();
 
-	hashcode = hashcode * 17 + (isStrict?1:0);
+        hashcode = hashcode * 17 + (isStrict ? 1 : 0);
 
-	if(hashcode == -1) {
-		    hashcode = 0;
-	}
-	return hashcode;
+        if (hashcode == -1) {
+            hashcode = 0;
+        }
+        return hashcode;
     }
 }

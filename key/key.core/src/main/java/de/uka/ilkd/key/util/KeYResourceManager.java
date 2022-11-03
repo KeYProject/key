@@ -1,6 +1,5 @@
 /**
- * KeYResourceManager controls the access to the properties
- * and resources used in the KeY system.
+ * KeYResourceManager controls the access to the properties and resources used in the KeY system.
  * Use the static method getManager to get the unique instance.
  */
 
@@ -19,8 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * KeYResourceManager controls the access to the properties
- * and resources used in the KeY system.
+ * KeYResourceManager controls the access to the properties and resources used in the KeY system.
  * Use the static method getManager to get the unique instance.
  */
 public class KeYResourceManager {
@@ -28,7 +26,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-            Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
+        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
 
     /**
      * the unique instance
@@ -82,8 +80,7 @@ public class KeYResourceManager {
         if (sha1 != null) {
             return sha1;
         }
-        sha1 =
-                readVersionString(getResourceFile(this, "sha1"));
+        sha1 = readVersionString(getResourceFile(this, "sha1"));
 
         return sha1;
     }
@@ -105,9 +102,7 @@ public class KeYResourceManager {
     public boolean visibleBranch() {
         final String b = getBranch();
         final String v = getVersion();
-        return !b.equals("")
-                && !INVISIBLE_BRANCHES.contains(b)
-                && !b.startsWith("KeY" + v)
+        return !b.equals("") && !INVISIBLE_BRANCHES.contains(b) && !b.startsWith("KeY" + v)
                 && !b.startsWith("KeY" + "-" + v);
     }
 
@@ -120,45 +115,38 @@ public class KeYResourceManager {
         if (version != null) {
             return version;
         }
-        version =
-                readVersionString(getResourceFile(this, "version"));
+        version = readVersionString(getResourceFile(this, "version"));
 
         return version;
     }
 
     /**
-     * Copies the specified resource to targetLocation if such a file
-     * does not exist yet.
-     * The created file is removed automatically after finishing JAVA.
+     * Copies the specified resource to targetLocation if such a file does not exist yet. The
+     * created file is removed automatically after finishing JAVA.
      *
-     * @param o              an Object the directory from where <code>resourcename</code>
-     *                       is copied is determined by looking on the package where <code>o.getClass()</code>
-     *                       is declared
-     * @param resourcename   String the name of the file to search  (only relative
-     *                       pathname to the path of the calling class)
+     * @param o an Object the directory from where <code>resourcename</code> is copied is determined
+     *        by looking on the package where <code>o.getClass()</code> is declared
+     * @param resourcename String the name of the file to search (only relative pathname to the path
+     *        of the calling class)
      * @param targetLocation target for copying
      * @return true if resource was copied
      */
-    public boolean copyIfNotExists(Object o, String resourcename,
-                                   String targetLocation) {
+    public boolean copyIfNotExists(Object o, String resourcename, String targetLocation) {
         return copyIfNotExists(o.getClass(), resourcename, targetLocation);
     }
 
-    public boolean copyIfNotExists(Class<?> cl, String resourcename,
-                                   String targetLocation) {
+    public boolean copyIfNotExists(Class<?> cl, String resourcename, String targetLocation) {
         return copy(cl, resourcename, targetLocation, false);
     }
 
-    public boolean copy(Class<?> cl, String resourcename,
-                        String targetLocation, boolean overwrite) {
+    public boolean copy(Class<?> cl, String resourcename, String targetLocation,
+            boolean overwrite) {
         URL resourceURL = cl.getResource(resourcename);
 
         LOGGER.debug("Load Resource:" + resourcename + " of class " + cl);
 
         if (resourceURL == null && cl.getSuperclass() != null) {
-            return copy(cl.getSuperclass(),
-                    resourcename,
-                    targetLocation, overwrite);
+            return copy(cl.getSuperclass(), resourcename, targetLocation, overwrite);
         } else if (resourceURL == null) {
             // error message Resource not found
             LOGGER.warn("No resource " + resourcename + " found");
@@ -182,9 +170,11 @@ public class KeYResourceManager {
 
 
                 long actualTransferredByte;
-                try (final ReadableByteChannel sourceStream = Channels.newChannel(resourceURL.openStream());
-                     FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
-                    actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+                try (final ReadableByteChannel sourceStream =
+                    Channels.newChannel(resourceURL.openStream());
+                        FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
+                    actualTransferredByte =
+                        targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
                 }
                 if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
                     throw new RuntimeException("File " + resourcename + " too big.");
@@ -202,7 +192,7 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param cl           the Class used to determine the resource
+     * @param cl the Class used to determine the resource
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
@@ -219,7 +209,7 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param o            the Object used to determine the resource
+     * @param o the Object used to determine the resource
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
@@ -228,14 +218,13 @@ public class KeYResourceManager {
     }
 
     /**
-     * All KeY {@link de.uka.ilkd.key.control.UserInterfaceControl}s should use a common
-     * title string when they require one, for instance for a GUI window title
-     * bar.
+     * All KeY {@link de.uka.ilkd.key.control.UserInterfaceControl}s should use a common title
+     * string when they require one, for instance for a GUI window title bar.
      *
-     * @return the title string to be used by the KeY
-     * <code>UserInterfaces</code>
+     * @return the title string to be used by the KeY <code>UserInterfaces</code>
      */
     public String getUserInterfaceTitle() {
-        return String.format("KeY %s%s", this.getVersion(), visibleBranch() ? " [" + getBranch() + "]" : "");
+        return String.format("KeY %s%s", this.getVersion(),
+            visibleBranch() ? " [" + getBranch() + "]" : "");
     }
 }

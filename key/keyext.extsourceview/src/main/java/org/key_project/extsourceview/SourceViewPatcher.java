@@ -27,10 +27,13 @@ public class SourceViewPatcher {
 
     private final static int HIGHTLIGHT_LEVEL = 11;
 
-    public static void updateSourceview(MainWindow window, KeYMediator mediator, boolean hideNonRelevant, boolean continueOnError) throws TransformException, InternTransformException {
+    public static void updateSourceview(MainWindow window, KeYMediator mediator,
+            boolean hideNonRelevant, boolean continueOnError)
+            throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
-        URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a single file
+        URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a
+                                                    // single file
 
         try {
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);
@@ -38,7 +41,8 @@ public class SourceViewPatcher {
             throw new InternTransformException("Failed to clear existing insertions", e);
         }
 
-        SequentBackTransformer transformer = new SequentBackTransformer(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+        SequentBackTransformer transformer = new SequentBackTransformer(mediator.getServices(),
+            mediator.getSelectedProof(), mediator.getSelectedNode());
 
         TermTranslator translator = new TermTranslator(mediator.getServices());
 
@@ -46,15 +50,18 @@ public class SourceViewPatcher {
 
         PositionMap posmap = transformer.generatePositionMap();
 
-        for (var iterm: parts.get()) {
+        for (var iterm : parts.get()) {
 
-            if (!iterm.IsRevelant() && hideNonRelevant) continue;
+            if (!iterm.IsRevelant() && hideNonRelevant)
+                continue;
 
             int line = posmap.getLineForInsTerm(iterm);
 
             int indentation = posmap.getLineIndent(line);
 
-            String jmlstr = " ".repeat(indentation) + ( continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
+            String jmlstr =
+                " ".repeat(indentation) + (continueOnError ? translator.translateSafe(iterm)
+                        : translator.translate(iterm));
 
             try {
                 addInsertion(sourceView, fileUri, line, iterm, jmlstr);
@@ -64,7 +71,8 @@ public class SourceViewPatcher {
         }
     }
 
-    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
+    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins,
+            String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
         Color bkg = new Color(222, 222, 222);
 
@@ -80,13 +88,16 @@ public class SourceViewPatcher {
 
             try {
                 for (OriginRef orig : originRefs) {
-                    if (!orig.hasFile() || !sv.hasFile(orig.fileURI())) continue;
+                    if (!orig.hasFile() || !sv.hasFile(orig.fileURI()))
+                        continue;
 
                     if (orig.LineStart == orig.LineEnd) {
-                        sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
+                        sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart,
+                            orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
                     } else {
                         for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
-                            sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
+                            sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN,
+                                HIGHTLIGHT_LEVEL);
                         }
                     }
                 }

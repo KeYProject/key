@@ -12,9 +12,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
- * Open the KeY project homepage in the system default browser.
- * May be inactive if Java 6 Desktop system is not supported or
- * internet connection missing.
+ * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop
+ * system is not supported or internet connection missing.
  *
  * @author bruns
  *

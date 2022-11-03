@@ -15,9 +15,8 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
     private final SeqLDT seqLDT;
 
 
-    public JMLBuiltInPropertyResolver(JavaInfo javaInfo,
-                                      SLResolverManager manager,
-                                      KeYJavaType specInClass) {
+    public JMLBuiltInPropertyResolver(JavaInfo javaInfo, SLResolverManager manager,
+            KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
         this.seqLDT = services.getTypeConverter().getSeqLDT();
     }
@@ -30,19 +29,16 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver,
-                                       String name,
-                                       SLParameters parameters)
+    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
         if (parameters != null) {
             return null;
         }
 
-        if (name.equals("length")
-                && receiver.isTerm()
+        if (name.equals("length") && receiver.isTerm()
                 && receiver.getTerm().sort().equals(seqLDT.targetSort())) {
             return new SLExpression(services.getTermBuilder().seqLen(receiver.getTerm()),
-                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
         }
 
         return null;

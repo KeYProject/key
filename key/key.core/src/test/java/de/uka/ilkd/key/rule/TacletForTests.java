@@ -36,8 +36,8 @@ public class TacletForTests {
     private TacletForTests() {
     }
 
-    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY +
-            File.separator + "testrules.key";
+    public static final String testRules =
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();
@@ -52,11 +52,11 @@ public class TacletForTests {
     private static Namespace<SchemaVariable> schemaVariables;
 
     public static Profile profile = new JavaProfile() {
-        //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+        // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
+        // library (HACK)
         public RuleCollection getStandardRules() {
-            return new RuleCollection(
-                    RuleSourceFactory.fromDefaultLocation(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
+            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
+                ImmutableSLList.<BuiltInRule>nil());
         }
     };
 
@@ -89,12 +89,14 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null) parse();
+        if (initConfig == null)
+            parse();
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null) parse();
+        if (services == null)
+            parse();
         return services;
     }
 
@@ -178,11 +180,12 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals("")) return null;
+        if (termstr.equals(""))
+            return null;
 
         try {
             KeyIO io = new KeyIO(services, nss);
-            //TacletForTests.getAbbrevs()
+            // TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,7 +196,8 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals("")) return null;
+        if (termstr.equals(""))
+            return null;
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

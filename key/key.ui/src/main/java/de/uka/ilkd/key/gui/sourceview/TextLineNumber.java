@@ -67,8 +67,7 @@ public class TextLineNumber extends JPanel
      * Create a line number component for a text component. This minimum display width will be based
      * on 3 digits.
      *
-     * @param component
-     *            the related text component
+     * @param component the related text component
      */
     public TextLineNumber(JTextComponent component) {
         this(component, 3);
@@ -77,10 +76,9 @@ public class TextLineNumber extends JPanel
     /**
      * Create a line number component for a text component.
      *
-     * @param component
-     *            the related text component
-     * @param minimumDisplayDigits
-     *            the number of digits used to calculate the minimum width of the component
+     * @param component the related text component
+     * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
+     *        component
      */
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
         this(component, minimumDisplayDigits, new int[0]);
@@ -89,12 +87,10 @@ public class TextLineNumber extends JPanel
     /**
      * Create a line number component for a text component.
      *
-     * @param component
-     *            the related text component
-     * @param minimumDisplayDigits
-     *            the number of digits used to calculate the minimum width of the component
-     * @param skips
-     *            skip line numbers for these lines
+     * @param component the related text component
+     * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
+     *        component
+     * @param skips skip line numbers for these lines
      */
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits, int[] skips) {
         this.component = component;
@@ -124,9 +120,8 @@ public class TextLineNumber extends JPanel
      * Set the update font property. Indicates whether this Font should be updated automatically
      * when the Font of the related text component is changed.
      *
-     * @param updateFont
-     *            when true update the Font and repaint the line numbers, otherwise just repaint the
-     *            line numbers.
+     * @param updateFont when true update the Font and repaint the line numbers, otherwise just
+     *        repaint the line numbers.
      */
     public void setUpdateFont(boolean updateFont) {
         this.updateFont = updateFont;
@@ -145,8 +140,7 @@ public class TextLineNumber extends JPanel
      * The border gap is used in calculating the left and right insets of the border. Default value
      * is 5.
      *
-     * @param borderGap
-     *            the gap in pixels
+     * @param borderGap the gap in pixels
      */
     public void setBorderGap(int borderGap) {
         this.borderGap = borderGap;
@@ -176,8 +170,8 @@ public class TextLineNumber extends JPanel
      * @param digitAlignment the new alignment.
      */
     public void setDigitAlignment(float digitAlignment) {
-        this.digitAlignment
-                = digitAlignment > 1.0f ? 1.0f : digitAlignment < 0.0f ? -1.0f : digitAlignment;
+        this.digitAlignment =
+            digitAlignment > 1.0f ? 1.0f : digitAlignment < 0.0f ? -1.0f : digitAlignment;
     }
 
     /**
@@ -193,8 +187,7 @@ public class TextLineNumber extends JPanel
      * Specify the mimimum number of digits used to calculate the preferred width of the component.
      * Default is 3.
      *
-     * @param minimumDisplayDigits
-     *            the number digits used in the preferred width calculation
+     * @param minimumDisplayDigits the number digits used in the preferred width calculation
      */
     public void setMinimumDisplayDigits(int minimumDisplayDigits) {
         this.minimumDisplayDigits = minimumDisplayDigits;
@@ -232,10 +225,9 @@ public class TextLineNumber extends JPanel
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2 = (Graphics2D)g;
-        RenderingHints rh = new RenderingHints(
-        RenderingHints.KEY_TEXT_ANTIALIASING,
-        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        Graphics2D g2 = (Graphics2D) g;
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setRenderingHints(rh);
 
         // Determine the width of the space available to draw the line number
@@ -287,8 +279,8 @@ public class TextLineNumber extends JPanel
         if (line.getStartOffset() == rowStartOffset) {
 
             int skipOffset = 0;
-            for (int i = 0; i < skipLines.length && skipLines[i] <= index+1; i++) {
-                if (skipLines[i] == index+1) {
+            for (int i = 0; i < skipLines.length && skipLines[i] <= index + 1; i++) {
+                if (skipLines[i] == index + 1) {
                     return ""; // skipped
                 }
                 skipOffset++;

@@ -20,9 +20,10 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (9/16/20)
  */
-@KeYGuiExtension.Info(name="Test case generation", description = "key.testgen", experimental = false)
-public class TestgenExtension implements
-        KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
+@KeYGuiExtension.Info(name = "Test case generation", description = "key.testgen",
+    experimental = false)
+public class TestgenExtension
+        implements KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
 
     private TestGenerationAction actionTestGeneration;
@@ -44,10 +45,10 @@ public class TestgenExtension implements
         init(window);
         if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
             KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+                KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
         } else {
             KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
         }
     }
 
@@ -60,7 +61,8 @@ public class TestgenExtension implements
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+            JComponent component) {
         return Collections.emptyList();
     }
 

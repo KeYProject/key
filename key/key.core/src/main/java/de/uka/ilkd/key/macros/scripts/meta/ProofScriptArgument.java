@@ -86,9 +86,7 @@ public class ProofScriptArgument<T> {
         if (flag != that.flag) {
             return false;
         }
-        if (command != null ?
-                !command.equals(that.command) :
-                that.command != null) {
+        if (command != null ? !command.equals(that.command) : that.command != null) {
             return false;
         }
         if (name != null ? !name.equals(that.name) : that.name != null) {

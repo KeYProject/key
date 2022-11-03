@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Builds the rule which inserts information flow contract applications.
  * <p/>
+ *
  * @author christoph
  */
 abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
@@ -48,9 +49,8 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
-                                     String schemaPrefix,
-                                     Services services) {
+    ImmutableList<Term> createTermSV(ImmutableList<Term> ts, String schemaPrefix,
+            Services services) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
@@ -59,43 +59,35 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    Term createTermSV(Term t,
-                      String schemaPrefix,
-                      Services services) {
+    Term createTermSV(Term t, String schemaPrefix, Services services) {
         if (t == null) {
             return null;
         }
         t = unlabel(t);
-        String svName = MiscTools.toValidVariableName(schemaPrefix +
-                                                      t.toString()).toString();
+        String svName = MiscTools.toValidVariableName(schemaPrefix + t.toString()).toString();
         Sort sort = t.sort();
-        Name name =
-                services.getVariableNamer().getTemporaryNameProposal(svName);
+        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
         return var(SchemaVariableFactory.createTermSV(name, sort));
     }
 
 
-    SchemaVariable createVariableSV(QuantifiableVariable v,
-                                    String schemaPrefix,
-                                    Services services) {
+    SchemaVariable createVariableSV(QuantifiableVariable v, String schemaPrefix,
+            Services services) {
         if (v == null) {
             return null;
         }
-        String svName =
-                MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
+        String svName = MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
         Sort sort = v.sort();
-        Name name =
-                services.getVariableNamer().getTemporaryNameProposal(svName);
+        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
         return SchemaVariableFactory.createVariableSV(name, sort);
 
     }
 
 
     void addVarconds(RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
-                     Iterable<SchemaVariable> quantifiableSVs)
-            throws IllegalArgumentException {
+            Iterable<SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
         RewriteTacletBuilderSchemaVarCollector svCollector =
-                new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
+            new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
         Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
         for (SchemaVariable sv : schemaVars) {
             if (sv instanceof TermSV) {
@@ -108,14 +100,12 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     Map<QuantifiableVariable, SchemaVariable> collectQuantifiableVariables(Term replaceWithTerm,
-                                                                           Services services) {
-        QuantifiableVariableVisitor qvVisitor =
-                new QuantifiableVariableVisitor();
+            Services services) {
+        QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         replaceWithTerm.execPreOrder(qvVisitor);
-        LinkedList<QuantifiableVariable> quantifiableVariables =
-                qvVisitor.getResult();
+        LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
         final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
+            new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
         for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
         }
@@ -128,6 +118,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     /**
      * Get eqAtLocs function as a term.
+     *
      * @param services the Services object.
      * @param heap1 the first heap term.
      * @param locset1 the first location set term.
@@ -135,16 +126,15 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @param locset2 the first location set term.
      * @return The eqAtLocs function term.
      */
-    public Term eqAtLocs(Services services, Term heap1, Term locset1,
-                         Term heap2, Term locset2) {
+    public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func((Function) services.getNamespaces().functions()
-                        .lookup(EQUAL_LOCS),
-                        heap1, locset1, heap2, locset2);
+                : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
+                    locset1, heap2, locset2);
     }
 
     /**
      * Get eqAtLocsPost function as a term.
+     *
      * @param services the Services object.
      * @param heap1Pre the first pre-heap term.
      * @param heap1Post the first post-heap term.
@@ -154,14 +144,11 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @param locset2 the second location set term.
      * @return The eqAtLocsPost function term.
      */
-    public Term eqAtLocsPost(Services services,
-                             Term heap1Pre, Term heap1Post, Term locset1,
-                             Term heap2Pre, Term heap2Post, Term locset2) {
+    public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post, Term locset1,
+            Term heap2Pre, Term heap2Post, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func((Function) services.getNamespaces().functions()
-                        .lookup(EQUAL_LOCS_POST),
-                        heap1Pre, heap1Post, locset1, heap2Pre, heap2Post,
-                        locset2);
+                : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
+                    heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
     class QuantifiableVariableVisitor implements Visitor {
@@ -175,8 +162,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
         @Override
         public void visit(Term visited) {
-            final ImmutableArray<QuantifiableVariable> boundVars =
-                    visited.boundVars();
+            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
             for (QuantifiableVariable var : boundVars) {
                 vars.add(var);
             }

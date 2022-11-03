@@ -19,15 +19,23 @@ public class InsertionTerm {
     public boolean IsRevelant() {
 
         OriginRef orig = Term.getOriginRef();
-        if (orig == null) return true;
+        if (orig == null)
+            return true;
 
-        if (orig.Type == OriginRefType.IMPLICIT_ENSURES_EXCNULL) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL) return false;
-        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP) return false;
+        if (orig.Type == OriginRefType.IMPLICIT_ENSURES_EXCNULL)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL)
+            return false;
+        if (orig.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
+            return false;
 
         return true;
     }

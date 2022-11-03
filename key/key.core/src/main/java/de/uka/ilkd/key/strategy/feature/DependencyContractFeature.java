@@ -16,8 +16,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-    private void removePreviouslyUsedSteps(Term focus, Goal goal,
-            List<PosInOccurrence> steps) {
+    private void removePreviouslyUsedSteps(Term focus, Goal goal, List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
             if (app.rule() instanceof UseDependencyContractRule
                     && app.posInOccurrence().subTerm().equalsModRenaming(focus)) {
@@ -36,12 +35,11 @@ public final class DependencyContractFeature extends BinaryFeature {
 
         // determine possible steps
 
-        List<LocationVariable> heapContext = bapp.getHeapContext() != null
-                ? bapp.getHeapContext()
+        List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
                 : HeapContext.getModHeaps(goal.proof().getServices(), false);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
-                heapContext, pos, goal.sequent(), goal.proof().getServices());
+        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext, pos,
+            goal.sequent(), goal.proof().getServices());
         if (steps.isEmpty()) {
             return false;
         }
@@ -59,8 +57,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         }
 
         // instantiate with arbitrary remaining step
-        bapp = bapp.setIfInsts(
-                ImmutableSLList.<PosInOccurrence> nil().prepend(steps.get(0)));
+        bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
         return true;
     }
 }

@@ -6,24 +6,24 @@ import recoder.service.SourceInfo;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class SchemaCrossReferenceServiceConfiguration
-    extends KeYCrossReferenceServiceConfiguration {
-  
+        extends KeYCrossReferenceServiceConfiguration {
+
     public SchemaCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh) {
-	super(keh);
+        super(keh);
     }
 
     /** we need another factory for some new program elements */
     protected ProgramFactory makeProgramFactory() {
-	return SchemaJavaProgramFactory.getInstance();
+        return SchemaJavaProgramFactory.getInstance();
     }
 
     /**
-       The cross reference source info is a subclass of the source info,
-       so this class simply overrides the source info factory method.
+     * The cross reference source info is a subclass of the source info, so this class simply
+     * overrides the source info factory method.
      */
     protected SourceInfo makeSourceInfo() {
- 	return new SchemaCrossReferenceSourceInfo(this);
-    }  
- 
+        return new SchemaCrossReferenceSourceInfo(this);
+    }
+
 
 }

@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test behaviour of for inputs in which braces are
- * omitted.
+ * Test behaviour of for inputs in which braces are omitted.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -21,25 +20,21 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
     public Term parseTerm(String s) throws Exception {
         PositionedString p = new PositionedString(s);
         /*
-         containerType and self variable are not relevant for the tests
-         currently and can be changed if needed.
+         * containerType and self variable are not relevant for the tests currently and can be
+         * changed if needed.
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO()
-                .services(getServices())
-                .classType(containerType)
-                .selfVar(self);
+        ProgramVariable self =
+            services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        JmlIO io = new JmlIO().services(getServices()).classType(containerType).selfVar(self);
         return io.parseExpression(p);
     }
 
     /*
-     * Test whether {@link KeYJMLParser} parses left-associatively for operators
-     * that have same precedence.
+     * Test whether {@link KeYJMLParser} parses left-associatively for operators that have same
+     * precedence.
      *
-     * Example
-     * 1 + 2 - 3 + 4 = ???
-     * Left-associative parsing: (((1 + 2) - 3) + 4) = 4
+     * Example 1 + 2 - 3 + 4 = ??? Left-associative parsing: (((1 + 2) - 3) + 4) = 4
      * Right-associative parsing: (1 + (2 - (3 + 4))) = -4
      */
     @Test
@@ -47,7 +42,8 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
 
         // test */%
         String s1 = parseTerm("1 * 2 / 3 % 4 * 5 / 6 % 7").toString();
-        String s2 = "javaMod(javaDivInt(javaMulInt(javaMod(javaDivInt(javaMulInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
+        String s2 =
+            "javaMod(javaDivInt(javaMulInt(javaMod(javaDivInt(javaMulInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
         assertEquals(s1, s2);
 
         // test +-

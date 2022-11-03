@@ -53,7 +53,8 @@ public interface ProgramFactory extends Service {
     /**
      * Parse a {@link ConstructorDeclaration}from the given reader.
      */
-    ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException;
+    ConstructorDeclaration parseConstructorDeclaration(Reader in)
+            throws IOException, ParserException;
 
     /**
      * Parse a {@link TypeReference}from the given reader.
@@ -131,8 +132,8 @@ public interface ProgramFactory extends Service {
     ASTList<Statement> parseStatements(String in) throws ParserException;
 
     /**
-     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the
-     * current project settings for the specified writer,
+     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the current project settings
+     * for the specified writer,
      *
      * @param out the (initial) writer to print to.
      * @return a new pretty printer.
@@ -173,7 +174,7 @@ public interface ProgramFactory extends Service {
      * @return a new instance of CompilationUnit.
      */
     CompilationUnit createCompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
-                                          ASTList<TypeDeclaration> typeDeclarations);
+            ASTList<TypeDeclaration> typeDeclarations);
 
     /**
      * Creates a new {@link DocComment}.
@@ -334,7 +335,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of UncollatedReferenceQualifier.
      */
-    UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix, Identifier id);
+    UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix,
+            Identifier id);
 
     /**
      * Creates a new {@link ClassDeclaration}.
@@ -349,8 +351,9 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of ClassDeclaration.
      */
-    ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended,
-                                            Implements implemented, ASTList<MemberDeclaration> members);
+    ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs,
+            Identifier name, Extends extended, Implements implemented,
+            ASTList<MemberDeclaration> members);
 
     /**
      * Creates a new {@link ClassDeclaration}.
@@ -392,8 +395,9 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of ConstructorDeclaration.
      */
-    ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier, Identifier name,
-                                                        ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body);
+    ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body);
 
     /**
      * Creates a new {@link Throws}.
@@ -435,16 +439,16 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of FieldDeclaration.
      */
-    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name,
-                                            Expression init);
+    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, Identifier name, Expression init);
 
     /**
      * Creates a new {@link FieldDeclaration}.
      *
      * @return a new instance of FieldDeclaration.
      */
-    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                            ASTList<FieldSpecification> vars);
+    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, ASTList<FieldSpecification> vars);
 
     /**
      * Creates a new {@link Extends}.
@@ -500,13 +504,13 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of InterfaceDeclaration.
      */
-    InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
-                                                    ASTList<MemberDeclaration> members);
+    InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            Identifier name, Extends extended, ASTList<MemberDeclaration> members);
 
     AnnotationDeclaration createAnnotationDeclaration();
 
-    AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
-                                                      ASTList<MemberDeclaration> members);
+    AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            Identifier name, ASTList<MemberDeclaration> members);
 
     /**
      * Creates a new {@link LocalVariableDeclaration}.
@@ -527,16 +531,16 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of LocalVariableDeclaration.
      */
-    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                            ASTList<VariableSpecification> vars);
+    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, ASTList<VariableSpecification> vars);
 
     /**
      * Creates a new {@link LocalVariableDeclaration}.
      *
      * @return a new instance of LocalVariableDeclaration.
      */
-    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                            Identifier name, Expression init);
+    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, Identifier name, Expression init);
 
 
     /**
@@ -551,19 +555,22 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of MethodDeclaration.
      */
-    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
-                                              ASTList<ParameterDeclaration> parameters, Throws exceptions);
+    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters,
+            Throws exceptions);
 
     /**
      * Creates a new {@link MethodDeclaration}.
      *
      * @return a new instance of MethodDeclaration.
      */
-    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
-                                              ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body);
+    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters,
+            Throws exceptions, StatementBlock body);
 
-    AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-                                                                      Identifier name, Expression defaultValue);
+    AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(
+            ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
+            Expression defaultValue);
 
     /**
      * Creates a new {@link ParameterDeclaration}.
@@ -584,7 +591,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of ParameterDeclaration.
      */
-    ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name);
+    ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, Identifier name);
 
     /**
      * Creates a new {@link VariableSpecification}.
@@ -612,7 +620,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of VariableSpecification.
      */
-    VariableSpecification createVariableSpecification(Identifier name, int dimensions, Expression init);
+    VariableSpecification createVariableSpecification(Identifier name, int dimensions,
+            Expression init);
 
     /**
      * Creates a new {@link FieldSpecification}.
@@ -822,7 +831,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of ArrayReference.
      */
-    ArrayReference createArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers);
+    ArrayReference createArrayReference(ReferencePrefix accessPath,
+            ASTList<Expression> initializers);
 
     /**
      * Creates a new {@link FieldReference}.
@@ -892,10 +902,11 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of MethodReference.
      */
-    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args);
+    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name,
+            ASTList<Expression> args);
 
-    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
-                                          ASTList<TypeArgumentDeclaration> typeArgs);
+    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name,
+            ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs);
 
 
     AnnotationPropertyReference createAnnotationPropertyReference(String id);
@@ -921,7 +932,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of SuperConstructorReference.
      */
-    SuperConstructorReference createSuperConstructorReference(ReferencePrefix path, ASTList<Expression> arguments);
+    SuperConstructorReference createSuperConstructorReference(ReferencePrefix path,
+            ASTList<Expression> arguments);
 
     /**
      * Creates a new {@link SuperReference}.
@@ -1355,15 +1367,16 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of New.
      */
-    New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments);
+    New createNew(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments);
 
     /**
      * Creates a new {@link New}.
      *
      * @return a new instance of New.
      */
-    New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
-                  ClassDeclaration anonymousClass);
+    New createNew(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments, ClassDeclaration anonymousClass);
 
     /**
      * Creates a new {@link NewArray}.
@@ -1853,7 +1866,8 @@ public interface ProgramFactory extends Service {
      *
      * @return a new instance of For.
      */
-    For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body);
+    For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
+            Statement body);
 
 
     /**

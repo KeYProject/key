@@ -32,15 +32,14 @@ public class Comment extends JavaSourceElement {
 
     protected ProgramElement parent;
     /**
-     * Mark if the comment is the comment to a container; parser uses this only
-     * for empty containers (i.e. StatementBlock, ArrayInitializer,
-     * ClassDeclaration)
+     * Mark if the comment is the comment to a container; parser uses this only for empty containers
+     * (i.e. StatementBlock, ArrayInitializer, ClassDeclaration)
      */
     private boolean isContainerComment;
 
     /**
-     * Create a new empty comment. The comment contains an empty string, the
-     * slash-asterics markers are not created.
+     * Create a new empty comment. The comment contains an empty string, the slash-asterics markers
+     * are not created.
      */
 
     public Comment() {
@@ -48,8 +47,7 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Create a new comment with the given content. No extra comment markers are
-     * created.
+     * Create a new comment with the given content. No extra comment markers are created.
      *
      * @param text the text of the comment.
      */
@@ -59,8 +57,7 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Create a new comment with the given content. No extra comment markers are
-     * created.
+     * Create a new comment with the given content. No extra comment markers are created.
      *
      * @param text the text of the comment.
      */
@@ -93,8 +90,8 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Check if this comment should be prefixed in front of the parent element,
-     * or if it should follow it.
+     * Check if this comment should be prefixed in front of the parent element, or if it should
+     * follow it.
      *
      * @return the boolean value.
      */
@@ -104,8 +101,8 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Define if this comment should be prefixed in front of the parent element,
-     * or if it should follow it. Implicitly sets isContainerComment to false.
+     * Define if this comment should be prefixed in front of the parent element, or if it should
+     * follow it. Implicitly sets isContainerComment to false.
      *
      * @param prefixed the boolean value.
      */
@@ -120,8 +117,7 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Define if this comment should be a container comment. Implicitly sets
-     * isPrefixed to false.
+     * Define if this comment should be a container comment. Implicitly sets isPrefixed to false.
      *
      * @param isContainerComment
      */
@@ -161,8 +157,8 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Set text, including all markers. The text must contain all necessary
-     * leading and closing tokens.
+     * Set text, including all markers. The text must contain all necessary leading and closing
+     * tokens.
      *
      * @param text a string.
      */

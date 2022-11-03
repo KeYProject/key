@@ -50,10 +50,10 @@ public class DockingHelper {
     /**
      * Sets the current layout of the docking framework back to factory default.
      * <p>
-     * We distinguish between four areas: left-top, left(-bottom), main, right.
-     * This methods goes through all dockables, and attach them to one of these areas,
-     * according to static fields above. The <code>id</code> field is used for identification,
-     * which is currently determined by the class name.
+     * We distinguish between four areas: left-top, left(-bottom), main, right. This methods goes
+     * through all dockables, and attach them to one of these areas, according to static fields
+     * above. The <code>id</code> field is used for identification, which is currently determined by
+     * the class name.
      *
      * @param mainWindow
      * @see #LEFT_PANEL
@@ -64,14 +64,10 @@ public class DockingHelper {
      * @see #createSingleDock(TabPanel)
      */
     public static void restoreFactoryDefault(MainWindow mainWindow) {
-        List<CDockable>
-                leftPanels = new LinkedList<>(),
-                leftTopPanels = new LinkedList<>(),
-                mainPanels = new LinkedList<>(),
-                rightPanels = new LinkedList<>();
+        List<CDockable> leftPanels = new LinkedList<>(), leftTopPanels = new LinkedList<>(),
+                mainPanels = new LinkedList<>(), rightPanels = new LinkedList<>();
 
-        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0;
-             i < c; i++) {
+        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
             final CDockable cur = mainWindow.getDockControl().getCDockable(i);
             if (cur instanceof SingleCDockable) {
                 final String id = ((SingleCDockable) cur).getUniqueId();
@@ -101,10 +97,10 @@ public class DockingHelper {
         }
 
         CGrid grid = new CGrid(mainWindow.getDockControl());
-        grid.add(0, 0, 1, 1, leftTopPanels.toArray(new CDockable[]{}));
-        grid.add(0, 1, 1, 2, leftPanels.toArray(new CDockable[]{}));
-        grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[]{}));
-        grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[]{}));
+        grid.add(0, 0, 1, 1, leftTopPanels.toArray(new CDockable[] {}));
+        grid.add(0, 1, 1, 2, leftPanels.toArray(new CDockable[] {}));
+        grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[] {}));
+        grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[] {}));
         mainWindow.getDockControl().getContentArea().deploy(grid);
     }
 
@@ -112,7 +108,7 @@ public class DockingHelper {
     /**
      * Constructs a dockable for the given component.
      *
-     * @param title     a non-null, non-empty title for this dock
+     * @param title a non-null, non-empty title for this dock
      * @param component a non-null component to show
      * @return a {@link DefaultSingleCDockable}
      * @see #createSingleDock(TabPanel)
@@ -133,9 +129,8 @@ public class DockingHelper {
         Stream<CAction> actions = p.getTitleActions().stream().map(DockingHelper::translateAction);
         CAction[] a = Stream.concat(actions, p.getTitleCActions().stream()).toArray(CAction[]::new);
 
-        return new DefaultSingleCDockable(p.getClass().getName(),
-                p.getIcon(), p.getTitle(), p.getComponent(),
-                p.getPermissions(), a);
+        return new DefaultSingleCDockable(p.getClass().getName(), p.getIcon(), p.getTitle(),
+            p.getComponent(), p.getPermissions(), a);
     }
 
     public static @Nonnull CAction translateAction(@Nonnull Action action) {
@@ -148,9 +143,8 @@ public class DockingHelper {
     }
 
     private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
-        CCheckBox button = new CCheckBox(
-                (String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON)) {
+        CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
+            (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override
             protected void changed() {
                 action.putValue(Action.SELECTED_KEY, this.isSelected());
@@ -171,9 +165,8 @@ public class DockingHelper {
     }
 
     private static CAction createButton(Action action) {
-        CButton button = new CButton(
-                (String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON));
+        CButton button = new CButton((String) action.getValue(Action.NAME),
+            (Icon) action.getValue(Action.SMALL_ICON));
         button.addActionListener(action);
         button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         button.setEnabled(action.isEnabled());

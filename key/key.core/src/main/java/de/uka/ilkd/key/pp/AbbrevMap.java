@@ -11,15 +11,13 @@ import java.util.stream.Collectors;
 public class AbbrevMap {
 
     /**
-     * HashMaps used to store the mappings from Term to String, String to Term
-     * and Term to Enabled.
+     * HashMaps used to store the mappings from Term to String, String to Term and Term to Enabled.
      */
     private HashMap<AbbrevWrapper, String> termstring;
     private HashMap<String, AbbrevWrapper> stringterm;
 
     /**
-     * Enabled is set true if a abbreviation should be used
-     * when printing the term.
+     * Enabled is set true if a abbreviation should be used when printing the term.
      */
     private HashMap<AbbrevWrapper, Boolean> termenabled;
 
@@ -35,22 +33,19 @@ public class AbbrevMap {
     /**
      * Associates a Term and its abbreviation in this map.
      *
-     * @param t            a term
+     * @param t a term
      * @param abbreviation the abbreviation for of this term
-     * @param enabled      true if the abbreviation should be used (e.g. when printing
-     *                     the term), false otherwise.
+     * @param enabled true if the abbreviation should be used (e.g. when printing the term), false
+     *        otherwise.
      */
-    public void put(Term t, String abbreviation, boolean enabled)
-            throws AbbrevException {
+    public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
         if (containsTerm(t)) {
-            throw new AbbrevException(
-                    "A abbreviation for " + t + " already exists", true);
+            throw new AbbrevException("A abbreviation for " + t + " already exists", true);
         }
         if (containsAbbreviation(abbreviation)) {
-            throw new AbbrevException("The abbreviation " + abbreviation
-                    + " is already" + " in use for: " + getTerm(abbreviation),
-                    false);
+            throw new AbbrevException("The abbreviation " + abbreviation + " is already"
+                + " in use for: " + getTerm(abbreviation), false);
         }
         scw = new AbbrevWrapper(t);
         termstring.put(scw, abbreviation);
@@ -59,20 +54,17 @@ public class AbbrevMap {
     }
 
     /**
-     * Changes the abbreviation of t to abbreviation. If the AbbrevMap doesn't
-     * contain t nothing happens.
+     * Changes the abbreviation of t to abbreviation. If the AbbrevMap doesn't contain t nothing
+     * happens.
      *
      * @throws AbbrevException if the abbreviation is already in use.
      */
-    public void changeAbbrev(Term t, String abbreviation)
-            throws AbbrevException {
+    public void changeAbbrev(Term t, String abbreviation) throws AbbrevException {
         if (containsTerm(t)) {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
-                throw new AbbrevException(
-                        "The abbreviation " + abbreviation + " is already"
-                                + " in use for: " + getTerm(abbreviation),
-                        false);
+                throw new AbbrevException("The abbreviation " + abbreviation + " is already"
+                    + " in use for: " + getTerm(abbreviation), false);
             }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
@@ -82,18 +74,16 @@ public class AbbrevMap {
     }
 
     /**
-     * Changes the abbreviation <code>abbreviation</code> to <code>t</code>. If
-     * the AbbrevMap doesn't contain <code>abbreviation</code> nothing happens.
+     * Changes the abbreviation <code>abbreviation</code> to <code>t</code>. If the AbbrevMap
+     * doesn't contain <code>abbreviation</code> nothing happens.
      *
      * @throws AbbrevException If an abbreviation for t already exists.
      */
-    public void changeAbbrev(String abbreviation, Term t, boolean enabled)
-            throws AbbrevException {
+    public void changeAbbrev(String abbreviation, Term t, boolean enabled) throws AbbrevException {
         if (containsAbbreviation(abbreviation)) {
             AbbrevWrapper scw;
             if (containsTerm(t)) {
-                throw new AbbrevException(
-                        "A abbreviation for " + t + " already exists", true);
+                throw new AbbrevException("A abbreviation for " + t + " already exists", true);
             }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
@@ -118,8 +108,8 @@ public class AbbrevMap {
     }
 
     /**
-     * Returns the term which is mapped to the abbreviation s, null if no term
-     * is mapped to the abbreviation.
+     * Returns the term which is mapped to the abbreviation s, null if no term is mapped to the
+     * abbreviation.
      */
     public Term getTerm(String s) {
         var term = stringterm.get(s);
@@ -127,16 +117,15 @@ public class AbbrevMap {
     }
 
     /**
-     * Returns the abbreviation mapped to the term t. Returns null if no
-     * abbreviation is mapped to t.
+     * Returns the abbreviation mapped to the term t. Returns null if no abbreviation is mapped to
+     * t.
      */
     public String getAbbrev(Term t) {
         return "@" + termstring.get(new AbbrevWrapper(t));
     }
 
     /**
-     * Returns true if the mapping is enabled, which means that the abbreviation
-     * may be used.
+     * Returns true if the mapping is enabled, which means that the abbreviation may be used.
      */
     public boolean isEnabled(Term t) {
         Boolean b = termenabled.get(new AbbrevWrapper(t));
@@ -148,12 +137,11 @@ public class AbbrevMap {
     /**
      * Sets the mapping of the term t to its abbreviation enabled or disabled
      *
-     * @param t       a Term
+     * @param t a Term
      * @param enabled true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
-        termenabled.put(new AbbrevWrapper(t),
-                enabled ? Boolean.TRUE : Boolean.FALSE);
+        termenabled.put(new AbbrevWrapper(t), enabled ? Boolean.TRUE : Boolean.FALSE);
     }
 
     /**
@@ -161,8 +149,7 @@ public class AbbrevMap {
      * Note, this will allocate a new data structure each time.
      */
     public Collection<Pair<Term, String>> export() {
-        return termstring.entrySet().stream()
-                .map(e -> new Pair<>(e.getKey().t, e.getValue()))
+        return termstring.entrySet().stream().map(e -> new Pair<>(e.getKey().t, e.getValue()))
                 .collect(Collectors.toList());
 
     }

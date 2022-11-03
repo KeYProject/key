@@ -8,39 +8,33 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.TacletApp;
 
 
-/** 
+/**
  * Composite of instantiation proposers.
  */
 public class InstantiationProposerCollection implements InstantiationProposer {
 
-    private ImmutableList<InstantiationProposer> proposers 
-    		= ImmutableSLList.<InstantiationProposer>nil();
+    private ImmutableList<InstantiationProposer> proposers =
+        ImmutableSLList.<InstantiationProposer>nil();
 
     /**
      * adds an instantiation proposer to the collection
      */
     public void add(InstantiationProposer proposer) {
-    	proposers = proposers.append(proposer);
+        proposers = proposers.append(proposer);
     }
-    
-    
-    public String getProposal(TacletApp app, 
-    			      SchemaVariable var, 
-			      Services services,
-			      Node undoAnchor,
-			      ImmutableList<String> previousProposals) {
+
+
+    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
+            ImmutableList<String> previousProposals) {
         for (InstantiationProposer proposer1 : proposers) {
             InstantiationProposer proposer = proposer1;
-            String proposal = proposer.getProposal(app,
-                    var,
-                    services,
-                    undoAnchor,
-                    previousProposals);
+            String proposal =
+                proposer.getProposal(app, var, services, undoAnchor, previousProposals);
             if (proposal != null) {
                 return proposal;
             }
         }
-	
-	return null;
+
+        return null;
     }
 }

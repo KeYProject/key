@@ -19,7 +19,9 @@ public class SearchNode {
 
 
 
-    public SearchNode(SequentFormula[] pattern, int succAntPos, ImmutableList<IfFormulaInstantiation> antec, ImmutableList<IfFormulaInstantiation> succ) {
+    public SearchNode(SequentFormula[] pattern, int succAntPos,
+            ImmutableList<IfFormulaInstantiation> antec,
+            ImmutableList<IfFormulaInstantiation> succ) {
         this.pattern = pattern;
         this.succAntPos = succAntPos;
         this.antec = antec;
@@ -31,7 +33,7 @@ public class SearchNode {
         this.pattern = parent.pattern;
         this.succAntPos = parent.succAntPos;
         int parentPos = parent.pos;
-        this.pos = parentPos+1;
+        this.pos = parentPos + 1;
         antec = parent.antec;
         succ = parent.succ;
         mc = cond;

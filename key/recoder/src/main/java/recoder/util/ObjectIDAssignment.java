@@ -3,8 +3,8 @@
 package recoder.util;
 
 /**
- * implements a simple object numbering. Each object is assigne a unique long
- * number, which can be used, e.g. for dumping object graphs.
+ * implements a simple object numbering. Each object is assigne a unique long number, which can be
+ * used, e.g. for dumping object graphs.
  *
  * @author RN
  */
@@ -14,8 +14,8 @@ public class ObjectIDAssignment {
     private static long currentId = 0;
 
     /**
-     * retrieves the long id of the given object. If there is currently no such,
-     * a new one is automatically created.
+     * retrieves the long id of the given object. If there is currently no such, a new one is
+     * automatically created.
      *
      * @param o the object to retrieve an id for
      * @return the unique number of that object
@@ -30,9 +30,8 @@ public class ObjectIDAssignment {
     }
 
     /**
-     * tells the assignment manager to forget about the given object. CAUTION:
-     * The next call to <tt>getID</tt> for the given object will produce a
-     * <b>new </b> id.
+     * tells the assignment manager to forget about the given object. CAUTION: The next call to
+     * <tt>getID</tt> for the given object will produce a <b>new </b> id.
      *
      * @param the object that is not needed anymore.
      */

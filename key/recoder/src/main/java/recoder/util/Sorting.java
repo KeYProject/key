@@ -3,8 +3,7 @@
 package recoder.util;
 
 /**
- * Different sort algorithms based upon standard arrays and arbitrary total
- * order relations.
+ * Different sort algorithms based upon standard arrays and arbitrary total order relations.
  *
  * @author AL
  */
@@ -83,7 +82,8 @@ public class Sorting {
     }
 
     protected final static Object median(Object x, Object y, Object z, Order o) {
-        return o.less(x, y) ? (o.less(y, z) ? y : (o.less(x, z) ? z : x)) : (o.less(y, z) ? y : (o.less(z, x) ? z : x));
+        return o.less(x, y) ? (o.less(y, z) ? y : (o.less(x, z) ? z : x))
+                : (o.less(y, z) ? y : (o.less(z, x) ? z : x));
     }
 
     public static void quickSort(Object[] a) {
@@ -142,31 +142,26 @@ public class Sorting {
     /*
      * public static void main(String[] argv) {
      *
-     * Integer[] a = new Integer[argv.length]; for (int i = 0; i < a.length; i +=
-     * 1) { a[i] = new Integer(argv[i]); } quickSort(a); for (int i = 0; i <
-     * a.length; i += 1) { System.out.print(a[i].toString() + ' '); }
-     * System.out.println();
+     * Integer[] a = new Integer[argv.length]; for (int i = 0; i < a.length; i += 1) { a[i] = new
+     * Integer(argv[i]); } quickSort(a); for (int i = 0; i < a.length; i += 1) {
+     * System.out.print(a[i].toString() + ' '); } System.out.println();
      *
-     * long heapTime, insertTime, quickTime; int n = 5; int m = 250; do {
-     * Integer[][] a = new Integer[m][n]; for (int j = 0; j < m; j += 1) { for
-     * (int i = 0; i < n; i += 1) { a[j][i] = new Integer((int)(Math.random() *
-     * Integer.MAX_VALUE)); } } System.gc(); long startTime =
-     * System.currentTimeMillis(); for (int j = 0; j < m; j += 1) {
-     * Sorting.heapSort(a[j]); } heapTime = System.currentTimeMillis() -
-     * startTime; for (int j = 0; j < m; j += 1) { for (int i = 0; i < n; i +=
-     * 1) { a[j][i] = new Integer((int)(Math.random() * Integer.MAX_VALUE)); } }
+     * long heapTime, insertTime, quickTime; int n = 5; int m = 250; do { Integer[][] a = new
+     * Integer[m][n]; for (int j = 0; j < m; j += 1) { for (int i = 0; i < n; i += 1) { a[j][i] =
+     * new Integer((int)(Math.random() * Integer.MAX_VALUE)); } } System.gc(); long startTime =
+     * System.currentTimeMillis(); for (int j = 0; j < m; j += 1) { Sorting.heapSort(a[j]); }
+     * heapTime = System.currentTimeMillis() - startTime; for (int j = 0; j < m; j += 1) { for (int
+     * i = 0; i < n; i += 1) { a[j][i] = new Integer((int)(Math.random() * Integer.MAX_VALUE)); } }
      * startTime = System.currentTimeMillis(); for (int j = 0; j < m; j += 1) {
-     * Sorting.insertionSort(a[j]); } insertTime = System.currentTimeMillis() -
-     * startTime; for (int j = 0; j < m; j += 1) { for (int i = 0; i < n; i +=
-     * 1) { a[j][i] = new Integer((int)(Math.random() * Integer.MAX_VALUE)); } }
-     * startTime = System.currentTimeMillis(); for (int j = 0; j < m; j += 1) {
-     * Sorting.quickSort(a[j]); } quickTime = System.currentTimeMillis() -
-     * startTime;
+     * Sorting.insertionSort(a[j]); } insertTime = System.currentTimeMillis() - startTime; for (int
+     * j = 0; j < m; j += 1) { for (int i = 0; i < n; i += 1) { a[j][i] = new
+     * Integer((int)(Math.random() * Integer.MAX_VALUE)); } } startTime =
+     * System.currentTimeMillis(); for (int j = 0; j < m; j += 1) { Sorting.quickSort(a[j]); }
+     * quickTime = System.currentTimeMillis() - startTime;
      *
-     * System.out.println("" + n + " random values sorted in " + heapTime + "ms / " +
-     * insertTime + "ms / " + quickTime + "ms using Heap-, Insertion-,
-     * QuickSort"); n += 1; } while (insertTime <= heapTime || heapTime <=
-     * quickTime); }
+     * System.out.println("" + n + " random values sorted in " + heapTime + "ms / " + insertTime +
+     * "ms / " + quickTime + "ms using Heap-, Insertion-, QuickSort"); n += 1; } while (insertTime
+     * <= heapTime || heapTime <= quickTime); }
      */
 
 }

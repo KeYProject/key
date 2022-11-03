@@ -6,19 +6,19 @@ import de.uka.ilkd.key.logic.Name;
 
 /**
  * Represents an intermediate rule / taclet application.
- * 
+ *
  * @author Dominic Scheurer
  * @see TacletAppIntermediate
  * @see BuiltInAppIntermediate
  */
 public abstract class AppIntermediate {
     private int lineNr = -1;
-    
+
     /**
      * @return The new names registered in the course of this app.
      */
     public abstract ImmutableList<Name> getNewNames();
-    
+
     /**
      * @return The name of this taclet / built in rule.
      */

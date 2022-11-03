@@ -1,4 +1,5 @@
 package de.uka.ilkd.key.gui;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 

@@ -53,15 +53,13 @@ public class HeatmapToggleAction extends MainWindowAction {
     }
 
     private void setIcon() {
-        setIcon(isSelected()
-                ? ICON_SELECTED
-                : ICON_NOT_SELECTED);
+        setIcon(isSelected() ? ICON_SELECTED : ICON_NOT_SELECTED);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
-                vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap());
+        vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
+            vs.getMaxAgeForHeatmap());
     }
 }

@@ -16,8 +16,7 @@ import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
- * Central part of MainWindow. Its main purpose is to serve as container for
- * SequentView instances.
+ * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.
  *
  * @author Kai Wallisch
  */
@@ -85,18 +84,15 @@ public final class MainFrame extends JPanel {
             }
 
             @Override
-            public void ancestorMoved(AncestorEvent event) { }
+            public void ancestorMoved(AncestorEvent event) {}
 
             @Override
-            public void ancestorAdded(AncestorEvent event) { }
+            public void ancestorAdded(AncestorEvent event) {}
         });
 
         // FIXME put this somewhere descent
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(
-                        KeyEvent.VK_C,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                        "copy");
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);

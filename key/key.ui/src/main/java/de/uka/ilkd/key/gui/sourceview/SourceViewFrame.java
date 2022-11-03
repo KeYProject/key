@@ -87,9 +87,13 @@ public class SourceViewFrame extends JSplitPane {
     }
 
     /**
-     * <p> Selects the tab containing the specified component. </p>
+     * <p>
+     * Selects the tab containing the specified component.
+     * </p>
      *
-     * <p> If this frame does not contain the specified component, this method has no effect. </p>
+     * <p>
+     * If this frame does not contain the specified component, this method has no effect.
+     * </p>
      *
      * @param component the component to select.
      *
@@ -108,9 +112,8 @@ public class SourceViewFrame extends JSplitPane {
      */
     public void addComponent(JComponent component, String toolTipText, Action closeAction) {
         tabbedPane.add(component);
-        tabbedPane.setTabComponentAt(
-                tabbedPane.indexOfComponent(component),
-                new ClosableTabComponent(component.getName(), closeAction));
+        tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
+            new ClosableTabComponent(component.getName(), closeAction));
 
         tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
 
@@ -122,16 +125,20 @@ public class SourceViewFrame extends JSplitPane {
     }
 
     /**
-     * <p> Removes a component from below the source view. </p>
+     * <p>
+     * Removes a component from below the source view.
+     * </p>
      *
-     * <p> If this frame does not contain the specified component, this method has no effect. </p>
+     * <p>
+     * If this frame does not contain the specified component, this method has no effect.
+     * </p>
      *
      * @param component the component to be removed.
      */
     public void removeComponent(JComponent component) {
         tabbedPane.remove(component);
 
-        synchronized(tabbedPane.getTreeLock()) {
+        synchronized (tabbedPane.getTreeLock()) {
             if (tabbedPaneShown && tabbedPane.getComponentCount() == 1) {
                 hideTabbedPane();
             }

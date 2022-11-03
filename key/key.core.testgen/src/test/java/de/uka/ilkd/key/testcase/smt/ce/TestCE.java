@@ -21,7 +21,8 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCE extends TestCommons {
-    public static final File testFile = new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
+    public static final File testFile =
+        new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(TestCE.class);
     private static boolean isInstalled = false;
@@ -32,14 +33,18 @@ public class TestCE extends TestCommons {
             isInstalled = getSolverType().isInstalled(true);
             installChecked = true;
             if (!isInstalled) {
-                LOGGER.warn("Warning: {} is not installed, tests skipped.", getSolverType().getName());
-                LOGGER.warn("Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
-                        SYSTEM_PROPERTY_SOLVER_PATH);
+                LOGGER.warn("Warning: {} is not installed, tests skipped.",
+                    getSolverType().getName());
+                LOGGER.warn(
+                    "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                    SYSTEM_PROPERTY_SOLVER_PATH);
             }
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
-                    LOGGER.warn("Warning: The version of the solver {} " +
-                            "used for the following tests may not be supported.", getSolverType().getName());
+                    LOGGER.warn(
+                        "Warning: The version of the solver {} "
+                            + "used for the following tests may not be supported.",
+                        getSolverType().getName());
                 }
             }
         }
@@ -50,8 +55,7 @@ public class TestCE extends TestCommons {
     public SolverType getSolverType() {
         SolverType type = SolverTypes.Z3_CE_SOLVER;
         // SolverType type = SolverType.Z3_SOLVER;
-        String solverPathProperty = System
-                .getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
             type.setSolverCommand(solverPathProperty);
         }
@@ -121,7 +125,7 @@ public class TestCE extends TestCommons {
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file, null, null, null);
+            KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             Assertions.assertNotNull(proof);

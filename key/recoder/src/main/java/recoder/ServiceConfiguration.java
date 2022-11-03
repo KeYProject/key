@@ -10,11 +10,11 @@ import recoder.service.*;
 /**
  * A configuration of services that can work together.
  * <p>
- * To exchange a service S1 by a service S2, simply override the corresponding
- * <CODE>makeS</CODE> method.
+ * To exchange a service S1 by a service S2, simply override the corresponding <CODE>makeS</CODE>
+ * method.
  * <p>
- * To provide a complete new Service S, add the following code to a subclass of
- * the DefaultServiceConfiguration:
+ * To provide a complete new Service S, add the following code to a subclass of the
+ * DefaultServiceConfiguration:
  *
  * <PRE>
  * <p>

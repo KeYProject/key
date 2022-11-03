@@ -11,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 /**
- * This file rule source derivative wraps its input stream into a
- * {@link GZIPInputStream} thus allowing decompressing gnu-zipped proof files.
+ * This file rule source derivative wraps its input stream into a {@link GZIPInputStream} thus
+ * allowing decompressing gnu-zipped proof files.
  *
  * @author tbormer on 12.02.16.
  */
@@ -21,11 +21,9 @@ public class GZipFileRuleSource extends FileRuleSource {
     /**
      * Instantiates a new file rule source.
      *
-     * This is only instantiated from
-     * {@link RuleSourceFactory#initRuleFile(File, boolean)}.
+     * This is only instantiated from {@link RuleSourceFactory#initRuleFile(File, boolean)}.
      *
-     * @param ruleFile
-     *            the file to read from.
+     * @param ruleFile the file to read from.
      */
     GZipFileRuleSource(File ruleFile) {
         super(ruleFile);
@@ -44,13 +42,8 @@ public class GZipFileRuleSource extends FileRuleSource {
     @Override
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
-            return CharStreams.fromChannel(
-                    channel,
-                    StandardCharsets.UTF_8,
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    file().toString(),
-                    -1);
+            return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
+                CodingErrorAction.REPLACE, file().toString(), -1);
         }
     }
 }

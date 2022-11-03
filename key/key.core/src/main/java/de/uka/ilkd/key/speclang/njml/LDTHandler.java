@@ -23,12 +23,14 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     }
 
     @Nullable
-    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
-        if(OverloadedOperatorHandler.UNARY_OPERATORS.contains(op)) {
+    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+            throws SLTranslationException {
+        if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(op)) {
             return buildUnary(op, left);
         }
 
-        KeYJavaType promotedType = services.getTypeConverter().getPromotedType(left.getType(), right.getType());
+        KeYJavaType promotedType =
+            services.getTypeConverter().getPromotedType(left.getType(), right.getType());
         Map<JMLOperator, Operator> opMap = getOperatorMap(promotedType.getJavaType());
         if (opMap == null) {
             // we are not responsible for the promoted promotedType

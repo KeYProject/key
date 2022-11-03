@@ -19,8 +19,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
  *
  * @author <TT>AutoDoc</TT>
  */
-public class Exec extends BranchStatement
-        implements StatementContainer, ProgramPrefix {
+public class Exec extends BranchStatement implements StatementContainer, ProgramPrefix {
 
     /**
      * Body.
@@ -39,14 +38,12 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
+     * @param body a statement block.
      */
     public Exec(StatementBlock body) {
         this.body = body;
         this.branches = null;
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
-                .computeEssentials(this);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
@@ -54,16 +51,13 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
-     * @param branches
-     *            a branch array.
+     * @param body a statement block.
+     * @param branches a branch array.
      */
     public Exec(StatementBlock body, Branch[] branches) {
         this.body = body;
         this.branches = new ImmutableArray<Branch>(branches);
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
-                .computeEssentials(this);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
 
@@ -72,16 +66,13 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
-     * @param branches
-     *            a branch array.
+     * @param body a statement block.
+     * @param branches a branch array.
      */
     public Exec(StatementBlock body, ImmutableArray<Branch> branches) {
         this.body = body;
         this.branches = branches;
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
-                .computeEssentials(this);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
 
@@ -90,16 +81,13 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param children
-     *            a list with all children
+     * @param children a list with all children
      */
     public Exec(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = new ImmutableArray<Branch>(
-            children.collect(Branch.class));
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
-                .computeEssentials(this);
+        this.branches = new ImmutableArray<Branch>(children.collect(Branch.class));
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
 
@@ -107,8 +95,7 @@ public class Exec extends BranchStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !body.isEmpty()
-                && body.getStatementAt(0) instanceof ProgramPrefix;
+        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
     }
 
     @Override
@@ -116,16 +103,13 @@ public class Exec extends BranchStatement
         if (hasNextPrefixElement()) {
             return (ProgramPrefix) body.getStatementAt(0);
         } else {
-            throw new IndexOutOfBoundsException(
-                "No next prefix element " + this);
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement()
-                ? getNextPrefixElement().getLastPrefixElement()
-                : this;
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
     @Override
@@ -169,14 +153,11 @@ public class Exec extends BranchStatement
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -212,16 +193,13 @@ public class Exec extends BranchStatement
     }
 
     /**
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array.
+     * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index
-     *            an index for a statement.
+     * @param index an index for a statement.
      *
      * @return the statement with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
@@ -242,14 +220,11 @@ public class Exec extends BranchStatement
     }
 
     /**
-     * Return the branch at the specified index in this node's "virtual" branch
-     * array.
+     * Return the branch at the specified index in this node's "virtual" branch array.
      *
-     * @param index
-     *            an index for a branch.
+     * @param index an index for a branch.
      * @return the branch with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public Branch getBranchAt(int index) {
@@ -269,11 +244,10 @@ public class Exec extends BranchStatement
     }
 
     /**
-     * calls the corresponding method of a visitor in order to perform some
-     * action/transformation on this element
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
      *
-     * @param v
-     *            the Visitor
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {

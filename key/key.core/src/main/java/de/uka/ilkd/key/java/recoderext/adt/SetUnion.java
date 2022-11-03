@@ -6,37 +6,37 @@ import recoder.java.Expression;
 public class SetUnion extends ADTPrefixConstruct {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8425018389934762589L;
 
 
     public SetUnion(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
-	makeParentRoleValid();
+        super(lhs, rhs);
+        makeParentRoleValid();
     }
 
 
     protected SetUnion(SetUnion proto) {
-	super(proto);
-	makeParentRoleValid();
+        super(proto);
+        makeParentRoleValid();
     }
-    
 
-    @Override    
+
+    @Override
     public SetUnion deepClone() {
-	return new SetUnion(this);
+        return new SetUnion(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
-	return 2;
+        return 2;
     }
 
-    
-    @Override    
+
+    @Override
     public int getNotation() {
-	return PREFIX;
+        return PREFIX;
     }
 }

@@ -43,31 +43,31 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Run this with
+ *
  * <pre>
  *     gradlew :key.core:testStrictSMT
  * </pre>
  */
 public class MasterHandlerTest {
     /**
-     * If this variable is set when running this test class, then
-     * those cases with expected result "weak_valid" will raise an
-     * exception unless they can be proved using the solver.
+     * If this variable is set when running this test class, then those cases with expected result
+     * "weak_valid" will raise an exception unless they can be proved using the solver.
      * <p>
-     * Otherwise a "timeout" or "unknown" is accepted. This can be
-     * used to deal with test cases that should verify but do not
-     * yet do so.
+     * Otherwise a "timeout" or "unknown" is accepted. This can be used to deal with test cases that
+     * should verify but do not yet do so.
      * <p>
      * (Default false)
      */
     private static final boolean STRICT_TEST = Boolean.getBoolean("key.newsmt2.stricttests");
     private static final boolean DUMP_SMT = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
-    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream().filter(it -> it.getClass()
-                    .equals(SolverTypeImplementation.class) && it.getName()
-                    .equals("Z3 (Legacy Translation)"))
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                    && it.getName().equals("Z3 (Legacy Translation)"))
             .findFirst().orElse(null);
 
-    public static List<Arguments> data() throws IOException, URISyntaxException, ProblemLoaderException {
+    public static List<Arguments> data()
+            throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -134,27 +134,25 @@ public class MasterHandlerTest {
             Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
             Files.write(tmpKey, lines);
 
-            KeYEnvironment<DefaultUserInterfaceControl> env =
-                    KeYEnvironment.load(tmpKey.toFile());
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
 
             Proof proof = env.getLoadedProof();
             Sequent sequent = proof.root().sequent();
 
-            SMTSettings settings = new DefaultSMTSettings(
-                    proof.getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    proof.getSettings().getNewSMTSettings(),
-                    proof);
+            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
 
-        String updates = props.get("smt-settings");
-        if (updates != null) {
-            Properties map = new Properties();
-            map.load(new StringReader(updates));
-            settings.getNewSettings().readSettings(map);
-        }
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                Properties map = new Properties();
+                map.load(new StringReader(updates));
+                settings.getNewSettings().readSettings(map);
+            }
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-            var translation = translator.translateProblem(sequent, env.getServices(), settings).toString();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
             return new TestData(name, path, props, translation);
         }
 
@@ -177,8 +175,9 @@ public class MasterHandlerTest {
 
         int i = 1;
         while (data.props.containsKey("contains." + i)) {
-            assertTrue(containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
-                    "Occurrence check for contains." + i);
+            assertTrue(
+                containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
+                "Occurrence check for contains." + i);
             i++;
         }
 
@@ -196,7 +195,7 @@ public class MasterHandlerTest {
     public void testZ3(TestData data) throws Exception {
         Assumptions.assumeTrue(Z3_SOLVER != null);
         Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-                "Z3 is not installed, this testcase is ignored.");
+            "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
@@ -215,16 +214,16 @@ public class MasterHandlerTest {
         try {
             String lookFor = null;
             switch (expectation) {
-                case "valid":
-                    lookFor = "unsat";
-                    break;
-                case "fail":
-                    lookFor = "(sat|timeout)";
-                    break;
-                case "irrelevant":
-                    break;
-                default:
-                    fail("Unexpected expectation: " + expectation);
+            case "valid":
+                lookFor = "unsat";
+                break;
+            case "fail":
+                lookFor = "(sat|timeout)";
+                break;
+            case "irrelevant":
+                break;
+            default:
+                fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {
@@ -240,7 +239,7 @@ public class MasterHandlerTest {
 
             if (!STRICT_TEST) {
                 assumeFalse("extended".equals(data.props.get("state")),
-                        "This is an extended test (will be run only in strict mode)");
+                    "This is an extended test (will be run only in strict mode)");
             }
 
             if (lookFor != null) {

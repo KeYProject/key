@@ -34,18 +34,15 @@ class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op        the top level operator
-     * @param subs      the Term that are the subterms of this term
+     * @param op the top level operator
+     * @param subs the Term that are the subterms of this term
      * @param boundVars logic variables bound by the operator
      * @param javaBlock contains the program part of the term (if any)
-     * @param labels    the terms labels (must not be null or empty)
+     * @param labels the terms labels (must not be null or empty)
      */
-    public LabeledTermImpl(Operator op,
-                           ImmutableArray<Term> subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
-                           ImmutableArray<TermLabel> labels,
-                           OriginRef originRef) {
+    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<TermLabel> labels, OriginRef originRef) {
         super(op, subs, boundVars, javaBlock, originRef);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
@@ -128,9 +125,8 @@ class LabeledTermImpl extends TermImpl {
         StringBuilder result = new StringBuilder(super.toString());
 
         String labelsStr = labels.stream()
-                //.filter(TermLabel::isProofRelevant)
-                .map(TermLabel::toString)
-                .collect(Collectors.joining(", "));
+                // .filter(TermLabel::isProofRelevant)
+                .map(TermLabel::toString).collect(Collectors.joining(", "));
 
         if (!labelsStr.isEmpty()) {
             result.append("<<");

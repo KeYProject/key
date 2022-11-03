@@ -8,11 +8,10 @@ import recoder.abstraction.Type;
 import recoder.convenience.Naming;
 
 /**
- * Generator for variable and method names creating an unbound series of names
- * derived from short cut versions of the base name or by enumeration. The
- * generator can be configured for short style (temporary variables) or long
- * style (public names) naming schemes. The generator takes care that no Java
- * keywords are generated.
+ * Generator for variable and method names creating an unbound series of names derived from short
+ * cut versions of the base name or by enumeration. The generator can be configured for short style
+ * (temporary variables) or long style (public names) naming schemes. The generator takes care that
+ * no Java keywords are generated.
  *
  * @author AL
  */
@@ -53,7 +52,7 @@ public class NameGenerator {
     /**
      * Create a generator for names based on the given name and style.
      *
-     * @param base     the base name.
+     * @param base the base name.
      * @param strategy the style to use.
      */
     public NameGenerator(String base, int strategy) {
@@ -61,8 +60,8 @@ public class NameGenerator {
     }
 
     /**
-     * Create a generator for names based on the given type name. Uses short
-     * style for primitive types, default style otherwise.
+     * Create a generator for names based on the given type name. Uses short style for primitive
+     * types, default style otherwise.
      *
      * @param type the type to derive a name from.
      */
@@ -80,19 +79,18 @@ public class NameGenerator {
     private static String[] getLetters(String base) {
         char c = Character.toLowerCase(base.charAt(0));
         if (c < 'y') {
-            return new String[]{base, "" + (char) (c + 1), "" + (char) (c + 2)};
+            return new String[] { base, "" + (char) (c + 1), "" + (char) (c + 2) };
         }
         if (c < 'z') {
-            return new String[]{base, "" + (char) (c + 1)};
+            return new String[] { base, "" + (char) (c + 1) };
         }
-        return new String[]{base};
+        return new String[] { base };
     }
 
     /**
-     * Separates single words of a base string using the following rules: 1. the
-     * first letter belongs to the first word 2. the last letter belongs to the
-     * last word 3. a capital letter with an adjacent lower case letter or
-     * underscore starts a new word
+     * Separates single words of a base string using the following rules: 1. the first letter
+     * belongs to the first word 2. the last letter belongs to the last word 3. a capital letter
+     * with an adjacent lower case letter or underscore starts a new word
      */
     private static String[] separateWords(String base) {
         int len = base.length();
@@ -258,7 +256,7 @@ public class NameGenerator {
             if (len == 1) {
                 derivates = getLetters(res.toString());
             } else {
-                derivates = new String[]{res.toString()};
+                derivates = new String[] { res.toString() };
             }
         } else {
             int c = 1;
@@ -284,9 +282,9 @@ public class NameGenerator {
     }
 
     /*
-     * Test program public static void main(String[] a) { for (int j = 0; j <
-     * a.length; j += 1) { System.out.print(a[j] + " -> "); NameGenerator nc =
-     * new NameGenerator(a[j], 0); for (int i = 0; i < 10; i += 1) {
-     * System.out.print(nc.getNextCandidate() + " "); } System.out.println(); } }
+     * Test program public static void main(String[] a) { for (int j = 0; j < a.length; j += 1) {
+     * System.out.print(a[j] + " -> "); NameGenerator nc = new NameGenerator(a[j], 0); for (int i =
+     * 0; i < 10; i += 1) { System.out.print(nc.getNextCandidate() + " "); } System.out.println(); }
+     * }
      */
 }

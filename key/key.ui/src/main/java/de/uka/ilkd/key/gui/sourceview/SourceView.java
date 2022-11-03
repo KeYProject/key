@@ -55,15 +55,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * This class is responsible for showing the source code and visualizing the symbolic execution
- * path of the currently selected node. This is done by adding tabs containing the source code and
+ * This class is responsible for showing the source code and visualizing the symbolic execution path
+ * of the currently selected node. This is done by adding tabs containing the source code and
  * highlighting the lines which were symbolically executed in the path from the root node down to
- * the current node.
- * In addition, by clicking on such a highlighted line the user can jump to the first node in the
- * proof tree where a statement from this line is symbolically executed.
+ * the current node. In addition, by clicking on such a highlighted line the user can jump to the
+ * first node in the proof tree where a statement from this line is symbolically executed.
  *
- * Editing the source code in the tabs is currently not implemented
- * (not supported by {@link JavaDocument}).
+ * Editing the source code in the tabs is currently not implemented (not supported by
+ * {@link JavaDocument}).
  *
  * @author Wolfram Pfeifer, lanzinger
  */
@@ -80,8 +79,8 @@ public final class SourceView extends JComponent {
     /**
      * ToolTip for the textPanes containing the source code.
      */
-    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent" +
-        " occurrence of this line in symbolic execution.";
+    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP =
+        "Jump upwards to the most recent" + " occurrence of this line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
@@ -97,7 +96,7 @@ public final class SourceView extends JComponent {
      * The color of normal highlights in source code (light green).
      */
     private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]normalHighlight",
+        ColorSettings.define("[SourceView]normalHighlight",
             "Color for highlighting symbolically executed lines in source view",
             new Color(194, 245, 194));
 
@@ -105,19 +104,17 @@ public final class SourceView extends JComponent {
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]mostRecentHighlight",
-                    "Color for highlighting most recently"
-                    + " symbolically executed line in source view",
-                    new Color(57, 210, 81));
+        ColorSettings.define("[SourceView]mostRecentHighlight",
+            "Color for highlighting most recently" + " symbolically executed line in source view",
+            new Color(57, 210, 81));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty TAB_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]tabHighlight",
-                    "Color for highlighting source view tabs"
-                    + " whose files contain highlighted lines.",
-                    new Color(57, 210, 81));
+        ColorSettings.define("[SourceView]tabHighlight",
+            "Color for highlighting source view tabs" + " whose files contain highlighted lines.",
+            new Color(57, 210, 81));
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -154,6 +151,7 @@ public final class SourceView extends JComponent {
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
+     *
      * @param mainWindow the MainWindow of the GUI
      */
     private SourceView(MainWindow mainWindow) {
@@ -182,7 +180,7 @@ public final class SourceView extends JComponent {
 
         // add extra height to make the status bar more noticeable
         sourceStatusBar.setPreferredSize(
-                new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
+            new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
@@ -212,13 +210,14 @@ public final class SourceView extends JComponent {
             }
         });
 
-        KeYGuiExtensionFacade.installKeyboardShortcuts(null,
-                this, KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(null, this,
+            KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
 
     }
 
     /**
      * Returns the singleton instance of the SourceView.
+     *
      * @param mainWindow KeY's main window
      * @return the component responsible for showing source code and symbolic execution information
      */
@@ -230,14 +229,20 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * <p> Creates a new highlight. </p>
+     * <p>
+     * Creates a new highlight.
+     * </p>
      *
-     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
-     *  starting with the one with the lowest level. </p>
+     * <p>
+     * If the are multiple highlights for a given line, they are drawn on top of each other,
+     * starting with the one with the lowest level.
+     * </p>
      *
-     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
-     *  except for the highlight that appears when the user moves the mouse over a line,
-     *  which has level {@code Integer.maxValue() - 1}. </p>
+     * <p>
+     * The highlights added by the {@code SourceView} itself have level {@code 0}, except for the
+     * highlight that appears when the user moves the mouse over a line, which has level
+     * {@code Integer.maxValue() - 1}.
+     * </p>
      *
      * @param fileURI the URI of the file in which to create the highlight.
      * @param sourceLine the line to highlight.
@@ -248,7 +253,8 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, Color color,
+            int level) throws BadLocationException, IOException {
         Tab tab = tabs.get(fileURI);
 
         if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
@@ -259,18 +265,25 @@ public final class SourceView extends JComponent {
 
         Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine);
 
-        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color, level);
+        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color,
+            level);
     }
 
     /**
-     * <p> Creates a new highlight. </p>
+     * <p>
+     * Creates a new highlight.
+     * </p>
      *
-     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
-     *  starting with the one with the lowest level. </p>
+     * <p>
+     * If the are multiple highlights for a given line, they are drawn on top of each other,
+     * starting with the one with the lowest level.
+     * </p>
      *
-     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
-     *  except for the highlight that appears when the user moves the mouse over a line,
-     *  which has level {@code Integer.maxValue() - 1}. </p>
+     * <p>
+     * The highlights added by the {@code SourceView} itself have level {@code 0}, except for the
+     * highlight that appears when the user moves the mouse over a line, which has level
+     * {@code Integer.maxValue() - 1}.
+     * </p>
      *
      * @param fileURI the URI of the file in which to create the highlight.
      * @param sourceLine the line to highlight.
@@ -281,7 +294,8 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, int startCol, int endCol, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlight(URI fileURI, String group, int sourceLine, int startCol,
+            int endCol, Color color, int level) throws BadLocationException, IOException {
         Tab tab = tabs.get(fileURI);
 
         if (tab == null || sourceLine < 0 || sourceLine >= tab.lineInformation.length) {
@@ -292,15 +306,20 @@ public final class SourceView extends JComponent {
 
         Range patchedRange = tab.calculatePatchedLineRangeFromLine(patchedLine, startCol, endCol);
 
-        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color, level);
+        return addHighlightDirect(fileURI, group, sourceLine, patchedLine, patchedRange, color,
+            level);
     }
 
     /**
-     * <p> Creates a new highlight (directly supplies patchedLine). </p>
+     * <p>
+     * Creates a new highlight (directly supplies patchedLine).
+     * </p>
      *
      * @see addHighlight
      */
-    public SourceViewHighlight addHighlightDirect(URI fileURI, String group, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) throws BadLocationException, IOException {
+    public SourceViewHighlight addHighlightDirect(URI fileURI, String group, int sourceLine,
+            int patchedLine, Range patchedRange, Color color, int level)
+            throws BadLocationException, IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -311,7 +330,8 @@ public final class SourceView extends JComponent {
 
         SortedSet<SourceViewHighlight> highlights = tab.highlights.get(patchedLine);
 
-        SourceViewHighlight highlight = new SourceViewHighlight(group, fileURI, sourceLine, patchedLine, patchedRange, color, level);
+        SourceViewHighlight highlight = new SourceViewHighlight(group, fileURI, sourceLine,
+            patchedLine, patchedRange, color, level);
         highlights.add(highlight);
 
         tab.markTabComponent();
@@ -323,11 +343,14 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}.
+     * <p>
+     * Creates a new set of highlights for a range of lines starting with {@code firstLine}.
      * </p>
      *
-     * <p> This method applies a heuristic to try and highlight the complete JML statement
-     *  starting in {@code firstLine}. </p>
+     * <p>
+     * This method applies a heuristic to try and highlight the complete JML statement starting in
+     * {@code firstLine}.
+     * </p>
      *
      * @param fileURI the URI of the file in which to create the highlights.
      * @param firstLine the first line to highlight.
@@ -338,9 +361,8 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public Set<SourceViewHighlight> addHighlightsForJMLStatement(
-            URI fileURI, int firstLine, Color color, int level)
-            throws BadLocationException, IOException {
+    public Set<SourceViewHighlight> addHighlightsForJMLStatement(URI fileURI, int firstLine,
+            Color color, int level) throws BadLocationException, IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -353,8 +375,7 @@ public final class SourceView extends JComponent {
         if (0 < lines.length && lines[firstLine - 1].trim().startsWith("@")) {
             int parens = 0;
 
-            outer_loop:
-            for (int i = firstLine; i <= lines.length; ++i) {
+            outer_loop: for (int i = firstLine; i <= lines.length; ++i) {
                 for (int j = 0; j < lines[i - 1].length(); ++j) {
                     if (lines[i - 1].charAt(j) == '(') {
                         ++parens;
@@ -389,13 +410,15 @@ public final class SourceView extends JComponent {
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public SourceViewHighlight changeHighlight(SourceViewHighlight oldHighlight, int newSourceLine, int newPatchedLine, Range newPatchedRange) throws BadLocationException {
+    public SourceViewHighlight changeHighlight(SourceViewHighlight oldHighlight, int newSourceLine,
+            int newPatchedLine, Range newPatchedRange) throws BadLocationException {
         URI fileURI = oldHighlight.getFileURI();
         int oldPatchedLine = oldHighlight.getPatchedLine();
 
         Tab tab = tabs.get(fileURI);
 
-        if (tab == null || !tab.highlights.containsKey(oldPatchedLine) || !tab.highlights.get(oldPatchedLine).contains(oldHighlight)) {
+        if (tab == null || !tab.highlights.containsKey(oldPatchedLine)
+                || !tab.highlights.get(oldPatchedLine).contains(oldHighlight)) {
             throw new IllegalArgumentException("highlight");
         }
 
@@ -407,15 +430,9 @@ public final class SourceView extends JComponent {
             tab.highlights.remove(oldPatchedLine);
         }
 
-        SourceViewHighlight newHighlight = new SourceViewHighlight(
-                oldHighlight.group,
-                oldHighlight.fileURI,
-                newSourceLine,
-                newPatchedLine,
-                newPatchedRange,
-                oldHighlight.color,
-                oldHighlight.level
-        );
+        SourceViewHighlight newHighlight =
+            new SourceViewHighlight(oldHighlight.group, oldHighlight.fileURI, newSourceLine,
+                newPatchedLine, newPatchedRange, oldHighlight.color, oldHighlight.level);
 
         if (!tab.highlights.containsKey(newPatchedLine)) {
             tab.highlights.put(newPatchedLine, new TreeSet<>());
@@ -431,13 +448,9 @@ public final class SourceView extends JComponent {
     }
 
     public List<SourceViewHighlight> listHighlights(String group) {
-        return tabs.
-                values().
-                stream().
-                flatMap(p -> p.highlights.values().stream()).
-                flatMap(Collection::stream).
-                filter(p -> p.group.equals(group)).
-                collect(Collectors.toList());
+        return tabs.values().stream().flatMap(p -> p.highlights.values().stream())
+                .flatMap(Collection::stream).filter(p -> p.group.equals(group))
+                .collect(Collectors.toList());
     }
 
     public List<SourceViewHighlight> listHighlights(URI fileURI) {
@@ -447,7 +460,8 @@ public final class SourceView extends JComponent {
             return new ArrayList<>();
         }
 
-        return tab.highlights.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        return tab.highlights.values().stream().flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     public List<SourceViewHighlight> listHighlights(URI fileURI, String group) {
@@ -457,15 +471,16 @@ public final class SourceView extends JComponent {
             return new ArrayList<>();
         }
 
-        return tab.highlights.values().stream().flatMap(Collection::stream).filter(p -> p.group.equals(group)).collect(Collectors.toList());
+        return tab.highlights.values().stream().flatMap(Collection::stream)
+                .filter(p -> p.group.equals(group)).collect(Collectors.toList());
     }
 
     /**
      * Removes a highlight.
      *
      * @param highlight the highlight to remove.
-     * @return {@code true} iff
-     *      this {@code SourceView} previously contained the specified highlight.
+     * @return {@code true} iff this {@code SourceView} previously contained the specified
+     *         highlight.
      */
     public boolean removeHighlight(SourceViewHighlight highlight) {
         Tab tab = tabs.get(highlight.getFileURI());
@@ -500,13 +515,13 @@ public final class SourceView extends JComponent {
     }
 
     public void removeHighlights(String group) {
-        for (SourceViewHighlight h: listHighlights(group)) {
+        for (SourceViewHighlight h : listHighlights(group)) {
             removeHighlight(h);
         }
     }
 
     public void removeHighlights(URI fileUri, String group) {
-        for (SourceViewHighlight h: listHighlights(fileUri, group)) {
+        for (SourceViewHighlight h : listHighlights(fileUri, group)) {
             removeHighlight(h);
         }
     }
@@ -516,7 +531,8 @@ public final class SourceView extends JComponent {
     }
 
     public synchronized void fireHighlightsChanged() {
-        for (HighlightsChangedListener listener : listenerList.getListeners(HighlightsChangedListener.class)) {
+        for (HighlightsChangedListener listener : listenerList
+                .getListeners(HighlightsChangedListener.class)) {
             listener.highlightsChanged();
         }
     }
@@ -547,7 +563,8 @@ public final class SourceView extends JComponent {
         for (URI fileURI : fileURIs) {
             if (addFile(fileURI)) {
                 updateNecessary = true;
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).addRelevantFile(fileURI);
+                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class)
+                        .addRelevantFile(fileURI);
             }
         }
 
@@ -558,6 +575,7 @@ public final class SourceView extends JComponent {
 
     /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
+     *
      * @param s the String to replace
      * @return the resulting String (without tabs)
      */
@@ -577,6 +595,7 @@ public final class SourceView extends JComponent {
      * active tab. Due to technical restrictions of the method viewToModel(Point), the result is a
      * little bit imprecise: The last char in a line is not detected as highlighted, this method
      * wrongly returns false.
+     *
      * @param point the point to check, usually the position of the mouse cursor
      * @return true iff the point is on a highlight
      */
@@ -601,8 +620,8 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        ImmutableSet<URI> fileURIs =
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).getRelevantFiles();
+        ImmutableSet<URI> fileURIs = mainWindow.getMediator().getSelectedProof()
+                .lookup(ProofJavaSourceCollection.class).getRelevantFiles();
 
         Iterator<URI> it = tabs.keySet().iterator();
 
@@ -662,10 +681,10 @@ public final class SourceView extends JComponent {
     /**
      * Performs an update of the GUI:
      * <ul>
-     *      <li>updates the TabbedPane with the source files used</li>
-     *      <li>highlights the symbolically executed lines</li>
-     *      <li>updates the source status bar of the main window with information about the current
-     *          branch</li>
+     * <li>updates the TabbedPane with the source files used</li>
+     * <li>highlights the symbolically executed lines</li>
+     * <li>updates the source status bar of the main window with information about the current
+     * branch</li>
      * </ul>
      */
     private void updateGUI() {
@@ -718,9 +737,9 @@ public final class SourceView extends JComponent {
         }
     }
 
-    private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list, Node node) {
-        if (pos != null
-                && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+    private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
+            Node node) {
+        if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI() != null) {
             list.addLast(new Pair<>(node, pos));
             node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(pos.getURI());
@@ -729,9 +748,10 @@ public final class SourceView extends JComponent {
 
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
+     *
      * @param node the given node
-     * @return a linked list of pairs of PositionInfo objects containing the start and end
-     * positions for the highlighting and Nodes.
+     * @return a linked list of pairs of PositionInfo objects containing the start and end positions
+     *         for the highlighting and Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
@@ -757,8 +777,8 @@ public final class SourceView extends JComponent {
             // This is a hack to make sure that the file containing the method which the current
             // proof obligation belongs to is always loaded.
 
-            node.sequent().forEach(formula ->
-                formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
+            node.sequent().forEach(
+                formula -> formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
 
                     @Override
                     public boolean visitSubtree(Term visited) {
@@ -766,58 +786,66 @@ public final class SourceView extends JComponent {
                     }
 
                     @Override
-                    public void visit(Term visited) { }
+                    public void visit(Term visited) {}
 
                     @Override
-                    public void subtreeLeft(Term subtreeRoot) { }
+                    public void subtreeLeft(Term subtreeRoot) {}
 
                     @Override
                     public void subtreeEntered(Term subtreeRoot) {
                         if (subtreeRoot.javaBlock() != null) {
-                            JavaASTVisitor visitor = new JavaASTVisitor(
-                                    subtreeRoot.javaBlock().program(),
+                            JavaASTVisitor visitor =
+                                new JavaASTVisitor(subtreeRoot.javaBlock().program(),
                                     mainWindow.getMediator().getServices()) {
 
-                                @Override
-                                protected void doDefaultAction(SourceElement el) {
-                                    if (el instanceof MethodBodyStatement) {
-                                        MethodBodyStatement mb = (MethodBodyStatement) el;
-                                        Statement body = mb.getBody(services);
-                                        PositionInfo posInf = null;
-                                        // try to find position information of the source element
-                                        if (body != null) {
-                                            posInf = body.getPositionInfo();
-                                        } else {
-                                            // the method is declared without a body
-                                            // -> we try to show the file either way
-                                            IProgramMethod pm = mb.getProgramMethod(services);
-                                            if (pm != null) {
-                                                posInf = pm.getPositionInfo();
+                                    @Override
+                                    protected void doDefaultAction(SourceElement el) {
+                                        if (el instanceof MethodBodyStatement) {
+                                            MethodBodyStatement mb = (MethodBodyStatement) el;
+                                            Statement body = mb.getBody(services);
+                                            PositionInfo posInf = null;
+                                            // try to find position information of the source
+                                            // element
+                                            if (body != null) {
+                                                posInf = body.getPositionInfo();
+                                            } else {
+                                                // the method is declared without a body
+                                                // -> we try to show the file either way
+                                                IProgramMethod pm = mb.getProgramMethod(services);
+                                                if (pm != null) {
+                                                    posInf = pm.getPositionInfo();
+                                                }
                                             }
-                                        }
-                                        if (posInf != null && posInf.getURI() != null) {
-                                            // sometimes the useful file info is only stored in
-                                            // parentClassURI for some reason ...
-                                            if (!posInf.getURI().equals(PositionInfo.UNKNOWN_URI)) {
-                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getURI());
-                                            } else if (!posInf.getParentClassURI().equals(PositionInfo.UNKNOWN_URI)) {
-                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getParentClassURI());
+                                            if (posInf != null && posInf.getURI() != null) {
+                                                // sometimes the useful file info is only stored in
+                                                // parentClassURI for some reason ...
+                                                if (!posInf.getURI()
+                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                    node.proof()
+                                                            .lookup(ProofJavaSourceCollection.class)
+                                                            .addRelevantFile(posInf.getURI());
+                                                } else if (!posInf.getParentClassURI()
+                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                    node.proof()
+                                                            .lookup(ProofJavaSourceCollection.class)
+                                                            .addRelevantFile(
+                                                                posInf.getParentClassURI());
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            };
+                                };
                             visitor.start();
                         }
                     }
-                })
-            );
+                }));
         }
 
         return list;
     }
 
-    public void addInsertion(URI fileURI, SourceViewInsertion ins) throws IOException, BadLocationException {
+    public void addInsertion(URI fileURI, SourceViewInsertion ins)
+            throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -827,7 +855,8 @@ public final class SourceView extends JComponent {
         tab.refreshInsertions();
     }
 
-    public void removeInsertion(URI fileURI, SourceViewInsertion ins) throws IOException, BadLocationException {
+    public void removeInsertion(URI fileURI, SourceViewInsertion ins)
+            throws IOException, BadLocationException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -842,7 +871,8 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        for (SourceViewInsertion ins: tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList())) {
+        for (SourceViewInsertion ins : tab.insertions.stream().filter(p -> p.Group.equals(group))
+                .collect(Collectors.toList())) {
             tab.removeInsertion(ins);
         }
 
@@ -854,7 +884,7 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        for (SourceViewInsertion ins: new ArrayList<>(tab.insertions)) {
+        for (SourceViewInsertion ins : new ArrayList<>(tab.insertions)) {
             tab.removeInsertion(ins);
         }
 
@@ -862,12 +892,8 @@ public final class SourceView extends JComponent {
     }
 
     public List<SourceViewInsertion> listInsertion(String group) {
-        return tabs.
-                values().
-                stream().
-                flatMap(p -> p.insertions.stream()).
-                filter(p -> p.Group.equals(group)).
-                collect(Collectors.toList());
+        return tabs.values().stream().flatMap(p -> p.insertions.stream())
+                .filter(p -> p.Group.equals(group)).collect(Collectors.toList());
     }
 
     public List<SourceViewInsertion> listInsertion(URI fileURI, String group) throws IOException {
@@ -875,7 +901,8 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        return tab.insertions.stream().filter(p -> p.Group.equals(group)).collect(Collectors.toList());
+        return tab.insertions.stream().filter(p -> p.Group.equals(group))
+                .collect(Collectors.toList());
     }
 
     public List<SourceViewInsertion> listInsertion(URI fileURI) throws IOException {
@@ -891,26 +918,27 @@ public final class SourceView extends JComponent {
     }
 
     public synchronized void fireInsertionChanged() {
-        for (InsertionChangedListener listener : listenerList.getListeners(InsertionChangedListener.class)) {
+        for (InsertionChangedListener listener : listenerList
+                .getListeners(InsertionChangedListener.class)) {
             listener.insertionsChanged();
         }
     }
 
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
+     *
      * @param se the given SourceElement
-     * @return a new PositionInfo starting at the minimum of all the contained positions and
-     * ending at the maximum position
+     * @return a new PositionInfo starting at the minimum of all the contained positions and ending
+     *         at the maximum position
      */
     private static PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement) {
-            if (se instanceof If
-                    || se instanceof Then
-                    || se instanceof Else) { // TODO: additional elements, e.g. code inside if
+            // TODO: additional elements, e.g. code inside if
+            if (se instanceof If || se instanceof Then || se instanceof Else) {
                 return PositionInfo.UNDEFINED;
             }
 
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement)se;
+            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) se;
             PositionInfo pos = se.getPositionInfo();
 
             for (int i = 0; i < ntpe.getChildCount(); i++) {
@@ -926,11 +954,12 @@ public final class SourceView extends JComponent {
     /**
      * Collects the information from the tree to which branch the current node belongs:
      * <ul>
-     *      <li>Invariant Initially Valid</li>
-     *      <li>Body Preserves Invariant</li>
-     *      <li>Use Case</li>
-     *      <li>...</li>
+     * <li>Invariant Initially Valid</li>
+     * <li>Body Preserves Invariant</li>
+     * <li>Use Case</li>
+     * <li>...</li>
      * </ul>
+     *
      * @param node the current node
      * @return a String containing the path information to display
      */
@@ -938,22 +967,18 @@ public final class SourceView extends JComponent {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();
-                /* Are there other interesting labels?
-                 * Please feel free to add them here. */
+                /*
+                 * Are there other interesting labels? Please feel free to add them here.
+                 */
                 if (label.equals("Invariant Initially Valid")
                         || label.equals("Invariant Preserved and Used") // for loop scope invariant
-                        || label.equals("Body Preserves Invariant")
-                        || label.equals("Use Case")
-                        || label.equals("Show Axiom Satisfiability")
-                        || label.startsWith("Pre (")                // precondition of a method
-                        || label.startsWith("Exceptional Post (")   // exceptional postcondition
-                        || label.startsWith("Post (")               // postcondition of a method
-                        || label.contains("Normal Execution")
-                        || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds")
-                        || label.contains("Validity")
-                        || label.contains("Precondition")
-                        || label.contains("Usage")) {
+                        || label.equals("Body Preserves Invariant") || label.equals("Use Case")
+                        || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
+                        || label.startsWith("Exceptional Post (") // exceptional postcondition
+                        || label.startsWith("Post (") // postcondition of a method
+                        || label.contains("Normal Execution") || label.contains("Null Reference")
+                        || label.contains("Index Out of Bounds") || label.contains("Validity")
+                        || label.contains("Precondition") || label.contains("Usage")) {
                     return label;
                 }
             }
@@ -989,12 +1014,12 @@ public final class SourceView extends JComponent {
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
      * Because we can add 'Insertions' into the document we have to differentiate in many places
-     * between source-positions and patched-positions.
-     * Where source-positions do not include insertions and are valid in the `source` attribute and
-     * patched-position contains them and are valid in the `patchedSource` attribute.
+     * between source-positions and patched-positions. Where source-positions do not include
+     * insertions and are valid in the `source` attribute and patched-position contains them and are
+     * valid in the `patchedSource` attribute.
      *
-     * The same is true for source-line and patched-line (line numbers)
-     * And tehre are a few methods to convert between the two systems.
+     * The same is true for source-line and patched-line (line numbers) And tehre are a few methods
+     * to convert between the two systems.
      *
      * @author Wolfram Pfeifer
      * @author lanzinger
@@ -1002,9 +1027,11 @@ public final class SourceView extends JComponent {
     private final class Tab extends JScrollPane {
         private static final long serialVersionUID = -8964428275919622930L;
 
-        private final static String KEY_SELECTION_HL = "de.uka.ild.key.gui.SourceView.Tab::selection_hl";
+        private final static String KEY_SELECTION_HL =
+            "de.uka.ild.key.gui.SourceView.Tab::selection_hl";
         private final static String KEY_JML_HL = "de.uka.ild.key.gui.SourceView.Tab::jml_hl";
-        private final static String KEY_SYMB_EXEC_HL = "de.uka.ild.key.gui.SourceView.Tab::symb_exec";
+        private final static String KEY_SYMB_EXEC_HL =
+            "de.uka.ild.key.gui.SourceView.Tab::symb_exec";
 
         /**
          * The file this tab belongs to.
@@ -1067,7 +1094,7 @@ public final class SourceView extends JComponent {
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
-            this.simpleFileName  = extractFileName(fileURI);
+            this.simpleFileName = extractFileName(fileURI);
 
             String fsource = "";
 
@@ -1103,7 +1130,7 @@ public final class SourceView extends JComponent {
             String s = uri.toString();
             int index = s.lastIndexOf("/");
             if (index < 0) {
-                return s;                       // fallback: return whole URI
+                return s; // fallback: return whole URI
             } else {
                 return s.substring(index + 1);
             }
@@ -1119,14 +1146,14 @@ public final class SourceView extends JComponent {
         }
 
         private void initTextPane(String fsource) {
-           //for (MouseListener l: registeredListener) {
-           //    textPane.removeMouseListener(l);
-           //}
-           //registeredListener.clear();
+            // for (MouseListener l: registeredListener) {
+            // textPane.removeMouseListener(l);
+            // }
+            // registeredListener.clear();
 
-           //for (MouseMotionListener l: registeredMotionListener) {
-           //    textPane.removeMouseMotionListener(l);
-           //}
+            // for (MouseMotionListener l: registeredMotionListener) {
+            // textPane.removeMouseMotionListener(l);
+            // }
             registeredMotionListener.clear();
 
             this.cacheTranslateToSourcePos.clear();
@@ -1153,7 +1180,8 @@ public final class SourceView extends JComponent {
                             return;
                         }
 
-                        SourceViewInsertion ins = getInsertionAtPatchedPos(textPane.viewToModel(mouseEvent.getPoint()));
+                        SourceViewInsertion ins =
+                            getInsertionAtPatchedPos(textPane.viewToModel(mouseEvent.getPoint()));
                         if (ins != null && ins.hasClickListener()) {
                             textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                             return;
@@ -1170,18 +1198,22 @@ public final class SourceView extends JComponent {
                 doc.insertString(0, this.source, new SimpleAttributeSet());
 
                 String lineBreak = getLineBreakSequence();
-                for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList())) {
-                    int idx = ins.Line-1;
-                    if (idx < 0 || idx >= lineInformation.length) continue;
+                for (SourceViewInsertion ins : insertions.stream()
+                        .sorted(Comparator.comparingInt(a -> -a.Line))
+                        .collect(Collectors.toList())) {
+                    int idx = ins.Line - 1;
+                    if (idx < 0 || idx >= lineInformation.length)
+                        continue;
 
                     int pos = lineInformation[idx].getOffset();
 
-                    doc.insertExtraString(pos, ins.getCleanText() + lineBreak, ins.getStyleAttrbuteSet());
+                    doc.insertExtraString(pos, ins.getCleanText() + lineBreak,
+                        ins.getStyleAttrbuteSet());
                 }
 
 
 
-            } catch (IOException|BadLocationException e) {
+            } catch (IOException | BadLocationException e) {
                 throw new AssertionError();
             }
 
@@ -1189,13 +1221,13 @@ public final class SourceView extends JComponent {
             MouseMotionListener mml2 = new MouseMotionListener() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
-                    synchronized(SourceView.this) {
+                    synchronized (SourceView.this) {
                         updateSelectionHighlight(e.getPoint());
                     }
                 }
 
                 @Override
-                public void mouseDragged(MouseEvent e) { }
+                public void mouseDragged(MouseEvent e) {}
             };
             textPane.addMouseMotionListener(mml2);
             registeredMotionListener.add(mml2);
@@ -1203,14 +1235,14 @@ public final class SourceView extends JComponent {
             MouseListener mml3 = new MouseAdapter() {
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    synchronized(SourceView.this) {
+                    synchronized (SourceView.this) {
                         updateSelectionHighlight(null);
                     }
                 }
 
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    synchronized(SourceView.this) {
+                    synchronized (SourceView.this) {
                         updateSelectionHighlight(e.getPoint());
                     }
                 }
@@ -1218,7 +1250,8 @@ public final class SourceView extends JComponent {
             textPane.addMouseListener(mml3);
             registeredListener.add(mml3);
 
-            MouseAdapter adapter = new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
+            MouseAdapter adapter =
+                new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
 
             textPane.addMouseListener(adapter);
             registeredListener.add(adapter);
@@ -1230,43 +1263,38 @@ public final class SourceView extends JComponent {
 
         private void initLineNumbers() {
 
-            List<SourceViewInsertion> ins = insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
+            List<SourceViewInsertion> ins = insertions.stream()
+                    .sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList());
 
 
             int[] skips = new int[ins.size()];
 
             for (int i = 0; i < ins.size(); i++) {
-                skips[i] = ins.get(i).Line+i;
+                skips[i] = ins.get(i).Line + i;
             }
 
-            //add Line numbers to each Scrollview
+            // add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1, skips);
             setRowHeaderView(tln);
         }
 
         private void markTabComponent() {
             if (highlights.isEmpty()) {
-                tabPane.setForegroundAt(
-                        tabPane.indexOfComponent(this),
-                        UIManager.getColor("TabbedPane.foreground"));
-                tabPane.setBackgroundAt(
-                        tabPane.indexOfComponent(this),
-                        UIManager.getColor("TabbedPane.background"));
+                tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                    UIManager.getColor("TabbedPane.foreground"));
+                tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                    UIManager.getColor("TabbedPane.background"));
             } else {
                 if (isSelected(this)) {
-                    tabPane.setForegroundAt(
-                            tabPane.indexOfComponent(this),
-                            TAB_HIGHLIGHT_COLOR.get());
-                    tabPane.setBackgroundAt(
-                            tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.background"));
+                    tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                        TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.background"));
                 } else {
-                    tabPane.setForegroundAt(
-                            tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.foreground"));
-                    tabPane.setBackgroundAt(
-                            tabPane.indexOfComponent(this),
-                            TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.foreground"));
+                    tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                        TAB_HIGHLIGHT_COLOR.get());
                 }
             }
         }
@@ -1299,10 +1327,8 @@ public final class SourceView extends JComponent {
                     int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
                     Color color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
 
-                    highlight.setTag(textPane.getHighlighter().addHighlight(
-                            range.start(),
-                            range.end(),
-                            new DefaultHighlightPainter(color)));
+                    highlight.setTag(textPane.getHighlighter().addHighlight(range.start(),
+                        range.end(), new DefaultHighlightPainter(color)));
                 }
             }
 
@@ -1333,19 +1359,11 @@ public final class SourceView extends JComponent {
                         // use a different color for most recent
                         if (i == 0) {
                             mostRecentLine = line;
-                            addHighlight(
-                                    absoluteFileName,
-                                    KEY_SYMB_EXEC_HL,
-                                    line,
-                                    MOST_RECENT_HIGHLIGHT_COLOR.get(),
-                                    0);
+                            addHighlight(absoluteFileName, KEY_SYMB_EXEC_HL, line,
+                                MOST_RECENT_HIGHLIGHT_COLOR.get(), 0);
                         } else if (line != mostRecentLine) {
-                            addHighlight(
-                                    absoluteFileName,
-                                    KEY_SYMB_EXEC_HL,
-                                    line,
-                                    NORMAL_HIGHLIGHT_COLOR.get(),
-                                    0);
+                            addHighlight(absoluteFileName, KEY_SYMB_EXEC_HL, line,
+                                NORMAL_HIGHLIGHT_COLOR.get(), 0);
                         }
                     }
                 }
@@ -1356,6 +1374,7 @@ public final class SourceView extends JComponent {
 
         /**
          * Paints the highlight for the line where the mouse pointer currently points to.
+         *
          * @param p the current position of the mouse pointer
          * @param highlight the highlight to change
          */
@@ -1368,7 +1387,8 @@ public final class SourceView extends JComponent {
                 SourceView.this.removeHighlights(absoluteFileName, KEY_SELECTION_HL);
             }
 
-            var selectionHL = listHighlights(absoluteFileName, KEY_SELECTION_HL).stream().findFirst().orElse(null);
+            var selectionHL = listHighlights(absoluteFileName, KEY_SELECTION_HL).stream()
+                    .findFirst().orElse(null);
 
             try {
                 int patchedPos = textPane.viewToModel(p);
@@ -1381,7 +1401,9 @@ public final class SourceView extends JComponent {
 
                     if (selectionHL == null) {
                         try {
-                            addHighlightDirect(absoluteFileName, KEY_SELECTION_HL, -1, patchedLine, patchedRange, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                            addHighlightDirect(absoluteFileName, KEY_SELECTION_HL, -1, patchedLine,
+                                patchedRange, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
+                                Integer.MAX_VALUE - 1);
                         } catch (BadLocationException | IOException e) {
                             LOGGER.debug("Caught exception!", e);
                         }
@@ -1398,7 +1420,8 @@ public final class SourceView extends JComponent {
 
                 if (selectionHL == null) {
                     try {
-                        addHighlight(absoluteFileName, KEY_SELECTION_HL, sourceLine, CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
+                        addHighlight(absoluteFileName, KEY_SELECTION_HL, sourceLine,
+                            CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(), Integer.MAX_VALUE - 1);
                     } catch (BadLocationException | IOException e) {
                         LOGGER.debug("Caught exception!", e);
                     }
@@ -1433,6 +1456,7 @@ public final class SourceView extends JComponent {
         /**
          * Calculates the range of actual text (not whitespace) in the line containing the given
          * position.
+         *
          * @param patchedPos the position to check (in displayed content)
          * @return the range of text (may be empty if there is just whitespace in the line)
          */
@@ -1441,11 +1465,11 @@ public final class SourceView extends JComponent {
 
             // find line end
             int end = text.indexOf('\n', patchedPos);
-            end = end == -1 ? text.length() : end;      // last line?
+            end = end == -1 ? text.length() : end; // last line?
 
             // find line start
-            int start = text.lastIndexOf('\n', patchedPos - 1);          // TODO: different line endings?
-            start = start == -1 ? 0 : start;            // first line?
+            int start = text.lastIndexOf('\n', patchedPos - 1); // TODO: different line endings?
+            start = start == -1 ? 0 : start; // first line?
 
             // ignore whitespace at the beginning of the line
             while (start < text.length() && start < end
@@ -1459,6 +1483,7 @@ public final class SourceView extends JComponent {
         /**
          * Calculates the range of actual text (not whitespace) in the line containing the given
          * position.
+         *
          * @param patchedLine the line to check (in displayed content)
          * @return the range of text (may be empty if there is just whitespace in the line)
          */
@@ -1466,14 +1491,15 @@ public final class SourceView extends JComponent {
             return calculatePatchedLineRangeFromLine(patchedLine, true);
         }
 
-        private Range calculatePatchedLineRangeFromLine(int patchedLine, boolean skipLeadingSpaces) {
+        private Range calculatePatchedLineRangeFromLine(int patchedLine,
+                boolean skipLeadingSpaces) {
 
             int start = 0;
 
             for (int i = 1; i < patchedLine; i++) {
-                int next = patchedSource.indexOf('\n', start+1);
+                int next = patchedSource.indexOf('\n', start + 1);
                 if (next == -1) {
-                    if (i == patchedLine-1) { // last line
+                    if (i == patchedLine - 1) { // last line
                         break;
                     }
 
@@ -1482,14 +1508,15 @@ public final class SourceView extends JComponent {
                 start = next;
             }
 
-            int end = patchedSource.indexOf('\n', start+1);
+            int end = patchedSource.indexOf('\n', start + 1);
             if (end == -1) {
                 end = patchedSource.length();
             }
 
             if (skipLeadingSpaces) {
                 // ignore whitespace at the beginning of the line
-                while (start < patchedSource.length() && start < end && Character.isWhitespace(patchedSource.charAt(start))) {
+                while (start < patchedSource.length() && start < end
+                        && Character.isWhitespace(patchedSource.charAt(start))) {
                     start++;
                 }
             }
@@ -1505,7 +1532,7 @@ public final class SourceView extends JComponent {
             int end = fullRange.end();
 
             startCol += start + 1;
-            endCol   += start + 1;
+            endCol += start + 1;
 
             if (startCol > start) {
                 start = Math.min(startCol, fullRange.end());
@@ -1524,7 +1551,7 @@ public final class SourceView extends JComponent {
         /**
          * Get the used linebreaks (\n | \r\n) in this document
          */
-        private String getLineBreakSequence(){
+        private String getLineBreakSequence() {
             if (source.contains("\r\n")) {
                 return "\r\n";
             }
@@ -1534,21 +1561,25 @@ public final class SourceView extends JComponent {
         /**
          * Add Insertions to a string
          */
-        private String patchSourceWithInsertions(String source, List<SourceViewInsertion> insertions) throws IOException {
+        private String patchSourceWithInsertions(String source,
+                List<SourceViewInsertion> insertions) throws IOException {
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             lineInformation = IOUtil.computeLineInformation(inStream);
 
             String lineBreak = getLineBreakSequence();
 
-            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList())) {
+            for (SourceViewInsertion ins : insertions.stream()
+                    .sorted(Comparator.comparingInt(a -> -a.Line)).collect(Collectors.toList())) {
 
-                int idx = ins.Line-1;
+                int idx = ins.Line - 1;
 
-                if (idx < 0 || idx >= lineInformation.length) continue;
+                if (idx < 0 || idx >= lineInformation.length)
+                    continue;
 
                 int pos = lineInformation[idx].getOffset();
 
-                source = source.substring(0, pos) + ins.getCleanText() + lineBreak + source.substring(pos);
+                source = source.substring(0, pos) + ins.getCleanText() + lineBreak
+                        + source.substring(pos);
             }
 
             return source;
@@ -1560,18 +1591,22 @@ public final class SourceView extends JComponent {
          */
         private SourceViewInsertion getInsertionAtPatchedPos(int patchedPos) {
 
-            int patchedLine = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+            int patchedLine = 1 + (int) Pattern.compile("\r?\n")
+                    .matcher(this.patchedSource.substring(0, patchedPos)).results().count();
 
             ArrayList<SourceViewInsertion> rev = new ArrayList<>(insertions);
             Collections.reverse(rev);
 
             int offset = 0;
-            for (SourceViewInsertion ins: rev.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
+            for (SourceViewInsertion ins : rev.stream().sorted(Comparator.comparingInt(a -> a.Line))
+                    .collect(Collectors.toList())) {
 
-                int idx = ins.Line-1;
-                if (idx < 0 || idx >= lineInformation.length) continue;
+                int idx = ins.Line - 1;
+                if (idx < 0 || idx >= lineInformation.length)
+                    continue;
 
-                if (offset + ins.Line == patchedLine) return ins;
+                if (offset + ins.Line == patchedLine)
+                    return ins;
 
                 offset++;
             }
@@ -1589,7 +1624,8 @@ public final class SourceView extends JComponent {
             }
 
             patchedPos = translateToSourcePos(patchedPos);
-            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.source.substring(0, patchedPos)).results().count();
+            int result = 1 + (int) Pattern.compile("\r?\n")
+                    .matcher(this.source.substring(0, patchedPos)).results().count();
 
             this.cacheTranslatePosToSourceLine.put(patchedPos, result);
 
@@ -1597,15 +1633,16 @@ public final class SourceView extends JComponent {
         }
 
         /**
-         * Translates an offset in the displayed document into an offset in the source fule
-         * (must undo insertions)
+         * Translates an offset in the displayed document into an offset in the source fule (must
+         * undo insertions)
          */
         private int translatePatchedPosToPatchedLine(int patchedPos) {
             if (this.cacheTranslatePosToPatchedLine.containsKey(patchedPos)) {
                 return this.cacheTranslatePosToPatchedLine.get(patchedPos);
             }
 
-            int result = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+            int result = 1 + (int) Pattern.compile("\r?\n")
+                    .matcher(this.patchedSource.substring(0, patchedPos)).results().count();
 
             this.cacheTranslatePosToPatchedLine.put(patchedPos, result);
 
@@ -1613,8 +1650,8 @@ public final class SourceView extends JComponent {
         }
 
         /**
-         * Translates an offset in the source file into an offset in the displayed
-         * Document (must skip Insertions)
+         * Translates an offset in the source file into an offset in the displayed Document (must
+         * skip Insertions)
          */
         public int translateToPatchedPos(int sourcePos) {
             if (this.cacheTranslateToPatchedPos.containsKey(sourcePos)) {
@@ -1624,20 +1661,21 @@ public final class SourceView extends JComponent {
             String lineBreak = getLineBreakSequence();
 
             int sourceLine = 1;
-            for (LineInformation li:lineInformation) {
+            for (LineInformation li : lineInformation) {
                 if (li.getOffset() < sourcePos) {
                     sourceLine++;
                 }
             }
 
             int offset = 0;
-            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
+            for (SourceViewInsertion ins : insertions.stream()
+                    .sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
                 if (ins.Line <= sourceLine) {
                     offset += ins.getCleanText().length() + lineBreak.length();
                 }
             }
 
-            int result = sourcePos+offset;
+            int result = sourcePos + offset;
 
             cacheTranslateToPatchedPos.put(sourcePos, result);
 
@@ -1645,26 +1683,30 @@ public final class SourceView extends JComponent {
         }
 
         /**
-         * Translates an offset in displayed document into an offset in the source file
-         * (must undo Insertions)
+         * Translates an offset in displayed document into an offset in the source file (must undo
+         * Insertions)
          */
         public int translateToSourcePos(int patchedPos) {
             if (this.cacheTranslateToSourcePos.containsKey(patchedPos)) {
                 return this.cacheTranslateToSourcePos.get(patchedPos);
             }
 
-            int lineInPatched = 1+(int)Pattern.compile("\r?\n").matcher(this.patchedSource.substring(0, patchedPos)).results().count();
+            int lineInPatched = 1 + (int) Pattern.compile("\r?\n")
+                    .matcher(this.patchedSource.substring(0, patchedPos)).results().count();
 
             String lineBreak = getLineBreakSequence();
 
             int result = patchedPos;
 
             int offset = 0;
-            for (SourceViewInsertion ins: insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
+            for (SourceViewInsertion ins : insertions.stream()
+                    .sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
 
-                int idx = ins.Line-1;
-                if (idx < 0 || idx >= lineInformation.length) continue;
-                if (offset + ins.Line > lineInPatched) break;
+                int idx = ins.Line - 1;
+                if (idx < 0 || idx >= lineInformation.length)
+                    continue;
+                if (offset + ins.Line > lineInPatched)
+                    break;
 
                 offset++;
                 result -= ins.getCleanText().length() + lineBreak.length();
@@ -1677,12 +1719,12 @@ public final class SourceView extends JComponent {
         }
 
         /**
-         * Translates a line in the souce into a line in the displayed content
-         * (must add Insertion offsets)
+         * Translates a line in the souce into a line in the displayed content (must add Insertion
+         * offsets)
          */
         public int translateSourceLineToPatchedLine(int sourceLine) {
 
-            int offset = (int)insertions.stream().filter(p -> p.Line < sourceLine).count();
+            int offset = (int) insertions.stream().filter(p -> p.Line < sourceLine).count();
 
             return sourceLine + offset;
 
@@ -1730,14 +1772,16 @@ public final class SourceView extends JComponent {
 
         /**
          * Update the position of all existing highlights
+         *
          * @param remLine remove line at this (patched) position
-         * @param startLine only update lines with (patched) line >=  (patched)startLine
+         * @param startLine only update lines with (patched) line >= (patched)startLine
          * @param lineDelta change the patchedLine attribute by this value
          * @param rangeDelta change the patchedRange attribute by this value
          */
-        private void batchUpdateHighlights(int remLine, int startLine, int lineDelta, int rangeDelta) throws BadLocationException {
+        private void batchUpdateHighlights(int remLine, int startLine, int lineDelta,
+                int rangeDelta) throws BadLocationException {
             int maxLine = startLine;
-            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry: highlights.entrySet()) {
+            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry : highlights.entrySet()) {
                 if (entry.getKey() >= startLine) {
                     maxLine = Math.max(maxLine, entry.getKey());
                 }
@@ -1750,34 +1794,29 @@ public final class SourceView extends JComponent {
             }
 
             // deep-copy highlights map, because we want to modify it in the following loop
-            var data = highlights.
-                    entrySet().
-                    stream().
-                    map(p -> new Tuple<>(p.getKey(), new HashSet<>(p.getValue()))).
-                    sorted(Comparator.comparingInt(a -> -a.getA())).collect(Collectors.toList());
+            var data = highlights.entrySet().stream()
+                    .map(p -> new Tuple<>(p.getKey(), new HashSet<>(p.getValue())))
+                    .sorted(Comparator.comparingInt(a -> -a.getA())).collect(Collectors.toList());
 
-            for (Tuple<Integer, HashSet<SourceViewHighlight>> entry: data) {
-                for (SourceViewHighlight hl: entry.getB()) {
+            for (Tuple<Integer, HashSet<SourceViewHighlight>> entry : data) {
+                for (SourceViewHighlight hl : entry.getB()) {
                     if (remLine >= 0 && hl.patchedLine == remLine) {
 
                         highlights.get(entry.getA()).remove(hl);
 
                     } else if (hl.patchedLine >= startLine) {
 
-                        SourceViewHighlight hlNew = new SourceViewHighlight(
-                            hl.group,
-                            hl.fileURI,
-                            hl.sourceLine,
-                            hl.patchedLine+lineDelta,
-                            new Range(hl.patchedRange.start() + rangeDelta, hl.patchedRange.end() + rangeDelta),
-                            hl.color,
-                            hl.level
-                        );
+                        SourceViewHighlight hlNew = new SourceViewHighlight(hl.group, hl.fileURI,
+                            hl.sourceLine, hl.patchedLine + lineDelta,
+                            new Range(hl.patchedRange.start() + rangeDelta,
+                                hl.patchedRange.end() + rangeDelta),
+                            hl.color, hl.level);
 
                         highlights.get(entry.getA()).remove(hl);
 
                         if (!highlights.containsKey(hlNew.patchedLine)) {
-                            highlights.put(hlNew.patchedLine, new TreeSet<>(Collections.reverseOrder()));
+                            highlights.put(hlNew.patchedLine,
+                                new TreeSet<>(Collections.reverseOrder()));
                         }
                         highlights.get(hlNew.patchedLine).add(hlNew);
 
@@ -1832,7 +1871,8 @@ public final class SourceView extends JComponent {
 
         private SourceViewInsertion hoveredInsertion = null;
 
-        private TextPaneMouseAdapter(Tab tab, JTextPane textPane, LineInformation[] li, URI fileURI) {
+        private TextPaneMouseAdapter(Tab tab, JTextPane textPane, LineInformation[] li,
+                URI fileURI) {
             this.textPane = textPane;
             this.li = li;
             this.fileURI = fileURI;
@@ -1895,7 +1935,8 @@ public final class SourceView extends JComponent {
             // jump in proof tree (get corresponding node from list)
             Node n = null;
             for (Pair<Node, PositionInfo> p : lines) {
-                if (p.second.getStartPosition().getLine() == patchedLine && p.second.getURI().equals(fileURI)) {
+                if (p.second.getStartPosition().getLine() == patchedLine
+                        && p.second.getURI().equals(fileURI)) {
                     n = p.first;
                     break;
                 }

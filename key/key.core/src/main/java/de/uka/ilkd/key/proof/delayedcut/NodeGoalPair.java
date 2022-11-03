@@ -8,13 +8,13 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author Benjamin Niedermann
  */
-public class NodeGoalPair{
-    public final Node node; 
+public class NodeGoalPair {
+    public final Node node;
     public final Goal goal;
-    
+
     public NodeGoalPair(Node node, Goal goal) {
         this.node = node;
         this.goal = goal;
     }
-    
+
 }

@@ -54,7 +54,7 @@ public class SequentBackTransformer {
             throw new TransformException("Can only work on functional contracts");
         }
 
-        FunctionalOperationContractPO funContractPO = (FunctionalOperationContractPO)contractPO;
+        FunctionalOperationContractPO funContractPO = (FunctionalOperationContractPO) contractPO;
 
         FunctionalOperationContract contract = funContractPO.getContract();
 
@@ -65,11 +65,12 @@ public class SequentBackTransformer {
         return new PositionMap(pos);
     }
 
-    private ArrayList<InsertionTerm> extractSuccedentTerms(boolean continueOnError) throws TransformException {
+    private ArrayList<InsertionTerm> extractSuccedentTerms(boolean continueOnError)
+            throws TransformException {
         ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
 
         boolean ensuresInResult = false;
-        for (SequentFormula sf: sequent.succedent()) {
+        for (SequentFormula sf : sequent.succedent()) {
 
             Term topTerm = sf.formula();
 
@@ -78,15 +79,17 @@ public class SequentBackTransformer {
                     result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, topTerm));
                     continue;
                 }
-                throw new TransformException("Cannot transform succedent formula with modularities");
+                throw new TransformException(
+                    "Cannot transform succedent formula with modularities");
             }
 
             var split = splitFormula(topTerm, Junctor.AND);
 
             boolean ensuresInSplit = false;
-            for (var term: split) {
+            for (var term : split) {
                 if (isRequires(term)) {
-                    // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
+                    // special-case, an [assume] in the succedent (e.g. by applying teh notLeft
+                    // taclet)
                     result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
                 } else if (isEnsures(term)) {
                     if (ensuresInResult) {
@@ -94,7 +97,10 @@ public class SequentBackTransformer {
                             result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
                             continue;
                         }
-                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
+                        throw new TransformException(
+                            "Cannot transform sequent with multiple 'real' succedents"); // TODO how
+                                                                                         // to
+                                                                                         // display?
                     }
                     result.add(new InsertionTerm(InsertionType.ASSERT, term));
                     ensuresInSplit = true;
@@ -104,7 +110,10 @@ public class SequentBackTransformer {
                             result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
                             continue;
                         }
-                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents"); //TODO how to display?
+                        throw new TransformException(
+                            "Cannot transform sequent with multiple 'real' succedents"); // TODO how
+                                                                                         // to
+                                                                                         // display?
                     }
                     result.add(new InsertionTerm(InsertionType.ASSIGNABLE, term));
                     ensuresInSplit = true;
@@ -113,7 +122,8 @@ public class SequentBackTransformer {
                         result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
                         continue;
                     }
-                    throw new TransformException("Failed to categorize succedent-term '"+term+"'");
+                    throw new TransformException(
+                        "Failed to categorize succedent-term '" + term + "'");
                 }
             }
             if (ensuresInSplit) {
@@ -124,10 +134,11 @@ public class SequentBackTransformer {
         return result;
     }
 
-    private ArrayList<InsertionTerm> extractAntecedentTerms(boolean continueOnError) throws TransformException {
+    private ArrayList<InsertionTerm> extractAntecedentTerms(boolean continueOnError)
+            throws TransformException {
         ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
 
-        for (SequentFormula sf: sequent.antecedent()) {
+        for (SequentFormula sf : sequent.antecedent()) {
 
             Term topTerm = sf.formula();
 
@@ -136,12 +147,13 @@ public class SequentBackTransformer {
                     result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, topTerm));
                     continue;
                 }
-                throw new TransformException("Cannot transform antecedent formula with modularities");
+                throw new TransformException(
+                    "Cannot transform antecedent formula with modularities");
             }
 
             var split = splitFormula(topTerm, Junctor.AND);
 
-            for (var term: split) {
+            for (var term : split) {
                 if (isRequires(term)) {
                     result.add(new InsertionTerm(InsertionType.ASSUME, term));
                 } else {
@@ -149,7 +161,8 @@ public class SequentBackTransformer {
                         result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term));
                         continue;
                     }
-                    throw new TransformException("Failed to categorize antecedent-term '"+term+"'");
+                    throw new TransformException(
+                        "Failed to categorize antecedent-term '" + term + "'");
                 }
             }
         }
@@ -161,39 +174,54 @@ public class SequentBackTransformer {
         Term result = svc.getTermBuilder().not(term);
 
         if (term.getOriginRef() != null && result.getOriginRef() == null) {
-            result = svc.getTermFactory().setOriginRef(result, term.getOriginRef().WithMetadata(false, true));
+            result = svc.getTermFactory().setOriginRef(result,
+                term.getOriginRef().WithMetadata(false, true));
         }
 
         return result;
     }
 
     private boolean isRequires(Term term) {
-        if (term.containsJavaBlockRecursive()) return false;
+        if (term.containsJavaBlockRecursive())
+            return false;
 
-        var origins = getSubOriginRefs(term, true).stream().filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN).collect(Collectors.toList());
-        if (origins.size() == 0) return false;
+        var origins = getSubOriginRefs(term, true).stream()
+                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
+        if (origins.size() == 0)
+            return false;
 
         return origins.stream().allMatch(p -> p.Type.isRequires());
     }
 
     private boolean isEnsures(Term term) {
-        if (term.containsJavaBlockRecursive()) return false;
+        if (term.containsJavaBlockRecursive())
+            return false;
 
-        var origins = getSubOriginRefs(term, true).stream().filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN).collect(Collectors.toList());
-        if (origins.size() == 0) return false;
+        var origins = getSubOriginRefs(term, true).stream()
+                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
+        if (origins.size() == 0)
+            return false;
 
         return origins.stream().allMatch(p -> p.Type.isEnsures());
     }
 
     private boolean isAssignable(Term term) {
-        if (term.containsJavaBlockRecursive()) return false;
+        if (term.containsJavaBlockRecursive())
+            return false;
 
         var origin = term.getOriginRef();
-        if (origin == null) return false;
-        if (origin.Type != OriginRefType.JML_ASSIGNABLE && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE) return false;
+        if (origin == null)
+            return false;
+        if (origin.Type != OriginRefType.JML_ASSIGNABLE
+                && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE)
+            return false;
 
-        if (term.op() != Quantifier.ALL) return false;
-        if (term.sub(0).op() != Quantifier.ALL) return false;
+        if (term.op() != Quantifier.ALL)
+            return false;
+        if (term.sub(0).op() != Quantifier.ALL)
+            return false;
 
         return true;
     }
@@ -202,12 +230,14 @@ public class SequentBackTransformer {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            if (term.getOriginRef() != null) r.add(term.getOriginRef());
+            if (term.getOriginRef() != null)
+                r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null) r.add(t.getOriginRef());
+                if (t.getOriginRef() != null)
+                    r.add(t.getOriginRef());
                 r.addAll(getSubOriginRefs(t, false));
             }
         }
@@ -215,7 +245,7 @@ public class SequentBackTransformer {
         return r;
     }
 
-    private List<Term> splitFormula(Term f, Operator j)  {
+    private List<Term> splitFormula(Term f, Operator j) {
         var r = new ArrayList<Term>();
 
         if (f.op() == j) {

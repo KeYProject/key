@@ -28,7 +28,6 @@ public class FinishAuxiliaryComputationMacro extends AlternativeMacro {
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] { new FinishAuxiliaryMethodComputationMacro(),
-                                  new FinishAuxiliaryLoopComputationMacro(),
-                                  new FinishAuxiliaryBlockComputationMacro()};
+            new FinishAuxiliaryLoopComputationMacro(), new FinishAuxiliaryBlockComputationMacro() };
     }
 }

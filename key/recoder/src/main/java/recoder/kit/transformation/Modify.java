@@ -17,14 +17,12 @@ import recoder.kit.TwoPassTransformation;
 import java.util.List;
 
 /**
- * Syntactic transformation that modifies a declaration by adding/removing
- * single modifiers. This transformation replaces an existing visibility
- * modifier if there is one. The modifier codes are taken from the
- * {@link recoder.kit.ModifierKit}, including the
- * {@link recoder.kit.ModifierKit#PACKAGE}pseudo modifier. The transformation
- * obeys the standard JavaDOC modifier order convention: Visibility modifiers go
- * first, then abstract or static and then final. All others are simply
- * appended.
+ * Syntactic transformation that modifies a declaration by adding/removing single modifiers. This
+ * transformation replaces an existing visibility modifier if there is one. The modifier codes are
+ * taken from the {@link recoder.kit.ModifierKit}, including the
+ * {@link recoder.kit.ModifierKit#PACKAGE}pseudo modifier. The transformation obeys the standard
+ * JavaDOC modifier order convention: Visibility modifiers go first, then abstract or static and
+ * then final. All others are simply appended.
  *
  * @author AL
  */
@@ -45,14 +43,14 @@ public class Modify extends TwoPassTransformation {
     /**
      * Creates a new transformation object that modifies a declaration.
      *
-     * @param sc        the service configuration to use.
+     * @param sc the service configuration to use.
      * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl      the declaration to modify. may not be <CODE>null</CODE> and
-     *                  must denote a valid identifier name.
-     * @param code      the modifier to create, using the codes from
-     *                  {@link recoder.kit.ModifierKit}.
+     * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
+     *        identifier name.
+     * @param code the modifier to create, using the codes from {@link recoder.kit.ModifierKit}.
      */
-    public Modify(CrossReferenceServiceConfiguration sc, boolean isVisible, Declaration decl, int code) {
+    public Modify(CrossReferenceServiceConfiguration sc, boolean isVisible, Declaration decl,
+            int code) {
         super(sc);
         if (decl == null) {
             throw new IllegalArgumentException("Missing declaration");
@@ -89,8 +87,8 @@ public class Modify extends TwoPassTransformation {
     }
 
     /**
-     * Finds out which modifier to remove and which to add, if any. This
-     * transformation is syntactic.
+     * Finds out which modifier to remove and which to add, if any. This transformation is
+     * syntactic.
      *
      * @return the problem report.
      * @deprecated Does not check vadility of modification.
@@ -102,73 +100,73 @@ public class Modify extends TwoPassTransformation {
             return setProblemReport(IDENTITY);
         }
         switch (modifier) {
-            case ModifierKit.PACKAGE:
-                remove = ModifierKit.getVisibilityModifier(decl);
+        case ModifierKit.PACKAGE:
+            remove = ModifierKit.getVisibilityModifier(decl);
+            break;
+        case ModifierKit.PUBLIC:
+            remove = ModifierKit.getVisibilityModifier(decl);
+            if (remove instanceof Public) {
                 break;
-            case ModifierKit.PUBLIC:
-                remove = ModifierKit.getVisibilityModifier(decl);
-                if (remove instanceof Public) {
-                    break;
-                }
-                insert = getProgramFactory().createPublic();
+            }
+            insert = getProgramFactory().createPublic();
+            break;
+        case ModifierKit.PROTECTED:
+            remove = ModifierKit.getVisibilityModifier(decl);
+            if (remove instanceof Protected) {
                 break;
-            case ModifierKit.PROTECTED:
-                remove = ModifierKit.getVisibilityModifier(decl);
-                if (remove instanceof Protected) {
-                    break;
-                }
-                insert = getProgramFactory().createProtected();
+            }
+            insert = getProgramFactory().createProtected();
+            break;
+        case ModifierKit.PRIVATE:
+            remove = ModifierKit.getVisibilityModifier(decl);
+            if (remove instanceof Private) {
                 break;
-            case ModifierKit.PRIVATE:
-                remove = ModifierKit.getVisibilityModifier(decl);
-                if (remove instanceof Private) {
-                    break;
-                }
-                insert = getProgramFactory().createPrivate();
-                break;
-            case ModifierKit.STATIC:
-                if (ModifierKit.getVisibilityModifier(decl) != null) {
-                    insertPosition += 1;
-                }
-                insert = getProgramFactory().createStatic();
-                break;
-            case ModifierKit.FINAL:
-                if (ModifierKit.getVisibilityModifier(decl) != null) {
-                    insertPosition += 1;
-                }
-                if (containsModifier(decl, Static.class)) {
-                    insertPosition += 1;
-                }
-                insert = getProgramFactory().createFinal();
-                break;
-            case ModifierKit.ABSTRACT:
-                if (ModifierKit.getVisibilityModifier(decl) != null) {
-                    insertPosition += 1;
-                }
-                insert = getProgramFactory().createAbstract();
-                break;
-            case ModifierKit.SYNCHRONIZED:
-                insertPosition = getLastModifierPosition();
-                insert = getProgramFactory().createSynchronized();
-                break;
-            case ModifierKit.TRANSIENT:
-                insertPosition = getLastModifierPosition();
-                insert = getProgramFactory().createTransient();
-                break;
-            case ModifierKit.STRICT:
-                insertPosition = getLastModifierPosition();
-                insert = getProgramFactory().createStrictFp();
-                break;
-            case ModifierKit.VOLATILE:
-                insertPosition = getLastModifierPosition();
-                insert = getProgramFactory().createVolatile();
-                break;
-            case ModifierKit.NATIVE:
-                insertPosition = getLastModifierPosition();
-                insert = getProgramFactory().createNative();
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported modifier code " + modifier);
+            }
+            insert = getProgramFactory().createPrivate();
+            break;
+        case ModifierKit.STATIC:
+            if (ModifierKit.getVisibilityModifier(decl) != null) {
+                insertPosition += 1;
+            }
+            insert = getProgramFactory().createStatic();
+            break;
+        case ModifierKit.FINAL:
+            if (ModifierKit.getVisibilityModifier(decl) != null) {
+                insertPosition += 1;
+            }
+            if (containsModifier(decl, Static.class)) {
+                insertPosition += 1;
+            }
+            insert = getProgramFactory().createFinal();
+            break;
+        case ModifierKit.ABSTRACT:
+            if (ModifierKit.getVisibilityModifier(decl) != null) {
+                insertPosition += 1;
+            }
+            insert = getProgramFactory().createAbstract();
+            break;
+        case ModifierKit.SYNCHRONIZED:
+            insertPosition = getLastModifierPosition();
+            insert = getProgramFactory().createSynchronized();
+            break;
+        case ModifierKit.TRANSIENT:
+            insertPosition = getLastModifierPosition();
+            insert = getProgramFactory().createTransient();
+            break;
+        case ModifierKit.STRICT:
+            insertPosition = getLastModifierPosition();
+            insert = getProgramFactory().createStrictFp();
+            break;
+        case ModifierKit.VOLATILE:
+            insertPosition = getLastModifierPosition();
+            insert = getProgramFactory().createVolatile();
+            break;
+        case ModifierKit.NATIVE:
+            insertPosition = getLastModifierPosition();
+            insert = getProgramFactory().createNative();
+            break;
+        default:
+            throw new IllegalArgumentException("Unsupported modifier code " + modifier);
         }
         return setProblemReport(NO_PROBLEM);
     }

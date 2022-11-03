@@ -17,14 +17,14 @@ import recoder.testsuite.basic.BasicTestsSuite;
 import java.util.List;
 
 /**
- * This test checks if all references in all compilation units are resolved and
- * contained in the reference lists of their corresponding target.
+ * This test checks if all references in all compilation units are resolved and contained in the
+ * reference lists of their corresponding target.
  */
 public class ReferenceCompletenessTest {
 
     private static String makeReferenceError(Reference r, ProgramModelElement x) {
         return Format.toString("%c %N @%p in %f", r) + " was not found in reference list of "
-                + Format.toString("%c %N", x);
+            + Format.toString("%c %N", x);
     }
 
     @Test
@@ -39,7 +39,8 @@ public class ReferenceCompletenessTest {
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
                 if (pe instanceof Reference) {
-                    Assert.assertTrue("Uncollated reference detected", !(pe instanceof UncollatedReferenceQualifier));
+                    Assert.assertTrue("Uncollated reference detected",
+                        !(pe instanceof UncollatedReferenceQualifier));
                     if (pe instanceof VariableReference) {
                         VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);

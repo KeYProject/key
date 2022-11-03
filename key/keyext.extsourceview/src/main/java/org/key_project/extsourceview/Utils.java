@@ -25,17 +25,20 @@ import java.util.List;
 
 public class Utils {
 
-    public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart, int lineEnd) throws URISyntaxException, IOException {
+    public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart,
+            int lineEnd) throws URISyntaxException, IOException {
         List<String> lines = Files.readAllLines(Path.of(file));
 
         StringBuilder r = new StringBuilder();
         for (int i = lineStart; i <= lineEnd; i++) {
-            if (i-1 < lines.size()) r.append(lines.get(i - 1)).append("\n");
+            if (i - 1 < lines.size())
+                r.append(lines.get(i - 1)).append("\n");
         }
         return r.toString();
     }
 
-    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom, boolean returnNullOnTopLevel) {
+    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom,
+            boolean returnNullOnTopLevel) {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
@@ -43,21 +46,25 @@ public class Utils {
                 return t;
             }
 
-            if (poc.isTopLevel()) return returnNullOnTopLevel ? null : t;
+            if (poc.isTopLevel())
+                return returnNullOnTopLevel ? null : t;
             poc = poc.up();
         }
     }
 
-    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf, boolean onlyAtoms) {
+    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf,
+            boolean onlyAtoms) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().IsAtom)) r.add(term.getOriginRef());
+            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().IsAtom))
+                r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().IsAtom)) r.add(t.getOriginRef());
+                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().IsAtom))
+                    r.add(t.getOriginRef());
                 r.addAll(getSubOriginRefs(t, false, onlyAtoms));
             }
         }

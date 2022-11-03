@@ -21,12 +21,11 @@ import recoder.service.SourceInfo;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 /**
- * Find out for a collection of Java files which referenced types are not defined
- * within the source directory. Stubs using empty method or constructor bodies
- * are allowed.
- * 
+ * Find out for a collection of Java files which referenced types are not defined within the source
+ * directory. Stubs using empty method or constructor bodies are allowed.
+ *
  * @author MU
- * 
+ *
  */
 public class ReferenceLister {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceLister.class);
@@ -53,8 +52,7 @@ public class ReferenceLister {
                 ProgramElement pe = walker.getProgramElement();
                 if (pe instanceof TypeReference) {
                     TypeReference typeRef = (TypeReference) pe;
-                    if (si.getType(typeRef) == null
-                            && !typeRef.getName().equals("void"))
+                    if (si.getType(typeRef) == null && !typeRef.getName().equals("void"))
                         LOGGER.info("Unresolvable type: {}", typeRef.toSource());
                 }
             }
@@ -81,8 +79,8 @@ public class ReferenceLister {
         ProgramFactory factory = sc.getProgramFactory();
         FileReader fileReader = new FileReader(file);
         final CompilationUnit cu;
-        try { 
-           cu = factory.parseCompilationUnit(fileReader);
+        try {
+            cu = factory.parseCompilationUnit(fileReader);
         } finally {
             fileReader.close();
         }
@@ -91,6 +89,7 @@ public class ReferenceLister {
     }
 
 }
+
 
 class RefSolverServiceConfiguration extends CrossReferenceServiceConfiguration {
     @Override

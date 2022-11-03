@@ -5,14 +5,13 @@ package recoder.java.reference;
 import recoder.java.*;
 
 /**
- * Array length reference. As a length reference is int-valued, and hence it is
- * no valid prefix.
+ * Array length reference. As a length reference is int-valued, and hence it is no valid prefix.
  *
  * @author AL
  */
 
-public class ArrayLengthReference extends JavaNonTerminalProgramElement implements Reference, Expression,
-        ReferenceSuffix {
+public class ArrayLengthReference extends JavaNonTerminalProgramElement
+        implements Reference, Expression, ReferenceSuffix {
 
     /**
      * serialization id
@@ -105,8 +104,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement implemen
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -128,11 +126,10 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement implemen
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

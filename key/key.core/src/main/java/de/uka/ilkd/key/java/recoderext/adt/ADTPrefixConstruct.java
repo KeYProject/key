@@ -7,26 +7,26 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
 public abstract class ADTPrefixConstruct extends Operator implements ReferencePrefix {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2903025447315816147L;
     private ReferenceSuffix suffix;
-    
-    public ADTPrefixConstruct(){
+
+    public ADTPrefixConstruct() {
         super();
     }
-    
-    public ADTPrefixConstruct(Expression unary){
+
+    public ADTPrefixConstruct(Expression unary) {
         super(unary);
     }
-    
-    public ADTPrefixConstruct(Expression lhs, Expression rhs){
-        super(lhs,rhs);
+
+    public ADTPrefixConstruct(Expression lhs, Expression rhs) {
+        super(lhs, rhs);
     }
-    
-    protected ADTPrefixConstruct(ADTPrefixConstruct proto){
+
+    protected ADTPrefixConstruct(ADTPrefixConstruct proto) {
         super(proto);
     }
 
@@ -45,14 +45,14 @@ public abstract class ADTPrefixConstruct extends Operator implements ReferencePr
         // SourceVisitors in RecodeR currently are only used to perform the toSource() operation.
         // One of them needs to be implemented in order for source code to be reproduced.
     }
-    
+
     @Override
-    public int getPrecedence(){
+    public int getPrecedence() {
         return 0; // TODO remove from subclasses
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return toSource();
     }
 

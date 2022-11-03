@@ -15,8 +15,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import java.util.*;
 
-public class SMTCommand
-        extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     public SMTCommand() {
@@ -33,24 +32,26 @@ public class SMTCommand
         return Collections.unmodifiableMap(result);
     }
 
-    @Override public SMTCommandArguments evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override
+    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "smt";
     }
 
-    @Override public void execute(SMTCommandArguments args)
-            throws ScriptException, InterruptedException {
+    @Override
+    public void execute(SMTCommandArguments args) throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
         if (args.all) {
-             goals = state.getProof().openGoals();
+            goals = state.getProof().openGoals();
         } else {
-             goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
 
         for (Goal goal : goals) {
@@ -59,13 +60,12 @@ public class SMTCommand
     }
 
     private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
-        DefaultSMTSettings settings = new DefaultSMTSettings(
-                goal.proof().getSettings().getSMTSettings(),
+        DefaultSMTSettings settings =
+            new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                goal.proof().getSettings().getNewSMTSettings(),
-                goal.proof());
+                goal.proof().getSettings().getNewSMTSettings(), goal.proof());
 
-        if(args.timeout >= 0) {
+        if (args.timeout >= 0) {
             settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
         }
 
@@ -79,14 +79,11 @@ public class SMTCommand
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
-                        .setTitle(args.solver);
+                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(args.solver);
                 problem.getGoal().apply(app);
-}
-            System.err.println("SMT Runtime, goal " +
-                    goal.node().serialNr() + ": " +
-                    timerListener.getRuntime() + " ms; " +
-                    finalResult);
+            }
+            System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
+                + timerListener.getRuntime() + " ms; " + finalResult);
         }
     }
 
@@ -119,12 +116,14 @@ public class SMTCommand
         private long stop;
 
         @Override
-        public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
+        public void launcherStarted(Collection<SMTProblem> problems,
+                Collection<SolverType> solverTypes, SolverLauncher launcher) {
             this.start = System.currentTimeMillis();
         }
 
         @Override
-        public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
+        public void launcherStopped(SolverLauncher launcher,
+                Collection<SMTSolver> finishedSolvers) {
             this.stop = System.currentTimeMillis();
         }
 
@@ -138,7 +137,7 @@ public class SMTCommand
 
         public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
             super(settings.getPdSettings(), settings.getPiSettings(),
-                    settings.getNewTranslationSettings(), settings.getProof());
+                settings.getNewTranslationSettings(), settings.getProof());
             this.timeout = timeout;
         }
 

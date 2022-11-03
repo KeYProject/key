@@ -16,8 +16,7 @@ public class TypeOf extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *            the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public TypeOf(ProgramElement pe) {
         super("#typeof", pe);
@@ -35,8 +34,7 @@ public class TypeOf extends ProgramTransformer {
         }
         KeYJavaType kjt = null;
         if (pe instanceof Expression) {
-            kjt = services.getTypeConverter().getKeYJavaType((Expression) pe,
-                ec);
+            kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
         } else {
             kjt = ((TypeRef) pe).getKeYJavaType();
         }

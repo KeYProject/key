@@ -41,8 +41,10 @@ public class SourceViewInsertion {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         SourceViewInsertion that = (SourceViewInsertion) o;
         return Line == that.Line && Group.equals(that.Group) && Text.equals(that.Text);
     }
@@ -89,25 +91,25 @@ public class SourceViewInsertion {
     }
 
     public void triggerClickListener(MouseEvent e) {
-        for (ClickListener l: this.clickListener) {
+        for (ClickListener l : this.clickListener) {
             l.onClick(e);
         }
     }
 
     public void triggerRightClickListener(MouseEvent e) {
-        for (ClickListener l: this.rightClickListener) {
+        for (ClickListener l : this.rightClickListener) {
             l.onClick(e);
         }
     }
 
     public void triggerMouseEnterListener(MouseEvent e) {
-        for (MouseMotionListener l: this.mouseEnterListener) {
+        for (MouseMotionListener l : this.mouseEnterListener) {
             l.onMotion(e);
         }
     }
 
     public void triggerMouseLeaveListener(MouseEvent e) {
-        for (MouseMotionListener l: this.mouseLeaveListener) {
+        for (MouseMotionListener l : this.mouseLeaveListener) {
             l.onMotion(e);
         }
     }

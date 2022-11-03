@@ -25,13 +25,10 @@ public class DebugView extends JTabbedPane implements TabPanel {
     public DebugView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
-        tabs = new DebugTab[]
-        {
-            OriginRefView = new OriginRefView(window, mediator),
+        tabs = new DebugTab[] { OriginRefView = new OriginRefView(window, mediator),
             SourceInsertionsView = new SourceInsertionsView(window, mediator),
             SourceHighlightsView = new SourceHighlightsView(window, mediator),
-            BackTransformationView = new BackTransformationView(window, mediator),
-        };
+            BackTransformationView = new BackTransformationView(window, mediator), };
     }
 
     @Nonnull
@@ -43,13 +40,12 @@ public class DebugView extends JTabbedPane implements TabPanel {
     @Nonnull
     @Override
     public JComponent getComponent() {
-        if (pnlMain == null)
-        {
+        if (pnlMain == null) {
             pnlMain = new JTabbedPane();
             pnlMain.setTabPlacement(JTabbedPane.BOTTOM);
             pnlMain.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-            for (DebugTab t: tabs) {
+            for (DebugTab t : tabs) {
                 pnlMain.addTab(t.getTitle(), t);
             }
 

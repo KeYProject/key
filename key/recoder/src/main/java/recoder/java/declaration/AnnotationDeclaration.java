@@ -26,7 +26,7 @@ public class AnnotationDeclaration extends InterfaceDeclaration {
     }
 
     public AnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
-                                 ASTList<MemberDeclaration> members) {
+            ASTList<MemberDeclaration> members) {
         super(modifiers, name, null, members);
     }
 
@@ -57,14 +57,18 @@ public class AnnotationDeclaration extends InterfaceDeclaration {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitAnnotationDeclaration(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public AnnotationDeclaration deepClone() {

@@ -36,8 +36,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             return label;
         }
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels()) {
             return null;
         }
 

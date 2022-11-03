@@ -24,7 +24,6 @@ public class SimpleRIFLExceptionHandler extends KeYRecoderExcHandler {
 
     @Override
     public void reportException(Throwable e) {
-        LoggerFactory.getLogger(SimpleRIFLExceptionHandler.class)
-                        .error("Error occured!", e);
+        LoggerFactory.getLogger(SimpleRIFLExceptionHandler.class).error("Error occured!", e);
     }
 }

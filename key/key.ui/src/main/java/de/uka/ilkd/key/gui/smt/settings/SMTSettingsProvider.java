@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
  * @version 1 (08.04.19)
  */
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
-    //de/uka/ilkd/key/gui/smt/settings/messages.xml
-    public static final ResourceBundle BUNDLE
-            = ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
+    // de/uka/ilkd/key/gui/smt/settings/messages.xml
+    public static final ResourceBundle BUNDLE =
+        ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
 
     public static final String PROGRESS_MODE_USER = "PROGRESS_MODE_USER";
     public static final String PROGRESS_MODE_CLOSE = "PROGRESS_MODE_CLOSE";
@@ -80,12 +80,13 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         } else {
             getChildren().add(new TranslationOptions());
         }
-        /* Only add options for those solvers that are actually theoretically available
-        according to the settings. Note that these aren't necessarily all the types
-        provided by SolverTypes, depending on the implementation of the
-        ProofIndependentSettings. */
+        /*
+         * Only add options for those solvers that are actually theoretically available according to
+         * the settings. Note that these aren't necessarily all the types provided by SolverTypes,
+         * depending on the implementation of the ProofIndependentSettings.
+         */
         for (SolverType options : solverTypes.stream().filter(
-                t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
+            t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
                 .collect(Collectors.toList())) {
             getChildren().add(new SolverOptions(options));
         }
@@ -118,26 +119,23 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createLocSetBoundField() {
         return addNumberField("Locset bound:", 0L, (long) Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_BOUND),
-                e -> settings.setLocsetBound(e.longValue()));
+            BUNDLE.getString(INFO_BOUND), e -> settings.setLocsetBound(e.longValue()));
     }
 
     private JSpinner createMaxProcesses() {
-        return addNumberField("Concurrent processes:",
-                0, Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.setMaxConcurrentProcesses(e.intValue()));
+        return addNumberField("Concurrent processes:", 0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_MAX_PROCESSES),
+            e -> settings.setMaxConcurrentProcesses(e.intValue()));
     }
 
     private JSpinner createTimeoutField() {
         // Use doubles so that the formatter doesn't make every entered String into integers.
         // [see NumberFormatter#stringToValue()].
-        JSpinner timeoutSpinner = addNumberField("Timeout:", 0.0, (double) Long.MAX_VALUE,
-                1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout((long) Math.floor(e.doubleValue() * 1000)));
+        JSpinner timeoutSpinner = addNumberField("Timeout:", 0.0, (double) Long.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_TIMEOUT_FIELD),
+            e -> settings.setTimeout((long) Math.floor(e.doubleValue() * 1000)));
         // Set the editor so that entered Strings only have three decimal places.
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(timeoutSpinner,
-                "#.###");
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(timeoutSpinner, "#.###");
         // Use floor rounding to be consistent with the value that will be set for the timeout.
         editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
         timeoutSpinner.setEditor(editor);
@@ -146,51 +144,46 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createIntBoundField() {
         return addNumberField("Integer bound:", 0L, (long) Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_BOUND),
-                e -> settings.setIntBound(e.longValue()));
+            BUNDLE.getString(INFO_BOUND), e -> settings.setIntBound(e.longValue()));
     }
 
     private JSpinner createSeqBoundField() {
         return addNumberField("Seq bound:", 0L, (long) Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_BOUND),
-                e -> settings.setSeqBound(e.longValue()));
+            BUNDLE.getString(INFO_BOUND), e -> settings.setSeqBound(e.longValue()));
     }
 
     private JSpinner createObjectBoundField() {
         return addNumberField("Object bound:", 0L, (long) Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_BOUND),
-                e -> settings.setObjectBound(e.longValue()));
+            BUNDLE.getString(INFO_BOUND), e -> settings.setObjectBound(e.longValue()));
     }
 
     private JComboBox<String> getProgressModeBox() {
         return addComboBox("", BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
-                e -> settings.setModeOfProgressDialog(
-                        ProgressMode.values()[progressModeBox.getSelectedIndex()]),
-                getProgressMode(ProgressMode.USER),
-                getProgressMode(ProgressMode.CLOSE));
+            e -> settings.setModeOfProgressDialog(
+                ProgressMode.values()[progressModeBox.getSelectedIndex()]),
+            getProgressMode(ProgressMode.USER), getProgressMode(ProgressMode.CLOSE));
     }
 
     private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started",
-                BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
-                false,
-                e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
+            BUNDLE.getString(INFO_CHECK_FOR_SUPPORT), false,
+            e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
     private JTextField getSaveToFilePanel() {
-        return addFileChooserPanel("Store translation to file:",
-                "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
-                true, e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
+        return addFileChooserPanel("Store translation to file:", "",
+            BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL), true,
+            e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
     private String getProgressMode(ProgressMode index) {
         switch (index) {
-            case USER:
-                return BUNDLE.getString(PROGRESS_MODE_USER);
-            case CLOSE:
-                return BUNDLE.getString(PROGRESS_MODE_CLOSE);
-            case CLOSE_FIRST:
-                return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
+        case USER:
+            return BUNDLE.getString(PROGRESS_MODE_USER);
+        case CLOSE:
+            return BUNDLE.getString(PROGRESS_MODE_CLOSE);
+        case CLOSE_FIRST:
+            return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
         }
         return "";
     }

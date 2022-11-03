@@ -32,7 +32,7 @@ public class SourceInsertionsView extends DebugTab {
 
         JTextField ed0 = new JTextField("debug");
         JTextField ed1 = new JTextField("3");
-        JTextField ed2 = new JTextField("    "+"    "+"Some Text");
+        JTextField ed2 = new JTextField("    " + "    " + "Some Text");
         ed2.setFont(Font.getFont("Courier New"));
         JButton btn1 = new JButton("Add Insertion");
         btn1.addActionListener((e) -> addInsertion(ed0.getText(), ed1.getText(), ed2.getText()));
@@ -58,10 +58,9 @@ public class SourceInsertionsView extends DebugTab {
 
         Runnable refresh = () -> {
             try {
-                var data = this.sourceView.listInsertion(this.sourceView.getSelectedFile()).
-                        stream().
-                        map(p -> String.format("[%s] {=> %d} '%s'", p.Group, p.Line, p.Text)).
-                        collect(Collectors.toList());
+                var data = this.sourceView.listInsertion(this.sourceView.getSelectedFile()).stream()
+                        .map(p -> String.format("[%s] {=> %d} '%s'", p.Group, p.Line, p.Text))
+                        .collect(Collectors.toList());
                 dlm.clear();
                 dlm.addAll(data);
             } catch (Exception ex) {
@@ -91,13 +90,15 @@ public class SourceInsertionsView extends DebugTab {
         try {
             int intpos = Integer.parseInt(pos);
 
-            SourceViewInsertion ins = new SourceViewInsertion(grp, intpos, text, Color.BLACK, new Color(222, 222, 222));
+            SourceViewInsertion ins =
+                new SourceViewInsertion(grp, intpos, text, Color.BLACK, new Color(222, 222, 222));
 
-            ins.addClickListener(e ->      JOptionPane.showMessageDialog(null, "[LeftClick]\n"  + text));
-            ins.addRightClickListener(e -> JOptionPane.showMessageDialog(null, "[RightClick]\n" + text));
+            ins.addClickListener(e -> JOptionPane.showMessageDialog(null, "[LeftClick]\n" + text));
+            ins.addRightClickListener(
+                e -> JOptionPane.showMessageDialog(null, "[RightClick]\n" + text));
 
             ins.addMouseEnterListener(e -> System.out.println("[ENTER] " + text));
-            ins.addMouseMoveListener(e ->  System.out.println("[MOVE]  " + text));
+            ins.addMouseMoveListener(e -> System.out.println("[MOVE]  " + text));
             ins.addMouseLeaveListener(e -> System.out.println("[LEAVE] " + text));
 
             sourceView.addInsertion(sourceView.getSelectedFile(), ins);

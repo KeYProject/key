@@ -68,16 +68,15 @@ public abstract class SequentView extends JEditorPane {
 
     protected static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
-    protected static final Color INACTIVE_BACKGROUND_COLOR
-            = new Color(UIManager.getColor("Panel.background").getRGB());
+    protected static final Color INACTIVE_BACKGROUND_COLOR =
+        new Color(UIManager.getColor("Panel.background").getRGB());
 
     //
-    private static final ColorSettings.ColorProperty HEATMAP_COLOR =
-            ColorSettings.define("[Heatmap]basecolor",
-                    "Base color of the heatmap. Other colors are derived from this one.",
-                    new Color(252, 202, 80));
+    private static final ColorSettings.ColorProperty HEATMAP_COLOR = ColorSettings.define(
+        "[Heatmap]basecolor", "Base color of the heatmap. Other colors are derived from this one.",
+        new Color(252, 202, 80));
 
-    //maximum opacity of heatmap color
+    // maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
@@ -90,8 +89,8 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * The current line width. Static declaration for this prevents constructors from
-     * using lineWidth 0.
+     * The current line width. Static declaration for this prevents constructors from using
+     * lineWidth 0.
      */
     private static int lineWidth;
 
@@ -130,10 +129,10 @@ public abstract class SequentView extends JEditorPane {
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
-    private final HashMap<Color, HighlightPainter> color2Highlight
-            = new LinkedHashMap<>();
+    private final HashMap<Color, HighlightPainter> color2Highlight = new LinkedHashMap<>();
 
-    /** The last observed mouse position for which a highlight was created.
+    /**
+     * The last observed mouse position for which a highlight was created.
      * <code>OUTSIDE_MOUSE_POSITION</code> means no highlight is applied.
      */
     private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
@@ -148,7 +147,7 @@ public abstract class SequentView extends JEditorPane {
         this.mainWindow = mainWindow;
 
         setContentType("text/html");
-        syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument)getDocument());
+        syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument) getDocument());
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -177,13 +176,12 @@ public abstract class SequentView extends JEditorPane {
         // Register tooltip
         setToolTipText("");
 
-        KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
-                this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(), this,
+            KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
 
         printer = new SequentViewLogicPrinter(new ProgramPrinter(null),
-                mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(),
-                getVisibleTermLabels());
+            mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
+            getVisibleTermLabels());
     }
 
     public final void setFont() {
@@ -197,7 +195,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     public void unregisterListener() {
-       Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
     }
 
     @Override
@@ -213,16 +211,15 @@ public abstract class SequentView extends JEditorPane {
 
         if (pis != null && !pis.isSequent()) {
             Term term = pis.getPosInOccurrence().subTerm();
-            text += "<b>Operator:</b> " + term.op().getClass().getSimpleName()
-                    + " (" + term.op() + ")";
+            text +=
+                "<b>Operator:</b> " + term.op().getClass().getSimpleName() + " (" + term.op() + ")";
             text += "<br><b>Sort</b>: " + term.sort();
         }
 
         StringJoiner extensionStr = new StringJoiner("<hr>", "<hr>", "");
         extensionStr.setEmptyValue("");
         KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).stream()
-            .filter(s -> !s.isEmpty())
-            .forEach(extensionStr::add);
+                .filter(s -> !s.isEmpty()).forEach(extensionStr::add);
         text += extensionStr;
 
         if (text.isEmpty()) {
@@ -265,8 +262,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * highlights the elements in the given range using the specified
-     * highlighter
+     * highlights the elements in the given range using the specified highlighter
      *
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
@@ -274,12 +270,9 @@ public abstract class SequentView extends JEditorPane {
     public void paintHighlight(Range range, Object highlighter) {
         try {
             if (range != null) {
-                getHighlighter()
-                        .changeHighlight(highlighter,
-                        range.start(), range.end());
+                getHighlighter().changeHighlight(highlighter, range.start(), range.end());
             } else {
-                getHighlighter()
-                        .changeHighlight(highlighter, 0, 0);
+                getHighlighter().changeHighlight(highlighter, 0, 0);
             }
         } catch (BadLocationException badLocation) {
             LOGGER.warn("SequentView tried to highlight an area that does not exist: {}", range);
@@ -287,8 +280,8 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * registers a highlighter that marks the regions specified by the returned
-     * tag with the given color
+     * registers a highlighter that marks the regions specified by the returned tag with the given
+     * color
      *
      * @param color the Color used to highlight regions of the sequent
      * @return the highlight for the specified color
@@ -299,7 +292,9 @@ public abstract class SequentView extends JEditorPane {
             // show highlights above each other
             // https://stackoverflow.com/questions/9083206/how-to-use-layeredhighlighter-one-highlight-on-top-of-another
             final HighlightPainter painter = new Highlighter.HighlightPainter() {
-                final DefaultHighlightPainter helper = new DefaultHighlighter.DefaultHighlightPainter(color);
+                final DefaultHighlightPainter helper =
+                    new DefaultHighlighter.DefaultHighlightPainter(color);
+
                 @Override
                 public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
                     helper.paint(g, p0, p1, bounds, c);
@@ -309,8 +304,7 @@ public abstract class SequentView extends JEditorPane {
         }
         Highlighter.HighlightPainter hp = color2Highlight.get(color);
         try {
-            highlight
-                    = getHighlighter().addHighlight(0, 0, hp);
+            highlight = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
             LOGGER.debug("Highlight range out of scope.");
             e.printStackTrace();
@@ -320,7 +314,9 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract String getTitle();
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see javax.swing.JEditorPane#getText()
      */
     /**
@@ -330,18 +326,16 @@ public abstract class SequentView extends JEditorPane {
     public String getText() {
         try {
             return getDocument().getText(0, getDocument().getLength());
-        }
-        catch (BadLocationException e) {
+        } catch (BadLocationException e) {
             return super.getText(); // shouldn't happen
         }
     }
 
     /**
-     * Get the PosInSequent object for the last observed
-     * and highlighted mouse position.
+     * Get the PosInSequent object for the last observed and highlighted mouse position.
      */
     public PosInSequent getLastPosInSequent() {
-        if(lastMousePosition.equals(OUTSIDE_MOUSE_POSITION)) {
+        if (lastMousePosition.equals(OUTSIDE_MOUSE_POSITION)) {
             // point to toplevel if mouse was outside.
             return PosInSequent.createSequentPos();
         } else {
@@ -350,15 +344,13 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Get a PosInSequent object for a given coordinate of the displayed
-     * sequent.
+     * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
     protected synchronized PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
         if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().
-                    getPosInSequent(characterIndex, getFilter());
+            return printer.getInitialPositionTable().getPosInSequent(characterIndex, getFilter());
         } else {
             return null;
         }
@@ -401,8 +393,7 @@ public abstract class SequentView extends JEditorPane {
             // change to HTML documents in the JEditorPane (previous JTextArea)). If
             // something concerning highlighting does not work in the future, here
             // could be a starting place to find the mistake.
-            s = getText(pos.getBounds().start() + 1,
-                    pos.getBounds().length());
+            s = getText(pos.getBounds().start() + 1, pos.getBounds().length());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -414,25 +405,23 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Return the character index for a certain coordinate. The usual
-     * viewToModel is focused on inter-character spaces, not characters, so it
-     * returns the correct index in the left half of the glyph but one too many
-     * in the right half. Therefore, we get width of character before the one
-     * given by viewToModel, subtract it from the given x value, and get the
-     * character at the new position. That is the correct one.
+     * Return the character index for a certain coordinate. The usual viewToModel is focused on
+     * inter-character spaces, not characters, so it returns the correct index in the left half of
+     * the glyph but one too many in the right half. Therefore, we get width of character before the
+     * one given by viewToModel, subtract it from the given x value, and get the character at the
+     * new position. That is the correct one.
      */
     public int correctedViewToModel(Point p) {
         String seqText = getText();
         int cursorPosition = viewToModel(p);
         cursorPosition -= (cursorPosition > 0 ? 1 : 0);
-        cursorPosition = (cursorPosition >= seqText.length()
-                ? seqText.length() - 1
-                : cursorPosition);
+        cursorPosition =
+            (cursorPosition >= seqText.length() ? seqText.length() - 1 : cursorPosition);
         cursorPosition = (cursorPosition >= 0 ? cursorPosition : 0);
-        int previousCharacterWidth
-                = getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
-        int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
-                (int) p.getY()));
+        int previousCharacterWidth =
+            getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
+        int characterIndex =
+            viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2), (int) p.getY()));
 
         // NOTE (DS): The below subtraction of 1 to the beginning is a
         // quick-and-dirty fix for the problem that the mouse pointer
@@ -458,8 +447,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * removes the term and first statement highlighter by setting them to
-     * position (0,0)
+     * removes the term and first statement highlighter by setting them to position (0,0)
      */
     public void disableHighlights() {
         disableHighlight(currentHighlight);
@@ -498,8 +486,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Get the character range to be highlighted for the given coordinate in the
-     * displayed sequent.
+     * Get the character range to be highlighted for the given coordinate in the displayed sequent.
      */
     synchronized Range getHighlightRange(Point p) {
         String seqText = getText();
@@ -517,9 +504,10 @@ public abstract class SequentView extends JEditorPane {
             // this really should not happen
             if (result.end() < 0) {
                 // Let's write some debug info since we can't reproduce
-                LOGGER.debug("SequentView::getHighlightRange rangeForIndex returned invalid range. " +
-                                "Result was {}, character index {}, point {}.",
-                        result, characterIndex, p);
+                LOGGER.debug(
+                    "SequentView::getHighlightRange rangeForIndex returned invalid range. "
+                        + "Result was {}, character index {}, point {}.",
+                    result, characterIndex, p);
                 LOGGER.debug("Sequence text: {}", seqText);
                 return null;
             }
@@ -532,19 +520,17 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Get the character range to be highlighted for the first statement in a
-     * java block at the given coordinate in the displayed sequent. Returns null
-     * if there is no java block there.
+     * Get the character range to be highlighted for the first statement in a java block at the
+     * given coordinate in the displayed sequent. Returns null if there is no java block there.
      */
     protected synchronized Range getFirstStatementRange(Point p) {
         if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
-            Range result = printer.getInitialPositionTable().
-                    firstStatementRangeForIndex(characterIndex);
+            Range result =
+                printer.getInitialPositionTable().firstStatementRangeForIndex(characterIndex);
             if (result == null) {
                 return null;
-            }
-            else {
+            } else {
                 return new Range(result.start() + 1, result.end() + 1);
             }
         } else {
@@ -586,8 +572,8 @@ public abstract class SequentView extends JEditorPane {
 
         InitialPositionTable posTable = printer.getInitialPositionTable();
         PosInSequent pis = userSelectionHighlightPis;
-        Range range = posTable.rangeForPath(
-                posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+        Range range =
+            posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
 
         removeUserSelectionHighlight();
 
@@ -595,8 +581,8 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightPis = pis;
             userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
             userSelectionHighlight = getHighlighter().addHighlight(
-                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
@@ -611,8 +597,8 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightPis = getPosInSequent(point);
             userSelectionHighlightRange = getHighlightRange(point);
             userSelectionHighlight = getHighlighter().addHighlight(
-                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
 
             sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
         } catch (BadLocationException e) {
@@ -651,9 +637,7 @@ public abstract class SequentView extends JEditorPane {
     protected boolean isInUserSelectionHighlight(Point point) {
         return point == null && userSelectionHighlightRange == null
                 || point != null && userSelectionHighlightRange != null
-                        && Objects.equals(
-                                userSelectionHighlightRange,
-                                getHighlightRange(point));
+                        && Objects.equals(userSelectionHighlightRange, getHighlightRange(point));
     }
 
     /**
@@ -671,8 +655,8 @@ public abstract class SequentView extends JEditorPane {
         try {
             userSelectionHighlightRange = new Range(pis.getBounds().start(), pis.getBounds().end());
             userSelectionHighlight = getHighlighter().addHighlight(
-                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
@@ -693,7 +677,7 @@ public abstract class SequentView extends JEditorPane {
 
     private void setLastMousePosition(Point p) {
         Point old = this.lastMousePosition;
-        lastMousePosition=p;
+        lastMousePosition = p;
         firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);
     }
 
@@ -708,7 +692,8 @@ public abstract class SequentView extends JEditorPane {
      */
     public int computeLineWidth() {
         // assumes we have a uniform font width
-        int maxChars = (int) (getVisibleRect().getWidth() / getFontMetrics(getFont()).charWidth('W'));
+        int maxChars =
+            (int) (getVisibleRect().getWidth() / getFontMetrics(getFont()).charWidth('W'));
 
         if (maxChars > 1) {
             maxChars -= 1;
@@ -717,9 +702,11 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Highlights sequent formulas according to their age (if newest is false),
-     * or the newest sequent formulas.
-     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to highlight.
+     * Highlights sequent formulas according to their age (if newest is false), or the newest
+     * sequent formulas.
+     *
+     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to
+     *        highlight.
      * @param newest Are newest sf's highlighted (true) or all up to max_age (false)?
      */
     protected void updateHeatmapSFHighlights(int max_age, boolean newest) {
@@ -732,16 +719,19 @@ public abstract class SequentView extends JEditorPane {
         int i = 0;
 
         // 5 "youngest" sequent formulas are highlighted.
-        ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
+        ImmutableList<SequentPrintFilterEntry> entryList =
+            filter.getFilteredAntec().append(filter.getFilteredSucc());
         if (newest) {
             SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
             entryList.toArray(sortedArray);
             Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
                 @Override
                 public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
-                    int o1age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                    int o1age =
+                        computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
                             o1.getFilteredFormula(), 1000);
-                    int o2age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                    int o2age =
+                        computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
                             o2.getFilteredFormula(), 1000);
                     return o1age - o2age;
                 }
@@ -750,25 +740,31 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil()
-                                .prepend(0).append(i);
+                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                                .<Integer>nil().prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
-                        Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                        // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
+                        // rangeForPath ist schuld
+                        Range newR = new Range(r.start() + 1, r.end() + 1);
                         Object tag = getColorHighlight(color);
                         paintHighlight(newR, tag);
                     }
                 }
                 ++i;
             }
-        } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
-            for(SequentPrintFilterEntry entry : entryList) {
+        } else { // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
+            for (SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
-                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, max_age + 2);
-                if(age < max_age) {
+                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                    form, max_age + 2);
+                if (age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i);
+                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                            .<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
-                    Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
@@ -778,9 +774,10 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Highlights terms according to their age (if newest is false),
-     * or the newest terms.
-     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to highlight.
+     * Highlights terms according to their age (if newest is false), or the newest terms.
+     *
+     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to
+     *        highlight.
      * @param newest Are newest terms highlighted (true) or all up to max_age (false)?
      */
     protected void updateHeatmapTermHighlights(int max_age, boolean newest) {
@@ -802,38 +799,48 @@ public abstract class SequentView extends JEditorPane {
         while (it.hasNext()) {
             node = it.next();
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
-                ImmutableList<SequentFormula> added_ante = node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
-                ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
+                ImmutableList<SequentFormula> added_ante =
+                    node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
+                ImmutableList<SequentFormula> added_succ =
+                    node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
                 for (SequentFormula sf : added_ante) {
-                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
+                    pio_age_list.add(
+                        new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
                 }
                 for (SequentFormula sf : added_succ) {
-                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
+                    pio_age_list.add(
+                        new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }
-                ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
+                ImmutableList<FormulaChangeInfo> modified =
+                    node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
                     PosInOccurrence positionOfMod = fci.getPositionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
-                            if(positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
+                            if (positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
                                 pair.active = false;
                             } else {
-                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
+                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(),
+                                    pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
                             }
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                        .removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
-                        if (pair.get_pio().sequentFormula().equals(sf) && pair.get_pio().isInAntec()) {
+                        if (pair.get_pio().sequentFormula().equals(sf)
+                                && pair.get_pio().isInAntec()) {
                             pair.active = false;
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(false)) {
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                        .removedFormulas(false)) {
                     for (PIO_age pair : pio_age_list) {
-                        if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
+                        if (pair.get_pio().sequentFormula().equals(sf)
+                                && !pair.get_pio().isInAntec()) {
                             pair.active = false;
                         }
                     }
@@ -845,10 +852,10 @@ public abstract class SequentView extends JEditorPane {
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
 
         pio_age_list.sort(new Comparator<PIO_age>() {
-                @Override
-                public int compare(PIO_age o1, PIO_age o2) {
-                    return o1.age >= o2.age ? 1 : -1;
-                }
+            @Override
+            public int compare(PIO_age o1, PIO_age o2) {
+                return o1.age >= o2.age ? 1 : -1;
+            }
         });
 
         // actual highlighting
@@ -859,8 +866,9 @@ public abstract class SequentView extends JEditorPane {
                     continue;
                 }
 
-                while (j+1 < pio_age_list.size() && pio_age_list.get(j+1).get_pio().equals(pair.get_pio())) {
-                    pair = pio_age_list.get(j+1);
+                while (j + 1 < pio_age_list.size()
+                        && pio_age_list.get(j + 1).get_pio().equals(pair.get_pio())) {
+                    pair = pio_age_list.get(j + 1);
                     pio_age_list.remove(j);
                 }
 
@@ -868,7 +876,9 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
-                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
@@ -883,7 +893,9 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
-                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
+                    // ist schuld
+                    Range newR = new Range(r.start() + 1, r.end() + 1);
                     Object tag = getColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
@@ -892,24 +904,25 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * computes the appropriate color for a given age and maximum age.
-     * Implements linear interpolation of the opacity of the color starting at default opacity.
+     * computes the appropriate color for a given age and maximum age. Implements linear
+     * interpolation of the opacity of the color starting at default opacity.
+     *
      * @param max_age the maximum age of a term / sf, specified in viewsettings
      * @param age the age of the given term / sf
      * @return the color, with interpolated opacity
      */
     private Color computeColorForAge(int max_age, int age) {
         float[] color = HEATMAP_COLOR.get().getRGBColorComponents(null);
-        float alpha = HEATMAP_DEFAULT_START_OPACITY *(1- (float) age/max_age);
+        float alpha = HEATMAP_DEFAULT_START_OPACITY * (1 - (float) age / max_age);
 
         return new Color(color[0], color[1], color[2], alpha);
     }
 
     /**
-     * computes the age of a given sequent formula, i.e.,
-     * its distance to the root of the proof tree. If the formula is older
-     * than max_age, we do not care, because this method is only used for
-     * heatmap highlighting, and older formulas are not considered anyway.
+     * computes the age of a given sequent formula, i.e., its distance to the root of the proof
+     * tree. If the formula is older than max_age, we do not care, because this method is only used
+     * for heatmap highlighting, and older formulas are not considered anyway.
+     *
      * @param node the current node
      * @param form the given sf
      * @param max_age the maximum age, specified in viewSettings
@@ -926,29 +939,29 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
-	public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
-		this.filter = sequentPrintFilter;
-		Node selectedNode = getMainWindow().getMediator().getSelectedNode();
-		if (selectedNode != null) {
-		    // bugfix #1458 (gitlab). The selected node may be null if no proof.
-		    this.filter.setSequent(selectedNode.sequent());
-		}
+    public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
+        this.filter = sequentPrintFilter;
+        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
+        if (selectedNode != null) {
+            // bugfix #1458 (gitlab). The selected node may be null if no proof.
+            this.filter.setSequent(selectedNode.sequent());
+        }
         if (forceUpdate) {
             printSequent();
         }
 
-		if (getParent() != null) {
-	        getParent().revalidate();
-		}
-	}
+        if (getParent() != null) {
+            getParent().revalidate();
+        }
+    }
 
     protected SequentPrintFilter getFilter() {
         return filter;
     }
 
     /**
-     * To update the enclosing components that might print a warning on hidden
-     * formulas, it suffices to repaint them.
+     * To update the enclosing components that might print a warning on hidden formulas, it suffices
+     * to repaint them.
      */
     protected void updateHidingProperty() {
         updateUI();
@@ -958,8 +971,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * Does this component hide formulas from the sequent due to the set search
-     * bar filter
+     * Does this component hide formulas from the sequent due to the set search bar filter
      *
      * @return true iff at least one formula is not shown
      */
@@ -973,8 +985,10 @@ public abstract class SequentView extends JEditorPane {
             return false;
         }
 
-        int filteredAntecSize = filter.getFilteredAntec() == null ? 0 : filter.getFilteredAntec().size();
-        int filteredSuccSize = filter.getFilteredSucc() == null ? 0 : filter.getFilteredSucc().size();
+        int filteredAntecSize =
+            filter.getFilteredAntec() == null ? 0 : filter.getFilteredAntec().size();
+        int filteredSuccSize =
+            filter.getFilteredSucc() == null ? 0 : filter.getFilteredSucc().size();
 
         int orgSize = originalSequent.size();
         int newSize = filteredAntecSize + filteredSuccSize;
@@ -984,15 +998,16 @@ public abstract class SequentView extends JEditorPane {
     /**
      *
      * @return {@code true} if this sequent view is supposed to be shown in the {@link MainFrame},
-     *  {@code false} if it is only supposed to be shown in some other frame.
+     *         {@code false} if it is only supposed to be shown in some other frame.
      */
     public boolean isMainSequentView() {
         return true;
     }
 
     /**
-     * Utility class consisting of a pair of the PosInOccurrence of a term, and its age.
-     * Used for term heatmap highlighting.
+     * Utility class consisting of a pair of the PosInOccurrence of a term, and its age. Used for
+     * term heatmap highlighting.
+     *
      * @author jschiffl
      *
      */
@@ -1000,20 +1015,25 @@ public abstract class SequentView extends JEditorPane {
         PosInOccurrence pio;
         int age;
         boolean active = true;
+
         public PIO_age(PosInOccurrence pio, int age) {
             this.pio = pio;
             this.age = age;
         }
+
         public PosInOccurrence get_pio() {
             return pio;
         }
+
         public int get_age() {
             return age;
         }
+
         public void set_pio(PosInOccurrence pio) {
             this.pio = pio;
 
         }
+
         @Override
         public String toString() {
             return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";

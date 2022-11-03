@@ -30,6 +30,6 @@ public class PositionMap {
     }
 
     public int getLineIndent(int line) {
-        return 9; //TODO
+        return 9; // TODO
     }
 }

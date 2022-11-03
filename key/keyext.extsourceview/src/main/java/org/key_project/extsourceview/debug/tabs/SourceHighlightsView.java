@@ -32,10 +32,12 @@ public class SourceHighlightsView extends DebugTab {
 
         sv.addHighlightsChangedListener(() -> {
             try {
-                var data = this.sourceView.listHighlights(this.sourceView.getSelectedFile()).
-                        stream().
-                        map(p -> String.format("[%s] [+%d] {%d -> %d} (%s)", p.getGroup(), p.getLevel(), p.getSourceLine(), p.getPatchedLine(), colHex(p.getColor()))).
-                        collect(Collectors.toList());
+                var data =
+                    this.sourceView.listHighlights(this.sourceView.getSelectedFile()).stream()
+                            .map(p -> String.format("[%s] [+%d] {%d -> %d} (%s)", p.getGroup(),
+                                p.getLevel(), p.getSourceLine(), p.getPatchedLine(),
+                                colHex(p.getColor())))
+                            .collect(Collectors.toList());
                 dlm.clear();
                 dlm.addAll(data);
             } catch (Exception ex) {
@@ -52,16 +54,8 @@ public class SourceHighlightsView extends DebugTab {
     }
 
     private static GridBagConstraints gbc(int x, int y) {
-        return new GridBagConstraints
-                (
-                        x, y,
-                        1, 1,
-                        1.0 , 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(2, 2, 2, 2),
-                        0, 0
-                );
+        return new GridBagConstraints(x, y, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+            GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0);
     }
 
     @Nonnull

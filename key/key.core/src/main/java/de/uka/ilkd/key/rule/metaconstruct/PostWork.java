@@ -28,8 +28,7 @@ public class PostWork extends ProgramTransformer {
     }
 
     /**
-     * Used to create this Java statement programmatically. Do not use in taclet
-     * meta constructs!
+     * Used to create this Java statement programmatically. Do not use in taclet meta constructs!
      *
      * @param pv The {@link ProgramVariable}
      */
@@ -39,24 +38,20 @@ public class PostWork extends ProgramTransformer {
     }
 
     /**
-     * performs the program transformation needed for symbolic program
-     * transformation
+     * performs the program transformation needed for symbolic program transformation
      *
      * @return the transformated program
      */
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        final ProgramVariable newObject = schema
-                ? (ProgramVariable) svInst
-                        .getInstantiation((SchemaVariable) body())
-                : (ProgramVariable) body();
+        final ProgramVariable newObject =
+            schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
+                    : (ProgramVariable) body();
 
         final ProgramVariable initialized = services.getJavaInfo().getAttribute(
-            ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-            services.getJavaInfo().getJavaLangObject());
+            ImplicitFieldAdder.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
         return new ProgramElement[] { KeYJavaASTFactory.assign(
-            KeYJavaASTFactory.fieldReference(newObject, initialized),
-            BooleanLiteral.TRUE) };
+            KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
     }
 }

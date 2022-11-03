@@ -4,24 +4,13 @@ public enum OriginRefType {
 
     UNKNOWN("unknown"),
 
-    JML_ACCESSIBLE("accessible"),
-    JML_ASSERT("assert"),
-    JML_ASSIGNABLE("assignable"),
-    JML_ASSUME("assume"),
-    JML_DECREASES("decreases"),
-    JML_MEASURED_BY("measured_by"),
-    JML_INVARIANT("invariant"),
-    JML_LOOP_INVARIANT("loop_invariant"),
-    JML_LOOP_INVARIANT_FREE("loop_invariant_free"),
-    JML_SIGNALS("signals"),
-    JML_SIGNALS_ONLY("signals_only"),
-    JML_BREAKS("breaks"),
-    JML_CONTINUES("continues"),
-    JML_RETURNS("returns"),
-    JML_REQUIRES("requires"),
-    JML_REQUIRES_FREE("requires_free"),
-    JML_ENSURES("ensures"),
-    JML_ENSURES_FREE("ensures_free"),
+    JML_ACCESSIBLE("accessible"), JML_ASSERT("assert"), JML_ASSIGNABLE("assignable"),
+    JML_ASSUME("assume"), JML_DECREASES("decreases"), JML_MEASURED_BY("measured_by"),
+    JML_INVARIANT("invariant"), JML_LOOP_INVARIANT("loop_invariant"),
+    JML_LOOP_INVARIANT_FREE("loop_invariant_free"), JML_SIGNALS("signals"),
+    JML_SIGNALS_ONLY("signals_only"), JML_BREAKS("breaks"), JML_CONTINUES("continues"),
+    JML_RETURNS("returns"), JML_REQUIRES("requires"), JML_REQUIRES_FREE("requires_free"),
+    JML_ENSURES("ensures"), JML_ENSURES_FREE("ensures_free"),
 
     IMPLICIT_ENSURES_EXCNULL("ensures_exc_null"),
     IMPLICIT_ENSURES_SELFINVARIANT("ensures_self_invariant"),
@@ -48,23 +37,21 @@ public enum OriginRefType {
     }
 
     public boolean isRequires() {
-        return this == OriginRefType.JML_REQUIRES ||
-               this == OriginRefType.JML_REQUIRES_FREE ||
-               this == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT ||
-               this == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK ||
-               this == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE ||
-               this == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP ||
-               this == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED ||
-               this == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL ||
-               this == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
+        return this == OriginRefType.JML_REQUIRES || this == OriginRefType.JML_REQUIRES_FREE
+                || this == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
+                || this == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK
+                || this == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE
+                || this == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
+                || this == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
+                || this == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL
+                || this == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
     }
 
     public boolean isEnsures() {
-        return this == OriginRefType.JML_ENSURES ||
-               this == OriginRefType.JML_ENSURES_FREE ||
-               this == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT ||
-               this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE ||
-               this == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
+        return this == OriginRefType.JML_ENSURES || this == OriginRefType.JML_ENSURES_FREE
+                || this == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
+                || this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
+                || this == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
     }
 
 }

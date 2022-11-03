@@ -37,7 +37,7 @@ public class ProofApi {
      * Save current Proof-> ProofApi
      */
     public void saveProof() throws IOException {
-        //TODO
+        // TODO
     }
 
     public KeYEnvironment<?> getEnv() {
@@ -50,7 +50,8 @@ public class ProofApi {
 
     public List<ProjectedNode> getOpenGoals() {
         ImmutableList<Goal> goals = proof.openGoals();
-        return goals.stream().map(g -> new ProjectedNode(g.node(), null)).collect(Collectors.toList());
+        return goals.stream().map(g -> new ProjectedNode(g.node(), null))
+                .collect(Collectors.toList());
     }
 
     public ProjectedNode getFirstOpenGoal() {
@@ -61,7 +62,8 @@ public class ProofApi {
         Set<String> s = new TreeSet<>();
         Goal goal = proof.getSubtreeGoals(proof.root()).head();
 
-        for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
+        for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex()
+                .rules()) {
             s.add(br.displayName());
         }
 

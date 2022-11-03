@@ -52,16 +52,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      *
-     * @param block
-     *            a block that begins with a loop.
-     * @param loopLabels
-     *            all labels belonging to the loop.
-     * @param breakLabel
-     *            the label used for break statements.
-     * @param continueLabel
-     *            the label used for continue statements.
-     * @param services
-     *            services.
+     * @param block a block that begins with a loop.
+     * @param loopLabels all labels belonging to the loop.
+     * @param breakLabel the label used for break statements.
+     * @param continueLabel the label used for continue statements.
+     * @param services services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
@@ -296,11 +291,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
-                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
-                        PositionInfo.UNDEFINED));
+                    (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
+                    PositionInfo.UNDEFINED));
             } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
-                        (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
+                    (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {
                 throw new IllegalStateException("Method-frame has wrong number of children.");
             }

@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A ChoiceExpr is a boolean expression that determines whether a taclet
- * or a goal should be activated. {@link ChoiceExpr} are built over  and, or, or not.
- * Its atoms are choices ({@code category:option}).
+ * A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
+ * activated. {@link ChoiceExpr} are built over and, or, or not. Its atoms are choices
+ * ({@code category:option}).
  * <p>
  * This class provides factory methods for constructing an AST.
  *
@@ -81,8 +81,10 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Proposition)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof Proposition))
+                return false;
             Proposition that = (Proposition) o;
             return choice.equals(that.choice);
         }
@@ -114,8 +116,10 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof And)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof And))
+                return false;
             And and = (And) o;
             return left.equals(and.left) && right.equals(and.right);
         }
@@ -147,8 +151,10 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Or)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof Or))
+                return false;
             Or or = (Or) o;
             return left.equals(or.left) && right.equals(or.right);
         }
@@ -178,8 +184,10 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Not)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof Not))
+                return false;
             Not not = (Not) o;
             return sub.equals(not.sub);
         }

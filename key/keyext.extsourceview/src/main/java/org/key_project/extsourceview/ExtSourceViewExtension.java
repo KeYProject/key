@@ -18,11 +18,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 @KeYGuiExtension.Info(name = "Extended Source View",
-        description = "Author: Mike Schwörer <main@mikescher.com>",
-        experimental = false,
-        optional = true,
-        priority = 10000)
-public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel {
+    description = "Author: Mike Schwörer <main@mikescher.com>", experimental = false,
+    optional = true, priority = 10000)
+public class ExtSourceViewExtension
+        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtSourceViewExtension.class);
 
@@ -39,7 +38,8 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        if (view == null) view = new DebugView(window, mediator);
+        if (view == null)
+            view = new DebugView(window, mediator);
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -58,15 +58,18 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (view == null) view = new DebugView(window, mediator);
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
+        if (view == null)
+            view = new DebugView(window, mediator);
 
         return Collections.singleton(view);
     }
 
     public void update(MainWindow window, KeYMediator mediator) {
         try {
-            SourceViewPatcher.updateSourceview(window, mediator, HideNonRelevantTerms, ContinueInError);
+            SourceViewPatcher.updateSourceview(window, mediator, HideNonRelevantTerms,
+                ContinueInError);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
@@ -75,7 +78,8 @@ public class ExtSourceViewExtension implements KeYGuiExtension, KeYGuiExtension.
             // some kind of internal error happened?
             LOGGER.error("error while updateing ext-sourceview", e);
             view.BackTransformationView.setStatusException(e);
-            JOptionPane.showMessageDialog(window, e.toString(), "ERROR WHIE UPDATING SV", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(window, e.toString(), "ERROR WHIE UPDATING SV",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }

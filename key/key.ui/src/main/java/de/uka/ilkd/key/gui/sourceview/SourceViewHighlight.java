@@ -10,8 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p> An object of this class represents a highlight of a specific line in the
- *  {@code SourceView}. </p>
+ * <p>
+ * An object of this class represents a highlight of a specific line in the {@code SourceView}.
+ * </p>
  *
  * @author lanzinger
  *
@@ -55,7 +56,8 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
      * @param color this highlight's color.
      * @param level this highlight's level.
      */
-    SourceViewHighlight(String group, URI fileURI, int sourceLine, int patchedLine, Range patchedRange, Color color, int level) {
+    SourceViewHighlight(String group, URI fileURI, int sourceLine, int patchedLine,
+            Range patchedRange, Color color, int level) {
         this.group = group;
         this.level = level;
         this.color = color;

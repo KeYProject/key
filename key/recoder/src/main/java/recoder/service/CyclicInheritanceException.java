@@ -31,7 +31,7 @@ public class CyclicInheritanceException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s  an explanation.
+     * @param s an explanation.
      * @param ct a class type which is part of the cycle.
      */
     public CyclicInheritanceException(String s, ClassType ct) {

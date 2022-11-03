@@ -20,10 +20,10 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
     private final File file;
 
     /**
-     * Sets up a new project file IO facility that reads from and/or writes to
-     * the specified (.properties) file.
+     * Sets up a new project file IO facility that reads from and/or writes to the specified
+     * (.properties) file.
      *
-     * @param system      the service configuration to initialize.
+     * @param system the service configuration to initialize.
      * @param projectFile the project file to load and/or save.
      */
     public DefaultProjectFileIO(ServiceConfiguration system, File projectFile) {
@@ -45,7 +45,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
 
     public String[] load() throws IOException {
         InputStream in = new FileInputStream(file);
-        Properties props = new Properties(); //defaults
+        Properties props = new Properties(); // defaults
         props.load(in);
         ProjectSettings ps = getProjectSettings();
         Enumeration enum2 = props.propertyNames();
@@ -96,8 +96,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         StringBuffer newpath = new StringBuffer();
         if (File.pathSeparatorChar == ':')
             relativePathList = relativePathList.replace(';', ':');
-        else if (File.pathSeparatorChar == ';'
-                && relativePathList.indexOf(":\\") == -1
+        else if (File.pathSeparatorChar == ';' && relativePathList.indexOf(":\\") == -1
                 && relativePathList.indexOf(":/") == -1)
             relativePathList = relativePathList.replace(':', ';');
         StringTokenizer paths = new StringTokenizer(relativePathList, File.pathSeparator);
@@ -114,8 +113,8 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
     }
 
     /**
-     * Saves the project properties to the assigned project file and adds all
-     * known compilation units.
+     * Saves the project properties to the assigned project file and adds all known compilation
+     * units.
      */
     public void save() throws IOException {
         OutputStream out = new FileOutputStream(file);
@@ -137,7 +136,8 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         StringBuffer newpath = new StringBuffer();
         StringTokenizer tok = new StringTokenizer(path, File.pathSeparator);
         while (true) {
-            newpath.append(FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(tok.nextToken())));
+            newpath.append(
+                FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(tok.nextToken())));
             if (tok.hasMoreTokens()) {
                 newpath.append(File.pathSeparator);
             } else {

@@ -58,18 +58,21 @@ public class OriginRefView extends DebugTab {
             @Override
             public void hover(PosInSequent pos, Term t) {
                 highlightTerm(window, mediator, pos, t);
-                if (!OriginRefView.this.triggerOnClick) showTerm(window, mediator, pos, t);
+                if (!OriginRefView.this.triggerOnClick)
+                    showTerm(window, mediator, pos, t);
             }
 
             @Override
             public void leaveHover() {
                 unhighlightTerm(window, mediator);
-                if (!OriginRefView.this.triggerOnClick) unshowTerm(window, mediator);
+                if (!OriginRefView.this.triggerOnClick)
+                    unshowTerm(window, mediator);
             }
 
             @Override
             public void click(PosInSequent pos, Term t) {
-                if (OriginRefView.this.triggerOnClick) showTerm(window, mediator, pos, t);
+                if (OriginRefView.this.triggerOnClick)
+                    showTerm(window, mediator, pos, t);
             }
         });
 
@@ -91,57 +94,86 @@ public class OriginRefView extends DebugTab {
         {
             var cbClick = new JCheckBox("Trigger on click");
             pnlConf.add(cbClick, gbc(0, 0));
-            cbClick.addItemListener(e -> { OriginRefView.this.triggerOnClick = cbClick.isSelected(); refreshShownTerm(window, mediator); });
+            cbClick.addItemListener(e -> {
+                OriginRefView.this.triggerOnClick = cbClick.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbAtom = new JCheckBox("Only show atoms", true);
             pnlConf.add(cbAtom, gbc(0, 1));
-            cbAtom.addItemListener(e -> { OriginRefView.this.showOnlyAtoms = cbAtom.isSelected(); refreshShownTerm(window, mediator); });
+            cbAtom.addItemListener(e -> {
+                OriginRefView.this.showOnlyAtoms = cbAtom.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Section [ToString]", true);
             pnlConf.add(cbSec, gbc(1, 0));
-            cbSec.addItemListener(e -> { OriginRefView.this.showSectionRepr = cbSec.isSelected(); refreshShownTerm(window, mediator); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionRepr = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Section [Self]", true);
             pnlConf.add(cbSec, gbc(1, 1));
-            cbSec.addItemListener(e -> { OriginRefView.this.showSectionSelf = cbSec.isSelected(); refreshShownTerm(window, mediator); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionSelf = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Section [Source]", true);
             pnlConf.add(cbSec, gbc(1, 2));
-            cbSec.addItemListener(e -> { OriginRefView.this.showSectionSource = cbSec.isSelected(); refreshShownTerm(window, mediator); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionSource = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Section [Children]", true);
             pnlConf.add(cbSec, gbc(1, 3));
-            cbSec.addItemListener(e -> { OriginRefView.this.showSectionChildren = cbSec.isSelected(); refreshShownTerm(window, mediator); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionChildren = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Section [Parent]", true);
             pnlConf.add(cbSec, gbc(1, 4));
-            cbSec.addItemListener(e -> { OriginRefView.this.showSectionParent = cbSec.isSelected(); refreshShownTerm(window, mediator); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionParent = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
         }
         {
             var cbSec = new JCheckBox("Enable Highlights", true);
             pnlConf.add(cbSec, gbc(2, 0));
-            cbSec.addItemListener(e -> { OriginRefView.this.highlightEnabled = cbSec.isSelected(); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.highlightEnabled = cbSec.isSelected();
+            });
         }
         {
             var cbSec = new JCheckBox("Highlight Only Atoms", true);
             pnlConf.add(cbSec, gbc(2, 1));
-            cbSec.addItemListener(e -> { OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected(); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected();
+            });
         }
         {
             var cbSec = new JCheckBox("Search for Parent", true);
             pnlConf.add(cbSec, gbc(2, 2));
-            cbSec.addItemListener(e -> { OriginRefView.this.highlightParents = cbSec.isSelected(); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.highlightParents = cbSec.isSelected();
+            });
         }
         {
             var cbSec = new JCheckBox("Highlight union of all children", true);
             pnlConf.add(cbSec, gbc(2, 3));
-            cbSec.addItemListener(e -> { OriginRefView.this.highlightAllChildren = cbSec.isSelected(); });
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.highlightAllChildren = cbSec.isSelected();
+            });
         }
 
         this.add(pnlConf, BorderLayout.NORTH);
@@ -159,13 +191,15 @@ public class OriginRefView extends DebugTab {
         return "TermOrigin Inspector";
     }
 
-    private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator,
+            PosInSequent pos, Term t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
 
             sv.removeHighlights(HL_KEY);
 
-            if (!highlightEnabled) return;
+            if (!highlightEnabled)
+                return;
 
             var originRefs = new ArrayList<OriginRef>();
             if (highlightAllChildren) {
@@ -184,16 +218,20 @@ public class OriginRefView extends DebugTab {
             }
 
             for (OriginRef orig : originRefs) {
-                if (!orig.hasFile()) continue;
+                if (!orig.hasFile())
+                    continue;
 
-                if (!sv.hasFile(orig.fileURI())) continue;
+                if (!sv.hasFile(orig.fileURI()))
+                    continue;
 
                 if (orig.LineStart == orig.LineEnd) {
-                    sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart, orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
+                    sv.addHighlight(orig.fileURI(), HL_KEY, orig.LineStart, orig.ColumnStart,
+                        orig.ColumnEnd, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
                 } else {
                     for (int i = orig.LineStart; i <= orig.LineEnd; i++) {
                         if (orig.hasFile()) {
-                            sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN, HIGHTLIGHT_LEVEL);
+                            sv.addHighlight(orig.fileURI(), HL_KEY, i, COL_HIGHLIGHT_MAIN,
+                                HIGHTLIGHT_LEVEL);
                         }
                     }
                 }
@@ -208,7 +246,8 @@ public class OriginRefView extends DebugTab {
         window.getSourceViewFrame().getSourceView().removeHighlights(HL_KEY);
     }
 
-    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator,
+            PosInSequent pos, Term t) {
         shownTerm = new Tuple<>(pos, t);
 
         var proof = mediator.getSelectedProof();
@@ -222,8 +261,10 @@ public class OriginRefView extends DebugTab {
                 txt.append("----------<TOSTRING>----------\n");
                 txt.append("\n");
                 txt.append("ToStr<Translate>: ").append(translator.translateSafe(t)).append("\n");
-                txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(t)).append("\n");
-                txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(t, true)).append("\n");
+                txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(t))
+                        .append("\n");
+                txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(t, true))
+                        .append("\n");
                 txt.append("\n");
             }
 
@@ -232,11 +273,11 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
 
                 if (t instanceof TermImpl) {
-                    TermImpl term = (TermImpl)t;
+                    TermImpl term = (TermImpl) t;
 
                     {
                         OriginRef o = term.getOriginRef();
-                        if(o != null) {
+                        if (o != null) {
                             txt.append(o.toString());
                             txt.append("\n");
                         }
@@ -256,7 +297,9 @@ public class OriginRefView extends DebugTab {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = Utils.getLines(mediator, o.File, i, i);
                             txt.append(str.stripTrailing()).append("\n");
-                            str = " ".repeat(o.ColumnStart - 1) + "[" + Utils.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]" + " ".repeat(o.ColumnEnd - 1);
+                            str = " ".repeat(o.ColumnStart - 1) + "["
+                                + Utils.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]"
+                                + " ".repeat(o.ColumnEnd - 1);
                             txt.append(str).append("\n");
                             txt.append("\n");
                         }
@@ -269,7 +312,7 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
 
                 if (t instanceof TermImpl) {
-                    TermImpl term = (TermImpl)t;
+                    TermImpl term = (TermImpl) t;
 
                     for (OriginRef o : Utils.getSubOriginRefs(term, false, showOnlyAtoms)) {
                         txt.append(o.toString());
@@ -286,10 +329,14 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
 
                 Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
-                if (parent != null && parent != pos.getPosInOccurrence().subTerm() && parent.getOriginRef() != null) {
-                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent)).append("\n");
-                    txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
-                    txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true)).append("\n");
+                if (parent != null && parent != pos.getPosInOccurrence().subTerm()
+                        && parent.getOriginRef() != null) {
+                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent))
+                            .append("\n");
+                    txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent))
+                            .append("\n");
+                    txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true))
+                            .append("\n");
                     txt.append("\n");
                     {
                         OriginRef o = parent.getOriginRef();

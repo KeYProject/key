@@ -37,16 +37,14 @@ import org.slf4j.LoggerFactory;
 public final class InnerNodeView extends SequentView {
     private static final Logger LOGGER = LoggerFactory.getLogger(InnerNodeView.class);
 
-    private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR =
-            ColorSettings.define("[innerNodeView]ruleAppHighlight", "",
-                    new Color(0.5f, 1.0f, 0.5f, 0.4f));
+    private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR = ColorSettings
+            .define("[innerNodeView]ruleAppHighlight", "", new Color(0.5f, 1.0f, 0.5f, 0.4f));
 
-    private static final ColorSettings.ColorProperty IF_FORMULA_HIGHLIGHT_COLOR =
-            ColorSettings.define("[innerNodeView]ifFormulaHighlight", "",
-                    new Color(0.8f, 1.0f, 0.8f, 0.5f));
+    private static final ColorSettings.ColorProperty IF_FORMULA_HIGHLIGHT_COLOR = ColorSettings
+            .define("[innerNodeView]ifFormulaHighlight", "", new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
     private static final ColorSettings.ColorProperty SELECTION_COLOR =
-            ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
+        ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
 
     private static final long serialVersionUID = -6542881446084654358L;
 
@@ -67,27 +65,26 @@ public final class InnerNodeView extends SequentView {
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                        mainWindow.getMediator().getNotationInfo(),
-                        mainWindow.getMediator().getServices(),
-                        getVisibleTermLabels()));
+            mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
+            getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
-        tacletInfo = new JTextArea(TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+        tacletInfo = new JTextArea(
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
         tacletInfo.setBackground(getBackground());
-        tacletInfo.setBorder(new CompoundBorder(
-                new MatteBorder(3, 0, 0, 0, Color.black),
-                new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
+            new EmptyBorder(new Insets(4, 0, 0, 0))));
         tacletInfo.setEditable(false);
 
-//        updateUI();
+        // updateUI();
     }
 
-    static final HighlightPainter RULEAPP_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
+    static final HighlightPainter RULEAPP_HIGHLIGHTER =
+        new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
 
-    static final HighlightPainter IF_FORMULA_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
+    static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
+        new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
@@ -106,17 +103,16 @@ public final class InnerNodeView extends SequentView {
             }
 
         } catch (BadLocationException badLocation) {
-            LOGGER.warn("NonGoalInfoView tried to highlight an area that does not exist.",badLocation);
+            LOGGER.warn("NonGoalInfoView tried to highlight an area that does not exist.",
+                badLocation);
         }
     }
 
     /**
-     * @param tapp The taclet app for which the if formulae should be
-     * highlighted.
+     * @param tapp The taclet app for which the if formulae should be highlighted.
      * @throws BadLocationException
      */
-    private void highlightIfFormulas(TacletApp tapp)
-            throws BadLocationException {
+    private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
         final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
         if (ifs == null) {
             return;
@@ -126,16 +122,13 @@ public final class InnerNodeView extends SequentView {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence pos
-                    = new PosInOccurrence(inst.getConstrainedFormula(),
-                    PosInTerm.getTopLevel(),
-                    inst.inAntec());
+            final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
+                PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
     }
 
-    private void highlightIfInsts(IBuiltInRuleApp bapp)
-            throws BadLocationException {
+    private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         for (PosInOccurrence pio : ifs) {
             highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
@@ -145,14 +138,14 @@ public final class InnerNodeView extends SequentView {
     /**
      * @param pos the PosInOccurrence that should be highlighted.
      * @param light the painter for the highlight.
-     * @return the range of characters that was highlighted. returns null if nothing has been highlighted.
+     * @return the range of characters that was highlighted. returns null if nothing has been
+     *         highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(PosInOccurrence pos,
-            HighlightPainter light)
+    private Range highlightPos(PosInOccurrence pos, HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());
-        if(path != null) {
+        if (path != null) {
             Range r = posTable.rangeForPath(path);
 
             // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty

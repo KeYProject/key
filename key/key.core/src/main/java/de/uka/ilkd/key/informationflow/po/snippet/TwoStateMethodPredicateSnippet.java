@@ -22,37 +22,33 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 /**
  * Generate term "self != null".
  * <p/>
+ *
  * @author christoph
  */
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
-                        ProofObligationVars poVars)
+    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
         IObserverFunction targetMethod =
-                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+            (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         final IProgramMethod pm = (IProgramMethod) targetMethod;
-        StatementBlock targetBlock =
-                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
-        LoopSpecification loopInv =
-                (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        StatementBlock targetBlock = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        LoopSpecification loopInv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
-        final ImmutableList<Term> termList =
-                extractTermListForPredicate(pm, poVars, d.hasMby);
-        final Sort[] argSorts =
-                generateContApplArgumentSorts(termList, pm);
+        final ImmutableList<Term> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
+        final Sort[] argSorts = generateContApplArgumentSorts(termList, pm);
         final Function contApplPred =
-                generateContApplPredicate(nameString, argSorts, d.tb, d.services);
+            generateContApplPredicate(nameString, argSorts, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
-    protected Sort[] generateContApplArgumentSorts(
-            ImmutableList<Term> termList, IProgramMethod pm) {
+    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
+            IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
-        //ImmutableArray<Sort> pmSorts = pm.argSorts();
+        // ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
         for (final Term arg : termList) {
@@ -64,17 +60,16 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Function generateContApplPredicate(String nameString,
-                                               Sort[] argSorts,
-                                               TermBuilder tb,
-                                               Services services) {
+    private Function generateContApplPredicate(String nameString, Sort[] argSorts, TermBuilder tb,
+            Services services) {
         final Name name = new Name(nameString);
         Namespace<Function> functionNS = services.getNamespaces().functions();
 
-        /* This predicate needs to present on all branches and, therefore, must be added
-         * to the toplevel function namespace. Hence, we rewind to the parent namespace here.
+        /*
+         * This predicate needs to present on all branches and, therefore, must be added to the
+         * toplevel function namespace. Hence, we rewind to the parent namespace here.
          */
-        while(functionNS.parent() != null)
+        while (functionNS.parent() != null)
             functionNS = functionNS.parent();
 
         Function pred = (Function) functionNS.lookup(name);
@@ -87,9 +82,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Term instantiateContApplPredicate(Function pred,
-                                              ImmutableList<Term> termList,
-                                              TermBuilder tb) {
+    private Term instantiateContApplPredicate(Function pred, ImmutableList<Term> termList,
+            TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
@@ -104,21 +98,19 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    abstract String generatePredicateName(IProgramMethod pm,
-                                          StatementBlock block,
-                                          LoopSpecification loopInv);
+    abstract String generatePredicateName(IProgramMethod pm, StatementBlock block,
+            LoopSpecification loopInv);
 
 
     /**
-     * Parameters and the result of a method only have to appear once in the
-     * predicate. This method chooses the right variables out of the poVars.
-     * @param poVars    The proof obligation variables.
+     * Parameters and the result of a method only have to appear once in the predicate. This method
+     * chooses the right variables out of the poVars.
+     *
+     * @param poVars The proof obligation variables.
      * @return
      */
-    private ImmutableList<Term> extractTermListForPredicate(
-            IProgramMethod pm,
-            ProofObligationVars poVars,
-            boolean hasMby) {
+    private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
+            ProofObligationVars poVars, boolean hasMby) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
 

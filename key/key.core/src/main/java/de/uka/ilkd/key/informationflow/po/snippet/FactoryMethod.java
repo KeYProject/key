@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  */
 interface FactoryMethod {
 
-    Term produce(BasicSnippetData d,
-                 ProofObligationVars poVars)
+    Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException;
 }

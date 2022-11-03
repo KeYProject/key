@@ -13,9 +13,9 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
- * Writes JML* translation of RIFL specifications to Java files. This is a
- * manipulating Recoder source visitor. Implementation warning: manipulating the
- * AST before traversing it may have unexpected results.
+ * Writes JML* translation of RIFL specifications to Java files. This is a manipulating Recoder
+ * source visitor. Implementation warning: manipulating the AST before traversing it may have
+ * unexpected results.
  *
  * @author bruns
  */
@@ -23,12 +23,11 @@ public class SpecificationInjector extends SourceVisitor {
 
     private static final String LINE_BREAK = "\n";
     private static final String DEFAULT_SPEC_COMMENT =
-            LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
+        LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
 
     /**
-     * Produces JML* respects clauses. Clauses are internally labeled with keys
-     * (resulting from security domains in RIFL), which are discarded in the
-     * final output.
+     * Produces JML* respects clauses. Clauses are internally labeled with keys (resulting from
+     * security domains in RIFL), which are discarded in the final output.
      *
      * @author bruns
      */
@@ -45,8 +44,7 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String JML_START = LINE_BREAK + DEFAULT_INDENTATION + "/*@ ";
 
         private final String indentation;
-        private final Map<String, Set<Entry<String, Type>>> respects =
-                new HashMap<>();
+        private final Map<String, Set<Entry<String, Type>>> respects = new HashMap<>();
         private SpecificationContainer sc;
 
         JMLFactory(SpecificationContainer sc) {
@@ -95,8 +93,7 @@ public class SpecificationInjector extends SourceVisitor {
         }
 
         String getRespects(Set<Entry<String, Type>> oneRespect, final Type t) {
-            var r = oneRespect.stream().filter(p -> p.getValue() == t)
-                    .map(Entry::getKey)
+            var r = oneRespect.stream().filter(p -> p.getValue() == t).map(Entry::getKey)
                     .collect(Collectors.joining(", "));
             if (r.isEmpty()) {
                 return " \\nothing";
@@ -204,7 +201,7 @@ public class SpecificationInjector extends SourceVisitor {
     }
 
     private void addComment(JavaProgramElement se, String comment) {
-        //remember which methods were specified and generate po files only for them
+        // remember which methods were specified and generate po files only for them
         if (se instanceof MethodDeclaration) {
             specifiedMethodDeclarations.add((MethodDeclaration) se);
         }
@@ -289,7 +286,7 @@ public class SpecificationInjector extends SourceVisitor {
                 factory.addToDetermines(fName, Type.SINK, fieldSnk);
             }
         }
-        //only add comment for methods for which we generated a specification
+        // only add comment for methods for which we generated a specification
         String comment = factory.getSpecification();
         if (comment != null) {
             addComment(md, factory.getSpecification());

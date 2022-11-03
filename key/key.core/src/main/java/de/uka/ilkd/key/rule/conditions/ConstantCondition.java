@@ -11,8 +11,8 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This variable condition checks if an instantiation is a constant formula or term,
- * i.e. its arity is equal to zero.
+ * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity
+ * is equal to zero.
  *
  * @author Michael Kirsten
  */
@@ -27,23 +27,19 @@ public class ConstantCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var,
-                         SVSubstitute instCandidate,
-                         SVInstantiations instMap,
-                         Services services) {
-        if ((!(var instanceof TermSV)
-                    || var != this.t)
-                && (!(var instanceof FormulaSV)
-                        || var != this.t)) {
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+            Services services) {
+        if ((!(var instanceof TermSV) || var != this.t)
+                && (!(var instanceof FormulaSV) || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {
-            Term tInst = (Term) instMap.getInstantiation((TermSV)t);
+            Term tInst = (Term) instMap.getInstantiation((TermSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }
         if (var instanceof FormulaSV) {
-            Term tInst = (Term) instMap.getInstantiation((FormulaSV)t);
+            Term tInst = (Term) instMap.getInstantiation((FormulaSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }
@@ -52,6 +48,6 @@ public class ConstantCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isConstant (" + t + ")";
+        return (negated ? "\\not" : "") + "\\isConstant (" + t + ")";
     }
 }
