@@ -40,3 +40,5 @@ bin/
 *.iml
 key.ipr
 key.iws
+
+key.ui/key.log.html

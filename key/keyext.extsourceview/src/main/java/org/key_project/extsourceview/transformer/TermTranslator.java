@@ -3,10 +3,7 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -15,12 +12,129 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class TermTranslator {
 
     private final Services svc;
+
+    public Map<String, String> nullaryFuncs = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>("null", "null"),
+            new AbstractMap.SimpleEntry<>("TRUE", "true"),
+            new AbstractMap.SimpleEntry<>("FALSE", "false"),
+            new AbstractMap.SimpleEntry<>("self", "this")
+    );
+
+    public Map<String, String> bracketFuncs = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>("wellFormed", "\\wellFormed"),
+            new AbstractMap.SimpleEntry<>("java.lang.Object::<inv>", "\\invariant_for")
+    );
+
+    public Map<String, String> inlineFuncs = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>("or", "%s || %s"),
+            new AbstractMap.SimpleEntry<>("and", "%s && %s"),
+            new AbstractMap.SimpleEntry<>("imp", "%s -> %s"),
+
+            new AbstractMap.SimpleEntry<>("not", "!%s"),
+
+            new AbstractMap.SimpleEntry<>("equals", "%s == %s"),
+            new AbstractMap.SimpleEntry<>("equiv", "%s <-> %s"),
+
+            new AbstractMap.SimpleEntry<>("add", "%s + %s"),
+            new AbstractMap.SimpleEntry<>("neg", "-%s"),
+            new AbstractMap.SimpleEntry<>("sub", "%s - %s"),
+            new AbstractMap.SimpleEntry<>("mul", "%s * %s"),
+            new AbstractMap.SimpleEntry<>("div", "%s / %s"),
+            new AbstractMap.SimpleEntry<>("mod", "%s % %s"),
+            //new AbstractMap.SimpleEntry<>("pow", ""),
+
+            new AbstractMap.SimpleEntry<>("lt", "%s < %s"),
+            new AbstractMap.SimpleEntry<>("gt", "%s > %s"),
+            new AbstractMap.SimpleEntry<>("geq", "%s >= %s"),
+            new AbstractMap.SimpleEntry<>("leq", "%s <= %s"),
+
+            //new AbstractMap.SimpleEntry<>("bsum", ""),
+            //new AbstractMap.SimpleEntry<>("bprod", ""),
+            //new AbstractMap.SimpleEntry<>("jdiv", ""),
+            //new AbstractMap.SimpleEntry<>("jmod", ""),
+            //new AbstractMap.SimpleEntry<>("unaryMinusJint", ""),
+            //new AbstractMap.SimpleEntry<>("unaryMinusJlong", ""),
+            //new AbstractMap.SimpleEntry<>("addJint", ""),
+            //new AbstractMap.SimpleEntry<>("addJlong", ""),
+            //new AbstractMap.SimpleEntry<>("subJint", ""),
+            //new AbstractMap.SimpleEntry<>("subJlong", ""),
+            //new AbstractMap.SimpleEntry<>("mulJint", ""),
+            //new AbstractMap.SimpleEntry<>("mulJlong", ""),
+            //new AbstractMap.SimpleEntry<>("modJint", ""),
+            //new AbstractMap.SimpleEntry<>("modJlong", ""),
+            //new AbstractMap.SimpleEntry<>("divJint", ""),
+            //new AbstractMap.SimpleEntry<>("divJlong", ""),
+
+            new AbstractMap.SimpleEntry<>("shiftright", "%s >> %s"),
+            new AbstractMap.SimpleEntry<>("shiftleft", "%s << %s"),
+
+            //new AbstractMap.SimpleEntry<>("shiftrightJint", ""),
+            //new AbstractMap.SimpleEntry<>("shiftrightJlong", ""),
+            //new AbstractMap.SimpleEntry<>("shiftleftJint", ""),
+            //new AbstractMap.SimpleEntry<>("shiftleftJlong", ""),
+            //new AbstractMap.SimpleEntry<>("unsignedshiftrightJint", ""),
+            //new AbstractMap.SimpleEntry<>("unsignedshiftrightJlong", ""),
+
+            new AbstractMap.SimpleEntry<>("binaryOr", "%s | %s"),
+            new AbstractMap.SimpleEntry<>("binaryAnd", "%s & %s"),
+            new AbstractMap.SimpleEntry<>("binaryXOr", "%s ^ %s")
+
+            //new AbstractMap.SimpleEntry<>("orJint", ""),
+            //new AbstractMap.SimpleEntry<>("orJlong", ""),
+            //new AbstractMap.SimpleEntry<>("andJint", ""),
+            //new AbstractMap.SimpleEntry<>("andJlong", ""),
+            //new AbstractMap.SimpleEntry<>("xorJint", ""),
+            //new AbstractMap.SimpleEntry<>("xorJlong", ""),
+
+            //new AbstractMap.SimpleEntry<>("moduloByte", ""),
+            //new AbstractMap.SimpleEntry<>("moduloShort", ""),
+            //new AbstractMap.SimpleEntry<>("moduloInt", ""),
+            //new AbstractMap.SimpleEntry<>("moduloLong", ""),
+            //new AbstractMap.SimpleEntry<>("moduloChar", ""),
+
+            //new AbstractMap.SimpleEntry<>("javaUnaryMinusInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaUnaryMinusLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseNegation", ""),
+            //new AbstractMap.SimpleEntry<>("javaAddInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaAddLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaSubInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaSubLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaMulInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaMulLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaMod", ""),
+            //new AbstractMap.SimpleEntry<>("javaDivInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaDivLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaShiftRightInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaShiftRightLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaShiftLeftInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaShiftLeftLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaUnsignedShiftRightInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaUnsignedShiftRightLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseOrInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseOrLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseAndInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseAndLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseXOrInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaBitwiseXOrLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaCastByte", ""),
+            //new AbstractMap.SimpleEntry<>("javaCastShort", ""),
+            //new AbstractMap.SimpleEntry<>("javaCastInt", ""),
+            //new AbstractMap.SimpleEntry<>("javaCastLong", ""),
+            //new AbstractMap.SimpleEntry<>("javaCastChar", ""),
+
+            //new AbstractMap.SimpleEntry<>("inByte", ""),
+            //new AbstractMap.SimpleEntry<>("inShort", ""),
+            //new AbstractMap.SimpleEntry<>("inInt", ""),
+            //new AbstractMap.SimpleEntry<>("inLong", ""),
+            //new AbstractMap.SimpleEntry<>("inChar", ""),
+            //new AbstractMap.SimpleEntry<>("index", "")
+    );
+
 
     public TermTranslator(Services services) {
         svc = services;
@@ -127,7 +241,7 @@ public class TermTranslator {
                 && term.sub(0).sub(0).op().name().toString().equals("heap")
                 && term.sub(0).sub(1).op().name().toString().equals("self") && term.sub(0).sub(2)
                         .op().name().toString().equals("java.lang.Object::<created>")) {
-            return "\\created(heap)"; // TODO not valid JML
+            return "\\created(this)"; // TODO not valid JML
         }
 
         if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE
@@ -135,7 +249,13 @@ public class TermTranslator {
                 && term.sub(0).op().name().toString().endsWith("::exactInstance")
                 && term.sub(0).arity() == 1
                 && term.sub(0).sub(0).op().name().toString().equals("self")) {
-            return "\\exactInstance(self)"; // TODO not valid JML
+            return "\\exactInstance(this)"; // TODO not valid JML
+        }
+
+        if (term.op().name().toString().endsWith("::exactInstance")
+                && term.arity() == 1
+                && term.sub(0).op().name().toString().equals("self")) {
+            return "\\exactInstance(this)"; // TODO not valid JML
         }
 
         if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL
@@ -152,33 +272,60 @@ public class TermTranslator {
         if (origin != null && origin.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
                 && term.op().name().toString().equals("java.lang.Object::<inv>")
                 && term.sub(1).op().name().toString().equals("self")) {
-            return "\\invariant_for(this)"; // TODO hacky
+            return "\\invariant_for(this)";
         }
 
         if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
                 && term.op().name().toString().equals("java.lang.Object::<inv>")
                 && term.sub(1).op().name().toString().equals("self")) {
-            return "\\invariant_for(this)"; // TODO hacky
+            return "\\invariant_for(this)";
         }
 
         // try to manually build the JML
 
-        if (term.op() == Junctor.OR)
-            return String.format("(%s) || (%s)", translate(term.sub(0)), translate(term.sub(1)));
-        if (term.op() == Junctor.AND)
-            return String.format("(%s) && (%s)", translate(term.sub(0)), translate(term.sub(1)));
-        if (term.op() == Junctor.IMP)
-            return String.format("(%s) -> (%s)", translate(term.sub(0)), translate(term.sub(1)));
-        if (term.op() == Junctor.NOT)
-            return String.format("!(%s)", translate(term.sub(0)));
-        if (term.op() == Junctor.TRUE)
-            return "true";
-        if (term.op() == Junctor.FALSE)
-            return "false";
-        if (term.op() == Equality.EQUALS)
-            return String.format("(%s) == (%s)", translate(term.sub(0)), translate(term.sub(1)));
-        if (term.op() == Equality.EQV)
-            return String.format("(%s) <-> (%s)", translate(term.sub(0)), translate(term.sub(1)));
+        if (term.op() instanceof LocationVariable && term.arity() == 0) {
+            return term.op().name().toString();
+        }
+
+        if (term.op() instanceof Function && term.op().name().toString().equals("Z")) {
+            return translateRaw(term, true);
+        }
+
+        if (term.op() instanceof Function && bracketFuncs.containsKey(term.op().name().toString())) {
+            String keyword = bracketFuncs.get(term.op().name().toString());
+
+            StringBuilder b = new StringBuilder();
+            b.append(keyword);
+            b.append("(");
+            for (int i = 0; i < term.op().arity(); i++) {
+                if (i > 0) b.append(", ");
+                b.append(translate(term.sub(i)));
+            }
+            b.append(")");
+            return b.toString();
+        }
+
+        if (term.op() instanceof Function && term.arity() == 0 && nullaryFuncs.containsKey(term.op().name().toString())) {
+            return nullaryFuncs.get(term.op().name().toString());
+        }
+
+        if ((term.op() instanceof Function || term.op() instanceof AbstractSortedOperator) && inlineFuncs.containsKey(term.op().name().toString())) {
+            String fmt = inlineFuncs.get(term.op().name().toString());
+
+            Object[] p = new String[term.arity()];
+            for (int i = 0; i < term.arity(); i++) {
+                if (needsBrackets(term, term.sub(i))) {
+                    p[i] = "(" + translate(term.sub(i)) + ")";
+                } else {
+                    p[i] = translate(term.sub(i));
+                }
+            }
+            return String.format(fmt, p);
+        }
+
+        if (term.op() instanceof Function && term.op().name().toString().equals("store")) {
+            return translate(term.sub(2)); //TODO ??
+        }
 
         // all hope is lost - error out
 
@@ -186,8 +333,18 @@ public class TermTranslator {
             unmodifiedTerm(origin.SourceTerm, term);
         }
 
-        throw new TransformException(
-            "Failed to translate term (unsupported op): " + translateRaw(term, true));
+        throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
+    }
+
+    private boolean needsBrackets(Term base, Term child) {
+        // this is by far not exhaustive, but more brackets are not an error
+
+        if (child.op() instanceof LocationVariable) return false;
+        if (child.op().arity() == 0) return false;
+        if (child.op() instanceof Function && child.op().name().toString().equals("Z")) return false;
+        if (child.op() instanceof Function && bracketFuncs.containsKey(child.op().name().toString())) return false;
+
+        return true;
     }
 
     private static boolean unmodifiedTerm(Term a, Term b) {
