@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class TestLineBreakpointStopConditionSimpleWithLoopInvariant
@@ -25,7 +26,7 @@ public class TestLineBreakpointStopConditionSimpleWithLoopInvariant
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingLocalMain = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Define test settings

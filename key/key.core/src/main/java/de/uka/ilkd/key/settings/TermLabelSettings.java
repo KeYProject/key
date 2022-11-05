@@ -26,12 +26,6 @@ public class TermLabelSettings extends AbstractSettings {
      */
     private boolean useOriginLabels = true;
 
-    /**
-     * @see #addSettingsListener(SettingsListener)
-     * @see #removeSettingsListener(SettingsListener)
-     */
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
-
     @Override
     public void readSettings(Properties props) {
         String str = props.getProperty(USE_ORIGIN_LABELS);

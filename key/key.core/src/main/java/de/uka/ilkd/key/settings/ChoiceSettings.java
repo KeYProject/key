@@ -80,6 +80,11 @@ public class ChoiceSettings extends AbstractSettings {
         return DefaultImmutableSet.fromImmutableList(choices);
     }
 
+    private void setChoiceCategories(HashMap<String, Set<String>> c2C) {
+        var old = category2Choices;
+        this.category2Choices = new HashMap<>(c2C);
+        firePropertyChange(PROP_CHOICE_CATEGORIES, old, category2Choices);
+    }
 
     /**
      * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
@@ -121,20 +126,6 @@ public class ChoiceSettings extends AbstractSettings {
         }
         setDefaultChoices(defaultTmp);
     }
-
-
-    /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-        while (it.hasNext()) {
-            it.next().settingsChanged(new EventObject(this));
-        }
-    }
-
 
     /**
      * gets a Properties object and has to perform the necessary steps in order to change this
@@ -179,20 +170,5 @@ public class ChoiceSettings extends AbstractSettings {
             category2Default.put(c.category(), c.name().toString());
         }
         return this;
-    }
-
-
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
     }
 }

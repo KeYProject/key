@@ -35,8 +35,6 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     // file
     private final Map<String, String> map = new LinkedHashMap<>();
 
-    private final List<SettingsListener> listeners = new LinkedList<>();
-
     /**
      * Creates a new settings object in which no option is set.
      */

@@ -170,29 +170,6 @@ public class StrategySettings extends AbstractSettings {
     }
 
     /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
-    }
-
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
-    }
-
-    /**
      * returns a shallow copy of the strategy properties
      */
     public StrategyProperties getActiveStrategyProperties() {

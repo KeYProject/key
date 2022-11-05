@@ -30,6 +30,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -306,7 +307,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term

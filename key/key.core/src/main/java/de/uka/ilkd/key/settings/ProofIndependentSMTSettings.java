@@ -38,7 +38,6 @@ public final class ProofIndependentSMTSettings
         new ProofIndependentSMTSettings();
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
-    public static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
     public static final String PROP_SOLVER_UNION = "activeSolverUnion";
     public static final String PROP_SHOW_RESULT_AFTER_EXECUTION = "PROP_SHOW_RESULT_AFTER_EXECUTION";
     public static final String PROP_STORE_SMT_TRANSLATION_FILE = "PROP_STORE_SMT_TRANSLATION_FILE";
@@ -64,8 +63,6 @@ public final class ProofIndependentSMTSettings
     private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-
-    private Collection<SettingsListener> listeners = new LinkedHashSet<>();
 
     private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
     private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
@@ -257,39 +254,7 @@ public final class ProofIndependentSMTSettings
         USER, CLOSE, CLOSE_FIRST
     }
 
-
     private final Map<SolverType, SolverData> dataOfSolvers = new LinkedHashMap<>();
-    private boolean showResultsAfterExecution = false;
-    private boolean storeSMTTranslationToFile = false;
-    private boolean storeTacletTranslationToFile = false;
-
-    private long timeout = 2000;
-    private int maxConcurrentProcesses = 2;
-
-    private ProgressMode modeOfProgressDialog = ProgressMode.USER;
-
-    private String pathForSMTTranslation = "";
-    private String pathForTacletTranslation = "";
-    private String activeSolver = "";
-
-
-    private long intBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long heapBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-
-    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
-    private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<>();
-
-    private boolean checkForSupport = true;
-
-
-    private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
-        copy(data);
-    }
-
 
     public int getMaxConcurrentProcesses() {
         return maxConcurrentProcesses;
@@ -455,23 +420,6 @@ public final class ProofIndependentSMTSettings
             res.addAll(legacyTranslationSolverUnions);
         }
         return res;
-    }
-
-    public void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listeners) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
-
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
     }
 
     public static class SolverData extends AbstractSettings {

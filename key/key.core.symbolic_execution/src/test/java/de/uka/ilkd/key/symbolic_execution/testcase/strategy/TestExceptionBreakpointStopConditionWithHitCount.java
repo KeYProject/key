@@ -16,13 +16,14 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TestExceptionBreakpointStopConditionWithHitCount
         extends AbstractSymbolicExecutionTestCase {
     @Test
     public void testBreakpointStopCondition() throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         try {

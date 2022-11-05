@@ -67,8 +67,6 @@ public class GeneralSettings extends AbstractSettings {
      */
     private boolean ensureSourceConsistency = true;
 
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
-
     GeneralSettings() {
         //addSettingsListener(AutoSaver.settingsListener);
     }
@@ -198,33 +196,5 @@ public class GeneralSettings extends AbstractSettings {
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, "" + autoSave);
         props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
-    }
-
-    /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
-    }
-
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * removes the listener from the settings object
-     *
-     * @param l the listener to remove
-     */
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
     }
 }
