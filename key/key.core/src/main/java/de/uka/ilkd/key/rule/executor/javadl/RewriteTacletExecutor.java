@@ -59,8 +59,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             with = services.getTermBuilder().cast(maxSort, with);
         }
 
-        if (term.getOriginRef() != null && term.getOriginRef().IsAtom
-                && with.getOriginRef() == null) {
+        if (term.getOriginRef() != null && with.getOriginRef() == null) {
             with = services.getTermFactory().setOriginRef(with, term.getOriginRef());
             with = services.getTermFactory().atomize(with);
         }

@@ -245,9 +245,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return expr;
         }
 
-        if (expr.getTerm().getOriginRef() != null
-                && !(!expr.getTerm().getOriginRef().IsAtom && isatom)) {
-            return expr;
+        if (expr.getTerm().getOriginRef() != null && !(!expr.getTerm().getOriginRef().IsAtom && isatom)) {
+           isatom = true;
         }
 
         String src = ctx.start.getTokenSource().getSourceName();
