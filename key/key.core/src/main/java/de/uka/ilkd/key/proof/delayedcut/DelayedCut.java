@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.delayedcut;
 
 import org.key_project.util.collection.ImmutableList;
@@ -24,9 +11,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * This class wraps the information about the delayed cut. It only wraps data
- * but not functional information.
- * 
+ * This class wraps the information about the delayed cut. It only wraps data but not functional
+ * information.
+ *
  * @author Benjamin Niedermann
  */
 public class DelayedCut {
@@ -43,9 +30,8 @@ public class DelayedCut {
     private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private Goal remainingGoal = null;
 
-    public DelayedCut(Proof proof, Node node, Term formula,
-            ImmutableList<Node> subtrees, int sideOfDecisionPredicate,
-            RuleApp firstAppliedRuleApp) {
+    public DelayedCut(Proof proof, Node node, Term formula, ImmutableList<Node> subtrees,
+            int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
         super();
         assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT
                 || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
@@ -85,11 +71,9 @@ public class DelayedCut {
         this.hideApp = hideApp;
     }
 
-    void setGoalsAfterUncovering(
-            ImmutableList<NodeGoalPair> goalsAfterUncovering) {
+    void setGoalsAfterUncovering(ImmutableList<NodeGoalPair> goalsAfterUncovering) {
         if (this.goalsAfterUncovering != null) {
-            throw new IllegalArgumentException(
-                    "There already exists a list of goals.");
+            throw new IllegalArgumentException("There already exists a list of goals.");
         }
         this.goalsAfterUncovering = goalsAfterUncovering;
     }

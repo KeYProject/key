@@ -1,21 +1,21 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.macros.scripts.LetCommand;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Alexander Weigl
  * @version 1 (02.05.17)
  */
 public class ValueInjectorTest {
-    @Test public void testInjectionSimple() throws Exception {
+    @Test
+    public void testInjectionSimple() throws Exception {
         PP pp = new PP();
         Map<String, String> args = new HashMap<>();
         args.put("b", "true");
@@ -24,24 +24,24 @@ public class ValueInjectorTest {
 
         ValueInjector.injection(null, pp, args);
 
-        Assert.assertEquals(true, pp.b);
-        Assert.assertEquals(42, pp.i);
-        Assert.assertEquals("blubb", pp.s);
+        assertEquals(true, pp.b);
+        assertEquals(42, pp.i);
+        assertEquals("blubb", pp.s);
 
     }
 
-    @Test(expected = ArgumentRequiredException.class) public void testRequired()
-            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException, ArgumentRequiredException,
-            IllegalAccessException {
+    @Test
+    public void testRequired() throws Exception {
         PP pp = new PP();
         Map<String, String> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
-
-        ValueInjector.injection(new LetCommand(), pp, args);
+        assertThrows(ArgumentRequiredException.class,
+            () -> ValueInjector.injection(new LetCommand(), pp, args));
     }
 
-    @Test public void testInferScriptArguments() throws NoSuchFieldException {
+    @Test
+    public void testInferScriptArguments() throws NoSuchFieldException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
         assertEquals(3, meta.size());
 

@@ -52,7 +52,7 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param e    an expression.
+     * @param e an expression.
      * @param body a statement mutable list.
      */
 
@@ -137,8 +137,7 @@ public class Case extends Branch implements ExpressionContainer {
 
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -178,11 +177,10 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -230,10 +228,9 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -254,10 +251,9 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
@@ -314,7 +310,8 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0) return this;
+        if (body == null || body.size() == 0)
+            return this;
         return body.get(body.size() - 1).getLastElement();
     }
 }

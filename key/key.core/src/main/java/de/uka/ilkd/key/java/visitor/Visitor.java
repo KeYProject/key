@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
@@ -24,6 +11,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -38,10 +26,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
- * This class is implemented by visitors/walkers.
- * Each AST node implements a visit(Visitor) method that
- * calls the  doActionAt<NodeType> method. Similar to the pretty print
- * mechanism.
+ * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
+ * that calls the doActionAt<NodeType> method. Similar to the pretty print mechanism.
  */
 public interface Visitor {
 
@@ -183,8 +169,7 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification
-        (ImplicitFieldSpecification x);
+    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -218,8 +203,7 @@ public interface Visitor {
 
     void performActionOnTimesAssignment(TimesAssignment x);
 
-    void performActionOnUnsignedShiftRightAssignment(
-        UnsignedShiftRightAssignment x);
+    void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x);
 
     void performActionOnBinaryNot(BinaryNot x);
 
@@ -348,34 +332,28 @@ public interface Visitor {
     void performActionOnLoopContract(LoopContract x);
 
     /**
-     * Adds block contract for new statement block to block contract
-     * of old block statement.
+     * Adds block contract for new statement block to block contract of old block statement.
      *
      * @param oldBlock the old block
      * @param newBlock the new block
      */
-    void performActionOnBlockContract(final StatementBlock oldBlock,
-                                      final StatementBlock newBlock);
+    void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
-     * Adds block contract for new statement block to block contract
-     * of old block statement.
+     * Adds block contract for new statement block to block contract of old block statement.
      *
      * @param oldBlock the old block
      * @param newBlock the new block
      */
-    void performActionOnLoopContract(final StatementBlock oldBlock,
-                                     final StatementBlock newBlock);
+    void performActionOnLoopContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
-     * Adds loop contract for new loop statement to loop contract
-     * of old loop statement.
+     * Adds loop contract for new loop statement to loop contract of old loop statement.
      *
      * @param oldLoop the old loop statement
      * @param newLoop the new loop statement
      */
-    void performActionOnLoopContract(final LoopStatement oldLoop,
-                                     final LoopStatement newLoop);
+    void performActionOnLoopContract(final LoopStatement oldLoop, final LoopStatement newLoop);
 
     void performActionOnMergeContract(MergeContract x);
 
@@ -414,4 +392,22 @@ public interface Visitor {
 
     void performActionOnCcatchBreakWildcardParameterDeclaration(
             CcatchBreakWildcardParameterDeclaration ccatchBreakWildcardParameterDeclaration);
+
+    /**
+     * Performs action on JML assert statement.
+     *
+     * @param jmlAssert the statement to perform the action on.
+     */
+    void performActionOnJmlAssert(JmlAssert jmlAssert);
+
+    /**
+     * Performs action on the condition of a JML assert statement.
+     *
+     * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
+     * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
+     *
+     * @param cond the condition to perform an action on (may be {@code null} if the JML assert
+     *        wasn't finished)
+     */
+    void performActionOnJmlAssertCondition(final Term cond);
 }

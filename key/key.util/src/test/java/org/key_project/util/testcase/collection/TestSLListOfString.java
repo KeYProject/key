@@ -1,21 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package org.key_project.util.testcase.collection;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
@@ -24,39 +10,33 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * tests non-destructive list implementation with String
  */
-
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
-    String[] str = new String[]{"Dies", "ist", "ein", "Test"};
+    String[] str = new String[] { "Dies", "ist", "ein", "Test" };
 
-    ImmutableList<String> a;   // "A" "B" "C"
-    ImmutableList<String> a1;  // "A" "B" "C"
-    ImmutableList<String> b;   // "A" "B"
-    ImmutableList<String> c;   // "A" "B" "C" "D"
-    ImmutableList<String> d;   // "A" "B" "A"
-    ImmutableList<String> e;   // "A" "B" null
-    ImmutableList<String> e1;   // "A" "B" null
+    ImmutableList<String> a; // "A" "B" "C"
+    ImmutableList<String> a1; // "A" "B" "C"
+    ImmutableList<String> b; // "A" "B"
+    ImmutableList<String> c; // "A" "B" "C" "D"
+    ImmutableList<String> d; // "A" "B" "A"
+    ImmutableList<String> e; // "A" "B" null
+    ImmutableList<String> e1; // "A" "B" null
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
-        a1 = ImmutableSLList.<String>nil()
-                .prepend("C").prepend("B").prepend("A");
-        b = ImmutableSLList.<String>nil()
-                .prepend("B").prepend("A");
-        c = ImmutableSLList.<String>nil()
-                .prepend("D").prepend("C").prepend("B").prepend("A");
-        d = ImmutableSLList.<String>nil()
-                .prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<String>nil()
-                .prepend((String) null).prepend("B").prepend("A");
+        a1 = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
+        b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
+        c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
+        d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
+        e = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
         e1 = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
     }
 
@@ -83,7 +63,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[size - 1 - nr]);
+                assertSame(it.next(), str[size - 1 - nr]);
                 nr++;
             }
             // list has right length
@@ -121,7 +101,7 @@ public class TestSLListOfString {
             }
             int nr = 0;
             while (it.hasNext()) {
-                Assert.assertSame(it.next(), str[nr]);
+                assertSame(it.next(), str[nr]);
                 nr++;
             }
             // list has right length
@@ -149,8 +129,8 @@ public class TestSLListOfString {
         }
         // test cascading tail
         for (int i = 0; i < str.length; i++) {
-            Assert.assertSame(newList[i + 1].tail(), newList[i]);
-            Assert.assertSame(newList[i + 1].head(), str[i]);
+            assertSame(newList[i + 1].tail(), newList[i]);
+            assertSame(newList[i + 1].head(), str[i]);
         }
     }
 
@@ -180,7 +160,8 @@ public class TestSLListOfString {
         }
         newList = newList.append(str[0]);
         newList = newList.removeAll(str[0]);
-        assertFalse("str[0] should have been removed", newList.contains(str[0]));
+        assertFalse(newList.contains(str[0]), "str[0] should have been removed");
+
     }
 
     @Test
@@ -196,27 +177,27 @@ public class TestSLListOfString {
         newList = newList.removeFirst(str[0]);
 
 
-        assertTrue("Only first occurrence should have been removed",
-                !Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1);
+        assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1,
+            "Only first occurrence should have been removed");
 
         newList = newList.removeFirst(str[0]);
-        assertEquals("Only first occurrence should have been removed", newList.size(), oldSize - 2);
+        assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");
         newList = newList.removeFirst(str[0]);
 
-        assertTrue("Only first occurrence should have been removed",
-                !(newList.contains(str[0])) && newList.size() == oldSize - 3);
+        assertTrue(!(newList.contains(str[0])) && newList.size() == oldSize - 3,
+            "Only first occurrence should have been removed");
 
     }
 
     @Test
     public void testEquals() {
-        assertEquals("a==a1", a, a1);
-        assertNotEquals("a!=b", a, b);
-        assertNotEquals("a!=c", a, c);
-        assertNotEquals("a!=d", a, d);
-        assertNotEquals("a!=e", a, e);
-        assertNotEquals("e!=a", e, a);
-        assertEquals("e==e1", e, e1);
+        assertEquals(a, a1, "a==a1");
+        assertNotEquals(a, b, "a!=b");
+        assertNotEquals(a, c, "a!=c");
+        assertNotEquals(a, d, "a!=d");
+        assertNotEquals(a, e, "a!=e");
+        assertNotEquals(e, a, "e!=a");
+        assertEquals(e, e1, "e==e1");
     }
 
 

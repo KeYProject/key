@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -32,10 +19,8 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -44,18 +29,12 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
-     * @param ifInstantiations
-     *            if instantiations.
-     * @param statement
-     *            the statement which the applied contract belongs to.
-     * @param contract
-     *            the contract being applied.
-     * @param heaps
-     *            the heap context.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     * @param statement the statement which the applied contract belongs to.
+     * @param contract the contract being applied.
+     * @param heaps the heap context.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
@@ -73,7 +52,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -87,6 +66,6 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     public BlockContractInternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
 
         return (BlockContractInternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                BlockContractInternalRule.INSTANCE);
+            BlockContractInternalRule.INSTANCE);
     }
 }

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
@@ -72,6 +59,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the precondition of the contract.
+     *
      * @param heap heap variable
      * @param selfVar self variable
      * @param paramVars parameter variables
@@ -85,6 +73,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the precondition of the contract.
+     *
      * @param heapContext heap context
      * @param selfVar self variable
      * @param paramVars parameter variables
@@ -98,6 +87,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the precondition of the contract.
+     *
      * @param heap heap variable
      * @param heapTerm heap term
      * @param selfTerm self term
@@ -111,6 +101,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the precondition of the contract.
+     *
      * @param heapContext heap context
      * @param heapTerms heap terms
      * @param selfTerm term of self variable
@@ -125,6 +116,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the dependency set of the contract.
+     *
      * @param heap the heap variable
      * @param atPre boolean whether old heap should be used
      * @param selfVar self variable
@@ -139,6 +131,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the dependency set of the contract.
+     *
      * @param heap the heap variable
      * @param atPre boolean whether old heap should be used
      * @param heapTerm the heap variable term
@@ -166,6 +159,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the measured_by clause of the contract.
+     *
      * @param selfVar the self variable
      * @param paramVars the parameter variables
      * @param services services object
@@ -176,6 +170,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the measured_by clause of the contract.
+     *
      * @param heapTerms terms for the heap context
      * @param selfTerm term of self variable
      * @param paramTerms terms of parameter variables
@@ -188,6 +183,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the contract in pretty HTML format.
+     *
      * @param services services instance
      * @return the html representation
      */
@@ -195,6 +191,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the contract in pretty plain text format.
+     *
      * @param services services instance
      * @return the plain text representation
      */
@@ -204,6 +201,7 @@ public interface Contract extends SpecificationElement {
      * Tells whether, on saving a proof where this contract is available, the contract should be
      * saved too. (this is currently true for contracts specified directly in DL, but not for JML
      * contracts)
+     *
      * @return see above
      */
     public boolean toBeSaved();
@@ -213,6 +211,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a parseable String representation of the contract. Precondition: toBeSaved() must be
      * true.
+     *
      * @param services the services instance
      * @return the (parseable) String representation
      */
@@ -220,6 +219,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns a proof obligation to the passed initConfig.
+     *
      * @param initConfig the initial configuration
      * @return the proof obligation
      */
@@ -227,6 +227,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Lookup the proof obligation belonging to the contract in the specification repository.
+     *
      * @param services the services instance
      * @return the proof obligation according to the specification repository
      */
@@ -234,6 +235,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
+     *
      * @param initConfig the initial configuration
      * @param contract the contract
      * @return the proof obligation
@@ -242,10 +244,10 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
+     *
      * @param initConfig the initial configuration
      * @param contract the contract
-     * @param supportSymbolicExecutionAPI
-     *              boolean saying whether symbolic execution api is supported
+     * @param supportSymbolicExecutionAPI boolean saying whether symbolic execution api is supported
      * @return the proof obligation
      */
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
@@ -253,6 +255,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns a contract which is identical this contract except that the id is set to the new id.
+     *
      * @param newId the new id value
      * @return an identical contract with the new id
      */
@@ -261,6 +264,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a contract which is identical to this contract except that the KeYJavaType and
      * IObserverFunction are set to the new values.
+     *
      * @param newKJT the new KeYJavaType
      * @param newPM the new observer function
      * @return an identical contract with the new KJT and PM (see above)
@@ -269,6 +273,7 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns technical name for the contract type.
+     *
      * @return the technical name
      */
     public String getTypeName();
@@ -302,6 +307,7 @@ public interface Contract extends SpecificationElement {
 
         /**
          * Create new instance of original variables
+         *
          * @param selfVar the original self variable
          * @param resVar the original result variable
          * @param excVar the original exception variable
@@ -318,7 +324,7 @@ public interface Contract extends SpecificationElement {
             this.exception = excVar;
             this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.<ProgramVariable> nil();
+                this.params = ImmutableSLList.<ProgramVariable>nil();
             } else {
                 this.params = (ImmutableList<ProgramVariable>) paramVars;
             }

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.util;
 
 
@@ -36,19 +23,19 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
 
     public KeYRecoderExcHandler(int errorThreshold) {
-	 setErrorThreshold(errorThreshold);
+        setErrorThreshold(errorThreshold);
     }
 
 
     public void clear() {
-	exceptions.clear();
+        exceptions.clear();
     }
 
 
     public List<Throwable> getExceptions() {
         List<Throwable> result = new LinkedList<Throwable>();
 
-        if(exceptions != null)
+        if (exceptions != null)
             result.addAll(exceptions);
 
         return result;
@@ -57,7 +44,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
     // Implementation of recoder.service.ErrorHandler
     public int getErrorCount() {
-         return exceptions.size();
+        return exceptions.size();
     }
 
 
@@ -79,7 +66,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     protected void recoderExitAction() {
         String msg = "Recoder: " + exceptions.size() + " errors have occurred - aborting.";
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
-        if(exceptions != null && !exceptions.isEmpty()) {
+        if (exceptions != null && !exceptions.isEmpty()) {
             ex.initCause(exceptions.get(0));
         }
         clear();
@@ -105,7 +92,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     @Override
     public void modelUpdated(EventObject event) {
         if (exceptions.size() > 0) {
-             recoderExitAction();
+            recoderExitAction();
         }
     }
 }

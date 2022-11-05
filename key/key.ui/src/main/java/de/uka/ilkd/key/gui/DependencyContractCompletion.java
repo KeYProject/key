@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.io.IOException;
@@ -32,24 +19,21 @@ import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
 /**
- * This class completes the instantiation for a dependency contract
- * applications. The user is queried for the heap with which to instantiate the
- * app.
+ * This class completes the instantiation for a dependency contract applications. The user is
+ * queried for the heap with which to instantiate the app.
  */
 public class DependencyContractCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
-            boolean forced) {
+    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         UseDependencyContractApp cApp = (UseDependencyContractApp) app;
 
         Services services = goal.proof().getServices();
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
-                cApp.getHeapContext(),
-                cApp.posInOccurrence(), goal.sequent(), services);
+        final List<PosInOccurrence> steps = UseDependencyContractRule
+                .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
         PosInOccurrence step = letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
@@ -58,15 +42,15 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     /**
-     * collects all possible heaps and presents them to the user for selection.
-     * If forced is true the user will not be asked if only one alternative is possible
-     * @param steps 
+     * collects all possible heaps and presents them to the user for selection. If forced is true
+     * the user will not be asked if only one alternative is possible
+     *
+     * @param steps
      * @param forced
      * @param services
      * @return
      */
-    private static PosInOccurrence letUserChooseStep(
-    		List<LocationVariable> heapContext,
+    private static PosInOccurrence letUserChooseStep(List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
         assert heapContext != null;
 
@@ -76,8 +60,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(),
-                services);
+        final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(), services);
         lp.setLineWidth(120);
 
         extractHeaps(heapContext, steps, heaps, lp);
@@ -85,11 +68,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         final Term[] resultHeaps;
         if (!forced) {
             // open dialog
-            final TermStringWrapper heapWrapper = (TermStringWrapper) JOptionPane
-                    .showInputDialog(MainWindow.getInstance(),
-                            "Please select base heap configuration:", "Instantiation",
-                            JOptionPane.QUESTION_MESSAGE, null, heaps,
-                            heaps.length > 0 ? heaps[0] : null);
+            final TermStringWrapper heapWrapper =
+                (TermStringWrapper) JOptionPane.showInputDialog(MainWindow.getInstance(),
+                    "Please select base heap configuration:", "Instantiation",
+                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps.length > 0 ? heaps[0] : null);
 
             if (heapWrapper == null) {
                 return null;
@@ -101,38 +83,39 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         return findCorrespondingStep(steps, resultHeaps);
     }
-    
-    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps, Term[] resultHeaps) {
-       // find corresponding step
-       for (PosInOccurrence step : steps) {
-           boolean match = true;
-           for(int j = 0; j<resultHeaps.length; j++) {
-              if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
-                 match = false;
-                 break;
-              }
-           }
-           if(match) {
-               return step;
+
+    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps,
+            Term[] resultHeaps) {
+        // find corresponding step
+        for (PosInOccurrence step : steps) {
+            boolean match = true;
+            for (int j = 0; j < resultHeaps.length; j++) {
+                if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
+                    match = false;
+                    break;
+                }
             }
-       }
-       assert false;
-       return null;
+            if (match) {
+                return step;
+            }
+        }
+        assert false;
+        return null;
     }
 
-    public static void extractHeaps(List<LocationVariable> heapContext,
-            List<PosInOccurrence> steps, final TermStringWrapper[] heaps,
-            final LogicPrinter lp) {
+    public static void extractHeaps(List<LocationVariable> heapContext, List<PosInOccurrence> steps,
+            final TermStringWrapper[] heaps, final LogicPrinter lp) {
         int i = 0;
         for (PosInOccurrence step : steps) {
             Operator op = step.subTerm().op();
             // necessary distinction (see bug #1232)
             // subterm may either be an observer or a heap term already
-            int size = (op instanceof IObserverFunction)?
-                ((IObserverFunction)op).getStateCount()*heapContext.size(): 1;
+            int size = (op instanceof IObserverFunction)
+                    ? ((IObserverFunction) op).getStateCount() * heapContext.size()
+                    : 1;
             final Term[] heapTerms = new Term[size];
             String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
-            for(int j =0 ; j < size; j++) {
+            for (int j = 0; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
                 final Term heap = step.subTerm().sub(j);
@@ -143,10 +126,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                prettyprint += (j>0 ? ", " : "")
-                + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+                prettyprint +=
+                    (j > 0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
             }
-            prettyprint += (size > 1 ? "]" : "")+"</tt></html>";
+            prettyprint += (size > 1 ? "]" : "") + "</tt></html>";
             heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
         }
     }
@@ -170,12 +153,12 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     public boolean canComplete(IBuiltInRuleApp app) {
         return checkCanComplete(app);
     }
-    
+
     /**
-     * Checks if the app is supported. 
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof UseDependencyContractRule;
-   }
+        return app.rule() instanceof UseDependencyContractRule;
+    }
 }

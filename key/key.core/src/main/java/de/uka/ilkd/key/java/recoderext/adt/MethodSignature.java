@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Identifier;
@@ -27,7 +14,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     private static final long serialVersionUID = 6966957683489654730L;
     private Identifier methodName;
     private ASTList<TypeReference> paramTypes;
-   
+
     public MethodSignature(Identifier methodName, ASTList<TypeReference> paramTypes) {
         super();
         this.methodName = methodName;
@@ -36,9 +23,10 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public ProgramElement getChildAt(int i) {
-        if (i == 0) return methodName;
+        if (i == 0)
+            return methodName;
         i--;
-        if (i>=0 && i<paramTypes.size()) {
+        if (i >= 0 && i < paramTypes.size()) {
             return paramTypes.get(i);
         }
         return null;
@@ -46,7 +34,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public int getChildCount() {
-        return 1+paramTypes.size();
+        return 1 + paramTypes.size();
     }
 
     @Override
@@ -74,8 +62,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public SourceElement deepClone() {
-        throw new IllegalStateException("Not implemented in "
-                +"MethodSignature");
+        throw new IllegalStateException("Not implemented in " + "MethodSignature");
     }
 
 

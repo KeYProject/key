@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,8 +19,8 @@ import java.net.URL;
  * @author weigl
  */
 public class LicenseAction extends MainWindowAction {
-    public static final String KEY_FALLBACK = (KeYConstants.COPYRIGHT + "\nKeY is protected by the "
-            + "GNU General Public License v2");
+    public static final String KEY_FALLBACK =
+        (KeYConstants.COPYRIGHT + "\nKeY is protected by the " + "GNU General Public License v2");
 
     private static final long serialVersionUID = 5606343347731759150L;
 
@@ -72,11 +59,10 @@ public class LicenseAction extends MainWindowAction {
     }
 
     public void showLicense() {
-        URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
-                "LICENSE.TXT");
+        URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class, "LICENSE.TXT");
 
         URL thirdPartyLic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
-                "THIRD_PARTY_LICENSES.txt");
+            "THIRD_PARTY_LICENSES.txt");
 
         JDialog fr = new JDialog(mainWindow, "KeY License");
         fr.getContentPane().setLayout(new BorderLayout());
@@ -87,8 +73,8 @@ public class LicenseAction extends MainWindowAction {
         pane.addTab("Third party libraries", createLicenseViewer(readStream(thirdPartyLic, "")));
 
         JButton okButton = new JButton("OK");
-        okButton.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
-                .getTopLevelAncestor()).dispose());
+        okButton.addActionListener(
+            e -> ((JDialog) ((JButton) e.getSource()).getTopLevelAncestor()).dispose());
         fr.getContentPane().add(okButton, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         fr.setSize(600, 900);

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -18,8 +5,7 @@ import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 
-public class CcatchSVWrapper extends Ccatch
-        implements KeYRecoderExtension, SVWrapper {
+public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWrapper {
     private static final long serialVersionUID = -1;
     protected SchemaVariable sv;
 
@@ -30,8 +16,7 @@ public class CcatchSVWrapper extends Ccatch
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv
-     *            the SchemaVariable
+     * @param sv the SchemaVariable
      */
     @Override
     public void setSV(SchemaVariable sv) {
@@ -72,8 +57,7 @@ public class CcatchSVWrapper extends Ccatch
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement p1,
-            recoder.java.ProgramElement p2) {
+    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
         return false;
     }
 

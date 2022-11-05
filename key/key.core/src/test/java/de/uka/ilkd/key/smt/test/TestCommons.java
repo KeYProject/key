@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -20,31 +8,30 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SMTTestSettings;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.experimental.categories.Category;
-import org.key_project.util.testcategories.Slow;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Use this class for testing SMT: It provides a mechanism to load proofs and
- * taclets. Do not modify this class directly but derive subclasses to implement
- * tests.
+ * Use this class for testing SMT: It provides a mechanism to load proofs and taclets. Do not modify
+ * this class directly but derive subclasses to implement tests.
  */
-@Category(Slow.class)
-public abstract class TestCommons extends TestCase {
-    protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
-            + File.separator + "smt" + File.separator + "tacletTranslation"
-            + File.separator;
+@Tag("slow")
+public abstract class TestCommons {
+    protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
+        + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */
@@ -54,7 +41,7 @@ public abstract class TestCommons extends TestCase {
     static protected Profile profile = init();
 
     static Profile init() {
-		return new JavaProfile();
+        return new JavaProfile();
     }
 
     private TermServices services;
@@ -72,8 +59,9 @@ public abstract class TestCommons extends TestCase {
 
     public abstract boolean toolNotInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
-        Assume.assumeFalse(toolNotInstalled());
+    protected boolean correctResult(String filepath, boolean isValid)
+            throws ProblemLoaderException {
+        Assumptions.assumeFalse(toolNotInstalled());
         SMTSolverResult result = checkFile(filepath);
         // unknown is always allowed. But wrong answers are not allowed
         return correctResult(isValid, result);
@@ -102,8 +90,8 @@ public abstract class TestCommons extends TestCase {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
-            Assert.assertNotNull(proof);
-            Assert.assertEquals(1, proof.openGoals().size());
+            assertNotNull(proof);
+            assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
             return checkGoal(g);
         } finally {
@@ -124,8 +112,8 @@ public abstract class TestCommons extends TestCase {
     }
 
     /**
-     * Returns a set of taclets that can be used for tests. REMARK: First you
-     * have to call <code>parse</code> to instantiate the set of taclets.
+     * Returns a set of taclets that can be used for tests. REMARK: First you have to call
+     * <code>parse</code> to instantiate the set of taclets.
      *
      * @return set of taclets.
      */
@@ -158,8 +146,7 @@ public abstract class TestCommons extends TestCase {
     }
 
     /**
-     * Calls
-     * <code>parse(File file, Profile profile) with the standard profile for testing.
+     * Calls <code>parse(File file, Profile profile) with the standard profile for testing.
      */
     protected ProofAggregate parse(File file) {
         return parse(file, profile);
@@ -169,6 +156,7 @@ public abstract class TestCommons extends TestCase {
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
      * @param file problem file.
+     * @param pro determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      * @profile determines the profile that should be used.
      */
@@ -176,8 +164,7 @@ public abstract class TestCommons extends TestCase {
         assertTrue(file.exists());
         ProofAggregate result = null;
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),
-                    file, null, pro);
+            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
@@ -186,8 +173,7 @@ public abstract class TestCommons extends TestCase {
             services = initConfig.getServices();
             // po.close();
         } catch (Exception e) {
-			fail("Error while loading problem file " + file + ":\n\n"
-					+ e.getMessage());
+            fail("Error while loading problem file " + file + ":\n\n" + e.getMessage());
         }
         return result;
     }

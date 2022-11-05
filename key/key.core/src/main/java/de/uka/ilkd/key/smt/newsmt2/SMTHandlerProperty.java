@@ -7,11 +7,10 @@ import java.util.Map;
 /**
  * SMT handler properties are properties for the new modular smt handler.
  *
- * They can defined individually in each {@link SMTHandler}. The settings
- * dialog (etc.) probe the installed SMTHandlers for all available properties.
+ * They can defined individually in each {@link SMTHandler}. The settings dialog (etc.) probe the
+ * installed SMTHandlers for all available properties.
  *
- * SMT handler properties have a limited system for type safety to
- * avoid nasty exceptions.
+ * SMT handler properties have a limited system for type safety to avoid nasty exceptions.
  *
  * @param <T> type of the stored data.
  *
@@ -20,8 +19,8 @@ import java.util.Map;
 public abstract class SMTHandlerProperty<T> {
 
     /**
-     * Name of the property. Should not have spaces.
-     * This is also used in the .props files for properties.
+     * Name of the property. Should not have spaces. This is also used in the .props files for
+     * properties.
      */
     private final String identifier;
 
@@ -35,16 +34,14 @@ public abstract class SMTHandlerProperty<T> {
      */
     private final String description;
 
-    public SMTHandlerProperty(String identifier, String label,
-                              String description) {
+    public SMTHandlerProperty(String identifier, String label, String description) {
         this.identifier = identifier;
         this.label = label;
         this.description = description;
     }
 
     /**
-     * Verify that the given string value can be converted to a value of the
-     * stored data type
+     * Verify that the given string value can be converted to a value of the stored data type
      *
      * @param value potential string representation of a property, not null.
      * @return true iff the argument is a valid representation.
@@ -54,7 +51,9 @@ public abstract class SMTHandlerProperty<T> {
     /**
      * Convert
      *
-     * <p>Precondition: {@code verify(s) == true}</p>
+     * <p>
+     * Precondition: {@code verify(s) == true}
+     * </p>
      *
      * @param s String to parse into a value
      * @return the value represented by s.
@@ -62,8 +61,7 @@ public abstract class SMTHandlerProperty<T> {
     public abstract T fromString(String s);
 
     /**
-     * The default value for the stored data type in case there
-     * is no value stored
+     * The default value for the stored data type in case there is no value stored
      *
      * @return a non-null constant value
      */
@@ -71,9 +69,10 @@ public abstract class SMTHandlerProperty<T> {
 
     /*
      * Part of the Visitor pattern
+     *
      * @see SMTHandlerPropertyVisitor
      */
-    public abstract <A,R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg);
+    public abstract <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg);
 
     public String getIdentifier() {
         return identifier;
@@ -90,8 +89,8 @@ public abstract class SMTHandlerProperty<T> {
     /**
      * Extract a value of this property from a Services object.
      *
-     * It uses the current proof (that must exist!), accesses its settings and
-     * there the new smtsetting.
+     * It uses the current proof (that must exist!), accesses its settings and there the new
+     * smtsetting.
      *
      * @param services non-null services object
      * @return the value read from the services.
@@ -153,15 +152,16 @@ public abstract class SMTHandlerProperty<T> {
     /**
      * A property of type int.
      *
-     * The string must be a parsable integer value in decimal representation
-     * in integer range. Default value is 0.
+     * The string must be a parsable integer value in decimal representation in integer range.
+     * Default value is 0.
      */
     public static class IntegerProperty extends SMTHandlerProperty<Integer> {
 
         private final int min;
         private final int max;
 
-        public IntegerProperty(String identifier, String heading, String description, int min, int max) {
+        public IntegerProperty(String identifier, String heading, String description, int min,
+                int max) {
             super(identifier, heading, description);
             this.min = min;
             this.max = max;
@@ -184,7 +184,7 @@ public abstract class SMTHandlerProperty<T> {
 
         @Override
         public Integer defaultValue() {
-            if(min <= 0 && 0 <= max) {
+            if (min <= 0 && 0 <= max) {
                 return 0;
             } else {
                 return min;
@@ -218,8 +218,7 @@ public abstract class SMTHandlerProperty<T> {
 
         @Override
         public boolean verify(String value) {
-            return value.equalsIgnoreCase("true") ||
-                    value.equalsIgnoreCase("false");
+            return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
         }
 
         @Override
@@ -239,24 +238,23 @@ public abstract class SMTHandlerProperty<T> {
     }
 
     /**
-     * A property for an enum type.
-     * The allowed strings are the names of the enum constants of the type.
-     * Default value is the first constant of E.
+     * A property for an enum type. The allowed strings are the names of the enum constants of the
+     * type. Default value is the first constant of E.
      *
-     * @param <E> an enum class that is wrapped here. Must contain at least one
-     *           constant.
+     * @param <E> an enum class that is wrapped here. Must contain at least one constant.
      */
     public static class EnumProperty<E extends Enum<E>> extends SMTHandlerProperty<E> {
         private final Class<E> enumType;
 
-        public EnumProperty(String identifier, String heading, String description, Class<E> enumType) {
+        public EnumProperty(String identifier, String heading, String description,
+                Class<E> enumType) {
             super(identifier, heading, description);
             this.enumType = enumType;
         }
 
         public E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
-                if(value.equalsIgnoreCase(enumConstant.toString())) {
+                if (value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;
                 }
             }

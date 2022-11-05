@@ -1,12 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -38,6 +29,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * Builds the rule which inserts information flow contract applications.
  * <p/>
+ *
  * @author christoph
  */
 abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletBuilder {
@@ -73,8 +65,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         unfoldCounter++;
 
         // create schema vars
-        IFProofObligationVars schemaVars =
-                generateApplicationDataSVs(ifVars, services);
+        IFProofObligationVars schemaVars = generateApplicationDataSVs(ifVars, services);
 
         // create find term and replace information flow variables by
         // schema variables
@@ -89,20 +80,20 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                collectQuantifiableVariables(schemaFind, services);
-        quantifiableVarsToSchemaVars.putAll(
-                collectQuantifiableVariables(schemaReplaceWith, services));
-	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
-	schemaFind = or.replace(schemaFind);
-	schemaReplaceWith = or.replace(schemaReplaceWith);
+            collectQuantifiableVariables(schemaFind, services);
+        quantifiableVarsToSchemaVars
+                .putAll(collectQuantifiableVariables(schemaReplaceWith, services));
+        final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
+        schemaFind = or.replace(schemaFind);
+        schemaReplaceWith = or.replace(schemaReplaceWith);
 
-        //create taclet
-        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        // create taclet
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
+            new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        final RewriteTacletGoalTemplate goal =
-                new RewriteTacletGoalTemplate(schemaReplaceWith);
+        final RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(schemaReplaceWith);
         tacletBuilder.addTacletGoalTemplate(goal);
         tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
         tacletBuilder.setSurviveSmbExec(true);
@@ -112,41 +103,33 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     }
 
 
-    private IFProofObligationVars generateApplicationDataSVs(
-            IFProofObligationVars ifVars,
+    private IFProofObligationVars generateApplicationDataSVs(IFProofObligationVars ifVars,
             Services services) {
         return new IFProofObligationVars(
-                generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
-                generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c2, services),
-                ifVars.symbExecVars);
+            generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
+            generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c2, services), ifVars.symbExecVars);
     }
 
 
     private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                           ProofObligationVars poVars,
-                                                           Services services) {
+            ProofObligationVars poVars, Services services) {
         Function n = services.getTypeConverter().getHeapLDT().getNull();
 
         // generate a new schema variable for any pre variable
-        Term selfAtPreSV =
-                createTermSV(poVars.pre.self, schemaPrefix, services);
+        Term selfAtPreSV = createTermSV(poVars.pre.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
-                createTermSV(poVars.pre.localVars, schemaPrefix, services);
-        Term guardAtPreSV =
-                createTermSV(poVars.pre.guard, schemaPrefix, services);
+            createTermSV(poVars.pre.localVars, schemaPrefix, services);
+        Term guardAtPreSV = createTermSV(poVars.pre.guard, schemaPrefix, services);
         Term resAtPreSV = null;
         Term excAtPreSV = null;
-        Term heapAtPreSV =
-                createTermSV(poVars.pre.heap, schemaPrefix, services);
-        Term mbyAtPreSV =
-                createTermSV(poVars.pre.mbyAtPre, schemaPrefix, services);
+        Term heapAtPreSV = createTermSV(poVars.pre.heap, schemaPrefix, services);
+        Term mbyAtPreSV = createTermSV(poVars.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
         // which do not equal the corresponding pre variable; else use
         // the pre schema variable
-        Term selfAtPostSV = (poVars.pre.self == poVars.post.self ?
-                             selfAtPreSV :
-                             createTermSV(poVars.post.self, schemaPrefix, services));
+        Term selfAtPostSV = (poVars.pre.self == poVars.post.self ? selfAtPreSV
+                : createTermSV(poVars.post.self, schemaPrefix, services));
 
         ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
         Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
@@ -157,66 +140,51 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
-                localVarsAtPostSVs =
-                        localVarsAtPostSVs.append(createTermSV(appDataPostLocalVar,
-                                                               schemaPrefix,
-                                                               services));
+                localVarsAtPostSVs = localVarsAtPostSVs
+                        .append(createTermSV(appDataPostLocalVar, schemaPrefix, services));
             }
         }
 
-        Term guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ?
-                             guardAtPreSV :
-                             createTermSV(poVars.post.guard, schemaPrefix, services);
-        Term resAtPostSV = (poVars.post.result == null ||
-                            poVars.post.result.op().equals(n)) ?
-                           null :
-                           createTermSV(poVars.post.result, schemaPrefix, services);
-        Term excAtPostSV = (poVars.post.exception == null ||
-                            poVars.post.exception.op().equals(n)) ?
-                           null :
-                           createTermSV(poVars.post.exception, schemaPrefix, services);
-        Term heapAtPostSV = (poVars.pre.heap == poVars.post.heap ?
-                             heapAtPreSV :
-                             createTermSV(poVars.post.heap, schemaPrefix, services));
+        Term guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ? guardAtPreSV
+                : createTermSV(poVars.post.guard, schemaPrefix, services);
+        Term resAtPostSV = (poVars.post.result == null || poVars.post.result.op().equals(n)) ? null
+                : createTermSV(poVars.post.result, schemaPrefix, services);
+        Term excAtPostSV =
+            (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
+                    : createTermSV(poVars.post.exception, schemaPrefix, services);
+        Term heapAtPostSV = (poVars.pre.heap == poVars.post.heap ? heapAtPreSV
+                : createTermSV(poVars.post.heap, schemaPrefix, services));
 
         // build state variable container for pre and post state
-        StateVars pre =
-                new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
-                              excAtPreSV, heapAtPreSV, mbyAtPreSV);
+        StateVars pre = new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
+            excAtPreSV, heapAtPreSV, mbyAtPreSV);
         pre = filterSchemaVars(poVars.pre, pre);
-        StateVars post =
-                new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
-                              excAtPostSV, heapAtPostSV, null);
+        StateVars post = new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
+            excAtPostSV, heapAtPostSV, null);
         post = filterSchemaVars(poVars.post, post);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post, poVars.exceptionParameter,
-                                       poVars.formalParams, services);
+        return new ProofObligationVars(pre, post, poVars.exceptionParameter, poVars.formalParams,
+            services);
     }
 
 
-    private static Term replace(Term term,
-                                IFProofObligationVars origVars,
-                                IFProofObligationVars schemaVars,
-                                Services services) {
+    private static Term replace(Term term, IFProofObligationVars origVars,
+            IFProofObligationVars schemaVars, Services services) {
         Term intermediateResult = replace(term, origVars.c1, schemaVars.c1, services);
         return replace(intermediateResult, origVars.c2, schemaVars.c2, services);
     }
 
 
-    private static Term replace(Term term,
-                                ProofObligationVars origVars,
-                                ProofObligationVars schemaVars,
-                                Services services) {
+    private static Term replace(Term term, ProofObligationVars origVars,
+            ProofObligationVars schemaVars, Services services) {
         Term intermediateResult = replace(term, origVars.pre, schemaVars.pre, services);
         return replace(intermediateResult, origVars.post, schemaVars.post, services);
     }
 
 
-    private static Term replace(Term term,
-                                StateVars origVars,
-                                StateVars schemaVars,
-                                Services services) {
+    private static Term replace(Term term, StateVars origVars, StateVars schemaVars,
+            Services services) {
         LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
@@ -229,12 +197,11 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             Term origTerm = origVarsIt.next();
             Term svTerm = schemaVarsIt.next();
             if (origTerm != null && svTerm != null) {
-                assert svTerm.sort().equals(origTerm.sort()) ||
-                       svTerm.sort().extendsSorts().contains(origTerm.sort()) :
-                        "mismatch of sorts: orignal term " + origTerm +
-                        ", sort " + origTerm.sort() +
-                        "; replacement term" + svTerm + ", sort " +
-                        svTerm.sort();
+                assert svTerm.sort().equals(origTerm.sort())
+                        || svTerm.sort().extendsSorts().contains(origTerm.sort())
+                        : "mismatch of sorts: orignal term " + origTerm + ", sort "
+                            + origTerm.sort() + "; replacement term" + svTerm + ", sort "
+                            + svTerm.sort();
                 map.put(origTerm, svTerm);
             }
         }
@@ -246,16 +213,14 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     }
 
 
-    private static Pair<StateVars, StateVars> filter(StateVars origVars,
-                                                     StateVars schemaVars) {
+    private static Pair<StateVars, StateVars> filter(StateVars origVars, StateVars schemaVars) {
         schemaVars = filterSchemaVars(origVars, schemaVars);
         origVars = filterSchemaVars(schemaVars, origVars);
         return new Pair<StateVars, StateVars>(origVars, schemaVars);
     }
 
 
-    private static StateVars filterSchemaVars(StateVars origVars,
-                                              StateVars schemaVars) {
+    private static StateVars filterSchemaVars(StateVars origVars, StateVars schemaVars) {
         if (origVars.termList.size() == schemaVars.termList.size()) {
             return schemaVars;
         }

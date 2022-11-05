@@ -24,17 +24,17 @@ public abstract class KeyAction extends AbstractAction {
     public static final String SHORTCUT_FOCUSED_CONDITION = "SHORTCUT_FOCUSED_CONDITION";
 
     /**
-     * Additional key for {@link javax.swing.Action}s. Describes the priority,
-     * and therefor an order to arrange these actions.
+     * Additional key for {@link javax.swing.Action}s. Describes the priority, and therefor an order
+     * to arrange these actions.
      */
     public static final String PRIORITY = "PRIORITY";
 
     /**
-     * Additional key for {@link javax.swing.Action}s. Describes a path in a menu
-     * where an action should be injected in.
+     * Additional key for {@link javax.swing.Action}s. Describes a path in a menu where an action
+     * should be injected in.
      * <p>
-     * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action
-     * into a sub-sub Menu Options below Heatmap.
+     * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
+     * a sub-sub Menu Options below Heatmap.
      *
      * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
      */
@@ -46,9 +46,9 @@ public abstract class KeyAction extends AbstractAction {
     public static final String CHECKBOX = "CHECKBOX";
 
     /**
-     * Key for defining local shortcuts which are prefered
-     * used by {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.KeyboardShortcuts}.
-     * In comparision with {@code ACCELERATOR_KEY} which should be used for global shortcuts.
+     * Key for defining local shortcuts which are prefered used by
+     * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.KeyboardShortcuts}. In comparision
+     * with {@code ACCELERATOR_KEY} which should be used for global shortcuts.
      * <p>
      * The stored values are {@link KeyStroke}.
      */

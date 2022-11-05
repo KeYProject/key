@@ -23,11 +23,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     }
 
     /**
-     * Transforms a rule context to a text representation.
-     * Does the same as `context.getText` but inserts a space between all children of RuleContexts.
+     * Transforms a rule context to a text representation. Does the same as `context.getText` but
+     * inserts a space between all children of RuleContexts.
      * <p>
-     * This assumes the following tree layout:
-     * `RuleContext (-> RuleContext)* -> Some leaf`
+     * This assumes the following tree layout: `RuleContext (-> RuleContext)* -> Some leaf`
      *
      * @param builder The StringBuilder to insert the text into
      * @param context The RuleContext to transform
@@ -58,8 +57,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     }
 
     public static enum Kind {
-        ASSERT("assert"),
-        ASSUME("assume");
+        ASSERT("assert"), ASSUME("assume");
 
         private String name;
 

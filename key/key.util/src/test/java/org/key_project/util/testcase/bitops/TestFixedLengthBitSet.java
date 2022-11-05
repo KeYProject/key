@@ -1,36 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package org.key_project.util.testcase.bitops;
+
+import org.junit.jupiter.api.Test;
+import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test case for {@link ImmutableFixedLengthBitSet}.
  *
  * @author Dominic Scheurer
  */
-public class TestFixedLengthBitSet extends TestCase {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
+public class TestFixedLengthBitSet {
     @Test
     public void testNumOfZeroBits() {
         ImmutableFixedLengthBitSet lbn = new ImmutableFixedLengthBitSet(4);
@@ -60,7 +43,7 @@ public class TestFixedLengthBitSet extends TestCase {
         ImmutableFixedLengthBitSet lbn = new ImmutableFixedLengthBitSet(4);
 
         // 0000
-        ArrayList<Integer> expected = new ArrayList<Integer>(); 
+        ArrayList<Integer> expected = new ArrayList<>();
         assertEquals(expected, lbn.getNonzeroPositions());
 
         // 1011
@@ -72,20 +55,20 @@ public class TestFixedLengthBitSet extends TestCase {
 
         // 1100
         lbn = lbn.setToValue(12);
-        expected = new ArrayList<Integer>(); 
+        expected = new ArrayList<>();
         expected.add(2);
         expected.add(3);
         assertEquals(expected, lbn.getNonzeroPositions());
 
         // 1000
         lbn = lbn.setToValue(8);
-        expected = new ArrayList<Integer>(); 
+        expected = new ArrayList<>();
         expected.add(3);
         assertEquals(expected, lbn.getNonzeroPositions());
 
         // 1111
         lbn = lbn.setToValue(15);
-        expected = new ArrayList<Integer>(); 
+        expected = new ArrayList<>();
         expected.add(0);
         expected.add(1);
         expected.add(2);
@@ -99,8 +82,7 @@ public class TestFixedLengthBitSet extends TestCase {
 
         try {
             lbn.setToValue(16);
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             return;
         }
 
@@ -113,8 +95,7 @@ public class TestFixedLengthBitSet extends TestCase {
 
         try {
             lbn.setToValue(-1);
-        }
-        catch (AssertionError e) {
+        } catch (AssertionError e) {
             return;
         }
 
@@ -147,7 +128,7 @@ public class TestFixedLengthBitSet extends TestCase {
             assertEquals(i, lbn.getValue());
             lbn = lbn.inc();
         }
-        
+
         assertEquals(15, lbn.getValue());
     }
 

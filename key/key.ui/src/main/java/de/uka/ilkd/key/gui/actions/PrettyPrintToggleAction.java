@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -25,56 +12,61 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
     public static final String NAME = "Use Pretty Syntax";
-    
+
     public static final String TOOL_TIP = "If ticked, infix notations are used.";
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8633254204256247698L;
-    
+
     /**
      * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
      * <p>
-     * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
+     * Such changes can occur in the Eclipse context when settings are changed in for instance the
+     * KeYIDE.
      */
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public PrettyPrintToggleAction(MainWindow mainWindow) {
-       super(mainWindow);
-       setName(NAME);
-       setTooltip(TOOL_TIP);
-        // Attention: The listener is never removed, because there is only one MainWindow!
+        super(mainWindow);
+        setName(NAME);
+        setTooltip(TOOL_TIP);
+         // Attention: The listener is never
+                                                            // removed, because there is only one
+                                                            // MainWindow!
        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
-       updateSelectedState();
+        updateSelectedState();
     }
-    
+
     protected void updateSelectedState() {
-       final boolean prettySyntax = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-       NotationInfo.DEFAULT_PRETTY_SYNTAX = prettySyntax;
-       setSelected(prettySyntax);
-       //setSelected(NotationInfo.PRETTY_SYNTAX);
+        final boolean prettySyntax =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        NotationInfo.DEFAULT_PRETTY_SYNTAX = prettySyntax;
+        setSelected(prettySyntax);
+        // setSelected(NotationInfo.PRETTY_SYNTAX);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        // Needs to be executed before the ViewSettings are modified, because the UI
+        // Needs to be executed before the// ViewSettings are modified, because the UI
         // will react on the settings change event!
         NotationInfo.DEFAULT_PRETTY_SYNTAX = selected;
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
         updateMainWindow(selected);
     }
-    
+
     protected void updateMainWindow(boolean prettySyntax) {
-       mainWindow.getUnicodeToggleAction().setEnabled(prettySyntax);
-       mainWindow.getHidePackagePrefixToggleAction().setEnabled(prettySyntax);
-       mainWindow.makePrettyView();
+        mainWindow.getUnicodeToggleAction().setEnabled(prettySyntax);
+        mainWindow.getHidePackagePrefixToggleAction().setEnabled(prettySyntax);
+        mainWindow.makePrettyView();
     }
 
     protected void handleViewSettingsChanged(EventObject e) {
-       updateSelectedState();
-       final boolean prettySyntax = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-       updateMainWindow(prettySyntax);
+        updateSelectedState();
+        final boolean prettySyntax =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        updateMainWindow(prettySyntax);
     }
 }

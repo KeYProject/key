@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -24,10 +11,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl
- *         This filter takes a search string and regroups the sequent
- *         so that the sequent formulas matching the search are grouped around
- *         the sequent arrow, so that they can be viewed together.
+ * @author jschiffl This filter takes a search string and regroups the sequent so that the sequent
+ *         formulas matching the search are grouped around the sequent arrow, so that they can be
+ *         viewed together.
  */
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {

@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * Handles JML expressions that begin with an escape character '\'.
  * <p>
- * Escaped identifiers in JML code are usually (always?) function symbols.
- * JML function symbols begin with an escape character, to distinguish them
- * from Java function symbols that might occur in an annotated source code.
+ * Escaped identifiers in JML code are usually (always?) function symbols. JML function symbols
+ * begin with an escape character, to distinguish them from Java function symbols that might occur
+ * in an annotated source code.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -38,7 +38,8 @@ public abstract class EscapeExpression extends Operator {
         children = new ASTArrayList<Expression>(arguments);
     }
 
-    public static EscapeExpression getEscapeExpression(String functionName, List<Expression> arguments) {
+    public static EscapeExpression getEscapeExpression(String functionName,
+            List<Expression> arguments) {
         if (functionName.startsWith("\\dl_")) {
             return new DLEmbeddedExpression(functionName.substring(4), arguments);
         } else if (JmlIO.isKnownFunction(functionName)) {
@@ -48,8 +49,7 @@ public abstract class EscapeExpression extends Operator {
     }
 
     /**
-     * Arity of an embedded JavaDL Expression depends upon the number of
-     * arguments.
+     * Arity of an embedded JavaDL Expression depends upon the number of arguments.
      */
     @Override
     public int getArity() {

@@ -36,8 +36,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             return label;
         }
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels()) {
             return null;
         }
 
@@ -65,11 +65,6 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
 
         if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
             result = null;
-        }
-
-        if (result != null && result.getOrigin() instanceof FileOrigin
-                && goal != null && goal.node() != null) {
-            goal.node().getNodeInfo().addRelevantFile(((FileOrigin) result.getOrigin()).fileName);
         }
 
         return result;

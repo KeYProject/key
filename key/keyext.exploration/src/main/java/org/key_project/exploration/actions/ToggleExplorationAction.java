@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 
 /**
  * Toggles the Exploration Mode.
+ *
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
@@ -29,19 +30,20 @@ public class ToggleExplorationAction extends KeyAction {
         setMenuPath(MENU_PATH);
         putValue(CHECKBOX, true);
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
-                e -> setSelected(model.isExplorationModeSelected()));
-        
-        mainWindow.getMediator().getSelectionModel().addKeYSelectionListener(new KeYSelectionListener() {
-            
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                updateEnable(mainWindow);
-            }
-            
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) { }
-        });
-        
+            e -> setSelected(model.isExplorationModeSelected()));
+
+        mainWindow.getMediator().getSelectionModel()
+                .addKeYSelectionListener(new KeYSelectionListener() {
+
+                    @Override
+                    public void selectedProofChanged(KeYSelectionEvent e) {
+                        updateEnable(mainWindow);
+                    }
+
+                    @Override
+                    public void selectedNodeChanged(KeYSelectionEvent e) {}
+                });
+
         updateEnable(mainWindow);
     }
 

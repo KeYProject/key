@@ -32,134 +32,173 @@ public abstract class ImplicitEnumMethod implements Method {
         this.ownerClass = ownerClass;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isAbstract()
      */
     public boolean isAbstract() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isNative()
      */
     public boolean isNative() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isSynchronized()
      */
     public boolean isSynchronized() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isVarArgMethod()
      */
     public boolean isVarArgMethod() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isFinal()
      */
     public boolean isFinal() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isStatic()
      */
     public boolean isStatic() {
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isPrivate()
      */
     public boolean isPrivate() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isProtected()
      */
     public boolean isProtected() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isPublic()
      */
     public boolean isPublic() {
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#isStrictFp()
      */
     public boolean isStrictFp() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#getContainingClassType()
      */
     public ClassType getContainingClassType() {
         return ownerClass;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Member#getAnnotations()
      */
     public List<? extends AnnotationUse> getAnnotations() {
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getFullName()
      */
     public String getFullName() {
         return Naming.getFullName(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return service;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
         service = pmi;
     }
 
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.ModelElement#validate()
      */
     public void validate() throws ModelException {
         // always valid
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ClassTypeContainer#getTypes()
      */
     public List<ClassType> getTypes() {
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ClassTypeContainer#getPackage()
      */
     public Package getPackage() {
         return service.getPackage(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ClassTypeContainer#getContainer()
      */
     public ClassTypeContainer getContainer() {
@@ -170,14 +209,18 @@ public abstract class ImplicitEnumMethod implements Method {
         return service.getExceptions(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#getReturnType()
      */
     public Type getReturnType() {
         return service.getReturnType(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#getSignature()
      */
     public List<Type> getSignature() {

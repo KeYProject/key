@@ -1,32 +1,25 @@
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.logic.Term;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserSorts extends AbstractTestTermParser {
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
-        parseDecls("\\programVariables {"
-                + "testTermParserSorts.IntegerMethods a;"
-                + "byte[] ba;"
-                + "char[] ca;"
-                + "short[] sa;"
-                + "int[] ia;"
-                + "long[] la;"
-                + "}");
+        parseDecls("\\programVariables {" + "testTermParserSorts.IntegerMethods a;" + "byte[] ba;"
+            + "char[] ca;" + "short[] sa;" + "int[] ia;" + "long[] la;" + "}");
     }
 
     /*
@@ -44,33 +37,31 @@ public class TestTermParserSorts extends AbstractTestTermParser {
         assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
 
         /*
-         * Test int::seqGet(s,i)
-         * Notice that pretty-printing of int::seqGet(s,i) results in: (int)s[i]
-         * But parsing of (int)s[i] results in: int::cast(any::seqGet(s,i)
+         * Test int::seqGet(s,i) Notice that pretty-printing of int::seqGet(s,i) results in:
+         * (int)s[i] But parsing of (int)s[i] results in: int::cast(any::seqGet(s,i)
          */
         pp = "(int)s[i]";
         expected = parseTerm("int::cast(any::seqGet(s,i))");
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
-        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp); // test pretty-printing
+        // test pretty-printing
+        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp);
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");
     }
 
     /*
-     * The KeY type int has several possible corresponding KeYJavaTypes.
-     * Those types are: char, byte, short, int, long
-     * 
-     * This test checks if the parser finds a suitable function,
-     * if a query with integer arguments is provided.
+     * The KeY type int has several possible corresponding KeYJavaTypes. Those types are: char,
+     * byte, short, int, long
      *
-     * Sometimes several functions are available that the parser may select.
-     * For example a query of the form "a.query(0)" with Java functions
-     * available that have the following signatures:
+     * This test checks if the parser finds a suitable function, if a query with integer arguments
+     * is provided.
      *
-     *      public int query(int i);
-     *      public int query(byte b);
+     * Sometimes several functions are available that the parser may select. For example a query of
+     * the form "a.query(0)" with Java functions available that have the following signatures:
+     *
+     * public int query(int i); public int query(byte b);
      *
      * Such a case is not considered here.
      */

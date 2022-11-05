@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -29,32 +17,29 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
- * This class extends the functionality of the {@link AbstractProblemLoader}. It
- * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
- * it opens the proof obligation browser it is not possible to instantiate a
- * proof configured by the opened file.
+ * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
+ * loading process as {@link SwingWorker3} {@link Thread} and it opens the proof obligation browser
+ * it is not possible to instantiate a proof configured by the opened file.
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses multiple Threads (UI and SwingWorker)?
+public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename in
+                                                                 // MultiThreadProblemLoader analog
+                                                                 // to SingleThreadProblemLoader
+                                                                 // because it uses multiple Threads
+                                                                 // (UI and SwingWorker)?
 
     private final ProverTaskListener ptl;
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(File file,
-            List<File> classPath,
-            File bootClassPath,
-            List<File> includes,
-            Profile profileOfNewProofs,
-            boolean forceNewProfileOfNewProofs,
-            KeYMediator mediator,
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath, List<File> includes,
+            Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-            Properties poPropertiesToForce,
-            ProverTaskListener ptl) {
+            Properties poPropertiesToForce, ProverTaskListener ptl) {
         super(file, classPath, bootClassPath, includes, profileOfNewProofs,
-                forceNewProfileOfNewProofs, mediator.getUI(),
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
+            forceNewProfileOfNewProofs, mediator.getUI(),
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
         this.mediator = mediator;
         this.ptl = ptl;
     }
@@ -67,7 +52,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
         Throwable message;
         try {
             message = doWork();
-        } catch(Throwable ex) {
+        } catch (Throwable ex) {
             message = ex;
         }
 
@@ -81,7 +66,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             return null;
         } catch (Exception exception) {
             final String errorMessage = "Failed to load "
-                    + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, exception));
             mediator.getUI().reportStatus(this, errorMessage);
             return exception;
@@ -97,10 +82,9 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     private void fireTaskFinished(long runningTime, final Throwable message) {
         if (ptl != null) {
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
-                    getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
-                    (getProof() != null
-                                ? getProof().countBranches() - getProof().openGoals().size()
-                                : 0));
+                getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
+                (getProof() != null ? getProof().countBranches() - getProof().openGoals().size()
+                        : 0));
             ptl.taskFinished(tfi);
         }
     }
@@ -117,17 +101,14 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking
-     * {@link ProverTaskListener#taskStarted(String, int)} on the registered
-     * listener.
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(String, int)} on the
+     * registered listener.
      *
      * Termination is announced by invoking
-     * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the
-     * registered listener.
+     * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<Throwable, Void> worker =
-                new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
 
             private long runTime;
 

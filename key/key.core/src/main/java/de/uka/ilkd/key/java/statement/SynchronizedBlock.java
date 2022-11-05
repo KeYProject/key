@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -34,20 +21,20 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- *  Synchronized block.
+ * Synchronized block.
  */
 
-public class SynchronizedBlock extends JavaStatement 
-    implements StatementContainer, ExpressionContainer, ProgramPrefix {
+public class SynchronizedBlock extends JavaStatement
+        implements StatementContainer, ExpressionContainer, ProgramPrefix {
 
     /**
- *      Expression.
+     * Expression.
      */
 
     protected final Expression expression;
 
     /**
- *      Body.
+     * Body.
      */
 
     protected final StatementBlock body;
@@ -55,32 +42,18 @@ public class SynchronizedBlock extends JavaStatement
     private final MethodFrame innerMostMethodFrame;
 
     private final int prefixLength;
-    
-   
-    
+
+
+
     /**
- *      Synchronized block.
- *      @param body a statement block.
+     * Synchronized block.
+     *
+     * @param body a statement block.
      */
 
     public SynchronizedBlock(StatementBlock body) {
-        this.body=body;
-	this.expression=null;
-    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-    prefixLength = info.getLength();
-    innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
-
-    /**
- *      Synchronized block.
- *      @param e an expression.
- *      @param body a statement block.
-     */
-
-    public SynchronizedBlock(Expression e, StatementBlock body) {
-        expression=e;
-        this.body=body;
+        this.body = body;
+        this.expression = null;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -88,17 +61,34 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /**
- *      Synchronized block.
- *      @param children a list with all children
+     * Synchronized block.
+     *
+     * @param e an expression.
+     * @param body a statement block.
+     */
+
+    public SynchronizedBlock(Expression e, StatementBlock body) {
+        expression = e;
+        this.body = body;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
+    }
+
+    /**
+     * Synchronized block.
+     *
+     * @param children a list with all children
      */
 
     public SynchronizedBlock(ExtList children) {
         super(children);
-	expression = children.get(Expression.class);
-	body = children.get(StatementBlock.class);
-    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-    prefixLength = info.getLength();
-    innerMostMethodFrame = info.getInnerMostMethodFrame();
+        expression = children.get(Expression.class);
+        body = children.get(StatementBlock.class);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
 
     }
 
@@ -115,13 +105,12 @@ public class SynchronizedBlock extends JavaStatement
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
-    
+
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
-            this;
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
-    
+
     @Override
     public int getPrefixLength() {
         return prefixLength;
@@ -135,31 +124,31 @@ public class SynchronizedBlock extends JavaStatement
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
-    }    
+    }
 
     /**
-     * The method checks whether the expression in the synchronized
-     * prefix is either a local variable or a meta class reference
-     * (as local variables of this type are not supported by KeY,
-     * see return value for
-     * {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     * The method checks whether the expression in the synchronized prefix is either a local
+     * variable or a meta class reference (as local variables of this type are not supported by KeY,
+     * see return value for {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     *
      * @return true iff the above stated condition holds.
      */
     private boolean expressionWithoutSideffects() {
-        return (expression instanceof ProgramVariable
-                    && !((ProgramVariable)expression).isMember())
+        return (expression instanceof ProgramVariable && !((ProgramVariable) expression).isMember())
                 || (expression instanceof MetaClassReference);
     }
 
     public PosInProgram getFirstActiveChildPos() {
-        return getStatementCount() == 0 ?
-                PosInProgram.TOP : (expressionWithoutSideffects() ?
-                        PosInProgram.TOP.down(getChildCount()-1).down(0) : PosInProgram.ONE);
+        return getStatementCount() == 0 ? PosInProgram.TOP
+                : (expressionWithoutSideffects()
+                        ? PosInProgram.TOP.down(getChildCount() - 1).down(0)
+                        : PosInProgram.ONE);
     }
-    
+
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -167,13 +156,14 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /*
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the expression at the specified index in this node's "virtual" expression array.
+     *
+     * @param index an index for an expression.
+     *
+     * @return the expression with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     */
 
     public Expression getExpressionAt(int index) {
         if (expression != null && index == 0) {
@@ -184,8 +174,9 @@ public class SynchronizedBlock extends JavaStatement
 
 
     /**
- *      Get expression.
- *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
 
     public Expression getExpression() {
@@ -193,40 +184,45 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) result++;
-        if (body       != null) result++;
+        if (expression != null)
+            result++;
+        if (body != null)
+            result++;
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     */
 
-    public ProgramElement getChildAt(int index) {       
+    public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) return expression;
+            if (index == 0)
+                return expression;
             index--;
         }
         if (body != null) {
-            if (index == 0) return body;
+            if (index == 0)
+                return body;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
- *      Get body.
- *      @return the statement block.
+     * Get body.
+     *
+     * @return the statement block.
      */
 
     public StatementBlock getBody() {
@@ -235,8 +231,9 @@ public class SynchronizedBlock extends JavaStatement
 
 
     /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -244,13 +241,14 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /*
-      Return the statement at the specified index in this node's
-      "virtual" statement array.
-      @param index an index for a statement.
-      @return the statement with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the statement at the specified index in this node's "virtual" statement array.
+     *
+     * @param index an index for a statement.
+     *
+     * @return the statement with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     */
 
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
@@ -258,7 +256,7 @@ public class SynchronizedBlock extends JavaStatement
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
+
 
 
     public SourceElement getFirstElement() {
@@ -266,12 +264,14 @@ public class SynchronizedBlock extends JavaStatement
     }
 
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnSynchronizedBlock(this);
+        v.performActionOnSynchronizedBlock(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

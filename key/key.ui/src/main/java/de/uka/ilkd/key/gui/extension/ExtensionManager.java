@@ -21,8 +21,7 @@ import java.util.Set;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-public class ExtensionManager extends SettingsPanel
-        implements SettingsProvider {
+public class ExtensionManager extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 6682677093231975786L;
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
     private HashMap<JCheckBox, Extension> map;
@@ -35,9 +34,9 @@ public class ExtensionManager extends SettingsPanel
         lblSubhead.setBackground(Color.orange.darker());
 
 
-        JLabel lblExplainExperimental = new JLabel("<html>The flask marks extensions " +
-                "that are only available, <br>" +
-                "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
+        JLabel lblExplainExperimental =
+            new JLabel("<html>The flask marks extensions " + "that are only available, <br>"
+                + "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
         lblExplainExperimental.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
         pNorth.add(lblExplainExperimental);
 
@@ -58,43 +57,43 @@ public class ExtensionManager extends SettingsPanel
         keywords += lblSubhead.getText();
 
         KeYGuiExtensionFacade.getExtensions().stream()
-                .sorted(Comparator.comparingInt(it ->
-                        it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
+                .sorted(Comparator.comparingInt(
+                    it -> it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
                 .filter(it -> !it.isDisabledByMaintainer()).forEach(it -> {
-            JCheckBox box = new JCheckBox();
-            box.setText(it.getName());
-            box.setSelected(!it.isDisabled());
-            box.setEnabled(it.isOptional());
-            map.put(box, it);
+                    JCheckBox box = new JCheckBox();
+                    box.setText(it.getName());
+                    box.setSelected(!it.isDisabled());
+                    box.setEnabled(it.isOptional());
+                    map.put(box, it);
 
-            keywords += box.getText();
-            pCenter.add(new JLabel(it.isExperimental()
-                    ? IconFactory.EXPERIMENTAL_EXTENSION.get()
-                    : null), new CC().newline());
-            pCenter.add(box);
+                    keywords += box.getText();
+                    pCenter.add(
+                        new JLabel(
+                            it.isExperimental() ? IconFactory.EXPERIMENTAL_EXTENSION.get() : null),
+                        new CC().newline());
+                    pCenter.add(box);
 
-            JLabel lblProvides = new JLabel(getSupportLabel(it));
-            keywords += lblProvides.getText();
-            lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
-            pCenter.add(new JLabel(), new CC().newline());
-            pCenter.add(lblProvides);
+                    JLabel lblProvides = new JLabel(getSupportLabel(it));
+                    keywords += lblProvides.getText();
+                    lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
+                    pCenter.add(new JLabel(), new CC().newline());
+                    pCenter.add(lblProvides);
 
-            if (!it.getDescription().isEmpty()) {
-                pCenter.add(new JLabel(), new CC().newline());
-                pCenter.add(createInfoArea(it.getDescription()));
-                keywords += it.getDescription();
-            }
-        });
+                    if (!it.getDescription().isEmpty()) {
+                        pCenter.add(new JLabel(), new CC().newline());
+                        pCenter.add(createInfoArea(it.getDescription()));
+                        keywords += it.getDescription();
+                    }
+                });
     }
 
     private String getSupportLabel(Extension it) {
-        return "Provides: " +
-                (it.supportsContextMenu() ? "ContextMenu " : "") +
-                (it.supportsLeftPanel() ? "LeftPanel " : "") +
-                (it.supportsMainMenu() ? "MainMenu " : "") +
-                (it.supportsSettings() ? "Settings " : "") +
-                (it.supportsStatusLine() ? "StatusLine " : "") +
-                (it.supportsToolbar() ? "Toolbar " : "");
+        return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
+            + (it.supportsLeftPanel() ? "LeftPanel " : "")
+            + (it.supportsMainMenu() ? "MainMenu " : "")
+            + (it.supportsSettings() ? "Settings " : "")
+            + (it.supportsStatusLine() ? "StatusLine " : "")
+            + (it.supportsToolbar() ? "Toolbar " : "");
     }
 
     @Override

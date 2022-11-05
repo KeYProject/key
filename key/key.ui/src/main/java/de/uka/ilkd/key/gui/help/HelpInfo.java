@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * @version 1 (10.04.19)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 /**
  * Annotate the help page for your component.
  *

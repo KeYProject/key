@@ -26,6 +26,12 @@ public class TermLabelSettings extends AbstractSettings {
      */
     private boolean useOriginLabels = true;
 
+    /**
+     * @see #addSettingsListener(SettingsListener)
+     * @see #removeSettingsListener(SettingsListener)
+     */
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+
     @Override
     public void readSettings(Properties props) {
         String str = props.getProperty(USE_ORIGIN_LABELS);
@@ -33,10 +39,8 @@ public class TermLabelSettings extends AbstractSettings {
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
-            LOGGER.debug(
-                    "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\".\n" +
-                    "Using the default value: true." +
-                    "\nThe string read was: {}", str);
+            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
+                + "Using the default value: true." + "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -32,11 +19,11 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * This macro resolves the well-definedness transformer, i.e. it applies exactly
- * all applicable rules to resolve the operators WD and wd (which are formula/term
- * transformers). These rules all have the prefix defined in {@link #WD_PREFIX}.
- * The macro is only applicable for proof obligations created in {@link #WellDefinednessPO}
- * and the Well-Definedness branches in {@link #WhileInvariantRule} and {@link #BlockContractRule}.
+ * This macro resolves the well-definedness transformer, i.e. it applies exactly all applicable
+ * rules to resolve the operators WD and wd (which are formula/term transformers). These rules all
+ * have the prefix defined in {@link #WD_PREFIX}. The macro is only applicable for proof obligations
+ * created in {@link #WellDefinednessPO} and the Well-Definedness branches in
+ * {@link #WhileInvariantRule} and {@link #BlockContractRule}.
  *
  * @author Michael Kirsten
  */
@@ -61,16 +48,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (proof == null
-                || proof.isDisposed()
-                || !WellDefinednessCheck.isOn()) {
+        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) {
             return false;
         }
         final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
@@ -80,23 +64,24 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         if (!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
-        for (Goal goal: goals) {
+        for (Goal goal : goals) {
             Node n = goal.node();
             while (n != null) {
-                // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
+                // Applicable in a well-definedness branch (e.g. of a loop statement or a block
+                // contract)
                 if (n.getNodeInfo().getBranchLabel() != null
                         && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
                     return true;
                 }
                 n = n.parent();
             }
-        }        
+        }
         return false;
     }
 
     /**
-     * This strategy accepts all rule apps for which the rule name is a
-     * Well-Definedness rule and rejects everything else.
+     * This strategy accepts all rule apps for which the rule name is a Well-Definedness rule and
+     * rejects everything else.
      */
     private static class WellDefinednessStrategy implements Strategy {
 
@@ -113,7 +98,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(name.startsWith(WD_PREFIX)) {
+            if (name.startsWith(WD_PREFIX)) {
                 return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -132,7 +117,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
     }
 }

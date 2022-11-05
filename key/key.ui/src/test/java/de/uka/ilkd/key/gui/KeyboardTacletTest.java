@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.gui;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Alexander Weigl
@@ -22,7 +23,8 @@ public class KeyboardTacletTest {
         assertEquals(0, KeyboardTacletModel.getPrefixLength("andLeft", "impRight"));
 
 
-        List<String> keywords = Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
+        List<String> keywords =
+            Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
 
         assertEquals(3, KeyboardTacletModel.getClashFreePrefix("impLeft", keywords));
 

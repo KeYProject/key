@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
 import java.util.Properties;
@@ -19,28 +6,27 @@ import java.util.Properties;
 public class GeneralSettings extends AbstractSettings {
     /**
      * This parameter disables the possibility to prune in closed branches. It is meant as a
-     * fallback solution if storing all closed goals needs too much memory or is not needed.
-     * Pruning is disabled as a default (for command-line mode, tests, ...) and explicitly has
-     * to be enabled for interactive mode.
+     * fallback solution if storing all closed goals needs too much memory or is not needed. Pruning
+     * is disabled as a default (for command-line mode, tests, ...) and explicitly has to be enabled
+     * for interactive mode.
      */
     public static boolean noPruningClosed = true;
 
     /**
-     * If this option is set, the (Disk)FileRepo does not delete its temporary directories
-     * (can be used for debugging).
+     * If this option is set, the (Disk)FileRepo does not delete its temporary directories (can be
+     * used for debugging).
      */
     public static boolean keepFileRepos = false;
 
     /**
-     * if true then JML specifications are globally disabled
-     * in this run of KeY, regardless of the regular settings
+     * if true then JML specifications are globally disabled in this run of KeY, regardless of the
+     * regular settings
      */
     public static boolean disableSpecs = false;
 
 
     private static final String TACLET_FILTER = "[General]StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY
-            = "[General]DnDDirectionSensitive";
+    private static final String DND_DIRECTION_SENSITIVE_KEY = "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
@@ -71,16 +57,17 @@ public class GeneralSettings extends AbstractSettings {
     private boolean useJML = true;
 
     /**
-     * auto save is disabled by default.
-     * Positive values indicate save period.
+     * auto save is disabled by default. Positive values indicate save period.
      */
     private int autoSave = 0;
 
     /**
-     * If enabled, source files are cached at first use to ensure consistency between proof
-     * and source code. Toggles between SimpleFilerepo (false) and DiskFileRepo (true).
+     * If enabled, source files are cached at first use to ensure consistency between proof and
+     * source code. Toggles between SimpleFilerepo (false) and DiskFileRepo (true).
      */
     private boolean ensureSourceConsistency = true;
+
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     GeneralSettings() {
         //addSettingsListener(AutoSaver.settingsListener);
@@ -155,9 +142,8 @@ public class GeneralSettings extends AbstractSettings {
     }
 
     /**
-     * gets a Properties object and has to perform the necessary
-     * steps in order to change this object in a way that it
-     * represents the stored settings
+     * gets a Properties object and has to perform the necessary steps in order to change this
+     * object in a way that it represents the stored settings
      */
     public void readSettings(Properties props) {
         String val = props.getProperty(TACLET_FILTER);
@@ -184,7 +170,8 @@ public class GeneralSettings extends AbstractSettings {
         if (val != null) {
             try {
                 setAutoSave(Integer.parseInt(val));
-                if (autoSave < 0) setAutoSave(0);
+                if (autoSave < 0)
+                    setAutoSave(0);
             } catch (NumberFormatException e) {
                 setAutoSave(0);
             }
@@ -197,9 +184,9 @@ public class GeneralSettings extends AbstractSettings {
     }
 
     /**
-     * implements the method required by the Settings interface. The
-     * settings are written to the given Properties object. Only entries of the form
-     * <key> = <value> (,<value>)* are allowed.
+     * implements the method required by the Settings interface. The settings are written to the
+     * given Properties object. Only entries of the form
+      <key> = <value> (,<value>)* are allowed.
      *
      * @param props the Properties object where to write the settings as (key, value) pair
      */
@@ -211,5 +198,33 @@ public class GeneralSettings extends AbstractSettings {
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, "" + autoSave);
         props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
+    }
+
+    /**
+     * sends the message that the state of this setting has been changed to its registered listeners
+     * (not thread-safe)
+     */
+    protected void fireSettingsChanged() {
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new EventObject(this));
+        }
+    }
+
+    /**
+     * adds a listener to the settings object
+     *
+     * @param l the listener
+     */
+    public void addSettingsListener(SettingsListener l) {
+        listenerList.add(l);
+    }
+
+    /**
+     * removes the listener from the settings object
+     *
+     * @param l the listener to remove
+     */
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
     }
 }

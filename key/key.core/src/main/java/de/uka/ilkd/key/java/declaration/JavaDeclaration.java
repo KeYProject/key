@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.ExtList;
@@ -36,63 +23,61 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.declaration.modifier.Volatile;
 
 /**
- *  Java declaration.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Java declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
-public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
- 			              implements Declaration {
+public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
 
     /**
-     * Modifiers.
-     * caches the wrapper for the modifiers. The wrapper is needed to get access
-     * to the array without hurting immutabilitiy */
+     * Modifiers. caches the wrapper for the modifiers. The wrapper is needed to get access to the
+     * array without hurting immutabilitiy
+     */
     protected final ImmutableArray<Modifier> modArray;
 
-    
+
     /**
-     *      Java declaration.
+     * Java declaration.
      */
     public JavaDeclaration() {
-	modArray = null;
+        modArray = null;
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-	modArray = new ImmutableArray<Modifier>(mods);
+        modArray = new ImmutableArray<Modifier>(mods);
     }
 
-    
+
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-	modArray = mods;
+        modArray = mods;
     }
 
-    
+
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes. May
-     * include: several Modifier (taken as modifiers of the declaration), 
-     * a Comment
-     */     
+     *
+     * @param children the children of this AST element as KeY classes. May include: several
+     *        Modifier (taken as modifiers of the declaration), a Comment
+     */
     public JavaDeclaration(ExtList children) {
-	super(children);
-	modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
+        super(children);
+        modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
     }
 
 
     /**
-     *      Get modifiers.
-     *      @return the modifier array wrapper.
+     * Get modifiers.
+     *
+     * @return the modifier array wrapper.
      */
     public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 
-    
+
     /**
-     *      Returns a Public, Protected, or Private Modifier, if there
-     *      is one, null otherwise. A return value of null can usually be
-     *      interpreted as package visibility.
+     * Returns a Public, Protected, or Private Modifier, if there is one, null otherwise. A return
+     * value of null can usually be interpreted as package visibility.
      */
     public VisibilityModifier getVisibilityModifier() {
         if (modArray == null) {
@@ -101,7 +86,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
             Modifier m = modArray.get(i);
             if (m instanceof VisibilityModifier) {
-                return (VisibilityModifier)m;
+                return (VisibilityModifier) m;
             }
         }
         return null;
@@ -118,7 +103,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return false;
     }
 
-    
+
     /**
      * Test whether the declaration is abstract.
      */
@@ -126,7 +111,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Abstract.class);
     }
 
-    
+
     /**
      * Test whether the declaration is private.
      */
@@ -134,7 +119,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Private.class);
     }
 
-    
+
     /**
      * Test whether the declaration is protected.
      */
@@ -142,7 +127,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Protected.class);
     }
 
-    
+
     /**
      * Test whether the declaration is public.
      */
@@ -150,7 +135,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Public.class);
     }
 
-    
+
     /**
      * Test whether the declaration is static.
      */
@@ -158,7 +143,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Static.class);
     }
 
-    
+
     /**
      * Test whether the declaration is transient.
      */
@@ -166,7 +151,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Transient.class);
     }
 
-    
+
     /**
      * Test whether the declaration is model (the jml modifier is meant).
      */
@@ -178,11 +163,15 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Get the state count of the declaration
      */
     protected int getStateCount() {
-        if(containsModifier(TwoState.class)) { return 2; }
-        if(containsModifier(NoState.class)) { return 0; }
+        if (containsModifier(TwoState.class)) {
+            return 2;
+        }
+        if (containsModifier(NoState.class)) {
+            return 0;
+        }
         return 1;
     }
-   
+
     /**
      * Test whether the declaration is ghost (the jml modifier is meant).
      */
@@ -190,7 +179,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Ghost.class);
     }
 
-    
+
     /**
      * Test whether the declaration is volatile.
      */
@@ -198,7 +187,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Volatile.class);
     }
 
-    
+
     /**
      * Test whether the declaration is strictfp.
      */
@@ -206,7 +195,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(StrictFp.class);
     }
 
-    
+
     /**
      * Test whether the declaration is final.
      */
@@ -214,7 +203,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Final.class);
     }
 
-    
+
     /**
      * Test whether the declaration is native.
      */
@@ -222,7 +211,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Native.class);
     }
 
-    
+
     /**
      * Test whether the declaration is synchronized.
      */

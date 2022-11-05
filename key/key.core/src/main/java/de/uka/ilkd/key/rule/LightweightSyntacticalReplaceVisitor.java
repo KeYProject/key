@@ -1,21 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 /**
- * visitor for <t> execPostOrder </t> of
- * {@link de.uka.ilkd.key.logic.Term}. Called with that method
- * on a term, the visitor builds a new term replacing SchemaVariables with their
- * instantiations that are given as a SVInstantiations object.
+ * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
+ * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
+ * are given as a SVInstantiations object.
  */
 package de.uka.ilkd.key.rule;
 
@@ -46,15 +32,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
 /**
- * A lightweight version of {@link SyntacticalReplaceVisitor} which does not
- * replace labels. This saves a lot of dependencies to {@link Goal},
- * {@link RuleApp}, {@link PosInOccurrence} etc. and is therefore useful for
- * internal computations not having access to all these objects. Since labels
+ * A lightweight version of {@link SyntacticalReplaceVisitor} which does not replace labels. This
+ * saves a lot of dependencies to {@link Goal}, {@link RuleApp}, {@link PosInOccurrence} etc. and is
+ * therefore useful for internal computations not having access to all these objects. Since labels
  * are not refactored, this class is *not* useful for rule applications etc.
  *
- * Note that this class is basically a stripped-down copy of
- * {@link SyntacticalReplaceVisitor}, so problems in that class would carry over
- * to this one...
+ * Note that this class is basically a stripped-down copy of {@link SyntacticalReplaceVisitor}, so
+ * problems in that class would carry over to this one...
  *
  * @author Dominic Steinhoefel
  */
@@ -65,25 +49,22 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private Term computedResult = null;
 
     /**
-     * the stack contains the subterms that will be added in the next step of
-     * execPostOrder in Term in order to build the new term. A boolean value
-     * between or under the subterms on the stack indicate that a term using
-     * these subterms should build a new term instead of using the old one,
-     * because one of its subterms has been built, too.
+     * the stack contains the subterms that will be added in the next step of execPostOrder in Term
+     * in order to build the new term. A boolean value between or under the subterms on the stack
+     * indicate that a term using these subterms should build a new term instead of using the old
+     * one, because one of its subterms has been built, too.
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = new Boolean(true);
     private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
     /**
-     * constructs a term visitor replacing any occurrence of a schemavariable
-     * found in {@code svInst} by its instantiation
+     * constructs a term visitor replacing any occurrence of a schemavariable found in
+     * {@code svInst} by its instantiation
      *
-     * @param svInst
-     *     mapping of schemavariables to their instantiation
+     * @param svInst mapping of schemavariables to their instantiation
      * @param localSpecRepo TODO
-     * @param services
-     *     the Services
+     * @param services the Services
      */
     public LightweightSyntacticalReplaceVisitor(SVInstantiations svInst, Services services) {
         this.services = services;
@@ -99,14 +80,12 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private JavaProgramElement addContext(StatementBlock pe) {
         final ContextInstantiationEntry cie = svInst.getContextInstantiation();
         if (cie == null) {
-            throw new IllegalStateException(
-                    "Context should also be instantiated");
+            throw new IllegalStateException("Context should also be instantiated");
         }
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                    (JavaNonTerminalProgramElement) cie.contextProgram(), pe,
-                    cie.getInstantiation());
+                (JavaNonTerminalProgramElement) cie.contextProgram(), pe, cie.getInstantiation());
         }
 
         return pe;
@@ -122,9 +101,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor(
-                    new StatementBlock(
-                            ((ContextStatementBlock) jb.program()).getBody()), // TODO
-                    services, svInst);
+                new StatementBlock(((ContextStatementBlock) jb.program()).getBody()), // TODO
+                services, svInst);
             trans.start();
             result = addContext((StatementBlock) trans.result());
         } else {
@@ -132,8 +110,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             trans.start();
             result = trans.result();
         }
-        return (result == jb.program()) ? jb
-                : JavaBlock.createJavaBlock((StatementBlock) result);
+        return (result == jb.program()) ? jb : JavaBlock.createJavaBlock((StatementBlock) result);
     }
 
     private Term[] neededSubs(int n) {
@@ -162,8 +139,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
     /**
      * the method is only still invoked to allow the
-     * {@link ConstraintAwareSyntacticalReplaceVisitor} to recursively replace
-     * meta variables
+     * {@link ConstraintAwareSyntacticalReplaceVisitor} to recursively replace meta variables
      */
     protected Term toTerm(Term o) {
         return o;
@@ -172,8 +148,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst
-                    .getInstantiation((SchemaVariable) originalLhs);
+            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
             if (lhsInst instanceof Term) {
                 lhsInst = ((Term) lhsInst).op();
             }
@@ -183,12 +158,10 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 newLhs = (UpdateableOperator) lhsInst;
             } else {
                 assert false : "not updateable: " + lhsInst;
-                throw new IllegalStateException(
-                        "Encountered non-updateable operator " + lhsInst
-                                + " on left-hand side of update.");
+                throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
+                    + " on left-hand side of update.");
             }
-            return newLhs == originalLhs ? op
-                    : ElementaryUpdate.getInstance(newLhs);
+            return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs);
         } else {
             return op;
         }
@@ -201,21 +174,20 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
-            instantiatedOp = handleSortDependingSymbol(
-                    (SortDependingFunction) p_operatorToBeInstantiated);
+            instantiatedOp =
+                handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
-            instantiatedOp = instantiateElementaryUpdate(
-                    (ElementaryUpdate) p_operatorToBeInstantiated);
+            instantiatedOp =
+                instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof ModalOperatorSV) {
-            instantiatedOp = instantiateOperatorSV(
-                    (ModalOperatorSV) p_operatorToBeInstantiated);
+            instantiatedOp = instantiateOperatorSV((ModalOperatorSV) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (p_operatorToBeInstantiated instanceof ProgramSV
                     && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else {
-                instantiatedOp = (Operator) svInst.getInstantiation(
-                        (SchemaVariable) p_operatorToBeInstantiated);
+                instantiatedOp =
+                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
             }
         }
         assert instantiatedOp != null;
@@ -223,23 +195,20 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable>
-            instantiateBoundVariables(Term visited) {
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
         ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
-            final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars
-                    .size()];
+            final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {
                     final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
-                    final Term instantiationForBoundSchemaVariable = (Term) svInst
-                            .getInstantiation(boundSchemaVariable);
+                    final Term instantiationForBoundSchemaVariable =
+                        (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
-                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable
-                                .op();
+                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
                     } else {
                         // this case may happen for PO generation of taclets
                         boundVar = (QuantifiableVariable) boundSchemaVariable;
@@ -257,8 +226,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     /**
-     * performs the syntactic replacement of schemavariables with their
-     * instantiations
+     * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
     public void visit(final Term visited) {
@@ -266,11 +234,9 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp)
-                        .isListSV())))) {
-            final Term newTerm = toTerm(
-                    svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                            svInst.getExecutionContext(), services));
+                && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV())))) {
+            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
+                svInst.getExecutionContext(), services));
             pushNew(newTerm);
         } else {
             final Operator newOp = instantiateOperator(visitedOp);
@@ -287,15 +253,14 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = //
-                    instantiateBoundVariables(visited);
+                instantiateBoundVariables(visited);
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp.arity());
-            if (boundVars != visited.boundVars() || jblockChanged
-                    || (newOp != visitedOp)
+            if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs,
-                        boundVars, jb, visited.getLabels());
+                final Term newTerm =
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t = resolveSubst(visited);
@@ -310,12 +275,12 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn();
 
-        final Sort realDepSort = svInst.getGenericSortInstantiations()
-                .getRealSort(depSort, services);
+        final Sort realDepSort =
+            svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
         final Operator res = depOp.getInstanceFor(realDepSort, services);
-        assert res != null : "Did not find instance of symbol " + depOp
-                + " for sort " + realDepSort;
+        assert res != null
+                : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
     }
 
@@ -356,13 +321,12 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     /**
-     * this method is called in execPreOrder and execPostOrder in class Term
-     * when leaving the subtree rooted in the term subtreeRoot. Default
-     * implementation is to do nothing. Subclasses can override this method when
-     * the visitor behaviour depends on informations bound to subtrees.
+     * this method is called in execPreOrder and execPostOrder in class Term when leaving the
+     * subtree rooted in the term subtreeRoot. Default implementation is to do nothing. Subclasses
+     * can override this method when the visitor behaviour depends on informations bound to
+     * subtrees.
      *
-     * @param subtreeRoot
-     *     root of the subtree which the visitor leaves.
+     * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
     public void subtreeLeft(Term subtreeRoot) {
@@ -370,7 +334,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = //
-                    mop.transform((Term) subStack.pop(), svInst, services);
+                mop.transform((Term) subStack.pop(), svInst, services);
             pushNew(newTerm);
         }
     }

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -25,8 +12,8 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 
 /**
- * Feature for checking if the term of the first projection contains the
- * term of the second projection.
+ * Feature for checking if the term of the first projection contains the term of the second
+ * projection.
  */
 public class ContainsTermFeature implements Feature {
 
@@ -42,31 +29,25 @@ public class ContainsTermFeature implements Feature {
 
 
     /**
-     * @param proj        the ProjectionToTerm to the instantiation is supposed
-     *                    to be inspected
+     * @param proj the ProjectionToTerm to the instantiation is supposed to be inspected
      * @param termFeature the term feature to use
-     * @param noInstCost  result if <code>schemaVar</code> is not instantiated
-     * @param demandInst  if <code>true</code> then raise an exception if
-     *                    <code>schemaVar</code> is not instantiated (otherwise:
-     *                    return <code>noInstCost</code>)
+     * @param noInstCost result if <code>schemaVar</code> is not instantiated
+     * @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
+     *        not instantiated (otherwise: return <code>noInstCost</code>)
      */
-    private ContainsTermFeature(ProjectionToTerm proj1,
-                                ProjectionToTerm proj2) {
+    private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         this.proj1 = proj1;
         this.proj2 = proj2;
     }
 
 
-    public static Feature create(ProjectionToTerm proj1,
-                                 ProjectionToTerm proj2) {
+    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app,
-                               PosInOccurrence pos,
-                               Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);
         final Term t2 = proj2.toTerm(app, pos, goal);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);

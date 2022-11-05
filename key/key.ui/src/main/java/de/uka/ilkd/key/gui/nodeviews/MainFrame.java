@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -29,8 +16,7 @@ import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
- * Central part of MainWindow. Its main purpose is to serve as container for
- * SequentView instances.
+ * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.
  *
  * @author Kai Wallisch
  */
@@ -98,18 +84,15 @@ public final class MainFrame extends JPanel {
             }
 
             @Override
-            public void ancestorMoved(AncestorEvent event) { }
+            public void ancestorMoved(AncestorEvent event) {}
 
             @Override
-            public void ancestorAdded(AncestorEvent event) { }
+            public void ancestorAdded(AncestorEvent event) {}
         });
 
         // FIXME put this somewhere descent
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(
-                        KeyEvent.VK_C,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                        "copy");
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);

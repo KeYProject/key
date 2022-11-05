@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
@@ -30,31 +17,26 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
 
     public TextualJMLMethodDecl(ImmutableList<String> mods,
-                                JmlParser.Method_declarationContext methodDefinition) {
+            JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
     }
 
     public String getParsableDeclaration() {
-        String m = mods.stream()
-                .map(it -> {
-                    if (JMLTransformer.javaMods.contains(it)) {
-                        return it;
-                    } else {
-                        return StringUtil.repeat(" ", it.length());
-                    }
-                })
-                .collect(Collectors.joining(" "));
+        String m = mods.stream().map(it -> {
+            if (JMLTransformer.javaMods.contains(it)) {
+                return it;
+            } else {
+                return StringUtil.repeat(" ", it.length());
+            }
+        }).collect(Collectors.joining(" "));
 
-        String paramsString = methodDefinition.param_list().param_decl()
-                .stream()
-                .map(it -> it.t.getText() +
-                        StringUtil.repeat("[]", it.RBRACKET().size()) +
-                        " " + it.p.getText())
+        String paramsString = methodDefinition.param_list().param_decl().stream()
+                .map(it -> it.typespec().getText() + " " + it.p.getText()
+                    + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
-        return String.format("%s %s %s (%s);",
-                m, methodDefinition.type().getText(),
-                getMethodName(), paramsString);
+        return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
+            getMethodName(), paramsString);
     }
 
     public JmlParser.Method_declarationContext getDecl() {
@@ -76,8 +58,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }

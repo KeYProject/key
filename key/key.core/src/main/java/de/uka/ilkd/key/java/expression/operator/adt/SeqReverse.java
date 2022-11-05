@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -30,38 +17,38 @@ public class SeqReverse extends Operator {
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return PREFIX;
     }
 
 
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqReverse(this);
+        v.performActionOnSeqReverse(this);
     }
 
 
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqReverse(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 1;
+        return 1;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }
 }

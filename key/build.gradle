@@ -21,6 +21,9 @@ plugins {
 
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"
+
+    // Code formatting
+    id "com.diffplug.spotless" version "6.11.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -59,28 +62,14 @@ sonarqube {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
+
+    apply plugin: "com.diffplug.spotless"
 
     group = rootProject.group
     version = rootProject.version
@@ -97,20 +86,27 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:1.7.32")
-        testImplementation("org.slf4j:slf4j-simple:1.7.32")
+        testImplementation("ch.qos.logback:logback-classic:1.2.10")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
-        testImplementation 'junit:junit:4.13.2'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+        testCompileOnly 'junit:junit:4.13.2'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+
         testImplementation project(':key.util')
     }
 
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-	// Setting the release to Java 11
-	options.release = 11
+        // Setting the release to Java 11
+        options.release = 11
     }
 
     tasks.withType(Javadoc) {
@@ -137,31 +133,39 @@ subprojects {
         maxParallelForks = 1 // weigl: test on master
     }
 
-    test {
-        // TODO consider moving this to key.core where it is repeated ...
-        // weigl: This has to be here. We repeat this in key.core because I was not sure whether
-        // it gets overwritten or not on a redeclaration of `test'.
+    tasks.withType(Test) {
+        useJUnitPlatform {
+            includeEngines 'junit-vintage'
+            includeEngines 'junit-jupiter'
+        }
+    }
 
-        useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
+
+
+    test {
+        // Before we switched to JUnit 5, we used JUnit 4 with a customized discovery of test class.
+        // This discovery called AutoSuite and searched in the compiled classes. AutoSuite was
+        // necessary due to bugs caused in some execution order.
+        // AutoSuites made the test order deterministic. A last known commit to find AutoSuite (for the case),
+        // is 980294d04008f6b3798986bce218bac2753b4783.
+
+        useJUnitPlatform {
+            excludeTags "owntest", "interactive", "performance"
         }
 
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
-        
+
         testLogging {
-           outputs.upToDateWhen {false}
+            outputs.upToDateWhen { false }
             showStandardStreams = true
         }
     }
 
     task testFast(type: Test) {
         group "verification"
-        useJUnit {
-            // CAUTION! These settings do not affect :key.core since the
-            // detection mechanism is different there.
-            excludeCategories 'org.key_project.util.testcategories.Slow'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        useJUnitPlatform {
+            excludeTags "slow", "performance", "interactive"
         }
 
         testLogging {
@@ -263,19 +267,19 @@ subprojects {
         repositories {
             maven {
                 name = "GitlabPackages"
-		url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
                 credentials(HttpHeaderCredentials) {
                     if(System.getenv("TOKEN") != null) {
-			name = 'Private-Token'
-		        value = System.getenv("TOKEN")
-                    }else{
+                        name = 'Private-Token'
+                        value = System.getenv("TOKEN")
+                    } else {
                         name = 'Job-Token'
                         value = System.getenv("CI_JOB_TOKEN")
                     }
-		}
-		authentication {
-		    header(HttpHeaderAuthentication)
-		}
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
         }
     }
@@ -303,6 +307,52 @@ subprojects {
             }
         }
     }
+
+
+    spotless {
+        // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
+
+        // optional: limit format enforcement to just the files changed by this feature branch
+        // ratchetFrom 'origin/master'
+
+        format('Key') {
+            // define the files to apply `misc` to
+            //target '*.gradle', '*.md', '.gitignore'
+            target 'src/main/resources/**/*.key'
+            trimTrailingWhitespace()
+            //indentWithSpaces(4)       // this does not really work
+            endWithNewline()
+            // TODO: license headers are problematic at the moment,
+            //  see https://git.key-project.org/key/key/-/wikis/KaKeY%202022-09-30
+            //licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
+        }
+
+        antlr4 {
+            target 'src/*/antlr4/**/*.g4' // default value, you can change if you want
+            //licenseHeaderFile "$rootDir/gradle/header"
+        }
+
+        java {
+            //target("*.java")
+            // don't need to set target, it is inferred from java
+
+            // We ignore the build folder to avoid double checks and checks of generated code.
+            targetExclude 'build/**'
+
+            // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            toggleOffOn()
+
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            trimTrailingWhitespace()        // not sure how to set this in the xml file ...
+            //googleJavaFormat().aosp().reflowLongStrings()
+
+            // specific delimiter: normally just 'package', but spotless crashes for files in default package
+            // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
+            // with completely commented out code (which would probably better just be removed in future).
+            //licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+        }
+    }
+
 }
 
 task start {
@@ -335,12 +385,12 @@ task alldoc(type: Javadoc) {
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
-        bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        bottom = "Copyright &copy; 2003-2022 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
-        links += 'http://download.oracle.com/javase/8/docs/api/'
+        links += "https://docs.oracle.com/en/java/javase/11/docs/api/"
         links += "http://www.antlr2.org/javadoc/"
         links += "http://www.antlr3.org/api/Java/"
-        links += "http://recoder.sourceforge.net/doc/api/"
+        links += "https://www.antlr.org/api/Java/"
     }
 }
 

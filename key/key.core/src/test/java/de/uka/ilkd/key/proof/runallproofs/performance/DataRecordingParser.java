@@ -13,7 +13,8 @@ public class DataRecordingParser extends ProofCollectionParser {
     }
 
     @Override
-    public DataRecordingTestFile getTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) {
+    public DataRecordingTestFile getTestFile(TestProperty testProperty, String path,
+            ProofCollectionSettings settings) {
         return new DataRecordingTestFile(testProperty, path, settings);
     }
 }

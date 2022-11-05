@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.translation;
 
 import org.key_project.util.collection.ImmutableList;
@@ -26,22 +13,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Wraps a list of expressions.
  */
 public final class SLParameters {
-    
+
     private final ImmutableList<SLExpression> parameters;
 
     public SLParameters(ImmutableList<SLExpression> parameters) {
         this.parameters = parameters;
     }
-    
-    
+
+
     public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
-    
-    
+
+
     public boolean isListOfTerm() {
-	for(SLExpression expr : parameters) {
-            if(!expr.isTerm()) {
+        for (SLExpression expr : parameters) {
+            if (!expr.isTerm()) {
                 return false;
             }
         }
@@ -56,7 +43,7 @@ public final class SLParameters {
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-        for(SLExpression expr : parameters) {
+        for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {
                 final Term term = expr.getTerm();
@@ -67,7 +54,7 @@ public final class SLParameters {
                 }
             }
             result = result.append(type);
-        }        
+        }
         return result;
     }
 

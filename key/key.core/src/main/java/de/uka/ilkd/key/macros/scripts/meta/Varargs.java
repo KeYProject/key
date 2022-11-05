@@ -13,5 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Varargs {
     Class<?> as() default String.class;
+
     String prefix() default "";
 }

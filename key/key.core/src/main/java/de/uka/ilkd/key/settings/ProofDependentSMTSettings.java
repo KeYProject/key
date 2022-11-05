@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
 
@@ -74,8 +61,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     }
 
 
-    private static final ProofDependentSMTSettings DEFAULT_DATA =
-            new ProofDependentSMTSettings();
+    private static final ProofDependentSMTSettings DEFAULT_DATA = new ProofDependentSMTSettings();
 
     public static ProofDependentSMTSettings getDefaultSettingsData() {
         return DEFAULT_DATA.clone();
@@ -110,10 +96,12 @@ public class ProofDependentSMTSettings extends AbstractSettings {
         SettingsConverter.store(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
         SettingsConverter.store(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
         SettingsConverter.store(props, MAX_GENERIC_SORTS, maxGenericSorts);
-        SettingsConverter.store(props, TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets());
+        SettingsConverter.store(props, TACLET_SELECTION,
+            supportedTaclets.getNamesOfSelectedTaclets());
         SettingsConverter.store(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
         SettingsConverter.store(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
-        SettingsConverter.store(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers);
+        SettingsConverter.store(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
+            useConstantsForIntegers);
         SettingsConverter.store(props, INTEGERS_MAXIMUM, maxInteger);
         SettingsConverter.store(props, INTEGERS_MINIMUM, minInteger);
         SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);

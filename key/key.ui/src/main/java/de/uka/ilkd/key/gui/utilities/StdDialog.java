@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Dimension;
@@ -28,18 +15,16 @@ import javax.swing.JOptionPane;
 
 
 /**
- * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel.
- * The content of the dialog is passed to the dialog by the constructor of the class.
- * You can access the three buttons (in order to add some action listeners) by:
- * <code>getOkButton()</code>
- * <code>getCancelButton()</code>
- * <code>getHelpButton()</code>
- * 
- * 
+ * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel. The
+ * content of the dialog is passed to the dialog by the constructor of the class. You can access the
+ * three buttons (in order to add some action listeners) by: <code>getOkButton()</code>
+ * <code>getCancelButton()</code> <code>getHelpButton()</code>
+ *
+ *
  * If you want to see how the dialog looks like execute the method <code>main</code> at the bottom
  * of this file.
  */
-public class StdDialog extends JDialog{
+public class StdDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JButton helpButton;
@@ -47,22 +32,22 @@ public class StdDialog extends JDialog{
     private JButton cancelButton;
     private boolean okButtonHasBeenPressed = false;
     private boolean cancelButtonHasBeenPressed = false;
-    private Box     contentBox; 
-    
-    public StdDialog(String title, int strut, boolean helpButton){
-        this(title,null,strut,helpButton);
+    private Box contentBox;
+
+    public StdDialog(String title, int strut, boolean helpButton) {
+        this(title, null, strut, helpButton);
     }
-    
+
     public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
-        this.setLocationByPlatform(true);       
+        this.setLocationByPlatform(true);
         this.setTitle(title);
         this.setModal(true);
-        //content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         Box vertBox = Box.createVerticalBox();
         Box horzBox = Box.createHorizontalBox();
-        
+
         vertBox.add(Box.createVerticalStrut(strut));
-        
+
         horzBox.add(Box.createHorizontalStrut(strut));
         horzBox.add(getContentBox());
         horzBox.add(Box.createHorizontalGlue());
@@ -71,7 +56,7 @@ public class StdDialog extends JDialog{
         vertBox.add(Box.createVerticalStrut(strut));
         horzBox = Box.createHorizontalBox();
         horzBox.add(Box.createHorizontalStrut(strut));
-        if(helpButton) {
+        if (helpButton) {
             horzBox.add(getHelpButton());
             horzBox.add(Box.createHorizontalStrut(strut));
         }
@@ -81,71 +66,69 @@ public class StdDialog extends JDialog{
         horzBox.add(getCancelButton());
         horzBox.add(Box.createHorizontalStrut(strut));
         vertBox.add(horzBox);
-      
-        vertBox.add(Box.createVerticalStrut(strut));        
+
+        vertBox.add(Box.createVerticalStrut(strut));
         this.getContentPane().add(vertBox);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                getCancelButton().doClick();                
+                getCancelButton().doClick();
             }
         });
-        if(content != null){
+        if (content != null) {
             setContent(content);
-        }else{
+        } else {
             this.pack();
         }
     }
-    public void setContent(JComponent content){
+
+    public void setContent(JComponent content) {
         getContentBox().removeAll();
         getContentBox().add(content);
-        content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        content.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         this.pack();
     }
-    
-    
 
-    
 
-    
+
     public boolean okButtonHasBeenPressed() {
         return okButtonHasBeenPressed;
     }
-    
+
     public boolean cancelButtonHasBeenPressed() {
         return cancelButtonHasBeenPressed;
     }
-    
+
     public JButton getHelpButton() {
-        if(helpButton == null){
+        if (helpButton == null) {
             helpButton = new JButton("Help");
         }
         return helpButton;
     }
-    
+
     public JButton getOkButton() {
-        if(okButton == null) {
+        if (okButton == null) {
             okButton = new JButton("OK");
             okButton.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     okButtonHasBeenPressed = true;
                     StdDialog.this.dispose();
-                    
+
                 }
             });
             okButton.setMnemonic(KeyEvent.VK_O);
         }
         return okButton;
     }
-    
+
     public JButton getCancelButton() {
-        if(cancelButton == null){
+        if (cancelButton == null) {
             cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     cancelButtonHasBeenPressed = true;
@@ -156,19 +139,19 @@ public class StdDialog extends JDialog{
         }
         return cancelButton;
     }
-    
-    private Box getContentBox(){
-        if(contentBox == null){
+
+    private Box getContentBox() {
+        if (contentBox == null) {
             contentBox = Box.createVerticalBox();
-            contentBox.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+            contentBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         }
         return contentBox;
     }
-    
-    public static void main(String [] args) {
-        final StdDialog dialog = new StdDialog("Test",new JButton("Test"), 5,true);
+
+    public static void main(String[] args) {
+        final StdDialog dialog = new StdDialog("Test", new JButton("Test"), 5, true);
         dialog.getOkButton().addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 JOptionPane.showMessageDialog(dialog, "OK");
@@ -177,6 +160,6 @@ public class StdDialog extends JDialog{
         dialog.setModal(true);
         dialog.setVisible(true);
     }
-    
+
 
 }

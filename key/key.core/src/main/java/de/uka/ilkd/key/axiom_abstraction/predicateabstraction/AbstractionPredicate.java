@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -40,14 +27,12 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * Interface for predicates used for predicate abstraction. An abstraction
- * predicate is a mapping from program variables or constants to formulae
- * instantiated for the respective variable.
+ * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
+ * from program variables or constants to formulae instantiated for the respective variable.
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractionPredicate
-        implements Function<Term, Term>, Named {
+public abstract class AbstractionPredicate implements Function<Term, Term>, Named {
 
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
@@ -55,8 +40,8 @@ public abstract class AbstractionPredicate
     private Sort argSort;
 
     /**
-     * The predicate term. Contains a placeholder ({@link #placeholderVariable})
-     * which is to be replaced by the concrete argument of the predicate.
+     * The predicate term. Contains a placeholder ({@link #placeholderVariable}) which is to be
+     * replaced by the concrete argument of the predicate.
      * <p>
      *
      * This field is needed to save proofs with abstraction predicates.
@@ -64,9 +49,8 @@ public abstract class AbstractionPredicate
     private Term predicateFormWithPlaceholder = null;
 
     /**
-     * The placeholder variable occurring in
-     * {@link #predicateFormWithPlaceholder} which is to be replaced by the
-     * concrete argument of the predicate.
+     * The placeholder variable occurring in {@link #predicateFormWithPlaceholder} which is to be
+     * replaced by the concrete argument of the predicate.
      * <p>
      *
      * This field is needed to save proofs with abstraction predicates.s
@@ -74,66 +58,56 @@ public abstract class AbstractionPredicate
     private LocationVariable placeholderVariable = null;
 
     /**
-     * Creates a new {@link AbstractionPredicate}. Constructor is hidden since
-     * elements fo this class should be created by the factory method
-     * {@link #create(String, Function)}.
+     * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
+     * class should be created by the factory method {@link #create(String, Function)}.
      *
-     * @param argSort
-     *            The expected sort for the arguments of the predicate.
+     * @param argSort The expected sort for the arguments of the predicate.
      */
     private AbstractionPredicate(Sort argSort) {
         this.argSort = argSort;
     }
 
     /**
-     * @return The placeholder variable and the function term that this
-     *         predicate has been constructed with.
+     * @return The placeholder variable and the function term that this predicate has been
+     *         constructed with.
      */
     public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
-        return new Pair<LocationVariable, Term>(placeholderVariable,
-                predicateFormWithPlaceholder);
+        return new Pair<LocationVariable, Term>(placeholderVariable, predicateFormWithPlaceholder);
     }
 
     /**
-     * Creates a new {@link AbstractionPredicate} with the given name and
-     * mapping. You may use nice Java 8 lambdas for the second argument!
+     * Creates a new {@link AbstractionPredicate} with the given name and mapping. You may use nice
+     * Java 8 lambdas for the second argument!
      * <p>
      *
      * This method has been created for testing purposes; you should rather user
      * {@link #create(Term, LocationVariable, Services)} instead.
      *
-     * @param argSort
-     *            The expected sort for the arguments of the predicate.
-     * @param mapping
-     *            The mapping from input terms of the adequate type to formulae,
-     *            e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
-     *            {@link TermBuilder}.
-     * @param services
-     *            The services object.
+     * @param argSort The expected sort for the arguments of the predicate.
+     * @param mapping The mapping from input terms of the adequate type to formulae, e.g. "(Term
+     *        input) -> (tb.gt(input, tb.zero()))" where tb is a {@link TermBuilder}.
+     * @param services The services object.
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
             final Function<Term, Term> mapping, Services services) {
-        LocationVariable placeholder = MergeRuleUtils
-                .getFreshLocVariableForPrefix("_ph", argSort, services);
+        LocationVariable placeholder =
+            MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort, services);
 
-        return create(mapping.apply(services.getTermBuilder().var(placeholder)),
-                placeholder, services);
+        return create(mapping.apply(services.getTermBuilder().var(placeholder)), placeholder,
+            services);
     }
 
     /**
-     * Creates a new {@link AbstractionPredicate} for the given predicate. The
-     * predicate should contain the given placeholder variable, which is
-     * substituted by the argument supplied to the generated mapping.
+     * Creates a new {@link AbstractionPredicate} for the given predicate. The predicate should
+     * contain the given placeholder variable, which is substituted by the argument supplied to the
+     * generated mapping.
      *
-     * @param predicate
-     *            The predicate formula containing the placeholder.
-     * @param placeholder
-     *            The placeholder to replace in the generated mapping.
-     * @param services
-     *            The services object.
-     * @return An abstraction predicate mapping terms to the predicate with the
-     *         placeholder substituted by the respective term.
+     * @param predicate The predicate formula containing the placeholder.
+     * @param placeholder The placeholder to replace in the generated mapping.
+     * @param services The services object.
+     * @return An abstraction predicate mapping terms to the predicate with the placeholder
+     *         substituted by the respective term.
      */
     public static AbstractionPredicate create(final Term predicate,
             final LocationVariable placeholder, Services services) {
@@ -142,8 +116,7 @@ public abstract class AbstractionPredicate
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name(
-                    "abstrPred_" + predicate.op().toString());
+            private final Name name = new Name("abstrPred_" + predicate.op().toString());
             private Function<Term, Term> mapping = null;
 
             @Override
@@ -151,14 +124,12 @@ public abstract class AbstractionPredicate
                 if (mapping == null) {
                     mapping = (Term param) -> {
                         if (param.sort() != fInputSort) {
-                            throw new IllegalArgumentException(
-                                    "Input must be of sort \"" + fInputSort
-                                            + "\", given: \"" + param.sort()
-                                            + "\".");
+                            throw new IllegalArgumentException("Input must be of sort \""
+                                + fInputSort + "\", given: \"" + param.sort() + "\".");
                         }
 
-                        return OpReplacer.replace(tb.var(placeholder), param,
-                                predicate, tf, services.getProof());
+                        return OpReplacer.replace(tb.var(placeholder), param, predicate, tf,
+                            services.getProof());
                     };
                 }
 
@@ -203,27 +174,22 @@ public abstract class AbstractionPredicate
     }
 
     /**
-     * Returns a parseable String representation of this abstraction predicate
-     * of the form "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
+     * Returns a parseable String representation of this abstraction predicate of the form
+     * "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
      *
-     * @param services
-     *            The services object.
+     * @param services The services object.
      * @return A parseable String representation of this predicate.
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder = getPredicateFormWithPlaceholder();
+        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+            getPredicateFormWithPlaceholder();
 
-        sb.append("(").append("'")
-                .append(predicateFormWithPlaceholder.first.sort()).append(" ")
+        sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
-                .append(OutputStreamProofSaver
-                        .escapeCharacters(OutputStreamProofSaver
-                                .printAnything(
-                                        predicateFormWithPlaceholder.second,
-                                        services, false)
-                                .toString().trim()
-                                .replaceAll("(\\r|\\n|\\r\\n)+", "")))
+                .append(OutputStreamProofSaver.escapeCharacters(OutputStreamProofSaver
+                        .printAnything(predicateFormWithPlaceholder.second, services, false)
+                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
 
         return sb.toString();
@@ -232,23 +198,16 @@ public abstract class AbstractionPredicate
     /**
      * Parses the String representation of an abstraction predicates.
      *
-     * @param s
-     *            {@link String} to parse.
-     * @param services
-     *            The {@link Services} object.
-     * @param localNamespaces
-     *            The local {@link NamespaceSet}.
+     * @param s {@link String} to parse.
+     * @param services The {@link Services} object.
+     * @param localNamespaces The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
-     * @throws ParserException
-     *             If there is a syntax error.
-     * @throws NameAlreadyBoundException
-     *             If the given placeholder is already known to the system.
-     * @throws SortNotKnownException
-     *             If the given sort is not known to the system.
+     * @throws ParserException If there is a syntax error.
+     * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
+     * @throws SortNotKnownException If the given sort is not known to the system.
      */
-    public static List<AbstractionPredicate> fromString(final String s,
-            final Services services, NamespaceSet localNamespaces)
-            throws ParserException {
+    public static List<AbstractionPredicate> fromString(final String s, final Services services,
+            NamespaceSet localNamespaces) throws ParserException {
         final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
 
         Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
@@ -259,9 +218,8 @@ public abstract class AbstractionPredicate
             matched = true;
 
             for (int i = 1; i < m.groupCount(); i += 2) {
-                assert i + 1 <= m
-                        .groupCount() : "Wrong format of join abstraction predicates: "
-                                + "There should always be pairs of placeholders and predicate terms.";
+                assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
+                    + "There should always be pairs of placeholders and predicate terms.";
 
                 final String phStr = m.group(i);
                 final String predStr = m.group(i + 1);
@@ -271,24 +229,20 @@ public abstract class AbstractionPredicate
                 ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
-                Namespace<IProgramVariable> variables = services.getNamespaces()
-                        .programVariables();
+                Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
                 if (variables.lookup(ph.second) == null) {
-                    variables.add(new LocationVariable(
-                            new ProgramElementName(ph.second.toString()),
-                            ph.first));
+                    variables.add(new LocationVariable(new ProgramElementName(ph.second.toString()),
+                        ph.first));
                 }
 
                 // Parse the predicate
                 result.add(MergeRuleUtils.parsePredicate(predStr,
-                        MergeRuleUtils.singletonArrayList(ph), localNamespaces,
-                        services));
+                    MergeRuleUtils.singletonArrayList(ph), localNamespaces, services));
             }
         }
 
         if (!matched) {
-            throw new ParserException(
-                    "Wrong format of join abstraction predicates", null);
+            throw new ParserException("Wrong format of join abstraction predicates", null);
         }
 
         return result;
@@ -303,8 +257,7 @@ public abstract class AbstractionPredicate
         final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
 
         return otherPred.placeholderVariable.equals(placeholderVariable)
-                && otherPred.predicateFormWithPlaceholder
-                        .equals(predicateFormWithPlaceholder);
+                && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);
     }
 
 }

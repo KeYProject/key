@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.logic.Choice;
@@ -32,12 +19,12 @@ public class ChoiceSettings extends AbstractSettings {
 
     private static final String PROP_CHOICE_DEFAULT = "category2Default";
     private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
-
     private HashMap<String, String> category2Default;
 
 
     /**
-     * maps categories to a set of Strings(representing the choices which are options for this category).
+     * maps categories to a set of Strings(representing the choices which are options for this
+     * category).
      */
     private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
 
@@ -61,15 +48,14 @@ public class ChoiceSettings extends AbstractSettings {
 
     /**
      * returns a copy of the HashMap that maps categories to
-     * their choices.
+      their choices.
      */
     public Map<String, Set<String>> getChoices() {
         return Collections.unmodifiableMap(category2Choices);
     }
 
     /**
-     * returns a copy of the HashMap that maps categories to
-     * their currently selected choices.
+     * returns a copy of the HashMap that maps categories to their currently selected choices.
      * <p>
      * The method name is somewhat misleading.
      */
@@ -96,9 +82,8 @@ public class ChoiceSettings extends AbstractSettings {
 
 
     /**
-     * updates <code>category2Choices</code> if new entries are found
-     * in <code>choiceNS</code> or if entries of <code>category2Choices</code>
-     * are no longer present in <code>choiceNS</code>
+     * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
+     * entries of <code>category2Choices</code> are no longer present in <code>choiceNS</code>
      *
      * @param remove remove entries not present in <code>choiceNS</code>
      */
@@ -137,17 +122,23 @@ public class ChoiceSettings extends AbstractSettings {
         setDefaultChoices(defaultTmp);
     }
 
-    private void setChoiceCategories(HashMap<String, Set<String>> c2C) {
-        var old = category2Choices;
-        this.category2Choices = new HashMap<>(c2C);
-        firePropertyChange(PROP_CHOICE_CATEGORIES, old, category2Choices);
+
+    /**
+     * sends the message that the state of this setting has been changed to its registered listeners
+     * (not thread-safe)
+     */
+    protected void fireSettingsChanged() {
+        Iterator<SettingsListener> it = listenerList.iterator();
+        ProofSettings.DEFAULT_SETTINGS.saveSettings();
+        while (it.hasNext()) {
+            it.next().settingsChanged(new EventObject(this));
+        }
     }
 
 
     /**
-     * gets a Properties object and has to perform the necessary
-     * steps in order to change this object in a way that it
-     * represents the stored settings
+     * gets a Properties object and has to perform the necessary steps in order to change this
+     * object in a way that it represents the stored settings
      */
     public void readSettings(Properties props) {
         String choiceSequence = props.getProperty(KEY_DEFAULT_CHOICES);
@@ -155,8 +146,7 @@ public class ChoiceSettings extends AbstractSettings {
         if (choiceSequence != null) {
             StringTokenizer st = new StringTokenizer(choiceSequence, ",");
             while (st.hasMoreTokens()) {
-                StringTokenizer st2 = new StringTokenizer(
-                        st.nextToken().trim(), "-");
+                StringTokenizer st2 = new StringTokenizer(st.nextToken().trim(), "-");
                 String category = st2.nextToken().trim();
                 String def = st2.nextToken().trim();
                 category2Default.put(category, def);
@@ -167,12 +157,13 @@ public class ChoiceSettings extends AbstractSettings {
 
 
     /**
-     * implements the method required by the Settings interface. The
-     * settings are written to the given Properties object. Only entries of
-     * the form &lt; key &gt; = &lt; value &gt; (,&lt; value &gt;)* are allowed.
+     * implements the method required by the Settings interface. The settings are written to the
+     * given Properties object. Only entries of
+      the form &lt; key &gt; = &lt; value &gt; (,&lt;
+     * value &gt;)* are allowed.
      *
-     * @param props the Properties object where to write the
-     *              settings as (key, value) pair
+     ** @param props the Properties object where to write the
+                   settings as (key, value) pair
      */
     @Override
     public void writeSettings(Properties props) {
@@ -188,5 +179,20 @@ public class ChoiceSettings extends AbstractSettings {
             category2Default.put(c.category(), c.name().toString());
         }
         return this;
+    }
+
+
+    /**
+     * adds a listener to the settings object
+     *
+     * @param l the listener
+     */
+    public void addSettingsListener(SettingsListener l) {
+        listenerList.add(l);
+    }
+
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
     }
 }

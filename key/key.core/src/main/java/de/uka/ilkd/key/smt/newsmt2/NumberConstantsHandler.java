@@ -9,8 +9,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import java.util.Properties;
 
 /**
- * This handler is responsible to render number constants
- * Z(3(2(1(#)))) as "123".
+ * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
  *
  * TODO Should that also do character constants (C) with the same machinery?
  */
@@ -21,7 +20,8 @@ public class NumberConstantsHandler implements SMTHandler {
     private Function negNumberSign;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+            String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();

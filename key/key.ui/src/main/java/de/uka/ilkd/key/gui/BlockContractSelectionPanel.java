@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
@@ -34,8 +21,8 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
     public BlockContractSelectionPanel(final Services services, final boolean multipleSelection) {
         super(services, multipleSelection);
     }
-    
-    
+
+
     /**
      * The static access is used e.g. by the eclipse plugins.
      * <p>
@@ -44,25 +31,24 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
+     *
      * @param services The {@link Services}
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
-    public static BlockContract computeBlockContract(
-            Services services, List<BlockContract> selection) {
+    public static BlockContract computeBlockContract(Services services,
+            List<BlockContract> selection) {
         if (selection.isEmpty()) {
             return null;
-        }
-        else if (selection.size() == 1) {
+        } else if (selection.size() == 1) {
             return selection.get(0);
-        }
-        else {
+        } else {
             ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
             for (BlockContract contract : selection) {
                 contracts = contracts.add(contract);
             }
             return BlockContractImpl.combine(contracts, services);
-        }        
+        }
     }
 
     /**
@@ -72,13 +58,13 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
+     *
      * @param services The {@link Services}
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     @Override
-    public BlockContract computeContract(
-            Services services, List<BlockContract> selection) {
-      return computeBlockContract(services, selection);
+    public BlockContract computeContract(Services services, List<BlockContract> selection) {
+        return computeBlockContract(services, selection);
     }
 }

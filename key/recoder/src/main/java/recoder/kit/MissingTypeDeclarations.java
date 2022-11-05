@@ -8,8 +8,7 @@ import java.util.List;
 
 
 /**
- * Problem report indicating that certain class types have no source
- * representation.
+ * Problem report indicating that certain class types have no source representation.
  */
 public class MissingTypeDeclarations extends MissingSources {
 

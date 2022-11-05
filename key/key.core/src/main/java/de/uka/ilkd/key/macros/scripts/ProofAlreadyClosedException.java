@@ -1,24 +1,11 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package de.uka.ilkd.key.macros.scripts;
 
 import java.net.URL;
 
 /**
- * Thrown if during the execution of a command, the proof is already closed. May
- * or may not lead to exceptional termination of the whole script based on the
- * <code>@failonclosed</code> setting.
- * 
+ * Thrown if during the execution of a command, the proof is already closed. May or may not lead to
+ * exceptional termination of the whole script based on the <code>@failonclosed</code> setting.
+ *
  * @author Dominic Steinhoefel
  */
 public class ProofAlreadyClosedException extends ScriptException {

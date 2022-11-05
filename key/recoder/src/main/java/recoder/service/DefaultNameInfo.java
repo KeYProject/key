@@ -43,7 +43,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     /**
      * caches old array types. Needed if types are renamed.
      */
-    private final HashMap<ClassType, ArrayList<ArrayType>> removedArrayCache = new HashMap<ClassType, ArrayList<ArrayType>>(128);
+    private final HashMap<ClassType, ArrayList<ArrayType>> removedArrayCache =
+        new HashMap<ClassType, ArrayList<ArrayType>>(128);
     // the predefined types
     private final PrimitiveType booleanType;
     private final PrimitiveType byteType;
@@ -54,8 +55,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     private final PrimitiveType doubleType;
     private final PrimitiveType charType;
     /**
-     * The unknown elements. They are used for error handling and to mark
-     * entities as "known-as-unknown" internally.
+     * The unknown elements. They are used for error handling and to mark entities as
+     * "known-as-unknown" internally.
      */
     private final ProgramModelElement unknownElement = new UnknownProgramModelElement();
     private final ClassType unknownClassType = new UnknownClassType();
@@ -125,7 +126,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     // parses the class search mode property and creates the internal
     // representation. Ignores everything that does not fit.
     private void updateSearchMode() {
-        String prop = serviceConfiguration.getProjectSettings().getProperty(PropertyNames.CLASS_SEARCH_MODE);
+        String prop =
+            serviceConfiguration.getProjectSettings().getProperty(PropertyNames.CLASS_SEARCH_MODE);
         if (prop == null) {
             // just in case...
             prop = "";
@@ -133,20 +135,20 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         searchMode = new int[prop.length()];
         for (int i = 0; i < searchMode.length; i++) {
             switch (prop.charAt(i)) {
-                case 's':
-                case 'S':
-                    searchMode[i] = SEARCH_SOURCE;
-                    break;
-                case 'c':
-                case 'C':
-                    searchMode[i] = SEARCH_CLASS;
-                    break;
-                case 'r':
-                case 'R':
-                    searchMode[i] = SEARCH_REFLECT;
-                    break;
-                default:
-                    searchMode[i] = NO_SEARCH;
+            case 's':
+            case 'S':
+                searchMode[i] = SEARCH_SOURCE;
+                break;
+            case 'c':
+            case 'C':
+                searchMode[i] = SEARCH_CLASS;
+                break;
+            case 'r':
+            case 'R':
+                searchMode[i] = SEARCH_REFLECT;
+                break;
+            default:
+                searchMode[i] = NO_SEARCH;
             }
         }
     }
@@ -192,7 +194,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         String name = ct.getFullName();
         Object ob = name2type.put(name, ct);
         if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) {
-            Debug.log("Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
+            Debug.log(
+                "Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
                     + Format.toString(" --- was: %N [%i]", (ProgramModelElement) ob));
         }
         // are there old array types which need to be recycled? This happens if
@@ -439,7 +442,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Type result = name2type.get(name);
         if (result != null && !name.equals(result.getFullName())) {
             // FIXME
-//        	System.err.println("Warning: Inconsistend state in name info!");
+            // System.err.println("Warning: Inconsistend state in name info!");
             // this ain't enough, need to fix this in DefaultSourceInfo somehow...
             name2type.remove(name);
             result = null;
@@ -489,8 +492,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     /*
-     * Here is room for improvement: Cache that stuff.
-     * That'd require incremental update, though!
+     * Here is room for improvement: Cache that stuff. That'd require incremental update, though!
      */
     public List<ClassType> getTypes(Package pkg) {
         Debug.assertNonnull(pkg);
@@ -547,7 +549,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         String shortname = name.substring(ldp + 1);
         for (int i = 0; i < fields.size(); i++) {
             String fname = fields.get(i).getName();
-            if (/*name == fname || */shortname.equals(fname)) {
+            if (/* name == fname || */shortname.equals(fname)) {
                 result = fields.get(i);
                 if (result != null) {
                     break;
@@ -571,23 +573,23 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         boolean result = false;
         for (int i = 0; !result && i < searchMode.length; i += 1) {
             switch (searchMode[i]) {
-                case SEARCH_SOURCE:
-                    if (DEBUG)
-                        Debug.log("Searching source code: " + classname);
-                    result = loadClassFromSourceCode(classname);
-                    break;
-                case SEARCH_CLASS:
-                    if (DEBUG)
-                        Debug.log("Searching class file: " + classname);
-                    result = loadClassFromPrecompiledCode(classname);
-                    break;
-                case SEARCH_REFLECT:
-                    if (DEBUG)
-                        Debug.log("Searching class: " + classname);
-                    result = loadClassByReflection(classname);
-                    break;
-                default:
-                    break;
+            case SEARCH_SOURCE:
+                if (DEBUG)
+                    Debug.log("Searching source code: " + classname);
+                result = loadClassFromSourceCode(classname);
+                break;
+            case SEARCH_CLASS:
+                if (DEBUG)
+                    Debug.log("Searching class file: " + classname);
+                result = loadClassFromPrecompiledCode(classname);
+                break;
+            case SEARCH_REFLECT:
+                if (DEBUG)
+                    Debug.log("Searching class: " + classname);
+                result = loadClassByReflection(classname);
+                break;
+            default:
+                break;
             }
         }
         return result;
@@ -616,7 +618,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
                     String shortedname = classname.substring(0, ldp);
                     // not a top-level type, parent type was loaded
                     // and member type has been registered:
-                    return !name2package.containsKey(shortedname) && loadClassFromSourceCode(shortedname)
+                    return !name2package.containsKey(shortedname)
+                            && loadClassFromSourceCode(shortedname)
                             && name2type.containsKey(classname);
                 }
             }
@@ -625,7 +628,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
                 result = true;
             }
         } catch (Exception e) {
-            Debug.error("Error trying to retrieve source file for type " + classname + "\n" + "Exception was " + e);
+            Debug.error("Error trying to retrieve source file for type " + classname + "\n"
+                + "Exception was " + e);
             e.printStackTrace();
         }
         return result;
@@ -647,8 +651,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
                 unknown += 1;
             }
         }
-        return "" + name2package.size() + " packages with " + (name2type.size() - unknown) + " types (" + unknown
-                + " were pure speculations) and " + name2field.size() + " fields";
+        return "" + name2package.size() + " packages with " + (name2type.size() - unknown)
+            + " types (" + unknown + " were pure speculations) and " + name2field.size()
+            + " fields";
     }
 
     public void unregisterClassType(String fullname) {
@@ -728,9 +733,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     /**
-     * this method is used if a typerename can be identified by the source info, mainly when
-     * an AttachChange of an Identifier follows directly to a DetachChange of an Identifier
-     * on the same parent. This leaves ArrayTypes untouched.
+     * this method is used if a typerename can be identified by the source info, mainly when an
+     * AttachChange of an Identifier follows directly to a DetachChange of an Identifier on the same
+     * parent. This leaves ArrayTypes untouched.
      *
      * @param ct
      * @param unregisterFrom
@@ -762,7 +767,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             register(ct);
 
         // original type name is now known to be unknown
-        name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file from disk
+        name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file
+                                                         // from disk
 
         // fields of this type
         List<? extends Field> fl = ct.getFields();

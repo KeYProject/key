@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -30,11 +17,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
- * The macro FinishSymbolicExecutionMacro continues automatic rule application
- * until there is no more modality on the sequent.
+ * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
+ * more modality on the sequent.
  *
- * This is done by implementing a delegation {@link Strategy} which assigns to
- * any rule application infinite costs if there is no modality on the sequent.
+ * This is done by implementing a delegation {@link Strategy} which assigns to any rule application
+ * infinite costs if there is no modality on the sequent.
  *
  * @author mattias ulbrich
  */
@@ -65,14 +52,13 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     /**
      * find a modality term in a node
      *
-     * @param node
-     *            TODO
+     * @param node TODO
      * @return TODO
      */
     static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
         for (SequentFormula sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
+            if (hasModality(sequentFormula.formula())) {
                 return true;
             }
         }
@@ -84,17 +70,17 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
-        if(term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
+        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
         }
 
-        if(term.op() instanceof Modality) {
+        if (term.op() instanceof Modality) {
             return true;
         }
 
         for (Term sub : term.subs()) {
-            if(hasModality(sub)) {
+            if (hasModality(sub)) {
                 return true;
             }
         }
@@ -105,8 +91,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     /**
      * Checks if a rule is marked as not suited for interaction.
      *
-     * @param rule
-     *            TODO
+     * @param rule TODO
      * @return TODO
      */
     static boolean isNonHumanInteractionTagged(Rule rule) {
@@ -126,13 +111,12 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new FilterSymbexStrategy(
-                proof.getActiveStrategy());
+        return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 
     /**
-     * The Class FilterAppManager is a special strategy assigning to any rule
-     * infinite costs if the goal has no modality
+     * The Class FilterAppManager is a special strategy assigning to any rule infinite costs if the
+     * goal has no modality
      */
     private static class FilterSymbexStrategy extends FilterStrategy {
 
@@ -149,20 +133,20 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal.node())) {
+            if (!hasModality(goal.node())) {
                 return false;
             }
-            if(isNonHumanInteractionTagged(app.rule())) {
+            if (isNonHumanInteractionTagged(app.rule())) {
                 return false;
             }
 
             return super.isApprovedApp(app, pio, goal);
         }
 
-      @Override
-      public boolean isStopAtFirstNonCloseableGoal() {
-         return false;
-      }
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+            return false;
+        }
 
     }
 

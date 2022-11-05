@@ -6,12 +6,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 
 public class ContractLoadingTests {
@@ -19,7 +18,8 @@ public class ContractLoadingTests {
 
     @Test
     public void sumAndMax() throws ProblemLoaderException {
-        final File javaFile = new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
+        final File javaFile =
+            new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
@@ -30,9 +30,10 @@ public class ContractLoadingTests {
 
     @Test
     public void issues1658() throws ProblemLoaderException {
-        final File javaFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
-        Assume.assumeTrue(javaFile.exists());
+        final File javaFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
+        Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assert.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertTrue(file.getProofContracts().size() > 0);
     }
 }

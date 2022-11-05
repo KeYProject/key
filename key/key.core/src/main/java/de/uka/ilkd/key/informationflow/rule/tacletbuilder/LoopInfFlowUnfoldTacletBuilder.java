@@ -44,19 +44,15 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " +
-                                           loopInv.getUniqueName());
+        return MiscTools
+                .toValidTacletName(UNFOLD + unfoldCounter + " of " + loopInv.getUniqueName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(loopInv,
-                                                   ifVars.c1, ifVars.c2,
-                                                   executionContext,
-                                                   guard,
-                                                   services);
+        InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
+            ifVars.c2, executionContext, guard, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }
 }

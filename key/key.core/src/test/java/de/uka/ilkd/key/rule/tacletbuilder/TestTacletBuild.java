@@ -1,41 +1,27 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Before;
-import org.junit.Test;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * class tests the building of Taclets in TacletBuilders, especially the
- * checking if the SchemaVariables fulfill certain conditions. They must
- * not occur more than once in find and if taken as a whole. Is obviously
- * quite incomplete.
+ * class tests the building of Taclets in TacletBuilders, especially the checking if the
+ * SchemaVariables fulfill certain conditions. They must not occur more than once in find and if
+ * taken as a whole. Is obviously quite incomplete.
  */
 public class TestTacletBuild {
 
@@ -45,7 +31,7 @@ public class TestTacletBuild {
 
     private TermBuilder tb;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         TacletForTests.setStandardFile(TacletForTests.testRules);
         TacletForTests.parse();
@@ -57,41 +43,34 @@ public class TestTacletBuild {
     public void test0() {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
-        Term b = tf.createTerm(
-                TacletForTests.getSchemaVariables().lookup("b"), NO_SUBTERMS);
+        Term b = tf.createTerm(TacletForTests.getSchemaVariables().lookup("b"), NO_SUBTERMS);
         Term t1 = tb.ex((QuantifiableVariable) u, b);
         Term t2 = tb.ex((QuantifiableVariable) v, b);
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                        ImmutableSLList.nil(),
-                        t2));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t2));
         boolean thrown = false;
         try {
             sb.getTaclet();
         } catch (RuntimeException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as there are different "
-                + "prefixes at different occurrences", thrown);
+        assertTrue(thrown, "An exception should be thrown as there are different "
+            + "prefixes at different occurrences");
         sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
         sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
-        sb.getTaclet();  //no exception is thrown here anymore
+        sb.getTaclet(); // no exception is thrown here anymore
     }
 
     @Test
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
-        SchemaVariable u =
-                TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm
-                (TacletForTests.getFunctions().lookup(new Name("A")),
-                        NO_SUBTERMS);
+        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
-        Sequent seq = Sequent.createSuccSequent
-                (Semisequent.EMPTY_SEMISEQUENT.insert
-                        (0, new SequentFormula(t1)).semisequent());
+        Sequent seq = Sequent.createSuccSequent(
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
@@ -101,24 +80,20 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable " +
-                "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
+            + "occurs more than once in the Taclets if and find");
     }
 
     @Test
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
-        SchemaVariable u =
-                TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm
-                (TacletForTests.getFunctions().lookup(new Name("A")),
-                        NO_SUBTERMS);
+        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Term t2 = tb.ex((QuantifiableVariable) u, A);
-        Sequent seq = Sequent.createSuccSequent
-                (Semisequent.EMPTY_SEMISEQUENT
-                        .insert(0, new SequentFormula(t1)).semisequent()
-                        .insert(1, new SequentFormula(t2)).semisequent());
+        Sequent seq = Sequent
+                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1))
+                        .semisequent().insert(1, new SequentFormula(t2)).semisequent());
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
         sb.setFind(A);
@@ -127,18 +102,15 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable "
-                + "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
+            + "occurs more than once in the Taclets if and find");
     }
 
     @Test
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
-        SchemaVariable u =
-                TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm
-                (TacletForTests.getFunctions().lookup(new Name("A")),
-                        NO_SUBTERMS);
+        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setFind(tf.createTerm(Junctor.AND, t1, t1));
@@ -147,31 +119,32 @@ public class TestTacletBuild {
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
-        assertTrue("An exception should be thrown as a bound SchemaVariable " +
-                "occurs more than once in the Taclets if and find", thrown);
+        assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
+            + "occurs more than once in the Taclets if and find");
     }
 
     private final HelperClassForTests helper = new HelperClassForTests();
 
-    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
+    public static final String testRules =
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
-            helper.parseThrowException(new File(testRules + File.separator +
-                    "schemaVarInAddruleRespectPrefix.key"));
+            helper.parseThrowException(
+                new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
-            assertTrue("Position of error message is wrong.",
-                e.toString().contains("schemaVarInAddruleRespectPrefix.key:21:2"));
-            assertTrue("Cause should be prefix error",
-                    e.getCause().getMessage()
-                            .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."));
+            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:2"),
+                "Position of error message is wrong.");
+            assertTrue(e.getCause().getMessage().contains(
+                "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
+                "Cause should be prefix error");
             return;
         } catch (ProofInputException e) {
             fail("Unexpected exception");
         }
-        fail("Expected an invalid prefix exception as the the addrule contains " +
-                "a schemavariable with wrong prefix.");
+        fail("Expected an invalid prefix exception as the the addrule contains "
+            + "a schemavariable with wrong prefix.");
 
     }
 }

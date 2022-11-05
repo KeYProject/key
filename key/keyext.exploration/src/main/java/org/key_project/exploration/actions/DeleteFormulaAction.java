@@ -24,7 +24,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         super(mainWindow);
         setName("Delete formula");
         this.posInSeq = pis;
-        //only enable if position is in sequent and a toplevel formula
+        // only enable if position is in sequent and a toplevel formula
         if (pis.getPosInOccurrence() != null) {
             setEnabled(!pis.isSequent() & pis.getPosInOccurrence().isTopLevel());
         } else {
@@ -35,12 +35,13 @@ public class DeleteFormulaAction extends ExplorationAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent()
-                || (posInSeq.getPosInOccurrence() != null && !posInSeq.getPosInOccurrence().isTopLevel()))
+        if (posInSeq.isSequent() || (posInSeq.getPosInOccurrence() != null
+                && !posInSeq.getPosInOccurrence().isTopLevel()))
             return;
 
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
-        if (pio == null) return;
+        if (pio == null)
+            return;
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());

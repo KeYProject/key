@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.LinkedList;
@@ -40,8 +27,8 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
     private final Stack<Label> labels;
     private final Stack<MethodFrame> frames;
 
-    public OuterBreakContinueAndReturnCollector(final ProgramElement root, final List<Label> alwaysInnerLabels, final Services services)
-    {
+    public OuterBreakContinueAndReturnCollector(final ProgramElement root,
+            final List<Label> alwaysInnerLabels, final Services services) {
         super(root, services);
         breaks = new LinkedList<Break>();
         continues = new LinkedList<Continue>();
@@ -51,41 +38,34 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
         frames = new Stack<MethodFrame>();
     }
 
-    public List<Break> getBreaks()
-    {
+    public List<Break> getBreaks() {
         return breaks;
     }
 
-    public List<Continue> getContinues()
-    {
+    public List<Continue> getContinues() {
         return continues;
     }
 
-    public List<Return> getReturns()
-    {
+    public List<Return> getReturns() {
         return returns;
     }
 
-    public boolean hasReturns()
-    {
+    public boolean hasReturns() {
         return !returns.isEmpty();
     }
 
-    public void collect()
-    {
+    public void collect() {
         start();
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
         loopAndSwitchCascadeDepth = 0;
         super.start();
     }
 
     @Override
-    protected void walk(final ProgramElement node)
-    {
+    protected void walk(final ProgramElement node) {
         if (node instanceof LoopStatement || node instanceof Switch) {
             loopAndSwitchCascadeDepth++;
         }
@@ -108,44 +88,38 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
     }
 
     @Override
-    protected void doAction(final ProgramElement node)
-    {
+    protected void doAction(final ProgramElement node) {
         if (node instanceof Break || node instanceof Continue || node instanceof Return) {
             node.visit(this);
         }
     }
 
     @Override
-    protected void doDefaultAction(final SourceElement x)
-    {
+    protected void doDefaultAction(final SourceElement x) {
         // do nothing
     }
 
     @Override
-    public void performActionOnBreak(final Break x)
-    {
+    public void performActionOnBreak(final Break x) {
         if (isJumpToOuterLabel(x)) {
             breaks.add(x);
         }
     }
 
     @Override
-    public void performActionOnContinue(final Continue x)
-    {
+    public void performActionOnContinue(final Continue x) {
         if (isJumpToOuterLabel(x)) {
             continues.add(x);
         }
     }
 
-    private boolean isJumpToOuterLabel(final LabelJumpStatement x)
-    {
+    private boolean isJumpToOuterLabel(final LabelJumpStatement x) {
         return loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
                 || x.getLabel() != null && labels.search(x.getLabel()) == -1;
     }
 
     @Override
-    public void performActionOnReturn(final Return x)
-    {
+    public void performActionOnReturn(final Return x) {
         if (frames.empty()) {
             returns.add(x);
         }

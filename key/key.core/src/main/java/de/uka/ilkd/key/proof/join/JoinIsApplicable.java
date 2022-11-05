@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.join;
 
 import java.util.LinkedList;
@@ -24,8 +11,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
- * Methods for checking the applicability of a join for a given selection
- * and thereby computing the prospective join partners.
+ * Methods for checking the applicability of a join for a given selection and thereby computing the
+ * prospective join partners.
  *
  * @see JoinProcessor
  * @author Benjamin Niedermann
@@ -38,13 +25,10 @@ public class JoinIsApplicable {
     }
 
     /**
-     * @param goal
-     *            The goal to join.
-     * @param pio
-     *            Selected formula (symblic state - program counter part) for
-     *            the join.
-     * @return The list of possible join partner objects -- may be empty (then,
-     *         the join is not applicable).
+     * @param goal The goal to join.
+     * @param pio Selected formula (symblic state - program counter part) for the join.
+     * @return The list of possible join partner objects -- may be empty (then, the join is not
+     *         applicable).
      */
     public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
@@ -56,15 +40,11 @@ public class JoinIsApplicable {
     /**
      * Computes the partners for the given selection.
      *
-     * @param goal
-     *            Goal which should be joined.
-     * @param pio
-     *            Selected formula (symblic state - program counter part) for
-     *            the join.
+     * @param goal Goal which should be joined.
+     * @param pio Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partners.
      */
-    public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            PosInOccurrence pio) {
+    public List<ProspectivePartner> computeProspecitvePartner(Goal goal, PosInOccurrence pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<ProspectivePartner>();
 
@@ -81,32 +61,26 @@ public class JoinIsApplicable {
     }
 
     /**
-     * Checks if two given goals are possible join partners for a given selected
-     * sequent formula (defined by pio); returns a ProspectivePartner object if
-     * this is the case and null otherwise.
+     * Checks if two given goals are possible join partners for a given selected sequent formula
+     * (defined by pio); returns a ProspectivePartner object if this is the case and null otherwise.
      *
-     * @param g1
-     *            Goal for the first node to join.
-     * @param pio
-     *            Selected formula (symbolic state - program counter part) for
-     *            the join.
-     * @param g2
-     *            Second goal for the join.
-     * @return A ProspectivePartner object if the given goals may be joined or
-     *         null otherwise.
+     * @param g1 Goal for the first node to join.
+     * @param pio Selected formula (symbolic state - program counter part) for the join.
+     * @param g2 Second goal for the join.
+     * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
-    private ProspectivePartner areProspectivePartners(Goal g1,
-            PosInOccurrence pio, Goal g2) {
+    private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {
         Term referenceFormula = pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
 
-        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
-                .sub(0) : tb.skip();
+        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0)
+                : tb.skip();
 
-        referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
-                .sub(1) : referenceFormula;
+        referenceFormula =
+            referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1)
+                    : referenceFormula;
 
         for (SequentFormula sf : g2.sequent().succedent()) {
             Term formula = sf.formula();
@@ -119,9 +93,8 @@ public class JoinIsApplicable {
 
             }
             if (formula.equalsModRenaming(referenceFormula)) {
-                return new ProspectivePartner(referenceFormula, g1.node(),
-                        pio.sequentFormula(), update1, g2.node(), sf,
-                        update2);
+                return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
+                    update1, g2.node(), sf, update2);
             }
         }
         return null;

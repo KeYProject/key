@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -24,7 +11,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 
 /**
  * Apply a single proof step.
- * 
+ *
  * @author Simon Greiner
  */
 public class OneStepProofMacro extends StrategyProofMacro {
@@ -45,7 +32,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    public String getDescription() {	        
+    public String getDescription() {
         return "One single proof step is applied";
     }
 
@@ -56,8 +43,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
 
     /**
-     * Strategy with counter, s.t. only one rule is applied 
-     * 
+     * Strategy with counter, s.t. only one rule is applied
+     *
      *
      */
 
@@ -66,6 +53,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
         public Strategy delegate;
+
         public OneStepStrategy(Strategy delegate) {
             this.delegate = delegate;
             this.counter = 0;
@@ -75,22 +63,23 @@ public class OneStepProofMacro extends StrategyProofMacro {
         public Name name() {
             return NAME;
         }
+
         /**
-         * If no rule was applied yet, apply the first rule and increase counter, s.t. no more rules can be applied.
+         * If no rule was applied yet, apply the first rule and increase counter, s.t. no more rules
+         * can be applied.
          */
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(counter == 0 && delegate.isApprovedApp(app, pio, goal)){
+            if (counter == 0 && delegate.isApprovedApp(app, pio, goal)) {
                 counter++;
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
-                Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
             return delegate.computeCost(app, pio, goal);
 
         }
@@ -104,7 +93,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

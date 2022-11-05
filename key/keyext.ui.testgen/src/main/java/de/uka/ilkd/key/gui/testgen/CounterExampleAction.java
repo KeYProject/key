@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -54,13 +42,11 @@ public class CounterExampleAction extends MainWindowAction {
     }
 
     /**
-     * Registers the action at some listeners to update its status in a correct
-     * fashion. This method has to be invoked after the Main class has been
-     * initialized with the KeYMediator.
+     * Registers the action at some listeners to update its status in a correct fashion. This method
+     * has to be invoked after the Main class has been initialized with the KeYMediator.
      * <p>
-     * <b>This class provides only the user interface and no counter example
-     * generation logic which is implemented by the
-     * {@link AbstractCounterExampleGenerator}</b>.
+     * <b>This class provides only the user interface and no counter example generation logic which
+     * is implemented by the {@link AbstractCounterExampleGenerator}</b>.
      */
     public void init() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
@@ -73,7 +59,7 @@ public class CounterExampleAction extends MainWindowAction {
                     setEnabled(false);
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
-                    //Can be applied only to root nodes
+                    // Can be applied only to root nodes
 
 
                     setEnabled(selNode.childrenCount() == 0 && !selNode.isClosed());
@@ -86,7 +72,8 @@ public class CounterExampleAction extends MainWindowAction {
             }
         };
         getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the
+        // functionality.
         // No functionality is allowed in this method body!
         getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
@@ -124,27 +111,28 @@ public class CounterExampleAction extends MainWindowAction {
     }
 
     /**
-     * Performs the {@link SemanticsBlastingMacro} in a side proof hidden to the
-     * user and shows the result with help of the {@link SolverListener}.
+     * Performs the {@link SemanticsBlastingMacro} in a side proof hidden to the user and shows the
+     * result with help of the {@link SolverListener}.
      */
-    public static class NoMainWindowCounterExampleGenerator extends AbstractSideProofCounterExampleGenerator {
+    public static class NoMainWindowCounterExampleGenerator
+            extends AbstractSideProofCounterExampleGenerator {
         /**
          * {@inheritDoc}
          */
         @Override
-        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof) {
+        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
+                Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
 
     /**
-     * Performs the {@link SemanticsBlastingMacro} in a {@link Proof} registered
-     * in the {@link MainWindow} and thus visible to the user.
-     * Results are shown with help of the {@link SolverListener}.
+     * Performs the {@link SemanticsBlastingMacro} in a {@link Proof} registered in the
+     * {@link MainWindow} and thus visible to the user. Results are shown with help of the
+     * {@link SolverListener}.
      * <p>
-     * <b>This class provides only the user interface and no counter example
-     * generation logic which is implemented by the
-     * {@link AbstractCounterExampleGenerator}</b>.
+     * <b>This class provides only the user interface and no counter example generation logic which
+     * is implemented by the {@link AbstractCounterExampleGenerator}</b>.
      */
     public static class MainWindowCounterExampleGenerator extends AbstractCounterExampleGenerator {
         /**
@@ -165,14 +153,12 @@ public class CounterExampleAction extends MainWindowAction {
          * {@inheritDoc}
          */
         @Override
-        protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) {
+        protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent,
+                String proofName) {
             Sequent newSequent = createNewSequent(oldSequent);
             InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
-            Proof proof = new Proof(proofName,
-                    newSequent, "",
-                    newInitConfig.createTacletIndex(),
-                    newInitConfig.createBuiltInRuleIndex(),
-                    newInitConfig);
+            Proof proof = new Proof(proofName, newSequent, "", newInitConfig.createTacletIndex(),
+                newInitConfig.createBuiltInRuleIndex(), newInitConfig);
 
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());
@@ -202,7 +188,8 @@ public class CounterExampleAction extends MainWindowAction {
          * {@inheritDoc}
          */
         @Override
-        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings, Proof proof) {
+        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
+                Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
@@ -218,7 +205,8 @@ public class CounterExampleAction extends MainWindowAction {
 
         @Override
         protected Void doInBackground() throws Exception {
-            final NoMainWindowCounterExampleGenerator generator = new NoMainWindowCounterExampleGenerator();
+            final NoMainWindowCounterExampleGenerator generator =
+                new NoMainWindowCounterExampleGenerator();
             generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
             return null;
         }

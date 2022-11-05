@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,18 +15,16 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Initializes the "before loop" update needed for the assignable clause.
  *
- * Only remembers the heaps of the context, not the changed local variables,
- * although this is done for the built-in loop invariant rules, where they
- * however are never used.
+ * Only remembers the heaps of the context, not the changed local variables, although this is done
+ * for the built-in loop invariant rules, where they however are never used.
  *
- * NOTE: If the local variables should be remembered, we have to find a way to
- * declare them globally in taclets, which currently is not possible for
- * statically unknown lists of variables. Variable conditions cannot access the
- * goal-local namespaces, only the global one.
+ * NOTE: If the local variables should be remembered, we have to find a way to declare them globally
+ * in taclets, which currently is not possible for statically unknown lists of variables. Variable
+ * conditions cannot access the goal-local namespaces, only the global one.
  *
- * Expects as arguments the loop formula (for determining the relevant heap
- * contexts) and three Skolem terms for the currently implemented heaps: The
- * normal heap, the savedHeap for transactions, and the permissions heap.
+ * Expects as arguments the loop formula (for determining the relevant heap contexts) and three
+ * Skolem terms for the currently implemented heaps: The normal heap, the savedHeap for
+ * transactions, and the permissions heap.
  *
  * @author Dominic Steinhoefel
  */
@@ -57,54 +42,43 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
 
-        return createBeforeLoopUpdate(
-                MiscTools.isTransaction((Modality) loopTerm.op()),
-                MiscTools.isPermissions(services), anonHeapTerm,
-                anonSavedHeapTerm, anonPermissionsHeapTerm, services);
+        return createBeforeLoopUpdate(MiscTools.isTransaction((Modality) loopTerm.op()),
+            MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
+            anonPermissionsHeapTerm, services);
     }
 
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param loopSpec
-     *     The {@link LoopSpecification}.
-     * @param isTransaction
-     *     set to true iff we're in a transaction modality (then, there are more
-     *     heaps available).
-     * @param isPermissions
-     *     set to true if the permissions profile is active (then, the
-     *     permissions heap is available).
-     * @param anonHeapTerm
-     *     The term with the Skolem heap.
-     * @param anonSavedHeapTerm
-     *     The term with the Skolem saved heap.
-     * @param anonPermissionsHeapTerm
-     *     The term with the Skolem permissions heap.
-     * @param services
-     *     The {@link Services} object (for the {@link TermBuilder}).
+     * @param loopSpec The {@link LoopSpecification}.
+     * @param isTransaction set to true iff we're in a transaction modality (then, there are more
+     *        heaps available).
+     * @param isPermissions set to true if the permissions profile is active (then, the permissions
+     *        heap is available).
+     * @param anonHeapTerm The term with the Skolem heap.
+     * @param anonSavedHeapTerm The term with the Skolem saved heap.
+     * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
+     * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
-    private static Term createBeforeLoopUpdate(boolean isTransaction,
-            boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm, Services services) {
+    private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
+            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term beforeLoopUpdate = tb.elementary(
-                (UpdateableOperator) anonHeapTerm.op(),
-                tb.var(heapLDT.getHeap()));
+        Term beforeLoopUpdate =
+            tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
 
         if (isTransaction) {
-            beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary((UpdateableOperator) anonSavedHeapTerm.op(),
-                            tb.var(heapLDT.getSavedHeap())));
+            beforeLoopUpdate = tb.parallel(beforeLoopUpdate, tb.elementary(
+                (UpdateableOperator) anonSavedHeapTerm.op(), tb.var(heapLDT.getSavedHeap())));
         }
 
         if (isPermissions) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary(
-                            (UpdateableOperator) anonPermissionsHeapTerm.op(),
-                            tb.var(heapLDT.getPermissionHeap())));
+                tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
+                    tb.var(heapLDT.getPermissionHeap())));
         }
 
         return beforeLoopUpdate;

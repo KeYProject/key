@@ -1,24 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 import java.util.Map;
 
-public class LinkedHashMap<K, V>
-    extends java.util.LinkedHashMap<K, V>
-    implements Iterable<Pair<K, V>> {
+public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
+        implements Iterable<Pair<K, V>> {
 
 
     private static final long serialVersionUID = 4295774122581786871L;
@@ -29,7 +15,7 @@ public class LinkedHashMap<K, V>
 
 
     public LinkedHashMap(Map<? extends K, ? extends V> m) {
-    super(m);
+        super(m);
     }
 
 
@@ -51,7 +37,7 @@ public class LinkedHashMap<K, V>
     }
 
 
-    public void putAll(K[] keys, V[]vals) {
+    public void putAll(K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
             if (i < vals.length) {
                 put(keys[i], vals[i]);
@@ -83,7 +69,7 @@ public class LinkedHashMap<K, V>
         private final LinkedHashMap<K, V> map;
         private K last = null;
 
-        public PairIterator (final LinkedHashMap<K, V> map) {
+        public PairIterator(final LinkedHashMap<K, V> map) {
             this.map = map;
             keyIt = map.keySet().iterator();
         }

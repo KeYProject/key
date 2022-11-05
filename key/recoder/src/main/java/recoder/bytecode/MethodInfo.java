@@ -22,8 +22,8 @@ public class MethodInfo extends MemberInfo implements Method {
 
     protected List<TypeParameterInfo> typeParms;
 
-    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes, String[] exceptions,
-                      ClassFile cf) {
+    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes,
+            String[] exceptions, ClassFile cf) {
         super(accessFlags, name, cf);
         if (returntype != null) {
             this.returntype = returntype.intern();

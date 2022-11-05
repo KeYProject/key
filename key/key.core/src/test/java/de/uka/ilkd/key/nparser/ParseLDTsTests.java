@@ -2,8 +2,8 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,7 +24,7 @@ public class ParseLDTsTests {
 
     private void load(Services services, String resources) throws IOException {
         URL url = getClass().getResource(resources);
-        Assume.assumeNotNull(url, services);
+        Assumptions.assumeTrue(url != null && services != null);
         KeyIO io = new KeyIO(services);
         io.load(url).loadComplete();
     }

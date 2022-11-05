@@ -10,62 +10,66 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
 /**
  * The default implementation of {@link IExecutionConstraint}.
+ *
  * @author Martin Hentschel
  */
 public class ExecutionConstraint extends AbstractExecutionElement implements IExecutionConstraint {
-   /**
-    * The {@link Term} representing the constraint.
-    */
-   private final Term term;
-   
-   /**
-    * The {@link PosInOccurrence} of the modality of interest.
-    */
-   private final PosInOccurrence modalityPIO;
+    /**
+     * The {@link Term} representing the constraint.
+     */
+    private final Term term;
 
-   /**
-    * Constructor.
-    * @param settings The {@link ITreeSettings} to use.
-    * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    * @param term The {@link Term} representing the constraint.
-    */
-   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO, Term term) {
-      super(settings, proofNode);
-      assert term != null;
-      assert modalityPIO != null;
-      this.term = term;
-      this.modalityPIO = modalityPIO;
-   }
+    /**
+     * The {@link PosInOccurrence} of the modality of interest.
+     */
+    private final PosInOccurrence modalityPIO;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String lazyComputeName() throws ProofInputException {
-      return formatTerm(term, getServices());
-   }
+    /**
+     * Constructor.
+     *
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     *        {@link IExecutionNode}.
+     * @param term The {@link Term} representing the constraint.
+     */
+    public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
+            Term term) {
+        super(settings, proofNode);
+        assert term != null;
+        assert modalityPIO != null;
+        this.term = term;
+        this.modalityPIO = modalityPIO;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Constraint";
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String lazyComputeName() throws ProofInputException {
+        return formatTerm(term, getServices());
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Term getTerm() {
-      return term;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getElementType() {
+        return "Constraint";
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PosInOccurrence getModalityPIO() {
-      return modalityPIO;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Term getTerm() {
+        return term;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PosInOccurrence getModalityPIO() {
+        return modalityPIO;
+    }
 }

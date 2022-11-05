@@ -1,21 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
-
 lexer grammar KeYLexer;
 
 @header {
@@ -68,7 +50,7 @@ lexer grammar KeYLexer;
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
-       if (token.getType() == NUM_LITERAL) {//rewrite NUM_LITERALs to identifier when preceeded by an '('
+       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceeded by an '('
            for (int k = 1; k <= MAX_K; k++) {
                int codePoint = _input.LA(k);
                if (Character.isWhitespace(codePoint)) continue;
@@ -163,6 +145,7 @@ DIFFERENTFIELDS:'\\differentFields';
 ISREFERENCE:'\\isReference';
 ISREFERENCEARRAY:'\\isReferenceArray';
 ISSTATICFIELD : '\\isStaticField';
+ISINSTRICTFP : '\\isInStrictFp';
 ISSUBTYPE : '\\sub';
 EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
@@ -451,9 +434,32 @@ fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
 
-NUM_LITERAL:
+INT_LITERAL:
     (DIGIT | '_')+ ('l'|'L')?
 ;
+
+fragment EXP_SUFFIX:
+   ('e'|'E') ('+'|'-')? (DIGIT)+
+   ;
+
+// reals, floats and doubles are all rationals here.
+fragment RATIONAL_LITERAL:
+      (DIGIT)+ ('.' (DIGIT)*)? (EXP_SUFFIX)?
+    | '.' (DIGIT)+ (EXP_SUFFIX)?
+    ;
+
+FLOAT_LITERAL:
+    RATIONAL_LITERAL ('f' | 'F')
+    ;
+
+DOUBLE_LITERAL:
+    RATIONAL_LITERAL ('d' | 'D')
+    ;
+
+REAL_LITERAL:
+    RATIONAL_LITERAL ('r' | 'R')
+    ;
+
 
 /**
   * Here we have to accept all strings of ki01           ERROR_CHAR 0:\                                                 nd \\[a-z_]

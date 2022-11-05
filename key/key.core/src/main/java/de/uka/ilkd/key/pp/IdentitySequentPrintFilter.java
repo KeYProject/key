@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.pp;
 
 import org.key_project.util.collection.ImmutableList;
@@ -41,8 +28,9 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered antecedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered antecedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
@@ -51,8 +39,9 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered succcedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered succcedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered succcedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
@@ -71,6 +60,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * constructor
+         *
          * @param originalFormula the original formula to be filtered
          */
         IdentityFilterEntry(SequentFormula originalFormula) {
@@ -79,6 +69,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * Formula to display
+         *
          * @return the original formula
          */
         public SequentFormula getFilteredFormula() {
@@ -87,6 +78,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * Original formula from sequent
+         *
          * @return the original formula
          */
         public SequentFormula getOriginalFormula() {

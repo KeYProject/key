@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -20,8 +7,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 
 
 /**
- * Feature for investigating whether some restrictions to the prefix of the
- * find formula apply.
+ * Feature for investigating whether some restrictions to the prefix of the find formula apply.
  *
  * @author christoph
  */
@@ -78,10 +64,9 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
 
     /**
-     * Construct a feature that checks the prefix with the passed
-     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
-     * otherwise computes top cost.
-     * 
+     * Construct a feature that checks the prefix with the passed PrefixCheckers. Computes zero
+     * costs, if all PrefixCheckers return true, otherwise computes top cost.
+     *
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PrefixChecker... prefixCheckers) {
@@ -89,40 +74,36 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     /**
-     * Construct a feature that checks the prefix with the passed
-     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
-     * otherwise computes top cost. Before the prefix check all
-     * PositionModifiers are applied. This allows for instance to ignore
-     * prefixing updates.
+     * Construct a feature that checks the prefix with the passed PrefixCheckers. Computes zero
+     * costs, if all PrefixCheckers return true, otherwise computes top cost. Before the prefix
+     * check all PositionModifiers are applied. This allows for instance to ignore prefixing
+     * updates.
      *
      * @param positionModifier the PositionModifier to be applied.
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier positionModifier,
-                                        PrefixChecker... prefixCheckers) {
-        this(new PositionModifier[]{positionModifier}, prefixCheckers);
+            PrefixChecker... prefixCheckers) {
+        this(new PositionModifier[] { positionModifier }, prefixCheckers);
     }
 
     /**
-     * Construct a feature that checks the prefix with the passed
-     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
-     * otherwise computes top cost. Before the prefix check all
-     * PositionModifiers are applied. This allows for instance to ignore
-     * prefixing updates.
+     * Construct a feature that checks the prefix with the passed PrefixCheckers. Computes zero
+     * costs, if all PrefixCheckers return true, otherwise computes top cost. Before the prefix
+     * check all PositionModifiers are applied. This allows for instance to ignore prefixing
+     * updates.
      *
      * @param positionModifiers the PositionModifiers to be applied.
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier[] positionModifiers,
-                                        PrefixChecker... prefixCheckers) {
+            PrefixChecker... prefixCheckers) {
         this.positionModifiers = positionModifiers;
         this.prefixCheckers = prefixCheckers;
     }
 
     @Override
-    protected boolean filter(TacletApp app,
-                             PosInOccurrence pos,
-                             Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

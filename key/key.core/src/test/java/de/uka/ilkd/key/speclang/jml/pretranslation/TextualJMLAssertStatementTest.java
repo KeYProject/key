@@ -2,12 +2,11 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
@@ -27,21 +26,12 @@ public class TextualJMLAssertStatementTest {
 
     @Test
     public void testTextRepr() {
+        assertTextRepr("//@ assert true;", "assert true ;");
+        assertTextRepr("//@ assert 1 + 2 == 3 && 2 != 3;", "assert 1 + 2 == 3 && 2 != 3 ;");
+        assertTextRepr("//@ assert (\\forall int j; 0 <= j < 10; true);",
+            "assert ( \\forall int j ; 0 <= j < 10 ; true ) ;");
         assertTextRepr(
-                "//@ assert true;",
-                "assert true ;"
-        );
-        assertTextRepr(
-                "//@ assert 1 + 2 == 3 && 2 != 3;",
-                "assert 1 + 2 == 3 && 2 != 3 ;"
-        );
-        assertTextRepr(
-                "//@ assert (\\forall int j; 0 <= j < 10; true);",
-                "assert ( \\forall int j ; 0 <= j < 10 ; true ) ;"
-        );
-        assertTextRepr(
-                "//@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));",
-                "assert ( \\forall int j ; 0 <= j < 10 ; ( \\exists int k ; 0 <= k < 10 ; j == k ) ) ;"
-        );
+            "//@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));",
+            "assert ( \\forall int j ; 0 <= j < 10 ; ( \\exists int k ; 0 <= k < 10 ; j == k ) ) ;");
     }
 }

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import org.key_project.util.collection.ImmutableList;
@@ -24,73 +11,77 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 
 /**
  * Default implementation of {@link ISymbolicLayout}.
+ *
  * @author Martin Hentschel
  */
 public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
-   /**
-    * The contained {@link ISymbolicEquivalenceClass}.
-    */
-   private final ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
-   
-   /**
-    * The {@link ISymbolicState}.
-    */
-   private ISymbolicState state;
-   
-   /**
-    * The contained {@link ISymbolicObject}s.
-    */
-   private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+    /**
+     * The contained {@link ISymbolicEquivalenceClass}.
+     */
+    private final ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
 
-   /**
-    * Constructor.
-    * @param equivalenceClasses The provided equivalence classes.
-    * @param settings The {@link IModelSettings} to use.
-    */
-   public SymbolicLayout(IModelSettings settings, 
-                                ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
-      super(settings);
-      assert equivalenceClasses != null;
-      this.equivalenceClasses = equivalenceClasses;
-   }
+    /**
+     * The {@link ISymbolicState}.
+     */
+    private ISymbolicState state;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ISymbolicState getState() {
-      return state;
-   }
+    /**
+     * The contained {@link ISymbolicObject}s.
+     */
+    private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
 
-   /**
-    * Sets the {@link ISymbolicState}.
-    * @param state The {@link ISymbolicState} to set.
-    */
-   public void setState(ISymbolicState state) {
-      this.state = state;
-   }
+    /**
+     * Constructor.
+     *
+     * @param equivalenceClasses The provided equivalence classes.
+     * @param settings The {@link IModelSettings} to use.
+     */
+    public SymbolicLayout(IModelSettings settings,
+            ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+        super(settings);
+        assert equivalenceClasses != null;
+        this.equivalenceClasses = equivalenceClasses;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<ISymbolicObject> getObjects() {
-      return objects;
-   }
-   
-   /**
-    * Adds a new {@link ISymbolicObject}.
-    * @param value The new {@link ISymbolicObject} to add.
-    */
-   public void addObject(ISymbolicObject object) {
-      objects = objects.append(object);
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ISymbolicState getState() {
+        return state;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses() {
-      return equivalenceClasses;
-   }
+    /**
+     * Sets the {@link ISymbolicState}.
+     *
+     * @param state The {@link ISymbolicState} to set.
+     */
+    public void setState(ISymbolicState state) {
+        this.state = state;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImmutableList<ISymbolicObject> getObjects() {
+        return objects;
+    }
+
+    /**
+     * Adds a new {@link ISymbolicObject}.
+     *
+     * @param value The new {@link ISymbolicObject} to add.
+     */
+    public void addObject(ISymbolicObject object) {
+        objects = objects.append(object);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses() {
+        return equivalenceClasses;
+    }
 }

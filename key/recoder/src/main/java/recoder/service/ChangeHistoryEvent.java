@@ -5,8 +5,7 @@ package recoder.service;
 import java.util.List;
 
 /**
- * Record of the syntactical changes that occured after the last validation of
- * the model.
+ * Record of the syntactical changes that occured after the last validation of the model.
  *
  * @author AL
  * @since 0.5

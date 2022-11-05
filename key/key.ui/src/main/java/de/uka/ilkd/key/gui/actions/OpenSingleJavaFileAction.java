@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -36,7 +23,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
     public OpenSingleJavaFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Open Single Java File...");
-        //setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
+        // setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load a single Java file without classpath.");
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         lookupAcceleratorKey();
@@ -56,9 +43,8 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
             mainWindow.addRecentFile(file.getAbsolutePath());
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
-            ProblemLoader pl = ui.getProblemLoader(file,
-                    Collections.emptyList(), null, Collections.emptyList(),
-                    ui.getMediator());
+            ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,
+                Collections.emptyList(), ui.getMediator());
             pl.setLoadSingleJavaFile(true);
             pl.runAsynchronously();
         }

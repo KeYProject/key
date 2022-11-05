@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
@@ -33,8 +20,8 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
 /**
- * A context given as {@link ContextStatementBlockInstantiation} is wrapped
- * around a given {@link ProgramElement}.
+ * A context given as {@link ContextStatementBlockInstantiation} is wrapped around a given
+ * {@link ProgramElement}.
  */
 public class ProgramContextAdder {
 
@@ -52,91 +39,73 @@ public class ProgramContextAdder {
     /**
      * wraps the context around the statements found in the putIn block
      */
-    public JavaNonTerminalProgramElement start(
-            JavaNonTerminalProgramElement context, StatementBlock putIn,
-            ContextStatementBlockInstantiation ct) {
+    public JavaNonTerminalProgramElement start(JavaNonTerminalProgramElement context,
+            StatementBlock putIn, ContextStatementBlockInstantiation ct) {
 
-        return wrap(context, putIn, ct.prefix().iterator(), ct.prefix().depth(),
-                ct.prefix(), ct.suffix());
+        return wrap(context, putIn, ct.prefix().iterator(), ct.prefix().depth(), ct.prefix(),
+            ct.suffix());
     }
 
-    protected JavaNonTerminalProgramElement wrap(
-            JavaNonTerminalProgramElement context, StatementBlock putIn,
-            IntIterator prefixPos, int prefixDepth, PosInProgram prefix,
+    protected JavaNonTerminalProgramElement wrap(JavaNonTerminalProgramElement context,
+            StatementBlock putIn, IntIterator prefixPos, int prefixDepth, PosInProgram prefix,
             PosInProgram suffix) {
 
         JavaNonTerminalProgramElement body = null;
 
-        ProgramElement next = prefixPos.hasNext()
-                ? context.getChildAt(prefixPos.next()) : null;
+        ProgramElement next = prefixPos.hasNext() ? context.getChildAt(prefixPos.next()) : null;
 
         if (!prefixPos.hasNext()) {
             body = createWrapperBody(context, putIn, suffix);
             // special case labeled statement as a label must not be
             // succeeded by a statement block
             if (context instanceof LabeledStatement) {
-                body = createLabeledStatementWrapper((LabeledStatement) context,
-                        body);
+                body = createLabeledStatementWrapper((LabeledStatement) context, body);
             }
             return body;
         } else {
-            body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos,
-                    prefixDepth, prefix, suffix);
+            body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos, prefixDepth, prefix,
+                suffix);
             if (context instanceof StatementBlock) {
-                return createStatementBlockWrapper((StatementBlock) context,
-                        body);
+                return createStatementBlockWrapper((StatementBlock) context, body);
             } else if (context instanceof Try) {
-                return createTryStatementWrapper((StatementBlock) body,
-                        (Try) context);
+                return createTryStatementWrapper((StatementBlock) body, (Try) context);
             } else if (context instanceof MethodFrame) {
-                return createMethodFrameWrapper((MethodFrame) context,
-                        (StatementBlock) body);
+                return createMethodFrameWrapper((MethodFrame) context, (StatementBlock) body);
             } else if (context instanceof LabeledStatement) {
-                return createLabeledStatementWrapper((LabeledStatement) context,
-                        body);
+                return createLabeledStatementWrapper((LabeledStatement) context, body);
             } else if (context instanceof LoopScopeBlock) {
-                return createLoopScopeBlockWrapper((LoopScopeBlock) context,
-                        (StatementBlock) body);
+                return createLoopScopeBlockWrapper((LoopScopeBlock) context, (StatementBlock) body);
             } else if (context instanceof SynchronizedBlock) {
-                return createSynchronizedBlockWrapper(
-                        (SynchronizedBlock) context, (StatementBlock) body);
+                return createSynchronizedBlockWrapper((SynchronizedBlock) context,
+                    (StatementBlock) body);
             } else if (context instanceof Exec) {
-                return createExecStatementWrapper((StatementBlock) body,
-                    (Exec) context);
+                return createExecStatementWrapper((StatementBlock) body, (Exec) context);
             } else {
-                throw new RuntimeException(new UnexpectedException(
-                        "Unexpected block type: " + context.getClass()));
+                throw new RuntimeException(
+                    new UnexpectedException("Unexpected block type: " + context.getClass()));
             }
         }
     }
 
     /**
-     * inserts the content of the statement block <code>putIn</code> and adds
-     * succeeding children of the innermost non terminal element (usually
-     * statement block) in the context.
+     * inserts the content of the statement block <code>putIn</code> and adds succeeding children of
+     * the innermost non terminal element (usually statement block) in the context.
      *
-     * @param wrapper
-     *            the JavaNonTerminalProgramElement with the context that has to
-     *            be wrapped around the content of <code>putIn</code>
-     * @param putIn
-     *            the StatementBlock with content that has to be wrapped by the
-     *            elements hidden in the context
-     * @param suffix
-     *            the PosInProgram describing the position of the first element
-     *            before the suffix of the context
-     * @return the StatementBlock which encloses the content of
-     *         <code>putIn</code> together with the succeeding context elements
-     *         of the innermost context statement block (attention: in a case
-     *         like
-     *         <code>{{{oldStmnt; list of further stmnt;}} moreStmnts; }</code>
-     *         only the underscored part is returned
-     *         <code>{{ __{putIn;....}__ }moreStmnts;}</code> adding the other
-     *         braces including the <code>moreStmnts;</code> part has to be done
+     * @param wrapper the JavaNonTerminalProgramElement with the context that has to be wrapped
+     *        around the content of <code>putIn</code>
+     * @param putIn the StatementBlock with content that has to be wrapped by the elements hidden in
+     *        the context
+     * @param suffix the PosInProgram describing the position of the first element before the suffix
+     *        of the context
+     * @return the StatementBlock which encloses the content of <code>putIn</code> together with the
+     *         succeeding context elements of the innermost context statement block (attention: in a
+     *         case like <code>{{{oldStmnt; list of further stmnt;}} moreStmnts; }</code> only the
+     *         underscored part is returned <code>{{ __{putIn;....}__ }moreStmnts;}</code> adding
+     *         the other braces including the <code>moreStmnts;</code> part has to be done
      *         elsewhere.
      */
-    private final StatementBlock createWrapperBody(
-            JavaNonTerminalProgramElement wrapper, StatementBlock putIn,
-            PosInProgram suffix) {
+    private final StatementBlock createWrapperBody(JavaNonTerminalProgramElement wrapper,
+            StatementBlock putIn, PosInProgram suffix) {
 
         final int putInLength = putIn.getChildCount();
 
@@ -156,32 +125,26 @@ public class ProgramContextAdder {
         putIn.getBody().arraycopy(0, body, 0, putInLength);
 
         for (int i = putInLength; i < childrenToAdd; i++) {
-            body[i] = (Statement) wrapper
-                    .getChildAt(lastChild + (i - putInLength));
+            body[i] = (Statement) wrapper.getChildAt(lastChild + (i - putInLength));
         }
 
         /*
-         * Example: In <code>{{{oldStmnt; list of further stmnt;}} moreStmnts;
-         * }</code> where <code>oldStmnt;</code> has to be replaced by the
-         * content of <code>putIn</code>. Up to here (including the return
-         * statement) the underscored part has been created: <code>{{
-         * __{putIn;....}__ }moreStmnts;}</code> Attention: we have not yet
-         * added the enclosing braces or even the <code>moreStmnts</code>
+         * Example: In <code>{{{oldStmnt; list of further stmnt;}} moreStmnts; }</code> where
+         * <code>oldStmnt;</code> has to be replaced by the content of <code>putIn</code>. Up to
+         * here (including the return statement) the underscored part has been created: <code>{{
+         * __{putIn;....}__ }moreStmnts;}</code> Attention: we have not yet added the enclosing
+         * braces or even the <code>moreStmnts</code>
          */
         return new StatementBlock(new ImmutableArray<Statement>(body));
     }
 
     /**
-     * Replaces the first statement in the wrapper block. The replacement is
-     * optimized as it just returns the replacement block if it is the only
-     * child of the statement block to be constructed and the chld is a
-     * statementblock too.
+     * Replaces the first statement in the wrapper block. The replacement is optimized as it just
+     * returns the replacement block if it is the only child of the statement block to be
+     * constructed and the chld is a statementblock too.
      *
-     * @param wrapper
-     *            the StatementBlock where to replace the first statement
-     * @param replacement
-     *            the StatementBlock that replaces the first statement of the
-     *            block
+     * @param wrapper the StatementBlock where to replace the first statement
+     * @param replacement the StatementBlock that replaces the first statement of the block
      * @return the resulting statement block
      */
     protected StatementBlock createStatementBlockWrapper(StatementBlock wrapper,
@@ -190,8 +153,7 @@ public class ProgramContextAdder {
         if (childrenCount <= 1 && replacement instanceof StatementBlock) {
             return (StatementBlock) replacement;
         } else {
-            Statement[] body = new Statement[childrenCount > 0 ? childrenCount
-                    : 1];
+            Statement[] body = new Statement[childrenCount > 0 ? childrenCount : 1];
             /* reconstruct block */
             body[0] = (Statement) replacement;
             if (childrenCount - 1 > 0) {
@@ -209,30 +171,27 @@ public class ProgramContextAdder {
         return new Exec(body, old.getBranchList());
     }
 
-    protected MethodFrame createMethodFrameWrapper(MethodFrame old,
-            StatementBlock body) {
-        return new MethodFrame(old.getProgramVariable(),
-                old.getExecutionContext(), body, old.getPositionInfo());
+    protected MethodFrame createMethodFrameWrapper(MethodFrame old, StatementBlock body) {
+        return new MethodFrame(old.getProgramVariable(), old.getExecutionContext(), body,
+            old.getPositionInfo());
     }
 
-    protected LabeledStatement createLabeledStatementWrapper(
-            LabeledStatement old, JavaNonTerminalProgramElement body) {
+    protected LabeledStatement createLabeledStatementWrapper(LabeledStatement old,
+            JavaNonTerminalProgramElement body) {
         return new LabeledStatement(old.getLabel(),
-                body instanceof StatementBlock && body.getChildCount() == 1
-                        && !(body.getChildAt(
-                                0) instanceof LocalVariableDeclaration)
-                                        ? (Statement) body.getChildAt(0)
-                                        : (Statement) body,
-                old.getPositionInfo());
+            body instanceof StatementBlock && body.getChildCount() == 1
+                    && !(body.getChildAt(0) instanceof LocalVariableDeclaration)
+                            ? (Statement) body.getChildAt(0)
+                            : (Statement) body,
+            old.getPositionInfo());
     }
 
-    protected LoopScopeBlock createLoopScopeBlockWrapper(
-            LoopScopeBlock old, StatementBlock body) {
+    protected LoopScopeBlock createLoopScopeBlockWrapper(LoopScopeBlock old, StatementBlock body) {
         return new LoopScopeBlock(old.getIndexPV(), body);
     }
 
-    protected SynchronizedBlock createSynchronizedBlockWrapper(
-            SynchronizedBlock old, StatementBlock body) {
+    protected SynchronizedBlock createSynchronizedBlockWrapper(SynchronizedBlock old,
+            StatementBlock body) {
         return new SynchronizedBlock(old.getExpression(), body);
     }
 

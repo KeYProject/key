@@ -1,22 +1,9 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -28,7 +15,7 @@ public class TestEnumClassDeclaration {
 
     ProgramFactory factory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         factory = ProofJavaProgramFactory.getInstance();
         ServiceConfiguration sc = new DefaultServiceConfiguration();
@@ -37,31 +24,33 @@ public class TestEnumClassDeclaration {
     }
 
     private static final String[] enums = {
-            // Simple
-            "enum A { a1, a2, a3 }",
-            // Two
-            "enum B implements C { b1(13), b2(42); B(int i){} void m() {} int j; }",
-            // 2 Constructors
-            "enum C { c1, c2(23); C(int i) { this(); } C() { j = 0; } int j; }"
-    };
+        // Simple
+        "enum A { a1, a2, a3 }",
+        // Two
+        "enum B implements C { b1(13), b2(42); B(int i){} void m() {} int j; }",
+        // 2 Constructors
+        "enum C { c1, c2(23); C(int i) { this(); } C() { j = 0; } int j; }" };
 
     @Test
     public void testSimple() throws ParserException {
-        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[0]).getTypeDeclarationAt(0);
+        EnumDeclaration ed =
+            (EnumDeclaration) factory.parseCompilationUnit(enums[0]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
         LOGGER.debug(ec.toSource());
     }
 
     @Test
     public void testTwo() throws ParserException {
-        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[1]).getTypeDeclarationAt(0);
+        EnumDeclaration ed =
+            (EnumDeclaration) factory.parseCompilationUnit(enums[1]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
         LOGGER.debug(ec.toSource());
     }
 
     @Test
     public void test2Constr() throws ParserException {
-        EnumDeclaration ed = (EnumDeclaration) factory.parseCompilationUnit(enums[2]).getTypeDeclarationAt(0);
+        EnumDeclaration ed =
+            (EnumDeclaration) factory.parseCompilationUnit(enums[2]).getTypeDeclarationAt(0);
         EnumClassDeclaration ec = new EnumClassDeclaration(ed);
         LOGGER.debug(ec.toSource());
     }

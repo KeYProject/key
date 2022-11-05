@@ -46,15 +46,15 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     /**
      * Translation of a string to a list of strings by using {@link #SET_DELIMITER}.
+     *
      * @param str a nonnull, emptible string
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
     private static @Nonnull List<String> parseStringList(@Nonnull String str) {
         // escape special chars (in particular the comma)
-        return Arrays.stream(str.split(SET_DELIMITER))
-                     .map(s -> SettingsConverter.convert(s, true))
-                     .collect(Collectors.toCollection(ArrayList::new));
+        return Arrays.stream(str.split(SET_DELIMITER)).map(s -> SettingsConverter.convert(s, true))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -63,9 +63,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      */
     private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
         // escape special chars (in particular the comma)
-        return seq.stream()
-                  .map(s -> SettingsConverter.convert(s, false))
-                  .collect(Collectors.joining(SET_DELIMITER));
+        return seq.stream().map(s -> SettingsConverter.convert(s, false))
+                .collect(Collectors.joining(SET_DELIMITER));
     }
 
     public boolean isInitialized() {
@@ -119,10 +118,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     }
 
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
-        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key,
-                parseStringSet(defValue),
-                AbstractPropertiesSettings::parseStringSet,
-                AbstractPropertiesSettings::stringSetToString);
+        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
+            AbstractPropertiesSettings::parseStringSet,
+            AbstractPropertiesSettings::stringSetToString);
         propertyEntries.add(pe);
         return pe;
     }
@@ -130,16 +128,15 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Creates a string list property.
      *
-     * @param key      the key value of this property inside {@link Properties} instance
+     * @param key the key value of this property inside {@link Properties} instance
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
-                                                                   @Nullable String defValue) {
-        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
-                parseStringList(defValue),
-                AbstractPropertiesSettings::parseStringList,
-                AbstractPropertiesSettings::stringListToString);
+            @Nullable String defValue) {
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
+            AbstractPropertiesSettings::parseStringList,
+            AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
         return pe;
     }
@@ -172,9 +169,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             this(key, defaultValue, convert, Objects::toString);
         }
 
-        private DefaultPropertyEntry(String key, T defaultValue,
-                                     Function<String, T> convert,
-                                     Function<T, String> toString) {
+        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
+                Function<T, String> toString) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;

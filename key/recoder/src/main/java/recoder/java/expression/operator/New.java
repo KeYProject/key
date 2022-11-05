@@ -21,16 +21,15 @@ import recoder.list.generic.ASTList;
  * if getType() instanceof UserType
  * <LI>Anonymous Inner Class definition and construction <BR>
  * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)
- * { m<sub>1</sub>, ..., m<sub>k</sub> }</tt>
- * <BR>
+ * { m<sub>1</sub>, ..., m<sub>k</sub> }</tt> <BR>
  * if getType() instanceof UserType && getClassDeclaration() !=<tt>null</tt>
  * </OL>
- * The access path is <tt>null</tt> in most cases, except when an inner class
- * constructor is invoked from an outer instance.
+ * The access path is <tt>null</tt> in most cases, except when an inner class constructor is invoked
+ * from an outer instance.
  */
 
-public class New extends TypeOperator implements ConstructorReference, ExpressionStatement, ReferencePrefix,
-        ReferenceSuffix, TypeDeclarationContainer {
+public class New extends TypeOperator implements ConstructorReference, ExpressionStatement,
+        ReferencePrefix, ReferenceSuffix, TypeDeclarationContainer {
 
     /**
      * serialization id
@@ -69,12 +68,13 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * New.
      *
-     * @param accessPath      a reference prefix.
+     * @param accessPath a reference prefix.
      * @param constructorName a type reference.
-     * @param arguments       an expression mutable list.
+     * @param arguments an expression mutable list.
      */
 
-    public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments) {
+    public New(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments) {
         setReferencePrefix(accessPath);
         setTypeReference(constructorName);
         setArguments(arguments);
@@ -84,14 +84,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * New.
      *
-     * @param accessPath      a reference prefix.
+     * @param accessPath a reference prefix.
      * @param constructorName a type reference.
-     * @param arguments       an expression mutable list.
-     * @param anonymousClass  a class declaration.
+     * @param arguments an expression mutable list.
+     * @param anonymousClass a class declaration.
      */
 
-    public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
-               ClassDeclaration anonymousClass) {
+    public New(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments, ClassDeclaration anonymousClass) {
         this(accessPath, constructorName, arguments);
         setClassDeclaration(anonymousClass);
         makeParentRoleValid();
@@ -267,11 +267,11 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     /*
-     * Return the type declaration at the specified index in this node's
-     * "virtual" type declaration array. @param index an index for a type
-     * declaration. @return the type declaration with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of
-     * bounds.
+     * Return the type declaration at the specified index in this node's "virtual" type declaration
+     * array. @param index an index for a type declaration. @return the type declaration with the
+     * given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
@@ -301,8 +301,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -361,11 +360,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

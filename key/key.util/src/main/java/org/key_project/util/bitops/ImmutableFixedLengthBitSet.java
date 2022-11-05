@@ -1,25 +1,11 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package org.key_project.util.bitops;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 
 /**
- * Represents a non-negative number with access to single bits; the length of
- * the bit set is fixed. Comparable to {@link BitSet} with fixed length. Objects
- * of this class are immutable.
+ * Represents a non-negative number with access to single bits; the length of the bit set is fixed.
+ * Comparable to {@link BitSet} with fixed length. Objects of this class are immutable.
  *
  * @author Dominic Scheurer
  */
@@ -29,12 +15,10 @@ public class ImmutableFixedLengthBitSet {
     private int value = -1;
 
     /**
-     * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length.
-     * All bits are set to zero (so the {@link ImmutableFixedLengthBitSet}
-     * represents the number 0).
+     * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length. All bits are set to
+     * zero (so the {@link ImmutableFixedLengthBitSet} represents the number 0).
      *
-     * @param length
-     *            The length of the new {@link ImmutableFixedLengthBitSet}.
+     * @param length The length of the new {@link ImmutableFixedLengthBitSet}.
      */
     public ImmutableFixedLengthBitSet(int length) {
         this.bitSet = new boolean[length];
@@ -42,15 +26,12 @@ public class ImmutableFixedLengthBitSet {
     }
 
     /**
-     * Constructs a new {@link ImmutableFixedLengthBitSet} from an explicit
-     * internal representation and value. Note: It is not checked that the value
-     * really faithfully represents the bitSet, so callers are responsible to
-     * make sure that this property holds.
+     * Constructs a new {@link ImmutableFixedLengthBitSet} from an explicit internal representation
+     * and value. Note: It is not checked that the value really faithfully represents the bitSet, so
+     * callers are responsible to make sure that this property holds.
      *
-     * @param bitSet
-     *            The new bit set.
-     * @param value
-     *            The value for bitSet.
+     * @param bitSet The new bit set.
+     * @param value The value for bitSet.
      */
     private ImmutableFixedLengthBitSet(boolean[] bitSet, int value) {
         this.bitSet = bitSet;
@@ -58,8 +39,7 @@ public class ImmutableFixedLengthBitSet {
     }
 
     /**
-     * @return The integer value represented by this
-     *         {@link ImmutableFixedLengthBitSet}.
+     * @return The integer value represented by this {@link ImmutableFixedLengthBitSet}.
      */
     public/* @ pure @ */int getValue() {
         if (value > -1) {
@@ -80,8 +60,7 @@ public class ImmutableFixedLengthBitSet {
     /**
      * Sets this {@link ImmutableFixedLengthBitSet} to the given value.
      *
-     * @param value
-     *            Value to set the {@link ImmutableFixedLengthBitSet} to.
+     * @param value Value to set the {@link ImmutableFixedLengthBitSet} to.
      */
     public ImmutableFixedLengthBitSet setToValue(int value) {
         assert value < intPow(2, bitSet.length) : "Value to high for this bit set.";
@@ -97,16 +76,15 @@ public class ImmutableFixedLengthBitSet {
     }
 
     /**
-     * Returns a new {@link ImmutableFixedLengthBitSet} with a value incremented
-     * by one compared to this {@link ImmutableFixedLengthBitSet}.
+     * Returns a new {@link ImmutableFixedLengthBitSet} with a value incremented by one compared to
+     * this {@link ImmutableFixedLengthBitSet}.
      */
     public ImmutableFixedLengthBitSet inc() {
         return setToValue(getValue() + 1);
     }
 
     /**
-     * @return The number of bits in the {@link ImmutableFixedLengthBitSet} set
-     *         to zero.
+     * @return The number of bits in the {@link ImmutableFixedLengthBitSet} set to zero.
      */
     public/* @ pure @ */int getNumOfZeroBits() {
         int result = 0;
@@ -121,8 +99,7 @@ public class ImmutableFixedLengthBitSet {
     }
 
     /**
-     * @return A list of all non-zero positions in the
-     *         {@link ImmutableFixedLengthBitSet}.
+     * @return A list of all non-zero positions in the {@link ImmutableFixedLengthBitSet}.
      */
     public ArrayList<Integer> getNonzeroPositions() {
         ArrayList<Integer> result = new ArrayList<Integer>();
@@ -137,7 +114,7 @@ public class ImmutableFixedLengthBitSet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -160,10 +137,8 @@ public class ImmutableFixedLengthBitSet {
     /**
      * Power function for integers.
      *
-     * @param a
-     *            The base.
-     * @param b
-     *            The exponent.
+     * @param a The base.
+     * @param b The exponent.
      * @return a^b.
      */
     private static int intPow(int a, int b) {

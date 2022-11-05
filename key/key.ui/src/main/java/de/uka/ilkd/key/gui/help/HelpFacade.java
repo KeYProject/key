@@ -18,9 +18,9 @@ import java.net.URLEncoder;
 /**
  * A gate to the KeY documentation system.
  * <p>
- * Provides the facility to open the documentation at press of F1.
- * The opened page is determined context-sensitive by the current focused component
- * and parent components. Specify the URL via {@HelpInfo}.
+ * Provides the facility to open the documentation at press of F1. The opened page is determined
+ * context-sensitive by the current focused component and parent components. Specify the URL via
+ * {@HelpInfo}.
  *
  * @author Alexander Weigl
  * @version 1 (10.04.19)
@@ -65,8 +65,7 @@ public class HelpFacade {
     }
 
     /**
-     * Opens the specified sub page of the key
-     * documentation website in the default system browser.
+     * Opens the specified sub page of the key documentation website in the default system browser.
      *
      * @param path a valid suffix to the current URI
      */
@@ -77,8 +76,8 @@ public class HelpFacade {
     /**
      * Tries to find the documentation of the given component and opens it.
      * <p>
-     * The documentation is determined by following the parents to the root and checking
-     * for {@see HelpInfo} on the classes.
+     * The documentation is determined by following the parents to the root and checking for
+     * {@see HelpInfo} on the classes.
      *
      * @param path
      */
@@ -109,8 +108,9 @@ public class HelpFacade {
     }
 
     /**
-     * Creates a {@link CButton}, that can be add to dockables and opens the given
-     * help pages at {@link #HELP_BASE_URL}
+     * Creates a {@link CButton}, that can be add to dockables and opens the given help pages at
+     * {@link #HELP_BASE_URL}
+     *
      * @param s path to help page
      * @return
      */

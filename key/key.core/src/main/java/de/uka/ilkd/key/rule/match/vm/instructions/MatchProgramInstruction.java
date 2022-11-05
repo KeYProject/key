@@ -18,8 +18,8 @@ public class MatchProgramInstruction implements MatchInstruction {
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services) {
         final MatchConditions result = pe.match(
-                new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
-                matchConditions);
+            new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
+            matchConditions);
         return result;
     }
 }

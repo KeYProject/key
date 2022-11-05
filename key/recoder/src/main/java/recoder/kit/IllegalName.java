@@ -5,8 +5,7 @@ package recoder.kit;
 import recoder.NamedModelElement;
 
 /**
- * Problem report indicating that a chosen name is illegal, for instance a
- * keyword.
+ * Problem report indicating that a chosen name is illegal, for instance a keyword.
  */
 public class IllegalName extends Problem {
 

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -35,25 +22,19 @@ public class DoBreak extends ProgramTransformer {
     /**
      * creates a do-break ProgramTransformer
      *
-     * @param labeledBreak
-     *            the LabeledStatement contained by the meta construct
+     * @param labeledBreak the LabeledStatement contained by the meta construct
      */
     public DoBreak(LabeledStatement labeledBreak) {
         super("do-break", labeledBreak);
     }
 
     /**
-     * a helper method to perform the symbolic execution of the doBreak
-     * metaconstruct.
+     * a helper method to perform the symbolic execution of the doBreak metaconstruct.
      *
-     * @param block
-     *            the NonTerminalProgramElement to go through and look for the
-     *            label
-     * @param breakLabel
-     *            the Label the break statement marked
+     * @param block the NonTerminalProgramElement to go through and look for the label
+     * @param breakLabel the Label the break statement marked
      */
-    private ProgramElement doBreak(NonTerminalProgramElement block,
-            Label breakLabel, Break b) {
+    private ProgramElement doBreak(NonTerminalProgramElement block, Label breakLabel, Break b) {
 
         if (block instanceof LabeledStatement) {
             // we enter a labeled block so we have to check the label
@@ -73,12 +54,9 @@ public class DoBreak extends ProgramTransformer {
     }
 
     /**
-     * performs the program transformation needed for symbolic program
-     * transformation
+     * performs the program transformation needed for symbolic program transformation
      *
-     * @param services
-     *            the Services with all necessary information about the java
-     *            programs
+     * @param services the Services with all necessary information about the java programs
      * @return the transformated program
      */
     @Override
@@ -93,10 +71,9 @@ public class DoBreak extends ProgramTransformer {
         if (lst.getChildAt(1) instanceof Break) {
             breakStmnt = (Break) lst.getChildAt(1);
         } else {
-            breakStmnt = (Break) ((StatementBlock) lst.getChildAt(1))
-                    .getChildAt(0);
+            breakStmnt = (Break) ((StatementBlock) lst.getChildAt(1)).getChildAt(0);
         }
-        return new ProgramElement[] { doBreak((NonTerminalProgramElement) pe,
-            breakStmnt.getLabel(), breakStmnt) };
+        return new ProgramElement[] {
+            doBreak((NonTerminalProgramElement) pe, breakStmnt.getLabel(), breakStmnt) };
     }
 }

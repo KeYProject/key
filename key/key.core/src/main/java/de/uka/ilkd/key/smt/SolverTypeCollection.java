@@ -1,19 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,20 +20,18 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     private int hashCode = -1;
 
     /**
-     * 
-     * @param type
-     *            at least on solver type must be passed.
+     *
+     * @param type at least on solver type must be passed.
      * @param types
-     * @param minUsableSolvers
-     *            specifies how many solvers at leas must be usable, so that
-     *            <code>isUsable</code> returns true.
+     * @param minUsableSolvers specifies how many solvers at leas must be usable, so that
+     *        <code>isUsable</code> returns true.
      */
-    public SolverTypeCollection(String name, int minUsableSolvers,
-	    SolverType type, SolverType... types) {
-	this.types.add(type);
-	this.name = name;
-	this.minUsableSolver = minUsableSolvers;
-	Collections.addAll(this.types, types);
+    public SolverTypeCollection(String name, int minUsableSolvers, SolverType type,
+            SolverType... types) {
+        this.types.add(type);
+        this.name = name;
+        this.minUsableSolver = minUsableSolvers;
+        Collections.addAll(this.types, types);
     }
 
     /**
@@ -56,8 +41,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
      * @param minUsableSolvers the min number of usable solvers
      * @param types the types to add
      */
-    public SolverTypeCollection(String name, int minUsableSolvers,
-                Collection<SolverType> types) {
+    public SolverTypeCollection(String name, int minUsableSolvers, Collection<SolverType> types) {
         this.name = name;
         this.minUsableSolver = minUsableSolvers;
         this.types.addAll(types);
@@ -72,14 +56,15 @@ public class SolverTypeCollection implements Iterable<SolverType> {
             return false;
         }
         SolverTypeCollection stc = (SolverTypeCollection) o;
-        return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver && types.equals(stc.types);
+        return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver
+                && types.equals(stc.types);
     }
 
     public int hashCode() {
         if (hashCode == -1) {
             hashCode = (minUsableSolver + 1) * name.hashCode();
-            for (SolverType type:types) {
-                hashCode = hashCode + 7*type.hashCode();
+            for (SolverType type : types) {
+                hashCode = hashCode + 7 * type.hashCode();
             }
             if (hashCode == -1) {
                 hashCode = 0;
@@ -88,46 +73,46 @@ public class SolverTypeCollection implements Iterable<SolverType> {
         return hashCode;
     }
 
-	public LinkedList<SolverType> getTypes() {
-		return types;
-	}
+    public LinkedList<SolverType> getTypes() {
+        return types;
+    }
 
-	public boolean isUsable() {
-		int usableCount = 0;
-		for (SolverType type : types) {
-			if (type.isInstalled(false)) {
-				usableCount++;
-			}
-		}
+    public boolean isUsable() {
+        int usableCount = 0;
+        for (SolverType type : types) {
+            if (type.isInstalled(false)) {
+                usableCount++;
+            }
+        }
 
-		return usableCount >= minUsableSolver;
-	}
+        return usableCount >= minUsableSolver;
+    }
 
-	public String name() {
-		return name;
-	}
+    public String name() {
+        return name;
+    }
 
-	public String toString() {
-		String s = "";
+    public String toString() {
+        String s = "";
 
-		int i = 0;
-		for (SolverType type : types) {
-			if (type.isInstalled(false)) {
-				if (i > 0) {
-					s += ", ";
-				}
-				s += type.getName();
-				i++;
-			}
-		}
-		if (s.isEmpty()) {
-			return "No solver available.";
-		}
-		return s;
-	}
+        int i = 0;
+        for (SolverType type : types) {
+            if (type.isInstalled(false)) {
+                if (i > 0) {
+                    s += ", ";
+                }
+                s += type.getName();
+                i++;
+            }
+        }
+        if (s.isEmpty()) {
+            return "No solver available.";
+        }
+        return s;
+    }
 
-	@Override
-	public Iterator<SolverType> iterator() {
-		return types.iterator();
-	}
+    @Override
+    public Iterator<SolverType> iterator() {
+        return types.iterator();
+    }
 }

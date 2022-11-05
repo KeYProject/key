@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.join;
 
 import java.util.Iterator;
@@ -23,8 +10,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 
 /**
- * Methods for computing conflicts affecting a delayed cut application. Relies
- * on the given {@link ApplicationCheck} object.
+ * Methods for computing conflicts affecting a delayed cut application. Relies on the given
+ * {@link ApplicationCheck} object.
  *
  * @see ApplicationCheck
  * @author Benjamin Niedermann
@@ -36,8 +23,7 @@ public enum LateApplicationCheck {
         return check(check, node.sequent(), cutNode);
     }
 
-    private List<String> check(ApplicationCheck check, Sequent sequent,
-            Node cutNode) {
+    private List<String> check(ApplicationCheck check, Sequent sequent, Node cutNode) {
         List<String> conflicts = new LinkedList<String>();
         for (Iterator<SequentFormula> it = sequent.iterator(); it.hasNext();) {
             SequentFormula sf = it.next();

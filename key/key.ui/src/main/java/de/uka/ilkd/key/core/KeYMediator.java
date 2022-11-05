@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.core;
 
 import java.util.Collection;
@@ -71,11 +58,10 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.util.lookup.Lookup;
 
 /**
- * The {@link KeYMediator} provides control logic for the user interface
- * implemented in Swing.
+ * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
  * <p>
- * <strong>Attention: </strong> Logic to apply rules has to be implemented user
- * interface independent in the {@link ProofControl}!
+ * <strong>Attention: </strong> Logic to apply rules has to be implemented user interface
+ * independent in the {@link ProofControl}!
  */
 public class KeYMediator {
 
@@ -95,8 +81,7 @@ public class KeYMediator {
     private KeYMediatorProofTreeListener proofTreeListener;
 
     /**
-     * current proof and node the user works with. All user interaction is relative
-     * to this model
+     * current proof and node the user works with. All user interaction is relative to this model
      */
     private KeYSelectionModel keySelectionModel;
 
@@ -118,8 +103,8 @@ public class KeYMediator {
     private boolean inAutoMode = false;
 
     /**
-     * creates the KeYMediator with a reference to the application's main frame and
-     * the current proof settings
+     * creates the KeYMediator with a reference to the application's main frame and the current
+     * proof settings
      */
     public KeYMediator(AbstractMediatorUserInterfaceControl ui) {
         this.ui = ui;
@@ -232,8 +217,8 @@ public class KeYMediator {
     }
 
     /**
-     * Returns a filter that is used for filtering taclets that should not be showed
-     * while interactive proving.
+     * Returns a filter that is used for filtering taclets that should not be showed while
+     * interactive proving.
      */
     public TacletFilter getFilterForInteractiveProving() {
         if (filterForInteractiveProving == null) {
@@ -267,15 +252,15 @@ public class KeYMediator {
     }
 
     private void finishSetBack(final Proof proof) {
-        TaskFinishedInfo info = new DefaultTaskFinishedInfo(this, null, proof, 0, 0,
-            getNrGoalsClosedByAutoMode()) {
-            @Override
-            public String toString() {
-                return "Proof has been pruned: "
-                    + (proof.openGoals().size() == 1 ? "one open goal remains."
-                        : (proof.openGoals().size() + " open goals remain."));
-            }
-        };
+        TaskFinishedInfo info =
+            new DefaultTaskFinishedInfo(this, null, proof, 0, 0, getNrGoalsClosedByAutoMode()) {
+                @Override
+                public String toString() {
+                    return "Proof has been pruned: "
+                        + (proof.openGoals().size() == 1 ? "one open goal remains."
+                                : (proof.openGoals().size() + " open goals remain."));
+                }
+            };
         this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
             ServiceCaches caches = proof.getServices().getCaches();
@@ -355,8 +340,8 @@ public class KeYMediator {
     }
 
     /**
-     * adds a listener to the KeYSelectionModel, so that the listener will be
-     * informed if the proof or node the user has selected changed
+     * adds a listener to the KeYSelectionModel, so that the listener will be informed if the proof
+     * or node the user has selected changed
      *
      * @param listener the KeYSelectionListener to add
      */
@@ -365,8 +350,8 @@ public class KeYMediator {
     }
 
     /**
-     * adds a listener to the KeYSelectionModel, so that the listener will be
-     * informed if the proof or node the user has selected changed
+     * adds a listener to the KeYSelectionModel, so that the listener will be informed if the proof
+     * or node the user has selected changed
      *
      * adds the listener only if it not already registered
      *
@@ -457,8 +442,8 @@ public class KeYMediator {
     }
 
     /**
-     * fires the request of a GUI component for modal access this can be used to
-     * disable all views even if the GUI component has no built in modal support
+     * fires the request of a GUI component for modal access this can be used to disable all views
+     * even if the GUI component has no built in modal support
      */
     public synchronized void fireModalDialogOpened(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
@@ -470,8 +455,8 @@ public class KeYMediator {
     }
 
     /**
-     * fires that a GUI component that has asked for modal access has been closed,
-     * so views can be enabled again
+     * fires that a GUI component that has asked for modal access has been closed, so views can be
+     * enabled again
      */
     public synchronized void fireModalDialogClosed(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
@@ -578,11 +563,13 @@ public class KeYMediator {
                 if (b) {
                     inAutoMode = true;
                     getUI().getProofControl()
-                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is this
-                                                                                  // wrong use of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                            .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                      // this
+                                                                                      // wrong use
+                                                                                      // of
+                                                                                      // auto mode
+                                                                                      // really
+                                                                                      // required?
                 }
             }
         };
@@ -597,11 +584,13 @@ public class KeYMediator {
                 if (b) {
                     inAutoMode = false;
                     getUI().getProofControl()
-                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is this
-                                                                                  // wrong use of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                            .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                      // this
+                                                                                      // wrong use
+                                                                                      // of
+                                                                                      // auto mode
+                                                                                      // really
+                                                                                      // required?
                 }
                 ui.notifyAutomodeStopped();
                 if (getSelectedProof() != null) {
@@ -615,8 +604,7 @@ public class KeYMediator {
     /**
      * Checks if the auto mode is currently running.
      *
-     * @return {@code true} auto mode is running, {@code false} auto mode is not
-     *         running.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
      */
     public boolean isInAutoMode() {
         return inAutoMode;
@@ -629,13 +617,13 @@ public class KeYMediator {
      * Retrieves a user-defined data.
      *
      * @param service the class for which the data were registered
-     * @param <T>     any class
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if(userData==null){
+            if (userData == null) {
                 return null;
             }
             return userData.get(service);
@@ -648,7 +636,7 @@ public class KeYMediator {
      * Register a user-defined data in this node info.
      *
      * @param obj an object to be registered
-     * @param service  the key under it should be registered
+     * @param service the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -657,6 +645,7 @@ public class KeYMediator {
 
     /**
      * Remove a previous registered user-defined data.
+     *
      * @param obj registered object
      * @param service the key under which the data was registered
      * @param <T> arbitray object
@@ -673,13 +662,14 @@ public class KeYMediator {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if(userData == null) userData = new Lookup();
+        if (userData == null)
+            userData = new Lookup();
         return userData;
     }
 
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-       private boolean pruningInProcess;
+        private boolean pruningInProcess;
 
         @Override
         public void proofClosed(ProofTreeEvent e) {
@@ -800,9 +790,8 @@ public class KeYMediator {
     }
 
     /**
-     * Disable certain actions until a proof is loaded. This is a workaround for a
-     * broken proof macro menu in the GUI. Remove this method as soon as another
-     * solution can be found.
+     * Disable certain actions until a proof is loaded. This is a workaround for a broken proof
+     * macro menu in the GUI. Remove this method as soon as another solution can be found.
      */
     @Deprecated
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
@@ -839,8 +828,8 @@ public class KeYMediator {
     }
 
     /**
-     * besides the number of rule applications it is possible to define a timeout
-     * after which rule application shall be terminated
+     * besides the number of rule applications it is possible to define a timeout after which rule
+     * application shall be terminated
      *
      * @return the time in ms after which automatic rule application stops
      */
@@ -864,29 +853,29 @@ public class KeYMediator {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
-//    /**
-//     * returns the prover task listener of the main frame
-//     */
-//    // TODO used 1 time, drop it? (MU)
-//    public ProverTaskListener getProverTaskListener() {
-//        return ui;
-//    }
+    // /**
+    // * returns the prover task listener of the main frame
+    // */
+    // // TODO used 1 time, drop it? (MU)
+    // public ProverTaskListener getProverTaskListener() {
+    // return ui;
+    // }
 
     public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {
-            final String result = CheckedUserInput.showAsDialog("Cut Formula",
-                "Please supply a formula:", null, "",
-                new InspectorForDecisionPredicates(getSelectedProof().getServices(), invokedNode,
-                    DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                    DelayedCutProcessor.getApplicationChecks()),
-                true);
+            final String result =
+                CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null, "",
+                    new InspectorForDecisionPredicates(getSelectedProof().getServices(),
+                        invokedNode, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                        DelayedCutProcessor.getApplicationChecks()),
+                    true);
 
             if (result == null) {
                 return false;
             }
 
-            Term formula = InspectorForDecisionPredicates
-                .translate(getSelectedProof().getServices(), result);
+            Term formula =
+                InspectorForDecisionPredicates.translate(getSelectedProof().getServices(), result);
 
             DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
                 formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
@@ -894,7 +883,7 @@ public class KeYMediator {
 
                 @Override
                 public void eventRebuildingTree(final int currentTacletNumber,
-                    final int totalNumber) {
+                        final int totalNumber) {
 
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -966,8 +955,7 @@ public class KeYMediator {
     /**
      * Returns the {@link AutoSaver} to use.
      *
-     * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver}
-     *         should be used.
+     * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver} should be used.
      */
     public AutoSaver getAutoSaver() {
         return autoSaver;
@@ -976,8 +964,8 @@ public class KeYMediator {
     /**
      * Provides a list of currently opened view.
      * <p>
-     * You can use this instance directly inside your components or
-     * add a listener to observe changes.
+     * You can use this instance directly inside your components or add a listener to observe
+     * changes.
      *
      * @see DefaultListModel#addListDataListener
      */

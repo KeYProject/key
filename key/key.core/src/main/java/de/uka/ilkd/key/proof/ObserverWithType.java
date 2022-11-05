@@ -12,8 +12,7 @@ public class ObserverWithType {
     public final KeYJavaType kjt;
     public final IObserverFunction obs;
 
-    public ObserverWithType(KeYJavaType kjt,
-                            IObserverFunction obs) {
+    public ObserverWithType(KeYJavaType kjt, IObserverFunction obs) {
         this.kjt = kjt;
         this.obs = obs;
     }

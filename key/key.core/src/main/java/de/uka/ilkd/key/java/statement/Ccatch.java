@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.statement;
 
 import java.util.Optional;
@@ -32,8 +19,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  * Ccatch.
  *
  */
-public class Ccatch extends BranchImp
-        implements ParameterContainer, VariableScope {
+public class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
 
     /**
      * Parameter.
@@ -59,10 +45,8 @@ public class Ccatch extends BranchImp
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e a parameter declaration.
+     * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -74,13 +58,10 @@ public class Ccatch extends BranchImp
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e a parameter declaration.
+     * @param body a statement.
      */
-    public Ccatch(CcatchNonstandardParameterDeclaration e,
-            StatementBlock body) {
+    public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
         super();
         this.body = body;
         parameter = Optional.empty();
@@ -90,18 +71,15 @@ public class Ccatch extends BranchImp
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children
-     *            the children of this AST element as KeY classes. May contain:
-     *            Comments, a ParameterDeclaration (declaring the catched
-     *            exceptions) a StatementBlock (as the action to do when
-     *            catching)
+     * @param children the children of this AST element as KeY classes. May contain: Comments, a
+     *        ParameterDeclaration (declaring the catched exceptions) a StatementBlock (as the
+     *        action to do when catching)
      */
     public Ccatch(ExtList children) {
         super(children);
-        parameter = Optional
-                .ofNullable(children.get(ParameterDeclaration.class));
-        nonStdParameter = Optional.ofNullable(
-            children.get(CcatchNonstandardParameterDeclaration.class));
+        parameter = Optional.ofNullable(children.get(ParameterDeclaration.class));
+        nonStdParameter =
+            Optional.ofNullable(children.get(CcatchNonstandardParameterDeclaration.class));
         body = children.get(StatementBlock.class);
     }
 
@@ -136,14 +114,11 @@ public class Ccatch extends BranchImp
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -176,15 +151,13 @@ public class Ccatch extends BranchImp
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array.
+     * Return the statement at the specified index in this node's "virtual" statement array.
      *
      * @param index an index for a statement.
      *
      * @return the statement with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of
-     * bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
@@ -205,16 +178,14 @@ public class Ccatch extends BranchImp
     }
 
     /**
-     * Return the parameter declaration at the specified index in this node's
-     * "virtual" parameter declaration array.
+     * Return the parameter declaration at the specified index in this node's "virtual" parameter
+     * declaration array.
      *
-     * @param index
-     *            an index for a parameter declaration.
+     * @param index an index for a parameter declaration.
      *
      * @return the parameter declaration with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
@@ -225,19 +196,16 @@ public class Ccatch extends BranchImp
     }
 
     /**
-     * Return the non-standard parameter declaration at the specified index in
-     * this node's "virtual" parameter declaration array.
+     * Return the non-standard parameter declaration at the specified index in this node's "virtual"
+     * parameter declaration array.
      *
-     * @param index
-     *            an index for a parameter declaration.
+     * @param index an index for a parameter declaration.
      *
      * @return the parameter declaration with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(
-            int index) {
+    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(int index) {
         if (hasNonStdParameterDeclaration() && index == 0) {
             return nonStdParameter.get();
         }
@@ -272,11 +240,10 @@ public class Ccatch extends BranchImp
     }
 
     /**
-     * calls the corresponding method of a visitor in order to perform some
-     * action/transformation on this element
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
      *
-     * @param v
-     *            the Visitor
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {

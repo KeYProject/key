@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.util.Debug;
@@ -26,11 +13,10 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This class is used to load and save settings for proofs such as which data
- * type models are used to represent the java types. Which heuristics have to be
- * loaded and so on. The class loads the file proofsettings.config from the
- * place where you started key. If the file is not available standard settings
- * are used. The loaded file has the following structure: <code>
+ * This class is used to load and save settings for proofs such as which data type models are used
+ * to represent the java types. Which heuristics have to be loaded and so on. The class loads the
+ * file proofsettings.config from the place where you started key. If the file is not available
+ * standard settings are used. The loaded file has the following structure: <code>
  * // KeY-Configuration file
  * ActiveHeuristics=simplify_prog , simplify
  * MaximumNumberOfHeuristcsApplications=400
@@ -44,7 +30,8 @@ import java.util.Properties;
 public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
-    public static final File PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
+    public static final File PROVER_CONFIG_FILE =
+        new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.props");
     public static final ProofSettings DEFAULT_SETTINGS = ProofSettings.loadedSettings();
@@ -68,16 +55,16 @@ public class ProofSettings {
 
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
-    private final ProofDependentSMTSettings smtSettings = ProofDependentSMTSettings.getDefaultSettingsData();
+    private final ProofDependentSMTSettings smtSettings =
+        ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
     private Properties lastLoadedProperties = null;
 
     /**
-     * create a proof settings object. When you add a new settings object,
-     * PLEASE UPDATE THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING
-     * INTEGERS DIRECTLY
+     * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
+     * ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING INTEGERS DIRECTLY
      */
     private ProofSettings() {
         addSettings(strategySettings);
@@ -243,12 +230,10 @@ public class ProofSettings {
     /**
      * Checks if the choice settings are initialized.
      *
-     * @return {@code true} settings are initialized, {@code false} settings are
-     * not initialized.
+     * @return {@code true} settings are initialized, {@code false} settings are not initialized.
      */
     public static boolean isChoiceSettingInitialised() {
-        return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices()
-                .isEmpty();
+        return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
     }
 
     /**

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
@@ -39,8 +26,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Replaces the MethodBodyStatement shortcut with the full body, performs prefix
- * adjustments in the body (execution context).
+ * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
+ * body (execution context).
  */
 public class ExpandMethodBody extends ProgramTransformer {
 
@@ -79,22 +66,20 @@ public class ExpandMethodBody extends ProgramTransformer {
 
         final HashMap<ProgramVariable, ProgramVariable> map = new LinkedHashMap<>();
         for (int i = 0; i < argsAsParam.size(); i++) {
-            IProgramVariable pv = methDecl.getParameterDeclarationAt(i)
-                    .getVariableSpecification().getProgramVariable();
+            IProgramVariable pv = methDecl.getParameterDeclarationAt(i).getVariableSpecification()
+                    .getProgramVariable();
             assert pv instanceof ProgramVariable : "Unexpected schematic variable";
             Expression arg = argsAsParam.get(i);
             assert arg instanceof ProgramVariable : "Unexpected schematic variable";
             map.put((ProgramVariable) pv, (ProgramVariable) argsAsParam.get(i));
         }
-        ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map,
-            services);
+        ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map, services);
         paramRepl.start();
         result = (StatementBlock) paramRepl.result();
 
-        return new ProgramElement[] { KeYJavaASTFactory.methodFrame(
-            mbs.getResultVariable(), KeYJavaASTFactory
-                    .executionContext(mbs.getBodySource(), pm, newCalled),
-            result, PositionInfo.UNDEFINED) };
+        return new ProgramElement[] { KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
+            KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm, newCalled), result,
+            PositionInfo.UNDEFINED) };
     }
 
 }

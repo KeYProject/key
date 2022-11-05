@@ -21,12 +21,15 @@ public class AnnotationPropertyInfo extends MethodInfo implements AnnotationProp
      * @param cf
      * @param defaultValue
      */
-    public AnnotationPropertyInfo(int accessFlags, String returntype, String name, ClassFile cf, Object defaultValue) {
+    public AnnotationPropertyInfo(int accessFlags, String returntype, String name, ClassFile cf,
+            Object defaultValue) {
         super(accessFlags, returntype, name, new String[0], new String[0], cf);
         this.defaultValue = defaultValue;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.AnnotationProperty#getDefaultValue()
      */
     public Object getDefaultValue() {

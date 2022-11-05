@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.logic.Term;
@@ -22,24 +9,23 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 /**
- * The abstract superclass of caches for taclet app indexes that are implemented
- * using a common backend <code>LRUCache</code> (the backend is stored in
- * <code>TermTacletAppIndexCacheSet</code>). The backend is accessed in a way
- * that guarantees that two distinct instances of this class never interfere, by
- * choosing cache keys that are specific for a particular instance of
- * <code>PrefixTermTacletAppIndexCacheImpl</code> and cannot be created by
- * other instances. This ensures that it is safe to use one instance of
- * <code>LRUCache</code> for many instances of
- * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different
- * proof branches, different locations).
+ * The abstract superclass of caches for taclet app indexes that are implemented using a common
+ * backend <code>LRUCache</code> (the backend is stored in <code>TermTacletAppIndexCacheSet</code>).
+ * The backend is accessed in a way that guarantees that two distinct instances of this class never
+ * interfere, by choosing cache keys that are specific for a particular instance of
+ * <code>PrefixTermTacletAppIndexCacheImpl</code> and cannot be created by other instances. This
+ * ensures that it is safe to use one instance of <code>LRUCache</code> for many instances of
+ * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different proof branches,
+ * different locations).
  */
 public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTacletAppIndexCache {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
     protected PrefixTermTacletAppIndexCacheImpl(ImmutableList<QuantifiableVariable> prefix,
-                                                Map<CacheKey, TermTacletAppIndex> cache) {
+            Map<CacheKey, TermTacletAppIndex> cache) {
         super(prefix);
         this.cache = cache;
     }
@@ -54,9 +40,11 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     @SuppressWarnings("unused")
     private void countAccess(boolean hit) {
         ++total;
-        if (hit) ++hits;
+        if (hit)
+            ++hits;
         if (total % 1000 == 0 && total != 0) {
-            LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(), ((double) hits) / (double) total);
+            LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(),
+                ((double) hits) / (double) total);
         }
     }
 
@@ -70,18 +58,17 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     protected abstract String name();
 
     /**
-     * @return a freshly created key for the term <code>t</code> that can be
-     * stored in the <code>cache</code>
+     * @return a freshly created key for the term <code>t</code> that can be stored in the
+     *         <code>cache</code>
      */
     private CacheKey getNewKey(Term t) {
         return new CacheKey(this, t);
     }
 
     /**
-     * @return a key for the term <code>t</code> that can be used for cache
-     * queries. Calling this method twice will return the same object
-     * (with different attribute values), i.e., the result is not
-     * supposed to be stored anywhere
+     * @return a key for the term <code>t</code> that can be used for cache queries. Calling this
+     *         method twice will return the same object (with different attribute values), i.e., the
+     *         result is not supposed to be stored anywhere
      */
     private CacheKey getQueryKey(Term t) {
         queryCacheKey.analysedTerm = t;
@@ -100,11 +87,11 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey)) return false;
+            if (!(obj instanceof CacheKey))
+                return false;
 
             final CacheKey objKey = (CacheKey) obj;
-            return parent == objKey.parent
-                    && analysedTerm.equals(objKey.analysedTerm);
+            return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 
         public int hashCode() {

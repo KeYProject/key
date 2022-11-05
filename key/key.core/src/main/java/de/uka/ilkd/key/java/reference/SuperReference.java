@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -27,31 +14,30 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Super reference.
- *  
+ * Super reference.
+ *
  */
 
-public class SuperReference extends JavaNonTerminalProgramElement
-                            implements Reference, Expression, ReferencePrefix, 
-                            ReferenceSuffix, ExpressionContainer, 
-                            TypeReferenceContainer {
+public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression,
+        ReferencePrefix, ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
-     *      Access path.
+     * Access path.
      */
     private final ReferencePrefix prefix;
 
 
     /**
-     *      Super reference.
+     * Super reference.
      */
     public SuperReference() {
         prefix = null;
     }
 
     /**
-     *      Super reference.
-     *      @param accessPath a reference expression.
+     * Super reference.
+     *
+     * @param accessPath a reference expression.
      */
     public SuperReference(ReferencePrefix accessPath) {
         this.prefix = accessPath;
@@ -59,10 +45,11 @@ public class SuperReference extends JavaNonTerminalProgramElement
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     */ 
+     */
     public SuperReference(ExtList children) {
-	prefix =children.get(ReferencePrefix.class);
+        prefix = children.get(ReferencePrefix.class);
     }
 
 
@@ -76,8 +63,9 @@ public class SuperReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
 
     public ReferencePrefix getReferencePrefix() {
@@ -85,33 +73,36 @@ public class SuperReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
-	int count = 0;
-	if (prefix != null) count++;
+        int count = 0;
+        if (prefix != null)
+            count++;
         return count;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) return prefix;
-        } 
+            if (index == 0)
+                return prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -119,52 +110,58 @@ public class SuperReference extends JavaNonTerminalProgramElement
     }
 
     /*
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the expression at the specified index in this node's "virtual" expression array.
+     *
+     * @param index an index for an expression.
+     *
+     * @return the expression with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     */
 
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression && index == 0) {
-            return (Expression)prefix;
+            return (Expression) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
 
     /*
-      Return the type reference at the specified index in this node's
-      "virtual" type reference array.
-      @param index an index for a type reference.
-      @return the type reference with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array.
+     *
+     * @param index an index for a type reference.
+     *
+     * @return the type reference with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     */
 
     public TypeReference getTypeReferenceAt(int index) {
         if ((prefix instanceof TypeReference) && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnSuperReference(this);
+        v.performActionOnSuperReference(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -172,15 +169,14 @@ public class SuperReference extends JavaNonTerminalProgramElement
     }
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
+        return this;
     }
 
     /**
-     * returns the KeYJavaType 
+     * returns the KeYJavaType
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getSuperclass
-	    (ec.getTypeReference().getKeYJavaType());
+        return javaServ.getJavaInfo().getSuperclass(ec.getTypeReference().getKeYJavaType());
     }
 
 }

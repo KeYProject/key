@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package de.uka.ilkd.key.proof.io;
 
 import org.antlr.v4.runtime.CharStream;
@@ -27,9 +15,10 @@ public abstract class RuleSource {
     public abstract File file();
 
     /**
-     * Provides an URL to the location the RuleSource is read from.
-     * This is more general than returning a file (works also e.g. in case of jar files where the
-     * file would be "jar:file:///...").
+     * Provides an URL to the location the RuleSource is read from. This is more general than
+     * returning a file (works also e.g. in case of jar files where the file would be
+     * "jar:file:///...").
+     *
      * @return the location of the RuleSource as url
      * @throws IOException on I/O errors
      */

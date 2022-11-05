@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -24,10 +11,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * The constructor call meta construct is used to handle a allocation expression
- * like <code>new Class(...)</code>. Thereby it replaces the allocation
- * expression by a method reference to an implict method called
- * <code>&lt;init&gt;</code> that is mainly the constructor but in its
+ * The constructor call meta construct is used to handle a allocation expression like
+ * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
+ * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
 public class SpecialConstructorCall extends ProgramTransformer {
@@ -35,13 +21,12 @@ public class SpecialConstructorCall extends ProgramTransformer {
     /**
      * The normal form identifier {@link ProgramElementName}.
      */
-    private static final ProgramElementName NORMALFORM_IDENTIFIER = new ProgramElementName(
-        de.uka.ilkd.key.java.recoderext.//
+    private static final ProgramElementName NORMALFORM_IDENTIFIER =
+        new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
                 ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
-     * @param consRef
-     *            The constructor reference.
+     * @param consRef The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
         super(new Name("special-constructor-call"), consRef);
@@ -60,8 +45,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
             prefix = KeYJavaASTFactory.superReference();
         }
 
-        return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix,
-            NORMALFORM_IDENTIFIER, constructorReference.getArguments()) };
+        return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
+            constructorReference.getArguments()) };
     }
 
 }

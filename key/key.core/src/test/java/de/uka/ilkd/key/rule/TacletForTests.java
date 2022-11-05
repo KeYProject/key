@@ -1,19 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
-/**
- * this class is used to parse in Taclet from a file that are used by tests
- */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -37,21 +21,23 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
-import java.io.StringReader;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * this class is used to parse in Taclet from a file that are used by tests
+ */
 public class TacletForTests {
 
     private TacletForTests() {
     }
 
-    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY +
-            File.separator + "testrules.key";
+    public static final String testRules =
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();
@@ -66,11 +52,11 @@ public class TacletForTests {
     private static Namespace<SchemaVariable> schemaVariables;
 
     public static Profile profile = new JavaProfile() {
-        //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+        // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
+        // library (HACK)
         public RuleCollection getStandardRules() {
-            return new RuleCollection(
-                    RuleSourceFactory.fromDefaultLocation(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
+            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
+                ImmutableSLList.<BuiltInRule>nil());
         }
     };
 
@@ -103,12 +89,14 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null) parse();
+        if (initConfig == null)
+            parse();
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null) parse();
+        if (services == null)
+            parse();
         return services;
     }
 
@@ -192,25 +180,24 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals("")) return null;
+        if (termstr.equals(""))
+            return null;
 
-        StringReader br = null;
         try {
             KeyIO io = new KeyIO(services, nss);
-            //TacletForTests.getAbbrevs()
+            // TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail("Exception occurred while parsing of " + termstr);
+            fail("Exception occurred while parsing of " + termstr);
             return null;
-        } finally {
-            if (br != null) br.close();
         }
 
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals("")) return null;
+        if (termstr.equals(""))
+            return null;
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

@@ -20,8 +20,8 @@ public class ShowInteractiveBranchesAction extends KeyAction {
     public ShowInteractiveBranchesAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
         setName("Hide justification");
-        setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
-                "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
+        setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n "
+            + "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
         setMenuPath(ToggleExplorationAction.MENU_PATH);
         putValue(CHECKBOX, true);
 
@@ -36,7 +36,7 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         setEnabled(model.isExplorationModeSelected());
 
         Icon secondBranch;
-        if(model.isShowInteractiveBranches()) {
+        if (model.isShowInteractiveBranches()) {
             secondBranch = Icons.SECOND_BRANCH_HIDE.get(16);
         } else {
             secondBranch = Icons.SECOND_BRANCH;
@@ -55,7 +55,8 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         if (model.isShowInteractiveBranches()) {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
         } else {
-            model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
+            model.setExplorationTacletAppState(
+                ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
         }
     }
 }

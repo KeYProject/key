@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt.communication;
 
 
@@ -24,10 +11,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * On each side of the pipe there are sender and receivers:
- * **** Receiver ====<=Output======= Sender    ******************
- * KeY* Sender	======Input=>====== Receiver  *External Process*
- * **** Receiver ====<=Error======== Sender    ******************
+ * On each side of the pipe there are sender and receivers: **** Receiver ====<=Output======= Sender
+ * ****************** KeY* Sender ======Input=>====== Receiver *External Process* **** Receiver
+ * ====<=Error======== Sender ******************
  *
  * @author Benjamin Niedermann (original)
  * @author Mattias Ulbrich (ovrhaul)
@@ -44,16 +30,15 @@ class LegacyPipe implements Pipe {
 
     /**
      * The delimiters of the messages, i.e. strings that indicate the end of a message. If you
-     * specify several delimiters a single message is chosen as small as possible, i.e., it does
-     * not contain any delimiter.
+     * specify several delimiters a single message is chosen as small as possible, i.e., it does not
+     * contain any delimiter.
      */
     private final String[] messageDelimiters;
 
-    private static final Message EXCEPTION_MESSAGE =
-            new Message("Exception", MessageType.ERROR);
+    private static final Message EXCEPTION_MESSAGE = new Message("Exception", MessageType.ERROR);
 
     private static final Message STREAM_CLOSED_MESSAGE =
-            new Message("Stream closed", MessageType.ERROR);
+        new Message("Stream closed", MessageType.ERROR);
 
     /**
      * User specific data.
@@ -91,8 +76,7 @@ class LegacyPipe implements Pipe {
             // do not use BufferedReader, but this wrapper in order to support different
             // message delimiters.
             BufferedMessageReader reader =
-                    new BufferedMessageReader(new InputStreamReader(input),
-                            messageDelimiters);
+                new BufferedMessageReader(new InputStreamReader(input), messageDelimiters);
 
             try {
 
@@ -164,7 +148,7 @@ class LegacyPipe implements Pipe {
 
     @Override
     public void sendEOF() {
-        //not used anymore
+        // not used anymore
     }
 
     public void join() throws InterruptedException {
@@ -180,8 +164,7 @@ class LegacyPipe implements Pipe {
 
 
     @Override
-    public @Nullable
-    String readMessage() throws IOException, InterruptedException {
+    public @Nullable String readMessage() throws IOException, InterruptedException {
         while (isAlive()) {
             Message result = messageQueue.take();
             if (result == EXCEPTION_MESSAGE) {
@@ -206,8 +189,7 @@ class LegacyPipe implements Pipe {
         return stderrReceiver.alive && stdoutReceiver.alive;
     }
 
-    public @Nonnull
-    SolverCommunication getSolverCommunication() {
+    public @Nonnull SolverCommunication getSolverCommunication() {
         return session;
     }
 }

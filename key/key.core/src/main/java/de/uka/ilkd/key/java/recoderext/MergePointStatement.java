@@ -1,24 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import recoder.java.*;
 import recoder.java.statement.JavaStatement;
 
-public class MergePointStatement extends JavaStatement
-        implements ExpressionContainer {
+public class MergePointStatement extends JavaStatement implements ExpressionContainer {
     private static final long serialVersionUID = 8513553210611636414L;
 
     private StatementContainer astParent;
@@ -71,8 +57,8 @@ public class MergePointStatement extends JavaStatement
     /**
      * Finds the source element that occurs first in the source.
      *
-     * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     * @return the last source element in the syntactical representation of this element, may be
+     *         equals to this element.
      */
     @Override
     public SourceElement getFirstElement() {
@@ -82,8 +68,8 @@ public class MergePointStatement extends JavaStatement
     /**
      * Finds the source element that occurs last in the source.
      *
-     * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     * @return the last source element in the syntactical representation of this element, may be
+     *         equals to this element.
      */
     @Override
     public SourceElement getLastElement() {
@@ -101,8 +87,7 @@ public class MergePointStatement extends JavaStatement
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -42,12 +29,12 @@ class MultiTrigger implements Trigger {
     }
 
     @Override
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-            ImmutableSet<Term> targetTerms, Services services) {
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
+            Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
 
-        ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
-                targetTerms, services);
+        ImmutableSet<Substitution> mulsubs =
+            setMultiSubstitution(triggers.iterator(), targetTerms, services);
 
         for (Substitution sub : mulsubs) {
             if (sub.isTotalOn(qvs)) {
@@ -59,14 +46,12 @@ class MultiTrigger implements Trigger {
     }
 
     /** help function for getMultiSubstitution */
-    private ImmutableSet<Substitution> setMultiSubstitution(
-            Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
+    private ImmutableSet<Substitution> setMultiSubstitution(Iterator<? extends Trigger> ts,
+            ImmutableSet<Term> terms, Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
         if (ts.hasNext()) {
-            ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
-                    terms, services);
-            ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms,
-                    services);
+            ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(terms, services);
+            ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms, services);
             if (nextSubs.isEmpty()) {
                 return subi;
             } else if (subi.isEmpty()) {
@@ -86,9 +71,8 @@ class MultiTrigger implements Trigger {
     }
 
     /**
-     * unify two substitution, if same variable are bound with same term return
-     * a new substitution with all universal quantifiable variables in two
-     * substituition, otherwise return null
+     * unify two substitution, if same variable are bound with same term return a new substitution
+     * with all universal quantifiable variables in two substituition, otherwise return null
      */
     private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
         final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();

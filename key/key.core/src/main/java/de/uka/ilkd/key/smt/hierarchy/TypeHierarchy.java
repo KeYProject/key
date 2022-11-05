@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt.hierarchy;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -35,8 +22,7 @@ public class TypeHierarchy {
     private static final Logger LOGGER = LoggerFactory.getLogger(TypeHierarchy.class);
 
     /**
-     * Maps each sort to its SortNode.
-     * The SortNode contains the parents and children of the sort.
+     * Maps each sort to its SortNode. The SortNode contains the parents and children of the sort.
      */
     private final HashMap<Sort, SortNode> sortMap = new HashMap<>();
     /**
@@ -55,9 +41,9 @@ public class TypeHierarchy {
     public TypeHierarchy(Services services) {
         this.services = services;
 
-        //Find all sorts
+        // Find all sorts
         for (var sort : services.getNamespaces().sorts().allElements()) {
-            //don't add the null sort
+            // don't add the null sort
             if (!sort.equals(services.getTypeConverter().getHeapLDT().getNull().sort())) {
                 addSort(sort);
                 sortList.add(sort);
@@ -68,13 +54,13 @@ public class TypeHierarchy {
             }
         }
 
-        //For all found sorts find their parents and children.
+        // For all found sorts find their parents and children.
         for (Entry<Sort, SortNode> e : sortMap.entrySet()) {
             Sort s = e.getKey();
             SortNode n = e.getValue();
 
             for (Sort p : s.extendsSorts(services)) {
-                //get parent node
+                // get parent node
                 SortNode pn = sortMap.get(p);
                 if (pn == null) {
                     continue;
@@ -129,15 +115,14 @@ public class TypeHierarchy {
     }
 
     /**
-     * Removes all interface sorts from the type hierarchy.
-     * All sorts without non-interface parents become children of java.lang.Object.
-     * All other sorts are left unchanged.
+     * Removes all interface sorts from the type hierarchy. All sorts without non-interface parents
+     * become children of java.lang.Object. All other sorts are left unchanged.
      */
     public void removeInterfaceNodes() {
 
         JavaInfo info = services.getJavaInfo();
 
-        //find all interface sorts and contract them
+        // find all interface sorts and contract them
         Set<Sort> interfaceSorts = new HashSet<>();
         for (Sort s : sortMap.keySet()) {
 
@@ -145,7 +130,7 @@ public class TypeHierarchy {
             if (kjt != null) {
                 Type jt = kjt.getJavaType();
                 if (jt instanceof InterfaceDeclaration) {
-                    //contract interface sort
+                    // contract interface sort
                     contractNode(s);
                     interfaceSorts.add(s);
                 }
@@ -153,13 +138,13 @@ public class TypeHierarchy {
 
 
         }
-        //remove the found interface sorts from the map
+        // remove the found interface sorts from the map
         for (Sort sort : interfaceSorts) {
             sortMap.remove(sort);
         }
         /*
-         * Some sorts may end up with two parents, one of which is java.lang.Object.
-         * In those cases we remove java.lang.Object as parent.
+         * Some sorts may end up with two parents, one of which is java.lang.Object. In those cases
+         * we remove java.lang.Object as parent.
          */
         for (var e : sortMap.entrySet()) {
             var node = e.getValue();
@@ -182,8 +167,8 @@ public class TypeHierarchy {
     }
 
     /**
-     * Contracts a sort s. Removes s as child of its parents and parent of its children.
-     * The children of s become the children of all parents of s and vice-versa.
+     * Contracts a sort s. Removes s as child of its parents and parent of its children. The
+     * children of s become the children of all parents of s and vice-versa.
      *
      * @param s The sort to be contracted.
      */
@@ -193,14 +178,14 @@ public class TypeHierarchy {
         Set<SortNode> children = node.getChildren();
 
 
-        //add children as children of parent
+        // add children as children of parent
         for (SortNode p : parents) {
             p.removeChild(node);
             for (SortNode c : children) {
                 p.addChild(c);
             }
         }
-        //add parents as parents of children
+        // add parents as parents of children
         for (SortNode c : children) {
             c.removeParent(node);
             for (SortNode p : parents) {

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package org.key_project.util.collection;
 
 import javax.annotation.Nonnull;
@@ -35,14 +22,10 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @return a Collector that accumulates the input elements into a new ImmutableSet.
      */
     public static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
-        return Collector.of(
-                HashSet<T>::new,
-                (set, el) -> set.add(el),
-                (set1, set2) -> {
-                    set1.addAll(set2);
-                    return set1; },
-                ImmutableSet::<T>fromSet,
-                Characteristics.UNORDERED);
+        return Collector.of(HashSet<T>::new, (set, el) -> set.add(el), (set1, set2) -> {
+            set1.addAll(set2);
+            return set1;
+        }, ImmutableSet::<T>fromSet, Characteristics.UNORDERED);
     }
 
     /**
@@ -85,6 +68,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * Adds an element
+     *
      * @return a set containing all elements of this one and the specified element.
      */
     ImmutableSet<T> add(T element);

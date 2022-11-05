@@ -1,22 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
- *                    Technical University Darmstadt, Germany
- *                    Chalmers University of Technology, Sweden
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
-
 package org.key_project.util.testcase.java;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.java.StringUtil;
 
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.Comparator;
 
 import static org.key_project.util.java.StringUtil.trim;
@@ -26,7 +13,7 @@ import static org.key_project.util.java.StringUtil.trim;
  *
  * @author Martin Hentschel
  */
-public class StringUtilTest extends TestCase {
+public class StringUtilTest {
     /**
      * Tests {@link StringUtil#startsWith(Object, String)}
      */
@@ -147,7 +134,9 @@ public class StringUtilTest extends TestCase {
         assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C", "A B C D"));
         assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C D", "A B C"));
         assertTrue(StringUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
-        assertTrue(StringUtil.equalIgnoreWhiteSpace("{result=self.doubleValue(_value)@ExistingContractTest; }", "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
+        assertTrue(StringUtil.equalIgnoreWhiteSpace(
+            "{result=self.doubleValue(_value)@ExistingContractTest; }",
+            "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
     }
 
     /**
@@ -158,7 +147,8 @@ public class StringUtilTest extends TestCase {
         String text = "First Line\nSecond Line\nLine\twith\tTabs\nLast Line";
         assertNull(StringUtil.toSingleLinedString(null));
         assertEquals("", StringUtil.toSingleLinedString(""));
-        assertEquals("First Line Second Line Line with Tabs Last Line", StringUtil.toSingleLinedString(text));
+        assertEquals("First Line Second Line Line with Tabs Last Line",
+            StringUtil.toSingleLinedString(text));
     }
 
     /**
@@ -167,16 +157,17 @@ public class StringUtilTest extends TestCase {
     @Test
     public void testReplaceAll() {
         String text = "ABCDABCDABCDABCD";
-        assertNull(StringUtil.replaceAll(null, new char[]{}, 'X'));
+        assertNull(StringUtil.replaceAll(null, new char[] {}, 'X'));
         assertEquals(text, StringUtil.replaceAll(text, null, 'X'));
-        assertEquals(text, StringUtil.replaceAll(text, new char[]{}, 'X'));
-        assertEquals("XBCDXBCDXBCDXBCD", StringUtil.replaceAll(text, new char[]{'A'}, 'X'));
-        assertEquals("AXCDAXCDAXCDAXCD", StringUtil.replaceAll(text, new char[]{'B'}, 'X'));
-        assertEquals("ABXDABXDABXDABXD", StringUtil.replaceAll(text, new char[]{'C'}, 'X'));
-        assertEquals("ABCXABCXABCXABCX", StringUtil.replaceAll(text, new char[]{'D'}, 'X'));
-        assertEquals("ABCDABCDABCDABCD", StringUtil.replaceAll(text, new char[]{'E'}, 'X'));
-        assertEquals("XBXDXBXDXBXDXBXD", StringUtil.replaceAll(text, new char[]{'A', 'C'}, 'X'));
-        assertEquals("XXXXXXXXXXXXXXXX", StringUtil.replaceAll(text, new char[]{'A', 'B', 'C', 'D'}, 'X'));
+        assertEquals(text, StringUtil.replaceAll(text, new char[] {}, 'X'));
+        assertEquals("XBCDXBCDXBCDXBCD", StringUtil.replaceAll(text, new char[] { 'A' }, 'X'));
+        assertEquals("AXCDAXCDAXCDAXCD", StringUtil.replaceAll(text, new char[] { 'B' }, 'X'));
+        assertEquals("ABXDABXDABXDABXD", StringUtil.replaceAll(text, new char[] { 'C' }, 'X'));
+        assertEquals("ABCXABCXABCXABCX", StringUtil.replaceAll(text, new char[] { 'D' }, 'X'));
+        assertEquals("ABCDABCDABCDABCD", StringUtil.replaceAll(text, new char[] { 'E' }, 'X'));
+        assertEquals("XBXDXBXDXBXDXBXD", StringUtil.replaceAll(text, new char[] { 'A', 'C' }, 'X'));
+        assertEquals("XXXXXXXXXXXXXXXX",
+            StringUtil.replaceAll(text, new char[] { 'A', 'B', 'C', 'D' }, 'X'));
     }
 
     /**
@@ -284,6 +275,7 @@ public class StringUtilTest extends TestCase {
         assertFalse(StringUtil.isEmpty(" A "));
     }
 
+    @Test
     public void testTestTrim() {
         assertEquals("abc", trim("(abc)", "()"));
         assertEquals("abc", trim("1234567890abc1234567890", Character::isDigit));
@@ -292,8 +284,9 @@ public class StringUtilTest extends TestCase {
         assertEquals("abc", trim("(abc)", "()"));
         assertEquals("abc", trim("   \n\t\fabc\n", Character::isWhitespace));
         assertEquals("", trim("abc", it -> true));
-        assertEquals("", trim("   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
-                it -> true));
+        assertEquals("", trim(
+            "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
+            it -> true));
         assertEquals("", trim("", 'c'));
     }
 }

@@ -7,7 +7,7 @@ public class SegSum {
 
     /*@ public normal_behaviour
       @ requires 0 <= i && i<=j && j<a.length;
-      @ ensures result == (\sum int k; i <=k & k<j; a[k]);
+      @ ensures \result == (\sum int k; i <=k & k<j; a[k]);
       @*/
     public static int segSum(int[] a, int i, int j) {
         int s = 0;

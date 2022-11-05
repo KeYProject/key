@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design 
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General 
-// Public License. See LICENSE.TXT for details.
-// 
 package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
@@ -50,8 +38,10 @@ public class InfoTreeModel extends DefaultTreeModel {
     public InfoTreeModel(Goal goal, XMLResources xmlResources, MainWindow mainWindow) {
         super(new InfoTreeNode());
         insertAsLast(new RulesNode(xmlResources.getRuleExplanations(), goal), (InfoTreeNode) root);
-        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()), (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()),
+            (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()),
+            (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -64,18 +54,19 @@ public class InfoTreeModel extends DefaultTreeModel {
          *
          */
         private static final long serialVersionUID = -5546552277804988834L;
-        private static final String COLLECTION = 
-                "This node stands for a category of symbols; expand it to browse the symbols " +
-                "in the category.";
+        private static final String COLLECTION =
+            "This node stands for a category of symbols; expand it to browse the symbols "
+                + "in the category.";
         private static final String DEFAULT_FUNCTIONS_LABEL =
-                "Display descriptions for documented interpreted function and predicate symbols.";
+            "Display descriptions for documented interpreted function and predicate symbols.";
 
         FunctionsNode(Properties functionExplanations) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
             Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
 
-            List<String> sortedKeys = new ArrayList<String>(functionExplanations.stringPropertyNames());
+            List<String> sortedKeys =
+                new ArrayList<String>(functionExplanations.stringPropertyNames());
             java.util.Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
@@ -133,7 +124,8 @@ public class InfoTreeModel extends DefaultTreeModel {
             insertAsLast(proveableTacletsRoot, this);
 
             if (goal != null && goal.proof() != null && goal.proof().mgt() != null) {
-                for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
+                for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex()
+                        .builtInRuleIndex().rules()) {
                     insertAsLast(new InfoTreeNode(br, ruleExplanations), builtInRoot);
                 }
                 Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
@@ -148,15 +140,19 @@ public class InfoTreeModel extends DefaultTreeModel {
                         continue; // do not break system because of this
                     }
                     if (just.isAxiomJustification()) {
-                        insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot, ruleExplanations);
+                        insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot,
+                            ruleExplanations);
                     } else {
-                        insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot, ruleExplanations);
+                        insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot,
+                            ruleExplanations);
                     }
                 }
             }
 
-            axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getChildCount(axiomTacletRoot) + ")");
-            proveableTacletsRoot.setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
+            axiomTacletRoot
+                    .setUserObject(TACLET_BASE + " (" + getChildCount(axiomTacletRoot) + ")");
+            proveableTacletsRoot
+                    .setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
         }
 
         private int getChildCount(InfoTreeNode root) {
@@ -173,10 +169,12 @@ public class InfoTreeModel extends DefaultTreeModel {
         /**
          * groups subsequent insertions with the same name under a new node
          */
-        private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent, Properties ruleExplanations) {
+        private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent,
+                Properties ruleExplanations) {
             InfoTreeNode insNode = (InfoTreeNode) ins;
             if (parent.getChildCount() > 0) {
-                InfoTreeNode lastNode = (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
+                InfoTreeNode lastNode =
+                    (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
                 if (getName(insNode).equals(getName(lastNode))) {
                     if (lastNode.getChildCount() == 0) {
                         removeNodeFromParent(lastNode);
@@ -212,8 +210,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
 
         private List<NoPosTacletApp> sort(Set<NoPosTacletApp> set) {
-            final ArrayList<NoPosTacletApp> l
-                    = new ArrayList<NoPosTacletApp>(set);
+            final ArrayList<NoPosTacletApp> l = new ArrayList<NoPosTacletApp>(set);
 
             Collections.sort(l, new Comparator<NoPosTacletApp>() {
                 @Override

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
@@ -53,8 +40,8 @@ public class TacletInstantiationModel {
     private final TacletFindModel tableModel;
 
     /**
-     * the application of the Taclet of which this model is used to complete the
-     * instantiations of the schemavariables and/or if-sequent
+     * the application of the Taclet of which this model is used to complete the instantiations of
+     * the schemavariables and/or if-sequent
      */
     private TacletApp app;
 
@@ -75,8 +62,8 @@ public class TacletInstantiationModel {
     private final Goal goal;
 
     /**
-     * Create new data model for the apply Taclet dialog wrapping a combo box model
-     * and a table model.
+     * Create new data model for the apply Taclet dialog wrapping a combo box model and a table
+     * model.
      *
      * @param app
      * @param seq
@@ -144,10 +131,10 @@ public class TacletInstantiationModel {
         int size = asize + ifseq.succedent().size();
 
         if (size > 0) {
-            ImmutableList<IfFormulaInstantiation> antecCand = IfFormulaInstSeq.createList(seq, true,
-                    services);
-            ImmutableList<IfFormulaInstantiation> succCand = IfFormulaInstSeq.createList(seq, false,
-                    services);
+            ImmutableList<IfFormulaInstantiation> antecCand =
+                IfFormulaInstSeq.createList(seq, true, services);
+            ImmutableList<IfFormulaInstantiation> succCand =
+                IfFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
             Term ifFma;
@@ -157,9 +144,11 @@ public class TacletInstantiationModel {
 
             for (int i = 0; i < size; i++) {
                 ifFma = it.next().formula();
-                ifChoiceModel[i] = new TacletAssumesModel(ifFma, taclet().getMatcher()
-                        .matchIf((i < asize ? antecCand : succCand), ifFma, matchCond, services)
-                        .getFormulas(), app, goal, services, nss, scm);
+                ifChoiceModel[i] =
+                    new TacletAssumesModel(
+                        ifFma, taclet().getMatcher().matchIf((i < asize ? antecCand : succCand),
+                            ifFma, matchCond, services).getFormulas(),
+                        app, goal, services, nss, scm);
             }
         } else {
             ifChoiceModel = EMPTY_IF_CHOICES;
@@ -169,8 +158,8 @@ public class TacletInstantiationModel {
     private TacletApp createTacletAppFromIfs(TacletApp tacletApp) throws IfMismatchException,
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
-        ImmutableList<IfFormulaInstantiation> instList = ImmutableSLList
-                .<IfFormulaInstantiation>nil();
+        ImmutableList<IfFormulaInstantiation> instList =
+            ImmutableSLList.<IfFormulaInstantiation>nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));
@@ -183,8 +172,8 @@ public class TacletInstantiationModel {
         }
 
         if (tacletApp == null) {
-            throw new IfMismatchException("Mismatch of '\\assumes'-formulas.\n"
-                    + "Reasons may be: ambigous instantiation "
+            throw new IfMismatchException(
+                "Mismatch of '\\assumes'-formulas.\n" + "Reasons may be: ambigous instantiation "
                     + "of schemavariables or unsatisfiable constraints.");
         }
 
@@ -231,9 +220,9 @@ public class TacletInstantiationModel {
     }
 
     /**
-     * replaces the TacletApp of this ApplyTacletDialogModel by an TacletApp where
-     * all name conflicts are resolved and thus the parser is enabled to accept
-     * variables from the context or the prefix of the Taclet.
+     * replaces the TacletApp of this ApplyTacletDialogModel by an TacletApp where all name
+     * conflicts are resolved and thus the parser is enabled to accept variables from the context or
+     * the prefix of the Taclet.
      *
      */
     public void prepareUnmatchedInstantiation() {

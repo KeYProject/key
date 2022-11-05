@@ -8,14 +8,14 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class SMTCommand
-        extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     public SMTCommand() {
@@ -32,56 +32,70 @@ public class SMTCommand
         return Collections.unmodifiableMap(result);
     }
 
-    @Override public SMTCommandArguments evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override
+    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "smt";
     }
 
-    @Override public void execute(SMTCommandArguments args)
-            throws ScriptException, InterruptedException {
+    @Override
+    public void execute(SMTCommandArguments args) throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
-        final List<Goal> goals = new ArrayList<>();
-        
-        if (args.allGoals) {
-            goals.addAll(state.getProof().openEnabledGoals().stream().collect(Collectors.toList()));
+        ImmutableList<Goal> goals;
+        if (args.all) {
+            goals = state.getProof().openGoals();
         } else {
-            goals.add(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
-        
+
         for (Goal goal : goals) {
-            DefaultSMTSettings settings = new DefaultSMTSettings(
-                    goal.proof().getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    goal.proof().getSettings().getNewSMTSettings(),
-                    goal.proof());
-            SolverLauncher launcher = new SolverLauncher(settings);
-            Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
-            probList.add(new SMTProblem(goal));
-            launcher.launch(su.getTypes(), probList, goal.proof().getServices());
-    
-            for (SMTProblem problem : probList) {
-                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
-                            .setTitle(args.solver);
-                    problem.getGoal().apply(app);
-                }
-            }
+            runSMT(args, su, goal);
         }
     }
 
-    private SolverTypeCollection computeSolvers(String value) {
+    private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
+        DefaultSMTSettings settings =
+            new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                goal.proof().getSettings().getNewSMTSettings(), goal.proof());
+
+        if (args.timeout >= 0) {
+            settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
+        }
+
+        SolverLauncher launcher = new SolverLauncher(settings);
+        Collection<SMTProblem> probList = new LinkedList<>();
+        probList.add(new SMTProblem(goal));
+        TimerListener timerListener = new TimerListener();
+        launcher.addListener(timerListener);
+        launcher.launch(su.getTypes(), probList, goal.proof().getServices());
+
+        for (SMTProblem problem : probList) {
+            SMTSolverResult finalResult = problem.getFinalResult();
+            if (finalResult.isValid() == ThreeValuedTruth.VALID) {
+                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(args.solver);
+                problem.getGoal().apply(app);
+            }
+            System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
+                + timerListener.getRuntime() + " ms; " + finalResult);
+        }
+    }
+
+    private SolverTypeCollection computeSolvers(String value) throws ScriptException {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<SolverType>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
-            if (type != null) {
-                types.add(type);
+            if (type == null) {
+                throw new ScriptException("Unknown SMT solver: " + name);
             }
+            types.add(type);
         }
         return new SolverTypeCollection(value, 1, types);
     }
@@ -89,9 +103,47 @@ public class SMTCommand
     public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
-        
-        @Option(value = "allgoals", required = false)
-        public boolean allGoals = false;
+
+        @Option(value = "all", required = false)
+        public boolean all = false;
+
+        @Option(value = "timeout", required = false)
+        public int timeout = -1;
     }
 
+    private static class TimerListener implements SolverLauncherListener {
+        private long start;
+        private long stop;
+
+        @Override
+        public void launcherStarted(Collection<SMTProblem> problems,
+                Collection<SolverType> solverTypes, SolverLauncher launcher) {
+            this.start = System.currentTimeMillis();
+        }
+
+        @Override
+        public void launcherStopped(SolverLauncher launcher,
+                Collection<SMTSolver> finishedSolvers) {
+            this.stop = System.currentTimeMillis();
+        }
+
+        public long getRuntime() {
+            return stop - start;
+        }
+    }
+
+    private class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
+        private final int timeout;
+
+        public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
+            super(settings.getPdSettings(), settings.getPiSettings(),
+                settings.getNewTranslationSettings(), settings.getProof());
+            this.timeout = timeout;
+        }
+
+        @Override
+        public long getTimeout() {
+            return timeout;
+        }
+    }
 }

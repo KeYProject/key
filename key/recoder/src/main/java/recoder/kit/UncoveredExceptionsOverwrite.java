@@ -5,8 +5,8 @@ package recoder.kit;
 import recoder.abstraction.Method;
 
 /**
- * Problem report indicating that a method has been overwritten with a version
- * that offers more strict exceptions.
+ * Problem report indicating that a method has been overwritten with a version that offers more
+ * strict exceptions.
  */
 public class UncoveredExceptionsOverwrite extends Conflict {
 

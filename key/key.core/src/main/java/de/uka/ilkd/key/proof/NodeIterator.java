@@ -22,7 +22,7 @@ class NodeIterator implements Iterator<Node> {
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Changing the proof tree "
-                + "structure this way is not allowed.");
+        throw new UnsupportedOperationException(
+            "Changing the proof tree " + "structure this way is not allowed.");
     }
 }

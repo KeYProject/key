@@ -16,7 +16,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Rule application class for close-after-merge rule applications.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
@@ -28,9 +28,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Term pc;
     private Set<Name> newNames;
 
-    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio, Node thePartnerNode,
-            Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
+            Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
@@ -41,8 +40,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         setNewNames(newNames);
     }
 
-    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio) {
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
@@ -64,8 +62,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public boolean complete() {
-        return partnerNode != null && correspondingMergeNode != null
-                && mergeNodeState != null && partnerState != null && pc != null;
+        return partnerNode != null && correspondingMergeNode != null && mergeNodeState != null
+                && partnerState != null && pc != null;
     }
 
     // // GETTERS AND SETTERS // //

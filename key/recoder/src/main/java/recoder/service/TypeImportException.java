@@ -6,8 +6,8 @@ import recoder.ModelException;
 import recoder.ParserException;
 
 /**
- * Exception indicating that a certain type could not be imported. This might
- * have been a consequence of a parse or IO exception.
+ * Exception indicating that a certain type could not be imported. This might have been a
+ * consequence of a parse or IO exception.
  *
  * @author AL
  */

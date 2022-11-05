@@ -27,16 +27,10 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author lanzinger
  */
-@KeYGuiExtension.Info(name = "Origin Tracking",
-        optional = true,
-        description = "UI support for origin tracking",
-        experimental = false)
-public class OriginTermLabelsExt
-        implements KeYGuiExtension,
-        KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Tooltip,
-        KeYGuiExtension.MainMenu,
-        KeYGuiExtension.TermInfo {
+@KeYGuiExtension.Info(name = "Origin Tracking", optional = true,
+    description = "UI support for origin tracking", experimental = false)
+public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Tooltip, KeYGuiExtension.MainMenu, KeYGuiExtension.TermInfo {
 
     /** @see ToggleTermOriginTrackingAction */
     private ToggleTermOriginTrackingAction toggleTrackingAction;
@@ -69,16 +63,13 @@ public class OriginTermLabelsExt
     }
 
     @Override
-    public List<Action> getContextActions(
-            KeYMediator mediator,
-            ContextMenuKind kind,
+    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
         } else if (kind == DefaultContextMenuKind.PROOF_TREE && underlyingObject instanceof Node) {
             Node node = (Node) underlyingObject;
-            return NodeInfoVisualizer.getInstances(node).stream()
-                    .map(OpenVisualizerAction::new)
+            return NodeInfoVisualizer.getInstances(node).stream().map(OpenVisualizerAction::new)
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -114,13 +105,12 @@ public class OriginTermLabelsExt
 
         PosInOccurrence pio = pos.getPosInOccurrence();
 
-        OriginTermLabel label = pio == null ? null : (OriginTermLabel) pio
-                .subTerm().getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label =
+            pio == null ? null : (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
-            result += "<b>Origin of (former) sub-terms:</b><br>" +
-                    label.getSubtermOrigins().stream()
-                    .map(o -> "" + o + "<br>").reduce("", String::concat);
+            result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()
+                    .stream().map(o -> "" + o + "<br>").reduce("", String::concat);
         }
 
         List<String> resultList = new LinkedList<>();

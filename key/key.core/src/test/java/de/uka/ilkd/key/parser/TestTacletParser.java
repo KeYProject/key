@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -27,15 +14,14 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * class tests the parser for Taclets
@@ -43,40 +29,24 @@ import static org.junit.Assert.*;
 
 
 public class TestTacletParser {
-    private static final String DECLS = ("\\sorts { s; }\n" +
-            "\\functions {\n" +
-            "  s f(s);\n" +
-            "}\n" +
-            "\\schemaVariables {\n" +
-            "  \\formula b,b0,post;\n" +
-            "  \\program Statement #p1, #s ; \n" +
-            "  \\program Expression #e2, #e ; \n" +
-            "  \\program SimpleExpression #se ; \n" +
-            "  \\program Variable #slhs, #arr, #ar, #ar1 ; \n" +
-            "  \\program LoopInit #i ; \n" +
-            "  \\program Label #lab, #lb0, #lb1 ; \n" +
-            "  \\program Label #inner, #outer ; \n" +
-            "  \\program Type #typ ; \n" +
-            "  \\program Variable #v0, #v, #v1, #k, #boolv ; \n" +
-            "  \\program[list] Catch #cf ; \n" +
-            "  \\term s x,x0 ;\n" +
-            "  \\skolemTerm s sk ;\n" +
-            "  \\variables s z,z0 ;\n" +
-            "}\n"
-    );
-    private NamespaceSet nss;
-    private Services services;
+    private static final String DECLS =
+        ("\\sorts { s; }\n" + "\\functions {\n" + "  s f(s);\n" + "}\n" + "\\schemaVariables {\n"
+            + "  \\formula b,b0,post;\n" + "  \\program Statement #p1, #s ; \n"
+            + "  \\program Expression #e2, #e ; \n" + "  \\program SimpleExpression #se ; \n"
+            + "  \\program Variable #slhs, #arr, #ar, #ar1 ; \n" + "  \\program LoopInit #i ; \n"
+            + "  \\program Label #lab, #lb0, #lb1 ; \n" + "  \\program Label #inner, #outer ; \n"
+            + "  \\program Type #typ ; \n" + "  \\program Variable #v0, #v, #v1, #k, #boolv ; \n"
+            + "  \\program[list] Catch #cf ; \n" + "  \\term s x,x0 ;\n" + "  \\skolemTerm s sk ;\n"
+            + "  \\variables s z,z0 ;\n" + "}\n");
 
-    private TermFactory tf;
     private Namespace<SchemaVariable> schemaVariableNS;
     private KeyIO io;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        nss = new NamespaceSet();
-        services = TacletForTests.services();
+        NamespaceSet nss = new NamespaceSet();
+        Services services = TacletForTests.services();
         io = new KeyIO(services, nss);
-        tf = services.getTermFactory();
         parseDecls(DECLS);
     }
 
@@ -143,20 +113,16 @@ public class TestTacletParser {
         AntecTacletBuilder builder = new AntecTacletBuilder();
         builder.setFind(parseFma("b->b0"));
         builder.setName(new Name("imp_left"));
-        builder.addTacletGoalTemplate(new
-                AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                sequent("b0", null)));
+        builder.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), sequent("b0", null)));
 
-        builder.addTacletGoalTemplate(new
-                AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                sequent(null, "b")));
+        builder.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), sequent(null, "b")));
 
         Taclet impleft = builder.getAntecTaclet();
         String impleftString =
-                "imp_left{\\find(b->b0 ==>) \\replacewith(b0 ==>); \\replacewith(==> b)}";
-        assertEquals("imp-left", impleft, parseTaclet(impleftString));
+            "imp_left{\\find(b->b0 ==>) \\replacewith(b0 ==>); \\replacewith(==> b)}";
+        assertEquals(impleft, parseTaclet(impleftString), "imp-left");
     }
 
     @Test
@@ -165,16 +131,13 @@ public class TestTacletParser {
         // find(=> b->b0) replacewith(b => b0)
         SuccTacletBuilder builder = new SuccTacletBuilder();
         builder.setFind(parseFma("b->b0"));
-        builder.addTacletGoalTemplate(new
-                AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                sequent("b", "b0")));
+        builder.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), sequent("b", "b0")));
         builder.setName(new Name("imp_right"));
         Taclet impright = builder.getSuccTaclet();
-        String imprightString =
-                "imp_right{\\find(==> b->b0) \\replacewith(b ==> b0)}";
+        String imprightString = "imp_right{\\find(==> b->b0) \\replacewith(b ==> b0)}";
 
-        assertEquals("imp-right", impright, parseTaclet(imprightString));
+        assertEquals(impright, parseTaclet(imprightString), "imp-right");
     }
 
     @Test
@@ -182,15 +145,11 @@ public class TestTacletParser {
         // cut rule
         // add(b=>) add(=>b)
         NoFindTacletBuilder builder = new NoFindTacletBuilder();
-        builder.addTacletGoalTemplate(new
-                TacletGoalTemplate(sequent("b", null),
-                ImmutableSLList.nil()
-        ));
+        builder.addTacletGoalTemplate(
+            new TacletGoalTemplate(sequent("b", null), ImmutableSLList.nil()));
 
-        builder.addTacletGoalTemplate(new
-                TacletGoalTemplate(sequent(null, "b"),
-                ImmutableSLList.nil()
-        ));
+        builder.addTacletGoalTemplate(
+            new TacletGoalTemplate(sequent(null, "b"), ImmutableSLList.nil()));
         builder.setName(new Name("cut"));
 
         Taclet cut = builder.getNoFindTaclet();
@@ -208,8 +167,7 @@ public class TestTacletParser {
         builder.setName(new Name("close_goal"));
         Taclet close = builder.getSuccTaclet();
         String closeString = "close_goal{\\assumes (b==>) \\find(==>b) \\closegoal}";
-        assertEquals("close", close,
-                parseTaclet(closeString));
+        assertEquals(close, parseTaclet(closeString), "close");
     }
 
     @Test
@@ -217,19 +175,15 @@ public class TestTacletParser {
         // contraposition rule
         // find(b->b0) replacewith(-b0 -> -b)
 
-        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<RewriteTaclet>();
+        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<>();
         builder.setFind(parseFma("b->b0"));
-        builder.addTacletGoalTemplate(new
-                RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                parseFma("!b0->!b")));
+        builder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), parseFma("!b0->!b")));
         builder.setName(new Name("contraposition"));
         Taclet contraposition = builder.getRewriteTaclet();
-        String contrapositionString =
-                "contraposition{\\find(b->b0) \\replacewith(!b0 -> !b)}";
+        String contrapositionString = "contraposition{\\find(b->b0) \\replacewith(!b0 -> !b)}";
 
-        assertEquals("contraposition", contraposition,
-                parseTaclet(contrapositionString));
+        assertEquals(contraposition, parseTaclet(contrapositionString), "contraposition");
     }
 
     @Test
@@ -239,17 +193,14 @@ public class TestTacletParser {
         SuccTacletBuilder builder = new SuccTacletBuilder();
 
         builder.setFind(parseFma("\\forall z; b"));
-        builder.addTacletGoalTemplate(new
-                AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                sequent(null, "{\\subst z; sk}b")));
-        builder.addVarsNewDependingOn(lookup_schemavar("sk"),
-                lookup_schemavar("b"));
+        builder.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), sequent(null, "{\\subst z; sk}b")));
+        builder.addVarsNewDependingOn(lookup_schemavar("sk"), lookup_schemavar("b"));
         builder.setName(new Name("all_right"));
         Taclet allright = builder.getSuccTaclet();
         String allrightString =
-                "all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(sk, b) ) \\replacewith (==> {\\subst z; sk}b)}";
-        assertEquals("all-right", allright, parseTaclet(allrightString));
+            "all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(sk, b) ) \\replacewith (==> {\\subst z; sk}b)}";
+        assertEquals(allright, parseTaclet(allrightString), "all-right");
     }
 
     @Test
@@ -261,38 +212,31 @@ public class TestTacletParser {
         builder.setFind(parseFma("\\forall z; b"));
 
 
-        builder.addTacletGoalTemplate(new
-                TacletGoalTemplate(sequent("{\\subst z; x}b", null),
-                ImmutableSLList.nil()));
+        builder.addTacletGoalTemplate(
+            new TacletGoalTemplate(sequent("{\\subst z; x}b", null), ImmutableSLList.nil()));
         builder.setName(new Name("all_left"));
         Taclet allleft = builder.getAntecTaclet();
-        String allleftString =
-                "all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}";
-        assertEquals("all-left", allleft,
-                parseTaclet(allleftString));
+        String allleftString = "all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}";
+        assertEquals(allleft, parseTaclet(allleftString), "all-left");
     }
 
     @Test
     public void testExConjSplit() {
-        //exists-conj-split rule
-        //find(ex z . ( b & b0 )) varcond(z not free in b)
-        //  replacewith( b & ex z.b0 )
+        // exists-conj-split rule
+        // find(ex z . ( b & b0 )) varcond(z not free in b)
+        // replacewith( b & ex z.b0 )
 
-        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<RewriteTaclet>();
+        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<>();
         builder.setFind(parseFma("\\exists z; (b & b0)"));
-        builder.addVarsNotFreeIn(lookup_schemavar("z"),
-                lookup_schemavar("b"));
-        builder.addTacletGoalTemplate(new
-                RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                parseFma("b & \\exists z; b0")));
+        builder.addVarsNotFreeIn(lookup_schemavar("z"), lookup_schemavar("b"));
+        builder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), parseFma("b & \\exists z; b0")));
         builder.setName(new Name("exists_conj_split"));
         Taclet exconjsplit = builder.getRewriteTaclet();
-        String exconjsplitString = "exists_conj_split{"
-                + "\\find(\\exists z; ( b & b0 )) \\varcond(\\notFreeIn(z, b)) \n"
+        String exconjsplitString =
+            "exists_conj_split{" + "\\find(\\exists z; ( b & b0 )) \\varcond(\\notFreeIn(z, b)) \n"
                 + "\\replacewith( b & \\exists z; b0 )}";
-        assertEquals("ex-conj-split", exconjsplit,
-                parseTaclet(exconjsplitString));
+        assertEquals(exconjsplit, parseTaclet(exconjsplitString), "ex-conj-split");
     }
 
     @Test
@@ -300,81 +244,71 @@ public class TestTacletParser {
         // f-idempotent-rule
         // find(f(f(x))) replacewith( f(x) )
 
-        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<RewriteTaclet>();
+        RewriteTacletBuilder<RewriteTaclet> builder = new RewriteTacletBuilder<>();
 
         builder.setFind(parseTerm("f(f(x))"));
-        builder.addTacletGoalTemplate(new
-                RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                parseTerm("f(x)")));
+        builder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), parseTerm("f(x)")));
         builder.setName(new Name("f_idempotent"));
         Taclet fidempotent = builder.getRewriteTaclet();
-        String fidempotentString =
-                "f_idempotent{\\find(f(f(x))) \\replacewith(f(x))}";
-        assertEquals("f-idempotent", fidempotent,
-                parseTaclet(fidempotentString));
+        String fidempotentString = "f_idempotent{\\find(f(f(x))) \\replacewith(f(x))}";
+        assertEquals(fidempotent, parseTaclet(fidempotentString), "f-idempotent");
     }
 
     @Test
     public void testMakeInsertEq() {
         // make-insert-eq rule
         // find (x = x0 =>) addrules ( find (x) replacewith (x0) )
-        RewriteTacletBuilder<RewriteTaclet> insertbuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        RewriteTacletBuilder<RewriteTaclet> insertbuilder = new RewriteTacletBuilder<>();
         insertbuilder.setFind(parseTerm("x"));
-        insertbuilder.addTacletGoalTemplate(new
-                RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(),
-                parseTerm("x0")));
+        insertbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.nil(), parseTerm("x0")));
         insertbuilder.setName(new Name("insert_eq"));
         Taclet inserteq = insertbuilder.getTaclet();
 
         AntecTacletBuilder builder = new AntecTacletBuilder();
 
         builder.setFind(parseFma("x=x0"));
-        builder.addTacletGoalTemplate(new
-                TacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil().prepend(inserteq)));
+        builder.addTacletGoalTemplate(new TacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+            ImmutableSLList.<Taclet>nil().prepend(inserteq)));
         builder.setName(new Name("make_insert_eq"));
         Taclet makeinserteq = builder.getAntecTaclet();
-        String makeinserteqString = "make_insert_eq"
-                + "{\\find (x = x0 ==>)"
-                + "\\addrules ( insert_eq{\\find (x) \\replacewith (x0)} )}";
-        assertEquals("make-insert-eq", makeinserteq,
-                parseTaclet(makeinserteqString));
+        String makeinserteqString = "make_insert_eq" + "{\\find (x = x0 ==>)"
+            + "\\addrules ( insert_eq{\\find (x) \\replacewith (x0)} )}";
+        assertEquals(makeinserteq, parseTaclet(makeinserteqString), "make-insert-eq");
     }
 
     @Test
     public void testSchemaJava0() {
         parseTaclet("while_right { \\find (\\<{.. while(#e2) {#p1} ...}\\>post)"
-                + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
+            + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
 
     }
 
     @Test
     public void testSchemaJava4() {
-        FindTaclet taclet = (FindTaclet) parseTaclet("variable_declaration{ \\find (\\<{.. #typ #v0; ...}\\>post)"
+        FindTaclet taclet =
+            (FindTaclet) parseTaclet("variable_declaration{ \\find (\\<{.. #typ #v0; ...}\\>post)"
                 + " \\replacewith (\\<{.. #typ #v0; if (true); ...}\\>post)	}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
 
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
         LocalVariableDeclaration lvd = (LocalVariableDeclaration) ct.getChildAt(0);
-        VariableSpecification vs = (VariableSpecification) lvd.getChildAt(1);
+        lvd.getChildAt(1);
 
     }
 
     @Test
     public void testVarcondNew() {
-        FindTaclet taclet =
-                (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond(\\new(#boolv,long)) \\replacewith(true)}");
-
-        taclet = (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond (\\newTypeOf(#v0, #e2)) \\replacewith(true)}");
-
+        parseTaclet("xy{ \\find (true) \\varcond(\\new(#boolv,long)) \\replacewith(true)}");
+        parseTaclet("xy{ \\find (true) \\varcond (\\newTypeOf(#v0, #e2)) \\replacewith(true)}");
     }
 
     @Test
     public void testSchemaJava6() {
-        FindTaclet taclet = (FindTaclet) parseTaclet("xy{ \\find (\\<{.. boolean #boolv; ...}\\>post)"
+        FindTaclet taclet =
+            (FindTaclet) parseTaclet("xy{ \\find (\\<{.. boolean #boolv; ...}\\>post)"
                 + " \\replacewith (\\<{.. if (true); ...}\\>post)	}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
@@ -387,9 +321,9 @@ public class TestTacletParser {
 
     @Test
     public void testSchemaJava8() {
-        FindTaclet taclet = (FindTaclet) parseTaclet
-                ("break_test {\\find(\\<{.. #lb0:{ break #lb1; } ...}\\>post)" +
-                        " \\replacewith (\\<{..  ...}\\>post)}");
+        FindTaclet taclet =
+            (FindTaclet) parseTaclet("break_test {\\find(\\<{.. #lb0:{ break #lb1; } ...}\\>post)"
+                + " \\replacewith (\\<{..  ...}\\>post)}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
@@ -397,33 +331,29 @@ public class TestTacletParser {
 
     @Test
     public void testSchemaJava10() {
-        FindTaclet taclet = (FindTaclet) parseTaclet
-                ("array_test {\\find(\\<{..#arr[#e][#e2]=#e2;...}\\>true) \\replacewith (true)}");
+        FindTaclet taclet = (FindTaclet) parseTaclet(
+            "array_test {\\find(\\<{..#arr[#e][#e2]=#e2;...}\\>true) \\replacewith (true)}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
         CopyAssignment ca = (CopyAssignment) ct.getChildAt(0);
         ArrayReference ar = (ArrayReference) ca.getChildAt(0);
         for (int i = 0; i < 2; i++) {
-            assertTrue(ar.getChildAt(i) != null);
+            assertNotNull(ar.getChildAt(i));
         }
         ar = (ArrayReference) ar.getChildAt(0);
         for (int i = 0; i < 2; i++) {
-            assertTrue(ar.getChildAt(i) != null);
+            assertNotNull(ar.getChildAt(i));
         }
     }
 
     @Test
     public void testSchemaJava11() {
-        FindTaclet taclet =
-                (FindTaclet) parseTaclet("eval_order_array_access_right{" +
-                        " \\find(\\<{..#v=#ar[#e];...}\\>post)" +
-                        "\\varcond(\\newTypeOf(#ar1, #ar)," +
-                        "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))" +
-                        "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" +
-                        "#ar1[#k]=#ar[#k];}" +
-                        "#v0=#e; #v=#ar1[#v0];...}\\>post)" +
-                        "\\displayname \"eval_order_array_access_right\"}");
+        parseTaclet("eval_order_array_access_right{" + " \\find(\\<{..#v=#ar[#e];...}\\>post)"
+            + "\\varcond(\\newTypeOf(#ar1, #ar)," + "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))"
+            + "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" + "#ar1[#k]=#ar[#k];}"
+            + "#v0=#e; #v=#ar1[#v0];...}\\>post)"
+            + "\\displayname \"eval_order_array_access_right\"}");
     }
 
 
@@ -432,34 +362,31 @@ public class TestTacletParser {
         // broken taclet with free variable SV in replacewith
         // buggy { find(==>b) replacewith(==>b,z=z) }
 
-        String brokenTacletString = "buggy { \\find(==>b)" +
-                "\\replacewith(==>b,z=z) }";
+        String brokenTacletString = "buggy { \\find(==>b)" + "\\replacewith(==>b,z=z) }";
         try {
             parseTaclet(brokenTacletString);
-            //p.setSchemaVariablesNamespace(schemaVariableNS);
-            fail("Expected the taclet builder to throw an exception " +
-                    "because of free variables in replacewith");
+            // p.setSchemaVariablesNamespace(schemaVariableNS);
+            fail("Expected the taclet builder to throw an exception "
+                + "because of free variables in replacewith");
         } catch (Exception e) {
-            assertTrue("Expected IllegalArgumentException, but got " + e,
-                    e instanceof IllegalArgumentException);
+            assertTrue(e instanceof IllegalArgumentException,
+                "Expected IllegalArgumentException, but got " + e);
         }
     }
 
 
-    //Following tests should work, if parser didn't exit system but propagated
+    // Following tests should work, if parser didn't exit system but propagated
     // exceptions until here.
     @Test
     public void testSchemaJava1() {
         boolean thrown = false;
         try {
-            parseTaclet("xyz { find (<{.. int j=0; for(#i;j<9;j++)" +
-                    "; ...}>post)"
-                    + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" +
-                    "  ...}>post) } ");
+            parseTaclet("xyz { find (<{.. int j=0; for(#i;j<9;j++)" + "; ...}>post)"
+                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" + "  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
-        assertTrue("forinit only valid in initializer of for", thrown);
+        assertTrue(thrown, "forinit only valid in initializer of for");
     }
 
 
@@ -468,12 +395,12 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#lab;j<42;j++) ; ...}>post)"
-                    + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
+                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
-        assertTrue("label SV not valid here", thrown);
+        assertTrue(thrown, "label SV not valid here");
     }
 
-    //more SchemaJava tests are in ../rule/TestMatchTaclet
+    // more SchemaJava tests are in ../rule/TestMatchTaclet
 }

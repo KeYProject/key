@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2017 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -28,8 +15,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchReturnValParameterDeclaration extends
-        CcatchNonstandardParameterDeclaration implements ParameterContainer {
+public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParameterDeclaration
+        implements ParameterContainer {
 
     private final ParameterDeclaration delegate;
 
@@ -60,14 +47,11 @@ public class CcatchReturnValParameterDeclaration extends
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {

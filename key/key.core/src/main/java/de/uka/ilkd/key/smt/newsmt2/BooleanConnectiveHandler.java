@@ -15,8 +15,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 /**
- * This SMT translation handler takes care of
- * the builtin Boolean connectives.
+ * This SMT translation handler takes care of the builtin Boolean connectives.
  *
  * @author Jonas Schiffl
  */
@@ -34,7 +33,8 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+            String[] handlerOptions) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");

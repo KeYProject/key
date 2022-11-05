@@ -23,13 +23,15 @@ public class MainWindowTabbedPane extends JTabbedPane {
     public static final float TAB_ICON_SIZE = 16f;
     private ProofTreeView proofTreeView;
 
-    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {
+    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator,
+            AutoModeAction autoModeAction) {
         assert mediator != null;
         assert mainWindow != null;
 
         proofTreeView = new ProofTreeView(mediator);
         InfoView infoView = new InfoView(mainWindow, mediator);
-        StrategySelectionView strategySelectionView = new StrategySelectionView(mainWindow, mediator);
+        StrategySelectionView strategySelectionView =
+            new StrategySelectionView(mainWindow, mediator);
         GoalList openGoalsView = new GoalList(mediator);
 
         Stream<TabPanel> panels = KeYGuiExtensionFacade.getAllPanels(mainWindow);
@@ -41,22 +43,20 @@ public class MainWindowTabbedPane extends JTabbedPane {
 
 
         // change some key mappings which collide with font settings.
-        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .getParent().remove(
-                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-                        .getDefaultToolkit().getMenuShortcutKeyMask()));
-        getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
-                        .getDefaultToolkit().getMenuShortcutKeyMask()));
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent()
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(
+            KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         setName("leftTabbed");
     }
 
-    protected void addPanel(TabPanel p){
+    protected void addPanel(TabPanel p) {
         addTab(p.getTitle(), p.getIcon(), p.getComponent());
     }
 
     protected void setEnabledForAllTabs(boolean b) {
-        for(int i = 0; i < getTabCount(); i++)
+        for (int i = 0; i < getTabCount(); i++)
             getComponentAt(i).setEnabled(b);
     }
 

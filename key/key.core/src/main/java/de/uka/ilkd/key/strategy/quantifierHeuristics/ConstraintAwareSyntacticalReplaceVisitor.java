@@ -12,50 +12,45 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
 
 /**
- * In KeY 1.x we supported a free variable calculus based on meta variables. 
- * This feature has been abandoned in KeY 2.0. Until the strategy for 
- * quantifier instantiations is adapted, we cannot get rid of them 
- * completely (they are used to determine triggers).
+ * In KeY 1.x we supported a free variable calculus based on meta variables. This feature has been
+ * abandoned in KeY 2.0. Until the strategy for quantifier instantiations is adapted, we cannot get
+ * rid of them completely (they are used to determine triggers).
  */
-public class ConstraintAwareSyntacticalReplaceVisitor extends
-        SyntacticalReplaceVisitor {
+public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplaceVisitor {
 
     @Deprecated
     private final Constraint metavariableInst;
 
-    public ConstraintAwareSyntacticalReplaceVisitor(
-            TermLabelState termLabelState, Services services,
-            Constraint metavariableInst,
+    public ConstraintAwareSyntacticalReplaceVisitor(TermLabelState termLabelState,
+            Services services, Constraint metavariableInst,
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
-        super(termLabelState, labelHint,
-                applicationPosInOccurrence, goal, rule, ruleApp, 
-                services, services.getTermBuilder(false));
+        super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp, services,
+            services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;
     }
-    
+
     protected Term toTerm(Term t) {
-        if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
+        if (EqualityConstraint.metaVars(t).size() != 0 && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
-                    new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
-                            applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
-            t.execPostOrder ( srv );
-            return srv.getTerm ();
+                new ConstraintAwareSyntacticalReplaceVisitor(termLabelState, services,
+                    metavariableInst, applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
+            t.execPostOrder(srv);
+            return srv.getTerm();
         } else {
             return t;
         }
     }
 
     public void visited(Term visited) {
-        if (visited.op() instanceof Metavariable
-                && metavariableInst.getInstantiation((Metavariable) visited.op(), services)
-                        .op() != visited.op()) {
+        if (visited.op() instanceof Metavariable && metavariableInst
+                .getInstantiation((Metavariable) visited.op(), services).op() != visited.op()) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visited.op(), services));
         } else {
             super.visit(visited);
-        }        
+        }
     }
-    
+
 }

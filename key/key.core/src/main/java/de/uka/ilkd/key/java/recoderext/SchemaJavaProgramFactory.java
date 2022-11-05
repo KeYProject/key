@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 // This file is partially taken from the RECODER library, which is protected by
 // the LGPL, and modified.
 
@@ -49,18 +36,17 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     protected Namespace<SchemaVariable> svns;
 
     /**
-     Protected constructor - use {@link #getInstance} instead.
+     * Protected constructor - use {@link #getInstance} instead.
      */
     protected SchemaJavaProgramFactory() {}
 
     /**
-     The singleton instance of the program factory.
+     * The singleton instance of the program factory.
      */
-    private static SchemaJavaProgramFactory theFactory
-	= new SchemaJavaProgramFactory();
+    private static SchemaJavaProgramFactory theFactory = new SchemaJavaProgramFactory();
 
     /**
-     Returns the single instance of this class.
+     * Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
         return theFactory;
@@ -74,20 +60,17 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     @Override
-    public Identifier createIdentifier (String text){
+    public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
 
-    public SpecialReferenceWrapper createThisReference(TypeReference typeRef,
-						       Expression var) {
-	return new SpecialReferenceWrapper
-	    (typeRef, (ReferencePrefix) var);
+    public SpecialReferenceWrapper createThisReference(TypeReference typeRef, Expression var) {
+        return new SpecialReferenceWrapper(typeRef, (ReferencePrefix) var);
     }
 
     public RMethodCallStatement createRMethodCallStatement(ProgramVariableSVWrapper resVar,
-							   ExecutionContext esvw,
-							   Statement st) {
-	return new RMethodCallStatement(resVar, esvw, st);
+            ExecutionContext esvw, Statement st) {
+        return new RMethodCallStatement(resVar, esvw, st);
     }
 
     public LoopScopeBlock createLoopScopeBlock() {
@@ -95,41 +78,38 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
 
-    public RMethodBodyStatement createRMethodBodyStatement
-            (TypeReference typeRef,
-             ProgramVariableSVWrapper resVar,
-             MethodReference mr) {
+    public RMethodBodyStatement createRMethodBodyStatement(TypeReference typeRef,
+            ProgramVariableSVWrapper resVar, MethodReference mr) {
         return new RMethodBodyStatement(typeRef, resVar, mr);
     }
 
     public RKeYMetaConstruct createRKeYMetaConstruct() {
-	return new RKeYMetaConstruct();
+        return new RKeYMetaConstruct();
     }
 
     public RKeYMetaConstructExpression createRKeYMetaConstructExpression() {
-	return new RKeYMetaConstructExpression();
+        return new RKeYMetaConstructExpression();
     }
 
 
     public RKeYMetaConstructType createRKeYMetaConstructType() {
-	return new RKeYMetaConstructType();
+        return new RKeYMetaConstructType();
     }
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
-                          MethodSignatureSVWrapper pm,
-							     ExpressionSVWrapper var) {
-	return new ContextStatementBlock(typeRef, pm, var);
+            MethodSignatureSVWrapper pm, ExpressionSVWrapper var) {
+        return new ContextStatementBlock(typeRef, pm, var);
     }
 
     public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {
-	return new ContextStatementBlock(ec);
+        return new ContextStatementBlock(ec);
     }
 
     /**
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression(Expression e) {
-	return new PassiveExpression(e);
+        return new PassiveExpression(e);
     }
 
     public MergePointStatement createMergePointStatement() {
@@ -144,115 +124,110 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression() {
-	return new PassiveExpression();
+        return new PassiveExpression();
     }
 
-    public static void throwSortInvalid(SchemaVariable sv, String s)
-	throws ParseException {
-	throw new ParseException("Sort of declared schema variable "
-				  +sv.name().toString()+" "
-				  +sv.sort().name().toString()
-				  +" does not comply with expected type "+s
-				  +" in Java program.");
+    public static void throwSortInvalid(SchemaVariable sv, String s) throws ParseException {
+        throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
+            + sv.sort().name().toString() + " does not comply with expected type " + s
+            + " in Java program.");
     }
 
 
     public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
-	if (svns==null) return false;
-	Named n=svns.lookup(new Name(s));
-	if (n!=null && n instanceof SchemaVariable) {
-	    return ((SchemaVariable) n).sort()==sort;
-	}
-	return false;
+        if (svns == null)
+            return false;
+        Named n = svns.lookup(new Name(s));
+        if (n != null && n instanceof SchemaVariable) {
+            return ((SchemaVariable) n).sort() == sort;
+        }
+        return false;
     }
 
 
     public SchemaVariable lookupSchemaVariable(String s) throws ParseException {
-	SchemaVariable sv=null;
-	Named n=svns.lookup(new Name(s));
-	if (n!=null && n instanceof SchemaVariable) {
-	    sv=(SchemaVariable) n;
-	} else {
-	    throw new ParseException("Schema variable not declared: "+s);
-	}
-	return sv;
+        SchemaVariable sv = null;
+        Named n = svns.lookup(new Name(s));
+        if (n != null && n instanceof SchemaVariable) {
+            sv = (SchemaVariable) n;
+        } else {
+            throw new ParseException("Schema variable not declared: " + s);
+        }
+        return sv;
     }
 
     public StatementSVWrapper getStatementSV(String s) throws ParseException {
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Statement");
-	}
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Statement");
+        }
 
-	return new StatementSVWrapper(sv);
+        return new StatementSVWrapper(sv);
     }
 
     public ExpressionSVWrapper getExpressionSV(String s) throws ParseException {
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Expression");
-	}
-	return new ExpressionSVWrapper(sv);
-    }
-
-
-    public LabelSVWrapper getLabelSV(String s) throws ParseException{
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Label");
-	}
-	return new LabelSVWrapper(sv);
-    }
-
-    public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException{
-       SchemaVariable sv=lookupSchemaVariable(s);
-       if (!(sv instanceof ProgramSV)) {
-           throwSortInvalid(sv, "MethodSignature");
-       }
-       return new MethodSignatureSVWrapper(sv);
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Expression");
         }
+        return new ExpressionSVWrapper(sv);
+    }
+
+
+    public LabelSVWrapper getLabelSV(String s) throws ParseException {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Label");
+        }
+        return new LabelSVWrapper(sv);
+    }
+
+    public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "MethodSignature");
+        }
+        return new MethodSignatureSVWrapper(sv);
+    }
 
     public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
-        SchemaVariable sv=lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV) ||
-                sv.sort()!=ProgramSVSort.LABEL) {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
             throwSortInvalid(sv, "Label");
         }
         return new JumpLabelSVWrapper(sv);
     }
 
-    public TypeSVWrapper getTypeSV(String s) throws ParseException{
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Type");
-	}
-	return new TypeSVWrapper(sv);
+    public TypeSVWrapper getTypeSV(String s) throws ParseException {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Type");
+        }
+        return new TypeSVWrapper(sv);
     }
 
     public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException {
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Type");
-	}
-	return new ExecCtxtSVWrapper(sv);
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Type");
+        }
+        return new ExecCtxtSVWrapper(sv);
     }
 
-    public ProgramVariableSVWrapper getProgramVariableSV(String s)
-	throws ParseException{
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Program Variable");
-	}
-	return new ProgramVariableSVWrapper(sv);
+    public ProgramVariableSVWrapper getProgramVariableSV(String s) throws ParseException {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Program Variable");
+        }
+        return new ProgramVariableSVWrapper(sv);
     }
 
-    public CatchSVWrapper getCatchSV(String s)
-	throws ParseException {
-	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
-	    throwSortInvalid(sv, "Catch");
-	}
-	return new CatchSVWrapper(sv);
+    public CatchSVWrapper getCatchSV(String s) throws ParseException {
+        SchemaVariable sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "Catch");
+        }
+        return new CatchSVWrapper(sv);
     }
 
     public CcatchSVWrapper getCcatchSV(String s) throws ParseException {
@@ -264,7 +239,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
-     For internal reuse and synchronization.
+     * For internal reuse and synchronization.
      */
     private static final SchemaJavaParser parser = new SchemaJavaParser(System.in);
 
@@ -276,14 +251,15 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
             if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++){}
+                for (; ppe.getChildAt(i) != dest; i++) {
+                }
             }
             if (i == 0) { // before syntactical parent
-		c.setPrefixed(true);
+                c.setPrefixed(true);
             } else {
                 dest = ppe.getChildAt(i - 1);
                 while (dest instanceof NonTerminalProgramElement) {
-                    ppe = (NonTerminalProgramElement)dest;
+                    ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
                     if (i == 0) {
                         break;
@@ -307,8 +283,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
-       Perform post work on the created element. Creates parent links
-       and assigns comments.
+     * Perform post work on the created element. Creates parent links and assigns comments.
      */
     private static void postWork(ProgramElement pe) {
         List<Comment> comments = SchemaJavaParser.getComments();
@@ -324,19 +299,18 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         while (tw.next()) {
             pe = tw.getProgramElement();
             if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement)pe).makeParentRoleValid();
+                ((NonTerminalProgramElement) pe).makeParentRoleValid();
             }
-	    if (pe.getFirstElement()!=null) {
-		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount)
-		       && pos.compareTo(cpos) > 0) {
-		    attachComment(current, pe);
-		    commentIndex += 1;
-		    if (commentIndex < commentCount) {
-			current = comments.get(commentIndex);
-			cpos = current.getFirstElement().getStartPosition();
-		    }
-		}
+            if (pe.getFirstElement() != null) {
+                Position pos = pe.getFirstElement().getStartPosition();
+                while ((commentIndex < commentCount) && pos.compareTo(cpos) > 0) {
+                    attachComment(current, pe);
+                    commentIndex += 1;
+                    if (commentIndex < commentCount) {
+                        current = comments.get(commentIndex);
+                        cpos = current.getFirstElement().getStartPosition();
+                    }
+                }
             }
         }
         if (commentIndex < commentCount) {
@@ -357,202 +331,204 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
-     Parse a {@link CompilationUnit} from the given reader.
+     * Parse a {@link CompilationUnit} from the given reader.
      */
     @Override
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try {
-		SchemaJavaParser.initialize(in);
-		CompilationUnit res = SchemaJavaParser.CompilationUnit();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
-	        pe.initCause(e);
-		throw pe;
-	    }
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                CompilationUnit res = SchemaJavaParser.CompilationUnit();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
+            }
         }
     }
 
     /**
-     Parse a {@link TypeDeclaration} from the given reader.
+     * Parse a {@link TypeDeclaration} from the given reader.
      */
     @Override
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		TypeDeclaration res = SchemaJavaParser.TypeDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                TypeDeclaration res = SchemaJavaParser.TypeDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link FieldDeclaration} from the given reader.
+     * Parse a {@link FieldDeclaration} from the given reader.
      */
     @Override
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		FieldDeclaration res = SchemaJavaParser.FieldDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                FieldDeclaration res = SchemaJavaParser.FieldDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link MethodDeclaration} from the given reader.
+     * Parse a {@link MethodDeclaration} from the given reader.
      */
     @Override
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		MethodDeclaration res = SchemaJavaParser.MethodDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                MethodDeclaration res = SchemaJavaParser.MethodDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link MemberDeclaration} from the given reader.
+     * Parse a {@link MemberDeclaration} from the given reader.
      */
     @Override
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		MemberDeclaration res = SchemaJavaParser.ClassBodyDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                MemberDeclaration res = SchemaJavaParser.ClassBodyDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link ParameterDeclaration} from the given reader.
+     * Parse a {@link ParameterDeclaration} from the given reader.
      */
     @Override
-    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		ParameterDeclaration res = SchemaJavaParser.FormalParameter();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+    public ParameterDeclaration parseParameterDeclaration(Reader in)
+            throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                ParameterDeclaration res = SchemaJavaParser.FormalParameter();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link ConstructorDeclaration} from the given reader.
+     * Parse a {@link ConstructorDeclaration} from the given reader.
      */
     @Override
-    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		ConstructorDeclaration res = SchemaJavaParser.ConstructorDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+    public ConstructorDeclaration parseConstructorDeclaration(Reader in)
+            throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                ConstructorDeclaration res = SchemaJavaParser.ConstructorDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse a {@link TypeReference} from the given reader.
+     * Parse a {@link TypeReference} from the given reader.
      */
     @Override
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		TypeReference res = SchemaJavaParser.ResultType();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                TypeReference res = SchemaJavaParser.ResultType();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse an {@link Expression} from the given reader.
+     * Parse an {@link Expression} from the given reader.
      */
     @Override
     public Expression parseExpression(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		Expression res = SchemaJavaParser.Expression();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                Expression res = SchemaJavaParser.Expression();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
 
     /**
-     Parse some {@link Statement}s from the given reader.
+     * Parse some {@link Statement}s from the given reader.
      */
     @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
-		for (int i = 0; i < res.size(); i += 1) {
-		    postWork(res.get(i));
-		}
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException();
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
+                for (int i = 0; i < res.size(); i += 1) {
+                    postWork(res.get(i));
+                }
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException();
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
@@ -561,19 +537,18 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
      * Parse a {@link StatementBlock} from the given string.
      */
     @Override
-    public StatementBlock parseStatementBlock(Reader in)
-	throws IOException, ParserException {
-	synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
-		StatementBlock res = SchemaJavaParser.StartBlock();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-	        ParserException pe = new ParserException(e.getMessage());
+    public StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                SchemaJavaParser.initialize(in);
+                StatementBlock res = SchemaJavaParser.StartBlock();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                ParserException pe = new ParserException(e.getMessage());
                 pe.initCause(e);
                 throw pe;
-	    }
+            }
 
         }
     }
@@ -581,14 +556,15 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
     public void setSVNamespace(Namespace<SchemaVariable> ns) {
-	svns=ns;
+        svns = ns;
     }
 
     public CcatchReturnParameterDeclaration createCcatchReturnParameterDeclaration() {
         return new CcatchReturnParameterDeclaration();
     }
 
-    public CcatchReturnValParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration p) {
+    public CcatchReturnValParameterDeclaration createCcatchReturnValParameterDeclaration(
+            ParameterDeclaration p) {
         return new CcatchReturnValParameterDeclaration(p);
     }
 
@@ -596,7 +572,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new CcatchBreakParameterDeclaration();
     }
 
-    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(Identifier label) {
+    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(
+            Identifier label) {
         return new CcatchBreakLabelParameterDeclaration(label);
     }
 
@@ -608,7 +585,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new CcatchContinueParameterDeclaration();
     }
 
-    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(Identifier label) {
+    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(
+            Identifier label) {
         return new CcatchContinueLabelParameterDeclaration(label);
     }
 

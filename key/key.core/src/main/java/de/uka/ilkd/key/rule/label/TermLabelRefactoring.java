@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.label;
 
 import java.util.List;
@@ -38,14 +25,14 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence,
- *                                      Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
- * For more information about {@link TermLabel}s and how they are maintained
- * during prove read the documentation of interface {@link TermLabel}.
+ * For more information about {@link TermLabel}s and how they are maintained during prove read the
+ * documentation of interface {@link TermLabel}.
  * </p>
+ *
  * @author Martin Hentschel
  * @see TermLabel
  * @see TermLabelManager
@@ -62,29 +49,29 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *
      * @param rule the rule being applied.
      * @param goal the goal on which the rule is being applied.
-     * @param hint an optional hint passed from the active rule to describe the term which
-     *  should be created.
+     * @param hint an optional hint passed from the active rule to describe the term which should be
+     *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
     public static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
         if (goal != null) {
             Proof proof = goal.proof();
             if ((rule instanceof WhileInvariantRule
-                    && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
-                    (rule instanceof WhileInvariantRule
-                            && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
-                    (rule instanceof UseOperationContractRule
-                            && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-                    (rule instanceof AbstractAuxiliaryContractRule
-                            && AbstractAuxiliaryContractRule
-                            .FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-                    (rule instanceof AbstractAuxiliaryContractRule
-                            && AbstractAuxiliaryContractRule
-                            .NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
-                    (rule instanceof CloseAfterMerge && CloseAfterMerge
-                            .FINAL_WEAKENING_TERM_HINT.equals(hint))) {
-                ProofOblInput problem = proof.getServices()
-                        .getSpecificationRepository().getProofOblInput(proof);
+                    && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint))
+                    || (rule instanceof WhileInvariantRule
+                            && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint))
+                    || (rule instanceof UseOperationContractRule
+                            && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint))
+                    || (rule instanceof AbstractAuxiliaryContractRule
+                            && AbstractAuxiliaryContractRule.FULL_PRECONDITION_TERM_HINT
+                                    .equals(hint))
+                    || (rule instanceof AbstractAuxiliaryContractRule
+                            && AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT
+                                    .equals(hint))
+                    || (rule instanceof CloseAfterMerge
+                            && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
+                ProofOblInput problem =
+                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
                 if (problem instanceof AbstractOperationPO) {
                     return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
                 } else {
@@ -100,59 +87,50 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
      * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
+     *
      * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof}
-     *  on which a {@link Rule} is applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence}
-     *  in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence}
-     *  in the previous {@link Sequent}.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     *        applied right now.
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
+     *        which defines the {@link Term} that is rewritten.
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
+     *        previous {@link Sequent}.
      * @param rule The {@link Rule} which is applied.
      * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint An optional hint passed from the active rule
-     *      to describe the term which should be created.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
+     *        created.
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The required {@link RefactoringScope}.
      */
-    public RefactoringScope defineRefactoringScope(TermLabelState state,
-            Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm,
-            Rule rule,
-            Goal goal,
-            Object hint,
-            Term tacletTerm);
+    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm);
 
     /**
      * This method is used to refactor the labels of the given {@link Term}.
+     *
      * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a
-     *  {@link Rule} is applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous
-     *  {@link Sequent} which defines the {@link Term} that is rewritten.
-     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence}
-     *  in the previous {@link Sequent}.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     *        applied right now.
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
+     *        which defines the {@link Term} that is rewritten.
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
+     *        previous {@link Sequent}.
      * @param rule The {@link Rule} which is applied.
      * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which
-     *  should be created.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
+     *        created.
      * @param tacletTerm The optional taclet {@link Term}.
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    public void refactorLabels(TermLabelState state,
-            Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm,
-            Rule rule,
-            Goal goal,
-            Object hint,
-            Term tacletTerm,
-            Term term,
-            List<TermLabel> labels);
+    public void refactorLabels(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Term term, List<TermLabel> labels);
 
     /**
      * Possible refactoring scopes.
+     *
      * @author Martin Hentschel
      */
     public static enum RefactoringScope {

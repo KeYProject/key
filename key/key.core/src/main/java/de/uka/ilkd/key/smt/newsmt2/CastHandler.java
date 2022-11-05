@@ -21,15 +21,16 @@ public class CastHandler implements SMTHandler {
     private SortDependingFunction anyCast;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
+            String[] handlerOptions) throws IOException {
         this.anyCast = Sort.ANY.getCastSymbol(services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        return op instanceof SortDependingFunction &&
-                ((SortDependingFunction) op).isSimilar(anyCast);
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction) op).isSimilar(anyCast);
     }
 
     @Override

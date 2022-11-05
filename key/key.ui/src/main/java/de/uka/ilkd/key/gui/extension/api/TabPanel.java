@@ -17,8 +17,7 @@ public interface TabPanel {
     @Nonnull
     String getTitle();
 
-    default @Nullable
-    Icon getIcon() {
+    default @Nullable Icon getIcon() {
         return null;
     }
 
@@ -28,21 +27,18 @@ public interface TabPanel {
     /**
      * @return non-null
      */
-    default @Nonnull
-    Collection<Action> getTitleActions() {
+    default @Nonnull Collection<Action> getTitleActions() {
         return Collections.emptyList();
     }
 
     /**
      * @return
      */
-    default @Nonnull
-    Collection<CAction> getTitleCActions() {
+    default @Nonnull Collection<CAction> getTitleCActions() {
         return Collections.emptyList();
     }
 
-    default @Nullable
-    DefaultCDockable.Permissions getPermissions() {
+    default @Nullable DefaultCDockable.Permissions getPermissions() {
         return null;
     }
 }

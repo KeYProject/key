@@ -31,7 +31,7 @@
                                     <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                        <callStackEntry path="/0/0/0/0"/>
                                        <callStackEntry path="/0"/>
-                                       <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                           <callStackEntry path="/0/0/0/0"/>
                                           <callStackEntry path="/0"/>
                                           <branchStatement name="if (j==i)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
@@ -55,7 +55,7 @@
                                                             <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                <callStackEntry path="/0/0/0/0"/>
                                                                <callStackEntry path="/0"/>
-                                                               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                               <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                   <callStackEntry path="/0/0/0/0"/>
                                                                   <callStackEntry path="/0"/>
                                                                   <branchStatement name="if (j_1==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -67,7 +67,7 @@
                                                                         <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                            <callStackEntry path="/0/0/0/0"/>
                                                                            <callStackEntry path="/0"/>
-                                                                           <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                           <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                               <callStackEntry path="/0/0/0/0"/>
                                                                               <callStackEntry path="/0"/>
                                                                               <branchStatement name="if (j_1==i)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
@@ -91,7 +91,7 @@
                                                                                                 <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                    <callStackEntry path="/0/0/0/0"/>
                                                                                                    <callStackEntry path="/0"/>
-                                                                                                   <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                   <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                       <callStackEntry path="/0/0/0/0"/>
                                                                                                       <callStackEntry path="/0"/>
                                                                                                       <branchStatement name="if (j_2==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -103,7 +103,7 @@
                                                                                                             <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                <callStackEntry path="/0/0/0/0"/>
                                                                                                                <callStackEntry path="/0"/>
-                                                                                                               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                               <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                   <callStackEntry path="/0/0/0/0"/>
                                                                                                                   <callStackEntry path="/0"/>
                                                                                                                   <branchStatement name="if (j_2==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -115,7 +115,7 @@
                                                                                                                         <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                            <callStackEntry path="/0/0/0/0"/>
                                                                                                                            <callStackEntry path="/0"/>
-                                                                                                                           <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                           <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                               <callStackEntry path="/0/0/0/0"/>
                                                                                                                               <callStackEntry path="/0"/>
                                                                                                                               <branchStatement name="if (j_2==i)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
@@ -139,7 +139,7 @@
                                                                                                                                                 <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                                                    <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                    <callStackEntry path="/0"/>
-                                                                                                                                                   <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                   <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                       <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                       <callStackEntry path="/0"/>
                                                                                                                                                       <branchStatement name="if (j_3==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -151,7 +151,7 @@
                                                                                                                                                             <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                                                                <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                <callStackEntry path="/0"/>
-                                                                                                                                                               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                               <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                   <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                   <callStackEntry path="/0"/>
                                                                                                                                                                   <branchStatement name="if (j_3==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -163,7 +163,7 @@
                                                                                                                                                                         <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                                                                            <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                            <callStackEntry path="/0"/>
-                                                                                                                                                                           <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                                           <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                               <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                               <callStackEntry path="/0"/>
                                                                                                                                                                               <branchStatement name="if (j_3==i)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
@@ -175,7 +175,7 @@
                                                                                                                                                                                     <loopCondition name="true" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                                                                                                                                                        <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                        <callStackEntry path="/0"/>
-                                                                                                                                                                                       <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                                                       <statement name="result++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                                           <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                           <callStackEntry path="/0"/>
                                                                                                                                                                                           <branchStatement name="if (j_3==i)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
@@ -187,7 +187,7 @@
                                                                                                                                                                                                 <loopCondition name="i&lt;array_1.length-1" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                                                                                                                                                                                                    <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                                    <callStackEntry path="/0"/>
-                                                                                                                                                                                                   <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                                                                   <statement name="return result;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                                                       <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                                       <callStackEntry path="/0"/>
                                                                                                                                                                                                       <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of NestedLoopsWithContinue.sum(array_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">

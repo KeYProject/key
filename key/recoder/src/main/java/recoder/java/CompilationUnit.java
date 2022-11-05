@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A node representing a single source file containing {@link TypeDeclaration}s
- * and an optional {@link PackageSpecification}and an optional set of
- * {@link Import}s. In Java, any source file may contain at most one public
- * class type definition.
+ * A node representing a single source file containing {@link TypeDeclaration}s and an optional
+ * {@link PackageSpecification}and an optional set of {@link Import}s. In Java, any source file may
+ * contain at most one public class type definition.
  *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
 
-public class CompilationUnit extends JavaNonTerminalProgramElement implements TypeDeclarationContainer, TypeScope {
+public class CompilationUnit extends JavaNonTerminalProgramElement
+        implements TypeDeclarationContainer, TypeScope {
 
     /**
      * Undefined scope tag.
@@ -78,13 +78,13 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     /**
      * Compilation unit.
      *
-     * @param pkg              a package specification.
-     * @param imports          an import mutable list.
+     * @param pkg a package specification.
+     * @param imports an import mutable list.
      * @param typeDeclarations a type declaration mutable list.
      */
 
     public CompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
-                           ASTList<TypeDeclaration> typeDeclarations) {
+            ASTList<TypeDeclaration> typeDeclarations) {
         setPackageSpecification(pkg);
         setImports(imports);
         setDeclarations(typeDeclarations);
@@ -143,11 +143,10 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -202,13 +201,14 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     public SourceElement getLastElement() {
-        return (typeDeclarations != null && !typeDeclarations.isEmpty()) ? typeDeclarations.get(
-                typeDeclarations.size() - 1).getLastElement() : this;
+        return (typeDeclarations != null && !typeDeclarations.isEmpty())
+                ? typeDeclarations.get(typeDeclarations.size() - 1).getLastElement()
+                : this;
     }
 
     /**
-     * Get name of the unit. The name is empty if no data location is set;
-     * otherwise, the name of the current data location is returned.
+     * Get name of the unit. The name is empty if no data location is set; otherwise, the name of
+     * the current data location is returned.
      *
      * @return the name of this compilation unit.
      * @see #getDataLocation()
@@ -244,8 +244,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -379,11 +378,11 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     /*
-     * Return the type declaration at the specified index in this node's
-     * "virtual" type declaration array. @param index an index for a type
-     * declaration. @return the type declaration with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of
-     * bounds.
+     * Return the type declaration at the specified index in this node's "virtual" type declaration
+     * array. @param index an index for a type declaration. @return the type declaration with the
+     * given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
@@ -414,10 +413,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     /**
-     * Gets the primary type declaration of the compilation unit. The primary
-     * declaration is the first declaration of the unit, or the single public
-     * declaration. If there is no unambiguous primary declaration, this method
-     * returns <CODE>null</CODE>.
+     * Gets the primary type declaration of the compilation unit. The primary declaration is the
+     * first declaration of the unit, or the single public declaration. If there is no unambiguous
+     * primary declaration, this method returns <CODE>null</CODE>.
      */
 
     public TypeDeclaration getPrimaryTypeDeclaration() {

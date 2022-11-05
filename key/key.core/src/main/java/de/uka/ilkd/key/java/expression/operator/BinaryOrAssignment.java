@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -20,8 +7,9 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Binary or assignment.
- *  @author <TT>AutoDoc</TT>
+ * Binary or assignment.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryOrAssignment extends Assignment {
@@ -29,10 +17,10 @@ public class BinaryOrAssignment extends Assignment {
 
 
     /**
-     *      Binary or assignment.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the right side.
+     * Binary or assignment.
+     *
+     * @param children an ExtList with all children of this node the first children in list will be
+     *        the one on the left side, the second the one on the right side.
      */
 
     public BinaryOrAssignment(ExtList children) {
@@ -41,8 +29,9 @@ public class BinaryOrAssignment extends Assignment {
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -50,8 +39,9 @@ public class BinaryOrAssignment extends Assignment {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -59,20 +49,23 @@ public class BinaryOrAssignment extends Assignment {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnBinaryOrAssignment(this);
+        v.performActionOnBinaryOrAssignment(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

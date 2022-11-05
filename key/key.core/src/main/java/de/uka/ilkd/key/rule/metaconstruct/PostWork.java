@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -41,8 +28,7 @@ public class PostWork extends ProgramTransformer {
     }
 
     /**
-     * Used to create this Java statement programmatically. Do not use in taclet
-     * meta constructs!
+     * Used to create this Java statement programmatically. Do not use in taclet meta constructs!
      *
      * @param pv The {@link ProgramVariable}
      */
@@ -52,24 +38,20 @@ public class PostWork extends ProgramTransformer {
     }
 
     /**
-     * performs the program transformation needed for symbolic program
-     * transformation
+     * performs the program transformation needed for symbolic program transformation
      *
      * @return the transformated program
      */
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        final ProgramVariable newObject = schema
-                ? (ProgramVariable) svInst
-                        .getInstantiation((SchemaVariable) body())
-                : (ProgramVariable) body();
+        final ProgramVariable newObject =
+            schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
+                    : (ProgramVariable) body();
 
         final ProgramVariable initialized = services.getJavaInfo().getAttribute(
-            ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-            services.getJavaInfo().getJavaLangObject());
+            ImplicitFieldAdder.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
         return new ProgramElement[] { KeYJavaASTFactory.assign(
-            KeYJavaASTFactory.fieldReference(newObject, initialized),
-            BooleanLiteral.TRUE) };
+            KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
     }
 }

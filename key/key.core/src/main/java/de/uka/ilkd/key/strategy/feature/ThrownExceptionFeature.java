@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
@@ -41,23 +28,19 @@ public class ThrownExceptionFeature extends BinaryFeature {
     private final Sort[] filteredExceptions;
 
     /**
-     * creates a feature filtering first active throw statements where the
-     * thrown exception is of one of the given types (or their subtypes)
-     * 
-     * @param p_filteredExceptions
-     *            the String array with the types of the thrown exceptions
-     * @param services
-     *            the Services
+     * creates a feature filtering first active throw statements where the thrown exception is of
+     * one of the given types (or their subtypes)
+     *
+     * @param p_filteredExceptions the String array with the types of the thrown exceptions
+     * @param services the Services
      */
-    private ThrownExceptionFeature(String[] p_filteredExceptions,
-            Services services) {
+    private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
         final List<Sort> filtered = new ArrayList<Sort>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
 
         for (String p_filteredException : p_filteredExceptions) {
-            final KeYJavaType nullPointer = javaInfo
-                    .getKeYJavaType(p_filteredException);
+            final KeYJavaType nullPointer = javaInfo.getKeYJavaType(p_filteredException);
             if (nullPointer != null) {
                 filtered.add(nullPointer.getSort());
             }
@@ -75,27 +58,23 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
-                .getServices(), ((TacletApp) app).instantiations()
-                .getExecutionContext());
+        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
+            ((TacletApp) app).instantiations().getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
-            return fstActive instanceof Throw
-                    && blockedExceptions(((Throw) fstActive).getExpressionAt(0)
-                            .getKeYJavaType(services, ec).getSort());
+            return fstActive instanceof Throw && blockedExceptions(
+                ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }
 
     /**
-     * returns the first executable statement (often identical with the first
-     * active statement)
-     * 
-     * @param term
-     *            the Term with the program at top level
+     * returns the first executable statement (often identical with the first active statement)
+     *
+     * @param term the Term with the program at top level
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {

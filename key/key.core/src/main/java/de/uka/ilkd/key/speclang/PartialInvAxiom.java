@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
@@ -37,11 +24,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * A class axiom which is essentially of the form "o.<inv> -> phi": it demands
- * that the invariants of the objects of a particular class imply a particular
- * formula. These axioms are logically weaker than the full definitions of <inv>
- * expressed as RepresentsAxioms, but they may have higher visibility, making
- * them available in proofs where the corresponding full definition is not.
+ * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
+ * of the objects of a particular class imply a particular formula. These axioms are logically
+ * weaker than the full definitions of <inv> expressed as RepresentsAxioms, but they may have higher
+ * visibility, making them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {
 
@@ -54,15 +40,17 @@ public final class PartialInvAxiom extends ClassAxiom {
      */
     private final IObserverFunction target;
     /**
-     * Whether the axiom matches static invariants (i.e., &lt;$inv&gt;)
-     * or instance invariants (i.e., &lt;inv&gt;).
+     * Whether the axiom matches static invariants (i.e., &lt;$inv&gt;) or instance invariants
+     * (i.e., &lt;inv&gt;).
      */
     private final boolean isStatic;
 
-    /** Creates a new class axiom.
+    /**
+     * Creates a new class axiom.
      *
      * @param inv (partial) invariant from which the axiom is derived
-     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or instance invariants (i.e., &lt;inv&gt;)
+     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
+     *        instance invariants (i.e., &lt;inv&gt;)
      * @param services
      */
     public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
@@ -70,14 +58,12 @@ public final class PartialInvAxiom extends ClassAxiom {
         this.inv = inv;
         assert !isStatic || inv.isStatic();
         this.isStatic = isStatic;
-        this.target =
-                isStatic ?
-                        services.getJavaInfo().getStaticInv(inv.getKJT())
-                        : services.getJavaInfo().getInv();
+        this.target = isStatic ? services.getJavaInfo().getStaticInv(inv.getKJT())
+                : services.getJavaInfo().getInv();
         assert target != null;
     }
 
-    public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
+    public PartialInvAxiom(ClassInvariant inv, String displayName, Services services) {
         this(inv, false, services);
         this.displayName = displayName;
     }
@@ -92,104 +78,89 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-       if (o == null || this.getClass() != o.getClass()) return false;
-       final PartialInvAxiom other = (PartialInvAxiom) o;
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        final PartialInvAxiom other = (PartialInvAxiom) o;
 
-       if (!target.equals(other.target)) return false;
-       if (!inv.equals(other.inv)) return false;
-       return true;
+        if (!target.equals(other.target))
+            return false;
+        if (!inv.equals(other.inv))
+            return false;
+        return true;
     }
 
     @Override
     public int hashCode() {
-       return 17*(inv.hashCode() + 17 * target.hashCode());
+        return 17 * (inv.hashCode() + 17 * target.hashCode());
     }
+
     @Override
     public String getName() {
-	return inv.getName();
+        return inv.getName();
     }
 
 
     @Override
     public IObserverFunction getTarget() {
-	return target;
+        return target;
     }
 
 
     @Override
     public KeYJavaType getKJT() {
-	return inv.getKJT();
+        return inv.getKJT();
     }
 
 
     @Override
     public VisibilityModifier getVisibility() {
-	return inv.getVisibility();
+        return inv.getVisibility();
     }
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         for (int i = 0; i < 2; i++) {
+            // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
-                                                    + (target.isStatic()? "static ": "")
-                                                    + inv.getName()
-                                                    + (i == 0 ? "" : " EQ"));
+                + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
 
-            //create schema variables
+            // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
-            for(int j=0; j<HeapContext.getModHeaps(services, false).size(); j++) {
-                heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+j),
-                                                       heapLDT.targetSort(),
-                                                       false,
-                                                       false));
+            for (int j = 0; j < HeapContext.getModHeaps(services, false).size(); j++) {
+                heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
+                    heapLDT.targetSort(), false, false));
             }
-            final SchemaVariable selfSV =
-                    target.isStatic()
-                    ? null
-                    : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                         inv.getKJT().getSort());
-            final SchemaVariable eqSV = target.isStatic()
-                                        ? null
-                                        : SchemaVariableFactory.createTermSV(
-                    new Name("EQ"),
-                    services.getJavaInfo().objectSort());
+            final SchemaVariable selfSV = target.isStatic() ? null
+                    : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
+            final SchemaVariable eqSV = target.isStatic() ? null
+                    : SchemaVariableFactory.createTermSV(new Name("EQ"),
+                        services.getJavaInfo().objectSort());
 
-            ImmutableSet<Taclet> taclets =
-                    TG.generatePartialInvTaclet(name,
-                                                heapSVs,
-                                                selfSV,
-                                                eqSV,
-                                                inv.getInv(selfSV, services),
-                                                inv.getKJT(),
-                                                toLimit,
-                                                target.isStatic(),
-                                                i == 1,
-                                                services);
+            ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
+                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
+                services);
             result = result.union(taclets);
 
-            //EQ taclet only for non-static invariants
+            // EQ taclet (with i==1) only for non-static invariants
             if (target.isStatic()) {
                 break;
             }
         }
 
-        //return
+        // return
         return result;
     }
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
-	    						Services services) {
-        final ProgramVariable dummySelfVar =
-                services.getTermBuilder().selfVar(inv.getKJT(), false);
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+        final ProgramVariable dummySelfVar = services.getTermBuilder().selfVar(inv.getKJT(), false);
         return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
 
@@ -199,6 +170,6 @@ public final class PartialInvAxiom extends ClassAxiom {
     }
 
     public ClassInvariant getInv() {
-       return inv;
+        return inv;
     }
 }

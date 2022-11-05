@@ -1,13 +1,13 @@
 /*
  * Created on 11.03.2005
-
+ *
  *
  * This file is part of the RECODER library and protected by the LGPL.
  */
 package recoder.testsuite.transformation;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.DefaultSourceFileRepository;
@@ -27,16 +27,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.fail;
-//import application.Obfuscate;
+import static org.junit.jupiter.api.Assertions.fail;
+// import application.Obfuscate;
 
 
 /**
  * @author gutzmann
- * <p>
- * Tests some transformations.
+ *         <p>
+ *         Tests some transformations.
  */
-@Ignore
+@Disabled
 public class TransformationTests {
     private CrossReferenceServiceConfiguration crsc;
     private DefaultSourceFileRepository dsfr;
@@ -47,9 +47,9 @@ public class TransformationTests {
         dsfr = new DefaultSourceFileRepository(crsc);
         crsc.getProjectSettings().addPropertyChangeListener(dsfr);
         crsc.getProjectSettings().setProperty(PropertyNames.INPUT_PATH,
-                new File("src/test/resources/transformation/" + base + "/").getAbsolutePath());
+            new File("src/test/resources/transformation/" + base + "/").getAbsolutePath());
         crsc.getProjectSettings().setProperty(PropertyNames.OUTPUT_PATH,
-                new File("build/tmp/transformation/output/" + base + "/").getAbsolutePath());
+            new File("build/tmp/transformation/output/" + base + "/").getAbsolutePath());
         crsc.getProjectSettings().ensureSystemClassesAreInPath();
         dsfr.initialize(crsc);
     }
@@ -71,22 +71,20 @@ public class TransformationTests {
             fail();
         }
     }
-    
-    /*public void testObfuscater() {
-        setPath("obfuscate");
-        runIt();
-        Obfuscate of = new Obfuscate(crsc);
-        if (of.analyze() instanceof NoProblem)
-            of.transform();
-        // TODO write back and compare!
-    }*/
+
+    /*
+     * public void testObfuscater() { setPath("obfuscate"); runIt(); Obfuscate of = new
+     * Obfuscate(crsc); if (of.analyze() instanceof NoProblem) of.transform(); // TODO write back
+     * and compare! }
+     */
 
     @Test
     public void testReadOnly() {
         setPath("readOnly");
         runIt();
 
-        List<TypeReference> trl = crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getType("Test"));
+        List<TypeReference> trl =
+            crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getType("Test"));
         for (TypeReference tr : trl) {
             System.out.println(tr.toSource());
         }
@@ -100,7 +98,7 @@ public class TransformationTests {
         NameInfo ni = crsc.getNameInfo();
         ClassDeclaration cd = (ClassDeclaration) ni.getType("DefaultCons");
         ConstructorDeclaration cons = new ConstructorDeclaration(vm, new Identifier("DefaultCons"),
-                null, null, new StatementBlock());
+            null, null, new StatementBlock());
         cd.getMembers().add(cons);
         cd.makeParentRoleValid();
         ch.attached(cons);

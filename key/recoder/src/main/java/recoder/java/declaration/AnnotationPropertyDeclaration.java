@@ -13,7 +13,8 @@ import recoder.list.generic.ASTList;
 /**
  * @author gutzmann
  */
-public class AnnotationPropertyDeclaration extends MethodDeclaration implements AnnotationProperty, ExpressionContainer {
+public class AnnotationPropertyDeclaration extends MethodDeclaration
+        implements AnnotationProperty, ExpressionContainer {
     /**
      * serialization id
      */
@@ -36,8 +37,8 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
      * @param parameters
      * @param exceptions
      */
-    public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-                                         Identifier name, Expression defaultValue) {
+    public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            TypeReference returnType, Identifier name, Expression defaultValue) {
         super(modifiers, returnType, name, null, null);
         this.defaultValue = defaultValue;
         makeParentRoleValid();
@@ -54,7 +55,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.AnnotationProperty#getDefaultValue()
      */
     public Object getDefaultValue() {
@@ -75,14 +78,18 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
             defaultValue.setExpressionContainer(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ExpressionContainer#getExpressionCount()
      */
     public int getExpressionCount() {
         return defaultValue == null ? 0 : 1;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {

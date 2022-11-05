@@ -1,27 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.merge;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
-
-import org.junit.Test;
-import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -34,15 +11,26 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.DefaultImmutableSet;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test suite for the predicates lattice implementation.
  *
  * @author Dominic Scheurer
  */
-public class PredicateAbstractionLatticeTests extends TestCase {
+public class PredicateAbstractionLatticeTests {
 
-    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
+    private static final File TEST_RESOURCES_DIR_PREFIX =
+        new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
 
     @Test
     public void testCreateSignLatticeWithPredicates() {
@@ -50,31 +38,24 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         final Proof p = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "dummy.key");
         final Services services = p.getServices();
 
-        final Sort intSort =
-                (Sort) p.getServices().getNamespaces().sorts().lookup("int");
+        final Sort intSort = p.getServices().getNamespaces().sorts().lookup("int");
         final TermBuilder tb = p.getServices().getTermBuilder();
 
-        final AbstractionPredicate gtZero =
-                AbstractionPredicate.create(intSort,
-                        (Term input) -> (tb.gt(input, tb.zero())), services);
-        final AbstractionPredicate eqZero =
-                AbstractionPredicate
-                        .create(intSort,
-                                (Term input) -> (tb.equals(input, tb.zero())),
-                                services);
-        final AbstractionPredicate ltZero =
-                AbstractionPredicate.create(intSort,
-                        (Term input) -> (tb.lt(input, tb.zero())), services);
+        final AbstractionPredicate gtZero = AbstractionPredicate.create(intSort,
+            (Term input) -> (tb.gt(input, tb.zero())), services);
+        final AbstractionPredicate eqZero = AbstractionPredicate.create(intSort,
+            (Term input) -> (tb.equals(input, tb.zero())), services);
+        final AbstractionPredicate ltZero = AbstractionPredicate.create(intSort,
+            (Term input) -> (tb.lt(input, tb.zero())), services);
 
-        ArrayList<AbstractionPredicate> predicates =
-                new ArrayList<AbstractionPredicate>();
+        ArrayList<AbstractionPredicate> predicates = new ArrayList<>();
 
         predicates.add(gtZero);
         predicates.add(eqZero);
         predicates.add(ltZero);
 
         ConjunctivePredicateAbstractionLattice lattice =
-                new ConjunctivePredicateAbstractionLattice(predicates);
+            new ConjunctivePredicateAbstractionLattice(predicates);
 
         assertEquals(9, lattice.size());
 
@@ -83,64 +64,40 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         ConjunctivePredicateAbstractionDomainElement e1, e2, e3, e4, e5, e6, e7, e8, e9;
 
         // BOTTOM
-        assertEquals(e1 = ConjunctivePredicateAbstractionDomainElement.BOTTOM,
-                it.next());
+        assertEquals(e1 = ConjunctivePredicateAbstractionDomainElement.BOTTOM, it.next());
         // <0 & =0 & >0
-        assertEquals(
-                e2 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil()
-                                        .add(ltZero).add(eqZero).add(gtZero)),
-                it.next());
+        assertEquals(e2 = new ConjunctivePredicateAbstractionDomainElement(
+            DefaultImmutableSet.<AbstractionPredicate>nil().add(ltZero).add(eqZero).add(gtZero)),
+            it.next());
         // =0 & >0
         assertEquals(
-                e3 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil()
-                                        .add(eqZero).add(gtZero)), it.next());
+            e3 = new ConjunctivePredicateAbstractionDomainElement(
+                DefaultImmutableSet.<AbstractionPredicate>nil().add(eqZero).add(gtZero)),
+            it.next());
         // <0 & >0
         assertEquals(
-                e4 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil()
-                                        .add(ltZero).add(gtZero)), it.next());
+            e4 = new ConjunctivePredicateAbstractionDomainElement(
+                DefaultImmutableSet.<AbstractionPredicate>nil().add(ltZero).add(gtZero)),
+            it.next());
         // <0 & =0
         assertEquals(
-                e5 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil()
-                                        .add(ltZero).add(eqZero)), it.next());
+            e5 = new ConjunctivePredicateAbstractionDomainElement(
+                DefaultImmutableSet.<AbstractionPredicate>nil().add(ltZero).add(eqZero)),
+            it.next());
         // >0
-        assertEquals(
-                e6 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil().add(
-                                                gtZero)), it.next());
+        assertEquals(e6 = new ConjunctivePredicateAbstractionDomainElement(
+            DefaultImmutableSet.<AbstractionPredicate>nil().add(gtZero)), it.next());
         // =0
-        assertEquals(
-                e7 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil().add(
-                                                eqZero)), it.next());
+        assertEquals(e7 = new ConjunctivePredicateAbstractionDomainElement(
+            DefaultImmutableSet.<AbstractionPredicate>nil().add(eqZero)), it.next());
         // <0
-        assertEquals(
-                e8 =
-                        new ConjunctivePredicateAbstractionDomainElement(
-                                DefaultImmutableSet
-                                        .<AbstractionPredicate> nil().add(
-                                                ltZero)), it.next());
+        assertEquals(e8 = new ConjunctivePredicateAbstractionDomainElement(
+            DefaultImmutableSet.<AbstractionPredicate>nil().add(ltZero)), it.next());
         // TOP
-        assertEquals(e9 = ConjunctivePredicateAbstractionDomainElement.TOP,
-                it.next());
+        assertEquals(e9 = ConjunctivePredicateAbstractionDomainElement.TOP, it.next());
 
         // There should be no further elements.
-        assertFalse(it.hasNext());
+        Assertions.assertFalse(it.hasNext());
 
         // Now try a few joins.
         // Joins with top should result in top.
@@ -167,52 +124,46 @@ public class PredicateAbstractionLatticeTests extends TestCase {
 
     @Test
     public void testTrivialPredicatesLattice() {
-        ArrayList<AbstractionPredicate> predicates =
-                new ArrayList<AbstractionPredicate>();
+        ArrayList<AbstractionPredicate> predicates = new ArrayList<>();
 
         ConjunctivePredicateAbstractionLattice lattice =
-                new ConjunctivePredicateAbstractionLattice(predicates);
+            new ConjunctivePredicateAbstractionLattice(predicates);
 
         assertEquals(2, lattice.size());
 
         Iterator<AbstractDomainElement> it = lattice.iterator();
 
         // BOTTOM
-        assertEquals(ConjunctivePredicateAbstractionDomainElement.BOTTOM,
-                it.next());
+        assertEquals(ConjunctivePredicateAbstractionDomainElement.BOTTOM, it.next());
         // TOP
-        assertEquals(ConjunctivePredicateAbstractionDomainElement.TOP,
-                it.next());
+        assertEquals(ConjunctivePredicateAbstractionDomainElement.TOP, it.next());
 
         // This should be all.
-        assertFalse(it.hasNext());
+        Assertions.assertFalse(it.hasNext());
     }
 
+    @Test
     public void testToAndFromString() {
         // Dummy proof to get services etc.
         final Proof p = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "dummy.key");
         final Services services = p.getServices();
         final TermBuilder tb = services.getTermBuilder();
 
-        final LocationVariable ph =
-                new LocationVariable(new ProgramElementName("ph"),
-                        (Sort) services.getNamespaces().sorts().lookup("int"));
+        final LocationVariable ph = new LocationVariable(new ProgramElementName("ph"),
+            services.getNamespaces().sorts().lookup("int"));
         final AbstractionPredicate pred =
-                AbstractionPredicate.create(tb.geq(tb.var(ph), tb.zero()), ph,
-                        services);
-        final ArrayList<AbstractionPredicate> preds =
-                new ArrayList<AbstractionPredicate>();
+            AbstractionPredicate.create(tb.geq(tb.var(ph), tb.zero()), ph, services);
+        final ArrayList<AbstractionPredicate> preds = new ArrayList<>();
         preds.add(pred);
 
         final ConjunctivePredicateAbstractionLattice lattice =
-                new ConjunctivePredicateAbstractionLattice(preds);
+            new ConjunctivePredicateAbstractionLattice(preds);
 
         final Iterator<AbstractDomainElement> it = lattice.iterator();
         it.next(); // Skip bottom elem
 
         final AbstractDomainElement elem = it.next();
 
-        assertEquals(elem,
-                lattice.fromString(elem.toParseableString(services), services));
+        assertEquals(elem, lattice.fromString(elem.toParseableString(services), services));
     }
 }

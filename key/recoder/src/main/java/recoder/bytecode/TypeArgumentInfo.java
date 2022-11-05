@@ -23,9 +23,11 @@ public class TypeArgumentInfo implements TypeArgument {
     /**
      *
      */
-    public TypeArgumentInfo(WildcardMode wildcardMode, String typeName, List<? extends TypeArgument> typeArgs, ByteCodeElement parent, boolean isTypeVariable) {
+    public TypeArgumentInfo(WildcardMode wildcardMode, String typeName,
+            List<? extends TypeArgument> typeArgs, ByteCodeElement parent, boolean isTypeVariable) {
         super();
-        if ((typeName == null && wildcardMode != WildcardMode.Any) || wildcardMode == null || parent == null)
+        if ((typeName == null && wildcardMode != WildcardMode.Any) || wildcardMode == null
+                || parent == null)
             throw new NullPointerException();
         this.wildcardMode = wildcardMode;
         this.typeName = typeName;
@@ -53,7 +55,8 @@ public class TypeArgumentInfo implements TypeArgument {
     public ClassFile getContainingClassFile() {
         if (parent instanceof ClassFile)
             return (ClassFile) parent;
-        else return (ClassFile) ((MethodInfo) parent).getContainingClassType();
+        else
+            return (ClassFile) ((MethodInfo) parent).getContainingClassType();
     }
 
     public MethodInfo getContainingMethodInfo() {

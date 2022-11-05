@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
@@ -43,16 +30,14 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
-    private static final String[] ADMITTED_RULES = {
-        "orRight", "impRight", "close", "andRight"
-    };
+    private static final String[] ADMITTED_RULES = { "orRight", "impRight", "close", "andRight" };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
     public AutoPilotPrepareProofMacro() { super(); }
-    
+
     @Override
     public String getName() {
         return "Auto Pilot (Preparation Only)";
@@ -65,9 +50,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Finish symbolic execution" +
-                "<li>Separate proof obligations" +
-                "<li>Expand invariant definitions</ol>";
+        return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
+            + "<li>Expand invariant definitions</ol>";
     }
 
     @Override
@@ -88,7 +72,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
         for (SequentFormula sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
+            if (hasModality(sequentFormula.formula())) {
                 return true;
             }
         }
@@ -100,12 +84,12 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
-        if(term.op() instanceof Modality) {
+        if (term.op() instanceof Modality) {
             return true;
         }
 
         for (Term sub : term.subs()) {
-            if(hasModality(sub)) {
+            if (hasModality(sub)) {
                 return true;
             }
         }
@@ -124,13 +108,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name()))
                     return true;
             }
         }
         return false;
     }
-    
+
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
@@ -148,42 +132,42 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
-                   // Assumptions are normally not considered by the cost
-                   // computation, because they are normally not yet
-                   // instantiated when the costs are computed. Because the
-                   // application of a rule sometimes makes sense only if
-                   // the assumptions are instantiated in a particular way
-                   // (for instance equalities should not be applied on
-                   // themselves), we need to give the delegate the possiblity
-                   // to reject the application of a rule by calling
-                   // isApprovedApp. Otherwise, in particular equalities may
-                   // be applied on themselves.
-                   delegate.isApprovedApp(app, pio, goal);
+            // Assumptions are normally not considered by the cost
+            // computation, because they are normally not yet
+            // instantiated when the costs are computed. Because the
+            // application of a rule sometimes makes sense only if
+            // the assumptions are instantiated in a particular way
+            // (for instance equalities should not be applied on
+            // themselves), we need to give the delegate the possiblity
+            // to reject the application of a rule by calling
+            // isApprovedApp. Otherwise, in particular equalities may
+            // be applied on themselves.
+                    delegate.isApprovedApp(app, pio, goal);
         }
 
         @Override
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
-            if(isNonHumanInteractionTagged(rule)) {
+            if (isNonHumanInteractionTagged(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if(hasModality(goal.node())) {
+            if (hasModality(goal.node())) {
                 return delegate.computeCost(app, pio, goal);
             }
 
             String name = rule.name().toString();
-            if(ADMITTED_RULES_SET.contains(name)) {
+            if (ADMITTED_RULES_SET.contains(name)) {
                 return NumberRuleAppCost.getZeroCost();
             }
-            
+
             // apply OSS to <inv>() calls.
-            if(rule instanceof OneStepSimplifier) {
+            if (rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
-                if(target.op() instanceof UpdateApplication) {
+                if (target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
-                    if(updatedOp instanceof ObserverFunction) {
+                    if (updatedOp instanceof ObserverFunction) {
                         return NumberRuleAppCost.getZeroCost();
                     }
                 }
@@ -200,7 +184,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

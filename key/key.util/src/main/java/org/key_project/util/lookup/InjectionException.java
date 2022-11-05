@@ -23,7 +23,8 @@ public class InjectionException extends RuntimeException {
         super(cause);
     }
 
-    protected InjectionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected InjectionException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

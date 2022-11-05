@@ -1,15 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -25,9 +13,8 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
     }
 
     /**
-     * @return true iff the stored rule app is applicable for the given sequent,
-     * i.e. always true since NoFindTaclets are not bound to a find-position
-     * (if-formulas are not considered)
+     * @return true iff the stored rule app is applicable for the given sequent, i.e. always true
+     *         since NoFindTaclets are not bound to a find-position (if-formulas are not considered)
      */
     @Override
     protected boolean isStillApplicable(Goal p_goal) {

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -30,10 +17,8 @@ import de.uka.ilkd.key.speclang.translation.*;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo,
-                              KeYJavaType specInClass,
-                              ParsableVariable selfVar,
-                              SLExceptionFactory eManager) {
+    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, ParsableVariable selfVar,
+            SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
@@ -44,11 +29,9 @@ public final class JMLResolverManager extends SLResolverManager {
 
     @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-                "spec_public")) {
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_public")) {
             return new Public();
-        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-                "spec_protected")) {
+        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_protected")) {
             return new Protected();
         } else {
             return null;

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -39,37 +26,37 @@ public class SeqLength extends Operator {
     }
 
 
-    @Override    
+    @Override
     public SeqLength deepClone() {
         return new SeqLength(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
         return 1;
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return POSTFIX;
     }
 
 
-    @Override    
+    @Override
     public void accept(SourceVisitor v) {
 
     }
-    
-    public String toSource(){
-        return children.get(0).toSource()+".length";
+
+    public String toSource() {
+        return children.get(0).toSource() + ".length";
     }
 
 }

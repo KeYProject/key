@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import junit.framework.TestCase;
+public class TestZipProofSaving {
 
-public class TestZipProofSaving extends TestCase {
-
-
+    @Test
     public void testZip() throws Exception {
 
         Path file = Files.createTempFile("keyZipTest", ".key");
@@ -32,15 +32,16 @@ public class TestZipProofSaving extends TestCase {
             throws ProblemLoaderException, IOException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toFile());
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
-        GZipProofSaver proofSaver = new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
+        GZipProofSaver proofSaver =
+            new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
         proofSaver.save();
     }
 
     private void drain(InputStream is, OutputStream os) throws IOException {
         try {
-            byte buffer[] = new byte[4096];
+            byte[] buffer = new byte[4096];
             int read = is.read(buffer);
-            while(read >= 0) {
+            while (read >= 0) {
                 os.write(buffer, 0, read);
                 read = is.read(buffer);
             }

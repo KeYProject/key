@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableList;
@@ -24,11 +11,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * converts a for-loop to a while loop. Invariant and other rules cannot be
- * performed on for but only on while loops.
+ * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
+ * only on while loops.
  *
- * It makes uses of the {@link ForToWhileTransformation} to create a transformed
- * loop body which is then put into the corresponding context.
+ * It makes uses of the {@link ForToWhileTransformation} to create a transformed loop body which is
+ * then put into the corresponding context.
  *
  * <h2>Example</h2>
  *
@@ -77,16 +64,11 @@ public class ForToWhile extends ProgramTransformer {
     /**
      * creates an loop to while - ProgramTransformer
      *
-     * @param loop
-     *            the LoopStatement contained by the meta construct
-     * @param innerLabel
-     *            the label used to handle continue
-     * @param outerLabel
-     *            the label used to handle break (only needed for
-     *            do-while-loops)
+     * @param loop the LoopStatement contained by the meta construct
+     * @param innerLabel the label used to handle continue
+     * @param outerLabel the label used to handle break (only needed for do-while-loops)
      */
-    public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel,
-            Statement loop) {
+    public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel, Statement loop) {
         super("#for-to-while", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
@@ -94,13 +76,12 @@ public class ForToWhile extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe,
-            Services services, SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
-                (ProgramElementName) svInst.getInstantiation(outerLabel),
-                (ProgramElementName) svInst.getInstantiation(innerLabel),
-                services);
+            (ProgramElementName) svInst.getInstantiation(outerLabel),
+            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
 
         w.start();
         return new ProgramElement[] { w.result() };
@@ -109,8 +90,7 @@ public class ForToWhile extends ProgramTransformer {
     /**
      * return a list of the SV that are relevant to this UnwindLoop
      *
-     * @param svInst
-     *            the instantiations so far - ignored
+     * @param svInst the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override

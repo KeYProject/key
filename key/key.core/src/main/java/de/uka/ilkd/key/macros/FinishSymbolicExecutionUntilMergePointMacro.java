@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
@@ -62,20 +49,19 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule
- * application until a merge point is reached (i.e. a point where a {@link MergeRule} can
- * be applied) or there is no more modality on the sequent.
+ * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
+ * merge point is reached (i.e. a point where a {@link MergeRule} can be applied) or there is no
+ * more modality on the sequent.
  * <p>
- * 
- * This is done by implementing a delegation {@link Strategy} which assigns to
- * any rule application infinite costs if there is no modality on the sequent.
- * 
+ *
+ * This is done by implementing a delegation {@link Strategy} which assigns to any rule application
+ * infinite costs if there is no modality on the sequent.
+ *
  * @author Mattias Ulbrich
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
-public class FinishSymbolicExecutionUntilMergePointMacro extends
-        StrategyProofMacro {
+public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
 
     private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
     private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
@@ -85,8 +71,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
     public FinishSymbolicExecutionUntilMergePointMacro() {
     }
 
-    public FinishSymbolicExecutionUntilMergePointMacro(
-            HashSet<ProgramElement> blockElems) {
+    public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
         this.blockElems = blockElems;
     }
 
@@ -103,14 +88,13 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
     @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
-                + "merge point is reached or there is no more modality in the sequent.";
+            + "merge point is reached or there is no more modality in the sequent.";
     }
 
     /**
      * Returns true iff there is a modality in the sequent of the given node.
-     * 
-     * @param node
-     *            Node to check.
+     *
+     * @param node Node to check.
      * @return True iff there is a modality in the sequent of the given node.
      */
     private static boolean hasModality(Node node) {
@@ -126,9 +110,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
     /**
      * Recursive check for existence of modality.
-     * 
-     * @param term
-     *            The term to check.
+     *
+     * @param term The term to check.
      * @return True iff there is a modality in the sequent of the given term.
      */
     private static boolean hasModality(Term term) {
@@ -151,9 +134,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
@@ -188,22 +171,18 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
                 try {
                     // Do single proof step
                     new OneStepProofMacro().applyTo(uic, goal.node(), null,
-                            DUMMY_PROVER_TASK_LISTENER); // TODO Change
-                }
-                catch (InterruptedException e) {
-                }
-                catch (Exception e) {
+                        DUMMY_PROVER_TASK_LISTENER); // TODO Change
+                } catch (InterruptedException e) {
+                } catch (Exception e) {
                 }
 
                 // We want no splits, but the proof must have changed
                 if (lastNode.childrenCount() == 1) {
                     lastNode = lastNode.child(0);
-                }
-                else {
+                } else {
                     break;
                 }
-            }
-            while (hasBreakPoint(goal.sequent().succedent()));
+            } while (hasBreakPoint(goal.sequent().succedent()));
 
             // Undo until a break condition is the first active statement again.
             while (!hasBreakPoint(lastNode.sequent().succedent())) {
@@ -232,17 +211,13 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
     };
 
     /**
-     * @param succedent
-     *            Succedent of a sequent.
-     * @return true iff the given succedent has one formula with a break point
-     *         statement.
+     * @param succedent Succedent of a sequent.
+     * @return true iff the given succedent has one formula with a break point statement.
      */
     private boolean hasBreakPoint(Semisequent succedent) {
         for (SequentFormula formula : succedent.asList()) {
-            if (blockElems
-                    .contains(JavaTools
-                            .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula
-                                    .formula())))) {
+            if (blockElems.contains(JavaTools
+                    .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula.formula())))) {
                 return true;
             }
         }
@@ -251,14 +226,12 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
     }
 
     /**
-     * The Class FilterSymbexStrategy is a special strategy assigning to any
-     * rule infinite costs if the goal has no modality or if a merge point is
-     * reached.
+     * The Class FilterSymbexStrategy is a special strategy assigning to any rule infinite costs if
+     * the goal has no modality or if a merge point is reached.
      */
     private class FilterSymbexStrategy extends FilterStrategy {
 
-        private final Name NAME = new Name(
-                FilterSymbexStrategy.class.getSimpleName());
+        private final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
@@ -281,27 +254,24 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
             if (pio != null) {
                 JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
-                SourceElement activeStmt = JavaTools
-                        .getActiveStatement(theJavaBlock);
+                SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)
-                        || (alreadySeen.contains(theJavaBlock) && !blockElems
-                                .contains(activeStmt))) {
+                        || (alreadySeen.contains(theJavaBlock)
+                                && !blockElems.contains(activeStmt))) {
                     // For sake of efficiency: Do not treat the same
                     // statement block multiple times. However, we have
                     // to consider it if it is a break point, of course.
                     return super.isApprovedApp(app, pio, goal);
-                }
-                else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
+                } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
                     alreadySeen.add(theJavaBlock);
                 }
 
                 // Find break points
-                blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock
-                        .program(), goal.proof().getServices()));
+                blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock.program(),
+                    goal.proof().getServices()));
 
-                if (app.rule().name().toString()
-                        .equals("One Step Simplification")) {
+                if (app.rule().name().toString().equals("One Step Simplification")) {
 
                     // We allow One Step Simplification, otherwise we sometimes
                     // would have to do a simplification ourselves before
@@ -315,12 +285,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
         }
 
         /**
-         * Returns a set of merge points for the given statement block. A merge
-         * point is the statement in a program directly after an if-then-else or
-         * a try-catch-finally block.
-         * 
-         * @param toSearch
-         *            The statement block to search for merge points.
+         * Returns a set of merge points for the given statement block. A merge point is the
+         * statement in a program directly after an if-then-else or a try-catch-finally block.
+         *
+         * @param toSearch The statement block to search for merge points.
          * @return A set of merge points for the given statement block.
          */
         private HashSet<ProgramElement> findMergePoints(StatementBlock toSearch,
@@ -346,8 +314,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
             for (int i = 0; i < stmts.size(); i++) {
                 SourceElement stmt = stmts.get(i);
 
-                if ((stmt instanceof If || stmt instanceof Try)
-                        && i < stmts.size() - 1) {
+                if ((stmt instanceof If || stmt instanceof Try) && i < stmts.size() - 1) {
                     // We have found a reason for a break point (i.e.,
                     // a try or if statement), so let's add the next
                     // statement as a break point.
@@ -361,8 +328,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
                     // of potential nested loops, so there may occur
                     // an early stop in this case.
 
-                    FindBreakVisitor visitor = new FindBreakVisitor(getBodies(
-                            stmt).element(), services);
+                    FindBreakVisitor visitor =
+                        new FindBreakVisitor(getBodies(stmt).element(), services);
                     visitor.start();
                     if (visitor.containsBreak()) {
                         result.add(stmts.get(i + 1));
@@ -374,8 +341,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
         }
 
         /**
-         * Visitor for finding out whether there is a break statement contained
-         * in a program element.
+         * Visitor for finding out whether there is a break statement contained in a program
+         * element.
          */
         private class FindBreakVisitor extends JavaASTVisitor {
             private boolean containsBreak = false;
@@ -402,61 +369,47 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
         };
 
         /**
-         * Returns the bodies for various compound statements like if, try,
-         * case, etc. If there is no body, an empty list is returned.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         * Returns the bodies for various compound statements like if, try, case, etc. If there is
+         * no body, an empty list is returned.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(SourceElement elem) {
             if (elem instanceof If) {
                 return getBodies((If) elem);
-            }
-            else if (elem instanceof Then) {
+            } else if (elem instanceof Then) {
                 return getBodies((Then) elem);
-            }
-            else if (elem instanceof Else) {
+            } else if (elem instanceof Else) {
                 return getBodies((Else) elem);
-            }
-            else if (elem instanceof Try) {
+            } else if (elem instanceof Try) {
                 return getBodies((Try) elem);
-            }
-            else if (elem instanceof Catch) {
+            } else if (elem instanceof Catch) {
                 return getBodies((Catch) elem);
-            }
-            else if (elem instanceof Finally) {
+            } else if (elem instanceof Finally) {
                 return getBodies((Finally) elem);
-            }
-            else if (elem instanceof MethodFrame) {
+            } else if (elem instanceof MethodFrame) {
                 return getBodies((MethodFrame) elem);
-            }
-            else if (elem instanceof Case) {
+            } else if (elem instanceof Case) {
                 return getBodies((Case) elem);
-            }
-            else if (elem instanceof CatchAllStatement) {
+            } else if (elem instanceof CatchAllStatement) {
                 return getBodies((CatchAllStatement) elem);
-            }
-            else if (elem instanceof LabeledStatement) {
+            } else if (elem instanceof LabeledStatement) {
                 return getBodies((LabeledStatement) elem);
-            }
-            else if (elem instanceof LoopStatement) {
+            } else if (elem instanceof LoopStatement) {
                 return getBodies((LoopStatement) elem);
-            }
-            else if (elem instanceof SynchronizedBlock) {
+            } else if (elem instanceof SynchronizedBlock) {
                 return getBodies((SynchronizedBlock) elem);
-            }
-            else {
+            } else {
                 return new LinkedList<StatementBlock>();
             }
         }
 
         /**
-         * Returns the bodies for an If element. NOTE: This includes the bodies
-         * for the Then *and* the Else part!
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         * Returns the bodies for an If element. NOTE: This includes the bodies for the Then *and*
+         * the Else part!
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(If elem) {
@@ -473,9 +426,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a Then element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Then elem) {
@@ -491,9 +443,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for an Else element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Else elem) {
@@ -508,11 +459,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
         }
 
         /**
-         * Returns the bodies for a Try element. NOTE: This includes the bodies
-         * for Try *and* for the branches!
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         * Returns the bodies for a Try element. NOTE: This includes the bodies for Try *and* for
+         * the branches!
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Try elem) {
@@ -535,9 +485,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a Catch element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Catch elem) {
@@ -553,9 +502,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a Finally element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Finally elem) {
@@ -571,9 +519,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a MethodFrame element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(MethodFrame elem) {
@@ -589,9 +536,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the bodies for a Case element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Case elem) {
@@ -609,9 +555,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a CatchAllStatement element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
@@ -627,9 +572,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a LabeledStatement element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
@@ -645,9 +589,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a LoopStatement element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LoopStatement elem) {
@@ -663,9 +606,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
 
         /**
          * Returns the body for a SynchronizedBlock element.
-         * 
-         * @param elem
-         *            The element to return the bodies for.
+         *
+         * @param elem The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {

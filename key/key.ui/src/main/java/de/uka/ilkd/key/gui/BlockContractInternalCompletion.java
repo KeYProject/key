@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
@@ -35,14 +22,15 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
 
     private final MainWindow mainWindow;
 
-    BlockContractInternalCompletion(MainWindow mainWindow){
+    BlockContractInternalCompletion(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
 
     @Override
-    public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
-            final Goal goal, final boolean force) {
-        BlockContractInternalBuiltInRuleApp result = (BlockContractInternalBuiltInRuleApp) application;
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
+            final boolean force) {
+        BlockContractInternalBuiltInRuleApp result =
+            (BlockContractInternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -53,20 +41,20 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation =
-                BlockContractInternalRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
+        final Instantiation instantiation = BlockContractInternalRule.INSTANCE
+                .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
-                BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
-        final AuxiliaryContractConfigurator<BlockContract> configurator
-            = new AuxiliaryContractConfigurator<>("Block Contract Configurator",
-                new BlockContractSelectionPanel(services, true),
-                mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
+            BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
+        final AuxiliaryContractConfigurator<BlockContract> configurator =
+            new AuxiliaryContractConfigurator<>("Block Contract Configurator",
+                new BlockContractSelectionPanel(services, true), mainWindow, services,
+                contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
-                    HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(
-                    (StatementBlock) instantiation.statement, configurator.getContract(), heaps);
+                HeapContext.getModHeaps(services, instantiation.isTransactional());
+            result.update((StatementBlock) instantiation.statement, configurator.getContract(),
+                heaps);
         }
         return result;
     }
@@ -77,10 +65,10 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
     }
 
     /**
-     * Checks if the app is supported.
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof BlockContractInternalRule;
-   }
+        return app.rule() instanceof BlockContractInternalRule;
+    }
 }

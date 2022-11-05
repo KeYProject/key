@@ -42,8 +42,8 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     /**
-     * Proceed to the next occurrance of an object of the given class or a
-     * subclass thereof. If there is no such object, the walk is finished.
+     * Proceed to the next occurrance of an object of the given class or a subclass thereof. If
+     * there is no such object, the walk is finished.
      */
     public boolean next(Class c) {
         while (next()) {
@@ -55,8 +55,8 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     /**
-     * Proceed to the next occurrance of an object accepted by the given filter.
-     * If there is no such object, the walk is finished.
+     * Proceed to the next occurrance of an object accepted by the given filter. If there is no such
+     * object, the walk is finished.
      */
     public boolean next(ModelElementFilter filter) {
         while (next()) {
@@ -68,16 +68,14 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     /**
-     * Proceeds to the next element, if available. Returns true, if there is
-     * one, false otherwise.
+     * Proceeds to the next element, if available. Returns true, if there is one, false otherwise.
      *
      * @return true if the iterator points to an object.
      */
     public abstract boolean next();
 
     /**
-     * Returns the current ProgramElement of the iteration, or null if there is
-     * no more element.
+     * Returns the current ProgramElement of the iteration, or null if there is no more element.
      *
      * @return the current ProgramElement, or <CODE>null</CODE>.
      * @see #next()

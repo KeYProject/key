@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.join;
 
 import java.util.Comparator;
@@ -32,19 +19,16 @@ public interface PredicateEstimator {
     public static final PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
 
     /**
-     * @param partner
-     *            Structure comprising the partners of a join.
-     * @param proof
-     *            The underlying proof.
-     * @return A decision predicate for the two nodes in partner. The predicate
-     *         should be true in the sequent of the first node and false in the
-     *         sequent of the second node.
+     * @param partner Structure comprising the partners of a join.
+     * @param proof The underlying proof.
+     * @return A decision predicate for the two nodes in partner. The predicate should be true in
+     *         the sequent of the first node and false in the sequent of the second node.
      */
     public Result estimate(ProspectivePartner partner, Proof proof);
 
     /**
-     * Encapsulates a decision predicate for the delayed cut mechanism and the
-     * common parent node at which to prune, i.e. apply the delayed cut.
+     * Encapsulates a decision predicate for the delayed cut mechanism and the common parent node at
+     * which to prune, i.e. apply the delayed cut.
      */
     public interface Result {
         Term getPredicate();
@@ -53,9 +37,10 @@ public interface PredicateEstimator {
     }
 }
 
+
 /**
- * Tries to determine the decision predicate. The information about the
- * predicate is extracted from the labels of branches in the proof.
+ * Tries to determine the decision predicate. The information about the predicate is extracted from
+ * the labels of branches in the proof.
  *
  * @author Benjamin Niedermann
  */
@@ -70,8 +55,7 @@ class StdPredicateEstimator implements PredicateEstimator {
         final Node node = getFirstDifferentNode(partner);
         String branchLabel = node.getNodeInfo().getBranchLabel();
         if (branchLabel != null
-                && (branchLabel.endsWith(TRUE_LABEL) || branchLabel
-                        .endsWith(FALSE_LABEL))) {
+                && (branchLabel.endsWith(TRUE_LABEL) || branchLabel.endsWith(FALSE_LABEL))) {
             final boolean positive = branchLabel.endsWith(TRUE_LABEL);
             String suffix = positive ? TRUE_LABEL : FALSE_LABEL;
             int index = branchLabel.lastIndexOf(suffix);
@@ -89,8 +73,7 @@ class StdPredicateEstimator implements PredicateEstimator {
                     @Override
                     public Term getPredicate() {
                         if (!positive) {
-                            return proof.getServices().getTermBuilder()
-                                    .not(term);
+                            return proof.getServices().getTermBuilder().not(term);
                         }
                         return term;
                     }
@@ -120,10 +103,10 @@ class StdPredicateEstimator implements PredicateEstimator {
 
         };
     }
-    
+
     /**
-     * Goes up to the common node of partner.getNode(0) and partner.getNode(1)
-     * and returns the next node on the path to partner.getNode(0).
+     * Goes up to the common node of partner.getNode(0) and partner.getNode(1) and returns the next
+     * node on the path to partner.getNode(0).
      *
      * @param partner The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
@@ -166,13 +149,10 @@ class StdPredicateEstimator implements PredicateEstimator {
     }
 
     /**
-     * Translates a branch label (without common prefixes such as "CUT:" etc.)
-     * to a term.
+     * Translates a branch label (without common prefixes such as "CUT:" etc.) to a term.
      *
-     * @param estimation
-     *            The branch label without prefix.
-     * @param services
-     *            The services object.
+     * @param estimation The branch label without prefix.
+     * @param services The services object.
      * @return A term corresponding to the branch label.
      */
     private Term translate(String estimation, Services services) {

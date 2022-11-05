@@ -1,21 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
-
 parser grammar KeYParser;
 
 @header {
@@ -119,7 +101,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | NUM_LITERAL
+  simple_ident (DOT simple_ident)* | INT_LITERAL
 ;
 
 simple_ident_dots_comma_list
@@ -344,7 +326,8 @@ boolean_literal: TRUE | FALSE;
 literals:
     boolean_literal
   | char_literal
-  | number
+  | integer
+  | floatnum
   | string_literal
 ;
 
@@ -541,8 +524,14 @@ argument_list
     RPAREN
 ;
 
-number:
-  (MINUS)? (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+integer:
+  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+;
+
+floatnum: // called floatnum because "float" collide with the Java language
+    (MINUS)? FLOAT_LITERAL  #floatLiteral
+  | (MINUS)? DOUBLE_LITERAL #doubleLiteral
+  | (MINUS)? REAL_LITERAL   #realLiteral
 ;
 
 char_literal:
@@ -620,7 +609,7 @@ varexp
   negate=NOT_?
   varexpId
   (LBRACKET  parameter+=IDENT (COMMA parameter+=IDENT)* RBRACKET)?
-  LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
+  (LPAREN varexp_argument (COMMA varexp_argument)* RPAREN)?
 ;
 
 
@@ -673,6 +662,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | GET_FREE_INVARIANT
   | GET_VARIANT
   | IS_LABELED
+  | ISINSTRICTFP
 ;
 
 varexp_argument
@@ -703,8 +693,18 @@ option
 option_list
 :
   LPAREN
-    option (COMMA option)*
+    ( (option (COMMA option)*)
+      | option_expr)
   RPAREN
+;
+
+option_expr
+:
+    option_expr AND option_expr #option_expr_and
+  | option_expr OR option_expr  #option_expr_or
+  | NOT option_expr             #option_expr_not
+  | LPAREN option_expr RPAREN   #option_expr_paren
+  | option                      #option_expr_prop
 ;
 
 goalspec

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2020 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.ArrayList;
@@ -37,8 +24,7 @@ import recoder.util.Debug;
  *
  * @author Dominic Steinhöfel
  */
-public class Exec extends BranchStatement
-        implements StatementContainer, VariableScope {
+public class Exec extends BranchStatement implements StatementContainer, VariableScope {
 
     /**
      * serialization id
@@ -67,8 +53,7 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
+     * @param body a statement block.
      */
 
     public Exec(StatementBlock body) {
@@ -79,10 +64,8 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
-     * @param branches
-     *            a branch mutable list.
+     * @param body a statement block.
+     * @param branches a branch mutable list.
      */
     public Exec(StatementBlock body, ASTList<Branch> branches) {
         setBranchList(branches);
@@ -93,8 +76,7 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param proto
-     *            a Exec.
+     * @param proto a Exec.
      */
     protected Exec(Exec proto) {
         super(proto);
@@ -158,20 +140,16 @@ public class Exec extends BranchStatement
             result++;
         if (branches != null)
             result += branches.size();
-        result += variableDeclarations == null ? 0
-                : variableDeclarations.size();
+        result += variableDeclarations == null ? 0 : variableDeclarations.size();
         return result;
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -215,19 +193,15 @@ public class Exec extends BranchStatement
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @exception ClassCastException if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -235,8 +209,7 @@ public class Exec extends BranchStatement
         if (p == null) {
             throw new NullPointerException();
         }
-        count = (variableDeclarations == null) ? 0
-                : variableDeclarations.size();
+        count = (variableDeclarations == null) ? 0 : variableDeclarations.size();
         for (int i = 0; i < count; i++) {
             if (variableDeclarations.get(i) == p) {
                 if (q == null) {
@@ -283,8 +256,7 @@ public class Exec extends BranchStatement
     /**
      * Set body.
      *
-     * @param body
-     *            a statement block.
+     * @param body a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -302,10 +274,9 @@ public class Exec extends BranchStatement
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     @Override
@@ -329,8 +300,7 @@ public class Exec extends BranchStatement
     /**
      * Set branch list.
      *
-     * @param branches
-     *            a branch mutable list.
+     * @param branches a branch mutable list.
      */
     public void setBranchList(ASTList<Branch> branches) {
         this.branches = branches;
@@ -348,10 +318,9 @@ public class Exec extends BranchStatement
     }
 
     /*
-     * Return the branch at the specified index in this node's "virtual" branch
-     * array. @param index an index for a branch. @return the branch with the
-     * given index. @exception ArrayIndexOutOfBoundsException if <tt> index
-     * </tt> is out of bounds.
+     * Return the branch at the specified index in this node's "virtual" branch array. @param index
+     * an index for a branch. @return the branch with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     @Override
     public Branch getBranchAt(int index) {
@@ -366,8 +335,8 @@ public class Exec extends BranchStatement
         if (v instanceof SourceVisitorExtended) {
             ((SourceVisitorExtended) v).visitExec(this);
         } else {
-//            throw new IllegalStateException(
-//                "Method 'accept' not implemented in Exec");
+            // throw new IllegalStateException(
+            // "Method 'accept' not implemented in Exec");
         }
     }
 
@@ -385,8 +354,7 @@ public class Exec extends BranchStatement
         return variableDeclarations;
     }
 
-    public void setVariableDeclarations(
-            ASTList<LocalVariableDeclaration> variableDeclarations) {
+    public void setVariableDeclarations(ASTList<LocalVariableDeclaration> variableDeclarations) {
         this.variableDeclarations = variableDeclarations;
     }
 

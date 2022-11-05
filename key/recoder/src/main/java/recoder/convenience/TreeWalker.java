@@ -6,9 +6,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
 /**
- * Walks a syntax tree in depth-first order. This roughly yields the syntactical
- * order of the program elements, except for closing parentheses and other
- * implicit lexical tokens.
+ * Walks a syntax tree in depth-first order. This roughly yields the syntactical order of the
+ * program elements, except for closing parentheses and other implicit lexical tokens.
  *
  * @author AL
  */
@@ -43,7 +42,8 @@ public class TreeWalker extends AbstractTreeWalker {
             NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
-                ProgramElement[] newStack = new ProgramElement[Math.max(stack.length * 2, count + s)];
+                ProgramElement[] newStack =
+                    new ProgramElement[Math.max(stack.length * 2, count + s)];
                 System.arraycopy(stack, 0, newStack, 0, count);
                 stack = newStack;
             }

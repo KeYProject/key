@@ -3,9 +3,9 @@ package de.uka.ilkd.key.java;
 import de.uka.ilkd.key.java.recoderext.Ghost;
 import de.uka.ilkd.key.proof.runallproofs.Function;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
@@ -48,17 +48,17 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_AssertsFalse() throws IOException {
         File inputFile = new File(FindResources.getTestResourcesDirectory(),
-                "de/uka/ilkd/key/java/recoderext/AssertsFalse.java");
+            "de/uka/ilkd/key/java/recoderext/AssertsFalse.java");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> om = findMethod(cu, "AssertsFalse", "m");
-        LOGGER.debug("{}",cu);
-        Assert.assertTrue("Could not find method AssertsFalse#m()", om.isPresent());
+        LOGGER.debug("{}", cu);
+        Assertions.assertTrue(om.isPresent(), "Could not find method AssertsFalse#m()");
         MethodDeclaration m = (MethodDeclaration) om.get();
         assertContainsComment(m, it -> it.startsWith("/*@ normal_behavior"));
 
         Statement last = lastStatement(m);
-        Assert.assertTrue(last instanceof EmptyStatement);
+        Assertions.assertTrue(last instanceof EmptyStatement);
         assertContainsComment((JavaProgramElement) last, it -> it.equals("//@ assert false;"));
     }
 
@@ -66,24 +66,24 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_Steinhofel1() throws IOException {
         File inputFile = new File(FindResources.getTestResourcesDirectory(),
-                "de/uka/ilkd/key/java/recoderext/Steinhoefel1.java");
+            "de/uka/ilkd/key/java/recoderext/Steinhoefel1.java");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
         LOGGER.debug("{}", cu);
-        Assert.assertTrue("Could not find method Steinhoefel1#fib()", ofib.isPresent());
+        Assertions.assertTrue(ofib.isPresent(), "Could not find method Steinhoefel1#fib()");
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
 
         LocalVariableDeclaration ghost1 = (LocalVariableDeclaration) m.getBody().getStatementAt(2);
-        Assert.assertTrue(ghost1.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k0_old", ghost1.getVariables().get(0).getName());
+        Assertions.assertTrue(ghost1.getDeclarationSpecifiers().get(0) instanceof Ghost);
+        Assertions.assertEquals("k0_old", ghost1.getVariables().get(0).getName());
 
         LocalVariableDeclaration ghost2 = (LocalVariableDeclaration) m.getBody().getStatementAt(3);
-        Assert.assertTrue(ghost2.getDeclarationSpecifiers().get(0) instanceof Ghost);
-        Assert.assertEquals("k1_old", ghost2.getVariables().get(0).getName());
+        Assertions.assertTrue(ghost2.getDeclarationSpecifiers().get(0) instanceof Ghost);
+        Assertions.assertEquals("k1_old", ghost2.getVariables().get(0).getName());
 
-        For forLoop = (For) m.getBody().getStatementAt(4); //retrieve the for loop
+        For forLoop = (For) m.getBody().getStatementAt(4); // retrieve the for loop
         assertContainsComment(forLoop, it -> it.equals("//@ ghost int k0_old = k0;"));
         assertContainsComment(forLoop, it -> it.equals("//@ ghost int k1_old = k1;"));
         assertContainsComment(forLoop, it -> it.startsWith("/*@ loop_invariant"));
@@ -92,14 +92,15 @@ public class ProofJavaProgramFactoryTest {
 
         CopyAssignment ghost3 = (CopyAssignment) loopBody.getStatementAt(3);
         VariableReference var3 = (VariableReference) ghost3.getChildAt(0);
-        Assert.assertEquals("k0_old", var3.getName());
+        Assertions.assertEquals("k0_old", var3.getName());
 
         CopyAssignment ghost4 = (CopyAssignment) loopBody.getStatementAt(5);
         VariableReference var4 = (VariableReference) ghost4.getChildAt(0);
-        Assert.assertEquals("k1_old", var4.getName());
+        Assertions.assertEquals("k1_old", var4.getName());
 
         EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
-        EmptyStatement lastStatementInForLoop = (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
+        EmptyStatement lastStatementInForLoop =
+            (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
         assertContainsComment(empty1, it -> it.equals("//@ set k0_old = k0;"));
         assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k1_old = k1;"));
 
@@ -108,25 +109,25 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_SetStatements() throws IOException {
         File inputFile = new File(FindResources.getTestResourcesDirectory(),
-                "de/uka/ilkd/key/java/recoderext/SetInMethodBody.java");
+            "de/uka/ilkd/key/java/recoderext/SetInMethodBody.java");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> ofib = findMethod(cu, "SetInMethodBody", "foo");
         LOGGER.debug("{}", cu);
-        Assert.assertTrue("Could not find method SetInMethodBody#foo()", ofib.isPresent());
+        Assertions.assertTrue(ofib.isPresent(), "Could not find method SetInMethodBody#foo()");
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
 
         CopyAssignment assign1 = (CopyAssignment) m.getBody().getStatementAt(0);
         VariableReference var1 = (VariableReference) assign1.getChildAt(0);
-        Assert.assertEquals("message", var1.getName());
+        Assertions.assertEquals("message", var1.getName());
 
         EmptyStatement empty1 = (EmptyStatement) m.getBody().getStatementAt(1);
         assertContainsComment(empty1, it -> it.equals("//@ set message = arg0;"));
 
         CopyAssignment assign2 = (CopyAssignment) m.getBody().getStatementAt(2);
         VariableReference var2 = (VariableReference) assign2.getChildAt(0);
-        Assert.assertEquals("cause", var2.getName());
+        Assertions.assertEquals("cause", var2.getName());
 
         EmptyStatement empty2 = (EmptyStatement) m.getBody().getStatementAt(3);
         assertContainsComment(empty2, it -> it.equals("//@ set cause = arg1;"));
@@ -138,15 +139,15 @@ public class ProofJavaProgramFactoryTest {
     public void testAttachCommentsCompilationUnit_SmansEtAlArrayList() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
-                "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
+            "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
         String expected = IOUtil.readFrom(expectedFile);
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
-        //Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
+        // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
 
         String out = getActualResult(cu);
         LOGGER.debug("{}", out);
-        Assert.assertEquals("Difference in attached comments", expected, out);
+        Assertions.assertEquals(expected, out, "Difference in attached comments");
     }
 
 
@@ -154,19 +155,19 @@ public class ProofJavaProgramFactoryTest {
     public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
-                "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
+            "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
         String expected = IOUtil.readFrom(expectedFile);
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
         LOGGER.debug("{}", out);
-        Assert.assertEquals("Difference in attached comments", expected, out);
+        Assertions.assertEquals(expected, out, "Difference in attached comments");
     }
 
 
     private String getActualResult(CompilationUnit cu) {
-        Function<String, String> prepareComment = it ->
-                it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
+        Function<String, String> prepareComment =
+            it -> it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
 
         StringWriter out = new StringWriter();
         PrintWriter actual = new PrintWriter(out);
@@ -175,10 +176,8 @@ public class ProofJavaProgramFactoryTest {
             ProgramElement pe = walker.getProgramElement();
             ASTList<Comment> b = pe.getComments();
             if (b != null && !b.isEmpty()) {
-                actual.format("(%d/%d) -- %s\n",
-                        pe.getStartPosition().getLine(),
-                        pe.getEndPosition().getLine(),
-                        pe.getClass().getName());
+                actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
+                    pe.getEndPosition().getLine(), pe.getClass().getName());
                 for (Comment comment : pe.getComments()) {
                     actual.format("  * %s\n", prepareComment.apply(comment.getText()));
                 }
@@ -197,18 +196,18 @@ public class ProofJavaProgramFactoryTest {
 
     private void assertContainsComment(JavaProgramElement m, Predicate<String> needle) {
         ASTList<Comment> haystack = m.getComments();
-        Optional<Comment> search = haystack.stream()
-                .filter(it -> needle.test(it.getText()))
-                .findFirst();
+        Optional<Comment> search =
+            haystack.stream().filter(it -> needle.test(it.getText())).findFirst();
 
-        Assert.assertTrue("Could not find comment satisfying the given predicate.",
-                search.isPresent());
+        Assertions.assertTrue(search.isPresent(),
+            "Could not find comment satisfying the given predicate.");
     }
 
     private CompilationUnit getCompilationUnit(File inputFile) throws IOException {
-        Assume.assumeTrue("Required input file " + inputFile + " does not exists!", inputFile.exists());
+        Assumptions.assumeTrue(inputFile.exists(),
+            "Required input file " + inputFile + " does not exists!");
         String content = IOUtil.readFrom(inputFile);
-        return r2k.recoderCompilationUnits(new String[]{content}).get(0);
+        return r2k.recoderCompilationUnits(new String[] { content }).get(0);
     }
 
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
@@ -217,8 +216,7 @@ public class ProofJavaProgramFactoryTest {
             if (td instanceof ClassDeclaration) {
                 ClassDeclaration clazz = (ClassDeclaration) td;
                 if (clazz.getName().equals(className)) {
-                    return clazz.getMethods().stream()
-                            .filter(it -> it.getName().equals(methodName))
+                    return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();
                 }
             }

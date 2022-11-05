@@ -11,8 +11,7 @@ import java.util.stream.Collectors;
 /**
  * This program is a little for debugging KeY Lexer.
  * <p>
- * You can start this problem via gradle:
- * <code>
+ * You can start this problem via gradle: <code>
  * <pre>
  * gradle debugLexer
  * </pre>
@@ -44,15 +43,14 @@ public class DebugKeyLexer {
                 e.printStackTrace(stream);
             }
             return null;
-        }).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         format = DEFAULT_FORMAT;
     }
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            new DebugKeyLexer(
-                    Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+            new DebugKeyLexer(Arrays.stream(args).map(File::new).collect(Collectors.toList()))
+                    .run();
         } else {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
                 String tmp;
@@ -64,8 +62,7 @@ public class DebugKeyLexer {
                     } else {
                         break;
                     }
-                }
-                while (true);
+                } while (true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,7 +74,8 @@ public class DebugKeyLexer {
     }
 
     public static void debug(KeYLexer lexer) {
-        DebugKeyLexer dkl = new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+        DebugKeyLexer dkl =
+            new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -90,12 +88,10 @@ public class DebugKeyLexer {
         Token t;
         do {
             t = toks.nextToken();
-            stream.format(format,
-                    toks.getLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    toks._mode,
-                    t.getText().replace("\n", "\\n"));
-            if (t.getType() == KeYLexer.ERROR_CHAR) stream.println("!!ERROR!!");
+            stream.format(format, toks.getLine(), toks.getVocabulary().getSymbolicName(t.getType()),
+                toks._mode, t.getText().replace("\n", "\\n"));
+            if (t.getType() == KeYLexer.ERROR_CHAR)
+                stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }
 }

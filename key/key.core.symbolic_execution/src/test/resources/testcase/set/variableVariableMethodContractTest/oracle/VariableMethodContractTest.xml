@@ -26,15 +26,15 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <operationContract name="result = max(self) catch(exc_0)
-pre: !self = null
+         <operationContract name="result_max = max(self) catch(exc_0)
+pre: (!self = null)&lt;&lt;impl&gt;&gt;
 post: ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; self.l2 = 42)
 &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
    -&gt;   java.lang.Error::instance(exc_0) = TRUE
       |   java.lang.RuntimeException::instance(exc_0)
         = TRUE)
 mod: {(self, VariableMethodContractTest::$l2)}
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result" exceptionTerm="exc_0" contractParameters="self" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_max" exceptionTerm="exc_0" contractParameters="self" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="l2" isArrayIndex="false">
@@ -60,8 +60,8 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                      </variable>
                   </value>
                </variable>
-               <variable name="result" isArrayIndex="false">
-                  <value name="result {true}" typeString="int" valueString="result" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               <variable name="result_max" isArrayIndex="false">
+                  <value name="result_max {true}" typeString="int" valueString="result_max" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
@@ -80,7 +80,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                            </value>
                         </variable>
                         <variable name="l" isArrayIndex="false">
-                           <value name="l {true}" typeString="int" valueString="result" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="l {true}" typeString="int" valueString="result_max" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -101,7 +101,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                               </value>
                            </variable>
                            <variable name="l" isArrayIndex="false">
-                              <value name="l {true}" typeString="int" valueString="result" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="l {true}" typeString="int" valueString="result_max" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>

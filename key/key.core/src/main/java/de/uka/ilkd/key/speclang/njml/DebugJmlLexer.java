@@ -11,8 +11,7 @@ import java.util.stream.Collectors;
 /**
  * This program is a little for debugging KeY Lexer.
  * <p>
- * You can start this problem via gradle:
- * <code>
+ * You can start this problem via gradle: <code>
  * <pre>
  * gradle debugLexer
  * </pre>
@@ -44,15 +43,14 @@ public class DebugJmlLexer {
                 e.printStackTrace(stream);
             }
             return null;
-        }).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         format = DEFAULT_FORMAT;
     }
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            new DebugJmlLexer(
-                    Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+            new DebugJmlLexer(Arrays.stream(args).map(File::new).collect(Collectors.toList()))
+                    .run();
         } else {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
                 String tmp;
@@ -64,8 +62,7 @@ public class DebugJmlLexer {
                     } else {
                         break;
                     }
-                }
-                while (true);
+                } while (true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,7 +74,8 @@ public class DebugJmlLexer {
     }
 
     public static void debug(JmlLexer lexer) {
-        DebugJmlLexer dkl = new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+        DebugJmlLexer dkl =
+            new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -91,13 +89,10 @@ public class DebugJmlLexer {
         do {
             int modeBefore = toks._mode;
             t = toks.nextToken();
-            stream.format(format,
-                    t.getLine(),
-                    t.getCharPositionInLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    t.getText().replace("\n", "\\n"),
-                    modeBefore, toks._mode, t.getChannel());
-            //if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
+            stream.format(format, t.getLine(), t.getCharPositionInLine(),
+                toks.getVocabulary().getSymbolicName(t.getType()), t.getText().replace("\n", "\\n"),
+                modeBefore, toks._mode, t.getChannel());
+            // if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }
 }

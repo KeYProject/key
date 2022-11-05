@@ -1,22 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Term;
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +13,16 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 
 /**
- * This class tests, if design principles have been hurt. Therefore, it
- * makes use of reflection.
+ * This class tests, if design principles have been hurt. Therefore, it makes use of reflection.
  */
-public class DesignTests extends TestCase {
+public class DesignTests {
 
     private static final File binaryPath;
     private static final Logger LOGGER = LoggerFactory.getLogger(DesignTests.class);
@@ -44,10 +32,12 @@ public class DesignTests extends TestCase {
         if ("org.key_project.core".equals(projectRoot.getName())) {
             projectRoot = new File(projectRoot, "bin");
         } else if (projectRoot.isFile()) {
-            projectRoot = new File(projectRoot.getParentFile().getParentFile().getParentFile(), "key.core" + File.separator + "bin");
+            projectRoot = new File(projectRoot.getParentFile().getParentFile().getParentFile(),
+                "key.core" + File.separator + "bin");
         }
 
-        binaryPath = new File(projectRoot, "de" + File.separator + "uka" + File.separator + "ilkd" + File.separator + "key");
+        binaryPath = new File(projectRoot,
+            "de" + File.separator + "uka" + File.separator + "ilkd" + File.separator + "key");
     }
 
     private static final FileFilter FILTER = fileName -> {
@@ -60,35 +50,34 @@ public class DesignTests extends TestCase {
     private String message = "";
 
     /**
-     * Creates an instance used to test if design principles have been
-     * hurt.
+     * Creates an instance used to test if design principles have been hurt.
      */
     public DesignTests() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         allClasses = getAllClasses(binaryPath);
-        Assert.assertTrue("No classes found in and below " + binaryPath, allClasses.length >= 1);
+        Assertions.assertTrue(allClasses.length >= 1,
+            "No classes found in and below " + binaryPath);
     }
 
     /**
      * collects all found in the given directory
      *
-     * @param directory a File denoting the directory where to look for
-     *                  the classes
+     * @param directory a File denoting the directory where to look for the classes
      * @return array of found class files
      */
     private static Class<?>[] getClasses(File directory) {
         LOGGER.info(".");
         File[] classFiles = directory.listFiles(FILTER);
 
-        Class<?>[] classes = new Class
-                [(classFiles == null) ? 0 : classFiles.length];
+        Class<?>[] classes = new Class[(classFiles == null) ? 0 : classFiles.length];
         for (int i = 0; i < classes.length; i++) {
             String absoluteName = classFiles[i].getAbsolutePath();
-            String className = absoluteName.substring
-                    (absoluteName.indexOf("de" + File.separatorChar)).replace(File.separatorChar, '.');
+            String className =
+                absoluteName.substring(absoluteName.indexOf("de" + File.separatorChar))
+                        .replace(File.separatorChar, '.');
             className = className.substring(0, className.indexOf(".class"));
 
             try {
@@ -107,22 +96,18 @@ public class DesignTests extends TestCase {
      * adds all elements of <code>source</code> to <code>target</code>
      *
      * @param source the array whose elements have to inserted
-     * @param target the LinkedList where to insert the elements of the
-     *               source
+     * @param target the LinkedList where to insert the elements of the source
      */
     private static void copyToList(Class<?>[] source, LinkedList<Class<?>> target) {
         Collections.addAll(target, source);
     }
 
     /**
-     * iterates through the directory structure starting at
-     * <code>topDir</code> and collects all found
-     * classes.
+     * iterates through the directory structure starting at <code>topDir</code> and collects all
+     * found classes.
      *
-     * @param topDir File giving the directory where to start the
-     *               iteration
-     * @return all found classes including the ones in
-     * <code>topDir</code>
+     * @param topDir File giving the directory where to start the iteration
+     * @return all found classes including the ones in <code>topDir</code>
      */
     public static Class<?>[] getAllClasses(File topDir) {
         LinkedList<Class<?>> result = new LinkedList<>();
@@ -135,7 +120,7 @@ public class DesignTests extends TestCase {
             for (File subDirectory : subDirectories) {
                 copyToList(getAllClasses(subDirectory), result);
             }
-            return result.toArray(new Class[0]);
+            return (Class<?>[]) result.toArray(new Class[0]);
         }
     }
 
@@ -157,43 +142,70 @@ public class DesignTests extends TestCase {
     /**
      * does not test if GUI is used within methods
      */
+    @Disabled("weigl: stupid test")
+    @Test
+    public void xtestTermSubclassVisibility() {
+        LinkedList<Class<?>> badClasses = new LinkedList<>();
+        for (Class<?> allClass : allClasses) {
+            if (allClass != Term.class && (Term.class).isAssignableFrom(allClass)) {
+                int mods = allClass.getModifiers();
+                if (Modifier.isProtected(mods) || Modifier.isPublic(mods)) {
+                    badClasses.add(allClass);
+                }
+            }
+        }
+        if (badClasses.size() > 0) {
+            message = "Visibility of subclasses of Term  ";
+            message += "must be package private or private.\n";
+            message += printBadClasses(badClasses);
+        }
+        Assertions.assertEquals(0, badClasses.size(), message);
+    }
+
+    /**
+     * does not test if GUI is used within methods
+     */
+    @Test
     public void testGuiSep() {
         LinkedList<Class<?>> badClasses = new LinkedList<>();
         for (Class<?> allClass : allClasses) {
-            if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClass) ||
-                    allClass.getPackage().getName().contains("key.rule") ||
-                    allClass.getPackage().getName().contains("key.logic") ||
-                    allClass.getPackage().getName().contains("key.proof") ||
-                    allClass.getPackage().getName().contains("de.uka.ilkd.key.smt.counterexample") ||
-                    allClass.getPackage().getName().contains("de.uka.ilkd.key.smt.testgen") ||
-                    allClass.getPackage().getName().contains("key.java") ||
-                    allClass.getPackage().getName().contains("key.core") ||
-                    allClass.getPackage().getName().contains("key.settings") ||
-                    allClass.getPackage().getName().contains("key.strategy")
-            ) {
+            if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClass)
+                    || allClass.getPackage().getName().contains("key.rule")
+                    || allClass.getPackage().getName().contains("key.logic")
+                    || allClass.getPackage().getName().contains("key.proof")
+                    || allClass.getPackage().getName()
+                            .contains("de.uka.ilkd.key.smt.counterexample")
+                    || allClass.getPackage().getName().contains("de.uka.ilkd.key.smt.testgen")
+                    || allClass.getPackage().getName().contains("key.java")
+                    || allClass.getPackage().getName().contains("key.core")
+                    || allClass.getPackage().getName().contains("key.settings")
+                    || allClass.getPackage().getName().contains("key.strategy")) {
 
                 // exclude KeYMediator for the moment (contains some workarounds)
-                if (allClass.getName().contains("KeYMediator")) continue;
+                if (allClass.getName().contains("KeYMediator"))
+                    continue;
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) {
-                        //|| pkgname.contains("key.gui")) { as long as the mediator and settings are in the GUI
+                        // || pkgname.contains("key.gui")) { as long as the mediator and settings
+                        // are in the GUI
                         LOGGER.error("Illegal GUI reference at field {} declared in class {}",
-                                f.getName(), allClass.getName());
+                            f.getName(), allClass.getName());
                         badClasses.add(allClass);
                     }
                 }
 
                 for (Method m : allClass.getDeclaredMethods()) {
                     if (java.awt.Component.class.isAssignableFrom(m.getReturnType())) {
-                        LOGGER.error("Illegal GUI reference as return type of {} declared in class {}",
-                                m.getName(), allClass.getName());
-                        badClasses.add(allClass);
+                        LOGGER.error(
+                            "Illegal GUI reference as return type of {} declared in class {}",
+                            m.getName(), allClass.getName());
                     }
                     for (Class<?> t : m.getParameterTypes())
                         if (java.awt.Component.class.isAssignableFrom(t)) {
-                            LOGGER.error("Illegal GUI reference as parameter type of {} declared in class {}",
-                                    m.getName(), allClass.getName());
+                            LOGGER.error(
+                                "Illegal GUI reference as parameter type of {} declared in class {}",
+                                m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
                 }
@@ -204,7 +216,7 @@ public class DesignTests extends TestCase {
             message += printBadClasses(badClasses);
         }
 
-        assertEquals(message, 0, badClasses.size());
+        Assertions.assertEquals(0, badClasses.size(), message);
     }
 
     private boolean implementsEquals(Class<?> cl) {
@@ -231,9 +243,10 @@ public class DesignTests extends TestCase {
     }
 
     /**
-     * Tests that if <code>equals()</code> is overridden,
-     * <code>hashCode()</code> is also overridden.
+     * Tests that if <code>equals()</code> is overridden, <code>hashCode()</code> is also
+     * overridden.
      */
+    @Test
     public void testHashCodeImplemented() {
         LinkedList<Class<?>> badClasses = new LinkedList<>();
         for (Class<?> clazz : allClasses) {
@@ -246,7 +259,7 @@ public class DesignTests extends TestCase {
             message += printBadClasses(badClasses);
         }
 
-        assertEquals(message, 0, badClasses.size());
+        Assertions.assertEquals(0, badClasses.size(), message);
     }
 
 
@@ -270,7 +283,8 @@ public class DesignTests extends TestCase {
                 }
             }
         }
-        LOGGER.info("[Design tests finished. (" + (testcases - failures) + "/" + testcases + ") tests passed.]");
+        LOGGER.info("[Design tests finished. (" + (testcases - failures) + "/" + testcases
+            + ") tests passed.]");
         if (failures > 0) {
             System.exit(1);
         }

@@ -6,11 +6,12 @@ import java.io.File;
 import java.util.Properties;
 
 public class TestGenerationSettings extends AbstractSettings {
-    //region Default Values for option fields
+    // region Default Values for option fields
     private static final boolean DEFAULT_APPLYSYMBOLICEX = false;
     private static final int DEFAULT_MAXUNWINDS = 3;
     private static final int DEFAULT_CONCURRENTPROCESSES = 1;
-    private static final String DEFAULT_OUTPUTPATH = System.getProperty("user.home") + File.separator + "testFiles";
+    private static final String DEFAULT_OUTPUTPATH =
+        System.getProperty("user.home") + File.separator + "testFiles";
     private static final boolean DEFAULT_REMOVEDUPLICATES = true;
     private static final boolean DEFAULT_USERFL = false;
     private static final boolean DEFAULT_USEJUNIT = false;
@@ -18,10 +19,11 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final String DEFAULT_OPENJMLPATH = ".";
     private static final String DEFAULT_OBJENESISPATH = ".";
     private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
-    //endregion
+    // endregion
 
     // region property names
-    private static final String PROP_APPLY_SYMBOLIC_EXECUTION = "[TestGenSettings]applySymbolicExecution";
+    private static final String PROP_APPLY_SYMBOLIC_EXECUTION =
+        "[TestGenSettings]applySymbolicExecution";
     private static final String PROP_MAX_UWINDS = "[TestGenSettings]maxUnwinds";
     private static final String PROP_OUTPUT_PATH = "[TestGenSettings]OutputPath";
     private static final String PROP_REMOVE_DUPLICATES = "[TestGenSettings]RemoveDuplicates";
@@ -31,8 +33,9 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final String PROP_INVARIANT_FOR_ALL = "[TestGenSettings]InvariantForAll";
     private static final String PROP_OPENJML_PATH = "[TestGenSettings]OpenJMLPath";
     private static final String PROP_OBJENESIS_PATH = "[TestGenSettings]ObjenesisPath";
-    private static final String PROP_INCLUDE_POST_CONDITION = "[TestGenSettings]IncludePostCondition";
-    //endregion
+    private static final String PROP_INCLUDE_POST_CONDITION =
+        "[TestGenSettings]IncludePostCondition";
+    // endregion
 
     // Option fields
     private boolean applySymbolicExecution;
@@ -245,33 +248,22 @@ public class TestGenerationSettings extends AbstractSettings {
 
     @Override
     public void writeSettings(Properties props) {
-        SettingsConverter.store(props,
-                TestGenerationSettings.PROP_APPLY_SYMBOLIC_EXECUTION,
-                applySymbolicExecution);
-        SettingsConverter.store(props,
-                TestGenerationSettings.PROP_CONCURRENT_PROCESSES,
-                concurrentProcesses);
-        SettingsConverter.store(props,
-                TestGenerationSettings.PROP_INVARIANT_FOR_ALL,
-                invariantForAll);
-        SettingsConverter.store(props, TestGenerationSettings.PROP_MAX_UWINDS,
-                maxUnwinds);
-        SettingsConverter.store(props, TestGenerationSettings.PROP_OUTPUT_PATH,
-                outputPath);
-        SettingsConverter.store(props,
-                TestGenerationSettings.PROP_REMOVE_DUPLICATES,
-                removeDuplicates);
-        SettingsConverter.store(props,
-                TestGenerationSettings.PROP_USE_RFL,
-                useRFL);
-        SettingsConverter.store(props, TestGenerationSettings.PROP_USE_JUNIT,
-                useJunit);
-        SettingsConverter.store(props, TestGenerationSettings.PROP_OPENJML_PATH,
-                openjmlPath);
-        SettingsConverter.store(props, TestGenerationSettings.PROP_OBJENESIS_PATH,
-                objenesisPath);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_APPLY_SYMBOLIC_EXECUTION,
+            applySymbolicExecution);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_CONCURRENT_PROCESSES,
+            concurrentProcesses);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_INVARIANT_FOR_ALL,
+            invariantForAll);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_MAX_UWINDS, maxUnwinds);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_OUTPUT_PATH, outputPath);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_REMOVE_DUPLICATES,
+            removeDuplicates);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_USE_RFL, useRFL);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_USE_JUNIT, useJunit);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_OPENJML_PATH, openjmlPath);
+        SettingsConverter.store(props, TestGenerationSettings.PROP_OBJENESIS_PATH, objenesisPath);
         SettingsConverter.store(props, TestGenerationSettings.PROP_INCLUDE_POST_CONDITION,
-                includePostCondition);
+            includePostCondition);
     }
 
     public void set(TestGenerationSettings settings) {

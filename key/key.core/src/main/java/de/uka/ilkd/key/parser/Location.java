@@ -1,22 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +12,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-/** 
- * This class represents a location in a file.  It consists of a
- * filename, a line number and a column number. The filename may be
- * null, if the file is unknown (e.g. standard input). The class is
+/**
+ * This class represents a location in a file. It consists of a filename, a line number and a column
+ * number. The filename may be null, if the file is unknown (e.g. standard input). The class is
  * mainly used for parser exceptions.
  *
- * <p>Both line and column numbers are assumed to be 1-based.
- * That is the first character is on line 1, column 1.
+ * <p>
+ * Both line and column numbers are assumed to be 1-based. That is the first character is on line 1,
+ * column 1.
  *
  * @author Hubert Schmid
  */
@@ -53,6 +41,7 @@ public final class Location {
     /**
      * Legacy constructor for creating a new Location from a String denoting the file path and line
      * and column number, tries to convert the path given as String into a URL.
+     *
      * @param filename path to the resource of the Location
      * @param line line of the Location
      * @param column column of the Location
@@ -66,6 +55,7 @@ public final class Location {
 
     /**
      * Creates a new Location with the given resource location, line and column numbers.
+     *
      * @param url location of the resource
      * @param line line of the Location
      * @param column column of the Location
@@ -77,9 +67,9 @@ public final class Location {
     }
 
     /**
-     * This factory method can be used to create a Location for a RecognitionException.
-     * A possibly thrown MalformedURLException is caught and printed to debug output,
-     *  null is returned instead.
+     * This factory method can be used to create a Location for a RecognitionException. A possibly
+     * thrown MalformedURLException is caught and printed to debug output, null is returned instead.
+     *
      * @param re the RecognitionException to create a Location for
      * @return the created Location or null if creation failed
      */
@@ -88,7 +78,8 @@ public final class Location {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Location could not be created from String: " + re.input.getSourceName(), e);
+            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
+                e);
             return null;
         }
     }
@@ -118,6 +109,7 @@ public final class Location {
     /** Internal string representation. Do not rely on format! */
     @Override
     public String toString() {
-        return "[" + fileUrl + ":" + line + "," + column + "]";
+        var url = fileUrl == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUrl.toString();
+        return "[" + url + ":" + line + "," + column + "]";
     }
 }

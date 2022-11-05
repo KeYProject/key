@@ -22,8 +22,8 @@ public interface NamedModelElement extends ModelElement {
     String getName();
 
     /**
-     * Lexical order on names of named model elements. The model elements may be
-     * null; null elements are considered as empty strings.
+     * Lexical order on names of named model elements. The model elements may be null; null elements
+     * are considered as empty strings.
      */
     class LexicalOrder extends Order.CustomLexicalOrder {
 
@@ -32,7 +32,8 @@ public interface NamedModelElement extends ModelElement {
         }
 
         public boolean isComparable(Object x, Object y) {
-            return (x == null && y == null) || ((x instanceof NamedModelElement) && (y instanceof NamedModelElement));
+            return (x == null && y == null)
+                    || ((x instanceof NamedModelElement) && (y instanceof NamedModelElement));
         }
     }
 

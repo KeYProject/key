@@ -10,7 +10,8 @@ import recoder.java.reference.*;
  * @author <TT>AutoDoc</TT>
  */
 
-public class Import extends JavaNonTerminalProgramElement implements TypeReferenceContainer, PackageReferenceContainer {
+public class Import extends JavaNonTerminalProgramElement
+        implements TypeReferenceContainer, PackageReferenceContainer {
 
     /**
      * serialization id
@@ -50,10 +51,9 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Creates a non-static (default) Import.
-     * Same as <code>new Import(t, multi, false)</code>
+     * Creates a non-static (default) Import. Same as <code>new Import(t, multi, false)</code>
      *
-     * @param t     a type reference.
+     * @param t a type reference.
      * @param multi indicates the wildcard.
      */
 
@@ -128,7 +128,8 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
             ((PackageReference) reference).setParent(this);
         } else if (reference instanceof UncollatedReferenceQualifier) {
             ((UncollatedReferenceQualifier) reference).setParent(this);
-        } else throw new IllegalStateException("Unknown reference type encountered");
+        } else
+            throw new IllegalStateException("Unknown reference type encountered");
     }
 
     /**
@@ -145,8 +146,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Checks if this import is a multi type import, also known as
-     * type-on-demand import.
+     * Checks if this import is a multi type import, also known as type-on-demand import.
      *
      * @return the kind of this import.
      */
@@ -213,8 +213,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -271,10 +270,9 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
         if (reference instanceof TypeReference && index == 0) {
@@ -293,9 +291,8 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Returns the package reference of this import, if there is one.
-     * Note that if reference is a URQ, this method will return <code>null</code>,
-     * although this URQ may denote a Package.
+     * Returns the package reference of this import, if there is one. Note that if reference is a
+     * URQ, this method will return <code>null</code>, although this URQ may denote a Package.
      *
      * @return the reference of this import statement.
      */
@@ -304,8 +301,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Returns the reference of this import, either a type or a package
-     * reference.
+     * Returns the reference of this import, either a type or a package reference.
      *
      * @return the reference of this import statement.
      */
@@ -323,11 +319,10 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
