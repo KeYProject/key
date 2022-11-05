@@ -11,17 +11,17 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public abstract class BinaryTermFeature implements TermFeature {
 
-    protected BinaryTermFeature () {}
-    
+    protected BinaryTermFeature() {}
+
     /** Constant that represents the boolean value true */
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
-    public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
-    
-    final public RuleAppCost compute ( Term term, Services services ) {
-        return filter ( term, services ) ? ZERO_COST : TOP_COST; 
+    public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
+
+    final public RuleAppCost compute(Term term, Services services) {
+        return filter(term, services) ? ZERO_COST : TOP_COST;
     }
-    
-    protected abstract boolean filter ( Term term, Services services );
+
+    protected abstract boolean filter(Term term, Services services);
 
 }

@@ -168,8 +168,7 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public void clear() {
-        for (int index = table.length; --index >= 0; table[index] = null)
-            ;
+        for (int index = table.length; --index >= 0; table[index] = null);
         count = 0;
     }
 
@@ -199,7 +198,7 @@ public abstract class AbstractIndex implements HashCode {
         try {
             AbstractIndex t = (AbstractIndex) super.clone();
             t.table = new Object[table.length];
-            for (int i = table.length; i-- > 0; ) {
+            for (int i = table.length; i-- > 0;) {
                 t.table[i] = table[i];
                 t.id[i] = id[i];
             }

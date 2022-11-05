@@ -5,13 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A simple i/o forwarding thread which maps {@link InputStream}s to
- * {@link OutputStream}s.
+ * A simple i/o forwarding thread which maps {@link InputStream}s to {@link OutputStream}s.
  * <p>
  * Used to redirect i/o from {@link Process}es to system streams.
  * <p>
- * The class is active and the threads terminate as soon as the input stream is
- * at EOF.
+ * The class is active and the threads terminate as soon as the input stream is at EOF.
  * <p>
  * NB: {@link ProcessBuilder#inheritIO()} would not work.
  *
@@ -29,8 +27,7 @@ public class IOForwarder extends Thread {
     }
 
     /**
-     * Forward the stdout and stderr streams of process to System.out and
-     * System.err.
+     * Forward the stdout and stderr streams of process to System.out and System.err.
      * <p>
      * This method launches two new threads.
      *

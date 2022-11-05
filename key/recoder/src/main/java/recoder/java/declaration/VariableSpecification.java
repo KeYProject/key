@@ -10,17 +10,16 @@ import recoder.service.ProgramModelInfo;
 
 /**
  * Variable specification that defines a variable name. This is a part of a
- * {@link recoder.java.declaration.VariableDeclaration}and does not contain a
- * type reference or own modifiers. Note that calls to modifiers are delegated
- * to the enclosing variable declaration and are therefore discouraged. This was
- * necessary to subtype Declaration as analyses are interested in the exact
- * location of a variable name.
+ * {@link recoder.java.declaration.VariableDeclaration}and does not contain a type reference or own
+ * modifiers. Note that calls to modifiers are delegated to the enclosing variable declaration and
+ * are therefore discouraged. This was necessary to subtype Declaration as analyses are interested
+ * in the exact location of a variable name.
  *
  * @author AL
  */
 
-public class VariableSpecification extends JavaNonTerminalProgramElement implements Declaration, NamedProgramElement,
-        ExpressionContainer, Variable {
+public class VariableSpecification extends JavaNonTerminalProgramElement
+        implements Declaration, NamedProgramElement, ExpressionContainer, Variable {
 
     /**
      * serialization id
@@ -93,9 +92,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     /**
      * Variable specification.
      *
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param dimensions an int value.
-     * @param init       an expression.
+     * @param init an expression.
      */
 
     public VariableSpecification(Identifier name, int dimensions, Expression init) {
@@ -177,8 +176,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -211,11 +209,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -268,10 +265,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     /**

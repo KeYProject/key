@@ -32,7 +32,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletOptionsSettings.class);
 
     private static final long serialVersionUID = 1455572432081960150L;
-    private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
+    private static final String EXPLANATIONS_RESOURCE =
+        "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
     private HashMap<String, String> category2Choice;
     private HashMap<String, Set<String>> category2Choices;
@@ -41,10 +42,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
-        pCenter.setLayout(new MigLayout(
-                new LC().fillX(),
-                new AC().fill().grow().gap("3mm")
-        ));
+        pCenter.setLayout(new MigLayout(new LC().fillX(), new AC().fill().grow().gap("3mm")));
         layoutHead();
         setFocusable(true);
         setChoiceSettings(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
@@ -55,8 +53,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * Returns the explanation for the given category.
      * </p>
      * <p>
-     * This method should be public and static because it is independent
-     * from the {@link JDialog} and it is also used by the eclipse projects.
+     * This method should be public and static because it is independent from the {@link JDialog}
+     * and it is also used by the eclipse projects.
      * </p>
      *
      * @param category The category for which the explanation is requested.
@@ -66,16 +64,17 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         synchronized (TacletOptionsSettings.class) {
             if (explanationMap == null) {
                 explanationMap = new Properties();
-                InputStream is = TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
+                InputStream is =
+                    TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
                     if (is == null) {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                     }
                     explanationMap.loadFromXML(is);
                 } catch (InvalidPropertiesFormatException e) {
-                    LOGGER.error("Cannot load help message in rule view (malformed XML).",e);
+                    LOGGER.error("Cannot load help message in rule view (malformed XML).", e);
                 } catch (IOException e) {
-                    LOGGER.error("Cannot load help messages in rule view.",e);
+                    LOGGER.error("Cannot load help messages in rule view.", e);
                 }
             }
         }
@@ -91,27 +90,27 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * Checks if the given choice makes a proof unsound.
      *
      * @param choice The choice to check.
-     * @return {@code true} proof will be unsound, {@code false} proof will be
-     * sound as long as all other choices are sound.
+     * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all
+     *         other choices are sound.
      */
     public static boolean isUnsound(String choice) {
-        return "runtimeExceptions:ignore".equals(choice) ||
-                "initialisation:disableStaticInitialisation".equals(choice) ||
-                "intRules:arithmeticSemanticsIgnoringOF".equals(choice);
+        return "runtimeExceptions:ignore".equals(choice)
+                || "initialisation:disableStaticInitialisation".equals(choice)
+                || "intRules:arithmeticSemanticsIgnoringOF".equals(choice);
     }
 
     /**
      * Checks if the given choice makes a proof incomplete.
      *
      * @param choice The choice to check.
-     * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long as all other choices are complete.
+     * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long
+     *         as all other choices are complete.
      */
     public static boolean isIncomplete(String choice) {
-        return "runtimeExceptions:ban".equals(choice) ||
-                "Strings:off".equals(choice) ||
-                "intRules:arithmeticSemanticsCheckingOF".equals(choice) ||
-                "integerSimplificationRules:minimal".equals(choice) ||
-                "programRules:None".equals(choice);
+        return "runtimeExceptions:ban".equals(choice) || "Strings:off".equals(choice)
+                || "intRules:arithmeticSemanticsCheckingOF".equals(choice)
+                || "integerSimplificationRules:minimal".equals(choice)
+                || "programRules:None".equals(choice);
     }
 
     /**
@@ -138,12 +137,11 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * Searches the choice in the given {@link ChoiceEntry}s.
      *
      * @param choices The {@link ChoiceEntry}s to search in.
-     * @param choice  The choice to search.
+     * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(List<ChoiceEntry> choices, final String choice) {
-        return choices.stream().filter(it -> it.getChoice().equals(choice))
-                .findAny().orElse(null);
+        return choices.stream().filter(it -> it.getChoice().equals(choice)).findAny().orElse(null);
     }
 
     /**
@@ -153,7 +151,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @return The created {@link ChoiceEntry}s.
      */
     public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
-        if (choices == null) return Collections.emptyList();
+        if (choices == null)
+            return Collections.emptyList();
         return choices.stream().map(TacletOptionsSettings::createChoiceEntry)
                 .collect(Collectors.toList());
     }
@@ -165,10 +164,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @return The created {@link ChoiceEntry}.
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
-        return new ChoiceEntry(choice,
-                isUnsound(choice),
-                isIncomplete(choice),
-                getInformation(choice));
+        return new ChoiceEntry(choice, isUnsound(choice), isIncomplete(choice),
+            getInformation(choice));
     }
 
     protected void layoutHead() {
@@ -256,7 +253,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         Box b = new Box(BoxLayout.X_AXIS);
         JRadioButton button = new JRadioButton(c.choice);
         btnGroup.add(button);
-        //add(new JLabel(c.choice));
+        // add(new JLabel(c.choice));
         b.add(button);
 
         if (c.incomplete) {
@@ -346,9 +343,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         /**
          * Constructor.
          *
-         * @param choice      The choice.
-         * @param unsound     Is unsound?
-         * @param incomplete  Is incomplete?
+         * @param choice The choice.
+         * @param unsound Is unsound?
+         * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
         public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
@@ -417,10 +414,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         public boolean equals(Object obj) {
             if (obj instanceof ChoiceEntry) {
                 ChoiceEntry other = (ChoiceEntry) obj;
-                return choice.equals(other.getChoice()) &&
-                        incomplete == other.isIncomplete() &&
-                        unsound == other.isUnsound() &&
-                        ObjectUtil.equals(information, other.getInformation());
+                return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
+                        && unsound == other.isUnsound()
+                        && ObjectUtil.equals(information, other.getInformation());
             } else {
                 return false;
             }
@@ -433,7 +429,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         public String toString() {
             if (unsound && incomplete) {
                 if (information != null) {
-                    return format("%s (%s and %s, %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT, information);
+                    return format("%s (%s and %s, %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT,
+                        information);
                 } else {
                     return format("%s (%s and %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT);
                 }

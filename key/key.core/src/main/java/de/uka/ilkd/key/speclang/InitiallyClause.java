@@ -16,8 +16,7 @@ public interface InitiallyClause extends SpecificationElement {
     public InitiallyClause map(UnaryOperator<Term> op, Services services);
 
     /**
-     * Returns the formula without implicit all-quantification over
-     * the receiver object.
+     * Returns the formula without implicit all-quantification over the receiver object.
      */
     public Term getClause(ParsableVariable selfVar, TermServices services);
 

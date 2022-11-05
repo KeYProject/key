@@ -45,9 +45,9 @@ public class OverflowChecker {
     }
 
     private SMTTerm doubleBitsize(SMTTerm t) {
-        //000000...
+        // 000000...
         SMTTerm zero = new SMTTermNumber(0, intsort.getBitSize(), null);
-        //111111...
+        // 111111...
         SMTTerm one = new SMTTermNumber(intsort.getBound() - 1, intsort.getBitSize(), null);
 
         SMTTerm zeroInt = new SMTTermNumber(0, intsort.getBitSize(), intsort);
@@ -143,12 +143,12 @@ public class OverflowChecker {
             if (t instanceof SMTTermMultOp) {
                 SMTTermMultOp tm = (SMTTermMultOp) t;
                 SMTTerm guard = null;
-                //create guard for addition
+                // create guard for addition
                 if (isAddOp(tm.getOperator())) {
                     guard = createGuardForAdd(tm);
 
                 }
-                //create guard for multiplication
+                // create guard for multiplication
                 else if (isMulOp(tm.getOperator())) {
                     guard = createGuardForMul(tm);
                 }
@@ -164,18 +164,14 @@ public class OverflowChecker {
     }
 
     private boolean isArithmeticOperator(SMTTermMultOp.Op op) {
-        return op.equals(SMTTermMultOp.Op.BVSDIV) ||
-                op.equals(SMTTermMultOp.Op.BVSREM) ||
-                op.equals(SMTTermMultOp.Op.MUL) ||
-                op.equals(SMTTermMultOp.Op.PLUS) ||
-                op.equals(SMTTermMultOp.Op.MINUS) ||
-                op.equals(SMTTermMultOp.Op.BVSMOD);
+        return op.equals(SMTTermMultOp.Op.BVSDIV) || op.equals(SMTTermMultOp.Op.BVSREM)
+                || op.equals(SMTTermMultOp.Op.MUL) || op.equals(SMTTermMultOp.Op.PLUS)
+                || op.equals(SMTTermMultOp.Op.MINUS) || op.equals(SMTTermMultOp.Op.BVSMOD);
     }
 
 
     private boolean isAddOp(SMTTermMultOp.Op op) {
-        return op.equals(SMTTermMultOp.Op.PLUS)
-                || op.equals(SMTTermMultOp.Op.MINUS);
+        return op.equals(SMTTermMultOp.Op.PLUS) || op.equals(SMTTermMultOp.Op.MINUS);
     }
 
     private boolean isMulOp(SMTTermMultOp.Op op) {
@@ -183,11 +179,9 @@ public class OverflowChecker {
     }
 
     private boolean isComparisonOp(SMTTermMultOp.Op op) {
-        return op.equals(SMTTermMultOp.Op.BVSGE) ||
-                op.equals(SMTTermMultOp.Op.BVSGT) ||
-                op.equals(SMTTermMultOp.Op.BVSLE) ||
-                op.equals(SMTTermMultOp.Op.BVSLT) ||
-                op.equals(SMTTermMultOp.Op.EQUALS);
+        return op.equals(SMTTermMultOp.Op.BVSGE) || op.equals(SMTTermMultOp.Op.BVSGT)
+                || op.equals(SMTTermMultOp.Op.BVSLE) || op.equals(SMTTermMultOp.Op.BVSLT)
+                || op.equals(SMTTermMultOp.Op.EQUALS);
     }
 
     /**
@@ -206,7 +200,7 @@ public class OverflowChecker {
 
         if (t instanceof SMTTermMultOp) {
             SMTTermMultOp tm = (SMTTermMultOp) t;
-            //we look for comparison terms like a < b
+            // we look for comparison terms like a < b
             if (isComparisonOp(tm.getOperator())) {
                 SMTTerm left = tm.getSubs().get(0);
                 SMTTerm right = tm.getSubs().get(1);
@@ -214,22 +208,20 @@ public class OverflowChecker {
                 Set<SMTTerm> leftSubs = new HashSet<>();
                 Set<SMTTerm> rightSubs = new HashSet<>();
 
-                getSubTerms(left, leftSubs); //sub terms of the left side
-                getSubTerms(right, rightSubs); //sub terms of the right side
+                getSubTerms(left, leftSubs); // sub terms of the left side
+                getSubTerms(right, rightSubs); // sub terms of the right side
 
-                //classify sub terms in universally and existentially quantified subs
+                // classify sub terms in universally and existentially quantified subs
                 Set<SMTTerm> universalSubs = new HashSet<>();
                 Set<SMTTerm> existentialSubs = new HashSet<>();
 
-                classifySubs(quantifiedVars, leftSubs, universalSubs,
-                        existentialSubs);
-                classifySubs(quantifiedVars, rightSubs, universalSubs,
-                        existentialSubs);
-                //create universal and existential guards
+                classifySubs(quantifiedVars, leftSubs, universalSubs, existentialSubs);
+                classifySubs(quantifiedVars, rightSubs, universalSubs, existentialSubs);
+                // create universal and existential guards
                 SMTTerm universalGuard = createGuard(universalSubs);
                 SMTTerm existentialGuard = createGuard(existentialSubs);
 
-                //return the guarded term
+                // return the guarded term
                 return existentialGuard.and(universalGuard.implies(t));
             }
         }
@@ -246,7 +238,8 @@ public class OverflowChecker {
     }
 
 
-    private void processTerm(SMTTerm t, Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars) {
+    private void processTerm(SMTTerm t, Set<SMTTermVariable> universalVars,
+            Set<SMTTermVariable> existentialVars) {
 
         if (t instanceof SMTTermMultOp) {
             SMTTermMultOp tm = (SMTTermMultOp) t;
@@ -330,18 +323,17 @@ public class OverflowChecker {
 
 
     /**
-     * Searches for non ground terms in sub, and stores them in terms.
-     * Begin with empty lists.
+     * Searches for non ground terms in sub, and stores them in terms. Begin with empty lists.
      *
-     * @param terms           list where the terms are stored
-     * @param sub             the term to be searched
-     * @param universalVars   universal variables
+     * @param terms list where the terms are stored
+     * @param sub the term to be searched
+     * @param universalVars universal variables
      * @param existentialVars existential variables
-     * @param bind            variables bounded by the current quantifier
+     * @param bind variables bounded by the current quantifier
      */
     public void searchArithTerms(Set<SMTTerm> terms, SMTTerm sub,
-                                 Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars,
-                                 List<SMTTermVariable> bind) {
+            Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars,
+            List<SMTTermVariable> bind) {
 
         if (sub instanceof SMTTermMultOp) {
             SMTTermMultOp tm = (SMTTermMultOp) sub;
@@ -405,9 +397,8 @@ public class OverflowChecker {
 
     }
 
-    private boolean acceptableTerm(SMTTermMultOp tm,
-                                   Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars,
-                                   List<SMTTermVariable> bind) {
+    private boolean acceptableTerm(SMTTermMultOp tm, Set<SMTTermVariable> universalVars,
+            Set<SMTTermVariable> existentialVars, List<SMTTermVariable> bind) {
 
         boolean known = true;
         boolean relevant = false;
@@ -483,19 +474,18 @@ public class OverflowChecker {
             return containsVars(tq.getSub());
         } else if (term instanceof SMTTermITE) {
             SMTTermITE ite = (SMTTermITE) term;
-            return containsVars(ite.getCondition()) ||
-                    containsVars(ite.getTrueCase()) ||
-                    containsVars(ite.getFalseCase());
+            return containsVars(ite.getCondition()) || containsVars(ite.getTrueCase())
+                    || containsVars(ite.getFalseCase());
         } else if (term instanceof SMTTermUnaryOp) {
             SMTTermUnaryOp tu = (SMTTermUnaryOp) term;
             return containsVars(tu.getSub());
-        } else return term instanceof SMTTermVariable;
+        } else
+            return term instanceof SMTTermVariable;
 
     }
 
-    private void classifySubs(Set<SMTTermVariable> universalVars,
-                              Set<SMTTerm> subs, Set<SMTTerm> universalSubs,
-                              Set<SMTTerm> existentialSubs) {
+    private void classifySubs(Set<SMTTermVariable> universalVars, Set<SMTTerm> subs,
+            Set<SMTTerm> universalSubs, Set<SMTTerm> existentialSubs) {
         for (SMTTerm sub : subs) {
 
             if (isUniversalSub(sub, universalVars)) {

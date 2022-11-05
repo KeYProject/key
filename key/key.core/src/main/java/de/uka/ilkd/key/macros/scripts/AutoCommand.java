@@ -45,15 +45,14 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl,
-                        Parameters arguments, EngineState state)
-            throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, Parameters arguments,
+            EngineState state) throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         final Profile profile = services.getProfile();
 
         // create the rule application engine
-        final ProverCore applyStrategy = new ApplyStrategy(
-                profile.getSelectedGoalChooserBuilder().create());
+        final ProverCore applyStrategy =
+            new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
 
         // find the targets
         final ImmutableList<Goal> goals;
@@ -63,14 +62,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             final Goal goal = state.getFirstOpenAutomaticGoal();
             goals = ImmutableSLList.<Goal>nil().prepend(goal);
 
-            final Optional<String> matchesRegEx = Optional
-                    .ofNullable(arguments.matches);
-            final Optional<String> breakpoint = Optional
-                    .ofNullable(arguments.breakpoint);
+            final Optional<String> matchesRegEx = Optional.ofNullable(arguments.matches);
+            final Optional<String> breakpoint = Optional.ofNullable(arguments.breakpoint);
             if (matchesRegEx.isPresent() || breakpoint.isPresent()) {
                 setupFocussedBreakpointStrategy( //
-                        matchesRegEx, breakpoint, goal, applyStrategy,
-                        services);
+                    matchesRegEx, breakpoint, goal, applyStrategy, services);
             }
         }
 
@@ -85,8 +81,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         // start actual autoprove
         try {
             for (Goal goal : goals) {
-                applyStrategy.start(state.getProof(),
-                        ImmutableSLList.<Goal>nil().prepend(goal));
+                applyStrategy.start(state.getProof(), ImmutableSLList.<Goal>nil().prepend(goal));
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {
@@ -100,41 +95,36 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     /**
-     * Sets up a focused automatic strategy. Focus is on the sequent formula
-     * matching the matchesRegEx (may not be null).
+     * Sets up a focused automatic strategy. Focus is on the sequent formula matching the
+     * matchesRegEx (may not be null).
      *
      * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus.
      * @param breakpointArg     An optional breakpoint argument.
      * @param goal              The {@link Goal} to apply the strategy on, needed for the rule
-     *                          application manager.
+                               application* manager.
      * @param proverCore        The {@link ProverCore}, needed for resetting the strategy
-     *                          afterward.
+                               afterward.
      * @param services          The {@link Services} object.
      * @throws ScriptException
      */
-    private void setupFocussedBreakpointStrategy(
-            final Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final Goal goal,
-            final ProverCore proverCore, final Services services)
-            throws ScriptException {
+    private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
+            final Optional<String> breakpointArg, final Goal goal, final ProverCore proverCore,
+            final Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
-                ? Optional.of(
-                MacroCommand.extractMatchingPio(goal.node().sequent(),
+                ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
                         maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
         final AutomatedRuleApplicationManager realManager = //
-                goal.getRuleAppManager();
+            goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
         final AutomatedRuleApplicationManager focusManager = //
-                new FocussedBreakpointRuleApplicationManager(realManager, goal,
-                        focus, breakpointArg);
+            new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 
         proverCore.addProverTaskObserver(
-                new AbstractProofControl.FocussedAutoModeTaskListener(
-                        services.getProof()));
+            new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
     public static class Parameters {

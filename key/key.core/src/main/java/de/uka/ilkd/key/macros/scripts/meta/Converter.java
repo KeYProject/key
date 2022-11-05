@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
 /**
- * A {@link Converter} translates a textual representation
- * to an instance of {@code T}.
+ * A {@link Converter} translates a textual representation to an instance of {@code T}.
  *
  * @param <T>
  * @author Alexander Weigl

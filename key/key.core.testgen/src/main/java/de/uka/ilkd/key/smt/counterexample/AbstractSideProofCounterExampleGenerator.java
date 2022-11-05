@@ -11,21 +11,23 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
- * Implementation of {@link AbstractCounterExampleGenerator} which instantiates
- * the new {@link Proof} as side proof.
+ * Implementation of {@link AbstractCounterExampleGenerator} which instantiates the new
+ * {@link Proof} as side proof.
  */
-public abstract class AbstractSideProofCounterExampleGenerator extends AbstractCounterExampleGenerator {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) throws ProofInputException {
-      Sequent newSequent = createNewSequent(oldSequent);
-      ProofEnvironment env = 
-              SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, new Choice("ban", "runtimeExceptions"));
-      ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
-      Proof proof = starter.getProof();
-      OneStepSimplifier.refreshOSS(proof);
-      return proof;
-   }
+public abstract class AbstractSideProofCounterExampleGenerator
+        extends AbstractCounterExampleGenerator {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent,
+            String proofName) throws ProofInputException {
+        Sequent newSequent = createNewSequent(oldSequent);
+        ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
+            new Choice("ban", "runtimeExceptions"));
+        ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
+        Proof proof = starter.getProof();
+        OneStepSimplifier.refreshOSS(proof);
+        return proof;
+    }
 }

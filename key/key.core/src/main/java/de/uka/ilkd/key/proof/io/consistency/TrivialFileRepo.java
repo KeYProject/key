@@ -15,8 +15,9 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
- * This FileRepo does not cache any files but writes to / reads from the original files on disk.
- * It can be used for recreating the old behavior of KeY without a FileRepo.
+ * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
+ * can be used for recreating the old behavior of KeY without a FileRepo.
+ *
  * @author Wolfram Pfeifer
  */
 public class TrivialFileRepo implements FileRepo {

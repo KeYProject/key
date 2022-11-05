@@ -5,61 +5,60 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Provides the basic implementation of an {@link IBreakpoint}.
+ *
  * @author Martin Hentschel
  */
 public abstract class AbstractBreakpoint implements IBreakpoint {
-   /**
-    * The proof this stop condition is associated with.
-    */
-   private final Proof proof;
+    /**
+     * The proof this stop condition is associated with.
+     */
+    private final Proof proof;
 
-   /**
-    * The flag if the Breakpoint is enabled.
-    */
-   private boolean enabled;
-   
-   /**
-    * Constructor.
-    * @param proof The {@link Proof} in which this {@link IBreakpoint} is used.
-    * @param enabled The enabled state.
-    */
-   public AbstractBreakpoint(Proof proof, boolean enabled) {
-      this.proof = proof;
-      this.enabled = enabled;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void updateState(int maxApplications, 
-                          long timeout, 
-                          Proof proof, 
-                          long startTime, 
-                          int countApplied, 
-                          Goal goal) {
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isEnabled() {
-      return enabled;
-   }
+    /**
+     * The flag if the Breakpoint is enabled.
+     */
+    private boolean enabled;
 
-   /**
-    * Sets the new enabled value.
-    * @param enabled the new value
-    */
-   public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
-   }
+    /**
+     * Constructor.
+     *
+     * @param proof The {@link Proof} in which this {@link IBreakpoint} is used.
+     * @param enabled The enabled state.
+     */
+    public AbstractBreakpoint(Proof proof, boolean enabled) {
+        this.proof = proof;
+        this.enabled = enabled;
+    }
 
-   /**
-    * @return the proof
-    */
-   public Proof getProof() {
-      return proof;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
+            int countApplied, Goal goal) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Sets the new enabled value.
+     *
+     * @param enabled the new value
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * @return the proof
+     */
+    public Proof getProof() {
+        return proof;
+    }
 }

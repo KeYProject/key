@@ -16,17 +16,16 @@ import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 
 /**
- * The macro UseInformationFlowContractMacro applies all applicable information
- * flow contracts.
+ * The macro UseInformationFlowContractMacro applies all applicable information flow contracts.
  * <p/>
  * The rules that are applied can be set in {@link #ADMITTED_RULENAMES}.
  * <p/>
+ *
  * @author christoph
  */
 public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
-    private static final String INF_FLOW_RULENAME_PREFIX =
-            "Use_information_flow_contract";
+    private static final String INF_FLOW_RULENAME_PREFIX = "Use_information_flow_contract";
 
     private static final String IMP_LEFT_RULENAME = "impLeft";
 
@@ -46,21 +45,20 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "Removes the original post condition from information flow " +
-               "contract application pre-branches.";
+        return "Removes the original post condition from information flow "
+            + "contract application pre-branches.";
     }
 
 
     @Override
-    protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
 
     /**
-     * This strategy accepts all rule apps for which the rule name starts with a
-     * string in the admitted set and rejects everything else.
+     * This strategy accepts all rule apps for which the rule name starts with a string in the
+     * admitted set and rejects everything else.
      */
     protected class RemovePostStrategy extends AbstractFeatureStrategy {
 
@@ -79,15 +77,14 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence pio,
-                                       Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
-                return applyTF( "b", IsPostConditionTermFeature.INSTANCE ).computeCost(ruleApp, pio, goal);
+                return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
+                    goal);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
-                RuleAppCost andRightCost =
-                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.computeCost(ruleApp, pio, goal);
+                RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
+                        .computeCost(ruleApp, pio, goal);
                 return andRightCost.add(NumberRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -96,30 +93,28 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app,
-                                     PosInOccurrence pio,
-                                     Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             String name = app.rule().name().toString();
             if (!name.equals("hide_right")) {
                 return true;
             }
 
             // approve if
-            //  - the parent.parent rule application is an information
-            //    flow contract rule application,
-            //  - the parent rule application is an impLeft rule application
-            //    and
-            //  - we are in the branch where we have to show the left hand side
-            //    of the implication
-            if (goal.node().parent() != null &&
-                goal.node().parent().parent() != null) {
+            // - the parent.parent rule application is an information
+            // flow contract rule application,
+            // - the parent rule application is an impLeft rule application
+            // and
+            // - we are in the branch where we have to show the left hand side
+            // of the implication
+            if (goal.node().parent() != null && goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
-                return getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                       parent.child(0) == goal.node() ||
-                       getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
-                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                       parent.child(2) != goal.node();
+                return getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
+                        && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                        && parent.child(0) == goal.node()
+                        || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
+                                && getAppRuleName(parent.parent()).startsWith(
+                                    INF_FLOW_RULENAME_PREFIX)
+                                && parent.child(2) != goal.node();
             }
             return false;
         }
@@ -133,15 +128,13 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        protected RuleAppCost instantiateApp(RuleApp app,
-                                             PosInOccurrence pio,
-                                             Goal goal) {
+        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return computeCost(app, pio, goal);
         }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
     }
 

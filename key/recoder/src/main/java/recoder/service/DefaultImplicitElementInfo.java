@@ -14,22 +14,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handles requests for implicitely defined program model elements. In
- * particular these are {@link recoder.abstraction.NullType},
+ * Handles requests for implicitely defined program model elements. In particular these are
+ * {@link recoder.abstraction.NullType},
  * {@link recoder.abstraction.Package},{@link recoder.abstraction.ArrayType},
- * {@link recoder.abstraction.DefaultConstructor},
- * {@link recoder.abstraction.ImplicitEnumValueOf},
- * {@link recoder.abstraction.ImplicitEnumValues},
- * and {@link recoder.abstraction.IntersectionType}.
+ * {@link recoder.abstraction.DefaultConstructor}, {@link recoder.abstraction.ImplicitEnumValueOf},
+ * {@link recoder.abstraction.ImplicitEnumValues}, and {@link recoder.abstraction.IntersectionType}.
  */
-public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implements ImplicitElementInfo {
+public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
+        implements ImplicitElementInfo {
 
     /**
      * maps type declarations to default constructors
      */
-    private final Map<ClassType, DefaultConstructor> type2defaultConstructor = new HashMap<ClassType, DefaultConstructor>();
+    private final Map<ClassType, DefaultConstructor> type2defaultConstructor =
+        new HashMap<ClassType, DefaultConstructor>();
 
-    private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods = new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
+    private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods =
+        new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
     private List<ClassType> enumValueOfExceptions = null;
 
     /**
@@ -52,7 +53,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
     }
 
     public List<ImplicitEnumMethod> getImplicitEnumMethods(EnumDeclaration etd) {
-        if (etd == null) throw new NullPointerException();
+        if (etd == null)
+            throw new NullPointerException();
         updateModel();
         List<ImplicitEnumMethod> res = type2implicitEnumMethods.get(etd);
         if (res == null) {
@@ -69,7 +71,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
     }
 
     public Type getType(ProgramModelElement pme) {
-        if (pme instanceof NullType || pme instanceof ArrayType || pme instanceof IntersectionType) {
+        if (pme instanceof NullType || pme instanceof ArrayType
+                || pme instanceof IntersectionType) {
             return (Type) pme;
         } else if (pme instanceof Package) {
             // valid for Package
@@ -193,8 +196,10 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
             if (enumValueOfExceptions == null) {
                 // since list is not visible as mutable to the outside, can cache result here.
                 enumValueOfExceptions = new ArrayList<ClassType>(2);
-                enumValueOfExceptions.add(getNameInfo().getClassType("java.lang.IllegalArgumentException"));
-                enumValueOfExceptions.add(getNameInfo().getClassType("java.lang.NullPointerException"));
+                enumValueOfExceptions
+                        .add(getNameInfo().getClassType("java.lang.IllegalArgumentException"));
+                enumValueOfExceptions
+                        .add(getNameInfo().getClassType("java.lang.NullPointerException"));
             }
             return enumValueOfExceptions;
         }
@@ -206,7 +211,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
         if (m instanceof ImplicitEnumValueOf) {
             return m.getContainingClassType();
         } else if (m instanceof ImplicitEnumValues) {
-            return getServiceConfiguration().getNameInfo().createArrayType(m.getContainingClassType());
+            return getServiceConfiguration().getNameInfo()
+                    .createArrayType(m.getContainingClassType());
         }
         // valid for Default Constructor
         return null;

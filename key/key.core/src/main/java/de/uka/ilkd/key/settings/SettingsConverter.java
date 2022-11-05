@@ -8,15 +8,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public final class SettingsConverter {
-    private static String[][] encoding = {
-            {"#", "#hash"}, // must be the first in the list.
-            {"\n", "#newline"},
-            {"\t", "#tab"},
-            {"=", "#equals"},
-            {"\\\"", "#qmark"},
-            {"\\\\", "#backslash"},
-            {",", "#comma"
-            }};
+    private static String[][] encoding = { { "#", "#hash" }, // must be the first in the list.
+        { "\n", "#newline" }, { "\t", "#tab" }, { "=", "#equals" }, { "\\\"", "#qmark" },
+        { "\\\\", "#backslash" }, { ",", "#comma" } };
     private static final String PREFIX = "#beg";
     private static final String POSTFIX = "#end";
     private static final String LIST_SEPARATOR = ",";
@@ -27,8 +21,7 @@ public final class SettingsConverter {
     public static String convert(String str, boolean encode) {
         String result = str;
         for (String[] strings : encoding) {
-            result = result.replaceAll(strings[encode ? 1 : 0],
-                    strings[encode ? 0 : 1]);
+            result = result.replaceAll(strings[encode ? 1 : 0], strings[encode ? 0 : 1]);
         }
         return result;
     }
@@ -38,8 +31,8 @@ public final class SettingsConverter {
         if (i == 0) {
             str = str.substring(PREFIX.length());
         } else {
-            throw new RuntimeException(String.format(
-                    "Given string '%s' has not the right prefix ('%s').", str, PREFIX));
+            throw new RuntimeException(
+                String.format("Given string '%s' has not the right prefix ('%s').", str, PREFIX));
         }
         i = str.lastIndexOf(POSTFIX);
         str = str.substring(0, i);
@@ -69,7 +62,7 @@ public final class SettingsConverter {
     }
 
     public static String[] readRawStringList(Properties props, String key, String split,
-                                             String[] defaultValue) {
+            String[] defaultValue) {
         String value = props.getProperty(key);
         if (value == null) {
             return defaultValue;
@@ -181,7 +174,7 @@ public final class SettingsConverter {
     }
 
     public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
-                                             T[] values) {
+            T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {

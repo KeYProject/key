@@ -7,8 +7,7 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 
 /**
- * A simple "echo" command for giving feedback to human observers during lengthy
- * executions.
+ * A simple "echo" command for giving feedback to human observers during lengthy executions.
  */
 public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
     public EchoCommand() {

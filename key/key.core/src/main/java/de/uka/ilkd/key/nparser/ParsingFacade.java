@@ -25,7 +25,8 @@ import java.util.*;
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
  * <p>
- * You should only use it if you need access to the parse trees instead of terms or taclet structure.
+ * You should only use it if you need access to the parse trees instead of terms or taclet
+ * structure.
  *
  * @author Alexander Weigl
  * @version 1 (19.08.19)
@@ -38,7 +39,8 @@ public final class ParsingFacade {
 
     /**
      * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
-     * <b>The use of this method is discourage and should be avoided in all high level scenarios.</b>
+     * <b>The use of this method is discourage and should be avoided in all high level
+     * scenarios.</b>
      *
      * @param ast a key ast object
      * @param <T> parse tree type
@@ -75,8 +77,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-    public static @Nonnull
-    ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
+    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -115,14 +116,9 @@ public final class ParsingFacade {
     public static KeyAst.File parseFile(URL url) throws IOException {
         long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
-             ReadableByteChannel channel = Channels.newChannel(is)) {
-            CodePointCharStream stream = CharStreams.fromChannel(
-                    channel,
-                    Charset.defaultCharset(),
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    url.toString(),
-                    -1);
+                ReadableByteChannel channel = Channels.newChannel(is)) {
+            CodePointCharStream stream = CharStreams.fromChannel(channel, Charset.defaultCharset(),
+                4096, CodingErrorAction.REPLACE, url.toString(), -1);
             return parseFile(stream);
         } finally {
             long stop = System.currentTimeMillis();
@@ -182,16 +178,15 @@ public final class ParsingFacade {
     }
 
     /**
-     * Translate a given context of a {@code string_value} grammar rule into a the literal value.
-     * In particular it truncates, and substitutes quote escapes {@code \"}.
+     * Translate a given context of a {@code string_value} grammar rule into a the literal value. In
+     * particular it truncates, and substitutes quote escapes {@code \"}.
      *
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @Nonnull
-    String getValueDocumentation(@Nonnull KeYParser.String_valueContext ctx) {
-        return ctx.getText().substring(1, ctx.getText().length() - 1)
-                .replace("\\\"", "\"")
+    public static @Nonnull String getValueDocumentation(
+            @Nonnull KeYParser.String_valueContext ctx) {
+        return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }
 
@@ -214,7 +209,7 @@ public final class ParsingFacade {
             return null;
         }
         String value = docComment.getText();
-        return value.substring(3, value.length() - 2);//remove leading "/*!" and trailing "*/"
+        return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }
 
 

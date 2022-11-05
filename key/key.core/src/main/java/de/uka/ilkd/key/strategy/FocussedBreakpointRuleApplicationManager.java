@@ -15,9 +15,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
- * A rule app manager that ensures that rules are only applied to a certain
- * subterm within the proof (within a goal). The real work is delegated to a
- * second manager (delegate pattern), this class only filters rule applications
+ * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
+ * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
+ * only filters rule applications
  */
 public class FocussedBreakpointRuleApplicationManager
         implements DelegationBasedAutomatedRuleApplicationManager {
@@ -25,22 +25,17 @@ public class FocussedBreakpointRuleApplicationManager
     private final AutomatedRuleApplicationManager delegate;
     private final Optional<String> breakpoint;
 
-    private FocussedBreakpointRuleApplicationManager(
-            AutomatedRuleApplicationManager delegate,
+    private FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
             Optional<String> breakpoint) {
         this.delegate = delegate;
         this.breakpoint = breakpoint;
     }
 
-    public FocussedBreakpointRuleApplicationManager(
-            AutomatedRuleApplicationManager delegate, Goal goal,
-            Optional<PosInOccurrence> focussedSubterm,
-            Optional<String> breakpoint) {
-        this(focussedSubterm
-                .map(pio -> new FocussedRuleApplicationManager(delegate, goal,
-                        pio))
-                .map(AutomatedRuleApplicationManager.class::cast)
-                .orElse(delegate), breakpoint);
+    public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+            Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
+        this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
+                .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
+            breakpoint);
 
         clearCache();
     }
@@ -57,8 +52,7 @@ public class FocussedBreakpointRuleApplicationManager
 
     @Override
     public Object clone() {
-        return new FocussedBreakpointRuleApplicationManager(delegate.copy(),
-                breakpoint);
+        return new FocussedBreakpointRuleApplicationManager(delegate.copy(), breakpoint);
     }
 
     @Override
@@ -85,10 +79,9 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
-            PosInOccurrence pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-                ImmutableSLList.<RuleApp> nil();
+            ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -103,17 +96,15 @@ public class FocussedBreakpointRuleApplicationManager
             return true;
         }
 
-        if ((!(rule instanceof Taclet)
-                || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
+        if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
             final SourceElement activeStmt = //
-                    JavaTools.getActiveStatement(pos.subTerm().javaBlock());
+                JavaTools.getActiveStatement(pos.subTerm().javaBlock());
             final String currStmtString = activeStmt.toString();
 
             if (currStmtString != null && //
                     (currStmtString.contains("{")
-                            ? currStmtString.substring(0,
-                                    currStmtString.indexOf("{"))
+                            ? currStmtString.substring(0, currStmtString.indexOf("{"))
                             : currStmtString).trim().equals(breakpoint.get())) {
                 return false;
             }
@@ -123,8 +114,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     private static boolean isJavaPIO(PosInOccurrence pio) {
-        return pio != null
-                && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+        return pio != null && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 
     @Override

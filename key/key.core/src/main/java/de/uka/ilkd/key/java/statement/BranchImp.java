@@ -6,25 +6,25 @@ import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 
 /**
- *  Branch.
- *  @author <TT>AutoDoc</TT>
+ * Branch.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
-public abstract class BranchImp 
-    extends JavaNonTerminalProgramElement implements Branch {
+public abstract class BranchImp extends JavaNonTerminalProgramElement implements Branch {
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes.    
-     * May contain: Comments
-     */ 
+     *
+     * @param children the children of this AST element as KeY classes. May contain: Comments
+     */
     public BranchImp(ExtList children) {
-	super(children);
+        super(children);
     }
 
 
     public BranchImp() {
-	super();
+        super();
     }
 
 

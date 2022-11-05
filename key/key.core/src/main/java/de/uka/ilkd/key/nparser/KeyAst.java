@@ -22,9 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * This is a monad around the parse tree.
- * We use this class to hide the {@link org.antlr.v4.runtime.ParserRuleContext}
- * from the rest of the Key system.
+ * This is a monad around the parse tree. We use this class to hide the
+ * {@link org.antlr.v4.runtime.ParserRuleContext} from the rest of the Key system.
  *
  * <p>
  * To obtain an KeYAst use the {@link ParsingFacade#getParseRuleContext(KeyAst)}.
@@ -59,8 +58,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
-                String text = StringUtil.trim(ctx.decls().pref.s.getText(), '"')
-                        .replace("\\\\:", ":");
+                String text =
+                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
@@ -106,8 +105,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         /**
-         * Extracts the decls and taclets into a string.
-         * This method is required for saving and loading proofs.
+         * Extracts the decls and taclets into a string. This method is required for saving and
+         * loading proofs.
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();

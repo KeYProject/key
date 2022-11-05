@@ -17,10 +17,8 @@ import de.uka.ilkd.key.speclang.translation.*;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo,
-                              KeYJavaType specInClass,
-                              ParsableVariable selfVar,
-                              SLExceptionFactory eManager) {
+    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, ParsableVariable selfVar,
+            SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
@@ -31,11 +29,9 @@ public final class JMLResolverManager extends SLResolverManager {
 
     @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-                "spec_public")) {
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_public")) {
             return new Public();
-        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-                "spec_protected")) {
+        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_protected")) {
             return new Protected();
         } else {
             return null;

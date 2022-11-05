@@ -26,8 +26,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Replaces the MethodBodyStatement shortcut with the full body, performs prefix
- * adjustments in the body (execution context).
+ * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
+ * body (execution context).
  */
 public class ExpandMethodBody extends ProgramTransformer {
 
@@ -66,22 +66,20 @@ public class ExpandMethodBody extends ProgramTransformer {
 
         final HashMap<ProgramVariable, ProgramVariable> map = new LinkedHashMap<>();
         for (int i = 0; i < argsAsParam.size(); i++) {
-            IProgramVariable pv = methDecl.getParameterDeclarationAt(i)
-                    .getVariableSpecification().getProgramVariable();
+            IProgramVariable pv = methDecl.getParameterDeclarationAt(i).getVariableSpecification()
+                    .getProgramVariable();
             assert pv instanceof ProgramVariable : "Unexpected schematic variable";
             Expression arg = argsAsParam.get(i);
             assert arg instanceof ProgramVariable : "Unexpected schematic variable";
             map.put((ProgramVariable) pv, (ProgramVariable) argsAsParam.get(i));
         }
-        ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map,
-            services);
+        ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map, services);
         paramRepl.start();
         result = (StatementBlock) paramRepl.result();
 
-        return new ProgramElement[] { KeYJavaASTFactory.methodFrame(
-            mbs.getResultVariable(), KeYJavaASTFactory
-                    .executionContext(mbs.getBodySource(), pm, newCalled),
-            result, PositionInfo.UNDEFINED) };
+        return new ProgramElement[] { KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
+            KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm, newCalled), result,
+            PositionInfo.UNDEFINED) };
     }
 
 }

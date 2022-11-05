@@ -17,13 +17,11 @@ import recoder.java.statement.Branch;
 import recoder.util.Debug;
 
 /**
- * A ccatch statement (branch of exec statement). Initial code copied from
- * recoder's Catch.
+ * A ccatch statement (branch of exec statement). Initial code copied from recoder's Catch.
  *
  * @author Dominic Steinhöfel
  */
-public class Ccatch extends Branch
-        implements ParameterContainer, VariableScope {
+public class Ccatch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * serialization id
@@ -54,10 +52,8 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e a parameter declaration.
+     * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -70,13 +66,10 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e a parameter declaration.
+     * @param body a statement.
      */
-    public Ccatch(CcatchNonstandardParameterDeclaration e,
-            StatementBlock body) {
+    public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
         super();
         setBody(body);
         setNonStdParameterDeclaration(e);
@@ -87,8 +80,7 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param proto
-     *            a Ccatch.
+     * @param proto a Ccatch.
      */
     protected Ccatch(Ccatch proto) {
         super(proto);
@@ -96,8 +88,7 @@ public class Ccatch extends Branch
             parameter = Optional.ofNullable(proto.parameter.get().deepClone());
         }
         if (proto.hasNonStdParameterDeclaration()) {
-            nonStdParameter = Optional
-                    .ofNullable(proto.nonStdParameter.get().deepClone());
+            nonStdParameter = Optional.ofNullable(proto.nonStdParameter.get().deepClone());
         }
         if (proto.body != null) {
             body = proto.body.deepClone();
@@ -151,14 +142,11 @@ public class Ccatch extends Branch
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -197,27 +185,22 @@ public class Ccatch extends Branch
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @exception ClassCastException if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
             throw new NullPointerException();
         }
-        if (hasParameterDeclaration()
-                && parameter.map(param -> param == p).orElse(false)) {
+        if (hasParameterDeclaration() && parameter.map(param -> param == p).orElse(false)) {
             ParameterDeclaration r = (ParameterDeclaration) q;
             parameter = Optional.of(r);
             if (r != null) {
@@ -256,10 +239,9 @@ public class Ccatch extends Branch
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
@@ -280,11 +262,10 @@ public class Ccatch extends Branch
     }
 
     /*
-     * Return the parameter declaration at the specified index in this node's
-     * "virtual" parameter declaration array. @param index an index for a
-     * parameter declaration. @return the parameter declaration with the given
-     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is
-     * out of bounds.
+     * Return the parameter declaration at the specified index in this node's "virtual" parameter
+     * declaration array. @param index an index for a parameter declaration. @return the parameter
+     * declaration with the given index. @exception ArrayIndexOutOfBoundsException if <tt> index
+     * </tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
@@ -294,8 +275,7 @@ public class Ccatch extends Branch
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public CcatchNonstandardParameterDeclaration getNonstandardParameterDeclarationAt(
-            int index) {
+    public CcatchNonstandardParameterDeclaration getNonstandardParameterDeclarationAt(int index) {
         if (hasNonStdParameterDeclaration() && index == 0) {
             return nonStdParameter.get();
         }
@@ -314,8 +294,7 @@ public class Ccatch extends Branch
     /**
      * Set body.
      *
-     * @param statement
-     *            a statement.
+     * @param statement a statement.
      */
     public void setBody(Statement statement) {
         body = (StatementBlock) statement;
@@ -324,8 +303,7 @@ public class Ccatch extends Branch
     /**
      * Set parent.
      *
-     * @param parent
-     *            a try.
+     * @param parent a try.
      */
     public void setParent(Exec parent) {
         this.parent = parent;
@@ -360,8 +338,7 @@ public class Ccatch extends Branch
     /**
      * Set parameter declaration.
      *
-     * @param p
-     *            a parameter declaration.
+     * @param p a parameter declaration.
      */
     public void setParameterDeclaration(ParameterDeclaration p) {
         parameter = Optional.ofNullable(p);
@@ -370,11 +347,9 @@ public class Ccatch extends Branch
     /**
      * Set parameter declaration.
      *
-     * @param p
-     *            a parameter declaration.
+     * @param p a parameter declaration.
      */
-    public void setNonStdParameterDeclaration(
-            CcatchNonstandardParameterDeclaration p) {
+    public void setNonStdParameterDeclaration(CcatchNonstandardParameterDeclaration p) {
         nonStdParameter = Optional.ofNullable(p);
     }
 
@@ -391,13 +366,10 @@ public class Ccatch extends Branch
     @Override
     public List<VariableSpecification> getVariablesInScope() {
         if (hasParameterDeclaration()) {
-            return parameter.map(ParameterDeclaration::getVariables)
-                    .orElse(null);
-        } else if (nonStdParameter
-                .map(p -> p instanceof CcatchReturnValParameterDeclaration)
+            return parameter.map(ParameterDeclaration::getVariables).orElse(null);
+        } else if (nonStdParameter.map(p -> p instanceof CcatchReturnValParameterDeclaration)
                 .orElse(false)) {
-            return nonStdParameter
-                    .map(CcatchReturnValParameterDeclaration.class::cast)
+            return nonStdParameter.map(CcatchReturnValParameterDeclaration.class::cast)
                     .map(CcatchReturnValParameterDeclaration::getDelegate)
                     .map(ParameterDeclaration::getVariables).orElse(null);
         }
@@ -408,20 +380,17 @@ public class Ccatch extends Branch
     @Override
     public VariableSpecification getVariableInScope(String name) {
         if (hasParameterDeclaration()) {
-            VariableSpecification v = parameter
-                    .map(ParameterDeclaration::getVariableSpecification)
-                    .orElse(null);
+            VariableSpecification v =
+                parameter.map(ParameterDeclaration::getVariableSpecification).orElse(null);
             if (name.equals(v.getName())) {
                 return v;
             }
-        } else if (nonStdParameter
-                .map(p -> p instanceof CcatchReturnValParameterDeclaration)
+        } else if (nonStdParameter.map(p -> p instanceof CcatchReturnValParameterDeclaration)
                 .orElse(false)) {
-            VariableSpecification v = nonStdParameter
-                    .map(CcatchReturnValParameterDeclaration.class::cast)
-                    .map(CcatchReturnValParameterDeclaration::getDelegate)
-                    .map(ParameterDeclaration::getVariableSpecification)
-                    .orElse(null);
+            VariableSpecification v =
+                nonStdParameter.map(CcatchReturnValParameterDeclaration.class::cast)
+                        .map(CcatchReturnValParameterDeclaration::getDelegate)
+                        .map(ParameterDeclaration::getVariableSpecification).orElse(null);
             if (name.equals(v.getName())) {
                 return v;
             }

@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
  * @version 1 (13.01.19)
  *
  * @see Lookup#createInstance(Class)
- * @see Lookup#inject(Object) 
+ * @see Lookup#inject(Object)
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inject {

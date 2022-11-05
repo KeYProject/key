@@ -17,7 +17,7 @@ public class ConstTermFeature implements TermFeature {
     }
 
     public static TermFeature createConst(RuleAppCost p_val) {
-        return new ConstTermFeature ( p_val );
+        return new ConstTermFeature(p_val);
     }
 
     private final RuleAppCost val;

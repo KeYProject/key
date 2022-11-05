@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * This class is used to resolve arithmetic operations to {@link SLExpression}s.
- * These are overladed for different primitive types.
+ * This class is used to resolve arithmetic operations to {@link SLExpression}s. These are overladed
+ * for different primitive types.
  *
  * It delegates to the {@link JMLOperatorHandler}s registered in the class.
  *
@@ -34,9 +34,9 @@ public class OverloadedOperatorHandler {
      */
     public enum JMLOperator {
         /* binaries */
-        ADD("+"), SUBTRACT("-"), MULT("*"), DIVISION("/"),
-        MODULO("%"), BITWISE_AND("&"), BITWISE_OR("|"), BITWISE_XOR("^"),
-        SHIFT_RIGHT(">>"), SHIFT_LEFT("<<"), UNSIGNED_SHIFT_RIGHT(">>>"),
+        ADD("+"), SUBTRACT("-"), MULT("*"), DIVISION("/"), MODULO("%"), BITWISE_AND("&"),
+        BITWISE_OR("|"), BITWISE_XOR("^"), SHIFT_RIGHT(">>"), SHIFT_LEFT("<<"),
+        UNSIGNED_SHIFT_RIGHT(">>>"),
         /* unaries */
         BITWISE_NEGATE("???"), UNARY_MINUS("-"),
         /* predicates */
@@ -66,33 +66,31 @@ public class OverloadedOperatorHandler {
      * The collection of those operators which take one (not two) arguments.
      */
     public static final Set<JMLOperator> UNARY_OPERATORS =
-            EnumSet.of(JMLOperator.BITWISE_NEGATE, JMLOperator.UNARY_MINUS);
+        EnumSet.of(JMLOperator.BITWISE_NEGATE, JMLOperator.UNARY_MINUS);
 
     /**
      * The collection of those operators whose result is expected to be boolean.
      */
     public static final Set<JMLOperator> PREDICATES =
-            EnumSet.of(JMLOperator.LT, JMLOperator.LTE, JMLOperator.GT, JMLOperator.GTE);
+        EnumSet.of(JMLOperator.LT, JMLOperator.LTE, JMLOperator.GT, JMLOperator.GTE);
 
     /**
-     * Functional interface that defines how JML arithmetic operators are
-     * overloaded for particular arguments.
+     * Functional interface that defines how JML arithmetic operators are overloaded for particular
+     * arguments.
      */
     public interface JMLOperatorHandler {
         /**
-         * Apply the provided arguments to the operator which corresponds
-         * to the given JML operator.
+         * Apply the provided arguments to the operator which corresponds to the given JML operator.
          *
-         * @param op    the JML operator
-         * @param left  left side of the binary expression
-         * @param right right side of the binary expression, null if op is
-         *              unary.
+         * @param op the JML operator
+         * @param left left side of the binary expression
+         * @param right right side of the binary expression, null if op is unary.
          * @return null if this handler is not able to do the translation.
-         * @throws SLTranslationException if translation fails (incompatible
-         * types e.g.)
+         * @throws SLTranslationException if translation fails (incompatible types e.g.)
          */
         @Nullable
-        SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException;
+        SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+                throws SLTranslationException;
     }
 
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
@@ -108,7 +106,8 @@ public class OverloadedOperatorHandler {
     }
 
     @Nullable
-    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
+    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+            throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
             if (term != null) {
@@ -130,9 +129,10 @@ public class OverloadedOperatorHandler {
 
         @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
-            if (left.getTerm().sort() == ldtSequence.targetSort() &&
-                    right.getTerm().sort() == ldtSequence.targetSort()) {
+        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+                throws SLTranslationException {
+            if (left.getTerm().sort() == ldtSequence.targetSort()
+                    && right.getTerm().sort() == ldtSequence.targetSort()) {
                 if (op == JMLOperator.ADD) {
                     return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm()));
                 }
@@ -152,26 +152,27 @@ public class OverloadedOperatorHandler {
 
         @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
+        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+                throws SLTranslationException {
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 switch (op) {
-                    case ADD:
-                    case BITWISE_OR:
-                        return new SLExpression(tb.union(l, r));
-                    case SUBTRACT:
-                        return new SLExpression(tb.setMinus(l, r));
-                    case BITWISE_AND:
-                        return new SLExpression(tb.intersect(l, r));
-                    case LT:
-                        return new SLExpression(tb.subset(l, r));
-                    case LTE:
-                        return new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                    case GT:
-                        return new SLExpression(tb.subset(r, l));
-                    case GTE:
-                        return new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
+                case ADD:
+                case BITWISE_OR:
+                    return new SLExpression(tb.union(l, r));
+                case SUBTRACT:
+                    return new SLExpression(tb.setMinus(l, r));
+                case BITWISE_AND:
+                    return new SLExpression(tb.intersect(l, r));
+                case LT:
+                    return new SLExpression(tb.subset(l, r));
+                case LTE:
+                    return new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
+                case GT:
+                    return new SLExpression(tb.subset(r, l));
+                case GTE:
+                    return new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
                 }
             }
             return null;
@@ -189,18 +190,20 @@ public class OverloadedOperatorHandler {
 
         @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
+        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+                throws SLTranslationException {
             if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
-                    && (right.getTerm().sort() == sortBoolean || right.getTerm().sort() == Sort.FORMULA)) {
+                    && (right.getTerm().sort() == sortBoolean
+                            || right.getTerm().sort() == Sort.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 switch (op) {
-                    case BITWISE_AND:
-                        return new SLExpression(tb.and(t1, t2));
-                    case BITWISE_OR:
-                        return new SLExpression(tb.or(t1, t2));
-                    case BITWISE_XOR:
-                        return new SLExpression(tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
+                case BITWISE_AND:
+                    return new SLExpression(tb.and(t1, t2));
+                case BITWISE_OR:
+                    return new SLExpression(tb.or(t1, t2));
+                case BITWISE_XOR:
+                    return new SLExpression(tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
                 }
             }
             return null;

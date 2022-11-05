@@ -6,32 +6,34 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
- *  Strict fp.
- *  @author <TT>AutoDoc</TT>
+ * Strict fp.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class StrictFp extends Modifier {
 
     /**
- *      Strict fp.
+     * Strict fp.
      */
 
     public StrictFp() {}
 
     /**
-     * Strict fp.    
-     * @param children the children of this AST element as KeY classes.
-     *  May contain: Comments
+     * Strict fp.
+     *
+     * @param children the children of this AST element as KeY classes. May contain: Comments
      */
 
     public StrictFp(ExtList children) {
-	super(children);
+        super(children);
     }
 
 
     /**
- *      Get symbol.
- *      @return the string.
+     * Get symbol.
+     *
+     * @return the string.
      */
 
     protected String getSymbol() {

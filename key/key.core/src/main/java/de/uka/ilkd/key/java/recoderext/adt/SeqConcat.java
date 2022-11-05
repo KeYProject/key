@@ -6,41 +6,42 @@ import recoder.java.Expression;
 public class SeqConcat extends ADTPrefixConstruct {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5950638934821692317L;
 
     public SeqConcat(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
-	makeParentRoleValid();
+        super(lhs, rhs);
+        makeParentRoleValid();
     }
 
 
     protected SeqConcat(SeqConcat proto) {
-	super(proto);
-	makeParentRoleValid();
-    }
-    
-
-    @Override    
-    public SeqConcat deepClone() {
-	return new SeqConcat(this);
+        super(proto);
+        makeParentRoleValid();
     }
 
 
-    @Override    
-    public int getArity() {
-	return 2;
-    }
-
-    
-    @Override    
-    public int getNotation() {
-	return PREFIX;
-    }
-    
     @Override
-    public String toSource(){
-        return "\\seq_concat("+children.get(0).toSource()+","+children.get(1).toSource()+")";
+    public SeqConcat deepClone() {
+        return new SeqConcat(this);
+    }
+
+
+    @Override
+    public int getArity() {
+        return 2;
+    }
+
+
+    @Override
+    public int getNotation() {
+        return PREFIX;
+    }
+
+    @Override
+    public String toSource() {
+        return "\\seq_concat(" + children.get(0).toSource() + "," + children.get(1).toSource()
+            + ")";
     }
 }

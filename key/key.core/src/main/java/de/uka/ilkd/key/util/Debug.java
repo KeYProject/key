@@ -19,14 +19,13 @@ public final class Debug {
      * has to be set in order to enable assertion
      */
     public static boolean ENABLE_ASSERTION =
-            Boolean.parseBoolean(System.getProperty("KeyAssertionFlag", "true"));
+        Boolean.parseBoolean(System.getProperty("KeyAssertionFlag", "true"));
 
     /**
      * has to be set in order to enable debugging
      */
-    public static boolean ENABLE_DEBUG =
-            "on".equals(System.getProperty("KeyDebugFlag"))
-                    || "on".equals(System.getenv("KeyDebugFlag"));
+    public static boolean ENABLE_DEBUG = "on".equals(System.getProperty("KeyDebugFlag"))
+            || "on".equals(System.getenv("KeyDebugFlag"));
 
 
     /**
@@ -47,10 +46,10 @@ public final class Debug {
     }
 
     /**
-     * an assertion failure is thrown if isOK is evaluated to false the text in
-     * message is handed over to this exception
+     * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
+     * over to this exception
      *
-     * @param isOK    boolean the assertion that is checked
+     * @param isOK boolean the assertion that is checked
      * @param message String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message) {
@@ -62,14 +61,13 @@ public final class Debug {
     }
 
     /**
-     * an assertion failure is thrown if isOK is evaluated to false the text in
-     * message is handed over to this exception
+     * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
+     * over to this exception
      *
-     * @param isOK    boolean the assertion that is checked
+     * @param isOK boolean the assertion that is checked
      * @param message String describes the failed assertion
      */
-    public static void assertTrue(boolean isOK, String message,
-                                  Object parameter) {
+    public static void assertTrue(boolean isOK, String message, Object parameter) {
         if (ENABLE_ASSERTION) {
             if (!isOK) {
                 fail(message + ":" + parameter);
@@ -78,11 +76,11 @@ public final class Debug {
     }
 
     /**
-     * an assertion failure is thrown if an iterable object is either null or
-     * contains the null element.
+     * an assertion failure is thrown if an iterable object is either null or contains the null
+     * element.
      *
      * @param iterable The iterable object to check
-     * @param message  String describes the failed assertion
+     * @param message String describes the failed assertion
      */
     public static void assertDeepNonNull(Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {
@@ -112,8 +110,7 @@ public final class Debug {
 
     public static void fail(String message, Object o) {
         if (ENABLE_ASSERTION) {
-            throw new AssertionFailure("\nAssertion failure: " + message + ":"
-                    + o);
+            throw new AssertionFailure("\nAssertion failure: " + message + ":" + o);
         }
     }
 }

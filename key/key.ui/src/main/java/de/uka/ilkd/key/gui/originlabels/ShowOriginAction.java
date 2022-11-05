@@ -33,7 +33,7 @@ public class ShowOriginAction extends MainWindowAction {
         this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
 
         final TermLabelSettings settings =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
@@ -53,23 +53,18 @@ public class ShowOriginAction extends MainWindowAction {
             }
         }
 
-        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(
-                pio,
-                getMediator().getSelectedNode(),
-                getMediator().getServices());
+        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
+            getMediator().getSelectedNode(), getMediator().getServices());
 
-        mainWindow.getSourceViewFrame().addComponent(
-                vis,
-                vis.getLongName(),
-                new AbstractAction() {
+        mainWindow.getSourceViewFrame().addComponent(vis, vis.getLongName(), new AbstractAction() {
 
-                    private static final long serialVersionUID = 2410334588447893970L;
+            private static final long serialVersionUID = 2410334588447893970L;
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        mainWindow.getSourceViewFrame().removeComponent(vis);
-                        vis.dispose();
-                    }
-                });
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainWindow.getSourceViewFrame().removeComponent(vis);
+                vis.dispose();
+            }
+        });
     }
 }

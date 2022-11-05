@@ -13,19 +13,16 @@ import java.util.Map;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
-public class IntegerHandler extends LDTHandler  {
+public class IntegerHandler extends LDTHandler {
 
-    private final Map<JMLOperator, Operator> jmlIntMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlIntMap = new EnumMap<>(JMLOperator.class);
 
-    private final Map<JMLOperator, Operator> jmlLongMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlLongMap = new EnumMap<>(JMLOperator.class);
 
-    private final Map<JMLOperator, Operator> jmlBigintMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlBigintMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<PrimitiveType, Map<JMLOperator, Operator>> opCategories =
-            new IdentityHashMap<>();
+        new IdentityHashMap<>();
 
     private final Services services;
 

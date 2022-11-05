@@ -28,10 +28,10 @@ public class Singleton extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSingleton(this);
+        v.performActionOnSingleton(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSingleton(this);
     }
@@ -41,6 +41,6 @@ public class Singleton extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+    }
 }

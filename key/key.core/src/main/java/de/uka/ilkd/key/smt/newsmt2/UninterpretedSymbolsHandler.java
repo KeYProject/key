@@ -17,8 +17,8 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 /**
- * This handler is a fallback handler that introduces a new uninterpreted
- * function symbol with prefix "u_".
+ * This handler is a fallback handler that introduces a new uninterpreted function symbol with
+ * prefix "u_".
  *
  * According declarations are added.
  */
@@ -31,14 +31,13 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        return (op instanceof Function && !bindsVars(op))
-            || op instanceof ProgramVariable;
+        return (op instanceof Function && !bindsVars(op)) || op instanceof ProgramVariable;
     }
 
     /*
@@ -57,10 +56,9 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
         String name = PREFIX + op.name().toString();
-        if(!trans.isKnownSymbol(name)) {
+        if (!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
-            if(op.sort() != Sort.FORMULA &&
-              (enableQuantifiers || op.arity() == 0)) {
+            if (op.sort() != Sort.FORMULA && (enableQuantifiers || op.arity() == 0)) {
                 trans.addAxiom(HandlerUtil.funTypeAxiom(op, name, trans));
             }
             trans.addKnownSymbol(name);

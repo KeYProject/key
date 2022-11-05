@@ -11,9 +11,8 @@ import javax.swing.text.*;
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 
 /**
- * This document performs syntax highlighting when strings are inserted.
- * However, only inserting the whole String at once is supported, otherwise the syntax highlighting
- * will be faulty.
+ * This document performs syntax highlighting when strings are inserted. However, only inserting the
+ * whole String at once is supported, otherwise the syntax highlighting will be faulty.
  *
  * Note that tab characters have to be replaced by spaces before inserting into the document.
  *
@@ -29,39 +28,33 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /** highight color for Java keywords (dark red/violet) */
     private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-            ColorSettings.define("[java]keyword", "",
-            new Color(0x7f0055));
+        ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
 
-    //private static final Color JAVA_STRING_COLOR = new Color(0x000000);
+    // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
 
     /** highight color for comments (dull green) */
     private static final ColorSettings.ColorProperty COMMENT_COLOR =
-            ColorSettings.define("[java]comment", "",
-                    new Color(0x3f7f5f));
+        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
 
     /** highight color for JavaDoc (dull green) */
     private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-            ColorSettings.define("[java]javadoc", "",
-                    new Color(0x3f7f5f));
+        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
 
     /** highight color for JML (dark blue) */
     private static final ColorSettings.ColorProperty JML_COLOR =
-            ColorSettings.define("[java]jml", "",
-                    new Color(0x0000c0));
+        ColorSettings.define("[java]jml", "", new Color(0x0000c0));
 
     /** highight color for JML keywords (blue) */
     private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-            ColorSettings.define("[java]jmlKeyword", "",
-                    new Color(0x0000f0));
+        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
 
     /**
-     * Enum to indicate the current mode (environment) of the parser.
-     * Examples are STRING ("..."), COMMENT (&#47;&#42; ... &#42;&#47;),
-     * JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
+     * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),
+     * COMMENT (&#47;&#42; ... &#42;&#47;), JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
      */
     private enum Mode {
         /** parser is currently inside a String */
-        //STRING,                                           // currently not in use
+        // STRING, // currently not in use
         /** parser is currently inside normal java code */
         NORMAL,
         /** parser is currently inside a keyword */
@@ -70,11 +63,11 @@ public class JavaDocument extends DefaultStyledDocument {
         COMMENT,
         /** parser is currently inside a line comment (starting with "&#47;&#47;") */
         LINE_COMMENT,
-        /** parser is currently inside a line JML annotation (starting with "&#47;&#47;&#64;")*/
+        /** parser is currently inside a line JML annotation (starting with "&#47;&#47;&#64;") */
         LINE_JML,
         /** parser is currently inside JavaDoc (starting with "&#47;&#42;&#42;") */
         JAVADOC,
-        /** parser is currently inside an annotation (starting with "&#64;")*/
+        /** parser is currently inside an annotation (starting with "&#64;") */
         ANNOTATION,
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
@@ -83,8 +76,8 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     /**
-     * Enum to indicate the current comment state of the parser.
-     * It is used to store which comment relevant chars were just recently encountered.
+     * Enum to indicate the current comment state of the parser. It is used to store which comment
+     * relevant chars were just recently encountered.
      */
     private enum CommentState {
         /** no comment char encountered */
@@ -95,120 +88,116 @@ public class JavaDocument extends DefaultStyledDocument {
         COMMENT,
         /** last processed chars were "&#47;&#47;" */
         LINECOMMENT,
-        /** current token could be a JML annotation marker
-         * (see JML reference manual 4.4,
+        /**
+         * current token could be a JML annotation marker (see JML reference manual 4.4,
          * <a href="http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29">
-         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>) */
+         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>)
+         */
         JML_ANNOTATION,
-        /** current token could be a JML annotation marker inside single line JML
-         * (see JML reference manual 4.4,
+        /**
+         * current token could be a JML annotation marker inside single line JML (see JML reference
+         * manual 4.4,
          * <a href="http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29">
-         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>) */
+         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>)
+         */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
         MAYBEEND;
     }
 
     /**
-     * Regular expression character class for all chars which are delimiters
-     * of keywords. \\Q ... \\E is used to escape all chars inside the class.
+     * Regular expression character class for all chars which are delimiters of keywords. \\Q ...
+     * \\E is used to escape all chars inside the class.
      */
     private static final String DELIM = "[\\Q .;{}[]\n\r()+-*/%!=<>?:~&|^@'\"\\E]";
 
     /** Pattern to match JML start with annotation marker(s). */
-    private static final Pattern JML_ANNOT_MARKER
-        = Pattern.compile("/\\*([+|-][$_a-zA-Z0-9]+)+@");
+    private static final Pattern JML_ANNOT_MARKER = Pattern.compile("/\\*([+|-][$_a-zA-Z0-9]+)+@");
 
     /** Pattern to match single line JML start with annotation marker(s). */
-    private static final Pattern JML_ANNOT_MARKER_LINE
-        = Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
+    private static final Pattern JML_ANNOT_MARKER_LINE =
+        Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
 
     /**
-     * Stores the Java keywords which have to be highlighted.
-     * The list is taken from
+     * Stores the Java keywords which have to be highlighted. The list is taken from
      * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">
-     * https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
-     * </a>.
+     * https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html </a>.
      *
-     * To add additional keywords, simply add them to the array.
-     * Note that the keywords must not contain any of the characters defined by the DELIM regex.
+     * To add additional keywords, simply add them to the array. Note that the keywords must not
+     * contain any of the characters defined by the DELIM regex.
      */
-    private static final String[] KEYWORDS = {
-        "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class",
-        "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally",
-        "float", "for", "if", "implements", "import", "instanceof", "int", "interface", "long",
-        "native", "new", "package", "private", "protected", "public", "return", "short",
-        "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws",
-        "transient", "try", "void", "volatile", "while",
-        "true", "false", "null"        // literals
-        // "const", "goto" // reserved, but currently not used in Java
+    private static final String[] KEYWORDS = { "abstract", "assert", "boolean", "break", "byte",
+        "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "enum",
+        "extends", "final", "finally", "float", "for", "if", "implements", "import", "instanceof",
+        "int", "interface", "long", "native", "new", "package", "private", "protected", "public",
+        "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw",
+        "throws", "transient", "try", "void", "volatile", "while", "true", "false", "null"
+            // "const", "goto" // reserved, but currently not used in Java
     };
 
     /**
      * Stores the JML keywords which have to be highlighted.
      *
-     * To add additional keywords, simply add them to the array.
-     * Note that the keywords must not contain any of the characters defined by the DELIM regex.
+     * To add additional keywords, simply add them to the array. Note that the keywords must not
+     * contain any of the characters defined by the DELIM regex.
      */
     private static final String[] JMLKEYWORDS = {
         // other Java keywords
-        "break", "case", "catch", "class", "const", "continue", "default", "do", "else",
-        "extends", "false", "finally", "for", "goto", "if", "implements", "import",
-        "instanceof", "interface", "label", "new", "null", "package", "return", "super",
-        "switch", "this", "throw", "throws", "true", "try", "void", "while",
+        "break", "case", "catch", "class", "const", "continue", "default", "do", "else", "extends",
+        "false", "finally", "for", "goto", "if", "implements", "import", "instanceof", "interface",
+        "label", "new", "null", "package", "return", "super", "switch", "this", "throw", "throws",
+        "true", "try", "void", "while",
         // types:
-        "boolean", "byte", "char", "double", "float", "int", "long", "short",
-        "\\bigint", "\\locset", "\\real", "\\seq", "\\TYPE",
+        "boolean", "byte", "char", "double", "float", "int", "long", "short", "\\bigint",
+        "\\locset", "\\real", "\\seq", "\\TYPE",
         // modifiers:
-        "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math",
-        "extract", "final", "ghost", "helper", "instance", "model", "native", "non_null",
-        "nullable", "nullable_by_default", "private", "protected", "peer", "\\peer", "public",
-        "pure", "rep", "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected",
-        "spec_public", "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized",
-        "transient", "two_state", "uninitialized", "volatile",
+        "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math", "extract",
+        "final", "ghost", "helper", "instance", "model", "native", "non_null", "nullable",
+        "nullable_by_default", "private", "protected", "peer", "\\peer", "public", "pure", "rep",
+        "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected", "spec_public",
+        "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized", "transient",
+        "two_state", "uninitialized", "volatile",
 
         "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
         "continue_behavior", "return_behavior",
         // special JML expressions:
-        "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything",
-        "\\exception", "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for",
-        "\\is_initialized", "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max",
-        "\\measured_by", "\\min", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
-        "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of",
-        "\\old", "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product",
-        "\\reach", "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
-        "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing",
-        "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
+        "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything", "\\exception",
+        "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for", "\\is_initialized",
+        "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max", "\\measured_by", "\\min",
+        "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed", "\\not_assigned",
+        "\\not_modified", "\\not_specified", "\\nothing", "\\num_of", "\\old", "\\only_assigned",
+        "\\only_called", "\\only_captured", "\\pre", "\\product", "\\reach", "\\reachLocs",
+        "\\result", "\\same", "\\seq_contains", "\\space", "\\static_constraint_for",
+        "\\static_invariant_for", "\\strictly_nothing", "\\subset", "\\sum", "\\type", "\\typeof",
+        "\\working_space", "\\values", "\\inv",
         // clause keywords:
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
         "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
-        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
-        "continues", "continues_redundantly", "debug", "\\declassifies", "decreases",
-        "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
-        "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
-        "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",
-        "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_redundantly",
-        "measured_by", "measured_by_redundantly", "maintaining", "maintaining_redundantly",
-        "maps", "maps_redundantly", "\\new_objects", "old", "refining", "represents",
-        "requires", "set", "signals", "signals_only", "\\such_that", "unreachable", "when",
-        "working_space",
+        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly", "continues",
+        "continues_redundantly", "debug", "\\declassifies", "decreases", "decreases_redundantly",
+        "decreasing", "decreasing_redundantly", "diverges", "determines", "diverges_redundantly",
+        "duration", "duration_redundantly", "ensures", "ensures_redundantly", "\\erases", "forall",
+        "for_example", "hence_by", "implies_that", "in", "in_redundantly", "\\into",
+        "loop_invariant", "loop_invariant_redundantly", "measured_by", "measured_by_redundantly",
+        "maintaining", "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects",
+        "old", "refining", "represents", "requires", "set", "signals", "signals_only",
+        "\\such_that", "unreachable", "when", "working_space",
         // "invariant-like" keywords
         "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
-        "constraint", "exceptional_behavior", "exceptional_behaviour", "initially",
-        "invariant", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
-        "normal_behaviour", "readable", "writable",
+        "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
+        "model_behavior", "model_behaviour", "monitors_for", "normal_behavior", "normal_behaviour",
+        "readable", "writable",
         // ADT functions:
-        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put",
-        "\\seq_reverse", "\\seq_length", "\\index_of", "\\seq_concat", "\\empty",
-        "\\singleton", "\\set_union", "\\intersect", "\\set_minus", "\\all_fields",
-        "\\infinite_union", "\\strictly_than_nothing"
-    };
+        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put", "\\seq_reverse",
+        "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton", "\\set_union",
+        "\\intersect", "\\set_minus", "\\all_fields", "\\infinite_union",
+        "\\strictly_than_nothing" };
 
     /** the style of annotations */
     private final SimpleAttributeSet annotation = new SimpleAttributeSet();
 
     /** the style of strings */
-    //private SimpleAttributeSet string = new SimpleAttributeSet();
+    // private SimpleAttributeSet string = new SimpleAttributeSet();
 
     /** default style */
     private final SimpleAttributeSet normal = new SimpleAttributeSet();
@@ -255,15 +244,15 @@ public class JavaDocument extends DefaultStyledDocument {
     private JavaDocument.Mode mode = Mode.NORMAL;
 
     /**
-     *  Stores the current comment state of the parser to recognize comments/comment ends.
+     * Stores the current comment state of the parser to recognize comments/comment ends.
      */
     private JavaDocument.CommentState state = CommentState.NO;
 
     /**
-     * Creates a new JavaDocument and sets the syntax highlighting styles
-     * (as in eclipse default settings).
+     * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
+     * settings).
      */
-    public JavaDocument () {
+    public JavaDocument() {
         updateStyles();
         ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
@@ -280,7 +269,7 @@ public class JavaDocument extends DefaultStyledDocument {
         StyleConstants.setForeground(keyword, JAVA_KEYWORD_COLOR.get());
         StyleConstants.setForeground(comment, COMMENT_COLOR.get());
         StyleConstants.setForeground(javadoc, JAVADOC_COLOR.get());
-        //StyleConstants.setForeground(string, JAVA_STRING_COLOR);
+        // StyleConstants.setForeground(string, JAVA_STRING_COLOR);
         StyleConstants.setForeground(jml, JML_COLOR.get());
         StyleConstants.setForeground(jmlkeyword, JML_KEYWORD_COLOR.get());
         StyleConstants.setBold(jmlkeyword, true);
@@ -288,17 +277,17 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkAt() {
         token += '@';
-        if (state == CommentState.COMMENT) {                // "/*@"
+        if (state == CommentState.COMMENT) { // "/*@"
             state = CommentState.NO;
             mode = Mode.JML;
-        } else if (state == CommentState.LINECOMMENT) {      // "//@"
+        } else if (state == CommentState.LINECOMMENT) { // "//@"
             state = CommentState.NO;
             mode = Mode.LINE_JML;
-        } else if (mode == Mode.NORMAL
-                && state == CommentState.NO) {              // "@"
+        } else if (mode == Mode.NORMAL && state == CommentState.NO) { // "@"
             mode = Mode.ANNOTATION;
             tokenStart = currentPos;
-        } else if (state == CommentState.JML_ANNOTATION || state == CommentState.JML_ANNOTATION_LINE) {
+        } else if (state == CommentState.JML_ANNOTATION
+                || state == CommentState.JML_ANNOTATION_LINE) {
             boolean lineComment = state == CommentState.JML_ANNOTATION_LINE;
             state = CommentState.NO;
             String features = token.substring(2); // cut-off '//' or '/*'
@@ -317,12 +306,12 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     private void checkPlusMinus(char c) {
-        if (state == CommentState.LINECOMMENT
-            || state == CommentState.JML_ANNOTATION_LINE) {   // "//+" or "//-"
+        if (state == CommentState.LINECOMMENT || state == CommentState.JML_ANNOTATION_LINE) {
+            // "//+" or "//-"
             token += c;
             state = CommentState.JML_ANNOTATION_LINE;
-        } else if (state == CommentState.COMMENT
-            || state == CommentState.JML_ANNOTATION) {    // "/*+" or "/*-"
+        } else if (state == CommentState.COMMENT || state == CommentState.JML_ANNOTATION) {
+            // "/*+" or "/*-"
             token += c;
             state = CommentState.JML_ANNOTATION;
         } else {
@@ -333,73 +322,72 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkLinefeed() throws BadLocationException {
         state = CommentState.NO;
-        if (mode == Mode.LINE_COMMENT) {                    // "// ... \n"
+        if (mode == Mode.LINE_COMMENT) { // "// ... \n"
             insertCommentString(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.LINE_JML) {                 // "//@ ... \n"
+        } else if (mode == Mode.LINE_JML) { // "//@ ... \n"
             insertJMLString(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.ANNOTATION) {               // "@ ... \n"
+        } else if (mode == Mode.ANNOTATION) { // "@ ... \n"
             insertAnnotation(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.NORMAL) {                   // normal mode
+        } else if (mode == Mode.NORMAL) { // normal mode
             insertNormalString(token, tokenStart);
-            token = "\n";             // reset token
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else {    // modes: JML, Comment, JavaDoc
+        } else { // modes: JML, Comment, JavaDoc
             token += '\n';
         }
     }
 
     private void checkStar() throws BadLocationException {
-        if (state == CommentState.MAYBE) {              // "/*"
-         // insert what we have in this line so far
+        if (state == CommentState.MAYBE) { // "/*"
+            // insert what we have in this line so far
             insertNormalString(token.substring(0, token.length() - 1), tokenStart);
             token = "/*";
             tokenStart = currentPos - 1;
             state = CommentState.COMMENT;
             mode = Mode.COMMENT;
-        } else if (state == CommentState.COMMENT) {     // "/**"
+        } else if (state == CommentState.COMMENT) { // "/**"
             // tokenStart should be already set here
             token += '*';
             state = CommentState.MAYBEEND;
             mode = Mode.JAVADOC;
-        } else if (mode == Mode.COMMENT                 // "/* ... *"
-                || mode == Mode.JAVADOC                 // "/*@ ... *"
-                || mode == Mode.JML) {                  // "/** ... *"
+        } else if (mode == Mode.COMMENT // "/* ... *"
+                || mode == Mode.JAVADOC // "/*@ ... *"
+                || mode == Mode.JML) { // "/** ... *"
             // tokenStart should be already set here
             token += '*';
             state = CommentState.MAYBEEND;
-        } else {                                        // multiplication
+        } else { // multiplication
             token += '*';
             state = CommentState.NO;
         }
     }
 
     private void checkSlash() throws BadLocationException {
-        if (mode == Mode.NORMAL
-                 && state == CommentState.NO) {          // "/"
+        if (mode == Mode.NORMAL && state == CommentState.NO) { // "/"
             token += '/';
             state = CommentState.MAYBE;
-        } else if (state == CommentState.MAYBE) {        // "//"
+        } else if (state == CommentState.MAYBE) { // "//"
             // insert what we have in this line so far
             insertNormalString(token.substring(0, token.length() - 1), tokenStart);
             token = "//";
             tokenStart = currentPos - 1;
             state = CommentState.LINECOMMENT;
             mode = Mode.LINE_COMMENT;
-        } else if (state == CommentState.MAYBEEND) {     // "/* ... */"
+        } else if (state == CommentState.MAYBEEND) { // "/* ... */"
             token += '/';
             if (mode == Mode.COMMENT) {
                 insertCommentString(token, tokenStart);
             } else if (mode == Mode.JAVADOC) {
-                if (token.equals("/**/")) {            // "/**/" is no JavaDoc
+                if (token.equals("/**/")) { // "/**/" is no JavaDoc
                     insertCommentString(token, tokenStart);
                 } else {
                     insertJavadocString(token, tokenStart);
@@ -409,7 +397,7 @@ public class JavaDocument extends DefaultStyledDocument {
             }
             state = CommentState.NO;
             mode = Mode.NORMAL;
-            token = "";             // reset token
+            token = ""; // reset token
             tokenStart = currentPos + 1;
         } else {
             // not NORMAL_MODE
@@ -417,7 +405,7 @@ public class JavaDocument extends DefaultStyledDocument {
         }
     }
 
-    private void checkQuote() {                 // TODO: separate style for Strings
+    private void checkQuote() { // TODO: separate style for Strings
         state = CommentState.NO;
         token += '"';
     }
@@ -443,7 +431,7 @@ public class JavaDocument extends DefaultStyledDocument {
         case '\n':
             checkLinefeed();
             break;
-        case '\t':  // all tabs should have been replaced earlier!
+        case '\t': // all tabs should have been replaced earlier!
         case ' ':
             checkSpaceTab(strChar);
             break;
@@ -461,8 +449,8 @@ public class JavaDocument extends DefaultStyledDocument {
         case '-':
             checkPlusMinus(strChar);
             break;
-        //case '*':
-        //case '/':
+        // case '*':
+        // case '/':
         case '(':
         case ')':
         case '[':
@@ -483,10 +471,10 @@ public class JavaDocument extends DefaultStyledDocument {
         case '>':
         case '=':
         case '\'':
-        //case ' ':
-        //case '"':
-        //case '\'':
-        //case '\n':
+            // case ' ':
+            // case '"':
+            // case '\'':
+            // case '\n':
             checkDelimiter(strChar);
             break;
         default:

@@ -24,8 +24,8 @@ public class DetachChange extends TreeChange {
     private int position;
 
     /**
-     * An attach change that effectively replaced this This information may be
-     * redundant, but is not in general.
+     * An attach change that effectively replaced this This information may be redundant, but is not
+     * in general.
      */
     private AttachChange replacement;
 
@@ -82,9 +82,8 @@ public class DetachChange extends TreeChange {
             buf.append(Format.toString("%c %n", getChangeRoot()));
             buf.append(Format.toString(" from %c %n in %u @%p", getChangeRootParent()));
             /*
-             * buf.append(" in role "); buf.append(getChangePositionCode() &
-             * 15); buf.append(" at index "); buf.append(getChangePositionCode() >>
-             * 4);
+             * buf.append(" in role "); buf.append(getChangePositionCode() & 15);
+             * buf.append(" at index "); buf.append(getChangePositionCode() >> 4);
              */
         }
         return buf.toString();

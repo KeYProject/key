@@ -3,8 +3,7 @@ package de.uka.ilkd.key.prover;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
- * An information object with additional information about the 
- * finished task.
+ * An information object with additional information about the finished task.
  */
 public interface TaskFinishedInfo {
     Object getSource();
@@ -12,11 +11,11 @@ public interface TaskFinishedInfo {
     Object getResult();
 
     long getTime();
-    
+
     int getAppliedRules();
 
     int getClosedGoals();
 
     Proof getProof();
-    
+
 }

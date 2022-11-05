@@ -8,9 +8,8 @@ import java.util.Properties;
 import java.util.Vector;
 
 /**
- * Information about the tags in a java style structured comment (DocComment).
- * Such a comment has an introductionary description and a list of tagged
- * descriptions.
+ * Information about the tags in a java style structured comment (DocComment). Such a comment has an
+ * introductionary description and a list of tagged descriptions.
  *
  * @author RN
  * @author AL
@@ -34,22 +33,20 @@ public class TagInfo {
 
     String introText;
     /**
-     * the tags contained in the comment. This is required to obtain the order
-     * in which the tags occur
+     * the tags contained in the comment. This is required to obtain the order in which the tags
+     * occur
      */
 
     Vector<String> tagNames;
     /**
-     * the tags and their string values. Tags are stored without the leading
-     * <tt>@</tt> sign
+     * the tags and their string values. Tags are stored without the leading <tt>@</tt> sign
      */
 
     Properties tagValues;
     boolean analyzed;
 
     /**
-     * Creates a new instance from the given string. The given string must not
-     * be <CODE>null</CODE>.
+     * Creates a new instance from the given string. The given string must not be <CODE>null</CODE>.
      *
      * @param comment the string containing the comment.
      */
@@ -59,11 +56,10 @@ public class TagInfo {
     }
 
     /**
-     * Strips comment characters from the beginning and end of the given string
-     * representing a single line.
+     * Strips comment characters from the beginning and end of the given string representing a
+     * single line.
      *
-     * @param line the string representing the line. The line is assumed to be
-     *             non empty.
+     * @param line the string representing the line. The line is assumed to be non empty.
      * @return the stripped and trimmed string
      */
 
@@ -151,8 +147,8 @@ public class TagInfo {
     }
 
     /**
-     * Returns the introductionary text of the comment. This is the text
-     * starting at the beginning of the comment to the first tag.
+     * Returns the introductionary text of the comment. This is the text starting at the beginning
+     * of the comment to the first tag.
      *
      * @return the intro of the comment.
      */
@@ -164,8 +160,7 @@ public class TagInfo {
     }
 
     /**
-     * Determines whether or not there are tags contained in the underlying
-     * comment.
+     * Determines whether or not there are tags contained in the underlying comment.
      *
      * @return <tt>true</tt> iff the comment contains tags.
      */
@@ -187,8 +182,8 @@ public class TagInfo {
     }
 
     /**
-     * return an enumeration of tags contained in the comment in order of their
-     * apperance in the comment.
+     * return an enumeration of tags contained in the comment in order of their apperance in the
+     * comment.
      *
      * @return an non-empty enumeration object.
      */
@@ -204,8 +199,7 @@ public class TagInfo {
     }
 
     /**
-     * returns the text for the given tag or <tt>null</tt> if that tag is not
-     * defined.
+     * returns the text for the given tag or <tt>null</tt> if that tag is not defined.
      *
      * @param tag the name of the tag
      * @return the value of that tag or <tt>null</tt>

@@ -28,7 +28,7 @@ public class Conditional extends Operator {
     /**
      * Conditional.
      *
-     * @param guard    an expression.
+     * @param guard an expression.
      * @param thenExpr an expression.
      * @param elseExpr an expression.
      */
@@ -93,8 +93,7 @@ public class Conditional extends Operator {
     }
 
     /**
-     * Checks if this operator is left or right associative. Conditionals are
-     * right associative.
+     * Checks if this operator is left or right associative. Conditionals are right associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.

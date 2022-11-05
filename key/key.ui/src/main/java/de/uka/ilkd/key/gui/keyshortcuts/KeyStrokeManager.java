@@ -10,17 +10,18 @@ import java.util.Map;
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
  * <p>
- * If possible, all actions should ask this interface for a {@link KeyStroke},
- * by calling {@link #lookupAndOverride(Action)}.
+ * If possible, all actions should ask this interface for a {@link KeyStroke}, by calling
+ * {@link #lookupAndOverride(Action)}.
  * <p>
- * The general guidelines for adding new keyboard shortcuts are<ul>
- * <li> they must not produce a printable character,
- * <li> they must not interfere with shortcuts already defined by the
- * window manager (this probably includes all combinations using the Windows key),
- * <li> the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
+ * The general guidelines for adding new keyboard shortcuts are
+ * <ul>
+ * <li>they must not produce a printable character,
+ * <li>they must not interfere with shortcuts already defined by the window manager (this probably
+ * includes all combinations using the Windows key),
+ * <li>the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
  * "sacred keybindings"</a> must not be touched,
- * <li> the theme for strategy macros should be consistent
- * (currently either F keys or CTRL + SHIFT + letter).
+ * <li>the theme for strategy macros should be consistent (currently either F keys or CTRL + SHIFT +
+ * letter).
  * </ul>
  *
  * @author bruns
@@ -28,8 +29,8 @@ import java.util.Map;
  */
 public final class KeyStrokeManager {
     /**
-     * This constant holds the typical key to be used for shortcuts
-     * (usually {@link java.awt.Event#CTRL_MASK})
+     * This constant holds the typical key to be used for shortcuts (usually
+     * {@link java.awt.Event#CTRL_MASK})
      */
     public static final int SHORTCUT_KEY_MASK = getShortcutMask();
 
@@ -54,12 +55,12 @@ public final class KeyStrokeManager {
     static final Map<String, WeakReference<Action>> actions = new HashMap<>(100);
 
     /**
-     * Get a {@link KeyStroke} for the given <code>key</code>.
-     * If no {@link KeyStroke} is defined, <code>defaultValue</code> is returned.
+     * Get a {@link KeyStroke} for the given <code>key</code>. If no {@link KeyStroke} is defined,
+     * <code>defaultValue</code> is returned.
      * <p>
      * Also thsi method sets the determined key stroke in the settings.
      *
-     * @param key          key
+     * @param key key
      * @param defaultValue default value
      * @return nullable
      * @see KeyStrokeSettings
@@ -93,8 +94,8 @@ public final class KeyStrokeManager {
     }
 
     /**
-     * The same as {@link #get(Object, KeyStroke)} but uses the given object's class name
-     * as key and non-default keystroke.
+     * The same as {@link #get(Object, KeyStroke)} but uses the given object's class name as key and
+     * non-default keystroke.
      *
      * @param action
      * @return
@@ -113,8 +114,8 @@ public final class KeyStrokeManager {
     }
 
     /**
-     * Lookup a user-defined key stroke via {@link #get(String, KeyStroke)} for the given key.
-     * If no key stroke is defined it uses the defined key stroke in the given <code>action</code>.
+     * Lookup a user-defined key stroke via {@link #get(String, KeyStroke)} for the given key. If no
+     * key stroke is defined it uses the defined key stroke in the given <code>action</code>.
      * <p>
      * Also adds the action to the list of {@link #actions}.
      *

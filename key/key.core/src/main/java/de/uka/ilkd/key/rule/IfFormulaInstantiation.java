@@ -5,8 +5,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 
 
 /*
- * This interface represents objects representing an instantiation of
- * one formula of the if-sequence of a taclet.
+ * This interface represents objects representing an instantiation of one formula of the if-sequence
+ * of a taclet.
  */
 
 public interface IfFormulaInstantiation {
@@ -14,7 +14,7 @@ public interface IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    SequentFormula getConstrainedFormula ();
+    SequentFormula getConstrainedFormula();
 
-    String             toString              (Services services);
+    String toString(Services services);
 }

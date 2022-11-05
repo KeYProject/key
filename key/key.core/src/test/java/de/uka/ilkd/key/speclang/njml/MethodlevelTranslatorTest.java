@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class MethodlevelTranslatorTest {
     @TestFactory
     public Stream<DynamicTest> getFiles() throws IOException {
-        InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
+        InputStream resourceAsStream =
+            ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
         return ClasslevelTranslatorTest.readInputs(resourceAsStream, this::parseAndInterpret);
     }
 

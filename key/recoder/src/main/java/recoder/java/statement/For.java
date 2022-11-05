@@ -35,13 +35,14 @@ public class For extends LoopStatement implements VariableScope {
     /**
      * For.
      *
-     * @param inits   a loop initializer mutable list.
-     * @param guard   an expression.
+     * @param inits a loop initializer mutable list.
+     * @param guard an expression.
      * @param updates an expression mutable list.
-     * @param body    a statement.
+     * @param body a statement.
      */
 
-    public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body) {
+    public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
+            Statement body) {
         super(body);
         setInitializers(inits);
         setGuard(guard);
@@ -131,7 +132,7 @@ public class For extends LoopStatement implements VariableScope {
 
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        // TODO maybe check if var is contained in inits? (consistency-check) 
+        // TODO maybe check if var is contained in inits? (consistency-check)
     }
 
     public void removeVariableFromScope(String name) {

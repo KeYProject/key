@@ -11,9 +11,8 @@ public class ProgramPrinter extends PrettyPrinter {
 
     /**
      * creates the program printer
-     * 
-     * @param writer
-     *                the Writer to print in, may be <code>null</code>.
+     *
+     * @param writer the Writer to print in, may be <code>null</code>.
      */
     public ProgramPrinter(Writer writer) {
         super(writer);
@@ -27,8 +26,7 @@ public class ProgramPrinter extends PrettyPrinter {
         super(null);
     }
 
-    public ProgramPrinter(Writer w, boolean b,
-            SVInstantiations instantiations) {
-        super(w,b,instantiations);
+    public ProgramPrinter(Writer w, boolean b, SVInstantiations instantiations) {
+        super(w, b, instantiations);
     }
 }

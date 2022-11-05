@@ -71,9 +71,11 @@ public class TestTypeReference extends ResolveGenericClass {
 
     @Test
     public void testVariableDeclaration() throws Exception {
-        String before = "class T<E,F> { void m() { E e1; E e2=e1; n(e2); F f1; n(e2); } void n(E e) { } }";
-        String after = "class T { void m() { java.lang.Object e1; java.lang.Object e2 = e1; n(e2); java.lang.Object f1; n(e2); } " +
-                "void n(java.lang.Object e) {} }";
+        String before =
+            "class T<E,F> { void m() { E e1; E e2=e1; n(e2); F f1; n(e2); } void n(E e) { } }";
+        String after =
+            "class T { void m() { java.lang.Object e1; java.lang.Object e2 = e1; n(e2); java.lang.Object f1; n(e2); } "
+                + "void n(java.lang.Object e) {} }";
         equalCU(before, after);
     }
 

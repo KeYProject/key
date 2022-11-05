@@ -32,7 +32,8 @@ public class TestZipProofSaving {
             throws ProblemLoaderException, IOException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toFile());
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
-        GZipProofSaver proofSaver = new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
+        GZipProofSaver proofSaver =
+            new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
         proofSaver.save();
     }
 
@@ -40,7 +41,7 @@ public class TestZipProofSaving {
         try {
             byte[] buffer = new byte[4096];
             int read = is.read(buffer);
-            while(read >= 0) {
+            while (read >= 0) {
                 os.write(buffer, 0, read);
                 read = is.read(buffer);
             }

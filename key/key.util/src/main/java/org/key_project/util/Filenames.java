@@ -15,20 +15,21 @@ public class Filenames {
     // =======================================================
 
     /**
-     * Separates the single directory entries in a filename.
-     * The first element is an empty String iff the filename is absolute.
-     * (For a Windows filename, it contains a drive letter and a colon).
-     * Ignores double slashes and slashes at the end, removes references to the cwd.
-     * E.g., "/home//daniel/./key/" yields {"","home","daniel","key"}.
-     * Tries to automatically detect UNIX or Windows directory delimiters.
-     * There is no check whether all other characters are valid for filenames.
+     * Separates the single directory entries in a filename. The first element is an empty String
+     * iff the filename is absolute. (For a Windows filename, it contains a drive letter and a
+     * colon). Ignores double slashes and slashes at the end, removes references to the cwd. E.g.,
+     * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to automatically detect UNIX
+     * or Windows directory delimiters. There is no check whether all other characters are valid for
+     * filenames.
      */
     public static List<String> disectFilename(String filename) {
         final char sep = File.separatorChar;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1) assert sep == '/' : "\"" + filename + "\" contains both / and \\";
-        else if (filename.indexOf("\\") != -1) assert sep == '\\' : "\"" + filename + "\" contains both / and \\";
+        if (filename.indexOf("/") != -1)
+            assert sep == '/' : "\"" + filename + "\" contains both / and \\";
+        else if (filename.indexOf("\\") != -1)
+            assert sep == '\\' : "\"" + filename + "\" contains both / and \\";
         else {
             res.add(filename);
             return res;
@@ -60,25 +61,24 @@ public class Filenames {
     }
 
     /**
-     * Returns a filename relative to another one.
-     * The second parameter needs to be absolute and is expected to refer to directory
-     * This method only operates on Strings, not on real files!
-     * Note that it treats Strings case-sensitive.
-     * The resulting filename always uses UNIX directory delimiters.
-     * Raises a RuntimeException if no relative path could be found
-     * (may happen on Windows systems).
+     * Returns a filename relative to another one. The second parameter needs to be absolute and is
+     * expected to refer to directory This method only operates on Strings, not on real files! Note
+     * that it treats Strings case-sensitive. The resulting filename always uses UNIX directory
+     * delimiters. Raises a RuntimeException if no relative path could be found (may happen on
+     * Windows systems).
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
         final List<String> origFileNameSections = disectFilename(origFilename);
         String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
         final List<String> destinationFilenameSections = disectFilename(toFilename);
-        String[] b = destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
+        String[] b =
+            destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
-        if (File.separatorChar == '\\' &&
-                a[0].length() == 2 && a[0].charAt(1) == ':') {
+        if (File.separatorChar == '\\' && a[0].length() == 2 && a[0].charAt(1) == ':') {
             char drive = Character.toUpperCase(a[0].charAt(0));
-            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive && b[0].charAt(1) == ':'))
+            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive
+                    && b[0].charAt(1) == ':'))
                 throw new RuntimeException("cannot make paths on different drives relative");
             // remove drive letter
             a[0] = "";
@@ -90,7 +90,8 @@ public class Filenames {
 
         if (a[0].equals("")) { // not already relative
             if (!b[0].equals(""))
-                throw new RuntimeException("\"" + toFilename + "\" is a relative path. Please use absolute paths to make others relative to them.");
+                throw new RuntimeException("\"" + toFilename
+                    + "\" is a relative path. Please use absolute paths to make others relative to them.");
 
             // remove ".." from paths
             a = removeDotDot(a);
@@ -102,7 +103,8 @@ public class Filenames {
             boolean diff = false;
             while (i < b.length) {
                 // shared until i
-                if (i >= a.length || !a[i].equals(b[i])) diff = true;
+                if (i >= a.length || !a[i].equals(b[i]))
+                    diff = true;
                 // add ".." for each remaining element in b
                 // and collect the remaining elements of a
                 if (diff) {
@@ -144,18 +146,9 @@ public class Filenames {
     }
 
     public static String toValidFileName(String s) {
-        s = s.replace("\\", "_")
-                .replace("$", "_")
-                .replace("?", "_")
-                .replace("|", "_")
-                .replace("<", "_")
-                .replace(">", "_")
-                .replace(":", "_")
-                .replace("*", "+")
-                .replace("\"", "'")
-                .replace("/", "-")
-                .replace("[", "(")
-                .replace("]", ")");
+        s = s.replace("\\", "_").replace("$", "_").replace("?", "_").replace("|", "_")
+                .replace("<", "_").replace(">", "_").replace(":", "_").replace("*", "+")
+                .replace("\"", "'").replace("/", "-").replace("[", "(").replace("]", ")");
         return s;
     }
 

@@ -4,8 +4,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public interface ComplexRuleJustification extends RuleJustification {
-    
-    public RuleJustification getSpecificJustification(RuleApp app, 
-                                                      TermServices services);
-    
+
+    public RuleJustification getSpecificJustification(RuleApp app, TermServices services);
+
 }

@@ -6,8 +6,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
 /**
- * the "default" implementation for iterator listeners. This class may serve as
- * a base class for derived specialized versions.
+ * the "default" implementation for iterator listeners. This class may serve as a base class for
+ * derived specialized versions.
  *
  * @author RN
  */
@@ -26,11 +26,13 @@ public class ASTIteratorAdapter implements ASTIteratorListener {
         return ENTER_ALL;
     }
 
-    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         return true;
     }
 
-    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         // defaults to nothing
     }
 

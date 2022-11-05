@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
-/** 
- * an extended identifier that accepts hash symbols in its name
- * but not as first character
+/**
+ * an extended identifier that accepts hash symbols in its name but not as first character
  */
 public class ExtendedIdentifier extends recoder.java.Identifier {
     /**
@@ -15,17 +14,15 @@ public class ExtendedIdentifier extends recoder.java.Identifier {
     }
 
     public void setText(String text) {
-        if (text.charAt(0)=='#') {
-            throw new IllegalArgumentException
-                ("No hash symbol allowed as first element in variable" +
-                            "identifiers");
-        } else if (text.charAt(0)=='<') {
-            throw new IllegalArgumentException
-            (text + " is no valid extended identifier.");
+        if (text.charAt(0) == '#') {
+            throw new IllegalArgumentException(
+                "No hash symbol allowed as first element in variable" + "identifiers");
+        } else if (text.charAt(0) == '<') {
+            throw new IllegalArgumentException(text + " is no valid extended identifier.");
         }
-        id=text.intern();
+        id = text.intern();
     }
-    
+
     public ExtendedIdentifier deepClone() {
         return new ExtendedIdentifier(id);
     }

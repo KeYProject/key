@@ -53,8 +53,7 @@ public final class ProgVarReplacer {
 
 
     /**
-     * creates a ProgVarReplacer that replaces program variables as specified
-     * by the map parameter
+     * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
      */
     public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
         this.map = map;
@@ -63,16 +62,12 @@ public final class ProgVarReplacer {
 
 
     /**
-     * merges "next" into "base"
-     * precondition:
-     *   "next" is the result of replacing in "base" the formula at position
-     *   "idx" by calling Semisequent.replace()
-     *   (this implies that "next" contains exactly one removed and one added
-     *   formula)
+     * merges "next" into "base" precondition: "next" is the result of replacing in "base" the
+     * formula at position "idx" by calling Semisequent.replace() (this implies that "next" contains
+     * exactly one removed and one added formula)
      */
-    public static void mergeSemiCIs(SemisequentChangeInfo base,
-                              SemisequentChangeInfo next,
-                              int idx) {
+    public static void mergeSemiCIs(SemisequentChangeInfo base, SemisequentChangeInfo next,
+            int idx) {
         assert next.modifiedFormulas().isEmpty();
 
         Iterator<SequentFormula> remIt = next.removedFormulas().iterator();
@@ -98,7 +93,7 @@ public final class ProgVarReplacer {
 
         for (final IProgramVariable var : vars) {
             IProgramVariable newVar = map.get(var);
-            if(newVar != null) {
+            if (newVar != null) {
                 result = result.remove(var);
                 result = result.add(newVar);
             }
@@ -112,33 +107,29 @@ public final class ProgVarReplacer {
      * replaces in the partially instantiated apps of a taclet index
      */
     public void replace(TacletIndex tacletIndex) {
-	ImmutableList<NoPosTacletApp> noPosTacletApps
-		= tacletIndex.getPartialInstantiatedApps();
-	ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
-	appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
-	appsToBeAdded   = DefaultImmutableSet.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
+        ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
+        appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
+        appsToBeAdded = DefaultImmutableSet.<NoPosTacletApp>nil();
 
-	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    NoPosTacletApp noPosTacletApp = it.next();
-	    SVInstantiations insts = noPosTacletApp.instantiations();
+        Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
+        while (it.hasNext()) {
+            NoPosTacletApp noPosTacletApp = it.next();
+            SVInstantiations insts = noPosTacletApp.instantiations();
 
-	    SVInstantiations newInsts = replace(insts);
+            SVInstantiations newInsts = replace(insts);
 
-	    if(newInsts != insts) {
-	    	NoPosTacletApp newNoPosTacletApp
-		 	= NoPosTacletApp.createNoPosTacletApp(
-				noPosTacletApp.taclet(),
-		    		newInsts,
-				noPosTacletApp.ifFormulaInstantiations(),
-				services);
-		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
-		appsToBeAdded   = appsToBeAdded.add(newNoPosTacletApp);
-	    }
-	}
+            if (newInsts != insts) {
+                NoPosTacletApp newNoPosTacletApp =
+                    NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
+                        noPosTacletApp.ifFormulaInstantiations(), services);
+                appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
+                appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
+            }
+        }
 
-	tacletIndex.removeTaclets(appsToBeRemoved);
-	tacletIndex.addTaclets(appsToBeAdded);
+        tacletIndex.removeTaclets(appsToBeRemoved);
+        tacletIndex.addTaclets(appsToBeAdded);
     }
 
 
@@ -146,66 +137,63 @@ public final class ProgVarReplacer {
      * replaces in an SVInstantiations
      */
     public SVInstantiations replace(SVInstantiations insts) {
-   	SVInstantiations result = insts;
+        SVInstantiations result = insts;
 
-    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
-	it = insts.pairIterator();
-	while(it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
-	    SchemaVariable sv     = e.key();
-	    InstantiationEntry<?> ie = e.value();
-	    Object inst = ie.getInstantiation();
+        Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it;
+        it = insts.pairIterator();
+        while (it.hasNext()) {
+            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            SchemaVariable sv = e.key();
+            InstantiationEntry<?> ie = e.value();
+            Object inst = ie.getInstantiation();
 
-	    if(ie instanceof ContextInstantiationEntry) {
-		ProgramElement pe = (ProgramElement) inst;
-		ProgramElement newPe = replace(pe);
-		if(newPe != pe) {
-		    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
-		    result = result.replace(cie.prefix(),
-					    cie.suffix(),
-					    cie.activeStatementContext(),
-					    newPe,
-					    services);
-		}
-	    } else if(ie instanceof OperatorInstantiation) {
-	    	/*nothing to be done (currently)*/
-	    } else if(ie instanceof ProgramInstantiation) {
-		ProgramElement pe = (ProgramElement) inst;
-		ProgramElement newPe = replace(pe);
-		if(newPe != pe) {
-		    result = result.replace(sv, newPe, services);
-		}
-	    } else if(ie instanceof ProgramListInstantiation) {
-		@SuppressWarnings("unchecked")
-        ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
-		int size = a.size();
+            if (ie instanceof ContextInstantiationEntry) {
+                ProgramElement pe = (ProgramElement) inst;
+                ProgramElement newPe = replace(pe);
+                if (newPe != pe) {
+                    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
+                    result = result.replace(cie.prefix(), cie.suffix(),
+                        cie.activeStatementContext(), newPe, services);
+                }
+            } else if (ie instanceof OperatorInstantiation) {
+                /* nothing to be done (currently) */
+            } else if (ie instanceof ProgramInstantiation) {
+                ProgramElement pe = (ProgramElement) inst;
+                ProgramElement newPe = replace(pe);
+                if (newPe != pe) {
+                    result = result.replace(sv, newPe, services);
+                }
+            } else if (ie instanceof ProgramListInstantiation) {
+                @SuppressWarnings("unchecked")
+                ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
+                int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 
-		boolean changedSomething = false;
-		for(int i = 0; i < size; i++) {
+                boolean changedSomething = false;
+                for (int i = 0; i < size; i++) {
                     ProgramElement pe = a.get(i);
-		    array[i] = replace(pe);
-		    if(array[i] != pe) {
-		    	changedSomething = true;
-		    }
-		}
+                    array[i] = replace(pe);
+                    if (array[i] != pe) {
+                        changedSomething = true;
+                    }
+                }
 
-		if(changedSomething) {
-		    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
-		    result = result.replace(sv, newA, services);
-		}
-	    } else if(ie instanceof TermInstantiation) {
-		Term t = (Term) inst;
-		Term newT = replace(t);
-		if(newT != t) {
-		    result = result.replace(sv, newT, services);
-		}
-	    } else {
-		assert false : "unexpected subtype of InstantiationEntry<?>";
-	    }
-	}
+                if (changedSomething) {
+                    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
+                    result = result.replace(sv, newA, services);
+                }
+            } else if (ie instanceof TermInstantiation) {
+                Term t = (Term) inst;
+                Term newT = replace(t);
+                if (newT != t) {
+                    result = result.replace(sv, newT, services);
+                }
+            } else {
+                assert false : "unexpected subtype of InstantiationEntry<?>";
+            }
+        }
 
-	return result;
+        return result;
     }
 
 
@@ -217,13 +205,12 @@ public final class ProgVarReplacer {
         SemisequentChangeInfo succCI = replace(s.succedent());
 
         Semisequent newAntecedent = anteCI.semisequent();
-        Semisequent newSuccedent  = succCI.semisequent();
+        Semisequent newSuccedent = succCI.semisequent();
 
-        Sequent newSequent = Sequent.createSequent(newAntecedent,
-                                                   newSuccedent);
+        Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
-        SequentChangeInfo result = SequentChangeInfo.createSequentChangeInfo
-                                              (anteCI, succCI, newSequent, s);
+        SequentChangeInfo result =
+            SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }
 
@@ -232,7 +219,7 @@ public final class ProgVarReplacer {
      * replaces in a semisequent
      */
     public SemisequentChangeInfo replace(Semisequent s) {
-    	  SemisequentChangeInfo result = new SemisequentChangeInfo();
+        SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.asList());
 
         final Iterator<SequentFormula> it = s.iterator();
@@ -241,7 +228,7 @@ public final class ProgVarReplacer {
             final SequentFormula oldcf = it.next();
             final SequentFormula newcf = replace(oldcf);
 
-            if(newcf != oldcf) {
+            if (newcf != oldcf) {
                 result.combine(result.semisequent().replace(formulaNumber, newcf));
             }
         }
@@ -256,11 +243,11 @@ public final class ProgVarReplacer {
     public SequentFormula replace(SequentFormula cf) {
         SequentFormula result = cf;
 
-	final Term newFormula = replace(cf.formula());
+        final Term newFormula = replace(cf.formula());
 
-	if(newFormula != cf.formula()) {
+        if (newFormula != cf.formula()) {
             result = new SequentFormula(newFormula);
-	}
+        }
         return result;
     }
 
@@ -269,7 +256,7 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return services.getTermFactory().createTerm((ProgramVariable)o, t.getLabels());
+            return services.getTermFactory().createTerm((ProgramVariable) o, t.getLabels());
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -284,10 +271,10 @@ public final class ProgVarReplacer {
 
         boolean changedSubTerm = false;
 
-        for(int i = 0, ar = t.arity(); i < ar; i++) {
+        for (int i = 0, ar = t.arity(); i < ar; i++) {
             final Term subTerm = t.sub(i);
             newSubTerms[i] = replace(subTerm);
-            if(newSubTerms[i] != subTerm) {
+            if (newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
         }
@@ -295,18 +282,16 @@ public final class ProgVarReplacer {
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
         if (!jb.isEmpty()) {
-            Statement s = (Statement)jb.program();
-            Statement newS = (Statement)replace(s);
-            if(newS != s) {
-                newJb = JavaBlock.createJavaBlock((StatementBlock)newS);
+            Statement s = (Statement) jb.program();
+            Statement newS = (Statement) replace(s);
+            if (newS != s) {
+                newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
             }
         }
 
         if (changedSubTerm || newJb != jb) {
-            result = services.getTermFactory().createTerm(t.op(),
-                    newSubTerms,
-                    t.boundVars(),
-                    newJb, t.getLabels());
+            result = services.getTermFactory().createTerm(t.op(), newSubTerms, t.boundVars(), newJb,
+                t.getLabels());
         }
         return result;
     }
@@ -329,11 +314,8 @@ public final class ProgVarReplacer {
      * replaces in a statement
      */
     public ProgramElement replace(ProgramElement pe) {
-        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe,
-                                                               map,
-                                                               false,
-                                                               services);
-	pvrv.start();
-	return pvrv.result();
+        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, map, false, services);
+        pvrv.start();
+        return pvrv.result();
     }
 }

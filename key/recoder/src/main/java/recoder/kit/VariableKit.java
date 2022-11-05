@@ -44,16 +44,17 @@ public class VariableKit {
     }
 
     /**
-     * creates a new variable name which does not exist within the given scope
-     * using the given <tt>guess</tt> as a name base.
+     * creates a new variable name which does not exist within the given scope using the given
+     * <tt>guess</tt> as a name base.
      *
-     * @param si      the source information service to be used
+     * @param si the source information service to be used
      * @param context the element that defines the scope
-     * @param guess   the variable name to be used if possible. If a variable with
-     *                that name already exists, the method uses suffix numbers.
+     * @param guess the variable name to be used if possible. If a variable with that name already
+     *        exists, the method uses suffix numbers.
      * @return a valid variable name within the given scope.
      */
-    public static String createValidVariableName(SourceInfo si, ProgramElement context, String guess) {
+    public static String createValidVariableName(SourceInfo si, ProgramElement context,
+            String guess) {
         Debug.assertNonnull(si, context, guess);
         String result = guess;
         int i = 0;
@@ -67,7 +68,7 @@ public class VariableKit {
     /**
      * creates a new variable name which does not exist within the given scope.
      *
-     * @param si      the source information service to be used
+     * @param si the source information service to be used
      * @param context the element that defines the scope
      * @return a valid variable name within the given scope.
      */
@@ -76,19 +77,19 @@ public class VariableKit {
     }
 
     /**
-     * Creates a declaration for a new variable with the given type and a name
-     * similar to the given guess.
+     * Creates a declaration for a new variable with the given type and a name similar to the given
+     * guess.
      *
-     * @param sc    the service configuration to be used
-     * @param sde   the element that defines the scope
-     * @param guess the variable name to be used if possible. If a variable with
-     *              that name already exists, the method uses suffix numbers.
-     * @param t     the type of the variable to be declared.
+     * @param sc the service configuration to be used
+     * @param sde the element that defines the scope
+     * @param guess the variable name to be used if possible. If a variable with that name already
+     *        exists, the method uses suffix numbers.
+     * @param t the type of the variable to be declared.
      * @return a valid variable name within the given scope.
      * @deprecated use createNewVariableName instead
      */
-    public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc, ProgramElement context,
-                                                                Type t, String guess) {
+    public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc,
+            ProgramElement context, Type t, String guess) {
         Debug.assertNonnull(sc, context, t);
         String vname = createValidVariableName(sc.getSourceInfo(), context, guess);
 
@@ -99,15 +100,15 @@ public class VariableKit {
     }
 
     /**
-     * Creates a new local variable declaration with the given type and a new
-     * artificial name.
+     * Creates a new local variable declaration with the given type and a new artificial name.
      *
-     * @param sc      the service configuration to be used.
+     * @param sc the service configuration to be used.
      * @param context the element that defines the scope.
-     * @param t       the type of the variable to be declared.
+     * @param t the type of the variable to be declared.
      * @return a valid variable name within the given scope.
      */
-    public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc, ProgramElement context, Type t) {
+    public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc,
+            ProgramElement context, Type t) {
         Debug.assertNonnull(sc, context, t);
         String varName = getNewVariableName(sc.getSourceInfo(), t, context);
         ProgramFactory f = sc.getProgramFactory();
@@ -117,13 +118,12 @@ public class VariableKit {
     }
 
     /**
-     * Create a reference to the first variable in a variable declaration. If
-     * there are multiple declarations (as in "int i = 0, j = 0;"), only the
-     * first one is used. This is no problem with e.g. ParameterDeclarations.
+     * Create a reference to the first variable in a variable declaration. If there are multiple
+     * declarations (as in "int i = 0, j = 0;"), only the first one is used. This is no problem with
+     * e.g. ParameterDeclarations.
      *
      * @param decl the declaration to create a reference for.
-     * @return a new variable reference to the first specification in the given
-     * declaration.
+     * @return a new variable reference to the first specification in the given declaration.
      */
     public static VariableReference createVariableReference(VariableDeclaration decl) {
 
@@ -153,8 +153,8 @@ public class VariableKit {
     /**
      * Query method that finds a name for a new variable with the given type.
      *
-     * @param si      the source info service.
-     * @param type    the type of the variable to be declared.
+     * @param si the source info service.
+     * @param type the type of the variable to be declared.
      * @param context the future context of the variable (defines its scope).
      * @return a variable name that is valid in the given context.
      */
@@ -163,8 +163,8 @@ public class VariableKit {
         NameGenerator generator = new NameGenerator(type);
         Set vars = collectInnerVariables(context);
         String result;
-        for (result = generator.getNextCandidate(); si.getVariable(result, context) != null || vars.contains(result); result = generator
-                .getNextCandidate()) {
+        for (result = generator.getNextCandidate(); si.getVariable(result, context) != null
+                || vars.contains(result); result = generator.getNextCandidate()) {
             // logic contained in loop control
         }
         return result;
@@ -173,13 +173,13 @@ public class VariableKit {
     /**
      * Query method that finds names for new variables with the given types.
      *
-     * @param si      the source info service.
-     * @param types   the types of the variables to be declared.
+     * @param si the source info service.
+     * @param types the types of the variables to be declared.
      * @param context the future context of the variables.
-     * @return an array of disjoint variable names that are all valid in the
-     * given context.
+     * @return an array of disjoint variable names that are all valid in the given context.
      */
-    public static String[] getNewVariableNames(SourceInfo si, Type[] types, ProgramElement context) {
+    public static String[] getNewVariableNames(SourceInfo si, Type[] types,
+            ProgramElement context) {
         Debug.assertNonnull(si, types, context);
         // speed up things a little bit
         while (!(context instanceof VariableScope)) {
@@ -200,21 +200,21 @@ public class VariableKit {
     }
 
     /**
-     * Transformation that renames a variable and all known references to it.
-     * The new name should not hide another variable.
+     * Transformation that renames a variable and all known references to it. The new name should
+     * not hide another variable.
      *
-     * @param ch      the change history (may be <CODE>null</CODE>).
-     * @param xr      the cross referencer service.
-     * @param var     the variable specification to be renamed; may not be <CODE>
+     * @param ch the change history (may be <CODE>null</CODE>).
+     * @param xr the cross referencer service.
+     * @param var the variable specification to be renamed; may not be <CODE>
      *                null</CODE>.
-     * @param newName the new name for the variable; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     * @param newName the new name for the variable; may not be <CODE>null</CODE> and must denote a
+     *        valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenameVariable
      */
-    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, VariableSpecification var,
-                                 String newName) {
+    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr,
+            VariableSpecification var, String newName) {
         Debug.assertNonnull(xr, var, newName);
         Debug.assertNonnull(var.getName());
         if (!newName.equals(var.getName())) {
@@ -229,17 +229,17 @@ public class VariableKit {
     }
 
     /**
-     * Factory method that creates a minimal qualified reference to the given
-     * variable (or field) for the given context. Returns <CODE>null</CODE> if
-     * the variable is not accessible in the given context, i.e. from a
-     * different type, or hidden by another local variable, or hidden by another
-     * inherited field.
+     * Factory method that creates a minimal qualified reference to the given variable (or field)
+     * for the given context. Returns <CODE>null</CODE> if the variable is not accessible in the
+     * given context, i.e. from a different type, or hidden by another local variable, or hidden by
+     * another inherited field.
      *
-     * @param si      the source info service to be used.
-     * @param v       the variable to be referred to.
+     * @param si the source info service to be used.
+     * @param v the variable to be referred to.
      * @param context the context to insert the variable reference later on.
      */
-    public static VariableReference createVariableReference(SourceInfo si, Variable v, ProgramElement context) {
+    public static VariableReference createVariableReference(SourceInfo si, Variable v,
+            ProgramElement context) {
         Debug.assertNonnull(si, v, context);
         String varname = v.getName();
         ProgramFactory f = context.getFactory();
@@ -272,8 +272,7 @@ public class VariableKit {
             // we will have to do it manually as getAllFields does not
             // report hidden fields
             List<ClassType> sups = ctxClass.getAllSupertypes();
-            both:
-            for (int i = 1, s = sups.size(); i < s; i += 1) {
+            both: for (int i = 1, s = sups.size(); i < s; i += 1) {
                 ClassType sup = sups.get(i);
                 List<? extends Field> flist = sup.getFields();
                 for (int j = 0, t = flist.size(); j < t; j += 1) {
@@ -281,7 +280,8 @@ public class VariableKit {
                     if (varname.equals(candid.getName())) {
                         if (candid == v && si.isVisibleFor(candid, ctxClass)) {
                             // access by "super.", then
-                            FieldReference res = f.createFieldReference(f.createIdentifier(varname));
+                            FieldReference res =
+                                f.createFieldReference(f.createIdentifier(varname));
                             res.setReferencePrefix(f.createSuperReference(prefix));
                             res.makeAllParentRolesValid();
                             return res;
@@ -304,25 +304,24 @@ public class VariableKit {
     }
 
     /**
-     * Query that retrieves all references to a given variable that are
-     * contained within the given tree. The specified flag defines the strategy
-     * to use: either the cross reference information is filtered, or the cross
-     * reference information is collected from the tree. The filtering mode is
-     * faster if the tree contains more nodes than there are global references
-     * to the given variable.
+     * Query that retrieves all references to a given variable that are contained within the given
+     * tree. The specified flag defines the strategy to use: either the cross reference information
+     * is filtered, or the cross reference information is collected from the tree. The filtering
+     * mode is faster if the tree contains more nodes than there are global references to the given
+     * variable.
      *
-     * @param xr       the cross referencer to use.
-     * @param v        a variable.
-     * @param root     the root of an arbitrary syntax tree.
-     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>,
-     *                 local cross reference information is build, otherwise the
-     *                 global cross reference information is filtered.
-     * @return the list of references to the given variable in the given tree,
-     * can be empty but not <CODE>null</CODE>.
+     * @param xr the cross referencer to use.
+     * @param v a variable.
+     * @param root the root of an arbitrary syntax tree.
+     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>, local cross
+     *        reference information is build, otherwise the global cross reference information is
+     *        filtered.
+     * @return the list of references to the given variable in the given tree, can be empty but not
+     *         <CODE>null</CODE>.
      * @since 0.63
      */
     public static List<VariableReference> getReferences(CrossReferenceSourceInfo xr, Variable v,
-                                                        NonTerminalProgramElement root, boolean scanTree) {
+            NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, v, root);
         List<VariableReference> result = new ArrayList<VariableReference>();
         if (scanTree) {
@@ -350,13 +349,13 @@ public class VariableKit {
      * serialVersionUID</CODE> constant.
      *
      * @param ni the NameInfo service to use.
-     * @param f  the field to check.
-     * @return <CODE>true</CODE> if the given field is a serial version UID of
-     * a type, <CODE>false</CODE> otherwise.
+     * @param f the field to check.
+     * @return <CODE>true</CODE> if the given field is a serial version UID of a type,
+     *         <CODE>false</CODE> otherwise.
      */
     public static boolean isSerialVersionUID(NameInfo ni, Field f) {
-        return (f.isStatic() && f.isFinal() && f.getType() == ni.getLongType() && f.getName()
-                .equals("serialVersionUID"));
+        return (f.isStatic() && f.isFinal() && f.getType() == ni.getLongType()
+                && f.getName().equals("serialVersionUID"));
     }
 
 }

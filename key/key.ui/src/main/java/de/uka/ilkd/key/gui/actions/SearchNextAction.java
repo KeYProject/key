@@ -6,8 +6,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import java.awt.event.ActionEvent;
 
 /*
- * Menu option for showing the next search result of sequent search
- * Keyboard shortcut: F3. This shortcut is set in the KeyStrokemanager
+ * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
+ * shortcut is set in the KeyStrokemanager
  */
 public class SearchNextAction extends MainWindowAction {
 

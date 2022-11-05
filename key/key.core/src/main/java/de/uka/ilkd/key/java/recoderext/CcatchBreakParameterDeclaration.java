@@ -7,8 +7,7 @@ import recoder.java.SourceVisitor;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchBreakParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchBreakParameterDeclaration extends CcatchNonstandardParameterDeclaration {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -35,8 +34,7 @@ public class CcatchBreakParameterDeclaration
     @Override
     public void accept(SourceVisitor v) {
         if (v instanceof SourceVisitorExtended) {
-            ((SourceVisitorExtended) v)
-                    .visitCcatchBreakParameterDeclaration(this);
+            ((SourceVisitorExtended) v).visitCcatchBreakParameterDeclaration(this);
         } else {
             // throw new IllegalStateException(
             // "Method 'accept' not implemented in Ccatch");

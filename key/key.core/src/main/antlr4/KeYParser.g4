@@ -693,8 +693,18 @@ option
 option_list
 :
   LPAREN
-    option (COMMA option)*
+    ( (option (COMMA option)*)
+      | option_expr)
   RPAREN
+;
+
+option_expr
+:
+    option_expr AND option_expr #option_expr_and
+  | option_expr OR option_expr  #option_expr_or
+  | NOT option_expr             #option_expr_not
+  | LPAREN option_expr RPAREN   #option_expr_paren
+  | option                      #option_expr_prop
 ;
 
 goalspec

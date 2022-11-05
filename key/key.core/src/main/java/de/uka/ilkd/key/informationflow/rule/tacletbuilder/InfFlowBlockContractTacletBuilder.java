@@ -48,21 +48,17 @@ public final class InfFlowBlockContractTacletBuilder
     }
 
     @Override
-    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
-                               Services services) {
-        BasicPOSnippetFactory fAssumes =
-                POSnippetFactory.getBasicFactory(blockContract, schemaDataAssumes,
-                                                 executionContext, services);
+    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
+        BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(blockContract,
+            schemaDataAssumes, executionContext, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
 
     @Override
-    Term generateSchemaFind(ProofObligationVars schemaDataFind,
-                            Services services) {
-        BasicPOSnippetFactory fFind =
-                POSnippetFactory.getBasicFactory(blockContract, schemaDataFind,
-                                                 executionContext, services);
+    Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
+        BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(blockContract,
+            schemaDataFind, executionContext, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -70,29 +66,23 @@ public final class InfFlowBlockContractTacletBuilder
     @Override
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
-                POSnippetFactory.getBasicFactory(blockContract, appData,
-                                                 executionContext, services);
+            POSnippetFactory.getBasicFactory(blockContract, appData, executionContext, services);
         return f.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
 
     @Override
     Term buildContractApplications(ProofObligationVars contAppData,
-                                   ProofObligationVars contAppData2,
-                                   Services services) {
+            ProofObligationVars contAppData2, Services services) {
         ImmutableSet<BlockContract> ifContracts =
-                services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
+            services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (BlockContract cont : ifContracts) {
-            InfFlowPOSnippetFactory f =
-                    POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                                                       contAppData2,
-                                                       executionContext,
-                                                       services);
-            contractsApplications =
-                    contractsApplications.append(
-                    f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
+            InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(cont, contAppData,
+                contAppData2, executionContext, services);
+            contractsApplications = contractsApplications
+                    .append(f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
 
         return and(contractsApplications);
@@ -102,10 +92,10 @@ public final class InfFlowBlockContractTacletBuilder
     ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract cont : ifContracts) {
-            if ((cont.getBlock().getStartPosition().getLine() ==
-                    blockContract.getBlock().getStartPosition().getLine()) &&
-                    cont.getTarget().getUniqueName()
-                    .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
+            if ((cont.getBlock().getStartPosition().getLine() == blockContract.getBlock()
+                    .getStartPosition().getLine())
+                    && cont.getTarget().getUniqueName()
+                            .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
                 result = result.add(cont);
             }
         }

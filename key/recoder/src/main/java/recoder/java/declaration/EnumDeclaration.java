@@ -44,7 +44,7 @@ public class EnumDeclaration extends TypeDeclaration {
      * @param members
      */
     public EnumDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,
-                           Implements implementing, ASTList<MemberDeclaration> members) {
+            Implements implementing, ASTList<MemberDeclaration> members) {
         super(declSpecs, name);
         setMembers(members);
         this.implementing = implementing;
@@ -108,10 +108,14 @@ public class EnumDeclaration extends TypeDeclaration {
 
     public int getChildCount() {
         int res = 0;
-        if (declarationSpecifiers != null) res += declarationSpecifiers.size();
-        if (name != null) res++;
-        if (implementing != null) res++;
-        if (members != null) res += members.size();
+        if (declarationSpecifiers != null)
+            res += declarationSpecifiers.size();
+        if (name != null)
+            res++;
+        if (implementing != null)
+            res++;
+        if (members != null)
+            res += members.size();
         return res;
     }
 
@@ -135,7 +139,8 @@ public class EnumDeclaration extends TypeDeclaration {
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) throw new NullPointerException();
+        if (p == null)
+            throw new NullPointerException();
         if (name == p) {
             name = (Identifier) q;
             if (name != null)
@@ -199,7 +204,8 @@ public class EnumDeclaration extends TypeDeclaration {
         for (int i = 0; i < members.size(); i++) {
             MemberDeclaration m = members.get(i);
             if (m instanceof EnumConstantDeclaration) {
-                if (((EnumConstantDeclaration) m).getEnumConstantSpecification().getConstructorReference().getClassDeclaration() != null) {
+                if (((EnumConstantDeclaration) m).getEnumConstantSpecification()
+                        .getConstructorReference().getClassDeclaration() != null) {
                     res = false;
                     break;
                 }
@@ -223,12 +229,16 @@ public class EnumDeclaration extends TypeDeclaration {
     @Override
     public void validate() throws ModelException {
         if (containsModifier(Abstract.class))
-            throw new IllegalModifierException("Illegal abstract modifier in EnumDeclaration " + getFullName());
+            throw new IllegalModifierException(
+                "Illegal abstract modifier in EnumDeclaration " + getFullName());
         if (containsModifier(Final.class))
-            throw new IllegalModifierException("Illegal final modifier in EnumDeclaration " + getFullName());
+            throw new IllegalModifierException(
+                "Illegal final modifier in EnumDeclaration " + getFullName());
         // TODO this appears wrong, check again:
-        //if (getASTParent() instanceof TypeDeclaration && !((TypeDeclaration)getASTParent()).isStatic())
-        //	throw new ModelException("enum " + getFullName() + " may not be member type of a (non-static) inner class");
+        // if (getASTParent() instanceof TypeDeclaration &&
+        // !((TypeDeclaration)getASTParent()).isStatic())
+        // throw new ModelException("enum " + getFullName() + " may not be member type of a
+        // (non-static) inner class");
         // TODO: local ? => error
 
     }
@@ -239,8 +249,7 @@ public class EnumDeclaration extends TypeDeclaration {
     }
 
     /**
-     * returns an unmodifiable list containing the enum constants.
-     * never returns <code>null</code>.
+     * returns an unmodifiable list containing the enum constants. never returns <code>null</code>.
      *
      * @return the enum constants
      */
@@ -257,8 +266,8 @@ public class EnumDeclaration extends TypeDeclaration {
     }
 
     /**
-     * returns an unmodifiable list of all members excluding the constants
-     * Never returns <code>null</code>.
+     * returns an unmodifiable list of all members excluding the constants Never returns
+     * <code>null</code>.
      *
      * @return a list of the members excluding constants
      */

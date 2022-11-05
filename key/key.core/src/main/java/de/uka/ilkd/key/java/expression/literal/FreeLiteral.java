@@ -9,7 +9,7 @@ import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.logic.Name;
 
 public class FreeLiteral extends Literal {
-    
+
     public final static FreeLiteral INSTANCE = new FreeLiteral();
 
     @Override

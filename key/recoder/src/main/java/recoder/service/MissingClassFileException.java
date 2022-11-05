@@ -5,8 +5,8 @@ package recoder.service;
 import recoder.ModelException;
 
 /**
- * Exception indicating that a vital class file is missing, usually a super type
- * of a known class file.
+ * Exception indicating that a vital class file is missing, usually a super type of a known class
+ * file.
  *
  * @author AL
  * @since 0.72
@@ -31,7 +31,7 @@ public class MissingClassFileException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s    an explanation.
+     * @param s an explanation.
      * @param name the name of the missing file.
      */
     public MissingClassFileException(String s, String name) {

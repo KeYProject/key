@@ -40,8 +40,8 @@ public class ProofMacroApi {
     }
 
     /**
-     * Searches for the proof script command in the registered commands by its name.
-     * If no command is found, null is returned.
+     * Searches for the proof script command in the registered commands by its name. If no command
+     * is found, null is returned.
      *
      * @param name the non-null name of the search proof script command
      * @return the proof script command or null

@@ -117,14 +117,12 @@ public final class JmlAssertRule implements BuiltInRule {
             target = UpdateApplication.getTarget(formula);
         }
 
-        final JmlAssert jmlAssert = Optional
-                .ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
-                .filter(JmlAssert.class::isInstance)
-                .map(JmlAssert.class::cast)
-                .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
+        final JmlAssert jmlAssert =
+            Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
+                    .filter(JmlAssert.class::isInstance).map(JmlAssert.class::cast)
+                    .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(),
-                services);
+        final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final Term self = MiscTools.getSelfTerm(frame, services);
 
         final Term condition = jmlAssert.getCond(self, services);
@@ -137,28 +135,25 @@ public final class JmlAssertRule implements BuiltInRule {
             result = goal.split(1);
         } else {
             throw new RuleAbortException(
-                    String.format("Unknown assertion type %s", jmlAssert.getKind()));
+                String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
         setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
 
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence,
-                                   Term update, Term condition, TermBuilder tb) {
+    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
+            Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
-                                Term update, Term target, Term condition,
-                                TermBuilder tb, Services services) {
+    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
+            Term condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final Term newTerm = tb.apply(update,
-                                      tb.imp(condition,
-                                             tb.prog((Modality) target.op(),
-                                                     javaBlock, target.sub(0), null)));
+            tb.imp(condition, tb.prog((Modality) target.op(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
     }

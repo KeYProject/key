@@ -15,11 +15,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Variable specification that defines a variable name. This is a part of a
- * {@link recoder.java.declaration.VariableDeclaration} and does not
- * contain a type reference or own modifiers. Note that calls to modifiers
- * are delegated to the enclosing variable declaration and are therefore
- * discouraged. This was necessary to subtype Declaration as analyses are
- * interested in the exact location of a variable name.
+ * {@link recoder.java.declaration.VariableDeclaration} and does not contain a type reference or own
+ * modifiers. Note that calls to modifiers are delegated to the enclosing variable declaration and
+ * are therefore discouraged. This was necessary to subtype Declaration as analyses are interested
+ * in the exact location of a variable name.
  *
  * @author AL
  */
@@ -58,18 +57,16 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
 
-    public VariableSpecification(IProgramVariable var, Expression init,
-                                 Type type) {
+    public VariableSpecification(IProgramVariable var, Expression init, Type type) {
         this(var, 0, init, type, null);
     }
 
-    public VariableSpecification(IProgramVariable var, int dim,
-                                 Expression init, Type type) {
+    public VariableSpecification(IProgramVariable var, int dim, Expression init, Type type) {
         this(var, dim, init, type, PositionInfo.UNDEFINED);
     }
 
-    public VariableSpecification(IProgramVariable var, int dim,
-                                 Expression init, Type type, PositionInfo pi) {
+    public VariableSpecification(IProgramVariable var, int dim, Expression init, Type type,
+            PositionInfo pi) {
         super(pi);
         this.var = var;
         this.initializer = init;
@@ -81,14 +78,11 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of RECODER ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
-     *                 May contain:
-     *                 an Expression (as initializer of the variable)
-     *                 a Comment
-     * @param dim      the dimension of this type
+     * @param children the children of this AST element as KeY classes. May contain: an Expression
+     *        (as initializer of the variable) a Comment
+     * @param dim the dimension of this type
      */
-    public VariableSpecification(ExtList children, IProgramVariable var,
-                                 int dim, Type type) {
+    public VariableSpecification(ExtList children, IProgramVariable var, int dim, Type type) {
         super(children);
         this.var = var;
         initializer = children.get(Expression.class);
@@ -104,23 +98,24 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null) result++;
-        if (initializer != null) result++;
+        if (var != null)
+            result++;
+        if (initializer != null)
+            result++;
         return result;
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual"
-     * child array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                                        of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
-            if (index == 0) return var;
+            if (index == 0)
+                return var;
             index--;
         }
         if (initializer != null && index == 0) {
@@ -131,7 +126,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     @Override
     protected int computeHashCode() {
-        return 37 * super.computeHashCode() + 31 * ((type == null) ? 0 : type.hashCode()) + dimensions;
+        return 37 * super.computeHashCode() + 31 * ((type == null) ? 0 : type.hashCode())
+                + dimensions;
     }
 
     /**
@@ -145,13 +141,14 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     /*
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the expression at the specified index in this node's "virtual" expression array.
+     *
+     * @param index an index for an expression.
+     *
+     * @return the expression with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     */
     public Expression getExpressionAt(int index) {
         if (initializer != null && index == 0) {
             return initializer;
@@ -177,7 +174,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         if (var.name() instanceof ProgramElementName) {
             return (ProgramElementName) var.name();
         } else {
-            return new ProgramElementName(var.name().toString()); //only with SVs
+            return new ProgramElementName(var.name().toString()); // only with SVs
         }
     }
 
@@ -244,8 +241,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     /**
-     * calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
      *
      * @param v the Visitor
      */
@@ -259,9 +256,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     /**
-     * equals modulo renaming is described in the corresponding
-     * comment in class SourceElement. The variables declared in the
-     * local variable declaration have to be added to the
+     * equals modulo renaming is described in the corresponding comment in class SourceElement. The
+     * variables declared in the local variable declaration have to be added to the
      * NameAbstractionTable.
      */
     @Override
@@ -287,8 +283,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
             return false;
         }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming
-                    (vs.getChildAt(i), nat)) {
+            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
                 return false;
             }
         }
@@ -300,8 +295,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            LOGGER.debug("Program match. Variables have different dimension " +
-                    "(template {}, source {})", this, pe);
+            LOGGER.debug(
+                "Program match. Variables have different dimension " + "(template {}, source {})",
+                this, pe);
             return null;
         }
         return matchCond;

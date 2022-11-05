@@ -35,18 +35,17 @@ import recoder.util.StringUtils;
 public class ProofJavaProgramFactory extends JavaProgramFactory {
 
     /**
-     Protected constructor - use {@link #getInstance} instead.
+     * Protected constructor - use {@link #getInstance} instead.
      */
     protected ProofJavaProgramFactory() {}
 
     /**
-     The singleton instance of the program factory.
+     * The singleton instance of the program factory.
      */
-    private static ProofJavaProgramFactory theFactory
-	= new ProofJavaProgramFactory();
+    private static ProofJavaProgramFactory theFactory = new ProofJavaProgramFactory();
 
     /**
-     Returns the single instance of this class.
+     * Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
         return theFactory;
@@ -55,22 +54,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     @Override
     public void initialize(ServiceConfiguration cfg) {
 
-      super.initialize(cfg);
-      ProjectSettings settings = cfg.getProjectSettings();
-      /*// that is the original recoder code:
-      ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
-              PropertyNames.JDK1_4)));
-      ProofJavaParser.setJava5(ALLOW_JAVA5);
-      */
-      ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
-              PropertyNames.JAVA_5)));
-      ProofJavaParser.setAwareOfAssert(true);
+        super.initialize(cfg);
+        ProjectSettings settings = cfg.getProjectSettings();
+        /*
+         * // that is the original recoder code:
+         * ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties(
+         * ).getProperty( PropertyNames.JDK1_4))); ProofJavaParser.setJava5(ALLOW_JAVA5);
+         */
+        ProofJavaParser.setJava5(StringUtils
+                .parseBooleanProperty(settings.getProperties().getProperty(PropertyNames.JAVA_5)));
+        ProofJavaParser.setAwareOfAssert(true);
 
-  }
+    }
 
 
     /**
-     For internal reuse and synchronization.
+     * For internal reuse and synchronization.
      */
     private static final ProofJavaParser parser = new ProofJavaParser(System.in);
 
@@ -84,14 +83,15 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
             if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++) {}
+                for (; ppe.getChildAt(i) != dest; i++) {
+                }
             }
             if (i == 0) { // before syntactical parent
-		c.setPrefixed(true);
+                c.setPrefixed(true);
             } else {
                 dest = ppe.getChildAt(i - 1);
                 while (dest instanceof NonTerminalProgramElement) {
-                    ppe = (NonTerminalProgramElement)dest;
+                    ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
                     if (i == 0) {
                         break;
@@ -115,10 +115,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
     // appends all comments with pos < endPos to the end of the last a block
-    private static int appendComments(ProgramElement last,
-                                      List<Comment> comments,
-                                      int commentIndex,
-                                      Position endPos) {
+    private static int appendComments(ProgramElement last, List<Comment> comments, int commentIndex,
+            Position endPos) {
         int commentCount = comments.size();
 
         while (commentIndex < commentCount) {
@@ -129,12 +127,12 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 return commentIndex;
             }
 
-            if ( ! current.getText().contains("@")) {
+            if (!current.getText().contains("@")) {
                 // "pure" comment without @ (we only need JML annotations)
                 // place it somewhere, doesn't matter
                 current.setPrefixed(true);
                 attachComment(current, last);
-                commentIndex +=1;
+                commentIndex += 1;
                 continue;
             }
 
@@ -198,14 +196,13 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement)pe).makeParentRoleValid();
+                ((NonTerminalProgramElement) pe).makeParentRoleValid();
             }
         }
     }
 
     /**
-       Perform post work on the created element. Creates parent links
-       and assigns comments.
+     * Perform post work on the created element. Creates parent links and assigns comments.
      */
     private static void postWork(ProgramElement programElem) {
         makeParentRolesValid(programElem);
@@ -280,182 +277,184 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
-     Parse a {@link CompilationUnit} from the given reader.
+     * Parse a {@link CompilationUnit} from the given reader.
      */
     @Override
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try {
-		ProofJavaParser.initialize(in);
-		CompilationUnit res = ProofJavaParser.CompilationUnit();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                CompilationUnit res = ProofJavaParser.CompilationUnit();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
         }
     }
 
     /**
-     Parse a {@link TypeDeclaration} from the given reader.
+     * Parse a {@link TypeDeclaration} from the given reader.
      */
     @Override
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		TypeDeclaration res = ProofJavaParser.TypeDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                TypeDeclaration res = ProofJavaParser.TypeDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link FieldDeclaration} from the given reader.
+     * Parse a {@link FieldDeclaration} from the given reader.
      */
     @Override
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		FieldDeclaration res = ProofJavaParser.FieldDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                FieldDeclaration res = ProofJavaParser.FieldDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link MethodDeclaration} from the given reader.
+     * Parse a {@link MethodDeclaration} from the given reader.
      */
     @Override
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		MethodDeclaration res = ProofJavaParser.MethodDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                MethodDeclaration res = ProofJavaParser.MethodDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link MemberDeclaration} from the given reader.
+     * Parse a {@link MemberDeclaration} from the given reader.
      */
     @Override
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		MemberDeclaration res = ProofJavaParser.ClassBodyDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                MemberDeclaration res = ProofJavaParser.ClassBodyDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link ParameterDeclaration} from the given reader.
+     * Parse a {@link ParameterDeclaration} from the given reader.
      */
     @Override
-    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ParameterDeclaration res = ProofJavaParser.FormalParameter();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+    public ParameterDeclaration parseParameterDeclaration(Reader in)
+            throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ParameterDeclaration res = ProofJavaParser.FormalParameter();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link ConstructorDeclaration} from the given reader.
+     * Parse a {@link ConstructorDeclaration} from the given reader.
      */
     @Override
-    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ConstructorDeclaration res = ProofJavaParser.ConstructorDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+    public ConstructorDeclaration parseConstructorDeclaration(Reader in)
+            throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ConstructorDeclaration res = ProofJavaParser.ConstructorDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link TypeReference} from the given reader.
+     * Parse a {@link TypeReference} from the given reader.
      */
     @Override
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		TypeReference res = ProofJavaParser.ResultType();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                TypeReference res = ProofJavaParser.ResultType();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse an {@link Expression} from the given reader.
+     * Parse an {@link Expression} from the given reader.
      */
     @Override
     public Expression parseExpression(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		Expression res = ProofJavaParser.Expression();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                Expression res = ProofJavaParser.Expression();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse some {@link Statement}s from the given reader.
+     * Parse some {@link Statement}s from the given reader.
      */
     @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
-		for (int i = 0; i < res.size(); i += 1) {
-		    postWork(res.get(i));
-		}
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
+                for (int i = 0; i < res.size(); i += 1) {
+                    postWork(res.get(i));
+                }
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
@@ -464,17 +463,16 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Parse a {@link StatementBlock} from the given string.
      */
     @Override
-    public StatementBlock parseStatementBlock(Reader in)
-	throws IOException, ParserException {
-	synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		StatementBlock res = ProofJavaParser.StartBlock();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+    public StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                StatementBlock res = ProofJavaParser.StartBlock();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
@@ -483,31 +481,30 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression(Expression e) {
-	return new PassiveExpression(e);
+        return new PassiveExpression(e);
     }
 
     /**
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression() {
-	return new PassiveExpression();
+        return new PassiveExpression();
     }
 
     /**
      * Create a {@link MethodSignature}.
      */
     public MethodSignature createMethodSignature(Identifier methodName,
-        ASTList<TypeReference> paramTypes) {
-       return new MethodSignature(methodName, paramTypes);
+            ASTList<TypeReference> paramTypes) {
+        return new MethodSignature(methodName, paramTypes);
     }
 
     /**
      * Create a {@link MethodCallStatement}.
      */
-    public MethodCallStatement createMethodCallStatement(Expression resVar,
-							 ExecutionContext ec,
-							 StatementBlock block) {
-	return new MethodCallStatement(resVar, ec, block);
+    public MethodCallStatement createMethodCallStatement(Expression resVar, ExecutionContext ec,
+            StatementBlock block) {
+        return new MethodCallStatement(resVar, ec, block);
     }
 
     public LoopScopeBlock createLoopScopeBlock() {
@@ -526,21 +523,20 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Create a {@link MethodBodyStatement}.
      */
     public MethodBodyStatement createMethodBodyStatement(TypeReference bodySource,
-							 Expression resVar,
-							 MethodReference methRef) {
-	return new MethodBodyStatement(bodySource, resVar, methRef);
+            Expression resVar, MethodReference methRef) {
+        return new MethodBodyStatement(bodySource, resVar, methRef);
     }
 
     /**
      * Create a {@link CatchAllStatement}.
      */
-    public Statement createCatchAllStatement(VariableReference param,
-					     StatementBlock body) {
-	return new CatchAllStatement(param, body);
+    public Statement createCatchAllStatement(VariableReference param, StatementBlock body) {
+        return new CatchAllStatement(param, body);
     }
 
     /**
      * Create a comment.
+     *
      * @param text comment text
      */
     @Override
@@ -550,6 +546,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
     /**
      * Create a comment.
+     *
      * @param text comment text
      */
     @Override
@@ -607,7 +604,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchBreakParameterDeclaration();
     }
 
-    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(Identifier label) {
+    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(
+            Identifier label) {
         return new CcatchBreakLabelParameterDeclaration(label);
     }
 
@@ -619,7 +617,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchContinueParameterDeclaration();
     }
 
-    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(Identifier label) {
+    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(
+            Identifier label) {
         return new CcatchContinueLabelParameterDeclaration(label);
     }
 
@@ -627,7 +626,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchContinueWildcardParameterDeclaration();
     }
 
-    public CcatchNonstandardParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration e) {
+    public CcatchNonstandardParameterDeclaration createCcatchReturnValParameterDeclaration(
+            ParameterDeclaration e) {
         return new CcatchReturnValParameterDeclaration(e);
     }
 }

@@ -16,8 +16,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * Not done yet: Should use semantical entities instead of syntactical
- * ~Declarations.
+ * Not done yet: Should use semantical entities instead of syntactical ~Declarations.
  */
 public class FactoryMethod implements DesignPattern {
 
@@ -26,8 +25,7 @@ public class FactoryMethod implements DesignPattern {
     private ConstructorDeclaration product;
 
     /**
-     * Creates a new factory method using the given constructor. Given a
-     * constructor of the form
+     * Creates a new factory method using the given constructor. Given a constructor of the form
      *
      * <PRE>
      * <p>
@@ -62,7 +60,8 @@ public class FactoryMethod implements DesignPattern {
             throw new IllegalArgumentException("A factory method requires a product");
         }
         try {
-            this.product = product.getFactory().parseConstructorDeclaration("public " + product.getName() + "(){}");
+            this.product = product.getFactory()
+                    .parseConstructorDeclaration("public " + product.getName() + "(){}");
         } catch (ParserException pe) {
             System.err.println(pe); // this should never happen
         }
@@ -86,16 +85,17 @@ public class FactoryMethod implements DesignPattern {
             System.err.println(pe); // this should never happen
         }
         Identifier name = clone.getIdentifier();
-        producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(), factory.createTypeReference(name), factory
-                .createIdentifier("create" + name.getText()), clone.getParameters(), clone.getThrown());
+        producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(),
+            factory.createTypeReference(name), factory.createIdentifier("create" + name.getText()),
+            clone.getParameters(), clone.getThrown());
         ASTList<Statement> statements = new ASTArrayList<Statement>(1);
         statements.add(factory.createReturn(MethodKit.createNew(clone)));
         producer.setBody(factory.createStatementBlock(statements));
     }
 
     /**
-     * The validation ensures that a producer exists and that the return value
-     * of the producer matches the product.
+     * The validation ensures that a producer exists and that the return value of the producer
+     * matches the product.
      */
     public void validate() throws ModelException {
         if (producer == null) {
@@ -106,7 +106,8 @@ public class FactoryMethod implements DesignPattern {
         }
         if (!producer.getReturnType().getName().equals(product.getMemberParent().getName())) {
             // could be allowed to create subtypes of return type
-            throw new InconsistentPatternException("Factory Method producer must create correct product type");
+            throw new InconsistentPatternException(
+                "Factory Method producer must create correct product type");
         }
     }
 

@@ -52,9 +52,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param dimensions an int value.
-     * @param init       an expression.
+     * @param init an expression.
      */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {
@@ -155,9 +155,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public ClassType getContainingClassType() {
         /*
-         * ProgramElement context = getASTParent(); while (context != null) {
-         * context = context.getASTParent(); if (context instanceof ClassType) {
-         * return (ClassType)context; } } return null;
+         * ProgramElement context = getASTParent(); while (context != null) { context =
+         * context.getASTParent(); if (context instanceof ClassType) { return (ClassType)context; }
+         * } return null;
          */
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());

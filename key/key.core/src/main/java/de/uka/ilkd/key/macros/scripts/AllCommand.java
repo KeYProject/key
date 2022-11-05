@@ -26,7 +26,7 @@ public class AllCommand extends AbstractCommand<Map<String, Object>> {
     @Override
     protected void execute(Map<String, Object> args) throws ScriptException, InterruptedException {
         String wrappedCmdname = args.get("#2").toString();
-        if(wrappedCmdname == null) {
+        if (wrappedCmdname == null) {
             throw new ScriptException("Missing command to apply onAll to");
         }
 
@@ -48,9 +48,9 @@ public class AllCommand extends AbstractCommand<Map<String, Object>> {
     private HashMap<String, Object> rearrangeArgs(Map<String, Object> args) {
         HashMap<String, Object> newArgs = new HashMap<>();
         for (Entry<String, Object> en : args.entrySet()) {
-            if(en.getKey().matches("#[0-9]+")) {
+            if (en.getKey().matches("#[0-9]+")) {
                 int no = Integer.parseInt(en.getKey().substring(1));
-                if(no != 1) {
+                if (no != 1) {
                     newArgs.put("#" + (no - 1), en.getValue());
                 }
             } else {
@@ -67,8 +67,8 @@ public class AllCommand extends AbstractCommand<Map<String, Object>> {
         // Node selectedNode = state.getSelectedNode();
         for (Goal g : proof.openGoals()) {
             // if (isBelow(g, selectedNode)) {
-                state.setGoal(g);
-                command.execute(uiControl, params, state);
+            state.setGoal(g);
+            command.execute(uiControl, params, state);
             // }
         }
         // state.setGoal(selectedNode);
@@ -80,7 +80,7 @@ public class AllCommand extends AbstractCommand<Map<String, Object>> {
         }
 
         Node node = g.node();
-        while(node != null) {
+        while (node != null) {
             if (node == above) {
                 return true;
             }

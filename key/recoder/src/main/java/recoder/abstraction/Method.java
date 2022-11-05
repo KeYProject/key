@@ -64,7 +64,7 @@ public interface Method extends Member, ClassTypeContainer {
      * Checks if this method takes a variable number of arguments.
      *
      * @return <CODE>true</CODE> if this methods takes a variable number of arguments,
-     * <code>false</code> otherwise.
+     *         <code>false</code> otherwise.
      * @since 0.80
      */
     boolean isVarArgMethod();

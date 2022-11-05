@@ -21,21 +21,19 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-public class FinishAuxiliaryLoopComputationMacro extends
-        AbstractFinishAuxiliaryComputationMacro {
+public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
 
             if (poForProof instanceof LoopInvExecutionPO) {
-                final Node parentOfInitiatingGoal = ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
-                if (parentOfInitiatingGoal != null &&
-                        parentOfInitiatingGoal.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                final Node parentOfInitiatingGoal =
+                    ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
+                if (parentOfInitiatingGoal != null && parentOfInitiatingGoal
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
                     return true;
                 }
             }
@@ -45,13 +43,10 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          final Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
@@ -59,7 +54,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final Services services = initiatingProof.getServices();
 
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
+            (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
@@ -70,7 +65,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
-                new LoopInfFlowUnfoldTacletBuilder(services);
+            new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);
         tacletBuilder.setExecutionContext(loopInvRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

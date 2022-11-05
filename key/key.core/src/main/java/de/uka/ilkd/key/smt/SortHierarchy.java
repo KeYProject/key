@@ -16,8 +16,7 @@ class SortWrapper {
     private final List<SortWrapper> parentSorts = new LinkedList<>();
 
     public boolean extendsTrans(SortWrapper sw) {
-        return sw.getSort() != getSort()
-                && getSort().extendsTrans(sw.getSort());
+        return sw.getSort() != getSort() && getSort().extendsTrans(sw.getSort());
     }
 
     public Sort getSort() {
@@ -43,8 +42,8 @@ class SortWrapper {
         return parentSorts;
     }
 
-    void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy, boolean explicitHierarchy,
-                            Services services) {
+    void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy,
+            boolean explicitHierarchy, Services services) {
         for (SortWrapper sw : sorts) {
             if (this.extendsTrans(sw)) {
                 addParent(sw, explicitNullHierarchy, explicitHierarchy, services);
@@ -53,16 +52,15 @@ class SortWrapper {
     }
 
     /**
-     * Removes all sorts from parentSorts, that are not extended by this sort
-     * directly, i.e. the sort <code>parent</code> is between
-     * <code>this.getSort()</code> and the considered sort.
+     * Removes all sorts from parentSorts, that are not extended by this sort directly, i.e. the
+     * sort <code>parent</code> is between <code>this.getSort()</code> and the considered sort.
      */
     private void removeGrandParents(SortWrapper parent) {
         parentSorts.removeIf(parent::extendsTrans);
     }
 
     private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy,
-                              boolean explicitHierarchy, Services services) {
+            boolean explicitHierarchy, Services services) {
         Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
         if ((explicitNullHierarchy && this.getSort() == nullOp.sort()) || explicitHierarchy) {
             parentSorts.add(parent);
@@ -84,6 +82,7 @@ class SortWrapper {
 
 }
 
+
 /**
  * The SortHierarchy works as a wrapper class for sorts.
  *
@@ -96,16 +95,13 @@ public class SortHierarchy {
     /**
      * Create a Sort Hierarchy.
      *
-     * @param sortnames a HashMap of sorts mapped to the Strings which is displayed in
-     *                  Formulas
+     * @param sortnames a HashMap of sorts mapped to the Strings which is displayed in Formulas
      */
-    protected SortHierarchy(Map<Sort, StringBuilder> sortnames,
-                            Map<Sort, StringBuilder> prednames,
-                            boolean explicitNullHierarchy, boolean explicitHierarchy,
-                            Services services) {
+    protected SortHierarchy(Map<Sort, StringBuilder> sortnames, Map<Sort, StringBuilder> prednames,
+            boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {
         for (Entry<Sort, StringBuilder> entry : sortnames.entrySet()) {
-            sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
-                    prednames.get(entry.getKey())));
+            sorts.add(
+                new SortWrapper(entry.getKey(), entry.getValue(), prednames.get(entry.getKey())));
         }
 
         for (SortWrapper sw : sorts) {

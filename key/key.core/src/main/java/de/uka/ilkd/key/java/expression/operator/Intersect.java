@@ -23,10 +23,10 @@ public class Intersect extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnIntersect(this);
+        v.performActionOnIntersect(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printIntersect(this);
     }

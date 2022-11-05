@@ -12,15 +12,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
- * The bound uniqueness checker ensures that schemavariables can be bound
- * at most once in the <tt>\find</tt> and <tt>\assumes</tt> part of a taclet. The justification for this restriction is to
- * prevent the user to write taclets that match only in very rare cases, e.g.
- * <code>
+ * The bound uniqueness checker ensures that schemavariables can be bound at most once in the
+ * <tt>\find</tt> and <tt>\assumes</tt> part of a taclet. The justification for this restriction is
+ * to prevent the user to write taclets that match only in very rare cases, e.g. <code>
  *   \assumes (==>\forall var; phi)
  *   \find (\forall var; phi ==>)
- * </code>
- * would nearly never match, as <tt>var</tt> would be required to match
- * the same object.
+ * </code> would nearly never match, as <tt>var</tt> would be required to match the same object.
  */
 public class BoundUniquenessChecker {
 
@@ -32,41 +29,40 @@ public class BoundUniquenessChecker {
     }
 
     public BoundUniquenessChecker(Term t, Sequent seq) {
-	addTerm(t);
-	addAll(seq);
+        addTerm(t);
+        addAll(seq);
     }
 
     /**
-     * adds <tt>term</tt> to the list of terms to include in
-     * the uniqueness check
+     * adds <tt>term</tt> to the list of terms to include in the uniqueness check
+     *
      * @param term a Term
      */
     public void addTerm(Term term) {
-	terms = terms.prepend(term);
+        terms = terms.prepend(term);
     }
 
     /**
-     * adds all formulas in the sequent to the list of terms to
-     * include in the uniqueness check
+     * adds all formulas in the sequent to the list of terms to include in the uniqueness check
+     *
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-	for (final SequentFormula cf : seq) {
-	    terms = terms.prepend(cf.formula());
-	}
+        for (final SequentFormula cf : seq) {
+            terms = terms.prepend(cf.formula());
+        }
     }
 
-    //recursive helper
+    // recursive helper
     private boolean correct(Term t) {
-	/* Note that a term can bound a variable in several
-	 * subterms.
+        /*
+         * Note that a term can bound a variable in several subterms.
          */
         final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<QuantifiableVariable>(10);
 
-        for (int i = 0, ar = t.arity(); i<ar; i++) {
-            for (int j=0, sz = t.varsBoundHere(i).size(); j<sz; j++) {
-                final QuantifiableVariable qv
-                = t.varsBoundHere(i).get(j);
+        for (int i = 0, ar = t.arity(); i < ar; i++) {
+            for (int j = 0, sz = t.varsBoundHere(i).size(); j < sz; j++) {
+                final QuantifiableVariable qv = t.varsBoundHere(i).get(j);
                 if (boundVars.contains(qv)) {
                     return false;
                 } else {
@@ -77,18 +73,17 @@ public class BoundUniquenessChecker {
 
         boundVars.addAll(localVars);
 
-	for (int i = 0, ar = t.arity(); i < ar; ++i) {
-	    if (!correct(t.sub(i))) {
-		return false;
-	    }
-	}
-	return true;
+        for (int i = 0, ar = t.arity(); i < ar; ++i) {
+            if (!correct(t.sub(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
-    /** 
-     * returns true if any variable is bound at most once in the
-     * given set of terms
+    /**
+     * returns true if any variable is bound at most once in the given set of terms
      */
     public boolean correct() {
         for (final Term term : terms) {
@@ -96,7 +91,7 @@ public class BoundUniquenessChecker {
                 return false;
             }
         }
-        return true;    
+        return true;
     }
 
 }

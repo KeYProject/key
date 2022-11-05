@@ -35,15 +35,10 @@ import java.util.List;
  * @version 1 (16.04.19)
  */
 @KeYGuiExtension.Info(name = "Exploration",
-        description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
-        experimental = false,
-        optional = true,
-        priority = 10000)
-public class ExplorationExtension implements KeYGuiExtension,
-        KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Startup,
-        KeYGuiExtension.Toolbar,
-        KeYGuiExtension.MainMenu,
+    description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
+    experimental = false, optional = true, priority = 10000)
+public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
@@ -53,12 +48,12 @@ public class ExplorationExtension implements KeYGuiExtension,
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                PosInSequent pos) {
             if (model.isExplorationModeSelected()) {
                 return Arrays.asList(new AddFormulaToAntecedentAction(),
-                        new AddFormulaToSuccedentAction(),
-                        new EditFormulaAction(pos),
-                        new DeleteFormulaAction(pos));
+                    new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
+                    new DeleteFormulaAction(pos));
             }
             return super.getContextActions(mediator, kind, pos);
         }
@@ -67,15 +62,15 @@ public class ExplorationExtension implements KeYGuiExtension,
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
-            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class), ExplorationNodeData.class);
+            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
+                ExplorationNodeData.class);
         }
     };
 
     @Nonnull
     @Override
     public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-                                          @Nonnull ContextMenuKind kind,
-                                          @Nonnull Object underlyingObject) {
+            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -85,7 +80,8 @@ public class ExplorationExtension implements KeYGuiExtension,
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
-            explorationToolbar.add(new JCheckBox(new ShowInteractiveBranchesAction(model, mainWindow)));
+            explorationToolbar
+                    .add(new JCheckBox(new ShowInteractiveBranchesAction(model, mainWindow)));
         }
         return explorationToolbar;
     }
@@ -118,35 +114,48 @@ public class ExplorationExtension implements KeYGuiExtension,
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
+    private void initLeftPanel(@Nonnull MainWindow window) {
+        leftPanel = new ExplorationStepsList(window);
+        leftPanel.setEnabled(model.isExplorationModeSelected());
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
+            e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
+    }
+
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
+        if (leftPanel == null) {
+            initLeftPanel(window);
+        }
+
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
+        if (leftPanel == null) {
+            initLeftPanel(MainWindow.getInstance());
+        }
+
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
 
     @Override
-    public @Nonnull
-    List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
-        return Arrays.asList(
-                new ToggleExplorationAction(model, mainWindow),
-                new ShowInteractiveBranchesAction(model, mainWindow));
+    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+        return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
+            new ShowInteractiveBranchesAction(model, mainWindow));
     }
 }
 
+
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     public static final ColorSettings.ColorProperty DARK_TURQOUIS_COLOR =
-            ColorSettings.define("[proofTree]turqois", "", new Color(19, 110, 128));
+        ColorSettings.define("[proofTree]turqois", "", new Color(19, 110, 128));
     public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
-            ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
+        ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
     public static final ColorSettings.ColorProperty LIGHT_PURPLE_COLOR =
-            ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
+        ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
 
     @Override
     public void style(@Nonnull Style style, GUIAbstractTreeNode treeNode) {

@@ -32,19 +32,17 @@ public class StatementKit {
     }
 
     /**
-     * Transformation returning a mutable statement list that contains the given
-     * statement, and creating a new {@link recoder.java.StatementBlock}if
-     * necessary. It is necessary to create a new block, if
-     * {@link #getStatementMutableList}returns <CODE>null</CODE>. This is
-     * the case if the statement container allows only a single statement and
-     * the given statement is not inside a {@link recoder.java.StatementBlock}.
-     * If the statement has no parent, it is wrapped into a new statement list
-     * which then is returned.
+     * Transformation returning a mutable statement list that contains the given statement, and
+     * creating a new {@link recoder.java.StatementBlock}if necessary. It is necessary to create a
+     * new block, if {@link #getStatementMutableList}returns <CODE>null</CODE>. This is the case if
+     * the statement container allows only a single statement and the given statement is not inside
+     * a {@link recoder.java.StatementBlock}. If the statement has no parent, it is wrapped into a
+     * new statement list which then is returned.
      *
-     * @param s  a statement; may not be <CODE>null</CODE>.
+     * @param s a statement; may not be <CODE>null</CODE>.
      * @param ch the change history; may be <CODE>null</CODE>.
-     * @return the mutable statement list that the given statement is part of;
-     * the list is contained in a new StatementBlock if necessary.
+     * @return the mutable statement list that the given statement is part of; the list is contained
+     *         in a new StatementBlock if necessary.
      * @see #getStatementMutableList
      * @see #wrapWithStatementBlock
      * @deprecated replaced by first class transformation PrepareStatementList
@@ -65,22 +63,20 @@ public class StatementKit {
     }
 
     /**
-     * Query returning a mutable statement list that contains the given
-     * statement, if there is such a list.
+     * Query returning a mutable statement list that contains the given statement, if there is such
+     * a list.
      * <UL>
-     * <LI>If the statement container already features a statement mutable
-     * list, this list is returned (e.g. {@link recoder.java.statement.Case}).
-     * </LI>
-     * <LI>If the statement container is a {@link recoder.java.StatementBlock},
-     * its list is returned (except it is empty).</LI>
-     * <LI>If the statement is the body of a
-     * {@link recoder.java.statement.LabeledStatement}, the list for that
-     * labeled statement is returned instead.</LI>
+     * <LI>If the statement container already features a statement mutable list, this list is
+     * returned (e.g. {@link recoder.java.statement.Case}).</LI>
+     * <LI>If the statement container is a {@link recoder.java.StatementBlock}, its list is returned
+     * (except it is empty).</LI>
+     * <LI>If the statement is the body of a {@link recoder.java.statement.LabeledStatement}, the
+     * list for that labeled statement is returned instead.</LI>
      * </UL>
      *
      * @param s a statement; may not be <CODE>null</CODE>.
-     * @return the mutable statement list that the given statement is part of,
-     * or <CODE>null</CODE> if there is none.
+     * @return the mutable statement list that the given statement is part of, or <CODE>null</CODE>
+     *         if there is none.
      */
     public static ASTList<Statement> getStatementMutableList(Statement s) {
         Debug.assertNonnull(s);
@@ -123,7 +119,8 @@ public class StatementKit {
             }
         }
         if (body == null) {
-            Debug.assertBoolean(true, "Could not handle container of statement " + Format.toString(Formats.ELEMENT_LONG, s));
+            Debug.assertBoolean(true, "Could not handle container of statement "
+                + Format.toString(Formats.ELEMENT_LONG, s));
         }
         if (body instanceof StatementBlock && body != s) {
             return ((StatementBlock) body).getBody();
@@ -132,16 +129,15 @@ public class StatementKit {
     }
 
     /**
-     * Transformation creating a new StatementBlock replacing the given
-     * statement and shifting it inside. If the statement has no parent, it is
-     * put into the new statement block and no changes are propagated. The new
-     * block is created even if the statement container already is a block. The
-     * new block is replacing the old statement with valid parent link. This
-     * transformation is safe if the statement is not an instance of
-     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a
-     * variable that is actually referred.
+     * Transformation creating a new StatementBlock replacing the given statement and shifting it
+     * inside. If the statement has no parent, it is put into the new statement block and no changes
+     * are propagated. The new block is created even if the statement container already is a block.
+     * The new block is replacing the old statement with valid parent link. This transformation is
+     * safe if the statement is not an instance of
+     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
+     * actually referred.
      *
-     * @param s  a statement to be wrapped by a new statement block.
+     * @param s a statement to be wrapped by a new statement block.
      * @param ch the change history; may be <CODE>null</CODE>.
      * @return the new statement block replacing <CODE>s</CODE>.
      * @deprecated
@@ -163,19 +159,19 @@ public class StatementKit {
     }
 
     /**
-     * Query deciding if the given single statement can be wrapped inside a
-     * block without changing program semantics. This is the case if the
-     * statement is not an instance of
-     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a
-     * variable that is actually referred from outside.
+     * Query deciding if the given single statement can be wrapped inside a block without changing
+     * program semantics. This is the case if the statement is not an instance of
+     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
+     * actually referred from outside.
      *
      * @param xr the cross referencer service used.
-     * @param s  a statement that might be wrapped.
-     * @return <CODE>true</CODE> if wrapping the statement in a block would
-     * not change the program semantics, <CODE>false</CODE> otherwise.
+     * @param s a statement that might be wrapped.
+     * @return <CODE>true</CODE> if wrapping the statement in a block would not change the program
+     *         semantics, <CODE>false</CODE> otherwise.
      * @deprecated
      */
-    public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr, Statement s) {
+    public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr,
+            Statement s) {
         Debug.assertNonnull(xr, s);
         if (s instanceof LocalVariableDeclaration) {
             LocalVariableDeclaration lvd = (LocalVariableDeclaration) s;
@@ -194,19 +190,19 @@ public class StatementKit {
     }
 
     /**
-     * Transformation that ensures that the given return or throw statement can
-     * be safely prepended by other statements. If the statement contains an
-     * expression that contains statements (side effects possible), the
-     * expression is replaced by a variable reference to a new temporary
-     * variable initialized by the former return value. If necessary, a new
-     * statement block is created wrapping the return or throw statement.
+     * Transformation that ensures that the given return or throw statement can be safely prepended
+     * by other statements. If the statement contains an expression that contains statements (side
+     * effects possible), the expression is replaced by a variable reference to a new temporary
+     * variable initialized by the former return value. If necessary, a new statement block is
+     * created wrapping the return or throw statement.
      *
-     * @param ch            the change history service (may be <CODE>null</CODE>).
-     * @param si            the source info service.
+     * @param ch the change history service (may be <CODE>null</CODE>).
+     * @param si the source info service.
      * @param returnOrThrow a return or throw statement.
      * @deprecated will become a first class transformation
      */
-    public static void preparePrepend(ChangeHistory ch, SourceInfo si, ExpressionJumpStatement returnOrThrow) {
+    public static void preparePrepend(ChangeHistory ch, SourceInfo si,
+            ExpressionJumpStatement returnOrThrow) {
         Debug.assertNonnull(si, returnOrThrow);
         List<Statement> destination = prepareStatementMutableList(returnOrThrow, ch);
         if (returnOrThrow.getExpressionCount() == 0) {
@@ -218,9 +214,11 @@ public class StatementKit {
         }
         ProgramFactory f = returnOrThrow.getFactory();
         Type type = si.getType(expr);
-        String vname = VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
+        String vname =
+            VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
         TypeReference tref = TypeKit.createTypeReference(si, type, expr);
-        LocalVariableDeclaration lvd = f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
+        LocalVariableDeclaration lvd =
+            f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
         lvd.getVariables().get(0).setInitializer(expr);
         lvd.makeAllParentRolesValid();
         VariableReference vref = f.createVariableReference(f.createIdentifier(vname));
@@ -242,10 +240,9 @@ public class StatementKit {
     }
 
     /**
-     * Checks if the specified statement is reachable as defined in the static
-     * language semantics.
+     * Checks if the specified statement is reachable as defined in the static language semantics.
      *
-     * @param s  a statement.
+     * @param s a statement.
      * @param si the SourceInfo service to use.
      * @return <CODE>true</CODE> if the statement is reachable, <CODE>false
      * </CODE> otherwise.
@@ -263,11 +260,11 @@ public class StatementKit {
     }
 
     /**
-     * Checks if the end of the specified statement block is reachable as
-     * defined in the static language semantics.
+     * Checks if the end of the specified statement block is reachable as defined in the static
+     * language semantics.
      *
      * @param block a statement block.
-     * @param si    the SourceInfo service to use.
+     * @param si the SourceInfo service to use.
      * @return <CODE>true</CODE> if the end of the block is reachable, <CODE>
      * false</CODE> otherwise.
      * @since 0.71
@@ -286,12 +283,11 @@ public class StatementKit {
     }
 
     /**
-     * Syntactic query locating the label addressed by the specified labeled
-     * break or continue statement.
+     * Syntactic query locating the label addressed by the specified labeled break or continue
+     * statement.
      *
      * @param s a labeled jump statement.
-     * @return the corresponding labeled statement, or <CODE>null</CODE> if
-     * there is none.
+     * @return the corresponding labeled statement, or <CODE>null</CODE> if there is none.
      * @since 0.71
      */
     public static LabeledStatement getCorrespondingLabel(LabelJumpStatement s) {
@@ -311,14 +307,13 @@ public class StatementKit {
     }
 
     /**
-     * For a method declaration or class initializer, returns a list of block
-     * exits, such as return or throw statements, and the body if its exit is
-     * reachable. For other members, returns an empty list.
+     * For a method declaration or class initializer, returns a list of block exits, such as return
+     * or throw statements, and the body if its exit is reachable. For other members, returns an
+     * empty list.
      *
-     * @param m  a member declaration.
+     * @param m a member declaration.
      * @param si the SourceInfo service to use.
-     * @return a list of statements that finish the member's body after
-     * execution.
+     * @return a list of statements that finish the member's body after execution.
      * @since 0.72
      */
     public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
@@ -350,15 +345,14 @@ public class StatementKit {
     }
 
     /**
-     * This walker performs a depth first search and reports the reachable
-     * statements in the body of the given member. Only non-abstract method
-     * declarations, constructor declarations, and class initializers can report
-     * statements. This implementation follows the static rules of the Java
-     * language specification and evaluates boolean conditions as Java
-     * compile-time constants only. No intra-procedural analysis is performed
-     * and throw statements are not mapped to corresponding catch clauses. <BR>
-     * To create a control flow graph, use the walker and query the succeeding
-     * statements for each reported statement.
+     * This walker performs a depth first search and reports the reachable statements in the body of
+     * the given member. Only non-abstract method declarations, constructor declarations, and class
+     * initializers can report statements. This implementation follows the static rules of the Java
+     * language specification and evaluates boolean conditions as Java compile-time constants only.
+     * No intra-procedural analysis is performed and throw statements are not mapped to
+     * corresponding catch clauses. <BR>
+     * To create a control flow graph, use the walker and query the succeeding statements for each
+     * reported statement.
      *
      * @since 0.71
      */
@@ -432,9 +426,8 @@ public class StatementKit {
         }
 
         /**
-         * Returns <CODE>true</CODE> if the specified statement has been found
-         * reachable already. The returned value remains valid after the
-         * iteration has finished.
+         * Returns <CODE>true</CODE> if the specified statement has been found reachable already.
+         * The returned value remains valid after the iteration has finished.
          */
         public boolean isReachable(Statement s) {
             return reached.contains(s);

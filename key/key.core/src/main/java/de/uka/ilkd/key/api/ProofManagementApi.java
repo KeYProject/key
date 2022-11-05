@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class serves as a facade to all functionalities that are needed for
- * proof management, i.e., loading proof files, retrieving the proof obligations
+ * This class serves as a facade to all functionalities that are needed for proof management, i.e.,
+ * loading proof files, retrieving the proof obligations
  *
  * @author Sarah Grebing.
  */
@@ -37,8 +37,8 @@ public class ProofManagementApi {
     /**
      * Retrieve a list of all available contracts
      *
-     * @return {@link List<Contract>}; can be null if no file was loaded before
-     *                                  (we should throw an exception here)
+     * @return {@link List<Contract>}; can be null if no file was loaded before (we should throw an
+     *         exception here)
      */
     public List<Contract> getProofContracts() {
         if (proofContracts.isEmpty())
@@ -47,20 +47,18 @@ public class ProofManagementApi {
     }
 
     /**
-     * constructs the possible proof contracts from the
-     * java info in the environment.
+     * constructs the possible proof contracts from the java info in the environment.
      */
     private void buildContracts() {
         proofContracts.clear();
         Set<KeYJavaType> kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
-                ImmutableSet<IObserverFunction> targets = currentEnv
-                        .getSpecificationRepository().getContractTargets(type);
+                ImmutableSet<IObserverFunction> targets =
+                    currentEnv.getSpecificationRepository().getContractTargets(type);
                 for (IObserverFunction target : targets) {
-                    ImmutableSet<Contract> contracts = currentEnv
-                            .getSpecificationRepository()
-                            .getContracts(type, target);
+                    ImmutableSet<Contract> contracts =
+                        currentEnv.getSpecificationRepository().getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
                     }
@@ -74,8 +72,7 @@ public class ProofManagementApi {
      * @return
      * @throws ProofInputException
      */
-    public ProofApi startProof(ProofOblInput contract)
-            throws ProofInputException {
+    public ProofApi startProof(ProofOblInput contract) throws ProofInputException {
         return new ProofApi(currentEnv.createProof(contract), currentEnv);
     }
 
@@ -85,8 +82,7 @@ public class ProofManagementApi {
      * @throws ProofInputException
      */
     public ProofApi startProof(Contract contract) throws ProofInputException {
-        return startProof(
-                contract.createProofObl(currentEnv.getInitConfig(), contract));
+        return startProof(contract.createProofObl(currentEnv.getInitConfig(), contract));
     }
 
     public ProofApi getLoadedProof() {
@@ -94,8 +90,8 @@ public class ProofManagementApi {
     }
 
     /**
-     * Constructs a set containing all names of a taclets that are registered
-     * in the current environment.
+     * Constructs a set containing all names of a taclets that are registered in the current
+     * environment.
      * <p>
      * The result is cached to speed up further calls.s
      *
@@ -107,32 +103,22 @@ public class ProofManagementApi {
             currentEnv.getInitConfig().activatedTaclets()
                     .forEach(taclet -> ruleNames.add(taclet.displayName()));
 
-            currentEnv.getInitConfig().builtInRules()
-                    .forEach(t -> ruleNames.add(t.displayName()));
+            currentEnv.getInitConfig().builtInRules().forEach(t -> ruleNames.add(t.displayName()));
         }
         return ruleNames;
     }
 
     /*
-    public KeYApi.CommandType getCommandType(String identifier) {
-        if (KeYApi.getMacroApi().getMacro(identifier) != null) {
-            return KeYApi.CommandType.MACRO;
-        }
-
-        if (KeYApi.getScriptCommandApi().getScriptCommands(identifier)
-                != null) {
-            return KeYApi.CommandType.SCRIPT;
-        }
-
-        if (getRuleNames().contains(identifier)) {
-            return KeYApi.CommandType.RULE;
-        }
-
-        return KeYApi.CommandType.UNKNOWN;
-    }
-
-    enum CommandType {
-        SCRIPT, RULE, MACRO, UNKNOWN;
-    }
-    */
+     * public KeYApi.CommandType getCommandType(String identifier) { if
+     * (KeYApi.getMacroApi().getMacro(identifier) != null) { return KeYApi.CommandType.MACRO; }
+     *
+     * if (KeYApi.getScriptCommandApi().getScriptCommands(identifier) != null) { return
+     * KeYApi.CommandType.SCRIPT; }
+     *
+     * if (getRuleNames().contains(identifier)) { return KeYApi.CommandType.RULE; }
+     *
+     * return KeYApi.CommandType.UNKNOWN; }
+     *
+     * enum CommandType { SCRIPT, RULE, MACRO, UNKNOWN; }
+     */
 }

@@ -6,8 +6,9 @@ import java.io.File;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
- * Load the file saved at the location described by {@link QuickSaveAction}.
- * Use the F6 key to access this feature.
+ * Load the file saved at the location described by {@link QuickSaveAction}. Use the F6 key to
+ * access this feature.
+ *
  * @author daniel
  *
  */

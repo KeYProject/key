@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * The project settings object manages global properties such as search and
- * output paths, and options for the pretty printer and can save and load a
- * textual representation of these informations.
+ * The project settings object manages global properties such as search and output paths, and
+ * options for the pretty printer and can save and load a textual representation of these
+ * informations.
  *
  * @author RN
  * @author AL
@@ -56,8 +56,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     private ErrorHandler errorHandler;
 
     /**
-     * Creates a new project settings object for the given service
-     * configuration.
+     * Creates a new project settings object for the given service configuration.
      */
     public ProjectSettings(ServiceConfiguration config) {
         super(config);
@@ -133,14 +132,13 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     /**
-     * Defines a property with the given name and value and informs all
-     * registered listeners. The method will automatically remove all segments
-     * from the search path that do not exist.
+     * Defines a property with the given name and value and informs all registered listeners. The
+     * method will automatically remove all segments from the search path that do not exist.
      *
-     * @param key   the name of the property to set.
+     * @param key the name of the property to set.
      * @param value the value of the property to set.
-     * @return the old value associated with the key, or <CODE>null</CODE> if
-     * this property has not been set.
+     * @return the old value associated with the key, or <CODE>null</CODE> if this property has not
+     *         been set.
      */
     public String setProperty(String key, String value) {
         String oldValue = properties.getProperty(key);
@@ -193,8 +191,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     /**
-     * Gets the current input path, removes all paths that do not exist or are
-     * duplicated, and writes back the property.
+     * Gets the current input path, removes all paths that do not exist or are duplicated, and
+     * writes back the property.
      */
     private String normalizeSearchPath(String pathlist) {
         if (pathlist == null) {
@@ -222,12 +220,12 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     /**
-     * Ensures that the class file repository can find "java.lang.Object" by
-     * adding the proper path to the search path list. This method must be
-     * called explicitly after creation of a service configuration.
+     * Ensures that the class file repository can find "java.lang.Object" by adding the proper path
+     * to the search path list. This method must be called explicitly after creation of a service
+     * configuration.
      *
-     * @return <CODE>true</CODE>, if the class file repository knows how to
-     * find "Object", <CODE>false</CODE> otherwise.
+     * @return <CODE>true</CODE>, if the class file repository knows how to find "Object",
+     *         <CODE>false</CODE> otherwise.
      */
     public boolean ensureSystemClassesAreInPath() {
         ClassFileRepository cfr = serviceConfiguration.getClassFileRepository();
@@ -248,10 +246,9 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     /**
-     * Ensures that the class file repository can find ext classes from the
-     * magic directory by adding the proper path to the search path list. This
-     * method must be called explicitly after creation of a service
-     * configuration.
+     * Ensures that the class file repository can find ext classes from the magic directory by
+     * adding the proper path to the search path list. This method must be called explicitly after
+     * creation of a service configuration.
      *
      * @since 0.72
      */
@@ -319,8 +316,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     /**
-     * Sets the current error handler and registers it as a change update
-     * listener.
+     * Sets the current error handler and registers it as a change update listener.
      *
      * @param handler the new error handler.
      */

@@ -30,13 +30,10 @@ public class MergeRuleMenuItem extends JMenuItem {
     /**
      * Creates a new menu item for the join rule.
      *
-     * @param goal
-     *            The selected goal.
-     * @param pio
-     *            The position the join shall be applied to (symbolic state /
-     *            program counter formula).
-     * @param mediator
-     *            The KeY mediator.
+     * @param goal The selected goal.
+     * @param pio The position the join shall be applied to (symbolic state / program counter
+     *        formula).
+     * @param mediator The KeY mediator.
      */
     public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {
@@ -49,11 +46,11 @@ public class MergeRuleMenuItem extends JMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final MergeRule joinRule = MergeRule.INSTANCE;
-                final MergeRuleBuiltInRuleApp app = (MergeRuleBuiltInRuleApp) joinRule
-                        .createApp(pio, services);
+                final MergeRuleBuiltInRuleApp app =
+                    (MergeRuleBuiltInRuleApp) joinRule.createApp(pio, services);
                 final MergeRuleCompletion completion = MergeRuleCompletion.INSTANCE;
-                final MergeRuleBuiltInRuleApp completedApp = (MergeRuleBuiltInRuleApp) completion
-                        .complete(app, goal, false);
+                final MergeRuleBuiltInRuleApp completedApp =
+                    (MergeRuleBuiltInRuleApp) completion.complete(app, goal, false);
 
                 // The completedApp may be null if the completion was not
                 // possible (e.g., if no candidates were selected by the
@@ -62,11 +59,11 @@ public class MergeRuleMenuItem extends JMenuItem {
                     try {
                         mediator.stopInterface(true);
 
-                        mediator.getUI().taskStarted(new DefaultTaskStartedInfo(
-                                TaskKind.Other,
-                                "Merging " + (completedApp.getMergePartners()
-                                        .size() + 1) + " nodes",
-                                completedApp.getMergePartners().size()));
+                        mediator.getUI()
+                                .taskStarted(new DefaultTaskStartedInfo(
+                                    TaskKind.Other, "Merging "
+                                        + (completedApp.getMergePartners().size() + 1) + " nodes",
+                                    completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
                         completedApp.registerProgressListener(progress -> {
@@ -79,8 +76,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                             @Override
                             protected Void doInBackground() throws Exception {
                                 long time = System.currentTimeMillis();
-                                mediator.getUI().getProofControl()
-                                        .applyInteractive(completedApp, goal);
+                                mediator.getUI().getProofControl().applyInteractive(completedApp,
+                                    goal);
                                 duration = System.currentTimeMillis() - time;
 
                                 return null;
@@ -89,12 +86,10 @@ public class MergeRuleMenuItem extends JMenuItem {
                             @Override
                             protected void done() {
                                 completedApp.clearProgressListeners();
-                                mediator.getUI().taskFinished(
-                                        new DefaultTaskFinishedInfo(this, goal,
-                                                goal.proof(), duration, 1, 0));
+                                mediator.getUI().taskFinished(new DefaultTaskFinishedInfo(this,
+                                    goal, goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
-                                mediator.getSelectionModel()
-                                        .setSelectedGoal(goal);
+                                mediator.getSelectionModel().setSelectedGoal(goal);
                             }
                         }.execute();
                     } catch (final Exception exc) {

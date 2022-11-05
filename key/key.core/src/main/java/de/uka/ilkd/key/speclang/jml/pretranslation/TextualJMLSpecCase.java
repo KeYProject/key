@@ -18,8 +18,8 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 
 /**
- * A JML specification case (i.e., more or less an operation contract) in
- * textual form. Is also used for block contracts.
+ * A JML specification case (i.e., more or less an operation contract) in textual form. Is also used
+ * for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
@@ -31,12 +31,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause, @Nonnull Name heap) {
-        List<LabeledParserRuleContext> seq = clauses.stream()
-                .filter(it -> it.clauseType.equals(clause))
-                .filter(it -> Objects.equals(it.heap, heap))
-                .map(it -> it.ctx)
-                .collect(Collectors.toList());
+    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
+            @Nonnull Name heap) {
+        List<LabeledParserRuleContext> seq =
+            clauses.stream().filter(it -> it.clauseType.equals(clause))
+                    .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -68,31 +68,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * Heap-independent clauses
      */
     public enum Clause {
-        MEASURED_BY,
-        WORKING_SPACE,
-        SIGNALS,
-        DIVERGES,
-        DEPENDS,
-        BREAKS,
-        CONTINUES,
-        RETURNS,
-        DECREASES,
-        SIGNALS_ONLY,
-        ABBREVIATION,
-        INFORMATION_FLOW
+        MEASURED_BY, WORKING_SPACE, SIGNALS, DIVERGES, DEPENDS, BREAKS, CONTINUES, RETURNS,
+        DECREASES, SIGNALS_ONLY, ABBREVIATION, INFORMATION_FLOW
     }
 
     /**
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        ACCESSIBLE,
-        ASSIGNABLE,
-        REQUIRES,
-        REQUIRES_FREE,
-        ENSURES,
-        ENSURES_FREE,
-        AXIOMS,
+        ACCESSIBLE, ASSIGNABLE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE, AXIOMS,
     }
 
     private final Behavior behavior;
@@ -131,7 +115,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
         clauses.add(new Entry(clause, ctx, heapName));
@@ -147,13 +132,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
     /**
-     * Merge clauses of two spec cases.
-     * Keep behavior of this one.
+     * Merge clauses of two spec cases. Keep behavior of this one.
      *
      * @param other
      */
@@ -173,7 +158,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addName(String n) {
         this.name = n;
-        //setPosition(n);
+        // setPosition(n);
     }
 
     public Behavior getBehavior() {
@@ -186,22 +171,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" +
-                "behavior=" + behavior +
-                ", clauses=" + clauses +
-                ", mods=" + mods +
-                ", name='" + name + '\'' +
-                '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
+            + mods + ", name='" + name + '\'' + '}';
     }
 
 
-    //region legacy api
+    // region legacy api
     public void addRequires(LabeledParserRuleContext label) {
         addClause(REQUIRES, label);
     }
 
     public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
-        /* weigl: prepare for future use of generated abbreviations from JML specifications*/
+        /* weigl: prepare for future use of generated abbreviations from JML specifications */
         return new Triple[0];
     }
 
@@ -239,9 +220,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(key))
-                        .map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -256,15 +236,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<LabeledParserRuleContext> getSignals() {
         return getList(SIGNALS);
     }
-    //endregion
+    // endregion
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TextualJMLSpecCase)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof TextualJMLSpecCase))
+            return false;
         TextualJMLSpecCase that = (TextualJMLSpecCase) o;
-        return getBehavior() == that.getBehavior() &&
-                clauses.equals(that.clauses);
+        return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 
     @Override

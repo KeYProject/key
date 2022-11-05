@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Facade for implementing syntactical JML syntax checks.
  * <p>
- * This facades holds a list of all known jmlChecks. Add yours to {@code jmlChecks}
- * to used in {@link JmlIO}.
+ * This facades holds a list of all known jmlChecks. Add yours to {@code jmlChecks} to used in
+ * {@link JmlIO}.
  *
  * @author Alexander Weigl
  * @version 1 (6/8/21)
@@ -32,10 +32,11 @@ public final class JmlChecks {
      * Returns a list of currently registered JML checks.
      */
     public static List<JmlCheck> getJmlChecks() {
-        //secure internal copy
+        // secure internal copy
         return new ArrayList<>(jmlChecks);
     }
 }
+
 
 class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
@@ -48,18 +49,17 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     }
 
     protected void addWarning(ParserRuleContext ctx, String text) {
-        PositionedString ps = new PositionedString(text,
-                ctx.start.getTokenSource().getSourceName(),
-                new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine())
-        );
+        PositionedString ps = new PositionedString(text, ctx.start.getTokenSource().getSourceName(),
+            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         warnings.add(ps);
     }
 }
 
+
 /**
- * This check tests warns if a {@code requires} clause follows a non-{@code requires} clause.
- * Such a constellation has different semantics in KeY than in the JML ref manual.
- * KeY does not recognize {@code requires} as contract initiators.
+ * This check tests warns if a {@code requires} clause follows a non-{@code requires} clause. Such a
+ * constellation has different semantics in KeY than in the JML ref manual. KeY does not recognize
+ * {@code requires} as contract initiators.
  */
 class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlCheck {
     @Override
@@ -78,8 +78,8 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
-                        "Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
-                                "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
+                    "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                        + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
             }
         }
     }

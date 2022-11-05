@@ -8,8 +8,8 @@ import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 
 /*
- * Menu option for showing the next search result of sequent search
- * Keyboard shortcut: F3. This shortcut is set in the KeyStrokemanager
+ * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
+ * shortcut is set in the KeyStrokemanager
  */
 public class SearchModeChangeAction extends MainWindowAction {
 
@@ -20,19 +20,17 @@ public class SearchModeChangeAction extends MainWindowAction {
         super(mainWindow);
         setName(mode.toString());
 
-        setIcon(
-            mode.icon
-        );
+        setIcon(mode.icon);
         setTooltip("Find the next occurence of current search term in sequent.");
         getMediator().enableWhenProofLoaded(this);
-	    if(mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
+        if (mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
             setAcceleratorLetter(KeyEvent.VK_H);
         } else if (mode == SequentViewSearchBar.SearchMode.HIDE) {
             setAcceleratorLetter(KeyEvent.VK_ESCAPE);
         } else if (mode == SequentViewSearchBar.SearchMode.REGROUP) {
             setAcceleratorLetter(KeyEvent.VK_I);
         }
-        
+
         this.mode = mode;
     }
 

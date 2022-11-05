@@ -7,25 +7,24 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
 /**
- * The Bottom element of the boolean lattice, representing
- * no boolean at all.
- * 
+ * The Bottom element of the boolean lattice, representing no boolean at all.
+ *
  * @author Dominic Scheurer
  */
 public class Bottom extends BooleanDomainElem {
 
-   private static final Bottom INSTANCE = new Bottom();
-   
-   private Bottom() {}
-   
-   public static Bottom getInstance() {
-      return INSTANCE;
-   }
-   
-   @Override
-   public Name name() {
-      return new Name("bottom");
-   }
+    private static final Bottom INSTANCE = new Bottom();
+
+    private Bottom() {}
+
+    public static Bottom getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public Name name() {
+        return new Name("bottom");
+    }
 
     @Override
     public Term getDefiningAxiom(Term varOrConst, Services services) {

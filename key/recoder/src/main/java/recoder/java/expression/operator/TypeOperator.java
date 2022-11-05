@@ -32,7 +32,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * Type operator.
      *
      * @param unaryChild an expression.
-     * @param typeref    a type reference.
+     * @param typeref a type reference.
      */
     public TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
@@ -42,8 +42,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      *
-     * @param lhs     an expression.
-     * @param rhs     an expression.
+     * @param lhs an expression.
+     * @param rhs an expression.
      * @param typeref a type reference.
      */
     public TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {
@@ -101,10 +101,9 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
         if (typeReference != null && index == 0) {
@@ -114,11 +113,10 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

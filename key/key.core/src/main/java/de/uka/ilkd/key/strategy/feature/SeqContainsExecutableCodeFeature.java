@@ -14,28 +14,25 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
     private final TermFeature tf;
-    
+
     private SeqContainsExecutableCodeFeature(boolean considerQueries) {
-        if ( considerQueries )
+        if (considerQueries)
             tf = ContainsExecutableCodeTermFeature.PROGRAMS_OR_QUERIES;
         else
             tf = ContainsExecutableCodeTermFeature.PROGRAMS;
     }
 
-    public final static Feature PROGRAMS =
-        new SeqContainsExecutableCodeFeature ( false );
-    public final static Feature PROGRAMS_OR_QUERIES =
-        new SeqContainsExecutableCodeFeature ( true );
+    public final static Feature PROGRAMS = new SeqContainsExecutableCodeFeature(false);
+    public final static Feature PROGRAMS_OR_QUERIES = new SeqContainsExecutableCodeFeature(true);
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
-            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
+        return containsExec(goal.sequent().succedent().iterator(), goal.proof().getServices())
+                || containsExec(goal.sequent().antecedent().iterator(), goal.proof().getServices());
     }
 
     private boolean containsExec(Iterator<SequentFormula> it, Services services) {
-        while ( it.hasNext () ) {
-            if ( tf.compute ( it.next ().formula (), services ).equals (
-                 BinaryTermFeature.ZERO_COST ) )
+        while (it.hasNext()) {
+            if (tf.compute(it.next().formula(), services).equals(BinaryTermFeature.ZERO_COST))
                 return true;
         }
         return false;

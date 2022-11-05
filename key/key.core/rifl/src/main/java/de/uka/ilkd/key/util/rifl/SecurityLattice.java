@@ -4,10 +4,10 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * A lattice of security domains in RIFL.
- * While the lattice is not necessarily complete, there are distinct top and bottom elements.
- * Instances of this class are mutable; new domains can be added and put into a hierarchy.
- * However, in any state the integrity is checked (top/bottom, acyclicity).
+ * A lattice of security domains in RIFL. While the lattice is not necessarily complete, there are
+ * distinct top and bottom elements. Instances of this class are mutable; new domains can be added
+ * and put into a hierarchy. However, in any state the integrity is checked (top/bottom,
+ * acyclicity).
  */
 public class SecurityLattice {
 
@@ -21,7 +21,7 @@ public class SecurityLattice {
     /**
      * Creates a two-element lattice.
      */
-    public SecurityLattice () {
+    public SecurityLattice() {
         top = new SecurityDomain(TOP);
         bottom = new SecurityDomain(BOTTOM);
         top.putSubDomain(bottom);
@@ -30,8 +30,9 @@ public class SecurityLattice {
     }
 
     /**
-     * Creates a new security domain and adds it to the lattice.
-     * The new domain is a direct subdomain of top and direct super-domain of bottom.
+     * Creates a new security domain and adds it to the lattice. The new domain is a direct
+     * subdomain of top and direct super-domain of bottom.
+     *
      * @param name name of the new domain (must not be "top" or "bottom")
      * @return the new domain
      */
@@ -46,29 +47,33 @@ public class SecurityLattice {
     }
 
     /**
-     * Refine the lattice by declaring a sub-domain relation between two domains.
-     * This checks whether the domains are already in the lattice and that the lattice is still acyclic.
+     * Refine the lattice by declaring a sub-domain relation between two domains. This checks
+     * whether the domains are already in the lattice and that the lattice is still acyclic.
      */
     void putSubDomain(SecurityDomain sup, SecurityDomain sub) {
-        if (sup == top || sub == bottom) return; // safely ignore this
-        if ( ! hash.contains(sup))
-            throw new IllegalArgumentException("Security domain "+sup+" must be added to the lattice first.");
-        if ( ! hash.contains(sub))
-            throw new IllegalArgumentException("Security domain "+sub+" must be added to the lattice first.");
+        if (sup == top || sub == bottom)
+            return; // safely ignore this
+        if (!hash.contains(sup))
+            throw new IllegalArgumentException(
+                "Security domain " + sup + " must be added to the lattice first.");
+        if (!hash.contains(sub))
+            throw new IllegalArgumentException(
+                "Security domain " + sub + " must be added to the lattice first.");
         if (sup == sub || sub.isSuperDomain(sup))
             throw new IllegalArgumentException("Security lattice must be acyclic.");
         sup.putSubDomain(sub);
     }
 
     public SecurityDomain top() { return top; }
+
     public SecurityDomain bottom() { return bottom; }
+
     public boolean contains(SecurityDomain d) { return hash.contains(d); }
 
 
     /**
-     * The kind of elements to the security lattice.
-     * Keeps track of <i>direct</i> super- and sub-elements.
-     * Instances are mutable, but only by the lattice owning it.
+     * The kind of elements to the security lattice. Keeps track of <i>direct</i> super- and
+     * sub-elements. Instances are mutable, but only by the lattice owning it.
      */
     public final class SecurityDomain {
 
@@ -92,9 +97,11 @@ public class SecurityLattice {
          */
         // TODO: do we really want strict super-elements??
         public boolean isSuperDomain(SecurityDomain other) {
-            if (other == this) return false;
-            for (SecurityDomain sub: subDomains) {
-                if (sub == other || sub.isSuperDomain(other)) return true;
+            if (other == this)
+                return false;
+            for (SecurityDomain sub : subDomains) {
+                if (sub == other || sub.isSuperDomain(other))
+                    return true;
             }
             return false;
         }
@@ -103,18 +110,20 @@ public class SecurityLattice {
          * Returns whether this domain is strictly lower in the hierarchy than the other one.
          */
         public boolean isSubDomain(SecurityDomain other) {
-            if (other == this) return false;
-            for (SecurityDomain sup: superDomains) {
-                if (sup == other || sup.isSubDomain(other)) return true;
+            if (other == this)
+                return false;
+            for (SecurityDomain sup : superDomains) {
+                if (sup == other || sup.isSubDomain(other))
+                    return true;
             }
             return false;
         }
 
         @Override
-        public String toString () { return name; }
+        public String toString() { return name; }
 
         // ensures unique names
         @Override
-        public int hashCode () { return name.hashCode(); }
+        public int hashCode() { return name.hashCode(); }
     }
 }

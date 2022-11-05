@@ -48,6 +48,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     };
 
     private transient Proof currentProof;
+    private boolean enabled;
 
 
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
@@ -56,8 +57,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     /**
-     * Sets the shown proof. If null is given the scenery is emptied otherwise the
-     * model reconstructed.
+     * Sets the shown proof. If null is given the scenery is emptied otherwise the model
+     * reconstructed.
      *
      * @param proof a proof or null
      */
@@ -71,16 +72,25 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
-    public Proof getProof() {return currentProof;}
+    public void setEnabled(boolean enabled) {
+        var old = this.enabled;
+        this.enabled = enabled;
+        if (old != enabled) {
+            createModel(currentProof);
+        }
+    }
+
+    public Proof getProof() { return currentProof; }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
-        if (model != null && !model.isDisposed()) {
+        if (enabled && model != null && !model.isDisposed()) {
             Node root = model.root();
-            //build the treemodel
+            // build the treemodel
             MyTreeNode rootNode = new MyTreeNode(root);
             treeModelExploration.setRoot(rootNode);
-            List<Node> explorationNodes = collectAllExplorationSteps(root, treeModelExploration, rootNode);
+            List<Node> explorationNodes =
+                collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
         }
         updateLabel();
@@ -93,15 +103,15 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    private List<Node> collectAllExplorationSteps(Node root, DefaultTreeModel dtm, MyTreeNode rootNode) {
+    private List<Node> collectAllExplorationSteps(Node root, DefaultTreeModel dtm,
+            MyTreeNode rootNode) {
         ArrayList<Node> list = new ArrayList<>();
         findExplorationChildren(root, list, dtm, rootNode);
         return list;
     }
 
     @Override
-    public @Nonnull
-    Collection<CAction> getTitleCActions() {
+    public @Nonnull Collection<CAction> getTitleCActions() {
         CButton helpButton = new CButton(null, IconFactory.HELP.get());
         helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
         return Collections.singleton(helpButton);
@@ -113,24 +123,21 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * During collection of the nodes, the nodes are grouped in the given TreeModel {@code dtm}
      * </p>
      *
-     * @param n      start node of exploration
-     *               indow, KeYMediator mediator) {
-     *               if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
-     *               return Collections.singleton(leftPanel);
-     *               }* @param foundNodes filled with found exploration nodes
-     * @param dtm    a tree model which is filled with nodes
+     * @param n start node of exploration indow, KeYMediator mediator) { if (leftPanel == null)
+     *        leftPanel = new ExplorationStepsList(window); return Collections.singleton(leftPanel);
+     *        }* @param foundNodes filled with found exploration nodes
+     * @param dtm a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */
     private void findExplorationChildren(@Nonnull Node node,
-                                         final @Nonnull ArrayList<Node> foundNodes,
-                                         @Nonnull DefaultTreeModel dtm,
-                                         @Nonnull MyTreeNode parent) {
+            final @Nonnull ArrayList<Node> foundNodes, @Nonnull DefaultTreeModel dtm,
+            @Nonnull MyTreeNode parent) {
         Set<Node> reached = new HashSet<>(512000);
         ArrayDeque<Node> nodes = new ArrayDeque<>(8);
         nodes.add(node);
 
-        //depth-first traversal
-        while(!nodes.isEmpty()) {
+        // depth-first traversal
+        while (!nodes.isEmpty()) {
             Node n = nodes.pollLast();
 
             ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
@@ -144,7 +151,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             reached.add(n);
             for (Node child : n) {
-                if(!reached.contains(child))
+                if (!reached.contains(child))
                     nodes.push(child);
             }
         }
@@ -219,7 +226,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         return this;
     }
 
-    //region Tree and ListUtils
+    // region Tree and ListUtils
     private void setTreeExpandedState(JTree tree, boolean expanded) {
         MyTreeNode node = (MyTreeNode) tree.getModel().getRoot();
         if (node != null) {
@@ -276,8 +283,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     private static class MyCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
-            JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                boolean isSelected, boolean cellHasFocus) {
+            JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
+                cellHasFocus);
             Node n = (Node) value;
 
             ExplorationNodeData expData = n.lookup(ExplorationNodeData.class);
@@ -292,14 +300,16 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-                                                      boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
+                leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
             ExplorationNodeData expData = n.getData().lookup(ExplorationNodeData.class);
 
             if (n.isRoot()) {
                 if (expData != null && expData.getExplorationAction() != null) {
-                    lbl.setText("Root Node" + n.getData().serialNr() + " " + expData.getExplorationAction());
+                    lbl.setText("Root Node" + n.getData().serialNr() + " "
+                        + expData.getExplorationAction());
                 } else {
                     lbl.setText("Root Node");
                 }
@@ -330,15 +340,15 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public void setData(Node data) {
             this.data = data;
         }
-        
+
         @Override
         public String toString() {
             return Integer.toString(data.serialNr());
         }
     }
-    //endregion
+    // endregion
 
-    //region Actions
+    // region Actions
     private class PruneExplorationAction extends KeyAction {
         public PruneExplorationAction() {
             setName("Prune selected exploration");
@@ -356,7 +366,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                 MyTreeNode selectedNode = (MyTreeNode) lastSelectedPathComponent;
                 mediator.getUI().getProofControl().pruneTo(selectedNode.getData());
                 explorationNode = selectedNode.getData();
-                //update tree with current proof
+                // update tree with current proof
             }
             if (selectedValue != null) {
                 mediator.getUI().getProofControl().pruneTo(selectedValue);
@@ -368,7 +378,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             if (explorationNode != null) {
                 ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
                 explorationNode.deregister(lookup, ExplorationNodeData.class);
-                //update list and tree with current proof
+                // update list and tree with current proof
             }
             createModel(mediator.getSelectedProof());
         }
@@ -390,5 +400,5 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             }
         }
     }
-    //endregion
+    // endregion
 }

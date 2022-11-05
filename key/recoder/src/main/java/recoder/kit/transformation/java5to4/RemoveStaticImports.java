@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Removes static imports from a given Compilation Unit and adds
- * qualfication prefixes to (possible) uses of such imports.
+ * Removes static imports from a given Compilation Unit and adds qualfication prefixes to (possible)
+ * uses of such imports.
  *
  * @author Tobias Gutzmann
  * @since 0.80
@@ -64,7 +64,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MemberReference && pe instanceof ReferenceSuffix && pe instanceof NameReference) {
+            if (pe instanceof MemberReference && pe instanceof ReferenceSuffix
+                    && pe instanceof NameReference) {
                 MemberReference r = (MemberReference) pe;
                 ReferenceSuffix s = (ReferenceSuffix) pe;
                 NameReference nr = (NameReference) pe;
@@ -72,9 +73,11 @@ public class RemoveStaticImports extends TwoPassTransformation {
                     continue; // not found through a static import
                 ClassType targetCT;
                 if (r instanceof MethodReference) {
-                    targetCT = getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
+                    targetCT =
+                        getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
                 } else if (r instanceof FieldReference) {
-                    targetCT = getSourceInfo().getField((FieldReference) r).getContainingClassType();
+                    targetCT =
+                        getSourceInfo().getField((FieldReference) r).getContainingClassType();
                 } else if (r instanceof TypeReference) {
                     Type t = getSourceInfo().getType((TypeReference) r);
                     if (!(t instanceof ClassType))
@@ -83,7 +86,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
                 } else {
                     continue;
                 }
-                if (targetCT instanceof TypeDeclaration && UnitKit.getCompilationUnit((TypeDeclaration) targetCT) == cu)
+                if (targetCT instanceof TypeDeclaration
+                        && UnitKit.getCompilationUnit((TypeDeclaration) targetCT) == cu)
                     continue;
                 String n = nr.getName();
                 for (int i = 0, si = statics.size(); i < si; i++) {

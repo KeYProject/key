@@ -43,24 +43,24 @@ public class TriggeredInstantiations implements TermGenerator {
     public static TermGenerator create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
-    
+
     private Sequent last = Sequent.EMPTY_SEQUENT;
     private Set<Term> lastCandidates = new HashSet<Term>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
-    
+
     private boolean checkConditions;
 
     /**
-     * 
+     *
      * @param checkConditions boolean indicating if conditions should be checked
      */
     public TriggeredInstantiations(boolean checkConditions) {
         this.checkConditions = checkConditions;
     }
-    
+
     @Override
     /**
-     * Generates all instances 
+     * Generates all instances
      */
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (app instanceof TacletApp) {
@@ -72,8 +72,8 @@ public class TriggeredInstantiations implements TermGenerator {
             final Set<Term> terms;
             final Set<Term> axiomSet;
             ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
- 
-            
+
+
             final Sequent seq = goal.sequent();
             if (seq != last) {
                 terms = new HashSet<Term>();
@@ -102,83 +102,78 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
 
-                    final SchemaVariable sv = taclet.getTrigger()
-                            .getTriggerVar();
+                    final SchemaVariable sv = taclet.getTrigger().getTriggerVar();
                     final Sort svSort;
                     if (sv.sort() instanceof GenericSort) {
-                        svSort = svInst.getGenericSortInstantiations()
-                                .getRealSort(sv, services);
+                        svSort = svInst.getGenericSortInstantiations().getRealSort(sv, services);
                     } else {
                         svSort = sv.sort();
                     }
 
-                    final Metavariable mv = new Metavariable(new Name("$MV$"
-                            + sv.name()), svSort);
+                    final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
-                    final Term trigger = instantiateTerm(
-                            taclet.getTrigger().getTerm(), services,
-                            svInst.replace(sv, services.getTermBuilder().var(mv), services));
+                    final Term trigger = instantiateTerm(taclet.getTrigger().getTerm(), services,
+                        svInst.replace(sv, services.getTermBuilder().var(mv), services));
 
-                    final Set<Term> instances = computeInstances(services,
-                            comprehension, mv, trigger, terms, axioms, tapp);
+                    final Set<Term> instances =
+                        computeInstances(services, comprehension, mv, trigger, terms, axioms, tapp);
 
                     return instances.iterator();
                 } else {
                     // at the moment instantiations with more than one
                     // missing taclet variable not supported
-                    return ImmutableSLList.<Term> nil().iterator();
+                    return ImmutableSLList.<Term>nil().iterator();
                 }
             } else {
-                return ImmutableSLList.<Term> nil().iterator();
+                return ImmutableSLList.<Term>nil().iterator();
             }
 
         } else {
-            throw new IllegalArgumentException(
-                    "At the moment only taclets are supported.");
+            throw new IllegalArgumentException("At the moment only taclets are supported.");
         }
 
     }
 
     private Term instantiateTerm(final Term term, final Services services,
             SVInstantiations svInst) {
-        final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(
-              new TermLabelState(), null, null, svInst, null, null, null, services);
+        final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(new TermLabelState(),
+            null, null, svInst, null, null, null, services);
         term.execPostOrder(syn);
         return syn.getTerm();
     }
 
-    private void computeAxiomAndCandidateSets(final Sequent seq,
-            final Set<Term> terms, final Set<Term> axioms, Services services) {        
+    private void computeAxiomAndCandidateSets(final Sequent seq, final Set<Term> terms,
+            final Set<Term> axioms, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
-    private void collectAxiomsAndCandidateTerms(final Set<Term> terms,
-            final Set<Term> axioms, final IntegerLDT integerLDT,
-            Semisequent antecedent, boolean inAntecedent, TermServices services) {
-        
+    private void collectAxiomsAndCandidateTerms(final Set<Term> terms, final Set<Term> axioms,
+            final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
+            TermServices services) {
+
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof Function || 
-                    sf.formula().op() == Equality.EQUALS) {
-                axioms.add(inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
+            if (sf.formula().op() instanceof Function || sf.formula().op() == Equality.EQUALS) {
+                axioms.add(
+                    inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }
         }
     }
 
     private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
             Services services) {
-        
+
         long cost = PredictCostProver.computerInstanceCost(
-                new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
-                cond, axioms, services);
+            new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
+            axioms, services);
         return cost == -1;
     }
 
-    private HashSet<Term> computeInstances(Services services,
-            final Term comprehension, final Metavariable mv,
-            final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms, TacletApp app) {
+    private HashSet<Term> computeInstances(Services services, final Term comprehension,
+            final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
+            TacletApp app) {
 
         final HashSet<Term> instances = new HashSet<Term>();
         final HashSet<Term> alreadyChecked = new HashSet<Term>();
@@ -191,7 +186,8 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
-                        ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
+                        ImmutableList<Term> conditions =
+                            instantiateConditions(services, app, middle);
                         for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {
                                 addToInstances = false;
@@ -208,23 +204,19 @@ public class TriggeredInstantiations implements TermGenerator {
         return instances;
     }
 
-    private ImmutableList<Term> instantiateConditions(Services services,
-            TacletApp app, final Term middle) {
+    private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
+            final Term middle) {
         ImmutableList<Term> conditions;
-        conditions = ImmutableSLList.<Term> nil();
+        conditions = ImmutableSLList.<Term>nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
-            conditions = conditions.append(instantiateTerm(
-                    singleAvoidCond,
-                    services,                    
-                    app.instantiations().replace(
-                            app.taclet().getTrigger().getTriggerVar(), middle,
-                            services)));
+            conditions =
+                conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()
+                        .replace(app.taclet().getTrigger().getTriggerVar(), middle, services)));
         }
         return conditions;
     }
 
-    private void collectTerms(Term instanceCandidate, Set<Term> terms,
-            IntegerLDT intLDT) {
+    private void collectTerms(Term instanceCandidate, Set<Term> terms, IntegerLDT intLDT) {
         if (instanceCandidate.freeVars().isEmpty()
                 && !instanceCandidate.containsJavaBlockRecursive()) {
             terms.add(instanceCandidate);

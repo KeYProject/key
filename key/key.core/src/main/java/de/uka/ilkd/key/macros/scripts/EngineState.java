@@ -48,15 +48,14 @@ public class EngineState {
     private Node lastSetGoalNode;
 
     /**
-     * If set to true, outputs all commands to observers and console. Otherwise,
-     * only shows explicit echo messages.
+     * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
+     * echo messages.
      */
     private boolean echoOn = true;
 
     /**
-     * If set to true, an already closed proof leads to an exception if another goal
-     * should be picked. Otherwise, script execution terminates without an
-     * exception.
+     * If set to true, an already closed proof leads to an exception if another goal should be
+     * picked. Otherwise, script execution terminates without an exception.
      */
     private boolean failOnClosedOn = true;
 
@@ -192,31 +191,28 @@ public class EngineState {
     }
 
     /**
-     * Returns the first open goal, which has to be automatic iff checkAutomatic
-     * is true.
+     * Returns the first open goal, which has to be automatic iff checkAutomatic is true.
      *
      * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic
-     * is true.
+      is true.
      * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
      * @throws ScriptException             If there is no such {@link Goal}, or something else goes
-     *                                     wrong.
+                                          wrong.
      */
     @SuppressWarnings("unused")
-    public Goal getFirstOpenGoal(boolean checkAutomatic)
-            throws ScriptException {
+    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
 
         Node rootNodeForSearch = proof.root();
         Goal newGoal = goal;
-        if (newGoal != null && ((checkAutomatic && !newGoal.isAutomatic())
-                || newGoal.node().isClosed())) {
+        if (newGoal != null
+                && ((checkAutomatic && !newGoal.isAutomatic()) || newGoal.node().isClosed())) {
             assert rootNodeForSearch != null;
             /*
-             * The first subtree of the previous goal is closed. Try with other
-             * subtrees.
+             * The first subtree of the previous goal is closed. Try with other subtrees.
              */
             rootNodeForSearch = goUpUntilOpen(lastSetGoalNode);
             newGoal = null;
@@ -230,8 +226,7 @@ public class EngineState {
         lastSetGoalNode = newGoal.node();
 
         if (newGoal == null) {
-            throw new ScriptException(
-                    "There must be an open goal at this point");
+            throw new ScriptException("There must be an open goal at this point");
         }
 
         return newGoal;
@@ -250,8 +245,8 @@ public class EngineState {
 
         while (currNode.isClosed()) {
             /*
-             * There should always be a non-closed parent since we check whether
-             * the proof is closed at the beginning.
+             * There should always be a non-closed parent since we check whether the proof is closed
+             * at the beginning.
              */
             currNode = currNode.parent();
         }
@@ -308,24 +303,19 @@ public class EngineState {
         return result;
     }
 
-    public Term toTerm(String string)
-            throws ParserException, ScriptException {
+    public Term toTerm(String string) throws ParserException, ScriptException {
         KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);
         Term formula = io.parseExpression(string);
         return formula;
     }
 
-    public Sort toSort(String sortName)
-            throws ParserException, ScriptException {
-        return (getFirstOpenAutomaticGoal() == null
-                ? getProof().getServices().getNamespaces()
-                : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts()
-                .lookup(sortName);
+    public Sort toSort(String sortName) throws ParserException, ScriptException {
+        return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
+                : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
     }
 
-    public Sequent toSequent(String sequent)
-            throws ParserException, ScriptException {
+    public Sequent toSequent(String sequent) throws ParserException, ScriptException {
         KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(getAbbreviations());
         return io.parseSequence(sequent);
@@ -335,8 +325,7 @@ public class EngineState {
         if (proof != null) {
             return proof.getSettings().getStrategySettings().getMaxSteps();
         } else {
-            return ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                    .getMaxSteps();
+            return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
     }
 

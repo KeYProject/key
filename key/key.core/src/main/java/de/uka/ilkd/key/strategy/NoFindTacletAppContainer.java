@@ -13,9 +13,8 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
     }
 
     /**
-     * @return true iff the stored rule app is applicable for the given sequent,
-     * i.e. always true since NoFindTaclets are not bound to a find-position
-     * (if-formulas are not considered)
+     * @return true iff the stored rule app is applicable for the given sequent, i.e. always true
+     *         since NoFindTaclets are not bound to a find-position (if-formulas are not considered)
      */
     @Override
     protected boolean isStillApplicable(Goal p_goal) {

@@ -137,7 +137,8 @@ public class ProofScriptEngine {
             }
 
             try {
-                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
+                ProofScriptCommand<Object> command =
+                    (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name + " at "
                             + BuilderHelpers.getPosition(commandContext));
@@ -156,7 +157,8 @@ public class ProofScriptEngine {
             } catch (ProofAlreadyClosedException e) {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
-                            String.format("Proof already closed while trying to fetch next goal.\n"
+                        String.format(
+                            "Proof already closed while trying to fetch next goal.\n"
                                             + "This error can be suppressed by setting '@failonclosed off'.\n\n"
                                             + "Command: %s\nPosition: %s\n",
                                     commandContext.getText(),
@@ -169,12 +171,13 @@ public class ProofScriptEngine {
                 }
             } catch (Exception e) {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
-                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
+                proof.getSubtreeGoals(stateMap.getProof().root())
+                        .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
-                                e.getMessage(), prettyPrintCommand(commandContext),
+                    String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n", e.getMessage(),
+                        prettyPrintCommand(commandContext),
                                 BuilderHelpers.getPosition(commandContext)),
-                        url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
+                    url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
             }
         }
     }
@@ -213,8 +216,7 @@ public class ProofScriptEngine {
     }
 
     /**
-     * Set the routine that is executed before every successfully executed
-     * command.
+     * Set the routine that is executed before every successfully executed command.
      *
      * @param monitor the monitor to set
      */

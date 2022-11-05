@@ -9,9 +9,10 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodR
  * A node in the symbolic execution tree which represents a exceptional method return.
  * </p>
  * <p>
- * The default implementation is {@link ExecutionExceptionalMethodReturn} which
- * is instantiated via a {@link SymbolicExecutionTreeBuilder} instance.
+ * The default implementation is {@link ExecutionExceptionalMethodReturn} which is instantiated via
+ * a {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
+ *
  * @author Martin Hentschel
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionExceptionalMethodReturn

@@ -34,15 +34,15 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 
 /**
- * This Dialog contains options for highlighting sequent formulae or terms
- * according to their age, i.e., when they were first introduced into the proof.
- * It is possible to highlight all sf/terms up to a specified age, or to
- * highlight the x newest sf/terms, x being specified by the user.
+ * This Dialog contains options for highlighting sequent formulae or terms according to their age,
+ * i.e., when they were first introduced into the proof. It is possible to highlight all sf/terms up
+ * to a specified age, or to highlight the x newest sf/terms, x being specified by the user.
  *
  * @author jschiffl
  *
@@ -56,8 +56,8 @@ public class HeatmapOptionsDialog extends JDialog {
     private static final long serialVersionUID = 5731407140427140088L;
 
     /** The view settings */
-    private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE
-        .getViewSettings();
+    private static final ViewSettings VS =
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
 
     /** Minimal setting for number of highlighted terms */
     private static final int MIN_AGE = 1;
@@ -66,20 +66,20 @@ public class HeatmapOptionsDialog extends JDialog {
     private static final int MAX_AGE = 1000;
 
     /** Text for introductory heatmap explanation */
-    private static final String INTRO_LABEL = "Heatmaps can be used to "
-        + "highlight the most recent changes in the sequent.";
+    private static final String INTRO_LABEL =
+        "Heatmaps can be used to " + "highlight the most recent changes in the sequent.";
 
     /** Explanation for age textfield */
-    private static final String TEXTFIELD_LABEL = "Maximum age of highlighted "
-        + "terms or formulae, or number of newest terms or formulae";
+    private static final String TEXTFIELD_LABEL =
+        "Maximum age of highlighted " + "terms or formulae, or number of newest terms or formulae";
 
     /** Tool tip for age textfield */
-    private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and "
-        + MAX_AGE + ".";
+    private static final String TOOLTIP_TEXT =
+        "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
 
     /** Button command names */
-    private static final String[] COMMANDS = { "default", "sf_age", "sf_newest", "terms_age",
-        "terms_newest" };
+    private static final String[] COMMANDS =
+        { "default", "sf_age", "sf_newest", "terms_age", "terms_newest" };
 
     /** Button names */
     private static final String[] BUTTON_NAMES = { "No heatmaps", "Sequent formulae up to age",
@@ -103,7 +103,8 @@ public class HeatmapOptionsDialog extends JDialog {
             + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */ // Not needed atm
-//    private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
+    // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
+    // 1000";
 
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
@@ -127,6 +128,7 @@ public class HeatmapOptionsDialog extends JDialog {
         final ButtonGroup group = new ButtonGroup();
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         // set up spinner for age value
 
@@ -143,7 +145,7 @@ public class HeatmapOptionsDialog extends JDialog {
         // Display the current settings
         loadSettings(radioButtons);
 
-        //save current settings in case the user escapes
+        // save current settings in case the user escapes
         boolean isShow = VS.isShowHeatmap();
         boolean isSF = VS.isHeatmapSF();
         boolean isNew = VS.isHeatmapNewest();
@@ -191,8 +193,7 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons
-     *            the radio buttons to set
+     * @param radioButtons the radio buttons to set
      */
     private void loadSettings(JRadioButton[] radioButtons) {
         if (VS.isShowHeatmap()) {
@@ -224,7 +225,8 @@ public class HeatmapOptionsDialog extends JDialog {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue());
+                VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(),
+                    (int) valueSpinner.getValue());
             }
         });
         JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
@@ -239,10 +241,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param okButton
-     *            the ok button on the panel
-     * @param cancelButton
-     *            the cancel button on the panel
+     * @param okButton the ok button on the panel
+     * @param cancelButton the cancel button on the panel
      * @return a panel with ok and cancel button
      */
     private JPanel setupButtonPanel(JButton okButton, JButton cancelButton) {
@@ -255,8 +255,7 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param spinner
-     *            the spinner shown on the panel
+     * @param spinner the spinner shown on the panel
      * @return a panel with spinner and explanation
      */
     private JPanel setupSpinnerPanel(JSpinner spinner, Color bg) {
@@ -277,10 +276,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons
-     *            the radio buttons shown on the panel
-     * @param bg
-     *            the background color
+     * @param radioButtons the radio buttons shown on the panel
+     * @param bg the background color
      * @return a panel with all the radio buttons and explanations
      */
     private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
@@ -331,16 +328,12 @@ public class HeatmapOptionsDialog extends JDialog {
     /**
      * Sets up the action that is called on pressing the ok button
      *
-     * @param panel
-     *            the main panel
-     * @param group
-     *            the radio button group
-     * @param spinner
-     *            the age spinner
+     * @param panel the main panel
+     * @param group the radio button group
+     * @param spinner the age spinner
      * @return
      */
-    private Action setupOkAction(JPanel panel, final ButtonGroup group,
-        JSpinner spinner) {
+    private Action setupOkAction(JPanel panel, final ButtonGroup group, JSpinner spinner) {
         Action action = new AbstractAction() {
 
             private static final long serialVersionUID = -5840137383763071948L;
@@ -393,12 +386,9 @@ public class HeatmapOptionsDialog extends JDialog {
 
         /**
          *
-         * @param s
-         *            the description
-         * @param title
-         *            title of the dialog
-         * @param owner
-         *            the parent window
+         * @param s the description
+         * @param title title of the dialog
+         * @param owner the parent window
          */
         public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);
@@ -424,13 +414,14 @@ public class HeatmapOptionsDialog extends JDialog {
                 public void windowGainedFocus(WindowEvent e) {
                     // do nothing
                 }
+
                 @Override
                 public void windowLostFocus(WindowEvent e) {
                     InfoDialog.this.dispose();
                 }
             });
 
-            //exit on escape button
+            // exit on escape button
             getRootPane().registerKeyboardAction(e -> {
                 dispose();
             }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);

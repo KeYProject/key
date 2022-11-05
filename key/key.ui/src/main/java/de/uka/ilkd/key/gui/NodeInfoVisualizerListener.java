@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui;
 
 /**
- * A listener to the {@link NodeInfoVisualizer} class.
- * Listeners are notified whenever a visualizer is registered or unregistered from
+ * A listener to the {@link NodeInfoVisualizer} class. Listeners are notified whenever a visualizer
+ * is registered or unregistered from
  * {@link NodeInfoVisualizer#getInstances(de.uka.ilkd.key.proof.Node)}.
  *
  * @author lanzinger

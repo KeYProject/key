@@ -4,10 +4,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
- * A {@link MergePartner} consists of a {@link Goal} and a
- * {@link PosInOccurrence}; the {@link PosInOccurrence} part indicates the
- * portion of the sequent in the {@link Goal} which represents the symbolic
- * state-program counter part.
+ * A {@link MergePartner} consists of a {@link Goal} and a {@link PosInOccurrence}; the
+ * {@link PosInOccurrence} part indicates the portion of the sequent in the {@link Goal} which
+ * represents the symbolic state-program counter part.
  *
  * @author Dominic Scheurer
  */
@@ -32,8 +31,8 @@ public class MergePartner {
     }
 
     /**
-     * @return The {@link PosInOccurrence} representing the symbolic
-     *         state-program counter part of the {@link MergePartner}.
+     * @return The {@link PosInOccurrence} representing the symbolic state-program counter part of
+     *         the {@link MergePartner}.
      */
     public PosInOccurrence getPio() {
         return pio;

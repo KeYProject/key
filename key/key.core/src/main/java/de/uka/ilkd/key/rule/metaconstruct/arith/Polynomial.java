@@ -24,12 +24,12 @@ public class Polynomial {
      * The polynomial expression of the BigInteger constant '0'.
      */
     public final static Polynomial ZERO =
-            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
     /**
      * The polynomial expression of the BigInteger constant '1'.
      */
     public final static Polynomial ONE =
-            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
+        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
 
     /**
      * The BigInteger constant for the value '-1'.
@@ -91,8 +91,7 @@ public class Polynomial {
         }
 
         if (m.getParts().isEmpty()) {
-            return new Polynomial(newParts,
-                    constantPart.multiply(m.getCoefficient()));
+            return new Polynomial(newParts, constantPart.multiply(m.getCoefficient()));
         }
 
         newParts = addPart(newParts, m.multiply(constantPart));
@@ -114,8 +113,7 @@ public class Polynomial {
 
     public Polynomial add(Monomial m) {
         if (m.getParts().isEmpty()) {
-            return new Polynomial(parts,
-                    constantPart.add(m.getCoefficient()));
+            return new Polynomial(parts, constantPart.add(m.getCoefficient()));
         }
 
         return new Polynomial(addPart(parts, m), constantPart);
@@ -222,6 +220,7 @@ public class Polynomial {
 
     /**
      * Creates a term from this polynomial expression.
+     *
      * @param services the services object
      * @return the resulting term
      */
@@ -281,12 +280,11 @@ public class Polynomial {
                 analyse(polynomial.sub(0));
                 analyse(polynomial.sub(1));
             } else if (op == numbers) {
-                final BigInteger c = new BigInteger(AbstractTermTransformer
-                        .convertToDecimalString(polynomial, services));
+                final BigInteger c = new BigInteger(
+                    AbstractTermTransformer.convertToDecimalString(polynomial, services));
                 constantPart = constantPart.add(c);
             } else {
-                parts = addPart(parts,
-                        Monomial.create(polynomial, services));
+                parts = addPart(parts, Monomial.create(polynomial, services));
             }
         }
     }

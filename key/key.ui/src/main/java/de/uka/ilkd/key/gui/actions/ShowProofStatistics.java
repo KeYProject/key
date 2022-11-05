@@ -53,12 +53,9 @@ public class ShowProofStatistics extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         final Proof proof = getMediator().getSelectedProof();
         if (proof == null) {
-            mainWindow.notify(new GeneralInformationEvent(
-                    "No statistics available.",
-                    "If you wish to see the statistics "
-                            + "for a proof you have to load one first"));
-        }
-        else {
+            mainWindow.notify(new GeneralInformationEvent("No statistics available.",
+                "If you wish to see the statistics " + "for a proof you have to load one first"));
+        } else {
             Window win = new Window(mainWindow, proof);
             win.setVisible(true);
         }
@@ -87,18 +84,17 @@ public class ShowProofStatistics extends MainWindowAction {
 
         if (s.interactiveSteps > 0) {
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                    new TreeSet<Map.Entry<String, Integer>>(
-                            new Comparator<Map.Entry<String, Integer>>() {
+                new TreeSet<Map.Entry<String, Integer>>(
+                    new Comparator<Map.Entry<String, Integer>>() {
                         @Override
-                        public int compare(Entry<String, Integer> o1,
-                                           Entry<String, Integer> o2) {
+                        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
                             int cmpRes = o2.getValue().compareTo(o1.getValue());
                             if (cmpRes == 0) {
                                 cmpRes = o1.getKey().compareTo(o2.getKey());
                             }
                             return cmpRes;
                         }
-                });
+                    });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
@@ -111,19 +107,14 @@ public class ShowProofStatistics extends MainWindowAction {
 
     public static String getHTMLStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
-        String stats = "<html><head>"
-                + "<style type=\"text/css\">"
-                + "body {font-weight: normal; text-align: center;}"
-                + "td {padding: 1px;}"
-                + "th {padding: 2px; font-weight: bold;}"
-                + "</style></head><body>";
+        String stats = "<html><head>" + "<style type=\"text/css\">"
+            + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
+            + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>";
 
         if (openGoals > 0) {
             stats +=
-                    "<strong>" + openGoals + " open goal"
-                            + (openGoals > 1 ? "s." : ".") + "</strong>";
-        }
-        else {
+                "<strong>" + openGoals + " open goal" + (openGoals > 1 ? "s." : ".") + "</strong>";
+        } else {
             stats += "<strong>Proved.</strong>";
         }
 
@@ -133,49 +124,34 @@ public class ShowProofStatistics extends MainWindowAction {
 
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
-                stats +=
-                        "<tr><th colspan=\"2\">" + x.first
-                                + "</th></tr>";
-            }
-            else {
-                stats +=
-                        "<tr><td>" + x.first + "</td><td>" + x.second
-                                + "</td></tr>";
+                stats += "<tr><th colspan=\"2\">" + x.first + "</th></tr>";
+            } else {
+                stats += "<tr><td>" + x.first + "</td><td>" + x.second + "</td></tr>";
             }
         }
 
         if (s.interactiveSteps > 0) {
-            stats +=
-                    "<tr><th colspan=\"2\">"
-                            + "Details on Interactive Apps"
-                            + "</th></tr>";
+            stats += "<tr><th colspan=\"2\">" + "Details on Interactive Apps" + "</th></tr>";
 
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                    new TreeSet<Map.Entry<String, Integer>>(
-                            new Comparator<Map.Entry<String, Integer>>() {
-                                @Override
-                                public int compare(
-                                        Entry<String, Integer> o1,
-                                        Entry<String, Integer> o2) {
-                                    int cmpRes =
-                                            o2.getValue().compareTo(
-                                                    o1.getValue());
+                new TreeSet<Map.Entry<String, Integer>>(
+                    new Comparator<Map.Entry<String, Integer>>() {
+                        @Override
+                        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+                            int cmpRes = o2.getValue().compareTo(o1.getValue());
 
-                                    if (cmpRes == 0) {
-                                        cmpRes =
-                                                o1.getKey().compareTo(
-                                                        o2.getKey());
-                                    }
+                            if (cmpRes == 0) {
+                                cmpRes = o1.getKey().compareTo(o2.getKey());
+                            }
 
-                                    return cmpRes;
-                                }
-                            });
+                            return cmpRes;
+                        }
+                    });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
                 stats +=
-                        "<tr><td>" + entry.getKey() + "</td><td>"
-                                + entry.getValue() + "</td></tr>";
+                    "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
             }
         }
 
@@ -211,7 +187,7 @@ public class ShowProofStatistics extends MainWindowAction {
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
             statisticsPane.setSize(new Dimension(10, 360));
             statisticsPane.setPreferredSize(
-                    new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
+                new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -219,7 +195,7 @@ public class ShowProofStatistics extends MainWindowAction {
             Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
             if (myFont != null) {
                 statisticsPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-                                                 Boolean.TRUE);
+                    Boolean.TRUE);
                 statisticsPane.setFont(myFont);
             } else {
                 LOGGER.debug("KEY_FONT_PROOF_TREE not available. Use standard font.");
@@ -235,13 +211,13 @@ public class ShowProofStatistics extends MainWindowAction {
             JButton csvButton = new JButton("Export as CSV");
             csvButton.addActionListener(event -> {
                 export("csv", MiscTools.toValidFileName(proof.name().toString()),
-                        ShowProofStatistics.getCSVStatisticsMessage(proof));
+                    ShowProofStatistics.getCSVStatisticsMessage(proof));
             });
 
             JButton htmlButton = new JButton("Export as HTML");
             htmlButton.addActionListener(event -> {
-                export("html",  MiscTools.toValidFileName(proof.name().toString()),
-                        ShowProofStatistics.getHTMLStatisticsMessage(proof));
+                export("html", MiscTools.toValidFileName(proof.name().toString()),
+                    ShowProofStatistics.getHTMLStatisticsMessage(proof));
             });
 
             buttonPane.add(okButton);
@@ -263,14 +239,10 @@ public class ShowProofStatistics extends MainWindowAction {
             add(scrollPane, BorderLayout.CENTER);
             add(buttonPane, BorderLayout.PAGE_END);
 
-            int w = 50
-                    + Math.max(
-                            scrollPane.getPreferredSize().width,
-                            buttonPane.getPreferredSize().width
-                            );
-            int h = scrollPane.getPreferredSize().height
-                    + buttonPane.getPreferredSize().height
-                    + 100;
+            int w = 50 + Math.max(scrollPane.getPreferredSize().width,
+                buttonPane.getPreferredSize().width);
+            int h =
+                scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }
@@ -284,15 +256,15 @@ public class ShowProofStatistics extends MainWindowAction {
         }
 
         private void export(String fileExtension, String fileName, String text) {
-            KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
-                    "Choose filename to save statistics");
+            KeYFileChooser fileChooser =
+                KeYFileChooser.getFileChooser("Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
             fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
             int result = fileChooser.showSaveDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                try(BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(new FileOutputStream(file)));) {
+                try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));) {
                     writer.write(text);
                 } catch (IOException e) {
                     e.printStackTrace();

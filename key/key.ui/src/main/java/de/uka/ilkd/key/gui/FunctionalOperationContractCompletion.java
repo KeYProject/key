@@ -11,9 +11,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
- * This class completes the instantiation for a functional operation contract
- * applications. The user is queried for the contract to apply. If in forced mode the combined contracts 
- * will be used.
+ * This class completes the instantiation for a functional operation contract applications. The user
+ * is queried for the contract to apply. If in forced mode the combined contracts will be used.
  */
 public class FunctionalOperationContractCompletion implements InteractiveRuleApplicationCompletion {
 
@@ -27,25 +26,22 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
                 return app;
             }
         }
-        
-        Instantiation inst = UseOperationContractRule.computeInstantiation(
-                app.posInOccurrence().subTerm(), services);
-        
-        ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
-                .getApplicableContracts(
-                        inst, services);
-        
-        FunctionalOperationContract[] contractsArr = contracts
-                .toArray(new FunctionalOperationContract[contracts.size()]);
-        
-        ContractConfigurator cc = new ContractConfigurator(
-                MainWindow.getInstance(), services, contractsArr,
-                "Contracts for " + inst.pm.getName(), true);
-        
+
+        Instantiation inst = UseOperationContractRule
+                .computeInstantiation(app.posInOccurrence().subTerm(), services);
+
+        ImmutableSet<FunctionalOperationContract> contracts =
+            UseOperationContractRule.getApplicableContracts(inst, services);
+
+        FunctionalOperationContract[] contractsArr =
+            contracts.toArray(new FunctionalOperationContract[contracts.size()]);
+
+        ContractConfigurator cc = new ContractConfigurator(MainWindow.getInstance(), services,
+            contractsArr, "Contracts for " + inst.pm.getName(), true);
+
         if (cc.wasSuccessful()) {
-            return  ((UseOperationContractRule) app.rule()).createApp(
-                    app.posInOccurrence()).setContract(
-                            cc.getContract());
+            return ((UseOperationContractRule) app.rule()).createApp(app.posInOccurrence())
+                    .setContract(cc.getContract());
         }
         return app;
     }
@@ -54,12 +50,12 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
     public boolean canComplete(IBuiltInRuleApp app) {
         return checkCanComplete(app);
     }
-    
+
     /**
-     * Checks if the app is supported. 
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof UseOperationContractRule;
-   }
+        return app.rule() instanceof UseOperationContractRule;
+    }
 }

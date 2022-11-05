@@ -13,7 +13,8 @@ import recoder.list.generic.ASTList;
  * @author <TT>AutoDoc</TT>
  */
 
-public class ClassInitializer extends JavaDeclaration implements MemberDeclaration, StatementContainer {
+public class ClassInitializer extends JavaDeclaration
+        implements MemberDeclaration, StatementContainer {
 
     /**
      * serialization id
@@ -55,7 +56,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
      * Class initializer.
      *
      * @param modifier a static.
-     * @param body     a statement block.
+     * @param body a statement block.
      */
 
     public ClassInitializer(Static modifier, StatementBlock body) {
@@ -152,10 +153,9 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
@@ -181,8 +181,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -221,11 +220,10 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

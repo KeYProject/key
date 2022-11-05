@@ -44,8 +44,9 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * Construct a new outer or member interface class.
      */
 
-    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
-                                ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
+    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+            Extends extended, ASTList<MemberDeclaration> members,
+            ASTList<TypeParameterDeclaration> typeParameters) {
         super(modifiers, name);
         setExtendedTypes(extended);
         setMembers(members);
@@ -53,8 +54,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
         makeParentRoleValid();
     }
 
-    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
-                                ASTList<MemberDeclaration> members) {
+    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+            Extends extended, ASTList<MemberDeclaration> members) {
         this(modifiers, name, extended, members, null);
     }
 
@@ -123,8 +124,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -199,11 +199,10 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
