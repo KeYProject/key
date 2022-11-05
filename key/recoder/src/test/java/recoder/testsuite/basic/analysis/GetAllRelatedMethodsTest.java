@@ -50,7 +50,7 @@ public class GetAllRelatedMethodsTest {
         checkRelatedMethodsCount(ct, "childAndIFirstMethod", 2);
         checkRelatedMethodsCount(ct, "baseAndChildAndIFirstMethod", 3);
         checkRelatedMethodsCount(ct, "baseAndIFirstMethod", 2);
-        //checkRelatedMethodsCount(ct, "clone",3); // Should be all classes
+        // checkRelatedMethodsCount(ct, "clone",3); // Should be all classes
         // overriding clone
 
         ct = loadClass("Base");
@@ -61,7 +61,8 @@ public class GetAllRelatedMethodsTest {
     }
 
     private void checkRelatedMethodsCount(ClassType ct, String methodName, int expectedNumber) {
-        List<Method> ml = MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
+        List<Method> ml =
+            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
         if (ml.size() != expectedNumber) {
             System.err.println("Aha");
         }

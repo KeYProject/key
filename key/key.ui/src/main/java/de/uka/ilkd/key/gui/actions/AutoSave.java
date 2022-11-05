@@ -13,15 +13,16 @@ public class AutoSave extends MainWindowAction {
 
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
-        setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory() +
-        		"periodically and when finished.");
+        setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory()
+            + "periodically and when finished.");
         setName("Auto Save Proofs");
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);
+        setSelected(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        int p = isSelected()? DEFAULT_PERIOD: 0;
+        int p = isSelected() ? DEFAULT_PERIOD : 0;
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setAutoSave(p);
         this.getMediator().setAutoSave(p);
     }

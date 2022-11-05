@@ -4,8 +4,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 
 
 /**
- * Interface for position modifiers. A position modifier is a function which
- * gets a position and delivers a (new) position as result.
+ * Interface for position modifiers. A position modifier is a function which gets a position and
+ * delivers a (new) position as result.
  *
  * @author christoph
  */

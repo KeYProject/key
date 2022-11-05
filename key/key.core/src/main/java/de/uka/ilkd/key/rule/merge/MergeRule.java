@@ -55,19 +55,19 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
- * Base for implementing merge rules. Extend this class, implement method
- * mergeValuesInStates(...) and register in class JavaProfile.
+ * Base for implementing merge rules. Extend this class, implement method mergeValuesInStates(...)
+ * and register in class JavaProfile.
  * <p>
- * 
- * The rule is applicable if the chosen subterm has the form { x := v || ... }
- * PHI and there are potential merge candidates.
+ *
+ * The rule is applicable if the chosen subterm has the form { x := v || ... } PHI and there are
+ * potential merge candidates.
  * <p>
- * 
+ *
  * Any rule application returned will be incomplete; completion is handled by
  * de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion.
- * 
+ *
  * @author Dominic Scheurer
- * 
+ *
  * @see MergeRuleUtils
  * @see MergeTotalWeakening
  * @see MergeByIfThenElse
@@ -84,33 +84,30 @@ public class MergeRule implements BuiltInRule {
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
     /**
-     * If set to true, merge rules are expected to check the equivalence for
-     * right sides (for preserving idempotency) only on a pure syntactical
-     * basis. If set to false, they are allowed to do a proof to check the
-     * equivalence in the respective contexts.
+     * If set to true, merge rules are expected to check the equivalence for right sides (for
+     * preserving idempotency) only on a pure syntactical basis. If set to false, they are allowed
+     * to do a proof to check the equivalence in the respective contexts.
      */
     protected static final boolean RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL = true;
 
     /**
-     * Thresholds the maximum depth of right sides in updates for which an
-     * equivalence proof is started.
-     * 
-     * We skip the check for equal valuation of this variable if the depth
-     * threshold is exceeded by one of the right sides. Experiments show a very
-     * big time overhead from a depth of about 8-10 on, or sometimes even
-     * earlier.
+     * Thresholds the maximum depth of right sides in updates for which an equivalence proof is
+     * started.
+     *
+     * We skip the check for equal valuation of this variable if the depth threshold is exceeded by
+     * one of the right sides. Experiments show a very big time overhead from a depth of about 8-10
+     * on, or sometimes even earlier.
      */
     private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
     /**
-     * Time threshold in milliseconds for the automatic simplification of
-     * formulae (side proofs are stopped after that amount of time).
+     * Time threshold in milliseconds for the automatic simplification of formulae (side proofs are
+     * stopped after that amount of time).
      */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 2000;
 
     /**
-     * {@link MergeRule} is a Singleton class, therefore constructor only
-     * package-wide visible.
+     * {@link MergeRule} is a Singleton class, therefore constructor only package-wide visible.
      */
     MergeRule() {
     }
@@ -131,8 +128,8 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, final Services services,
-            RuleApp ruleApp) throws RuleAbortException {
+    public final ImmutableList<Goal> apply(Goal goal, final Services services, RuleApp ruleApp)
+            throws RuleAbortException {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 
@@ -142,34 +139,30 @@ public class MergeRule implements BuiltInRule {
 
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
-        final int numSideConditionsToProve = mergeRuleApp
-                .getConcreteRule() instanceof MergeWithLatticeAbstraction
-                        ? ((MergeWithLatticeAbstraction) mergeRuleApp
-                                .getConcreteRule()).getUserChoices().size()
-                                * (mergeRuleApp.getMergePartners().size() + 1)
-                        : 0;
+        final int numSideConditionsToProve =
+            mergeRuleApp.getConcreteRule() instanceof MergeWithLatticeAbstraction
+                    ? ((MergeWithLatticeAbstraction) mergeRuleApp.getConcreteRule())
+                            .getUserChoices().size() * (mergeRuleApp.getMergePartners().size() + 1)
+                    : 0;
 
         // New goals are reversed to make sure that they are displayed in the
         // order expected by the user.
-        final ImmutableList<Goal> newGoals = goal
-                .split(1 + numSideConditionsToProve).reverse();
+        final ImmutableList<Goal> newGoals = goal.split(1 + numSideConditionsToProve).reverse();
         final Goal newGoal = newGoals.head();
 
         final TermBuilder tb = services.getTermBuilder();
         final MergeProcedure mergeRule = mergeRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
-        final ImmutableList<MergePartner> mergePartners = mergeRuleApp
-                .getMergePartners();
+        final ImmutableList<MergePartner> mergePartners = mergeRuleApp.getMergePartners();
 
-        final SymbolicExecutionStateWithProgCnt thisSEState = mergeRuleApp
-                .getMergeSEState();
+        final SymbolicExecutionStateWithProgCnt thisSEState = mergeRuleApp.getMergeSEState();
 
-        final ImmutableList<SymbolicExecutionState> mergePartnerStates = mergeRuleApp
-                .getMergePartnerStates();
+        final ImmutableList<SymbolicExecutionState> mergePartnerStates =
+            mergeRuleApp.getMergePartnerStates();
 
         // The merge loop
-        SymbolicExecutionState mergedState = new SymbolicExecutionState(
-                thisSEState.first, thisSEState.second, newGoal.node());
+        SymbolicExecutionState mergedState =
+            new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
@@ -179,16 +172,15 @@ public class MergeRule implements BuiltInRule {
             mergeRuleApp.fireProgressChange(cnt++);
 
             final Pair<SymbolicExecutionState, SymbolicExecutionState> noClash = //
-                    MergeRuleUtils.handleNameClashes(mergedState, state,
-                            services);
+                MergeRuleUtils.handleNameClashes(mergedState, state, services);
 
             mergedState = noClash.first;
             state = noClash.second;
 
             mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
 
-            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
-                    mergeRule, mergedState, state, thisSEState.third,
+            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult =
+                mergeStates(mergeRule, mergedState, state, thisSEState.third,
                     mergeRuleApp.getDistinguishingFormula(), services);
             newNames.addAll(mergeResult.second);
             sideConditionsToProve.addAll(mergeResult.third);
@@ -209,11 +201,9 @@ public class MergeRule implements BuiltInRule {
 
         // Close partner goals
         for (MergePartner mergePartner : mergePartners) {
-            closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(),
-                    mergePartner.getPio(), mergedState,
-                    mergePartnerNodesToStates
-                            .get(mergePartner.getGoal().node()),
-                    thisSEState.third, newNames);
+            closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(), mergePartner.getPio(),
+                mergedState, mergePartnerNodesToStates.get(mergePartner.getGoal().node()),
+                thisSEState.third, newNames);
         }
 
         // Delete previous sequents
@@ -225,11 +215,12 @@ public class MergeRule implements BuiltInRule {
         // also have. Otherwise, this would be a soundness problem (e.g. in
         // the case of insert_hidden taclets). However, taclets that are present
         // in all partner goals may be safely kept.
-        final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove = new ArrayList<NoPosTacletApp>();
+        final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove =
+            new ArrayList<NoPosTacletApp>();
         newGoal.indexOfTaclets().getPartialInstantiatedApps().forEach(app -> {
             for (final MergePartner mergePartner : mergePartners) {
-                if (!mergePartner.getGoal().indexOfTaclets()
-                        .getPartialInstantiatedApps().contains(app)) {
+                if (!mergePartner.getGoal().indexOfTaclets().getPartialInstantiatedApps()
+                        .contains(app)) {
                     partInstNoPosTacletsToRemove.add(app);
                     break;
                 }
@@ -239,20 +230,16 @@ public class MergeRule implements BuiltInRule {
         newGoal.indexOfTaclets().removeTaclets(partInstNoPosTacletsToRemove);
 
         // Add new antecedent (path condition)
-        for (Term antecedentFormula : getConjunctiveElementsFor(
-                resultPathCondition)) {
-            final SequentFormula newAntecedent = new SequentFormula(
-                    antecedentFormula);
+        for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
+            final SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
-        final Term succedentFormula = tb.apply(mergedState.first,
-                thisSEState.third);
-        final SequentFormula newSuccedent = new SequentFormula(
-                succedentFormula);
-        newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
-                PosInTerm.getTopLevel(), false));
+        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.third);
+        final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
+        newGoal.addFormula(newSuccedent,
+            new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
 
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
@@ -275,21 +262,18 @@ public class MergeRule implements BuiltInRule {
                 if (i == 0) {
                     i++;
 
-                    sideConditionGoal.node().getNodeInfo()
-                            .setBranchLabel("Merge Result");
+                    sideConditionGoal.node().getNodeInfo().setBranchLabel("Merge Result");
                     continue;
                 }
 
-                sideConditionGoal.node().getNodeInfo()
-                        .setBranchLabel("Merge is valid (" + i + ")");
+                sideConditionGoal.node().getNodeInfo().setBranchLabel("Merge is valid (" + i + ")");
 
                 clearSemisequent(sideConditionGoal, true);
                 clearSemisequent(sideConditionGoal, false);
                 final Term sideCondition = sideCondIt.next();
 
                 sideConditionGoal.addFormula(new SequentFormula(sideCondition),
-                        new PosInOccurrence(newSuccedent,
-                                PosInTerm.getTopLevel(), false));
+                    new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
 
                 i++;
             }
@@ -303,32 +287,24 @@ public class MergeRule implements BuiltInRule {
      * {@link MergeRule#mergeValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
      * . p must be the same in both states, so it is supplied separately.
      * <p>
-     * 
+     *
      * Override this method for special merge procedures.
      *
-     * @param mergeRule
-     *            The merge procedure to use for the merge.
-     * @param state1
-     *            First state to merge.
-     * @param state2
-     *            Second state to merge.
-     * @param programCounter
-     *            The formula \&lt;{ ... }\&gt; phi consisting of the common
-     *            program counter and the post condition.
-     * @param distinguishingFormula
-     *            The user-specified distinguishing formula. May be null (for
-     *            automatic generation).
-     * @param services
-     *            The services object.
-     * @return A new merged SE state (U*,C*) which is a weakening of the
-     *         original states.
+     * @param mergeRule The merge procedure to use for the merge.
+     * @param state1 First state to merge.
+     * @param state2 Second state to merge.
+     * @param programCounter The formula \&lt;{ ... }\&gt; phi consisting of the common program
+     *        counter and the post condition.
+     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     *        automatic generation).
+     * @param services The services object.
+     * @return A new merged SE state (U*,C*) which is a weakening of the original states.
      */
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
     protected Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeStates(
-            MergeProcedure mergeRule, SymbolicExecutionState state1,
-            SymbolicExecutionState state2, Term programCounter,
-            Term distinguishingFormula, Services services) {
+            MergeProcedure mergeRule, SymbolicExecutionState state1, SymbolicExecutionState state2,
+            Term programCounter, Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -343,15 +319,13 @@ public class MergeRule implements BuiltInRule {
         // NOTE: Deactivated this; This optimization can create shorter
         // formulas, but is very time consumptive. At the end, the result does
         // not always perform better than within the unoptimized version.
-        final Term newPathCondition = MergeRuleUtils
-                .createSimplifiedDisjunctivePathCondition(state1.second,
-                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
+        final Term newPathCondition = MergeRuleUtils.createSimplifiedDisjunctivePathCondition(
+            state1.second, state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
         // Collect program variables in Java block
-        progVars = progVars
-                .union(getLocationVariables(programCounter, services));
+        progVars = progVars.union(getLocationVariables(programCounter, services));
         // Collect program variables in update
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
@@ -384,20 +358,16 @@ public class MergeRule implements BuiltInRule {
             // Experiments show a very big time overhead from a depth of
             // about 8-10 on, or sometimes even earlier.
             if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING
-                    && rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING
-                    && !proofClosed
+                    && rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING && !proofClosed
                     && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
-                Term predicateTerm = tb.func(
-                        new Function(new Name("P"), Sort.FORMULA, v.sort()),
-                        tb.var(v));
+                Term predicateTerm =
+                    tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);
-                Term toProve = tb.and(tb.imp(appl1, appl2),
-                        tb.imp(appl2, appl1));
+                Term toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
 
-                proofClosed = isProvableWithSplitting(toProve, services,
-                        SIMPLIFICATION_TIMEOUT_MS);
+                proofClosed = isProvableWithSplitting(toProve, services, SIMPLIFICATION_TIMEOUT_MS);
             }
 
             if (proofClosed) {
@@ -405,57 +375,49 @@ public class MergeRule implements BuiltInRule {
                 // Arbitrary choice: Take value of first state if
                 // this does not equal the program variable itself
                 if (!rightSide1.equals(tb.var(v))) {
-                    newElementaryUpdates = newElementaryUpdates
-                            .prepend(tb.elementary(v, rightSide1));
+                    newElementaryUpdates =
+                        newElementaryUpdates.prepend(tb.elementary(v, rightSide1));
                 }
 
             } else {
 
                 // Apply merge procedure: Different values
 
-                Sort heapSort = (Sort) services.getNamespaces().sorts()
-                        .lookup("Heap");
+                Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
 
                 if (v.sort().equals(heapSort)) {
 
-                    ValuesMergeResult mergedHeaps = mergeHeaps(mergeRule, v,
-                            rightSide1, rightSide2, state1, state2,
-                            distinguishingFormula, services);
+                    ValuesMergeResult mergedHeaps = mergeHeaps(mergeRule, v, rightSide1, rightSide2,
+                        state1, state2, distinguishingFormula, services);
 
-                    newElementaryUpdates = newElementaryUpdates.prepend(
-                            tb.elementary(v, mergedHeaps.getMergeVal()));
+                    newElementaryUpdates =
+                        newElementaryUpdates.prepend(tb.elementary(v, mergedHeaps.getMergeVal()));
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints = tb
-                                .and(mergedHeaps.getNewConstraints());
+                        newAdditionalConstraints = tb.and(mergedHeaps.getNewConstraints());
                     } else {
-                        newAdditionalConstraints = tb.and(
-                                newAdditionalConstraints,
-                                tb.and(mergedHeaps.getNewConstraints()));
+                        newAdditionalConstraints = tb.and(newAdditionalConstraints,
+                            tb.and(mergedHeaps.getNewConstraints()));
                     }
 
                     newNames.addAll(mergedHeaps.getNewNames());
-                    sideConditionsToProve
-                            .addAll(mergedHeaps.getSideConditions());
+                    sideConditionsToProve.addAll(mergedHeaps.getSideConditions());
 
                 } else {
 
-                    ValuesMergeResult mergedVal = mergeRule.mergeValuesInStates(
-                            tb.var(v), state1, rightSide1, state2, rightSide2,
-                            distinguishingFormula, services);
+                    ValuesMergeResult mergedVal = mergeRule.mergeValuesInStates(tb.var(v), state1,
+                        rightSide1, state2, rightSide2, distinguishingFormula, services);
 
                     newNames.addAll(mergedVal.getNewNames());
                     sideConditionsToProve.addAll(mergedVal.getSideConditions());
 
-                    newElementaryUpdates = newElementaryUpdates
-                            .prepend(tb.elementary(v, mergedVal.getMergeVal()));
+                    newElementaryUpdates =
+                        newElementaryUpdates.prepend(tb.elementary(v, mergedVal.getMergeVal()));
 
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints = tb
-                                .and(mergedVal.getNewConstraints());
+                        newAdditionalConstraints = tb.and(mergedVal.getNewConstraints());
                     } else {
-                        newAdditionalConstraints = tb.and(
-                                newAdditionalConstraints,
-                                tb.and(mergedVal.getNewConstraints()));
+                        newAdditionalConstraints =
+                            tb.and(newAdditionalConstraints, tb.and(mergedVal.getNewConstraints()));
                     }
 
                 } // end else of if (v.sort().equals(heapSort))
@@ -471,44 +433,35 @@ public class MergeRule implements BuiltInRule {
         // merge techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the merge.
         return new Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>>(
-                new SymbolicExecutionState(newSymbolicState,
-                        newAdditionalConstraints == null ? newPathCondition
-                                : tb.and(newPathCondition,
-                                        tb.apply(newSymbolicState,
-                                                newAdditionalConstraints))),
-                newNames, sideConditionsToProve);
+            new SymbolicExecutionState(newSymbolicState,
+                newAdditionalConstraints == null ? newPathCondition
+                        : tb.and(newPathCondition,
+                            tb.apply(newSymbolicState, newAdditionalConstraints))),
+            newNames, sideConditionsToProve);
 
     }
 
     /**
-     * Merges two heaps in a zip-like procedure. The fallback is an if-then-else
-     * construct that is tried to be shifted as far inwards as possible.
+     * Merges two heaps in a zip-like procedure. The fallback is an if-then-else construct that is
+     * tried to be shifted as far inwards as possible.
      * <p>
-     * 
+     *
      * Override this method for specialized heap merge procedures.
-     * 
-     * @param heapVar
-     *            The heap variable for which the values should be merged.
-     * @param heap1
-     *            The first heap term.
-     * @param heap2
-     *            The second heap term.
-     * @param state1
-     *            SE state for the first heap term.
-     * @param state2
-     *            SE state for the second heap term
-     * @param services
-     *            The services object.
-     * @param distinguishingFormula
-     *            The user-specified distinguishing formula. May be null (for
-     *            automatic generation).
+     *
+     * @param heapVar The heap variable for which the values should be merged.
+     * @param heap1 The first heap term.
+     * @param heap2 The second heap term.
+     * @param state1 SE state for the first heap term.
+     * @param state2 SE state for the second heap term
+     * @param services The services object.
+     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     *        automatic generation).
      * @return A merged heap term.
      */
     protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,
             final LocationVariable heapVar, final Term heap1, final Term heap2,
-            final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, Term distinguishingFormula,
-            final Services services) {
+            final SymbolicExecutionState state1, final SymbolicExecutionState state2,
+            Term distinguishingFormula, final Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
@@ -518,23 +471,20 @@ public class MergeRule implements BuiltInRule {
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
-            return new ValuesMergeResult(newConstraints, heap1, newNames,
-                    sideConditionsToProve);
+            return new ValuesMergeResult(newConstraints, heap1, newNames, sideConditionsToProve);
         }
 
-        if (!(heap1.op() instanceof Function)
-                || !(heap2.op() instanceof Function)) {
+        if (!(heap1.op() instanceof Function) || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
-                    MergeByIfThenElse.createIfThenElseTerm(state1, state2,
-                            heap1, heap2, distinguishingFormula, services),
-                    newNames, sideConditionsToProve);
+                MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2,
+                    distinguishingFormula, services),
+                newNames, sideConditionsToProve);
         }
 
-        final Function storeFunc = (Function) services.getNamespaces()
-                .functions().lookup("store");
-        final Function createFunc = (Function) services.getNamespaces()
-                .functions().lookup("create");
+        final Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+        final Function createFunc =
+            (Function) services.getNamespaces().functions().lookup("create");
         // Note: Check if there are other functions that should be covered.
         // Unknown functions are treated by if-then-else procedure.
 
@@ -557,11 +507,9 @@ public class MergeRule implements BuiltInRule {
             if (pointer1.equals(pointer2) && field1.equals(field2)) {
                 // Potential for deep merge: Access of same object / field.
 
-                ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar,
-                        subHeap1, subHeap2, state1, state2,
-                        distinguishingFormula, services);
-                newConstraints = newConstraints
-                        .union(mergedSubHeap.getNewConstraints());
+                ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar, subHeap1, subHeap2,
+                    state1, state2, distinguishingFormula, services);
+                newConstraints = newConstraints.union(mergedSubHeap.getNewConstraints());
                 newNames.addAll(mergedSubHeap.getNewNames());
                 sideConditionsToProve.addAll(mergedSubHeap.getSideConditions());
 
@@ -573,24 +521,19 @@ public class MergeRule implements BuiltInRule {
 
                 } else {
 
-                    ValuesMergeResult mergedValAndConstr = mergeRule
-                            .mergeValuesInStates(field1, state1, value1, state2,
-                                    value2, distinguishingFormula, services);
+                    ValuesMergeResult mergedValAndConstr = mergeRule.mergeValuesInStates(field1,
+                        state1, value1, state2, value2, distinguishingFormula, services);
 
-                    newConstraints = newConstraints
-                            .union(mergedValAndConstr.getNewConstraints());
+                    newConstraints = newConstraints.union(mergedValAndConstr.getNewConstraints());
                     newNames.addAll(mergedValAndConstr.getNewNames());
-                    sideConditionsToProve
-                            .addAll(mergedValAndConstr.getSideConditions());
+                    sideConditionsToProve.addAll(mergedValAndConstr.getSideConditions());
                     mergedVal = mergedValAndConstr.getMergeVal();
 
                 }
 
-                return new ValuesMergeResult(newConstraints,
-                        tb.func((Function) heap1.op(),
-                                mergedSubHeap.getMergeVal(), heap1.sub(1),
-                                field1, mergedVal),
-                        newNames, sideConditionsToProve);
+                return new ValuesMergeResult(newConstraints, tb.func((Function) heap1.op(),
+                    mergedSubHeap.getMergeVal(), heap1.sub(1), field1, mergedVal), newNames,
+                    sideConditionsToProve);
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
 
@@ -609,18 +552,15 @@ public class MergeRule implements BuiltInRule {
             if (pointer1.equals(pointer2)) {
                 // Same objects are created: merge.
 
-                ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar,
-                        subHeap1, subHeap2, state1, state2,
-                        distinguishingFormula, services);
-                newConstraints = newConstraints
-                        .union(mergedSubHeap.getNewConstraints());
+                ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar, subHeap1, subHeap2,
+                    state1, state2, distinguishingFormula, services);
+                newConstraints = newConstraints.union(mergedSubHeap.getNewConstraints());
                 newNames.addAll(mergedSubHeap.getNewNames());
                 sideConditionsToProve.addAll(mergedSubHeap.getSideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                        tb.func((Function) heap1.op(),
-                                mergedSubHeap.getMergeVal(), pointer1),
-                        newNames, sideConditionsToProve);
+                    tb.func((Function) heap1.op(), mergedSubHeap.getMergeVal(), pointer1), newNames,
+                    sideConditionsToProve);
             }
 
             // "else" case is fallback at end of method:
@@ -629,22 +569,18 @@ public class MergeRule implements BuiltInRule {
         } // end else of else if (((Function) heap1.op()).equals(createFunc) &&
           // ((Function) heap2.op()).equals(createFunc))
 
-        return new ValuesMergeResult(newConstraints,
-                MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1,
-                        heap2, distinguishingFormula, services),
-                newNames, sideConditionsToProve);
+        return new ValuesMergeResult(newConstraints, MergeByIfThenElse.createIfThenElseTerm(state1,
+            state2, heap1, heap2, distinguishingFormula, services), newNames,
+            sideConditionsToProve);
 
     }
 
     /**
-     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U
-     * \&lt;{ ... }\&gt; phi, where U must be an update in normal form, i.e. a
-     * parallel update of elementary updates.
-     * 
-     * @param goal
-     *            Current goal.
-     * @param pio
-     *            Position of selected sequent formula.
+     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U \&lt;{ ... }\&gt; phi,
+     * where U must be an update in normal form, i.e. a parallel update of elementary updates.
+     *
+     * @param goal Current goal.
+     * @param pio Position of selected sequent formula.
      * @return true iff a suitable top level formula for merging.
      */
     @Override
@@ -653,18 +589,13 @@ public class MergeRule implements BuiltInRule {
     }
 
     /**
-     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U
-     * \&lt;{ ... }\&gt; phi, where U must be an update in normal form, i.e. a
-     * parallel update of elementary updates. We require that phi does not
-     * contain a Java block.
-     * 
-     * @param goal
-     *            Current goal.
-     * @param pio
-     *            Position of selected sequent formula.
-     * @param doMergePartnerCheck
-     *            Checks for available merge partners iff this flag is set to
-     *            true.
+     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U \&lt;{ ... }\&gt; phi,
+     * where U must be an update in normal form, i.e. a parallel update of elementary updates. We
+     * require that phi does not contain a Java block.
+     *
+     * @param goal Current goal.
+     * @param pio Position of selected sequent formula.
+     * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
     public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
@@ -703,15 +634,14 @@ public class MergeRule implements BuiltInRule {
 
         // Term after update must have the form "phi" or "\<{...}\> phi" or
         // "\[{...}\]", where phi must not contain a Java block.
-        if (termAfterUpdate.op() instanceof Modality && !termAfterUpdate.sub(0)
-                .javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
+        if (termAfterUpdate.op() instanceof Modality
+                && !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
         } else if (termAfterUpdate.op() instanceof UpdateApplication) {
             return false;
         }
 
-        return !doMergePartnerCheck
-                || findPotentialMergePartners(goal, pio).size() > 0;
+        return !doMergePartnerCheck || findPotentialMergePartners(goal, pio).size() > 0;
 
     }
 
@@ -721,33 +651,27 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio,
-            TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
         return new MergeRuleBuiltInRuleApp(this, pio);
     }
 
     /**
-     * Finds all suitable merge partners 
-     * 
-     * @param goal
-     *            Current goal to merge.
-     * @param pio
-     *            Position of update-program counter formula in goal.
-     * @param start
-     *            Node to start the search with.
-     * @param services
-     *            The services object.
+     * Finds all suitable merge partners
+     *
+     * @param goal Current goal to merge.
+     * @param pio Position of update-program counter formula in goal.
+     * @param start Node to start the search with.
+     * @param services The services object.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
-    public static ImmutableList<MergePartner> findPotentialMergePartners(
-            Goal goal, PosInOccurrence pio) {
+    public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
+            PosInOccurrence pio) {
 
         final Services services = goal.proof().getServices();
 
         final ImmutableList<Goal> allGoals = services.getProof().openGoals();
 
-        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(
-                goal.node(), pio, services);
+        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(goal.node(), pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
@@ -761,16 +685,15 @@ public class MergeRule implements BuiltInRule {
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 
-                    final PosInOccurrence gPio = new PosInOccurrence(f, pit,
-                            false);
+                    final PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
-                        final Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
-                                g.node(), gPio, services);
+                        final Triple<Term, Term, Term> partnerSEState =
+                            sequentToSETriple(g.node(), gPio, services);
 
                         if (ownSEState.third.equals(partnerSEState.third)) {
 
-                            potentialPartners = potentialPartners
-                                    .prepend(new MergePartner(g, gPio));
+                            potentialPartners =
+                                potentialPartners.prepend(new MergePartner(g, gPio));
 
                         }
                     }

@@ -7,17 +7,16 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 
 /**
- * Binary Term Feature return zero if root is a CNF quantifier formula with several 
- * clauses. And all the clause are CS-Related.
+ * Binary Term Feature return zero if root is a CNF quantifier formula with several clauses. And all
+ * the clause are CS-Related.
  */
 public class RecAndExistentiallyConnectedClausesFeature extends BinaryTermFeature {
-    public static final TermFeature INSTANCE =
-        new RecAndExistentiallyConnectedClausesFeature ();
+    public static final TermFeature INSTANCE = new RecAndExistentiallyConnectedClausesFeature();
 
     private RecAndExistentiallyConnectedClausesFeature() {}
 
     protected boolean filter(Term term, Services services) {
-        final ClausesGraph graph = ClausesGraph.create ( term, services.getCaches() );
-        return graph.isFullGraph ();
+        final ClausesGraph graph = ClausesGraph.create(term, services.getCaches());
+        return graph.isFullGraph();
     }
 }

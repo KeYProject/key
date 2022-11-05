@@ -30,7 +30,8 @@ public class ClasslevelTranslatorTest {
 
     @TestFactory
     Stream<DynamicTest> getFiles() throws IOException {
-        InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("classlevel.txt");
+        InputStream resourceAsStream =
+            ExpressionTranslatorTest.class.getResourceAsStream("classlevel.txt");
         return readInputs(resourceAsStream, this::parseAndInterpret);
     }
 
@@ -38,7 +39,7 @@ public class ClasslevelTranslatorTest {
             throws IOException {
         List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
             StringBuilder content = new StringBuilder();
             while ((l = reader.readLine()) != null) {
@@ -54,9 +55,7 @@ public class ClasslevelTranslatorTest {
                     seq.add(value.replaceAll("---Contract---", ""));
             }
         }
-        return seq.stream().map(it ->
-                DynamicTest.dynamicTest(it, () -> fn.accept(it))
-        );
+        return seq.stream().map(it -> DynamicTest.dynamicTest(it, () -> fn.accept(it)));
     }
 
     public void parseAndInterpret(String expr) {

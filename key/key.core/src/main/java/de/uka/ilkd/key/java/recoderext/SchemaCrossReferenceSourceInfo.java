@@ -10,41 +10,41 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.service.KeYCrossReferenceSourceInfo;
 
 public class SchemaCrossReferenceSourceInfo extends KeYCrossReferenceSourceInfo {
-    
+
     protected final PrimitiveType recoderTypeSVType;
 
     public SchemaCrossReferenceSourceInfo(ServiceConfiguration config) {
-	super(config);
-	recoderTypeSVType 
-	    = new PrimitiveType("TypeSV", this);
-    }    
+        super(config);
+        recoderTypeSVType = new PrimitiveType("TypeSV", this);
+    }
 
     public void initialize(ServiceConfiguration cfg) {
-	super.initialize(cfg);
-	cfg.getChangeHistory().removeChangeHistoryListener(this);
+        super.initialize(cfg);
+        cfg.getChangeHistory().removeChangeHistoryListener(this);
     }
 
     public Type getType(TypeReference tr) {
-	if (tr instanceof TypeSVWrapper) {
-	    return recoderTypeSVType;
-	} else {
-	    return super.getType(tr);
-	}
+        if (tr instanceof TypeSVWrapper) {
+            return recoderTypeSVType;
+        } else {
+            return super.getType(tr);
+        }
     }
 
     public Type getType(VariableSpecification vs) {
-	if (vs.getExpressionCount()>0 
-	    && vs.getExpressionAt(0) instanceof ProgramVariableSVWrapper) {
-	    return recoderTypeSVType;
-	} else {
-	    return super.getType(vs);
-	}
+        if (vs.getExpressionCount() > 0
+                && vs.getExpressionAt(0) instanceof ProgramVariableSVWrapper) {
+            return recoderTypeSVType;
+        } else {
+            return super.getType(vs);
+        }
     }
 
-    /** does not resolve the urq, just returns the argument
+    /**
+     * does not resolve the urq, just returns the argument
      */
-    public Reference resolveURQ(UncollatedReferenceQualifier urq){
-	return urq;
+    public Reference resolveURQ(UncollatedReferenceQualifier urq) {
+        return urq;
     }
 
 

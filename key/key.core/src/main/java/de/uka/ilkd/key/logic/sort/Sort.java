@@ -63,8 +63,7 @@ public interface Sort extends Named, HasOrigin {
 
     /**
      * @param s some sort.
-     * @return whether the given sort is a reflexive, transitive subsort of this
-     * sort.
+     * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
     boolean extendsTrans(Sort s);
 
@@ -94,9 +93,9 @@ public interface Sort extends Named, HasOrigin {
     String declarationString();
 
     /**
-     * Returns an human explainable text describing this sort.
-     * This field is typical set by the parser, who captures the documentation comments.
+     * Returns an human explainable text describing this sort. This field is typical set by the
+     * parser, who captures the documentation comments.
      */
     @Nullable
-    default String getDocumentation() {return null;}
+    default String getDocumentation() { return null; }
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.uka.ilkd.key.proof.io.intermediate;
 
@@ -18,23 +18,23 @@ import de.uka.ilkd.key.util.Pair;
 public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
 
     private int mergeNodeId = 0;
-    
+
     /**
      * Constructs a new close-merge-partner intermediate application.
      *
      * @param ruleName The name of the rule; should be "MergeAfterJoin".
-     * @param pos Position information for the merge rule application (Symbolic State - Program Counter formula).
+     * @param pos Position information for the merge rule application (Symbolic State - Program
+     *        Counter formula).
      * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
      */
-    public MergePartnerAppIntermediate(String ruleName,
-            Pair<Integer, PosInTerm> pos,
+    public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
             int mergeNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, newNames);
-        
-        assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString()) :
-            "Check if something should be changed when implementing a new rule for merge partners.";
-        
+
+        assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString())
+                : "Check if something should be changed when implementing a new rule for merge partners.";
+
         this.mergeNodeId = mergeNodeId;
     }
 

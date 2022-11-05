@@ -26,37 +26,37 @@ public class SeqLength extends Operator {
     }
 
 
-    @Override    
+    @Override
     public SeqLength deepClone() {
         return new SeqLength(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
         return 1;
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return POSTFIX;
     }
 
 
-    @Override    
+    @Override
     public void accept(SourceVisitor v) {
 
     }
-    
-    public String toSource(){
-        return children.get(0).toSource()+".length";
+
+    public String toSource() {
+        return children.get(0).toSource() + ".length";
     }
 
 }

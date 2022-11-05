@@ -24,13 +24,10 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  *
  * @author christoph
  */
-public class FinishAuxiliaryMethodComputationMacro
-        extends AbstractFinishAuxiliaryComputationMacro {
+public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -42,20 +39,16 @@ public class FinishAuxiliaryMethodComputationMacro
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          final Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
-        final InfFlowContractPO ifPO =
-                (InfFlowContractPO) services.getSpecificationRepository()
-                                         .getProofOblInput(initiatingProof);
+        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getSpecificationRepository()
+                .getProofOblInput(initiatingProof);
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 
@@ -64,7 +57,7 @@ public class FinishAuxiliaryMethodComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
-                new MethodInfFlowUnfoldTacletBuilder(services);
+            new MethodInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(ifContract);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);

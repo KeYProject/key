@@ -3,8 +3,8 @@
 package recoder.java;
 
 /**
- * References are uses of names, variables or members. They can have a name
- * (such as TypeReferences) or be anonymous (such as ArrayReference).
+ * References are uses of names, variables or members. They can have a name (such as TypeReferences)
+ * or be anonymous (such as ArrayReference).
  */
 
 public interface Reference extends ProgramElement {

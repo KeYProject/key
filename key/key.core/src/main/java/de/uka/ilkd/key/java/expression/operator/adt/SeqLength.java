@@ -11,7 +11,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- * Represents a function giving the length of  a sequence.
+ * Represents a function giving the length of a sequence.
+ *
  * @author bruns
  * @since 1.7.2120
  *
@@ -30,7 +31,7 @@ public class SeqLength extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqLength(this);
+        v.performActionOnSeqLength(this);
     }
 
     @Override

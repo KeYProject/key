@@ -27,7 +27,8 @@ import java.util.stream.Stream;
  */
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
-    public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    public static final File SETTINGS_FILE =
+        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
@@ -56,11 +57,8 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     public static Color fromHex(String s) {
         long i = Long.decode(s);
-        return new Color(
-                (int) ((i >> 16) & 0xFF),
-                (int) ((i >> 8) & 0xFF),
-                (int) (i & 0xFF),
-                (int) ((i >> 24) & 0xFF));
+        return new Color((int) ((i >> 16) & 0xFF), (int) ((i >> 8) & 0xFF), (int) (i & 0xFF),
+            (int) ((i >> 24) & 0xFF));
     }
 
     public static Color invert(Color c) {
@@ -82,12 +80,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
     }
 
-    private ColorProperty createColorProperty(String key,
-                                              String description,
-                                              Color defaultValue) {
+    private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
         Optional<ColorProperty> item =
-                getProperties().filter(it -> it.getKey().equals(key))
-                        .findFirst();
+            getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
             return item.get();
         }

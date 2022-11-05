@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * The Entry Point.
  * <p>
- * This facility is the entry point to the different KeY apis.
- * Currently it support the bootstrapping of the {@link KeYEnvironment} and the loading of proofs.
+ * This facility is the entry point to the different KeY apis. Currently it support the
+ * bootstrapping of the {@link KeYEnvironment} and the loading of proofs.
  * <p>
  * Created at 6.4.17
  *
@@ -57,8 +57,7 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadFromKeyFile(File keyFile)
-            throws ProblemLoaderException {
+    public static ProofManagementApi loadFromKeyFile(File keyFile) throws ProblemLoaderException {
         return new ProofManagementApi(KeYEnvironment.load(keyFile));
     }
 
@@ -70,11 +69,10 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File location,
-                                               List<File> classPath, File bootClassPath, List<File> includes)
-            throws ProblemLoaderException {
-        return new ProofManagementApi(KeYEnvironment
-                .load(location, classPath, bootClassPath, includes));
+    public static ProofManagementApi loadProof(File location, List<File> classPath,
+            File bootClassPath, List<File> includes) throws ProblemLoaderException {
+        return new ProofManagementApi(
+            KeYEnvironment.load(location, classPath, bootClassPath, includes));
     }
 
     /**
@@ -82,20 +80,20 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File javaSourceCode)
-            throws ProblemLoaderException {
+    public static ProofManagementApi loadProof(File javaSourceCode) throws ProblemLoaderException {
         return loadProof(javaSourceCode, null, null, null);
     }
 
     /**
-     * Load a proof file, creates a KeY environment that can be accessed with other methods from this facade
+     * Load a proof file, creates a KeY environment that can be accessed with other methods from
+     * this facade
      *
-     * @param file          Path to the source code folder/file or to a *.proof file
-     * @param classPaths    Optionally: Additional specifications for API classes
+     * @param file Path to the source code folder/file or to a *.proof file
+     * @param classPaths Optionally: Additional specifications for API classes
      * @param bootClassPath Optionally: Different default specifications for Java API
-     * @param includes      Optionally: Additional includes to consider
+     * @param includes Optionally: Additional includes to consider
      */
-    public abstract void loadProofFile(File file, List<File> classPaths,
-                                       File bootClassPath, List<File> includes);
+    public abstract void loadProofFile(File file, List<File> classPaths, File bootClassPath,
+            List<File> includes);
 
 }

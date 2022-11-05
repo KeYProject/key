@@ -43,7 +43,8 @@ public class ForestWalker extends AbstractTreeWalker {
             NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
-                ProgramElement[] newStack = new ProgramElement[Math.max(stack.length * 2, count + s)];
+                ProgramElement[] newStack =
+                    new ProgramElement[Math.max(stack.length * 2, count + s)];
                 System.arraycopy(stack, 0, newStack, 0, count);
                 stack = newStack;
             }

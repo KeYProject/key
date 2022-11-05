@@ -62,20 +62,21 @@ public class Java5Test {
         crsc = new CrossReferenceServiceConfiguration();
         dsfr = crsc.getSourceFileRepository();
         crsc.getProjectSettings().setProperty(PropertyNames.INPUT_PATH,
-                new File("test/java5/src/" + base + "/").getAbsolutePath() +
-                        File.pathSeparatorChar + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator + "jce.jar" +
-                        File.pathSeparatorChar + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator + "jsse.jar " +
-                        File.pathSeparatorChar + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator + "rt.jar" +
-                        File.pathSeparatorChar + "test/java5/src/prettyprinting/testcode/java/lib/namensfehler.jar"
-        );
+            new File("test/java5/src/" + base + "/").getAbsolutePath() + File.pathSeparatorChar
+                + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator
+                + "jce.jar" + File.pathSeparatorChar + System.getProperty("java.home")
+                + File.separatorChar + "lib" + File.separator + "jsse.jar " + File.pathSeparatorChar
+                + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator
+                + "rt.jar" + File.pathSeparatorChar
+                + "test/java5/src/prettyprinting/testcode/java/lib/namensfehler.jar");
         crsc.getProjectSettings().setProperty(PropertyNames.OUTPUT_PATH,
-                new File("test/java5/output/" + base + "/").getAbsolutePath());
+            new File("test/java5/output/" + base + "/").getAbsolutePath());
         crsc.getProjectSettings().ensureExtensionClassesAreInPath();
         crsc.getProjectSettings().ensureSystemClassesAreInPath();
     }
 
     private void runIt() {
-//        boolean b = crsc.getProjectSettings().java5Allowed();
+        // boolean b = crsc.getProjectSettings().java5Allowed();
         crsc.getProjectSettings().setProperty(ProjectSettings.JAVA_5, "true");
         crsc.getProjectSettings().setProperty(ProjectSettings.TABSIZE, "4");
         try {
@@ -84,8 +85,8 @@ public class Java5Test {
         } catch (ParserException pe) {
             System.err.println(pe.getMessage());
             fail("unexpected ParserException");
-//        } finally {
-//            crsc.getProjectSettings().setProperty(ProjectSettings.Java_5, Boolean.toString(b));
+            // } finally {
+            // crsc.getProjectSettings().setProperty(ProjectSettings.Java_5, Boolean.toString(b));
         }
         List<CompilationUnit> cul = dsfr.getCompilationUnits();
         for (int i = 0; i < cul.size(); i++) {
@@ -106,7 +107,7 @@ public class Java5Test {
         setPath("transformations");
         // I have a copy of recoder in my test directory. Usually this directory
         // doesn't exist, though ;-)
-//    	setPath("recoder");
+        // setPath("recoder");
         runIt();
         List<CompilationUnit> cul = dsfr.getCompilationUnits();
 
@@ -179,14 +180,14 @@ public class Java5Test {
 
         System.out.println("Trinary operators done");
 
-//    	/*
-//    	 * Co-variant return types DONT WORK ENTIRELY YET
-//    	 */
-//    	for (int i = 0, s = cul.size(); i < s; i++) {
-//    		new RemoveCoVariantReturnTypes(crsc, cul.getCompilationUnit(i)).execute();
-//    	}
-//
-//    	System.out.println("Co-variant return types done");
+        // /*
+        // * Co-variant return types DONT WORK ENTIRELY YET
+        // */
+        // for (int i = 0, s = cul.size(); i < s; i++) {
+        // new RemoveCoVariantReturnTypes(crsc, cul.getCompilationUnit(i)).execute();
+        // }
+        //
+        // System.out.println("Co-variant return types done");
 
 
         /*
@@ -206,12 +207,12 @@ public class Java5Test {
          */
 
 
-//    	cul = dsfr.getCompilationUnits();
-//    	for (int i = 0; i <cul.size(); i++) {
-//    		new ResolveGenerics(crsc, cul.getCompilationUnit(i)).execute();
-//    	}
+        // cul = dsfr.getCompilationUnits();
+        // for (int i = 0; i <cul.size(); i++) {
+        // new ResolveGenerics(crsc, cul.getCompilationUnit(i)).execute();
+        // }
 
-//    	System.out.println("Generics done");
+        // System.out.println("Generics done");
 
         writeBack();
 
@@ -232,7 +233,7 @@ public class Java5Test {
                     Comment c = cl.get(i);
                     String name = pe.getClass().getSimpleName();
                     if (c.getText().indexOf(name) == -1) {
-                        //System.err.println(pe.getClass().getName() + " - " + c.getText());
+                        // System.err.println(pe.getClass().getName() + " - " + c.getText());
                     }
                 }
             }
@@ -265,23 +266,23 @@ public class Java5Test {
 
             public void reportError(Exception e) throws RuntimeException {
                 switch (errNum++) {
-                    case 0:
-                        assertTrue(e instanceof AmbiguousStaticFieldImportException);
-                        break;
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        assertTrue(e instanceof UnresolvedReferenceException);
-                        break;
-                    default:
-                        System.err.println("failing:\n" + "    " + e.getMessage());
-                        fail("Too many errors");
+                case 0:
+                    assertTrue(e instanceof AmbiguousStaticFieldImportException);
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    assertTrue(e instanceof UnresolvedReferenceException);
+                    break;
+                default:
+                    System.err.println("failing:\n" + "    " + e.getMessage());
+                    fail("Too many errors");
                 }
                 if (!silent) {
                     System.out.print("ok: ");
@@ -297,16 +298,18 @@ public class Java5Test {
         });
         runIt();
 
-        //reparseAndCompare("errortest"); would cause too many errors
+        // reparseAndCompare("errortest"); would cause too many errors
     }
 
     private String getAnnotationName(AnnotationUse au) {
         if (au instanceof AnnotationUseInfo) {
             AnnotationUseInfo aus = (AnnotationUseInfo) au;
-            return dsfr.getServiceConfiguration().getByteCodeInfo().getAnnotationType(aus).getFullName();
+            return dsfr.getServiceConfiguration().getByteCodeInfo().getAnnotationType(aus)
+                    .getFullName();
         } else {
             AnnotationUseSpecification aus = (AnnotationUseSpecification) au;
-            return dsfr.getServiceConfiguration().getSourceInfo().getAnnotationType(aus).getFullName();
+            return dsfr.getServiceConfiguration().getSourceInfo().getAnnotationType(aus)
+                    .getFullName();
         }
     }
 
@@ -344,7 +347,8 @@ public class Java5Test {
             System.out.print(m.getName() + "(");
             boolean first = true;
             for (int j = 0; j < param.length; j++) {
-                if (!first) System.out.print(",");
+                if (!first)
+                    System.out.print(",");
                 first = false;
                 AnnotationUseInfo[] annot = m.getAnnotationsForParam(j);
                 for (int k = 0; k < annot.length; k++) {
@@ -369,10 +373,11 @@ public class Java5Test {
         List<ConstructorReference> crl = crsc.getCrossReferenceSourceInfo().getReferences(c);
         assertTrue(crl.size() == 3);
 
-        EnumConstantSpecification ecd = (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
+        EnumConstantSpecification ecd =
+            (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
         Method m = ecd.getConstructorReference().getClassDeclaration().getMethods().get(0);
         int s = crsc.getCrossReferenceSourceInfo().getReferences(m).size();
-        //assertTrue(s == 1);
+        // assertTrue(s == 1);
         reparseAndCompare("enumtest");
     }
 
@@ -388,15 +393,16 @@ public class Java5Test {
             Method m = td.getMethods().get(i);
             if (m.getName().equals("foobar")) {
                 MethodDeclaration md = (MethodDeclaration) m;
-                assertTrue("List<List<Map<String, List<String>>>>".equals(md.getTypeReference().toSource().trim()));
-//        		TreeWalker tw = new TreeWalker(md);
-//        		while (tw.next()) {
-//        			ProgramElement pe = tw.getProgramElement();
-//        			System.out.println(pe.getClass().getName() + " " + pe.getStartPosition());
-//        		}
+                assertTrue("List<List<Map<String, List<String>>>>"
+                        .equals(md.getTypeReference().toSource().trim()));
+                // TreeWalker tw = new TreeWalker(md);
+                // while (tw.next()) {
+                // ProgramElement pe = tw.getProgramElement();
+                // System.out.println(pe.getClass().getName() + " " + pe.getStartPosition());
+                // }
             }
         }
-//    	System.err.println(td.toSource());
+        // System.err.println(td.toSource());
         reparseAndCompare("generictest");
     }
 
@@ -412,25 +418,26 @@ public class Java5Test {
             createExtendedReport(newReport);
             StringBuffer oldBuf = oldReport.getBuffer();
             StringBuffer newBuf = newReport.getBuffer();
-            //assertTrue(oldBuf.length() == newBuf.length());
+            // assertTrue(oldBuf.length() == newBuf.length());
 
-            for (int i = 0, rep = 5; i < Math.min(oldBuf.length(), newBuf.length()) && rep > 0; i++) {
+            for (int i = 0, rep = 5; i < Math.min(oldBuf.length(), newBuf.length())
+                    && rep > 0; i++) {
                 if (oldBuf.charAt(i) != newBuf.charAt(i)) {
                     if (i > 1 && oldBuf.charAt(i - 1) == '.') {
                         // may be an anonymous class: skip till next '.', but at most 10(?) digits.
                         // TODO deal with numbers of different length...
                         int j = i + 1;
-                        while (Character.isDigit(oldBuf.charAt(j)) && Character.isDigit(newBuf.charAt(j))
-                                && j < i + 10)
+                        while (Character.isDigit(oldBuf.charAt(j))
+                                && Character.isDigit(newBuf.charAt(j)) && j < i + 10)
                             j++;
                         if (j - i > 6)
                             i = j;
                         continue;
                     }
-//					System.err.println(i);
-//					System.err.println(oldBuf.substring(i-10, i+10));
-//					System.err.println(newBuf.substring(i-10, i+10));
-//					System.err.println();
+                    // System.err.println(i);
+                    // System.err.println(oldBuf.substring(i-10, i+10));
+                    // System.err.println(newBuf.substring(i-10, i+10));
+                    // System.err.println();
                     rep--;
                 }
             }
@@ -442,13 +449,15 @@ public class Java5Test {
     private void scrubOutputPath(String path) {
         File myPath = new File(path);
         File[] list = myPath.listFiles();
-        if (list == null) return;
+        if (list == null)
+            return;
         for (int i = 0; i < list.length; i++) {
             File current = list[i];
             if (current.isDirectory()) {
                 scrubOutputPath(current.getAbsolutePath());
                 current.delete(); // if possible...
-            } else if (current.isFile() && current.getName().endsWith(".java")) current.delete();
+            } else if (current.isFile() && current.getName().endsWith(".java"))
+                current.delete();
         }
     }
 
@@ -462,17 +471,20 @@ public class Java5Test {
         cml.add(new Comment("/*comment to field spec 'a'*/", true));
         ((FieldSpecification) fl.get(0)).setComments(cml);
         MiscKit.unindent((FieldSpecification) fl.get(0));
-//        System.err.println(((FieldSpecification)fl.getField(0)).toSource());
-//        System.err.println(cd.getMembers().getMemberDeclaration(0).toSource());
-//        System.err.println(cd.getMembers().getMemberDeclaration(1).toSource());
-//        System.err.println(((FieldSpecification)fl.getField(1)).toSource());
-//
-//        //System.err.println()
-//
-//        for (int i = 0; i < crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getClassType("listexample.NTuple").getConstructors().getConstructor(0)).size(); i++) {
-//        	ConstructorReference cr = crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getClassType("listexample.NTuple").getConstructors().getConstructor(0)).getConstructorReference(i);
-//        	System.err.println(cr.toSource());
-//        }
+        // System.err.println(((FieldSpecification)fl.getField(0)).toSource());
+        // System.err.println(cd.getMembers().getMemberDeclaration(0).toSource());
+        // System.err.println(cd.getMembers().getMemberDeclaration(1).toSource());
+        // System.err.println(((FieldSpecification)fl.getField(1)).toSource());
+        //
+        // //System.err.println()
+        //
+        // for (int i = 0; i <
+        // crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getClassType("listexample.NTuple").getConstructors().getConstructor(0)).size();
+        // i++) {
+        // ConstructorReference cr =
+        // crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getClassType("listexample.NTuple").getConstructors().getConstructor(0)).getConstructorReference(i);
+        // System.err.println(cr.toSource());
+        // }
 
         reparseAndCompare("prettyprinting");
     }
@@ -506,12 +518,13 @@ public class Java5Test {
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                line.append("(" + (pe.getComments() == null ? 0 : pe.getComments().size()) + " comments)");
-                //line.append(number);
-                //line.append(' ');
+                line.append(
+                    "(" + (pe.getComments() == null ? 0 : pe.getComments().size()) + " comments)");
+                // line.append(number);
+                // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
                 if (!pos.equals(oldPos)) {
-                    //line.append(pos); // we're not really interested in exact positions
+                    // line.append(pos); // we're not really interested in exact positions
                     oldPos = pos;
                 }
                 line.append(' ');
@@ -535,7 +548,8 @@ public class Java5Test {
                         } else {
                             line.append(Format.toString("%N", t));
                         }
-                        if (crsc.getConstantEvaluator().isCompileTimeConstant((Expression) pe, res)) {
+                        if (crsc.getConstantEvaluator().isCompileTimeConstant((Expression) pe,
+                            res)) {
                             line.append(" ==" + res);
                         }
                     }

@@ -16,15 +16,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractPredicateAbstractionDomainElement extends
-        AbstractDomainElement {
+public abstract class AbstractPredicateAbstractionDomainElement extends AbstractDomainElement {
 
     private ImmutableSet<AbstractionPredicate> predicates = null;
     private boolean topElem = false;
 
     /**
-     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a
-     * given list of abstraction predicates.
+     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a given list of
+     * abstraction predicates.
      */
     public AbstractPredicateAbstractionDomainElement(
             final ImmutableSet<AbstractionPredicate> predicates) {
@@ -32,18 +31,17 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     }
 
     /**
-     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} that
-     * is a top element if isTopElem is set to true; otherwise, it is a bottom
-     * element.
+     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} that is a top element if
+     * isTopElem is set to true; otherwise, it is a bottom element.
      */
     protected AbstractPredicateAbstractionDomainElement(boolean isTopElem) {
-        this.predicates = DefaultImmutableSet.<AbstractionPredicate> nil();
+        this.predicates = DefaultImmutableSet.<AbstractionPredicate>nil();
         this.topElem = isTopElem;
     }
 
     /**
-     * @return Whether this element is the top element of the lattice (the axiom
-     *         of which is true for every input).
+     * @return Whether this element is the top element of the lattice (the axiom of which is true
+     *         for every input).
      */
     protected boolean isTopElem() {
         return topElem;
@@ -57,8 +55,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     }
 
     /**
-     * @param predicates
-     *            the abstraction predicates for this domain element to set.
+     * @param predicates the abstraction predicates for this domain element to set.
      */
     public void setPredicates(ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
@@ -66,7 +63,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.Named#name()
      */
     @Override
@@ -99,9 +96,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement#getDefiningAxiom
+     *
+     * @see de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement#getDefiningAxiom
      * (de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.java.Services)
      */
     @Override
@@ -121,8 +117,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
             Term application = pred.apply(varOrConst);
             if (result == null) {
                 result = application;
-            }
-            else {
+            } else {
                 result = combinePredicates(result, application, services);
             }
         }
@@ -132,27 +127,22 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
 
     /**
      * Combines the given predicate terms (classically using AND or OR).
-     * 
-     * @param preds
-     *            Term with all previous predicates.
-     * @param newPred
-     *            The new predicate to combine preds with.
-     * @param services
-     *            The services object.
+     *
+     * @param preds Term with all previous predicates.
+     * @param newPred The new predicate to combine preds with.
+     * @param services The services object.
      * @return The combination of preds with newPred.
      */
-    protected abstract Term combinePredicates(Term preds, Term newPred,
-            Services services);
+    protected abstract Term combinePredicates(Term preds, Term newPred, Services services);
 
     /**
      * NOTE: This method should be defined in accordance with
-     * {@link AbstractPredicateAbstractionLattice#getPredicateNameCombinationString()}
-     * . This is probably bad design, but a substitute of the Java shortcoming
-     * that there are no abstract static methods.
-     * 
-     * @return The String which is used for combining the names of predicates
-     *         for lattice types where multiple predicates determine an abstract
-     *         element.
+     * {@link AbstractPredicateAbstractionLattice#getPredicateNameCombinationString()} . This is
+     * probably bad design, but a substitute of the Java shortcoming that there are no abstract
+     * static methods.
+     *
+     * @return The String which is used for combining the names of predicates for lattice types
+     *         where multiple predicates determine an abstract element.
      */
     public abstract String getPredicateNameCombinationString();
 

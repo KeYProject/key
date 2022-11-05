@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Represents a sequence getter function.
+ *
  * @author bruns
  * @since 1.7.2120
  *
@@ -30,7 +31,7 @@ public class SeqGet extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqGet(this);
+        v.performActionOnSeqGet(this);
     }
 
     @Override

@@ -5,13 +5,13 @@ package de.uka.ilkd.key.proof.mgt;
  */
 public class LemmaJustification implements RuleJustification {
 
-   public static final LemmaJustification INSTANCE = new LemmaJustification();
+    public static final LemmaJustification INSTANCE = new LemmaJustification();
 
-   private LemmaJustification() {
-   }
+    private LemmaJustification() {
+    }
 
-   @Override
-   public boolean isAxiomJustification() {
-      return false;
-   }
+    @Override
+    public boolean isAxiomJustification() {
+        return false;
+    }
 }

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Represents a function giving the index of some element in a sequence (if it exists).
+ *
  * @author bruns
  *
  */
@@ -29,7 +30,7 @@ public class SeqIndexOf extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqIndexOf(this);
+        v.performActionOnSeqIndexOf(this);
     }
 
     @Override

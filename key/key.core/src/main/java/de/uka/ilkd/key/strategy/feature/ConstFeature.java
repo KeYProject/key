@@ -12,7 +12,7 @@ public class ConstFeature implements Feature {
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return val;
     }
-    
+
     private ConstFeature(RuleAppCost p_val) {
         val = p_val;
     }
@@ -24,6 +24,6 @@ public class ConstFeature implements Feature {
     public final RuleAppCost getValue() {
         return val;
     }
-    
+
     private final RuleAppCost val;
 }

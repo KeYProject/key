@@ -22,8 +22,7 @@ public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
     protected boolean filter(Term t, Services services) {
         if (t.op() instanceof Function) {
             Function op = t.op(Function.class);
-            return op.arity() == 0 &&
-                   op.sort() == heapLDT.targetSort();
+            return op.arity() == 0 && op.sort() == heapLDT.targetSort();
         } else {
             return false;
         }

@@ -12,7 +12,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 public class TacletOptionsAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6813540362001480606L;
 
@@ -21,7 +21,7 @@ public class TacletOptionsAction extends MainWindowAction {
         setName("Show Taclet Options");
         setIcon(IconFactory.configure(16));
         setAcceleratorLetter(KeyEvent.VK_T);
-	
+
         getMediator().enableWhenProofLoaded(this);
         lookupAcceleratorKey();
     }
@@ -29,11 +29,9 @@ public class TacletOptionsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (getMediator().getSelectedProof() == null) {
-            mainWindow.notify(
-                    new GeneralInformationEvent(
-                            "No contracts available.",
-                            "If you wish to see the available options "
-                            + "for a proof, you have to load one first."));
+            mainWindow.notify(new GeneralInformationEvent("No contracts available.",
+                "If you wish to see the available options "
+                    + "for a proof, you have to load one first."));
         } else {
             new ChoiceSelector(mainWindow, ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
         }

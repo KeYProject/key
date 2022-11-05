@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 
 /**
  * A simple checked exception which holds an location.
+ *
  * @author Alexander Weigl
  * @version 1 (6/21/21)
  */
@@ -32,7 +33,8 @@ public class LocatableException extends RuntimeException implements HasLocation 
         this.location = location;
     }
 
-    public LocatableException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Location location) {
+    public LocatableException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace, Location location) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.location = location;
     }

@@ -8,15 +8,14 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-/* FieldSpecification
- * taken from COMPOST and changed to achieve an immutable structure
+/*
+ * FieldSpecification taken from COMPOST and changed to achieve an immutable structure
  */
 
-public class FieldSpecification extends VariableSpecification
-        implements Field {
+public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
-     *      Field specification.
+     * Field specification.
      */
 
     public FieldSpecification() {}
@@ -26,9 +25,10 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     *      Field specification.
-     *      @param var the ProgramVariable representing this concrete field
-     *      @param type the Type of this field      
+     * Field specification.
+     *
+     * @param var the ProgramVariable representing this concrete field
+     * @param type the Type of this field
      */
 
     public FieldSpecification(ProgramVariable var, Type type) {
@@ -36,10 +36,11 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     *      Field specification.
-     *      @param var the ProgramVariable representing this concrete field
-     *      @param init the Expression the field is initialised with.
-     *      @param type the Type of this field      
+     * Field specification.
+     *
+     * @param var the ProgramVariable representing this concrete field
+     * @param init the Expression the field is initialised with.
+     * @param type the Type of this field
      */
 
     public FieldSpecification(ProgramVariable var, Expression init, Type type) {
@@ -47,51 +48,47 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     *      Field specification.
-     *      @param var the ProgramVariable representing this concrete field
-     *      @param dimensions an int defining the dimension
-     *      @param init the Expression the field is initialised with.
-     *      @param type the Type of this field      
+     * Field specification.
+     *
+     * @param var the ProgramVariable representing this concrete field
+     * @param dimensions an int defining the dimension
+     * @param init the Expression the field is initialised with.
+     * @param type the Type of this field
      */
-    public FieldSpecification(ProgramVariable var, int dimensions, 
-			      Expression init, Type type) {
+    public FieldSpecification(ProgramVariable var, int dimensions, Expression init, Type type) {
         super(var, dimensions, init, type, null);
     }
 
 
     /**
-     *      Field specification.
-     *      @param children an ExtList with the children.
-     * 	        May contain:
-     * 		an Expression (as initializer of the variable)
-     * 		a ProgramElementName (as name of the variable)
-     * 		a Comment
-     *      @param var the ProgramVariable representing this concrete field
-     *      @param dimensions an int defining the dimension
-     *      @param type the Type of this field      
+     * Field specification.
+     *
+     * @param children an ExtList with the children. May contain: an Expression (as initializer of
+     *        the variable) a ProgramElementName (as name of the variable) a Comment
+     * @param var the ProgramVariable representing this concrete field
+     * @param dimensions an int defining the dimension
+     * @param type the Type of this field
      */
 
-    public FieldSpecification(ExtList children, ProgramVariable var, 
-			      int dimensions, Type type) {
+    public FieldSpecification(ExtList children, ProgramVariable var, int dimensions, Type type) {
         super(children, var, dimensions, type);
     }
 
     /**
-     * returns the name of the field as used in programs. In the logic
-     * each field has a unique name which is composed by the class name where 
-     * it is declared and its source code name 
+     * returns the name of the field as used in programs. In the logic each field has a unique name
+     * which is composed by the class name where it is declared and its source code name
      *
      * @return returns the name of the field as used in programs
      */
-    public String getProgramName(){        
-        return getProgramElementName().getProgramName(); 
+    public String getProgramName() {
+        return getProgramElementName().getProgramName();
     }
-        
+
     /**
      * Test whether the declaration is static.
      */
     public boolean isStatic() {
-        return ((ProgramVariable)var).isStatic();
+        return ((ProgramVariable) var).isStatic();
     }
 
     /**
@@ -102,7 +99,7 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     * Test whether the declaration is protected.TO BE IMPLEMENTED 
+     * Test whether the declaration is protected.TO BE IMPLEMENTED
      */
 
     public boolean isProtected() {
@@ -110,7 +107,7 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     * Test whether the declaration is public.TO BE IMPLEMENTED 
+     * Test whether the declaration is public.TO BE IMPLEMENTED
      */
 
     public boolean isPublic() {
@@ -119,7 +116,7 @@ public class FieldSpecification extends VariableSpecification
 
 
     /**
-     * Test whether the declaration is transient.TO BE IMPLEMENTED 
+     * Test whether the declaration is transient.TO BE IMPLEMENTED
      */
 
     public boolean isTransient() {
@@ -127,25 +124,27 @@ public class FieldSpecification extends VariableSpecification
     }
 
     /**
-     * Test whether the declaration is volatile.TO BE IMPLEMENTED 
+     * Test whether the declaration is volatile.TO BE IMPLEMENTED
      */
 
     public boolean isVolatile() {
         return false;
     }
-    
+
     /**
-     * Test whether the declaration is strictFp.TO BE IMPLEMENTED 
+     * Test whether the declaration is strictFp.TO BE IMPLEMENTED
      */
     public boolean isStrictFp() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnFieldSpecification(this);
+        v.performActionOnFieldSpecification(this);
     }
 }

@@ -20,8 +20,7 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
     protected final MainWindowAction mainWindowAction;
 
     /*
-     * If this constructor is used, default selected state for the CheckBox
-     * is false.
+     * If this constructor is used, default selected state for the CheckBox is false.
      */
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
         this(mainWindow, label, false);
@@ -50,7 +49,7 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
         mainWindowAction.setTooltip(s);
     }
 
-    /* 
+    /*
      * Make sure getState() does the same as isSelected().
      */
     @Override

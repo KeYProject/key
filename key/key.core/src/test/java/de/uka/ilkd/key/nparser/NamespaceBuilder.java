@@ -21,8 +21,7 @@ import java.util.regex.Pattern;
  */
 public class NamespaceBuilder {
     private NamespaceSet nss;
-    private Pattern FUNCTION = Pattern.compile(
-            "(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
+    private Pattern FUNCTION = Pattern.compile("(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
 
     public NamespaceBuilder() {
         this(new NamespaceSet());
@@ -52,7 +51,7 @@ public class NamespaceBuilder {
             } catch (IndexOutOfBoundsException e) {
             }
 
-            Function f = new Function(new Name(name), sort, args.toArray(new Sort[]{}));
+            Function f = new Function(new Name(name), sort, args.toArray(new Sort[] {}));
             nss.functions().add(f);
         }
         return this;

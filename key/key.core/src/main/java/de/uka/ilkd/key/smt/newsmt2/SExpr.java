@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 /**
  * This class models s-expressions to be used for the SMT translation.
  * <p>
- * Every s-expression has got a {@link #name} and a (potentially empty) list of
- * {@link #children}.
+ * Every s-expression has got a {@link #name} and a (potentially empty) list of {@link #children}.
  * <p>
  * They can be printed out, non-simple names are escaped for SMT.
  *
@@ -121,8 +120,7 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and a given type.
      *
-     * The array of String children is mapped
-     * to a list of {@link SExpr}s.
+     * The array of String children is mapped to a list of {@link SExpr}s.
      *
      * @param name the non-null name of the atom
      * @param type the non-null type to use
@@ -143,8 +141,7 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and type {@link Type#NONE}.
      *
-     * The array of String children is mapped
-     * to a list of {@link SExpr}s.
+     * The array of String children is mapped to a list of {@link SExpr}s.
      *
      * @param name the non-null name of the atom
      * @param children the list of children to use.
@@ -175,8 +172,7 @@ public class SExpr implements Writable {
     }
 
     /**
-     * Create a new s-expr without atomic name (set to "")
-     * with children and type {@link Type#NONE}.
+     * Create a new s-expr without atomic name (set to "") with children and type {@link Type#NONE}.
      *
      * @param children the list of children to use.
      */
@@ -185,8 +181,7 @@ public class SExpr implements Writable {
     }
 
     /**
-     * Create a new s-expr without atomic name (set to "")
-     * with children and type {@link Type#NONE}.
+     * Create a new s-expr without atomic name (set to "") with children and type {@link Type#NONE}.
      *
      * @param children the list of children to use. Should not be modified elsewhere.
      */
@@ -216,17 +211,17 @@ public class SExpr implements Writable {
     /**
      * The atomic name may be an arbitrary string without '|'.
      *
-     * If certain characters occur in the string, it needs to be escaped between
-     * |...| to make it a valid SMTLIB2 identifier.
+     * If certain characters occur in the string, it needs to be escaped between |...| to make it a
+     * valid SMTLIB2 identifier.
      *
-     * Items of type {@link Type#VERBATIM} are not escaped since they are deliberately
-     * indicated as special.
+     * Items of type {@link Type#VERBATIM} are not escaped since they are deliberately indicated as
+     * special.
      *
      * @return the non-null SMTLIB2-valid name of this object, potentially escaped.
      */
     private String getEscapedName() {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
-            return name; //already escaped
+            return name; // already escaped
         }
         if (type == Type.VERBATIM) {
             return name;
@@ -246,10 +241,10 @@ public class SExpr implements Writable {
     @Override
     public void appendTo(StringBuilder sb) {
         boolean noSpace = name.isEmpty();
-        if(children.size() > 0 || noSpace) {
+        if (children.size() > 0 || noSpace) {
             sb.append("(").append(getEscapedName());
             for (SExpr child : children) {
-                if(!noSpace) {
+                if (!noSpace) {
                     sb.append(" ");
                 } else {
                     noSpace = false;
@@ -269,11 +264,12 @@ public class SExpr implements Writable {
      *
      * @param mapFunction a non-null function to be applied to the children.
      *
-     * @return a new SEXpr with the same name and type and with the mapFunction
-     *          applied to all children.
+     * @return a new SEXpr with the same name and type and with the mapFunction applied to all
+     *         children.
      */
     public SExpr map(Function<SExpr, SExpr> mapFunction) {
-        return new SExpr(name, type, children.stream().map(mapFunction).collect(Collectors.toList()));
+        return new SExpr(name, type,
+            children.stream().map(mapFunction).collect(Collectors.toList()));
     }
 
 }

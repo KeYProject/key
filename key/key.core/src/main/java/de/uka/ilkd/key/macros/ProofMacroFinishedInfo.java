@@ -13,11 +13,9 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
 /**
- * An information object with additional information about the
- * finished proof macro. The source is always a proof macro and
- * the result is always a list of goals. This information is
- * created and passed on by every application of a proof macro
- * as for the passed listener(s) to deal with it.
+ * An information object with additional information about the finished proof macro. The source is
+ * always a proof macro and the result is always a list of goals. This information is created and
+ * passed on by every application of a proof macro as for the passed listener(s) to deal with it.
  *
  * @author Michael Kirsten
  */
@@ -27,37 +25,33 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     private final boolean cancelled;
 
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
-                           Proof proof, long time, int appliedRules,
-                           int closedGoals, boolean cancelled) {
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof, long time,
+            int appliedRules, int closedGoals, boolean cancelled) {
         super(macro, goals, proof, time, appliedRules, closedGoals);
         this.cancelled = cancelled;
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
-                           long time, int appliedRules, int closedGoals) {
-        this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof,
-             time, appliedRules, closedGoals, false);
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, long time, int appliedRules,
+            int closedGoals) {
+        this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof, time, appliedRules,
+            closedGoals, false);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
-            Proof proof, Statistics statistics) {
-        this(macro, goals, proof,
-             statistics == null ? 0 : statistics.timeInMillis,
-             statistics == null ? 0 : statistics.totalRuleApps,
-             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()),
-             false);
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof,
+            Statistics statistics) {
+        this(macro, goals, proof, statistics == null ? 0 : statistics.timeInMillis,
+            statistics == null ? 0 : statistics.totalRuleApps,
+            proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()), false);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
-                           Statistics statistics) {
-        this(macro, goal, proof,
-             statistics == null ? 0 : statistics.timeInMillis,
-             statistics == null ? 0 : statistics.totalRuleApps,
-             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, Statistics statistics) {
+        this(macro, goal, proof, statistics == null ? 0 : statistics.timeInMillis,
+            statistics == null ? 0 : statistics.totalRuleApps,
+            proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof, boolean cancelled) {
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof,
+            boolean cancelled) {
         this(macro, goals, proof, proof == null ? null : proof.getStatistics());
     }
 
@@ -86,32 +80,24 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info,
-                           ImmutableList<Goal> goals) {
-        this(macro, goals, info.getProof(), info.getTime(),
-             info.getAppliedRules(), info.getClosedGoals(), info.cancelled);
+            ImmutableList<Goal> goals) {
+        this(macro, goals, info.getProof(), info.getTime(), info.getAppliedRules(),
+            info.getClosedGoals(), info.cancelled);
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
-        this(info.getMacro(),
-             info.getGoals(),
-             info.getProof(),
-             info.getTime() + stratInfo.getTime(),
-             info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-             info.getClosedGoals() + stratInfo.getClosedGoals(),
-             info.cancelled);
+        this(info.getMacro(), info.getGoals(), info.getProof(),
+            info.getTime() + stratInfo.getTime(),
+            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
+            info.getClosedGoals() + stratInfo.getClosedGoals(), info.cancelled);
     }
 
-    ProofMacroFinishedInfo(ProofMacroFinishedInfo info,
-                           ApplyStrategyInfo stratInfo,
-                           ImmutableList<Goal> goals) {
-        this(info.getMacro(),
-             goals,
-             stratInfo.getProof(),
-             info.getTime() + stratInfo.getTime(),
-             info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-             goals.size() <= info.getGoals().size()
-                 ? (info.getGoals().size() - goals.size()) : 0,
-             false);
+    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo,
+            ImmutableList<Goal> goals) {
+        this(info.getMacro(), goals, stratInfo.getProof(), info.getTime() + stratInfo.getTime(),
+            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
+            goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0,
+            false);
     }
 
     public void addInfo(String key, Object value) {
@@ -123,7 +109,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     public ProofMacro getMacro() {
-        return (ProofMacro)getSource();
+        return (ProofMacro) getSource();
     }
 
     public boolean isCancelled() {
@@ -136,7 +122,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         if (result == null) {
             return ImmutableSLList.<Goal>nil();
         } else {
-            return (ImmutableList<Goal>)result;
+            return (ImmutableList<Goal>) result;
         }
     }
 

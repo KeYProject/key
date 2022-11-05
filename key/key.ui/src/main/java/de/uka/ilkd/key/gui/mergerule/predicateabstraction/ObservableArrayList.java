@@ -21,7 +21,7 @@ public class ObservableArrayList<E> extends ArrayList<E> {
     public void removeListener(ObservableArrayListChangeListener listener) {
         listeners.remove(listener);
     }
-    
+
     @Override
     public void clear() {
         super.clear();

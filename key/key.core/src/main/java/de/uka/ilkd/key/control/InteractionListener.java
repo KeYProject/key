@@ -22,10 +22,11 @@ public interface InteractionListener {
 
     void runPrune(Node node);
 
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info);
+    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+            ProofMacroFinishedInfo info);
 
-    void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule,
-                        PosInOccurrence pos, boolean forced);
+    void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,
+            boolean forced);
 
     void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info);
 

@@ -12,7 +12,8 @@ import recoder.java.declaration.AnnotationElementValuePair;
 /**
  * @author ich
  */
-public class AnnotationPropertyReference extends JavaNonTerminalProgramElement implements MemberReference {
+public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
+        implements MemberReference {
     /**
      * serialization id
      */
@@ -38,7 +39,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ProgramElement#getASTParent()
      */
     public NonTerminalProgramElement getASTParent() {
@@ -53,7 +56,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
         this.parent = parent;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
@@ -61,7 +66,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public AnnotationPropertyReference deepClone() {

@@ -16,8 +16,8 @@ import java.util.Set;
 /**
  * An infrastructure to read string to string maps from files.
  *
- * Keys are written in form of heading lines like "### key".
- * The values are the lines between headings.
+ * Keys are written in form of heading lines like "### key". The values are the lines between
+ * headings.
  *
  * This is nice for having larger text blocks to map.
  *
@@ -40,7 +40,7 @@ public class LineProperties {
 
         while ((line = br.readLine()) != null) {
             if (line.startsWith("###")) {
-                if(lastKey != null) {
+                if (lastKey != null) {
                     String str = sb.toString().trim();
                     if (str.length() > 0) {
                         map.put(lastKey, str);
@@ -49,7 +49,7 @@ public class LineProperties {
                 sb.setLength(0);
 
                 lastKey = line.substring(3).trim();
-                if(lastKey.endsWith(":")) {
+                if (lastKey.endsWith(":")) {
                     lastKey = lastKey.substring(0, lastKey.length() - 1);
                 }
             } else {
@@ -57,7 +57,7 @@ public class LineProperties {
             }
         }
 
-        if(lastKey != null) {
+        if (lastKey != null) {
             String str = sb.toString().trim();
             if (str.length() > 0) {
                 map.put(lastKey, str);

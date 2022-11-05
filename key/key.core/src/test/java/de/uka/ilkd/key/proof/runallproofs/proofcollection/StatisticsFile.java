@@ -15,12 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Class for managing a file which contains statistics recorded during a
- * {@link RunAllProofsTest} run. Statistics are recorded as a table, which
- * contains one line for each tested file.
+ * Class for managing a file which contains statistics recorded during a {@link RunAllProofsTest}
+ * run. Statistics are recorded as a table, which contains one line for each tested file.
  * <p>
- * This class must be immutable because it is part of
- * {@link ProofCollectionSettings}, which is immutable as well.
+ * This class must be immutable because it is part of {@link ProofCollectionSettings}, which is
+ * immutable as well.
  */
 public class StatisticsFile implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
@@ -30,23 +29,21 @@ public class StatisticsFile implements Serializable {
     private final File statisticsFile;
 
     @SuppressWarnings("rawtypes")
-    private static final Column[] columns = new Column[]{
-            new Column<String>("Name") {
+    private static final Column[] columns = new Column[] { new Column<String>("Name") {
 
-                @Override
-                String addEntry(Statistics statistics, File keyFile,
-                                boolean proofClosed) {
-                    String name = keyFile.getAbsolutePath();
-                    final int slashIndex = name.lastIndexOf("examples/");
-                    return slashIndex >= 0 ? name.substring(slashIndex) : name;
-                }
+        @Override
+        String addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+            String name = keyFile.getAbsolutePath();
+            final int slashIndex = name.lastIndexOf("examples/");
+            return slashIndex >= 0 ? name.substring(slashIndex) : name;
+        }
 
-                @Override
-                String[] computeSumAndAverage(List<String> list) {
-                    return new String[]{"---SUM---", "---AVG---"};
-                }
+        @Override
+        String[] computeSumAndAverage(List<String> list) {
+            return new String[] { "---SUM---", "---AVG---" };
+        }
 
-            }, new LongColumn("Total rule apps") {
+    }, new LongColumn("Total rule apps") {
 
         @Override
         long getLongValueFromStatistics(Statistics statistics) {
@@ -95,14 +92,13 @@ public class StatisticsFile implements Serializable {
                 sum += Long.parseLong(s);
             }
             double avg = ((double) sum) / ((double) list.size());
-            return new String[]{"" + sum, "" + avg};
+            return new String[] { "" + sum, "" + avg };
         }
 
     }, new Column<Double>("Time per step (ms)") {
 
         @Override
-        Double addEntry(Statistics statistics, File keyFile,
-                        boolean proofClosed) {
+        Double addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
             return (double) statistics.timePerStepInMillis;
         }
 
@@ -113,7 +109,7 @@ public class StatisticsFile implements Serializable {
                 sum += Double.parseDouble(s);
             }
             double avg = sum / ((double) list.size());
-            return new String[]{"" + sum, "" + avg};
+            return new String[] { "" + sum, "" + avg };
         }
 
     }, new LongColumn("Total Runtime Memory (kB)") {
@@ -122,11 +118,10 @@ public class StatisticsFile implements Serializable {
         long getLongValueFromStatistics(Statistics statistics) {
             // get current memory consumption (after GC) in kB
             Runtime.getRuntime().gc();
-            return (Runtime.getRuntime().totalMemory() - Runtime
-                    .getRuntime().freeMemory()) / 1024;
+            return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024;
         }
 
-    }};
+    } };
 
     public StatisticsFile(File location) {
         this.statisticsFile = location;
@@ -134,8 +129,7 @@ public class StatisticsFile implements Serializable {
 
 
     /**
-     * Deletes an old statistics file and sets up a new one that has column names
-     * as first row.
+     * Deletes an old statistics file and sets up a new one that has column names as first row.
      */
     public void setUp() throws IOException {
         setUp(true);
@@ -169,8 +163,8 @@ public class StatisticsFile implements Serializable {
     /**
      * Method used for writing a new line into the table of statistics entries.
      *
-     * @param entries List representing a line in the table. Each list entry
-     *                corresponds to one table cell.
+     * @param entries List representing a line in the table. Each list entry corresponds to one
+     *        table cell.
      * @throws IOException In case statistics file is not accessible for some reason.
      */
     private void writeLine(List<String> entries) throws IOException {
@@ -191,9 +185,9 @@ public class StatisticsFile implements Serializable {
     /**
      * Append statistics for one proof to statistics file.
      *
-     * @param proof   {@link Proof}, whose statistics will be added.
-     * @param keyFile KeY file, from which the original proof obligation has been
-     *                created, must be mentioned explicitly.
+     * @param proof {@link Proof}, whose statistics will be added.
+     * @param keyFile KeY file, from which the original proof obligation has been created, must be
+     *        mentioned explicitly.
      * @throws IOException Thrown in case statistics file is not accessible.
      */
     public void appendStatistics(Proof proof, File keyFile) throws IOException {
@@ -201,8 +195,7 @@ public class StatisticsFile implements Serializable {
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
         for (Column<?> column : columns) {
-            entries.add(column.addEntry(statistics, keyFile, proofClosed)
-                    .toString());
+            entries.add(column.addEntry(statistics, keyFile, proofClosed).toString());
         }
         writeLine(entries);
     }
@@ -221,11 +214,11 @@ public class StatisticsFile implements Serializable {
             for (int i = 0; i < lists.length; i++) {
                 lists[i] = new LinkedList<String>();
             }
-            for (String row; (row = br.readLine()) != null; ) {
+            for (String row; (row = br.readLine()) != null;) {
                 String[] column = row.split("\\|");
                 if (column.length != columns.length) {
                     throw new RuntimeException(
-                            "Wrong number of columns after parsing statistics table.");
+                        "Wrong number of columns after parsing statistics table.");
                 }
                 for (int i = 0; i < lists.length; i++) {
                     lists[i].add(column[i]);
@@ -242,14 +235,15 @@ public class StatisticsFile implements Serializable {
             for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
                 Column<?> column = columns[i];
                 String[] sumAndAverage = column.computeSumAndAverage(lists[i]);
-                assert sumAndAverage.length == 2 : "Expecting exactly 2 strings returned by computeSumAndAverage()";
+                assert sumAndAverage.length == 2
+                        : "Expecting exactly 2 strings returned by computeSumAndAverage()";
                 sums.add(sumAndAverage[0]);
                 if (i != 6) {
                     avgs.add(sumAndAverage[1]);
                 } else {
                     /*
-                     * Adjust average calculation for "Time per step" so that it is
-                     * more stable. (see bug #1442)
+                     * Adjust average calculation for "Time per step" so that it is more stable.
+                     * (see bug #1442)
                      */
                     int sumNodes = Integer.parseInt(sums.get(1));
                     int sumAutomodeTime = Integer.parseInt(sums.get(4));
@@ -273,25 +267,23 @@ public class StatisticsFile implements Serializable {
             if (jobName == null) {
                 jobName = "local";
             }
-            String url = "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-"
-                    + jobName;
+            String url =
+                "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-" + jobName;
             File statisticsDir = statisticsFile.getParentFile();
             for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
 
                 // Create *.sum.properties file
-                Path sumFile = new File(statisticsDir, columns[i].name
-                        + ".sum.properties").toPath();
-                String[] lines = new String[]{"YVALUE=" + sums.get(i), url};
-                Files.write(sumFile, Arrays.asList(lines),
-                        Charset.defaultCharset());
+                Path sumFile =
+                    new File(statisticsDir, columns[i].name + ".sum.properties").toPath();
+                String[] lines = new String[] { "YVALUE=" + sums.get(i), url };
+                Files.write(sumFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", sumFile);
 
                 // Create *.avg.properties file
-                Path avgFile = new File(statisticsDir, columns[i].name
-                        + ".avg.properties").toPath();
-                lines = new String[]{"YVALUE=" + avgs.get(i), url};
-                Files.write(avgFile, Arrays.asList(lines),
-                        Charset.defaultCharset());
+                Path avgFile =
+                    new File(statisticsDir, columns[i].name + ".avg.properties").toPath();
+                lines = new String[] { "YVALUE=" + avgs.get(i), url };
+                Files.write(avgFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", avgFile);
 
             }
@@ -300,19 +292,16 @@ public class StatisticsFile implements Serializable {
              * Create properties file for number of test files.
              */
             int countFiles = lists[0].size();
-            Path countFilesPath = new File(statisticsDir,
-                    "NumberTestFiles.properties").toPath();
-            String[] lines = new String[]{"YVALUE=" + countFiles, url};
-            Files.write(countFilesPath, Arrays.asList(lines),
-                    Charset.defaultCharset());
+            Path countFilesPath = new File(statisticsDir, "NumberTestFiles.properties").toPath();
+            String[] lines = new String[] { "YVALUE=" + countFiles, url };
+            Files.write(countFilesPath, Arrays.asList(lines), Charset.defaultCharset());
             LOGGER.info("{} is written", countFilesPath);
         }
     }
 
 
     /**
-     * A column in statistics table whose entries are values of type {@link Long}
-     * .
+     * A column in statistics table whose entries are values of type {@link Long} .
      */
     private abstract static class LongColumn extends Column<Long> {
         LongColumn(String name) {
@@ -331,15 +320,15 @@ public class StatisticsFile implements Serializable {
                 sum += Long.parseLong(s);
             }
             double avg = ((double) sum) / ((double) list.size());
-            return new String[]{"" + sum, "" + avg};
+            return new String[] { "" + sum, "" + avg };
         }
 
         abstract long getLongValueFromStatistics(Statistics statistics);
     }
 
     /**
-     * Objects of this class represent a column in statistics file. Type of
-     * column entries is kept generic.
+     * Objects of this class represent a column in statistics file. Type of column entries is kept
+     * generic.
      */
     private abstract static class Column<T> {
         final String name;
@@ -350,8 +339,7 @@ public class StatisticsFile implements Serializable {
 
         abstract String[] computeSumAndAverage(List<String> list);
 
-        abstract T addEntry(Statistics statistics, File keyFile,
-                            boolean proofClosed);
+        abstract T addEntry(Statistics statistics, File keyFile, boolean proofClosed);
     }
 
     public File getStatisticsFile() {

@@ -12,7 +12,8 @@ import java.awt.*;
  * <p>
  * The status line hold a lblStatusText and a progress panel.
  * <p>
- * You add additional components by using the extension points {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
+ * You add additional components by using the extension points
+ * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
  *
  * <p>
  * <ul>
@@ -27,7 +28,7 @@ class MainStatusLine extends JPanel {
     private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
-    //private boolean phantomBoxAdded = false;
+    // private boolean phantomBoxAdded = false;
 
     MainStatusLine(String initialText, Font font) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -39,12 +40,10 @@ class MainStatusLine extends JPanel {
 
         lblStatusText.setText(initialText);
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
-        lblStatusText.setBorder(BorderFactory.createCompoundBorder(
-                lblStatusText.getBorder(),
-                BorderFactory.createEmptyBorder(0, 10, 0, 0)
-        ));
+        lblStatusText.setBorder(BorderFactory.createCompoundBorder(lblStatusText.getBorder(),
+            BorderFactory.createEmptyBorder(0, 10, 0, 0)));
 
-        //add(Box.createHorizontalGlue());
+        // add(Box.createHorizontalGlue());
         add(lblStatusText);
         add(Box.createHorizontalStrut(50));
 
@@ -65,8 +64,7 @@ class MainStatusLine extends JPanel {
     }
 
     /*
-     * The following methods should only be called from the event
-     * dispatching thread
+     * The following methods should only be called from the event dispatching thread
      */
 
     /**
@@ -77,8 +75,8 @@ class MainStatusLine extends JPanel {
     }
 
     /**
-     * Set the range of values the progress bar can display (see
-     * <code>setMaximum</code> of <code>ProgressBar</code>)
+     * Set the range of values the progress bar can display (see <code>setMaximum</code> of
+     * <code>ProgressBar</code>)
      */
     public void setProgressBarMaximum(int value) {
         progressBar.setMaximum(value);
@@ -99,27 +97,21 @@ class MainStatusLine extends JPanel {
         if (visible) {
             setProgress(0);
 
-            /* To avoid later resizing of the status line, add an
-            // invisible element with the same height as the abort button
-            if (!phantomBoxAdded) {
-                phantomBoxAdded = true;
-                ComponentListener phantomAdder = new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        progressPanel.removeComponentListener(this);
-                        Dimension s = progressPanel.getSize();
-                        s = new Dimension(0, (int) s.getHeight());
-                        add(Box.createRigidArea(s));
-                    }
-                };
-                progressPanel.addComponentListener(phantomAdder);
-            }*/
+            /*
+             * To avoid later resizing of the status line, add an // invisible element with the same
+             * height as the abort button if (!phantomBoxAdded) { phantomBoxAdded = true;
+             * ComponentListener phantomAdder = new ComponentAdapter() {
+             *
+             * @Override public void componentResized(ComponentEvent e) {
+             * progressPanel.removeComponentListener(this); Dimension s = progressPanel.getSize(); s
+             * = new Dimension(0, (int) s.getHeight()); add(Box.createRigidArea(s)); } };
+             * progressPanel.addComponentListener(phantomAdder); }
+             */
         }
     }
 
     /**
-     * Make the status line display the given string, don't modify
-     * anything else
+     * Make the status line display the given string, don't modify anything else
      */
     public void setStatusText(String s) {
         lblStatusText.setText(s);

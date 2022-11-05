@@ -9,8 +9,8 @@ import recoder.service.SourceInfo;
 public class CrossReferenceServiceConfiguration extends DefaultServiceConfiguration {
 
     /**
-     * The cross reference source info of this service configuration. This is a
-     * copy of the sourceInfo attribute, to avoid type casts.
+     * The cross reference source info of this service configuration. This is a copy of the
+     * sourceInfo attribute, to avoid type casts.
      */
     private CrossReferenceSourceInfo crossReferencer;
 
@@ -36,8 +36,8 @@ public class CrossReferenceServiceConfiguration extends DefaultServiceConfigurat
     }
 
     /**
-     * The cross reference source info is a subclass of the source info, so this
-     * class simply overrides the source info factory method.
+     * The cross reference source info is a subclass of the source info, so this class simply
+     * overrides the source info factory method.
      */
     protected SourceInfo makeSourceInfo() {
         return new DefaultCrossReferenceSourceInfo(this);

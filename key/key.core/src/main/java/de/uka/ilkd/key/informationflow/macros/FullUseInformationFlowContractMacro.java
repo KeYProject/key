@@ -30,8 +30,8 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
 
     @Override
     public String getDescription() {
-        return "Applies all applicable information flow contract rules and " +
-                "prepares the information flow pre branches.";
+        return "Applies all applicable information flow contract rules and "
+            + "prepares the information flow pre branches.";
     }
 
     @Override
@@ -41,23 +41,19 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {
-                new UseInformationFlowContractMacro(),
-                new PrepareInfFlowContractPreBranchesMacro()
-        };
+        return new ProofMacro[] { new UseInformationFlowContractMacro(),
+            new PrepareInfFlowContractPreBranchesMacro() };
     }
 
     /**
      * {@inheritDoc}
      *
      * <p>
-     * This compound macro is applicable if and only if the first macro is applicable.
-     * If there is no first macro, this is not applicable.
+     * This compound macro is applicable if and only if the first macro is applicable. If there is
+     * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof == null) {
             return false;
         }
@@ -66,7 +62,8 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
             return false;
         }
         final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof AbstractInfFlowPO) && super.canApplyTo(proof, goals, posInOcc);
+            services.getSpecificationRepository().getProofOblInput(proof);
+        return (poForProof instanceof AbstractInfFlowPO)
+                && super.canApplyTo(proof, goals, posInOcc);
     }
 }

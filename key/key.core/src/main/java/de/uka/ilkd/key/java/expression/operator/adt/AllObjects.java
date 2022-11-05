@@ -28,10 +28,10 @@ public class AllObjects extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnAllObjects(this);
+        v.performActionOnAllObjects(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printAllObjects(this);
     }
@@ -41,6 +41,6 @@ public class AllObjects extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+    }
 }

@@ -8,27 +8,27 @@ public class Counter {
     private int count;
 
     public Counter(String name) {
-        this.name=name;
+        this.name = name;
     }
-    
+
     private Counter(String name, int count) {
-       this(name);
-       this.count = count;
+        this(name);
+        this.count = count;
     }
-    
+
     public int getCount() {
         return count;
     }
-    
-    public int getCountPlusPlus(){
-	return count++;
+
+    public int getCountPlusPlus() {
+        return count++;
     }
-    
+
     public String toString() {
-        return "Counter "+ name + ": " + count;
+        return "Counter " + name + ": " + count;
     }
-    
+
     public Counter copy() {
-       return new Counter(name, count);
+        return new Counter(name, count);
     }
 }

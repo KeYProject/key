@@ -17,22 +17,14 @@ import java.util.stream.Collectors;
  */
 public class ProofDifference {
     private static final Integer THRESHOLD = 25;
-    private List<String>
-            leftAntec = new LinkedList<>(),
-            rightAntec = new LinkedList<>(),
-            rightSucc = new LinkedList<>(),
-            leftSucc = new LinkedList<>();
+    private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
+            rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
 
-    private Set<String>
-            exclusiveAntec = new HashSet<>(),
-            commonSucc = new HashSet<>(),
-            exclusiveSucc = new HashSet<>(),
-            commonAntec = new HashSet<>();
+    private Set<String> exclusiveAntec = new HashSet<>(), commonSucc = new HashSet<>(),
+            exclusiveSucc = new HashSet<>(), commonAntec = new HashSet<>();
 
     public static ProofDifference create(Services services, Node left, Node right) {
-        return create(
-                left, right,
-                (Term t) -> LogicPrinter.quickPrintTerm(t, services));
+        return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
     }
 
     public static ProofDifference create(Node left, Node right, Function<Term, String> printer) {
@@ -46,9 +38,9 @@ public class ProofDifference {
         return pd;
     }
 
-    private static List<String> initialise(Function<Term, String> printer, Semisequent semisequent) {
-        return semisequent.asList().stream().map(it ->
-                printer.apply(it.formula()))
+    private static List<String> initialise(Function<Term, String> printer,
+            Semisequent semisequent) {
+        return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
                 .collect(Collectors.toList());
     }
 
@@ -58,13 +50,13 @@ public class ProofDifference {
         return intersection;
     }
 
-    private static void computeDiff(List<String> left, List<String> right,
-                                    Set<String> common, Set<String> exclusive) {
+    private static void computeDiff(List<String> left, List<String> right, Set<String> common,
+            Set<String> exclusive) {
         computeDiff(new HashSet<>(left), new HashSet<>(right), common, exclusive);
     }
 
-    private static void computeDiff(Set<String> left, Set<String> right,
-                                    Set<String> common, Set<String> exclusive) {
+    private static void computeDiff(Set<String> left, Set<String> right, Set<String> common,
+            Set<String> exclusive) {
         common.addAll(intersect(left, right));
         exclusive.addAll(left);
         exclusive.addAll(right);
@@ -73,7 +65,7 @@ public class ProofDifference {
 
     static String findAndPopNearestMatch(String l, List<String> right) {
         String current = null;
-        //Ignore whitespace:
+        // Ignore whitespace:
         l = l.replaceAll("\\s", "");
         int min = Integer.MAX_VALUE;
         for (String r : right) {
@@ -89,9 +81,10 @@ public class ProofDifference {
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
-        int initCap = Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
-        PriorityQueue<Triple<Integer, Integer, Integer>> queue = new PriorityQueue<>(initCap,
-                Comparator.comparingInt((t) -> t.third));
+        int initCap =
+            Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
+        PriorityQueue<Triple<Integer, Integer, Integer>> queue =
+            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
                 queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
@@ -102,9 +95,9 @@ public class ProofDifference {
         boolean[] matchedRight = new boolean[right.size()];
         while (!queue.isEmpty()) {
             Triple<Integer, Integer, Integer> t = queue.poll();
-            /*if(t.third>=THRESHOLD) {
-                break;
-            }*/
+            /*
+             * if(t.third>=THRESHOLD) { break; }
+             */
             if (!matchedLeft[t.first] && !matchedRight[t.second]) {
                 String l = left.get((int) t.first);
                 String r = right.get((int) t.second);
@@ -184,10 +177,9 @@ public class ProofDifference {
                     } else if (j == 0) {
                         dp[i][j] = i;
                     } else {
-                        dp[i][j] = min(dp[i - 1][j - 1]
-                                        + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
-                                dp[i - 1][j] + 1,
-                                dp[i][j - 1] + 1);
+                        dp[i][j] = min(
+                            dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
+                            dp[i - 1][j] + 1, dp[i][j - 1] + 1);
                     }
                 }
             }
@@ -200,8 +192,7 @@ public class ProofDifference {
 
 
         public static int min(int... numbers) {
-            return Arrays.stream(numbers)
-                    .min().orElse(Integer.MAX_VALUE);
+            return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
         }
     }
 

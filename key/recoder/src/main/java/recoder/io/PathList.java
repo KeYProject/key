@@ -13,9 +13,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * This class describes a list of search paths. Search paths may contain a
- * mixture of directories, logical directories (e.g. "."), and archive files
- * (e.g. ".jar", ".zip").
+ * This class describes a list of search paths. Search paths may contain a mixture of directories,
+ * logical directories (e.g. "."), and archive files (e.g. ".jar", ".zip").
  *
  * @author RN
  * @author AL
@@ -24,8 +23,7 @@ public class PathList {
 
     private final static File NO_FILE = new File("");
     /**
-     * Caches names of types relative to the search path that are known to be
-     * unknown. Set <String>.
+     * Caches names of types relative to the search path that are known to be unknown. Set <String>.
      */
     private final Set<String> notFound = new HashSet<String>();
     /**
@@ -62,8 +60,8 @@ public class PathList {
     }
 
     /**
-     * creates a path list from the given strings. The single strings are
-     * interpreted as path strings.
+     * creates a path list from the given strings. The single strings are interpreted as path
+     * strings.
      *
      * @param paths the array of path strings to be added
      */
@@ -178,13 +176,12 @@ public class PathList {
     }
 
     /**
-     * Looks for the file with the given relative file name in the path list and
-     * returns the according location object. If no such file can be found
-     * within the paths, the method returns <tt>null</tt>.
+     * Looks for the file with the given relative file name in the path list and returns the
+     * according location object. If no such file can be found within the paths, the method returns
+     * <tt>null</tt>.
      *
      * @param relativeName the relative name of the file
-     * @return the location object or <tt>null</tt> if the file could not be
-     * found.
+     * @return the location object or <tt>null</tt> if the file could not be found.
      */
     public DataLocation find(String relativeName) {
         DataLocation result = locations.get(relativeName);
@@ -202,10 +199,10 @@ public class PathList {
     }
 
     /**
-     * Returns a relative name of the given absolute file name removing a
-     * directory path prefix if the prefix occurs in this path list. If the
-     * filename is a directory path that is already in this path list, a "." is
-     * returned. In any other case, the absolute file name is passed through.
+     * Returns a relative name of the given absolute file name removing a directory path prefix if
+     * the prefix occurs in this path list. If the filename is a directory path that is already in
+     * this path list, a "." is returned. In any other case, the absolute file name is passed
+     * through.
      *
      * @param absoluteFilename an absolute file name.
      * @return a name for this file, possibly relative to this search path.
@@ -234,9 +231,9 @@ public class PathList {
     }
 
     /**
-     * Looks for files with the given relative file name in the path list and
-     * returns an array containing the full path names of each match. If no file
-     * could be located, this method returns an empty array.
+     * Looks for files with the given relative file name in the path list and returns an array
+     * containing the full path names of each match. If no file could be located, this method
+     * returns an empty array.
      *
      * @param relativeName the relative name of the file
      * @return an array containing the full paths of all matching files

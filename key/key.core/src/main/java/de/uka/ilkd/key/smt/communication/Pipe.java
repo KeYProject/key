@@ -5,14 +5,15 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
- * This interface describes a pipe for sending messages to or receiving them from an external
- * SMT solver process.
+ * This interface describes a pipe for sending messages to or receiving them from an external SMT
+ * solver process.
  *
  * @author Wolfram Pfeifer
  */
 public interface Pipe {
     /**
      * Sends a message to the external process the Pipe is connected to.
+     *
      * @param message the message to send
      * @throws IOException if an I/O error occurs
      */
@@ -21,17 +22,21 @@ public interface Pipe {
     /**
      * Reads a message from the external process. This method blocks until there is a further
      * message or the underlying stream has been closed.
+     *
      * @return the received message
      * @throws IOException if reading fails
      * @throws InterruptedException if interrupted while waiting
      */
-    @Nullable String readMessage() throws IOException, InterruptedException;
+    @Nullable
+    String readMessage() throws IOException, InterruptedException;
 
     /**
      * Can be used to obtain the messages sent to and from the solver as well as its final result.
+     *
      * @return the data sent between KeY and solver until now
      */
-    @Nonnull SolverCommunication getSolverCommunication();
+    @Nonnull
+    SolverCommunication getSolverCommunication();
 
     /**
      * Forcibly closes the Pipe by destroying the process. Calling this method should be avoided if

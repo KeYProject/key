@@ -9,10 +9,10 @@ import java.io.StringWriter;
 /**
  * Wraps BufferedReader in order to provide different message delimiters.
  *
- * It returns successive message which are separated by one of a set of
- * delimiters.
+ * It returns successive message which are separated by one of a set of delimiters.
  *
  * For example:
+ *
  * <pre>
  *     delims = { "X", "Y" };
  *     br = new BufferedMessageReader(new StringReader("aXbYc"), delims);
@@ -22,11 +22,10 @@ import java.io.StringWriter;
  *     assert(null == br.readMessage());
  * </pre>
  *
- * The original implementation would *not* return "c" but return null after
- * b.
+ * The original implementation would *not* return "c" but return null after b.
  *
- * The method {@link #drain()} can be used to read the reader to the end
- * and give it back as a single string.
+ * The method {@link #drain()} can be used to read the reader to the end and give it back as a
+ * single string.
  *
  * @author Benjamin Niedermann (original version)
  * @author Mattias Ulbrich (complete overhaul)
@@ -41,6 +40,7 @@ class BufferedMessageReader {
 
     /**
      * Creates a new BufferedMessageReader wrapping the given Reader.
+     *
      * @param reader the Reader to wrap
      * @param delimiters the delimiters, where incoming messages should be split
      */
@@ -52,6 +52,7 @@ class BufferedMessageReader {
     /**
      * Call this method in order to read the next message from the given input stream. If there is
      * no message, it blocks until there is a further message or the stream has been closed.
+     *
      * @return a string between two delimiters or until the EOF.
      * @throws IOException if reading fails
      */
@@ -60,12 +61,12 @@ class BufferedMessageReader {
         StringBuilder sb = new StringBuilder();
         int c;
         while ((c = reader.read()) != -1) {
-            sb.append((char)c);
+            sb.append((char) c);
             for (String delim : delimiters) {
-                if(endsWith(sb, delim)) {
+                if (endsWith(sb, delim)) {
                     String result = sb.substring(0, sb.length() - delim.length());
 
-                    if(!result.isEmpty()) {
+                    if (!result.isEmpty()) {
                         return result;
                     }
 
@@ -103,7 +104,7 @@ class BufferedMessageReader {
         }
 
         for (int i = len - dlen, j = 0; i < len; i++, j++) {
-            if(sb.charAt(i) != s.charAt(j)) {
+            if (sb.charAt(i) != s.charAt(j)) {
                 return false;
             }
         }

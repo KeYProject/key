@@ -18,15 +18,16 @@ import java.util.Map;
 public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements ByteCodeInfo {
 
     /**
-     * Containment relation. This could be made internal part of the
-     * ByteCodeInfo hierarchy.
+     * Containment relation. This could be made internal part of the ByteCodeInfo hierarchy.
      */
-    private final Map<ProgramModelElement, ClassTypeContainer> element2container = new HashMap<ProgramModelElement, ClassTypeContainer>(256);
+    private final Map<ProgramModelElement, ClassTypeContainer> element2container =
+        new HashMap<ProgramModelElement, ClassTypeContainer>(256);
     /**
-     * Member and inner type relation. This could be made part of the NameInfo
-     * for packages and part of the ClassFile or the ClassFileCacheEntry.
+     * Member and inner type relation. This could be made part of the NameInfo for packages and part
+     * of the ClassFile or the ClassFileCacheEntry.
      */
-    private final Map<ClassTypeContainer, List<ClassType>> containedTypes = new HashMap<ClassTypeContainer, List<ClassType>>(32);
+    private final Map<ClassTypeContainer, List<ClassType>> containedTypes =
+        new HashMap<ClassTypeContainer, List<ClassType>>(32);
     /**
      * signature caching
      */
@@ -212,7 +213,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                         Type t = null;
                         String basename = ptypes[i];
                         int dim;
-                        if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real dimension.
+                        if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real
+                                                                 // dimension.
                             basename = basename.substring(0, dim);
                         List<? extends TypeParameter> tpl;
                         boolean checkClassTypeParameters = true;
@@ -258,7 +260,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                             if (t instanceof ArrayType) {
                                 t = makeParameterizedArrayType(t, mi.getTypeArgumentsForParam(i));
                             } else {
-                                t = new ParameterizedType((ClassType) t, mi.getTypeArgumentsForParam(i));
+                                t = new ParameterizedType((ClassType) t,
+                                    mi.getTypeArgumentsForParam(i));
                             }
                         }
                         res.add(t);
@@ -343,7 +346,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 register((ClassFile) outerClass);
             } else {
                 Debug.log("Found a non-ClassFile outer class of " + classname + ":"
-                        + Format.toString("%c %N", outerClass));
+                    + Format.toString("%c %N", outerClass));
             }
 
             // set containment
@@ -394,7 +397,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             c.setProgramModelInfo(this);
             element2container.put(c, cf);
         }
-        if (cl.isEmpty() && !cf.isInterface() && !cf.isEnumType() && Character.isJavaIdentifierStart(cf.getName().charAt(0))) {
+        if (cl.isEmpty() && !cf.isInterface() && !cf.isEnumType()
+                && Character.isJavaIdentifierStart(cf.getName().charAt(0))) {
             Debug.log("No constructor defined in " + cf.getFullName());
             // serviceConfiguration.getImplicitElementInfo().getDefaultConstructor(cf)
         }
@@ -412,21 +416,18 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 }
                 ni.getClassType(cn); // bad, bad side-effect programming ;)
                 /*
-                 * Remark by T.Gutzmann:
-                 * The inner class info is ment for the sole purpose of type resolving:
-                 * an inner class and a package-level class may have the same name
-                 * (although that violates naming conventions). There are rules for
-                 * resolving this problem on source code level; the information required
-                 * are not available in bytecode any more, except in the inner class info ;-)
-                 * As of Recoder 0.80, references to inner classes of other types are filtered out
-                 * by the bytecode parser.
+                 * Remark by T.Gutzmann: The inner class info is ment for the sole purpose of type
+                 * resolving: an inner class and a package-level class may have the same name
+                 * (although that violates naming conventions). There are rules for resolving this
+                 * problem on source code level; the information required are not available in
+                 * bytecode any more, except in the inner class info ;-) As of Recoder 0.80,
+                 * references to inner classes of other types are filtered out by the bytecode
+                 * parser.
                  *
-                 ** It is actually possible to receive a non-classfile here! The
-                 ** semantics of inner class chunks in class files seems to be a
-                 ** bit weird.
-                 ** com.sun.java.swing.plaf.windows.WindowsLookAndFeel.LazyFileChooserIcon
-                 ** contains an inner class link to
-                 ** javax.swing.UIDefaults.LazyValue, even though it is just a
+                 ** It is actually possible to receive a non-classfile here! The semantics of inner
+                 * class chunks in class files seems to be a bit weird.
+                 ** com.sun.java.swing.plaf.windows.WindowsLookAndFeel.LazyFileChooserIcon contains
+                 * an inner class link to javax.swing.UIDefaults.LazyValue, even though it is just a
                  ** subtype. Strange.
                  */
 
@@ -440,9 +441,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         if (sname != null) {
             ClassType ct = ni.getClassType(sname);
             if (ct == null) {
-                getErrorHandler().reportError(
-                        new MissingClassFileException("Unknown byte code supertype " + sname + " in class "
-                                + cf.getFullName(), sname));
+                getErrorHandler().reportError(new MissingClassFileException(
+                    "Unknown byte code supertype " + sname + " in class " + cf.getFullName(),
+                    sname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
@@ -455,9 +456,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             String iname = inames[i];
             ClassType ct = ni.getClassType(iname);
             if (ct == null) {
-                getErrorHandler().reportError(
-                        new MissingClassFileException("Unknown byte code supertype " + iname + " in class "
-                                + cf.getFullName(), iname));
+                getErrorHandler().reportError(new MissingClassFileException(
+                    "Unknown byte code supertype " + iname + " in class " + cf.getFullName(),
+                    iname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);
@@ -483,13 +484,11 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     }
 
     /*
-     * We reuse the class type cache for the class file cache entries. We can do
-     * that as we create cache entries during registration of class files and
-     * registration comes before any query. There is a cache entry for a class
-     * file if and only if it has been registered. Therefore, the class file
-     * cache may not be reset, which would happen after a call to reset().
-     * However, the byte code info should never have to be resetted as long as
-     * we do not change byte code.
+     * We reuse the class type cache for the class file cache entries. We can do that as we create
+     * cache entries during registration of class files and registration comes before any query.
+     * There is a cache entry for a class file if and only if it has been registered. Therefore, the
+     * class file cache may not be reset, which would happen after a call to reset(). However, the
+     * byte code info should never have to be resetted as long as we do not change byte code.
      */
     static class ClassFileCacheEntry extends ClassTypeCacheEntry {
         // could be extended by containment links?

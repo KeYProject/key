@@ -30,15 +30,14 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
- * an instance of this class describes the initial configuration of the prover.
- * This includes sorts, functions, heuristics, and variables namespaces,
- * information on the underlying java model, and a set of rules.
+ * an instance of this class describes the initial configuration of the prover. This includes sorts,
+ * functions, heuristics, and variables namespaces, information on the underlying java model, and a
+ * set of rules.
  */
 public class InitConfig {
 
     /**
-     * the services class allowing to access information about the underlying
-     * program model
+     * the services class allowing to access information about the underlying program model
      */
     private final Services services;
 
@@ -48,28 +47,25 @@ public class InitConfig {
     private ImmutableList<Taclet> taclets = ImmutableSLList.nil();
 
     /**
-     * maps categories to their default choice (both represented as Strings),
-     * which is used if no other choice is specified in the problemfile
+     * maps categories to their default choice (both represented as Strings), which is used if no
+     * other choice is specified in the problemfile
      */
-    private HashMap<String,String> category2DefaultChoice =
-        new LinkedHashMap<String,String>();
+    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<String, String>();
 
     /**
-     * maps taclets to their TacletBuilders. This information is needed when
-     * a taclet contains GoalTemplates annotated with taclet-options because
-     * in this case a new taclet has to be created containing only those
-     * GoalTemplates whose options are activated and those who don't belong
-     * to any specific option.
+     * maps taclets to their TacletBuilders. This information is needed when a taclet contains
+     * GoalTemplates annotated with taclet-options because in this case a new taclet has to be
+     * created containing only those GoalTemplates whose options are activated and those who don't
+     * belong to any specific option.
      */
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /**
-     * Set of the rule options activated for the current proof. The rule options
-     * ({@link Choice}s) allow to use different ruleset modelling or skipping
-     * certain features (e.g. nullpointer checks when resolving references)
+     * Set of the rule options activated for the current proof. The rule options ({@link Choice}s)
+     * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
+     * checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices
-    	= DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -83,32 +79,31 @@ public class InitConfig {
 
 
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
     public InitConfig(Services services) {
-       this.services  = services;
+        this.services = services;
 
-       category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
-             .getChoiceSettings()
-             .getDefaultChoices();
+        category2DefaultChoice =
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
     }
 
 
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
 
 
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
     /**
-     * returns the Services of this initial configuration providing access
-     * to the used program model
+     * returns the Services of this initial configuration providing access to the used program model
+     *
      * @return the Services of this initial configuration
      */
     public final Services getServices() {
@@ -117,18 +112,17 @@ public class InitConfig {
 
 
     public Profile getProfile() {
-	return services.getProfile();
+        return services.getProfile();
     }
 
 
     /**
-     * Adds a default option for a category.
-     * It does override previous default choices.
+     * Adds a default option for a category. It does override previous default choices.
      *
      * @return true if the default was successfully set
      */
     public boolean addCategoryDefaultChoice(@Nonnull String category, @Nonnull String choice) {
-        if(!category2DefaultChoice.containsKey(category)) {
+        if (!category2DefaultChoice.containsKey(category)) {
             category2DefaultChoice.put(category, choice);
             return true;
         }
@@ -136,19 +130,19 @@ public class InitConfig {
     }
 
     /**
-     * Adds default choices given in {@code init}.
-     * Not overriding previous default choices.
+     * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@Nonnull Map<String,String> init) {
-        boolean changed =false;
+    public void addCategory2DefaultChoices(@Nonnull Map<String, String> init) {
+        boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
         }
-        if(changed) {
-            //FIXME weigl: I do not understand why the default choices are back progragated!
+        if (changed) {
+            // FIXME weigl: I do not understand why the default choices are back progragated!
             // For me this is a design flaw.
             @SuppressWarnings("unchecked")
-            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
+            HashMap<String, String> clone =
+                (HashMap<String, String>) category2DefaultChoice.clone();
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -156,34 +150,33 @@ public class InitConfig {
     }
 
 
-    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder<? extends  Taclet>> taclet2Builder){
+    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
         this.taclet2Builder = taclet2Builder;
     }
 
 
     /**
-     * {@link Taclet}s are constructed using {@link TacletBuilder}s this map
-     * contains the pair of a taclet and its builder which is important as
-     * goals of a taclet may depend of the selected choices. Instead of
-     * creating all possible combinations in advance this is done by demand
+     * {@link Taclet}s are constructed using {@link TacletBuilder}s this map contains the pair of a
+     * taclet and its builder which is important as goals of a taclet may depend of the selected
+     * choices. Instead of creating all possible combinations in advance this is done by demand
+     *
      * @return the map from a taclet to its builder
      */
-    public HashMap<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder(){
+    public HashMap<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder() {
         return taclet2Builder;
     }
 
 
     /**
-     * sets the set of activated choices of this initial configuration.
-     * For categories without a specified choice the default choice contained
-     * in category2DefaultChoice is added.
+     * sets the set of activated choices of this initial configuration. For categories without a
+     * specified choice the default choice contained in category2DefaultChoice is added.
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
         category2DefaultChoice =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         @SuppressWarnings("unchecked")
-        HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
+        HashMap<String, String> c2DC = (HashMap<String, String>) category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
         }
@@ -191,20 +184,21 @@ public class InitConfig {
         ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
             final Choice c = (Choice) choiceNS().lookup(new Name(s));
-            if(c!=null){
+            if (c != null) {
                 category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
         }
-        this.activatedChoices = activatedChoices.union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
+        this.activatedChoices = activatedChoices
+                .union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
     }
 
 
-    /** Returns the choices which are currently active.
-     * For getting the active choices for a specific proof,
-     * <code>getChoices</code> in <code>de.uka.ilkd.key.proof.Proof
+    /**
+     * Returns the choices which are currently active. For getting the active choices for a specific
+     * proof, <code>getChoices</code> in <code>de.uka.ilkd.key.proof.Proof
      * </code> has to be used.
      */
     public ImmutableSet<Choice> getActivatedChoices() {
@@ -223,32 +217,32 @@ public class InitConfig {
         this.activatedTacletCache = null;
     }
 
-    public void setTaclets(Collection<Taclet> tacs){
+    public void setTaclets(Collection<Taclet> tacs) {
         taclets = ImmutableSLList.nil();
         addTaclets(tacs);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
-    public ImmutableList<Taclet> getTaclets(){
+    public ImmutableList<Taclet> getTaclets() {
         return taclets;
     }
 
     public Taclet lookupActiveTaclet(Name name) {
-       if (activatedTacletCache == null) {
-          fillActiveTacletCache();
-       }
-       return activatedTacletCache.get(name);
+        if (activatedTacletCache == null) {
+            fillActiveTacletCache();
+        }
+        return activatedTacletCache.get(name);
     }
 
     /**
      * returns the activated taclets of this initial configuration
      */
     public Collection<Taclet> activatedTaclets() {
-       if (activatedTacletCache == null) {
-          fillActiveTacletCache();
-       }
-       return activatedTacletCache.values();
+        if (activatedTacletCache == null) {
+            fillActiveTacletCache();
+        }
+        return activatedTacletCache.values();
     }
 
 
@@ -256,74 +250,73 @@ public class InitConfig {
      * fills the active taclet cache
      */
     private void fillActiveTacletCache() {
-       if (activatedTacletCache != null) {
-          return;
-       }
-       final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
-       for (Taclet t : taclets) {
-          TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
+        if (activatedTacletCache != null) {
+            return;
+        }
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        var choices = Collections.unmodifiableSet(activatedChoices.toSet());
+        for (Taclet t : taclets) {
+            TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
-          if(t.getChoices().subset(activatedChoices)){
-             if (b != null && b.getGoal2Choices() != null){
-                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
-             }
+            if (t.getChoices().eval(choices)) {
+                if (b != null && b.getGoal2Choices() != null) {
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
+                }
 
-             if (t != null) {
-                tacletCache.put(t.name(), t);
-             }
-          }
-       }
-       activatedTacletCache = Collections.unmodifiableMap(tacletCache);
+                if (t != null) {
+                    tacletCache.put(t.name(), t);
+                }
+            }
+        }
+        activatedTacletCache = Collections.unmodifiableMap(tacletCache);
     }
 
 
-    /** returns the built-in rules of this initial configuration
+    /**
+     * returns the built-in rules of this initial configuration
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null
-        	? ImmutableSLList.<BuiltInRule>nil()
-        	: profile.getStandardRules().getStandardBuiltInRules());
+        return (profile == null ? ImmutableSLList.<BuiltInRule>nil()
+                : profile.getStandardRules().getStandardBuiltInRules());
     }
 
 
-    /** registers a rule with the given justification at the
-     * justification managing {@link RuleJustification} object of this
-     * environment.
+    /**
+     * registers a rule with the given justification at the justification managing
+     * {@link RuleJustification} object of this environment.
      */
     public void registerRule(Rule r, RuleJustification j) {
-   justifInfo.addJustification(r, j);
+        justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r,
-                                             Node node,
-                                             boolean isAxiom) {
-        justifInfo.addJustification(r.rule(),
-                                    new RuleJustificationByAddRules(node,
-                                                                    isAxiom));
+    public void registerRuleIntroducedAtNode(RuleApp r, Node node, boolean isAxiom) {
+        justifInfo.addJustification(r.rule(), new RuleJustificationByAddRules(node, isAxiom));
     }
 
-    /** registers a list of rules with the given justification at the
-     * justification managing {@link RuleJustification} object of this
-     * environment. All rules of the list are given the same
-     * justification.
+    /**
+     * registers a list of rules with the given justification at the justification managing
+     * {@link RuleJustification} object of this environment. All rules of the list are given the
+     * same justification.
      */
     public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
-       for (Rule r : s) {
-          registerRule(r, j);
-       }
+        for (Rule r : s) {
+            registerRule(r, j);
+        }
     }
 
-    /** returns the object managing the rules in this environment and
-     * their justifications. The object is unique to this environment.
+    /**
+     * returns the object managing the rules in this environment and their justifications. The
+     * object is unique to this environment.
      */
     public RuleJustificationInfo getJustifInfo() {
-       return justifInfo;
+        return justifInfo;
     }
 
 
-    /** returns a newly created taclet index for the set of activated
-     * taclets contained in this initial configuration
+    /**
+     * returns a newly created taclet index for the set of activated taclets contained in this
+     * initial configuration
      */
     public TacletIndex createTacletIndex() {
         return TacletIndexKit.getKit().createTacletIndex(activatedTaclets());
@@ -331,8 +324,7 @@ public class InitConfig {
 
 
     /**
-     * returns a new created index for built in rules (at the moment immutable
-     * list)
+     * returns a new created index for built in rules (at the moment immutable list)
      */
     public BuiltInRuleIndex createBuiltInRuleIndex() {
         return new BuiltInRuleIndex(builtInRules());
@@ -348,6 +340,7 @@ public class InitConfig {
 
     /**
      * returns the function namespace of this initial configuration.
+     *
      * @return a non-null namespace
      */
     public Namespace<Function> funcNS() {
@@ -355,35 +348,40 @@ public class InitConfig {
     }
 
 
-    /** returns the sort namespace of this initial configuration
+    /**
+     * returns the sort namespace of this initial configuration
      */
     public Namespace<Sort> sortNS() {
         return namespaces().sorts();
     }
 
 
-    /** returns the heuristics namespace of this initial configuration
+    /**
+     * returns the heuristics namespace of this initial configuration
      */
     public Namespace<RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
 
-    /** returns the variable namespace of this initial configuration
+    /**
+     * returns the variable namespace of this initial configuration
      */
     public Namespace<QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 
 
-    /** returns the program variable namespace of this initial configuration
+    /**
+     * returns the program variable namespace of this initial configuration
      */
     public Namespace<IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
 
-    /** returns the choice namespace of this initial configuration
+    /**
+     * returns the choice namespace of this initial configuration
      */
     public Namespace<Choice> choiceNS() {
         return namespaces().choices();
@@ -400,41 +398,41 @@ public class InitConfig {
     }
 
 
-    /** returns a copy of this initial configuration copying the namespaces,
-     * the contained JavaInfo while using the immutable set of taclets in the
-     * copy
+    /**
+     * returns a copy of this initial configuration copying the namespaces, the contained JavaInfo
+     * while using the immutable set of taclets in the copy
      */
     public InitConfig copy() {
         return copyWithServices(services.copyPreservesLDTInformation());
     }
 
-    /** returns a copy of this initial configuration copying the namespaces,
-     * the contained JavaInfo while using the immutable set of taclets in the
-     * copy
+    /**
+     * returns a copy of this initial configuration copying the namespaces, the contained JavaInfo
+     * while using the immutable set of taclets in the copy
      */
     public InitConfig deepCopy() {
-       return copyWithServices(services.copy(false));
+        return copyWithServices(services.copy(false));
     }
 
 
-    /** returns a copy of this initial configuration copying the namespaces,
-     * the contained JavaInfo while using the immutable set of taclets in the
-     * copy
+    /**
+     * returns a copy of this initial configuration copying the namespaces, the contained JavaInfo
+     * while using the immutable set of taclets in the copy
      */
     @SuppressWarnings("unchecked")
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
         if (settings != null) {
-           ic.setSettings(new ProofSettings(settings));
+            ic.setSettings(new ProofSettings(settings));
         }
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
+            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
-        ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
+        ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
     }
 
@@ -442,11 +440,8 @@ public class InitConfig {
 
     @Override
     public String toString() {
-        return
-            "Namespaces:" + namespaces() +"\n" +
-            "Services:" + services +"\n"+
-            "Taclets:" + getTaclets() +"\n"+
-            "Built-In:" + builtInRules() +"\n";
+        return "Namespaces:" + namespaces() + "\n" + "Services:" + services + "\n" + "Taclets:"
+            + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
     }
 
     public FileRepo getFileRepo() {

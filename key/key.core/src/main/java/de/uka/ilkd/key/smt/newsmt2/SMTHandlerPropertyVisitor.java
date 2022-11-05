@@ -18,5 +18,5 @@ public interface SMTHandlerPropertyVisitor<A, R> {
 
     R visit(BooleanProperty booleanProp, A arg);
 
-    R visit(StringProperty stringProp, A arg) ;
+    R visit(StringProperty stringProp, A arg);
 }

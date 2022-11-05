@@ -12,31 +12,26 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public abstract class BinaryFeature implements Feature {
 
-    protected BinaryFeature () {}
-    
+    protected BinaryFeature() {}
+
     /** Constant that represents the boolean value true */
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
-    public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
-    
-    public RuleAppCost computeCost ( RuleApp app, PosInOccurrence pos, Goal goal ) {
-        return filter ( app, pos, goal ) ? ZERO_COST : TOP_COST; 
+    public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
+
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return filter(app, pos, goal) ? ZERO_COST : TOP_COST;
     }
-    
+
     /**
-     * Compute whether the result of the feature is zero (<code>true</code>)
-     * or infinity (<code>false</code>)
-     * 
-     * @param app
-     *            the RuleApp
-     * @param pos
-     *            position where <code>app</code> is to be applied
-     * @param goal
-     *            the goal on which <code>app</code> is to be applied
+     * Compute whether the result of the feature is zero (<code>true</code>) or infinity
+     * (<code>false</code>)
+     *
+     * @param app the RuleApp
+     * @param pos position where <code>app</code> is to be applied
+     * @param goal the goal on which <code>app</code> is to be applied
      * @return true iff the the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter ( RuleApp app,
-                                        PosInOccurrence pos,
-                                        Goal goal );
+    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal);
 
 }

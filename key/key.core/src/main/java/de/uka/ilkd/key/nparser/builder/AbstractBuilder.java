@@ -46,7 +46,8 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     @Override
     protected T aggregateResult(T aggregate, T nextResult) {
-        if (nextResult != null) return nextResult;
+        if (nextResult != null)
+            return nextResult;
         return aggregate;
     }
 
@@ -59,26 +60,31 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
-        if (seq.isEmpty()) return null;
+        if (seq.isEmpty())
+            return null;
         return accept(seq.iterator().next());
     }
 
     protected <T> T pop() {
-        if(parameters==null) throw new IllegalStateException("Stack is empty");
+        if (parameters == null)
+            throw new IllegalStateException("Stack is empty");
         return (T) parameters.pop();
     }
 
     protected void push(Object... obj) {
-        if(parameters == null) parameters = new Stack<>();
-        for (Object a : obj) parameters.push(a);
+        if (parameters == null)
+            parameters = new Stack<>();
+        for (Object a : obj)
+            parameters.push(a);
     }
 
     protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
-        if(parameters == null) parameters = new Stack<>();
+        if (parameters == null)
+            parameters = new Stack<>();
         int stackSize = parameters.size();
         push(args);
         T t = accept(ctx);
-        //Stack hygiene
+        // Stack hygiene
         while (parameters.size() > stackSize) {
             parameters.pop();
         }
@@ -99,22 +105,24 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected void each(RuleContext... ctx) {
-        for (RuleContext c : ctx) accept(c);
+        for (RuleContext c : ctx)
+            accept(c);
     }
 
     protected void each(Collection<? extends ParserRuleContext> argument) {
-        for (RuleContext c : argument) accept(c);
+        for (RuleContext c : argument)
+            accept(c);
     }
-    //endregion
+    // endregion
 
     protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
-        return Arrays.stream(ctxss)
-                .flatMap(it -> it.stream().map(a -> (T2) accept(a)))
+        return Arrays.stream(ctxss).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
     }
 
     public @Nonnull List<BuildingIssue> getBuildingIssues() {
-        if (buildingIssues == null) buildingIssues = new LinkedList<>();
+        if (buildingIssues == null)
+            buildingIssues = new LinkedList<>();
         return buildingIssues;
     }
 
@@ -129,9 +137,9 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         getBuildingIssues().add(be);
         return be;
     }
-    //endregion
+    // endregion
 
-    //region error handling
+    // region error handling
 
     /**
      * Throws a semanticError for the given ast node and message.
@@ -152,5 +160,5 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     protected void throwEx(Throwable e) {
         throw new BuildingException(e);
     }
-    //endregion
+    // endregion
 }

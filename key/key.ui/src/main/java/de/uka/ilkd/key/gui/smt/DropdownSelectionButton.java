@@ -14,14 +14,13 @@ import javax.swing.event.ChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
- * A button consisting of an action component (normal button) and
- * a selection component (dropdown button).
+ * A button consisting of an action component (normal button) and a selection component (dropdown
+ * button).
  *
- * The selection button opens a dropdown menu that lets the user
- * select some previously added actions and combines those selected
- * actions into a resulting one according to some reducing function
- * ({@link #reduceChoice}).
- * The resulting action is executed when pressing the action button.
+ * The selection button opens a dropdown menu that lets the user select some previously added
+ * actions and combines those selected actions into a resulting one according to some reducing
+ * function ({@link #reduceChoice}). The resulting action is executed when pressing the action
+ * button.
  *
  * The selection button's dropdown menu can also contain other components
  * ({@link #addComponent(Component)}).
@@ -44,9 +43,9 @@ public class DropdownSelectionButton {
      */
     private Action[] items;
     /**
-     * The function used to map some selected actions to the one that is to be executed.
-     * This is only used if more than one item can be selected at the same time.
-     * If only one action can be selected, the function that will be used is just the identity.
+     * The function used to map some selected actions to the one that is to be executed. This is
+     * only used if more than one item can be selected at the same time. If only one action can be
+     * selected, the function that will be used is just the identity.
      */
     private Function<Action[], Action> reduceChoice;
     /**
@@ -123,8 +122,8 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * Add a ChangeListener to this button that will be notified by #setSelectedItem().
-     * A listener cannot be added more than once (nothing will change if it is already present).
+     * Add a ChangeListener to this button that will be notified by #setSelectedItem(). A listener
+     * cannot be added more than once (nothing will change if it is already present).
      *
      * @param listener the new ChangeListener
      */
@@ -218,14 +217,14 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * Update the action button so that it executes the selected executedAction.
-     * If only one action can be chosen, make the executedAction the only element of selectedItems.
+     * Update the action button so that it executes the selected executedAction. If only one action
+     * can be chosen, make the executedAction the only element of selectedItems.
      */
     private void update() {
         setAction(executedAction);
         if (getAction() != null) {
-            getAction().putValue(Action.NAME, isEmptyItem() ? executedAction.toString()
-                    : prefix + executedAction.toString());
+            getAction().putValue(Action.NAME,
+                isEmptyItem() ? executedAction.toString() : prefix + executedAction.toString());
             if (isEmptyItem()) {
                 getAction().putValue(Action.SHORT_DESCRIPTION, emptyItem.getToolTip());
             }
@@ -237,8 +236,8 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * Check whether a given action is contained in the actions that can be selected via
-     * the selection component.
+     * Check whether a given action is contained in the actions that can be selected via the
+     * selection component.
      *
      * @param item the action to search
      * @return whether the given item can be selected
@@ -254,8 +253,8 @@ public class DropdownSelectionButton {
 
 
     /**
-     * Set the executedAction to be the given one and update the action button.
-     * Notify the ChangeListeners of this change.
+     * Set the executedAction to be the given one and update the action button. Notify the
+     * ChangeListeners of this change.
      *
      * @param item the new executedAction
      */
@@ -278,11 +277,12 @@ public class DropdownSelectionButton {
     protected JButton getSelectionButton() {
         if (selectionComponent == null) {
             selectionComponent = new JButton();
-            /* If the mouse is on the button and the button gets pressed (mouse is clicked),
-            the popup menu will close. The button action will only be carried out afterwards,
-            thus opening the popup menu up again - avoid that using the listener and flag:
-            If the mouse enters the button while the menu is visible, clicking the button
-            should not invoke the opening action.
+            /*
+             * If the mouse is on the button and the button gets pressed (mouse is clicked), the
+             * popup menu will close. The button action will only be carried out afterwards, thus
+             * opening the popup menu up again - avoid that using the listener and flag: If the
+             * mouse enters the button while the menu is visible, clicking the button should not
+             * invoke the opening action.
              */
             selectionComponent.addMouseListener(new MouseAdapter() {
                 @Override
@@ -300,10 +300,11 @@ public class DropdownSelectionButton {
                 public void actionPerformed(ActionEvent e) {
                     if (items.length > 0) {
                         if (!buttonShouldOpenMenu) {
-                            /* Do nothing if the button should not open the menu.
-                            If the menu is not visible anymore after clicking the button,
-                            change the button's behaviour for the next click
-                            (no matter whether the mouse moves). */
+                            /*
+                             * Do nothing if the button should not open the menu. If the menu is not
+                             * visible anymore after clicking the button, change the button's
+                             * behaviour for the next click (no matter whether the mouse moves).
+                             */
                             buttonShouldOpenMenu = !getMenu().isVisible();
                             return;
                         }
@@ -313,11 +314,9 @@ public class DropdownSelectionButton {
                             width = OptionalInt.of(0);
                         }
                         int newWidth = Math.max(width.getAsInt(),
-                                actionComponent.getWidth() + selectionComponent.getWidth());
-                        getMenu().setPopupSize(
-                                newWidth,
-                                Arrays.stream(getMenu().getComponents())
-                                        .mapToInt(c -> c.getPreferredSize().height).sum());
+                            actionComponent.getWidth() + selectionComponent.getWidth());
+                        getMenu().setPopupSize(newWidth, Arrays.stream(getMenu().getComponents())
+                                .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());
                         // If the menu is open and the mouse does not leave the button,
                         // make sure the button still does not reopen the menu after the next click.
@@ -341,8 +340,8 @@ public class DropdownSelectionButton {
             actionComponent = new JButton();
             // actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
             // Enable the selection button iff the action button is enabled as well.
-            actionComponent.addChangeListener(e ->
-                    getSelectionButton().setEnabled(actionComponent.isEnabled()));
+            actionComponent.addChangeListener(
+                e -> getSelectionButton().setEnabled(actionComponent.isEnabled()));
             actionComponent.setFocusPainted(false);
         }
         return actionComponent;
@@ -350,8 +349,8 @@ public class DropdownSelectionButton {
 
     /**
      * (Create and) return the dropdown popup menu that is opened by the selection component.
-     * Deletes all added components when the menu is null, thus leading a completely fresh and
-     * empty menu.
+     * Deletes all added components when the menu is null, thus leading a completely fresh and empty
+     * menu.
      *
      * @return the popup menu opened by the selection button
      */
@@ -365,14 +364,14 @@ public class DropdownSelectionButton {
 
     /**
      * Set the actions that can be selected, the maximum amount of items that can be selected at the
-     * same time (a positive integer) and the function used to create the action component's
-     * action out of all the selected actions.
+     * same time (a positive integer) and the function used to create the action component's action
+     * out of all the selected actions.
      *
-     * @param it        the selectable actions
-     * @param reduce    the function used to collapse multiple selected actions into one for the
-     *                  action component
-     * @param maxChoice the maximum amount of actions that can be selected,
-     *                  this is assumed to be at least 1 (otherwise it is changed to be 1)
+     * @param it the selectable actions
+     * @param reduce the function used to collapse multiple selected actions into one for the action
+     *        component
+     * @param maxChoice the maximum amount of actions that can be selected, this is assumed to be at
+     *        least 1 (otherwise it is changed to be 1)
      */
     public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
         items = it;
@@ -389,8 +388,8 @@ public class DropdownSelectionButton {
         selectedItems.clear();
         menuItems.clear();
         for (Action item : items) {
-            JMenuItem menuItem = maxChoiceAmount > 1
-                    ? new DoubleClickCheckBoxMenuItem(item) : new SelectionMenuItem(item);
+            JMenuItem menuItem = maxChoiceAmount > 1 ? new DoubleClickCheckBoxMenuItem(item)
+                    : new SelectionMenuItem(item);
             if (oldSelectedItems.contains(item) && maxChoiceAmount > 1) {
                 menuItem.setSelected(true);
             }
@@ -419,12 +418,13 @@ public class DropdownSelectionButton {
      * @param newMenuItems the new actions that can be selected
      */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
-        /* The menu could also be reused (just clear all its components first), but that leads to
-        weird behaviour when going from menu items with checkboxes to normal menu items
-        [see #setItems(...)]:
-        The space where the checkbox would be if the menu item had one is also free for
-        checkbox-less menu items (rather than that empty space on the left,
-        one would just expect the text to be completely on the left). */
+        /*
+         * The menu could also be reused (just clear all its components first), but that leads to
+         * weird behaviour when going from menu items with checkboxes to normal menu items [see
+         * #setItems(...)]: The space where the checkbox would be if the menu item had one is also
+         * free for checkbox-less menu items (rather than that empty space on the left, one would
+         * just expect the text to be completely on the left).
+         */
         menu = null;
         for (JMenuItem item : newMenuItems) {
             getMenu().add(item);
@@ -486,24 +486,23 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * The empty action to be set if items is empty.
-     * This action does nothing and is either always disabled or always enabled which
-     * causes the action component to be disabled/enabled when selecting such an EmptyAction
-     * via {@link #setSelectedItem(Action)}.
+     * The empty action to be set if items is empty. This action does nothing and is either always
+     * disabled or always enabled which causes the action component to be disabled/enabled when
+     * selecting such an EmptyAction via {@link #setSelectedItem(Action)}.
      */
     public static class EmptyAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
 
         /**
-         * The text that will be displayed in a DropdownSelectionButton's action component when
-         * its {@link #emptyItem} is selected.
+         * The text that will be displayed in a DropdownSelectionButton's action component when its
+         * {@link #emptyItem} is selected.
          */
         private String text;
 
         /**
-         * The tooltip text that will be displayed in a DropdownSelectionButton's action
-         * component when its {@link #emptyItem} is selected.
+         * The tooltip text that will be displayed in a DropdownSelectionButton's action component
+         * when its {@link #emptyItem} is selected.
          */
         private String toolTip;
 
@@ -514,7 +513,7 @@ public class DropdownSelectionButton {
         private boolean leaveButtonsEnabled;
 
         /**
-         *  Create a new EmptyAction with text "empty".
+         * Create a new EmptyAction with text "empty".
          *
          * @param enabled the EmptyAction's {@link #leaveButtonsEnabled} attribute
          */
@@ -581,8 +580,8 @@ public class DropdownSelectionButton {
     private final class DoubleClickCheckBoxMenuItem extends JCheckBoxMenuItem {
 
         /**
-         * The associated action, this is performed when double-clicking the menu item
-         * and selected when single-clicking it.
+         * The associated action, this is performed when double-clicking the menu item and selected
+         * when single-clicking it.
          */
         private final transient Action doubleClickAction;
 
@@ -597,13 +596,16 @@ public class DropdownSelectionButton {
             super.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    /* The selection status will be changed after a click before the action
-                    is performed, so at this point, if the item was not selected before, it is now.
-                    Hence, there may be too many selected items.
+                    /*
+                     * The selection status will be changed after a click before the action is
+                     * performed, so at this point, if the item was not selected before, it is now.
+                     * Hence, there may be too many selected items.
                      */
                     if (getSelectedItems().length > maxChoiceAmount) {
-                        /* If the selection cannot happen, set the selection status to false again
-                        and change nothing else. */
+                        /*
+                         * If the selection cannot happen, set the selection status to false again
+                         * and change nothing else.
+                         */
                         menuItem.setSelected(false);
                     } else {
                         // Call this to invoke the update stuff in the overridden #setSelected()
@@ -617,9 +619,8 @@ public class DropdownSelectionButton {
         }
 
         /**
-         * If the item is selected, add its corresponding action to the selectedItems,
-         * otherwise remove it.
-         * Set the executedAction to reduceChoice(selectedItems).
+         * If the item is selected, add its corresponding action to the selectedItems, otherwise
+         * remove it. Set the executedAction to reduceChoice(selectedItems).
          *
          * @param b true iff this item should be selected
          */
@@ -645,13 +646,14 @@ public class DropdownSelectionButton {
 
         /**
          * On double-click, select this item AND execute the corresponding action.
+         *
          * @param e the event that is processed by this item
          */
         @Override
         protected void processMouseEvent(MouseEvent e) {
             if (e.getClickCount() >= 2) {
-                doubleClickAction.actionPerformed(
-                        new ActionEvent(e, MouseEvent.MOUSE_CLICKED, null));
+                doubleClickAction
+                        .actionPerformed(new ActionEvent(e, MouseEvent.MOUSE_CLICKED, null));
                 setSelected(true);
                 return;
             }
@@ -662,8 +664,8 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * MenuItem that has an assigned action which is selected as the executedAction
-     * when clicking on the item.
+     * MenuItem that has an assigned action which is selected as the executedAction when clicking on
+     * the item.
      *
      * Updates the DropdownSelectionButton's {@link #executedAction} accordingly via
      * {@link #setSelectedItem(Action)}.
@@ -682,30 +684,36 @@ public class DropdownSelectionButton {
          */
         public SelectionMenuItem(Action item) {
             super();
-            /* If an action is performed on the menu item, the only thing that should happen
-            is setting the currently selected action to this one */
+            /*
+             * If an action is performed on the menu item, the only thing that should happen is
+             * setting the currently selected action to this one
+             */
             super.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     setSelectedItem(item);
                 }
             });
-            /* This has to come after the super#setAction call because that will call getAction()
-            and assume getAction() to change its return value after setting the action.
-            Otherwise that will lead to a stack overflow. */
+            /*
+             * This has to come after the super#setAction call because that will call getAction()
+             * and assume getAction() to change its return value after setting the action. Otherwise
+             * that will lead to a stack overflow.
+             */
             this.action = item;
         }
 
         /**
-         * The returned action is NOT executed when clicking on this menu item.
-         * The actually executed action is the one returned by {@link super#getAction()}.
+         * The returned action is NOT executed when clicking on this menu item. The actually
+         * executed action is the one returned by {@link super#getAction()}.
          *
          * @return the item's associated {@link #action}
          */
         @Override
         public Action getAction() {
-            /* If the item's action is accessed, it will return the action it represents instead
-            of the one that is executed when an action is performed on the item. */
+            /*
+             * If the item's action is accessed, it will return the action it represents instead of
+             * the one that is executed when an action is performed on the item.
+             */
             return action;
         }
     }

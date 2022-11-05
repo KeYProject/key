@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents an intersection type, which was introduced in java 5.
- * See JLS, 3rd edition, �4.9 for details.
+ * Represents an intersection type, which was introduced in java 5. See JLS, 3rd edition, �4.9 for
+ * details.
  *
  * @author Tobias Gutzmann
  */
@@ -41,21 +41,28 @@ public class IntersectionType implements ClassType {
         return res.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return pmi;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
         this.pmi = pmi;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {

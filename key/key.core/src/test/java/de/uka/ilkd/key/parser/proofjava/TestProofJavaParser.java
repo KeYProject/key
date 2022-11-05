@@ -18,10 +18,10 @@ import recoder.ServiceConfiguration;
 import recoder.java.Expression;
 
 /**
- * 
- * TestCases for a modified ProofJavaParser which supports <...> for generics
- * and for implicit identifiers.
- * 
+ *
+ * TestCases for a modified ProofJavaParser which supports <...> for generics and for implicit
+ * identifiers.
+ *
  * @author mulbrich
  * @version 2006-10-27
  */
@@ -35,8 +35,7 @@ public class TestProofJavaParser {
 
     @BeforeEach
     public void setUp() throws Exception {
-        sc = new KeYCrossReferenceServiceConfiguration(
-                new KeYRecoderExcHandler());
+        sc = new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
         factory = (ProofJavaProgramFactory) sc.getProgramFactory();
     }
 
@@ -78,5 +77,5 @@ public class TestProofJavaParser {
         factory.parseMemberDeclaration("private <Default> getDefault() { };");
         factory.parseMemberDeclaration("private <T> Type m() { };");
     }
-        
+
 }

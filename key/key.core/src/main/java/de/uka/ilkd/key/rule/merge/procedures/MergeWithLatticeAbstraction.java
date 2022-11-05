@@ -21,29 +21,25 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
- * Rule that merges two sequents based on a specified set of abstract domain
- * lattices. If no lattice is specified for a given sort, the rule proceeds such
- * that program variables are unchanged if they are equal in both states and
- * applies the if-then-else construction otherwise.
- * 
+ * Rule that merges two sequents based on a specified set of abstract domain lattices. If no lattice
+ * is specified for a given sort, the rule proceeds such that program variables are unchanged if
+ * they are equal in both states and applies the if-then-else construction otherwise.
+ *
  * @author Dominic Scheurer
  */
-public abstract class MergeWithLatticeAbstraction extends MergeProcedure implements ParametricMergeProcedure {
+public abstract class MergeWithLatticeAbstraction extends MergeProcedure
+        implements ParametricMergeProcedure {
 
     /**
-     * Returns the abstract domain lattice for the given sort or null if there
-     * has no lattice been specified for that sort.
-     * 
-     * @param s
-     *            The sort to return the matching lattice for.
-     * @param services
-     *            The services object.
-     * @return The abstract domain lattice suitable for the given sort. Return
-     *         null if there is no abstract domain for that sort; in this case,
-     *         an if-then-else merge will be performed.
+     * Returns the abstract domain lattice for the given sort or null if there has no lattice been
+     * specified for that sort.
+     *
+     * @param s The sort to return the matching lattice for.
+     * @param services The services object.
+     * @return The abstract domain lattice suitable for the given sort. Return null if there is no
+     *         abstract domain for that sort; in this case, an if-then-else merge will be performed.
      */
-    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
-            Services services);
+    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s, Services services);
 
     /**
      * @return Manually chosen lattice elements for program variables.
@@ -52,7 +48,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
@@ -61,17 +57,15 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure impleme
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v,
-            SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2,
+    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
+            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
 
-        AbstractDomainLattice lattice =
-                getAbstractDomainForSort(valueInState1.sort(), services);
+        AbstractDomainLattice lattice = getAbstractDomainForSort(valueInState1.sort(), services);
 
         if (lattice != null) {
 
@@ -83,33 +77,28 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure impleme
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
                 mergeElem = getUserChoices().get((ProgramVariable) v.op());
 
-                sideConditions
-                        .add(AbstractDomainLattice.getSideConditionForAxiom(
-                                state1, v, mergeElem, services));
-                sideConditions
-                        .add(AbstractDomainLattice.getSideConditionForAxiom(
-                                state2, v, mergeElem, services));
-            }
-            else {
+                sideConditions.add(
+                    AbstractDomainLattice.getSideConditionForAxiom(state1, v, mergeElem, services));
+                sideConditions.add(
+                    AbstractDomainLattice.getSideConditionForAxiom(state2, v, mergeElem, services));
+            } else {
                 // Merge with abstract domain lattice.
                 AbstractDomainElement abstrElem1 =
-                        lattice.abstractFrom(state1, valueInState1, services);
+                    lattice.abstractFrom(state1, valueInState1, services);
                 AbstractDomainElement abstrElem2 =
-                        lattice.abstractFrom(state2, valueInState2, services);
+                    lattice.abstractFrom(state2, valueInState2, services);
 
                 mergeElem = lattice.join(abstrElem1, abstrElem2);
             }
 
             Function newSkolemConst =
-                    getNewSkolemConstantForPrefix(mergeElem.toString(),
-                            valueInState1.sort(), services);
+                getNewSkolemConstantForPrefix(mergeElem.toString(), valueInState1.sort(), services);
             LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
             newNames.add(newSkolemConst.name());
 
             newConstraints =
-                    newConstraints.add(mergeElem.getDefiningAxiom(
-                            tb.func(newSkolemConst), services));
-            
+                newConstraints.add(mergeElem.getDefiningAxiom(tb.func(newSkolemConst), services));
+
             // NOTE: We also remember the precise values by if-then-else
             // construction. This preserves completeness and should also
             // not be harmful to performance in cases where completeness
@@ -117,24 +106,20 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure impleme
             // lattices where this construction is bad, it may be safely
             // removed (no harm to soundness!).
             /*
-            newConstraints =
-                    newConstraints.add(tb.equals(tb.func(newSkolemConst),
-                            MergeIfThenElse.createIfThenElseTerm(state1, state2,
-                                    valueInState1, valueInState2,
-                                    distinguishingFormula, services)));
-            */
-            
-            return new ValuesMergeResult(newConstraints,
-                    tb.func(newSkolemConst), newNames, sideConditions);
+             * newConstraints = newConstraints.add(tb.equals(tb.func(newSkolemConst),
+             * MergeIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
+             * distinguishingFormula, services)));
+             */
 
-        }
-        else {
+            return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst), newNames,
+                sideConditions);
 
-            return new ValuesMergeResult(DefaultImmutableSet.<Term> nil(),
-                    MergeByIfThenElse.createIfThenElseTerm(state1, state2,
-                            valueInState1, valueInState2,
-                            distinguishingFormula, services),
-                    new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+        } else {
+
+            return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
+                MergeByIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
+                    distinguishingFormula, services),
+                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
         }
 

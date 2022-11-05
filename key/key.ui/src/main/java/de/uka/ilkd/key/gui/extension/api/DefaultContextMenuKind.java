@@ -10,9 +10,7 @@ import de.uka.ilkd.key.rule.Rule;
  * @version 1 (07.04.19)
  */
 public enum DefaultContextMenuKind implements ContextMenuKind {
-    PROOF_LIST(Proof.class),
-    PROOF_TREE(Node.class),
-    TACLET_INFO(Rule.class),
+    PROOF_LIST(Proof.class), PROOF_TREE(Node.class), TACLET_INFO(Rule.class),
     SEQUENT_VIEW(PosInSequent.class);
 
     private final Class<?> clazz;

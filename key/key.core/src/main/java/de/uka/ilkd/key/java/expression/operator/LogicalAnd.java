@@ -11,17 +11,17 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Logical and.
+ * Logical and.
  */
 
 public class LogicalAnd extends Operator {
 
 
     /**
-     *      Logical and.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Logical and.
+     *
+     * @param children an ExtList with all children of this node the first children in list will be
+     *        the one on the left side, the second the one on the right side.
      */
 
     public LogicalAnd(ExtList children) {
@@ -29,21 +29,23 @@ public class LogicalAnd extends Operator {
     }
 
     public LogicalAnd(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+        super(lhs, rhs);
     }
 
 
     /**
-     *      Get arity.
-     *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
     public int getArity() {
         return 2;
     }
 
     /**
-     *      Get precedence.
-     *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -51,20 +53,23 @@ public class LogicalAnd extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLogicalAnd(this);
+        v.performActionOnLogicalAnd(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -72,7 +77,7 @@ public class LogicalAnd extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().getBooleanType();
+        return services.getTypeConverter().getBooleanType();
     }
 
 }

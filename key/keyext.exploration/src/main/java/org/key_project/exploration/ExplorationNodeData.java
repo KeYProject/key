@@ -7,17 +7,17 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * Information on exploration that is attached to nodes.
- * If such an object is attached to a node, this node will be highlighted in the tree with a border
- * and if an ExplorationAction is set this action is displayed in the ExplorationStepsList Tab
+ * Information on exploration that is attached to nodes. If such an object is attached to a node,
+ * this node will be highlighted in the tree with a border and if an ExplorationAction is set this
+ * action is displayed in the ExplorationStepsList Tab
  */
 public class ExplorationNodeData {
 
     private String explorationAction;
 
-    public static @Nonnull
-    ExplorationNodeData get(@Nonnull Node node) {
-        @Nullable ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
+    public static @Nonnull ExplorationNodeData get(@Nonnull Node node) {
+        @Nullable
+        ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if (data == null) {
             data = new ExplorationNodeData();
             node.register(data, ExplorationNodeData.class);
@@ -42,9 +42,12 @@ public class ExplorationNodeData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (o.getClass() != getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (o.getClass() != getClass())
+            return false;
         ExplorationNodeData that = (ExplorationNodeData) o;
         return Objects.equals(getExplorationAction(), that.getExplorationAction());
     }

@@ -39,12 +39,10 @@ public class FileUtils {
     }
 
     /*
-     * If the start is not a directory, the start is set to it's parent. If no
-     * canonical path for the destination is available, the absolute path is
-     * chosen. If the start and destination are equal, "." is returned. If start
-     * and destination have no common prefix, they are in different root
-     * directories (or devices) and the full path to the destination is
-     * returned.
+     * If the start is not a directory, the start is set to it's parent. If no canonical path for
+     * the destination is available, the absolute path is chosen. If the start and destination are
+     * equal, "." is returned. If start and destination have no common prefix, they are in different
+     * root directories (or devices) and the full path to the destination is returned.
      */
     public static String getRelativePath(File start, File dest) {
         if (start.isFile()) {
@@ -96,8 +94,7 @@ public class FileUtils {
     }
 
     /**
-     * Returns the file representing the Java system class archive file, if it
-     * exists.
+     * Returns the file representing the Java system class archive file, if it exists.
      *
      * @return the Java system class archive file.
      */
@@ -124,7 +121,8 @@ public class FileUtils {
             }
         }
         if (result == null) {
-            classpath = System.getProperty("java.home") + File.separator + LIB_SUBDIR + File.separator + ARCHIVE_NAME;
+            classpath = System.getProperty("java.home") + File.separator + LIB_SUBDIR
+                    + File.separator + ARCHIVE_NAME;
             result = new File(classpath);
         }
         if (!result.exists()) {
@@ -142,7 +140,8 @@ public class FileUtils {
     public static File getPathOfExtensionClassesDir() {
         File result = null;
         // <java.home>/lib/ext on Mac OS !
-        String classpath = System.getProperty("java.home") + File.separator + "lib" + File.separator + "ext";
+        String classpath =
+            System.getProperty("java.home") + File.separator + "lib" + File.separator + "ext";
 
         result = new File(classpath);
         if (!result.exists()) {

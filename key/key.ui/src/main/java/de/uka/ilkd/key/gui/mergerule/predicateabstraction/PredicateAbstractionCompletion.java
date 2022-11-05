@@ -25,90 +25,70 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  *
  * @author Dominic Scheurer
  */
-public class PredicateAbstractionCompletion extends
-      MergeProcedureCompletion<MergeWithPredicateAbstraction> {
+public class PredicateAbstractionCompletion
+        extends MergeProcedureCompletion<MergeWithPredicateAbstraction> {
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion#complete(de.uka.
-    * ilkd.key.rule.join.JoinProcedure, de.uka.ilkd.key.proof.Goal)
-    */
-   @Override
-   public MergeWithPredicateAbstraction complete(
-         MergeWithPredicateAbstraction proc,
-         Pair<Goal, PosInOccurrence> joinGoalPio,
-         Collection<MergePartner> partners) {
-      final Services services = joinGoalPio.first.proof().getServices();
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion#complete(de.uka.
+     * ilkd.key.rule.join.JoinProcedure, de.uka.ilkd.key.proof.Goal)
+     */
+    @Override
+    public MergeWithPredicateAbstraction complete(MergeWithPredicateAbstraction proc,
+            Pair<Goal, PosInOccurrence> joinGoalPio, Collection<MergePartner> partners) {
+        final Services services = joinGoalPio.first.proof().getServices();
 
-      // Compute the program variables that are different in the
-      // respective states.
+        // Compute the program variables that are different in the
+        // respective states.
 
-      final SymbolicExecutionState joinState =
-            MergeRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
-                  joinGoalPio.second, services);
+        final SymbolicExecutionState joinState =
+            MergeRuleUtils.sequentToSEPair(joinGoalPio.first.node(), joinGoalPio.second, services);
 
-      final ImmutableList<SymbolicExecutionState> partnerStates =
+        final ImmutableList<SymbolicExecutionState> partnerStates =
             MergeRuleUtils.sequentsToSEPairs(partners);
 
-      final ArrayList<LocationVariable> differingLocVars =
-            new ArrayList<LocationVariable>();
+        final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
 
-      MergeRuleUtils
-            .getUpdateLeftSideLocations(joinState.first)
-            .forEach(v -> {
-               // The meaning of the following statement corresponds to
-               // partnerStates.fold("right value for v differs", false)
-                  final boolean isDifferent =
-                        StreamSupport
-                              .stream(partnerStates.spliterator(), false)
-                              .collect(
-                                    Collectors
-                                          .reducing(
-                                                false,
-                                                partner -> !MergeRuleUtils
-                                                      .getUpdateRightSideForSafe(
-                                                            partner
-                                                                  .getSymbolicState(),
-                                                            v)
-                                                      .equals(
-                                                            MergeRuleUtils
-                                                                  .getUpdateRightSideForSafe(
-                                                                        joinState
-                                                                              .getSymbolicState(),
-                                                                        v)), (
-                                                      b1, b2) -> (b1 || b2)));
+        MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
+            // The meaning of the following statement corresponds to
+            // partnerStates.fold("right value for v differs", false)
+            final boolean isDifferent = StreamSupport.stream(partnerStates.spliterator(), false)
+                    .collect(Collectors
+                            .reducing(false,
+                                partner -> !MergeRuleUtils
+                                        .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
+                                        .equals(MergeRuleUtils.getUpdateRightSideForSafe(
+                                            joinState.getSymbolicState(), v)),
+                                (b1, b2) -> (b1 || b2)));
 
-                  if (isDifferent) {
-                     differingLocVars.add(v);
-                  }
-               });
+            if (isDifferent) {
+                differingLocVars.add(v);
+            }
+        });
 
-      final AbstractionPredicatesChoiceDialog dialog =
-            new AbstractionPredicatesChoiceDialog(joinGoalPio.first,
-                  differingLocVars);
+        final AbstractionPredicatesChoiceDialog dialog =
+            new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
 
-      assert proc instanceof MergeWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+        assert proc instanceof MergeWithPredicateAbstractionFactory
+                : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
-      final MergeWithPredicateAbstractionFactory procF =
+        final MergeWithPredicateAbstractionFactory procF =
             (MergeWithPredicateAbstractionFactory) proc;
 
-      dialog.setVisible(true);
+        dialog.setVisible(true);
 
-      final AbstractionPredicatesChoiceDialog.Result userInput =
-            dialog.getResult();
+        final AbstractionPredicatesChoiceDialog.Result userInput = dialog.getResult();
 
-      final ArrayList<AbstractionPredicate> chosenPreds =
-            userInput.getRegisteredPredicates();
+        final ArrayList<AbstractionPredicate> chosenPreds = userInput.getRegisteredPredicates();
 
-      // A null-pointer in the chosen predicates means that
-      // the user has pressed the cancel button.
-      if (chosenPreds == null) {
-         return proc;
-      }
-      else {
-         return procF.instantiate(chosenPreds, userInput.getLatticeType(),
-               userInput.getAbstractDomElemUserChoices());
-      }
-   }
+        // A null-pointer in the chosen predicates means that
+        // the user has pressed the cancel button.
+        if (chosenPreds == null) {
+            return proc;
+        } else {
+            return procF.instantiate(chosenPreds, userInput.getLatticeType(),
+                userInput.getAbstractDomElemUserChoices());
+        }
+    }
 }

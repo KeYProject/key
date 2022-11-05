@@ -30,7 +30,7 @@ public class TypingException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s    an explanation.
+     * @param s an explanation.
      * @param expr the expression that could not be typed.
      */
     public TypingException(String s, Expression expr) {

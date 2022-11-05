@@ -21,8 +21,8 @@ import java.util.Map;
  *
  * @author <TT>AutoDoc</TT>
  */
-public abstract class TypeDeclaration extends JavaDeclaration implements NamedProgramElement, MemberDeclaration,
-        TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
+public abstract class TypeDeclaration extends JavaDeclaration implements NamedProgramElement,
+        MemberDeclaration, TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
 
     /**
      * Undefined scope tag.
@@ -250,11 +250,11 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     /*
-     * Return the type declaration at the specified index in this node's
-     * "virtual" type declaration array. @param index an index for a type
-     * declaration. @return the type declaration with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of
-     * bounds.
+     * Return the type declaration at the specified index in this node's "virtual" type declaration
+     * array. @param index an index for a type declaration. @return the type declaration with the
+     * given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public TypeDeclaration getTypeDeclarationAt(int index) {
         if (members != null) {
@@ -335,16 +335,13 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public String getFullName() {
         return Naming.getFullName(this);
         /*
-         * ClassTypeContainer container = getContainer(); String containerName =
-         * null; if (container instanceof Method) { containerName =
-         * String.valueOf(System.identityHashCode(container)); container =
-         * container.getContainer(); if (container != null) { containerName =
-         * Naming.dot(container.getFullName(), containerName); } } else { if
-         * (container != null) { containerName = container.getFullName(); } }
-         * String name = getName(); if (name == null) { name =
-         * String.valueOf(System.identityHashCode(this)); } if (containerName !=
-         * null) { name = Naming.dotOnDemand(containerName, name); } return
-         * name;
+         * ClassTypeContainer container = getContainer(); String containerName = null; if (container
+         * instanceof Method) { containerName = String.valueOf(System.identityHashCode(container));
+         * container = container.getContainer(); if (container != null) { containerName =
+         * Naming.dot(container.getFullName(), containerName); } } else { if (container != null) {
+         * containerName = container.getFullName(); } } String name = getName(); if (name == null) {
+         * name = String.valueOf(System.identityHashCode(this)); } if (containerName != null) { name
+         * = Naming.dotOnDemand(containerName, name); } return name;
          */
     }
 
@@ -561,7 +558,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public void addVariableToScope(VariableSpecification var) {
-        Debug.assertBoolean(var instanceof FieldSpecification || (var instanceof EnumConstantSpecification && this instanceof EnumDeclaration));
+        Debug.assertBoolean(var instanceof FieldSpecification
+                || (var instanceof EnumConstantSpecification && this instanceof EnumDeclaration));
         if (name2field == null || name2field == UNDEFINED_SCOPE) {
             name2field = new HashMap<String, FieldSpecification>();
         }

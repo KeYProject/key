@@ -40,8 +40,7 @@ public class PrimitiveType implements Type {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -50,8 +49,7 @@ public class PrimitiveType implements Type {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param service the program model info for this element.
      */

@@ -16,9 +16,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Provides static SolverType objects to be reused and saves the properties to .props files.
- * Used to create {@link SolverType} (in the form of {@link SolverTypeImplementation}) objects
- * from .props files.
+ * Provides static SolverType objects to be reused and saves the properties to .props files. Used to
+ * create {@link SolverType} (in the form of {@link SolverTypeImplementation}) objects from .props
+ * files.
  *
  * @author Alicia Appelhagen
  */
@@ -80,19 +80,18 @@ public class SolverPropertiesLoader {
      * The default {@link de.uka.ilkd.key.smt.SMTTranslator}, if none is given in the .props file:
      * {@link ModularSMTLib2Translator}.
      */
-    private static final String DEFAULT_TRANSLATOR
-            = "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
+    private static final String DEFAULT_TRANSLATOR =
+        "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
-     * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket},
-     * if none is given in the .props file:
-     * {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
+     * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
+     * in the .props file: {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String DEFAULT_MESSAGE_HANDLER
-            = "de.uka.ilkd.key.smt.communication.Z3Socket";
+    private static final String DEFAULT_MESSAGE_HANDLER =
+        "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
-    private static final String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
+    private static final String[] DEFAULT_DELIMITERS = new String[] { "\n", "\r" };
     /**
      * The default solver TIMEOUT, if none is given in the .props file.
      */
@@ -131,25 +130,25 @@ public class SolverPropertiesLoader {
      */
     private static final String MIN_VERSION = "minVersion";
     /**
-     * The .props key for signalling whether the solver is a LEGACY solver
-     * (only used in experimental mode). Default value is false.
+     * The .props key for signalling whether the solver is a LEGACY solver (only used in
+     * experimental mode). Default value is false.
      */
     private static final String LEGACY = "legacy";
     /**
      * The .props key for the solver's
-     * {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}.
-     * Default socket is {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
+     * {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}. Default socket is
+     * {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
     private static final String SOLVER_SOCKET_CLASS = "socketClass";
     /**
-     * The .props key for the solver's {@link de.uka.ilkd.key.smt.SMTTranslator}.
-     * Default translator is {@link ModularSMTLib2Translator}.
+     * The .props key for the solver's {@link de.uka.ilkd.key.smt.SMTTranslator}. Default translator
+     * is {@link ModularSMTLib2Translator}.
      */
     private static final String TRANSLATOR_CLASS = "translatorClass";
     /**
-     * The .props key for the solver's {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s.
-     * Default is an empty list leading to all handlers being used.
-     * Only takes effect when used with {@link ModularSMTLib2Translator}.
+     * The .props key for the solver's {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s. Default is
+     * an empty list leading to all handlers being used. Only takes effect when used with
+     * {@link ModularSMTLib2Translator}.
      */
     private static final String HANDLER_NAMES = "handlers";
     /**
@@ -157,16 +156,15 @@ public class SolverPropertiesLoader {
      */
     private static final String HANDLER_OPTIONS = "handlerOptions";
     /**
-     * The .props key for the path to the solver's preamble file. If this is not a valid path,
-     * the default preamble will be used by making the parameter null.
+     * The .props key for the path to the solver's preamble file. If this is not a valid path, the
+     * default preamble will be used by making the parameter null.
      */
     private static final String PREAMBLE_FILE = "preamble";
 
     /**
-     * If a props file does not contain a solver NAME or two files have the same NAME,
-     * unique names have to be created because interacting with the solvers later requires
-     * uniqueness.
-     * The counters are used for uniqueness.
+     * If a props file does not contain a solver NAME or two files have the same NAME, unique names
+     * have to be created because interacting with the solvers later requires uniqueness. The
+     * counters are used for uniqueness.
      */
     private static final Map<String, Integer> NAME_COUNTERS = new HashMap<>();
 
@@ -238,28 +236,28 @@ public class SolverPropertiesLoader {
         // Read props file to create a SolverTypeImplementation object:
 
         // the solver's NAME has to be unique
-        name = uniqueName(SettingsConverter.readRawString(props, SolverPropertiesLoader.NAME,
-                DEFAULT_NAME));
+        name = uniqueName(
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.NAME, DEFAULT_NAME));
 
         // default solver COMMAND, TIMEOUT, parameters, VERSION parameter, solver INFO (some string)
-        command = SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND,
-                DEFAULT_COMMAND);
+        command =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND, DEFAULT_COMMAND);
         timeout = SettingsConverter.read(props, SolverPropertiesLoader.TIMEOUT, DEFAULT_TIMEOUT);
         if (timeout < -1) {
             timeout = -1;
         }
-        params = SettingsConverter.readRawString(props, SolverPropertiesLoader.PARAMS,
-                DEFAULT_PARAMS);
-        version = SettingsConverter.readRawString(props, SolverPropertiesLoader.VERSION,
-                DEFAULT_VERSION);
+        params =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.PARAMS, DEFAULT_PARAMS);
+        version =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.VERSION, DEFAULT_VERSION);
         minVersion = SettingsConverter.readRawString(props, SolverPropertiesLoader.MIN_VERSION,
-                DEFAULT_MINIMUM_VERSION);
+            DEFAULT_MINIMUM_VERSION);
         info = SettingsConverter.readRawString(props, SolverPropertiesLoader.INFO, DEFAULT_INFO);
 
         // the solver socket used for communication with the created solver
         try {
             String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
-                    DEFAULT_MESSAGE_HANDLER);
+                DEFAULT_MESSAGE_HANDLER);
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
             solverSocketClass = Z3Socket.class;
@@ -268,12 +266,12 @@ public class SolverPropertiesLoader {
 
         // the message DELIMITERS used by the created solver in its stdout
         delimiters = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.DELIMITERS,
-                SPLIT, DEFAULT_DELIMITERS);
+            SPLIT, DEFAULT_DELIMITERS);
 
         // the smt translator (class SMTTranslator) used by the created solver
         try {
-            String translatorClassName = SettingsConverter.readRawString(props, TRANSLATOR_CLASS,
-                    DEFAULT_TRANSLATOR);
+            String translatorClassName =
+                SettingsConverter.readRawString(props, TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
             translatorClass = ClassLoaderUtil.getClassforName(translatorClassName);
         } catch (ClassNotFoundException e) {
             translatorClass = ModularSMTLib2Translator.class;
@@ -282,29 +280,29 @@ public class SolverPropertiesLoader {
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
         handlerNames = SettingsConverter.readRawStringList(props,
-                SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]);
+            SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]);
         handlerOptions = SettingsConverter.readRawStringList(props,
-                SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
+            SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
-                timeout, delimiters, translatorClass, handlerNames, handlerOptions,
-                solverSocketClass, preamble);
+            timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
+            preamble);
     }
 
     /**
-     * Loads the solvers that are specified in .props files in
-     * resource packages named "de/uka/ilkd/key/smt/solvertypes".
+     * Loads the solvers that are specified in .props files in resource packages named
+     * "de/uka/ilkd/key/smt/solvertypes".
      */
     private static Collection<Properties> loadSolvers() {
         Collection<Properties> completePropsList = new ArrayList<>();
         try {
             // load single solvers.txt files from the same location everywhere in the classpath
-            for (Iterator<URL> it = SolverPropertiesLoader.class.getClassLoader().getResources(
-                    PACKAGE_PATH + SOLVER_LIST_FILE).asIterator(); it.hasNext();) {
+            for (Iterator<URL> it = SolverPropertiesLoader.class.getClassLoader()
+                    .getResources(PACKAGE_PATH + SOLVER_LIST_FILE).asIterator(); it.hasNext();) {
                 URL res = it.next();
                 try (InputStream stream = res.openStream()) {
                     if (stream == null) {
@@ -317,8 +315,8 @@ public class SolverPropertiesLoader {
                     for (String fileName : propsNames.stream().filter(n -> n.endsWith(".props"))
                             .collect(Collectors.toList())) {
                         Properties solverProp = new Properties();
-                        InputStream propsFile = SolverPropertiesLoader.class
-                                .getResourceAsStream(fileName);
+                        InputStream propsFile =
+                            SolverPropertiesLoader.class.getResourceAsStream(fileName);
                         try {
                             solverProp.load(propsFile);
                             props.add(solverProp);
@@ -327,8 +325,8 @@ public class SolverPropertiesLoader {
                             // should not break key
                             // if loading the props file does not work for any reason,
                             // create a warning and continue
-                            LOGGER.warn(String.format("Solver file %s could not be loaded.",
-                                    fileName));
+                            LOGGER.warn(
+                                String.format("Solver file %s could not be loaded.", fileName));
                         }
                     }
                     completePropsList.addAll(props);

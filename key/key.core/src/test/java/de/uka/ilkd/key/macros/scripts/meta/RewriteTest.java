@@ -19,13 +19,16 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class RewriteTest {
 
     /**
-     * Test for finding `f=x` and replacing it with `x=f`
-     * Taclet to be found and applied: eqSymm on `f=x`
+     * Test for finding `f=x` and replacing it with `x=f` Taclet to be found and applied: eqSymm on
+     * `f=x`
      */
     @Test
-    public void testTransitive() throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
+    public void testTransitive()
+            throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
+        File script =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
+        File keyFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
 
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
@@ -44,13 +47,16 @@ public class RewriteTest {
     }
 
     /**
-     * Test for finding `f<x` and replacing it with `x>f`
-     * Taclet to be found and applied: lt_to_gt on `f>x`
+     * Test for finding `f<x` and replacing it with `x>f` Taclet to be found and applied: lt_to_gt
+     * on `f>x`
      */
     @Test
-    public void testLessTransitive() throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
+    public void testLessTransitive()
+            throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
+        File script =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
+        File keyFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
 
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);

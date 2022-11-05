@@ -24,8 +24,8 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
     private static final long serialVersionUID = -40018491975119655L;
 
     /**
-     * a reference to the enum type.
-     * Note that this must always be set, even if no parantheses are present in the concrete syntax.
+     * a reference to the enum type. Note that this must always be set, even if no parantheses are
+     * present in the concrete syntax.
      */
     protected EnumConstructorReference ref;
 
@@ -76,7 +76,8 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ref != null) ref.setParent(this);
+        if (ref != null)
+            ref.setParent(this);
     }
 
     @Override
@@ -103,7 +104,8 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
     @Override
     public void validate() throws ModelException {
         super.validate();
-        if (ref == null) throw new ModelException("EnumConstructorReference not set in " + getFullName());
+        if (ref == null)
+            throw new ModelException("EnumConstructorReference not set in " + getFullName());
     }
 
     @Override

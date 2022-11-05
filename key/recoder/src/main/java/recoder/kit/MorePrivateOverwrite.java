@@ -5,8 +5,7 @@ package recoder.kit;
 import recoder.abstraction.Method;
 
 /**
- * Problem report indicating that a method has been overwritten with a lower
- * visibility.
+ * Problem report indicating that a method has been overwritten with a lower visibility.
  */
 public class MorePrivateOverwrite extends Conflict {
 

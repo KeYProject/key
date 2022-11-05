@@ -48,17 +48,13 @@ import org.key_project.util.lookup.Lookup;
 
 
 /**
- * A proof is represented as a tree whose nodes are created by
- * applying rules on the current (open) goals and dividing them up
- * into several new subgoals. To distinguish between open goals (the
- * ones we are working on) and closed goals or inner nodes we restrict
- * the use of the word goal to open goals which are a subset of the
- * proof tree's leaves.  This proof class represents a proof and
- * encapsulates its tree structure.  The {@link Goal} class represents
- * a goal with all needed extra information, and methods to apply
- * rules.  Furthermore it offers services that deliver the open goals,
- * namespaces and several other informations about the current state
- * of the proof.
+ * A proof is represented as a tree whose nodes are created by applying rules on the current (open)
+ * goals and dividing them up into several new subgoals. To distinguish between open goals (the ones
+ * we are working on) and closed goals or inner nodes we restrict the use of the word goal to open
+ * goals which are a subset of the proof tree's leaves. This proof class represents a proof and
+ * encapsulates its tree structure. The {@link Goal} class represents a goal with all needed extra
+ * information, and methods to apply rules. Furthermore it offers services that deliver the open
+ * goals, namespaces and several other informations about the current state of the proof.
  */
 public class Proof implements Named {
 
@@ -74,9 +70,8 @@ public class Proof implements Named {
     private Node root;
 
     /**
-     * list with prooftree listeners of this proof
-     * attention: firing events makes use of array list's random access
-     * nature
+     * list with prooftree listeners of this proof attention: firing events makes use of array
+     * list's random access nature
      */
     private List<ProofTreeListener> listenerList = new LinkedList<ProofTreeListener>();
 
@@ -84,9 +79,9 @@ public class Proof implements Named {
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
 
     /**
-     * list with the closed goals of the proof, needed to make pruning in closed branches
-     * possible. If the list needs too much memory, pruning can be disabled via the
-     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * list with the closed goals of the proof, needed to make pruning in closed branches possible.
+     * If the list needs too much memory, pruning can be disabled via the command line option
+     * "--no-pruning-closed". In this case the list will not be filled.
      */
     private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
 
@@ -96,25 +91,25 @@ public class Proof implements Named {
     /** the proof environment (optional) */
     private ProofEnvironment env;
 
-    /** maps the Abbreviations valid for this proof to their corresponding terms.*/
+    /** maps the Abbreviations valid for this proof to their corresponding terms. */
     private AbbrevMap abbreviations = new AbbrevMap();
 
-    /** the logic configuration for this proof, i.e., logic signature, rules etc.*/
+    /** the logic configuration for this proof, i.e., logic signature, rules etc. */
     private InitConfig initConfig;
 
-    /** the environment of the proof with specs and java model*/
+    /** the environment of the proof with specs and java model */
     private ProofCorrectnessMgt localMgt;
 
     private ProofIndependentSettings pis;
     /**
-     * when different users load and save a proof this vector fills up with
-     * Strings containing the user names.
-     * */
+     * when different users load and save a proof this vector fills up with Strings containing the
+     * user names.
+     */
     public Vector<String> userLog;
 
     /**
-     * when load and save a proof with different versions of key this vector
-     * fills up with Strings containing the GIT versions.
+     * when load and save a proof with different versions of key this vector fills up with Strings
+     * containing the GIT versions.
      */
     public Vector<String> keyVersionLog;
 
@@ -125,20 +120,23 @@ public class Proof implements Named {
     private SettingsListener settingsListener;
 
     /**
-     * Set to true if the proof has been abandoned and the dispose method has
-     * been called on this object.
+     * Set to true if the proof has been abandoned and the dispose method has been called on this
+     * object.
      */
     private boolean disposed = false;
 
     /** list of rule app listeners */
-    private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
+    private List<RuleAppListener> ruleAppListenerList =
+        Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
     /**
      * Contains all registered {@link ProofDisposedListener}.
      */
-    private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
+    private final List<ProofDisposedListener> proofDisposedListener =
+        new LinkedList<ProofDisposedListener>();
 
     /**
-     * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
+     * The {@link File} under which this {@link Proof} was saved the last time if available or
+     * {@code null} otherwise.
      */
     private File proofFile;
 
@@ -155,16 +153,17 @@ public class Proof implements Named {
 
         if (initConfig.getSettings() == null) {
             // if no settings have been assigned yet, take default settings
-            initConfig.setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
+            initConfig.setSettings(new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
         }
 
         final Services services = this.initConfig.getServices();
         services.setProof(this);
-        this.proofFile = services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
+        this.proofFile =
+            services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
 
-        settingsListener = new SettingsListener () {
+        settingsListener = new SettingsListener() {
             @Override
-            public void settingsChanged ( EventObject config ) {
+            public void settingsChanged(EventObject config) {
                 updateStrategyOnGoals();
             }
         };
@@ -181,18 +180,17 @@ public class Proof implements Named {
      */
     private void initStrategy() {
         StrategyProperties activeStrategyProperties =
-                initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
+            initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         final Profile profile = getServices().getProfile();
 
         final Name strategy = initConfig.getSettings().getStrategySettings().getStrategy();
         if (profile.supportsStrategyFactory(strategy)) {
-            setActiveStrategy
-            (profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
+            setActiveStrategy(
+                profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
-                    profile.getDefaultStrategyFactory().create(this,
-                            activeStrategyProperties));
+                profile.getDefaultStrategyFactory().create(this, activeStrategyProperties));
         }
     }
 
@@ -200,16 +198,15 @@ public class Proof implements Named {
 
     /** constructs a new empty proof with name */
     public Proof(String name, InitConfig initConfig) {
-        this ( new Name ( name ),
-                initConfig);
+        this(new Name(name), initConfig);
     }
 
-    private Proof(String name, Sequent problem, TacletIndex rules,
-            BuiltInRuleIndex builtInRules, InitConfig initConfig) {
-        this ( new Name ( name ), initConfig );
+    private Proof(String name, Sequent problem, TacletIndex rules, BuiltInRuleIndex builtInRules,
+            InitConfig initConfig) {
+        this(new Name(name), initConfig);
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels()) {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 
@@ -218,24 +215,21 @@ public class Proof implements Named {
         var sources = lookup(ProofJavaSourceCollection.class);
 
         rootNode.sequent().forEach(formula -> {
-            OriginTermLabel originLabel = (OriginTermLabel)
-                    formula.formula().getLabel(OriginTermLabel.NAME);
+            OriginTermLabel originLabel =
+                (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
                     sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
                 }
 
-                originLabel.getSubtermOrigins().stream()
-                    .filter(o -> o instanceof FileOrigin)
-                    .map(o -> (FileOrigin) o)
-                    .forEach(o -> sources.addRelevantFile(o.fileName));
+                originLabel.getSubtermOrigins().stream().filter(o -> o instanceof FileOrigin)
+                        .map(o -> (FileOrigin) o).forEach(o -> sources.addRelevantFile(o.fileName));
             }
         });
 
-        var firstGoal = new Goal(rootNode,
-                new RuleAppIndex(new TacletAppIndex(rules, getServices()),
-                        new BuiltInRuleAppIndex(builtInRules), getServices())
-                );
+        var firstGoal =
+            new Goal(rootNode, new RuleAppIndex(new TacletAppIndex(rules, getServices()),
+                new BuiltInRuleAppIndex(builtInRules), getServices()));
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 
@@ -244,27 +238,25 @@ public class Proof implements Named {
         }
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig ) {
-        this(name, Sequent.createSuccSequent
-                (Semisequent.EMPTY_SEMISEQUENT.insert(0,
-                        new SequentFormula(problem)).semisequent()),
-                initConfig.createTacletIndex(),
-                initConfig.createBuiltInRuleIndex(),
-                initConfig);
+    public Proof(String name, Term problem, String header, InitConfig initConfig) {
+        this(name,
+            Sequent.createSuccSequent(
+                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
 
 
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
-        this ( name, sequent, rules, builtInRules, initConfig );
+        this(name, sequent, rules, builtInRules, initConfig);
         problemHeader = header;
     }
 
 
     /**
-     * Cut off all reference such that it does not lead to a big memory leak
-     * if someone still holds a reference to this proof object.
+     * Cut off all reference such that it does not lead to a big memory leak if someone still holds
+     * a reference to this proof object.
      */
     public void dispose() {
         if (isDisposed()) {
@@ -278,7 +270,8 @@ public class Proof implements Named {
             getServices().getSpecificationRepository().removeProof(this);
         }
         if (localMgt != null) {
-            localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
+            localMgt.removeProofListener(); // This is strongly required because the listener is
+                                            // contained in a static List
         }
         // remove setting listener from settings
         initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
@@ -298,14 +291,14 @@ public class Proof implements Named {
         ruleAppListenerList = null;
         listenerList = null;
         disposed = true;
+        userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
     }
 
 
     /**
-     * Returns true if the proof has been abandoned and the dispose method has
-     * been called on this object. Should be asserted before proof object is
-     * accessed.
+     * Returns true if the proof has been abandoned and the dispose method has been called on this
+     * object. Should be asserted before proof object is accessed.
      */
     public boolean isDisposed() {
         return disposed;
@@ -314,6 +307,7 @@ public class Proof implements Named {
 
     /**
      * returns the name of the proof. Describes in short what has to be proved.
+     *
      * @return the name of the proof
      */
     @Override
@@ -377,7 +371,7 @@ public class Proof implements Named {
         this.env = env;
     }
 
-    public AbbrevMap abbreviations(){
+    public AbbrevMap abbreviations() {
         return abbreviations;
     }
 
@@ -392,8 +386,7 @@ public class Proof implements Named {
 
     public void setActiveStrategy(Strategy activeStrategy) {
         this.activeStrategy = activeStrategy;
-        getSettings().getStrategySettings().
-        setStrategy(activeStrategy.name());
+        getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
 
         // This could be seen as a hack; it's however important that OSS is
@@ -406,19 +399,19 @@ public class Proof implements Named {
     private void updateStrategyOnGoals() {
         Strategy ourStrategy = getActiveStrategy();
 
-        final Iterator<Goal> it = openGoals ().iterator ();
+        final Iterator<Goal> it = openGoals().iterator();
         while (it.hasNext()) {
             it.next().setGoalStrategy(ourStrategy);
         }
     }
 
 
-    public void clearAndDetachRuleAppIndexes () {
+    public void clearAndDetachRuleAppIndexes() {
         // Taclet indices of the particular goals have to
         // be rebuilt
-        final Iterator<Goal> it = openGoals ().iterator ();
+        final Iterator<Goal> it = openGoals().iterator();
         while (it.hasNext()) {
-            it.next().clearAndDetachRuleAppIndex ();
+            it.next().clearAndDetachRuleAppIndex();
         }
     }
 
@@ -434,8 +427,7 @@ public class Proof implements Named {
     /** sets the root of the proof */
     public void setRoot(Node root) {
         if (this.root != null) {
-            throw new IllegalStateException
-            ("Tried to reset the root of the proof.");
+            throw new IllegalStateException("Tried to reset the root of the proof.");
         } else {
             this.root = root;
             fireProofStructureChanged();
@@ -446,12 +438,14 @@ public class Proof implements Named {
     public ProofSettings getSettings() {
         return initConfig.getSettings();
     }
-    public ProofIndependentSettings getProofIndependentSettings(){
+
+    public ProofIndependentSettings getProofIndependentSettings() {
         return pis;
     }
 
     /**
      * Returns the list of open goals.
+     *
      * @return list with the open goals
      */
     public ImmutableList<Goal> openGoals() {
@@ -459,28 +453,32 @@ public class Proof implements Named {
     }
 
     /**
-     * Returns the list of closed goals, needed to make pruning in closed branches
-     * possible. If the list needs too much memory, pruning can be disabled via the
-     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * Returns the list of closed goals, needed to make pruning in closed branches possible. If the
+     * list needs too much memory, pruning can be disabled via the command line option
+     * "--no-pruning-closed". In this case the list will not be filled.
+     *
      * @return list with the closed goals
      */
     public ImmutableList<Goal> closedGoals() {
         return closedGoals;
     }
-    
+
     /**
      * Returns the list of all, open and closed, goals.
+     *
      * @return list with all goals.
-     * 
+     *
      * @see #openGoals()
      * @see #closedGoals()
      */
     public ImmutableList<Goal> allGoals() {
-        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals)
+                : openGoals.prepend(closedGoals);
     }
 
     /**
      * return the list of open and enabled goals
+     *
      * @return list of open and enabled goals, never null
      * @author mulbrich
      */
@@ -499,8 +497,8 @@ public class Proof implements Named {
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
-        for(Goal g : goals) {
-            if(g.isAutomatic() && !g.isLinked()) {
+        for (Goal g : goals) {
+            if (g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }
@@ -510,9 +508,10 @@ public class Proof implements Named {
 
     /**
      * removes the given goal and adds the new goals in list
+     *
      * @param oldGoal the old goal that has to be removed from list
-     * @param newGoals the IList<Goal> with the new goals that were
-     * result of a rule application on goal
+     * @param newGoals the IList<Goal> with the new goals that were result of a rule application on
+     *        goal
      */
     public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
         openGoals = openGoals.removeAll(oldGoal);
@@ -527,8 +526,8 @@ public class Proof implements Named {
 
 
     /**
-     * Add the given constraint to the closure constraint of the given
-     * goal, i.e. the given goal is closed if p_c is satisfied.
+     * Add the given constraint to the closure constraint of the given goal, i.e. the given goal is
+     * closed if p_c is satisfied.
      *
      * @param goalToClose the goal to close.
      */
@@ -536,9 +535,9 @@ public class Proof implements Named {
 
         Node closedSubtree = goalToClose.node().close();
 
-        boolean        b    = false;
-        Iterator<Node> it   = closedSubtree.leavesIterator();
-        Goal           goal;
+        boolean b = false;
+        Iterator<Node> it = closedSubtree.leavesIterator();
+        Goal goal;
 
         while (it.hasNext()) {
             goal = getGoal(it.next());
@@ -559,14 +558,12 @@ public class Proof implements Named {
     }
 
     /**
-     * Opens a previously closed node (the one corresponding to p_goal)
-     * and all its closed parents.<p>
+     * Opens a previously closed node (the one corresponding to p_goal) and all its closed parents.
+     * <p>
      *
-     * This is, for instance, needed for the {@link MergeRule}: In
-     * a situation where a merge node and its associated partners
-     * have been closed and the merge node is then pruned away,
-     * the partners have to be reopened again. Otherwise, we
-     * have a soundness issue.
+     * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
+     * and its associated partners have been closed and the merge node is then pruned away, the
+     * partners have to be reopened again. Otherwise, we have a soundness issue.
      *
      * @param goal The goal to be opened again.
      */
@@ -576,8 +573,10 @@ public class Proof implements Named {
         fireProofStructureChanged();
     }
 
-    /** removes the given goal from the list of open goals. Take care
-     * removing the last goal will fire the proofClosed event
+    /**
+     * removes the given goal from the list of open goals. Take care removing the last goal will
+     * fire the proofClosed event
+     *
      * @param goal the Goal to be removed
      */
     private void remove(Goal goal) {
@@ -592,7 +591,9 @@ public class Proof implements Named {
         }
     }
 
-    /** adds a new goal to the list of goals
+    /**
+     * adds a new goal to the list of goals
+     *
      * @param goal the Goal to be added
      */
     public void add(Goal goal) {
@@ -604,7 +605,9 @@ public class Proof implements Named {
     }
 
 
-    /** adds a list with new goals to the list of open goals
+    /**
+     * adds a list with new goals to the list of open goals
+     *
      * @param goals the IList<Goal> to be prepended
      */
     public void add(ImmutableList<Goal> goals) {
@@ -622,16 +625,16 @@ public class Proof implements Named {
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
-    public boolean closed () {
+    public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
     }
 
 
     /**
-     * This class is responsible for pruning a proof tree at a certain cutting point.
-     * It has been introduced to encapsulate the methods that are needed for pruning.
-     * Since the class has influence on the internal state of the proof it should not be
-     * moved to a new file, in order to restrict the access to it.
+     * This class is responsible for pruning a proof tree at a certain cutting point. It has been
+     * introduced to encapsulate the methods that are needed for pruning. Since the class has
+     * influence on the internal state of the proof it should not be moved to a new file, in order
+     * to restrict the access to it.
      */
     private class ProofPruner {
         private Node firstLeaf = null;
@@ -639,16 +642,18 @@ public class Proof implements Named {
         public ImmutableList<Node> prune(final Node cuttingPoint) {
 
             // there is only one leaf containing an open goal that is interesting for pruning the
-            // sub-tree of <code>node</code>, namely the first leave that is found by a breadth first search.
+            // sub-tree of <code>node</code>, namely the first leave that is found by a breadth
+            // first search.
             // The other leaves containing open goals are only important for removing the open goals
             // from the open goal list.
-            // To that end, those leaves are stored in residualLeaves. For increasing the performance,
+            // To that end, those leaves are stored in residualLeaves. For increasing the
+            // performance,
             // a tree structure has been chosen, because it offers the operation
             // <code>contains</code> in O(log n).
             final Set<Node> residualLeaves = new TreeSet<Node>(new Comparator<Node>() {
                 @Override
                 public int compare(Node o1, Node o2) {
-                    return o1.serialNr()-o2.serialNr();
+                    return o1.serialNr() - o2.serialNr();
                 }
             });
 
@@ -672,22 +677,19 @@ public class Proof implements Named {
                     }
 
                     if (initConfig != null && visitedNode.parent() != null) {
-                        Proof.this.mgt().ruleUnApplied(
-                                visitedNode.parent().getAppliedRuleApp());
+                        Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
                         for (final NoPosTacletApp app : visitedNode.parent()
                                 .getLocalIntroducedRules()) {
-                            initConfig.getJustifInfo().removeJustificationFor(
-                                    app.taclet());
+                            initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                         }
                     }
 
                     // Merge rule applications: Unlink all merge partners.
                     if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) visitedNode
-                                .getAppliedRuleApp();
+                        final MergeRuleBuiltInRuleApp mergeApp =
+                            (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
 
-                        for (MergePartner mergePartner : mergeApp
-                                .getMergePartners()) {
+                        for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                             final Goal linkedGoal = mergePartner.getGoal();
 
                             if (linkedGoal.node().isClosed()) {
@@ -710,8 +712,8 @@ public class Proof implements Named {
             });
 
             // first leaf is closed -> add as goal and reopen
-            final Goal firstGoal = firstLeaf.isClosed() ? getClosedGoal(firstLeaf)
-                    : getGoal(firstLeaf);
+            final Goal firstGoal =
+                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
                 add(firstGoal);
@@ -725,13 +727,14 @@ public class Proof implements Named {
                 firstGoal.setLinkedGoal(null);
             }
 
-            // Go from the first leaf that has been found to the cutting point. For each node on the path,
+            // Go from the first leaf that has been found to the cutting point. For each node on the
+            // path,
             // remove the local rules from firstGoal that have been added by the considered node.
-            traverseFromChildToParent(firstLeaf,cuttingPoint,new ProofVisitor() {
+            traverseFromChildToParent(firstLeaf, cuttingPoint, new ProofVisitor() {
 
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
-                    for (final NoPosTacletApp app :  visitedNode.getLocalIntroducedRules()){
+                    for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
                         firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
                         initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                     }
@@ -739,7 +742,7 @@ public class Proof implements Named {
                     firstGoal.pruneToParent();
 
                     final List<StrategyInfoUndoMethod> undoMethods =
-                            visitedNode.getStrategyInfoUndoMethods();
+                        visitedNode.getStrategyInfoUndoMethods();
                     for (StrategyInfoUndoMethod undoMethod : undoMethods) {
                         firstGoal.undoStrategyInfoAdd(undoMethod);
                     }
@@ -748,18 +751,20 @@ public class Proof implements Named {
 
 
             // do some cleaning and refreshing: Clearing indices, caches....
-            refreshGoal(firstGoal,cuttingPoint);
+            refreshGoal(firstGoal, cuttingPoint);
 
             // cut the subtree, it is not needed anymore.
-            ImmutableList<Node> subtrees =cut(cuttingPoint);
+            ImmutableList<Node> subtrees = cut(cuttingPoint);
 
 
-            //remove the goals of the residual leaves.
+            // remove the goals of the residual leaves.
             removeOpenGoals(residualLeaves);
             removeClosedGoals(residualLeaves);
 
-            /* this ensures that the open goals are in interactive mode and thus all rules are
-             * available in the just pruned goal (see GitLab #1480) */
+            /*
+             * this ensures that the open goals are in interactive mode and thus all rules are
+             * available in the just pruned goal (see GitLab #1480)
+             */
             setRuleAppIndexToInteractiveMode();
 
             return subtrees;
@@ -782,8 +787,8 @@ public class Proof implements Named {
 
         private void removeOpenGoals(Collection<Node> toBeRemoved) {
             ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
-            for(Goal openGoal : openGoals){
-                if(!toBeRemoved.contains(openGoal.node())){
+            for (Goal openGoal : openGoals) {
+                if (!toBeRemoved.contains(openGoal.node())) {
                     newGoalList = newGoalList.append(openGoal);
                 }
             }
@@ -791,16 +796,16 @@ public class Proof implements Named {
         }
 
         /**
-         * Removes the given collection of Nodes from the closedGoals.
-         * Nodes in the given collection which are not member of closedGoals are ignored.
-         * This method does not reopen the goals! This has to be done via the method
-         * reOpenGoal() if desired.
+         * Removes the given collection of Nodes from the closedGoals. Nodes in the given collection
+         * which are not member of closedGoals are ignored. This method does not reopen the goals!
+         * This has to be done via the method reOpenGoal() if desired.
+         *
          * @param toBeRemoved the goals to remove
          */
         private void removeClosedGoals(Collection<Node> toBeRemoved) {
             ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
-            for(Goal closedGoal : closedGoals) {
-                if(!toBeRemoved.contains(closedGoal.node())) {
+            for (Goal closedGoal : closedGoals) {
+                if (!toBeRemoved.contains(closedGoal.node())) {
                     newGoalList = newGoalList.prepend(closedGoal);
                 }
             }
@@ -811,11 +816,11 @@ public class Proof implements Named {
             ImmutableList<Node> children = ImmutableSLList.nil();
             Iterator<Node> it = node.childrenIterator();
 
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 children = children.append(it.next());
 
             }
-            for(Node child : children){
+            for (Node child : children) {
                 node.remove(child);
             }
             return children;
@@ -824,30 +829,32 @@ public class Proof implements Named {
     }
 
     /**
-     * Performs an undo operation on the given goal. This is equivalent to a pruning of the
-     * parent node of the goal (if this parent node exists).
+     * Performs an undo operation on the given goal. This is equivalent to a pruning of the parent
+     * node of the goal (if this parent node exists).
+     *
      * @param goal the Goal where the last rule application gets undone
      */
     public synchronized void pruneProof(Goal goal) {
-        if(goal.node().parent() != null) {
+        if (goal.node().parent() != null) {
             pruneProof(goal.node().parent());
         }
     }
 
     /**
      * Prunes the subtree beneath the node <code>cuttingPoint</code>, i.e. the node
-     * <code>cuttingPoint</code> remains as the last node on the branch. As a result,
-     * an open goal is associated with this node.
+     * <code>cuttingPoint</code> remains as the last node on the branch. As a result, an open goal
+     * is associated with this node.
+     *
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned.
      */
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
-        return pruneProof(cuttingPoint,true);
+        return pruneProof(cuttingPoint, true);
     }
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if(getGoal(cuttingPoint) != null) {
+        if (getGoal(cuttingPoint) != null) {
             return null;
         }
         // abort pruning if the node is closed and pruning in closed branches is disabled
@@ -869,16 +876,16 @@ public class Proof implements Named {
 
     /**
      * Makes a downwards directed breadth first search on the proof tree, starting with node
-     *  <code>startNode</code>. The visited notes are reported to the object <code>visitor</code>.
-     *  The first reported node is <code>startNode</code>.
+     * <code>startNode</code>. The visited notes are reported to the object <code>visitor</code>.
+     * The first reported node is <code>startNode</code>.
      */
     public void breadthFirstSearch(Node startNode, ProofVisitor visitor) {
         ArrayDeque<Node> queue = new ArrayDeque<Node>();
         queue.add(startNode);
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             Node currentNode = queue.poll();
             Iterator<Node> it = currentNode.childrenIterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 queue.add(it.next());
             }
             visitor.visit(this, currentNode);
@@ -887,19 +894,21 @@ public class Proof implements Named {
 
 
     /**
-     * Bread-first search for the first node, that matches the given
-     * predicate.
+     * Bread-first search for the first node, that matches the given predicate.
+     *
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
     public @Nullable Node findAny(@Nonnull Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if(pred.test(cur)) return cur;
+            if (pred.test(cur))
+                return cur;
             Iterator<Node> iter = cur.childrenIterator();
-            while(iter.hasNext()) queue.add(iter.next());
+            while (iter.hasNext())
+                queue.add(iter.next());
         }
         return null;
     }
@@ -909,13 +918,13 @@ public class Proof implements Named {
         do {
             visitor.visit(this, child);
             child = child.parent();
-        } while(child != parent);
+        } while (child != parent);
     }
 
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofExpanded(e);
             }
@@ -925,7 +934,7 @@ public class Proof implements Named {
     /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofIsBeingPruned(e);
             }
@@ -935,7 +944,7 @@ public class Proof implements Named {
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofPruned(e);
             }
@@ -946,7 +955,7 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofStructureChanged(e);
             }
@@ -957,7 +966,7 @@ public class Proof implements Named {
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofGoalRemoved(e);
             }
@@ -965,12 +974,12 @@ public class Proof implements Named {
     }
 
 
-    /** fires the event that new goals have been added to the list of
-     * goals
+    /**
+     * fires the event that new goals have been added to the list of goals
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofGoalsAdded(e);
             }
@@ -978,8 +987,8 @@ public class Proof implements Named {
     }
 
 
-    /** fires the event that new goals have been added to the list of
-     * goals
+    /**
+     * fires the event that new goals have been added to the list of goals
      */
     protected void fireProofGoalsAdded(Goal goal) {
         fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
@@ -989,7 +998,7 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofGoalsChanged(e);
             }
@@ -997,13 +1006,13 @@ public class Proof implements Named {
     }
 
 
-    /** fires the event that the proof has closed.
-     * This event fired instead of the proofGoalRemoved event when
-     * the last goal in list is removed.
+    /**
+     * fires the event that the proof has closed. This event fired instead of the proofGoalRemoved
+     * event when the last goal in list is removed.
      */
     protected void fireProofClosed() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.proofClosed(e);
             }
@@ -1012,11 +1021,12 @@ public class Proof implements Named {
 
     /**
      * Fires the event {@link ProofTreeListener#notesChanged(ProofTreeEvent)} to all listener.
+     *
      * @param node The changed {@link Node}.
      */
     protected void fireNotesChanged(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
                 listener.notesChanged(e);
             }
@@ -1026,11 +1036,11 @@ public class Proof implements Named {
 
     /**
      * adds a listener to the proof
+     *
      * @param listener the ProofTreeListener to be added
      */
-    public synchronized void addProofTreeListener
-    (ProofTreeListener listener) {
-        synchronized(listenerList) {
+    public synchronized void addProofTreeListener(ProofTreeListener listener) {
+        synchronized (listenerList) {
             listenerList.add(listener);
         }
     }
@@ -1038,12 +1048,12 @@ public class Proof implements Named {
 
     /**
      * removes a listener from the proof
+     *
      * @param listener the ProofTreeListener to be removed
      */
-    public synchronized void removeProofTreeListener
-    (ProofTreeListener listener) {
+    public synchronized void removeProofTreeListener(ProofTreeListener listener) {
         if (listenerList != null) { // TODO: check if necessary
-            synchronized(listenerList) {
+            synchronized (listenerList) {
                 listenerList.remove(listener);
             }
         }
@@ -1051,24 +1061,26 @@ public class Proof implements Named {
 
 
     public synchronized boolean containsProofTreeListener(ProofTreeListener listener) {
-        synchronized(listenerList) {
+        synchronized (listenerList) {
             return listenerList.contains(listener);
         }
     }
 
 
-    /** returns true if the given node is part of a Goal
-     * @return  true if the given node is part of a Goal
+    /**
+     * returns true if the given node is part of a Goal
+     *
+     * @return true if the given node is part of a Goal
      */
     public boolean isGoal(Node node) {
         return getGoal(node) != null;
     }
 
 
-    /** returns the goal that belongs to the given node or null if the
-     * node is an inner one
-     * @return the goal that belongs to the given node or null if the
-     * node is an inner one
+    /**
+     * returns the goal that belongs to the given node or null if the node is an inner one
+     *
+     * @return the goal that belongs to the given node or null if the node is an inner one
      */
     public Goal getGoal(Node node) {
         for (final Goal result : openGoals) {
@@ -1081,8 +1093,8 @@ public class Proof implements Named {
 
     /**
      * @param node the Node which is checked for a corresponding closed goal
-     * @return true if the goal that belongs to the given node is closed
-     * and false if not or if there is no such goal.
+     * @return true if the goal that belongs to the given node is closed and false if not or if
+     *         there is no such goal.
      */
     public boolean isClosedGoal(Node node) {
         return getClosedGoal(node) != null;
@@ -1090,9 +1102,10 @@ public class Proof implements Named {
 
     /**
      * Get the closed goal belonging to the given node if it exists.
+     *
      * @param node the Node where a corresponding closed goal is searched
-     * @return the closed goal that belongs to the given node or null if the
-     * node is an inner one or an open goal
+     * @return the closed goal that belongs to the given node or null if the node is an inner one or
+     *         an open goal
      */
     public Goal getClosedGoal(Node node) {
         for (final Goal result : closedGoals) {
@@ -1103,7 +1116,8 @@ public class Proof implements Named {
         return null;
     }
 
-    /** returns the list of goals of the subtree starting with node.
+    /**
+     * returns the list of goals of the subtree starting with node.
      *
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node
@@ -1113,7 +1127,7 @@ public class Proof implements Named {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : openGoals) {
-            //if list contains node, remove it to make the list faster later
+            // if list contains node, remove it to make the list faster later
             if (leaves.remove(goal.node())) {
                 result = result.prepend(goal);
             }
@@ -1123,6 +1137,7 @@ public class Proof implements Named {
 
     /**
      * Returns a list of all (closed) goals of the closed subtree pending from this node.
+     *
      * @param node the root of the subtree
      * @return the closed goals in the subtree
      */
@@ -1130,7 +1145,7 @@ public class Proof implements Named {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : closedGoals) {
-            //if list contains node, remove it to make the list faster later
+            // if list contains node, remove it to make the list faster later
             if (leaves.remove(goal.node())) {
                 result = result.prepend(goal);
             }
@@ -1140,6 +1155,7 @@ public class Proof implements Named {
 
     /**
      * get the list of goals of the subtree starting with node which are enabled.
+     *
      * @param node the Node where to start from
      * @return the list of enabled goals of the subtree starting with node
      */
@@ -1148,9 +1164,11 @@ public class Proof implements Named {
     }
 
 
-    /** returns true iff the given node is found in the proof tree
-     *@param node the Node to search for
-     *@return true iff the given node is found in the proof tree
+    /**
+     * returns true iff the given node is found in the proof tree
+     *
+     * @param node the Node to search for
+     * @return true iff the given node is found in the proof tree
      */
     public boolean find(Node node) {
         if (root == null) {
@@ -1169,22 +1187,21 @@ public class Proof implements Named {
 
 
     /**
-     * Currently the rule app index can either operate in interactive mode (and
-     * contain applications of all existing taclets) or in automatic mode (and
-     * only contain a restricted set of taclets that can possibly be applied
-     * automated). This distinction could be replaced with a more general way to
-     * control the contents of the rule app index
+     * Currently the rule app index can either operate in interactive mode (and contain applications
+     * of all existing taclets) or in automatic mode (and only contain a restricted set of taclets
+     * that can possibly be applied automated). This distinction could be replaced with a more
+     * general way to control the contents of the rule app index
      */
-    public void setRuleAppIndexToAutoMode () {
+    public void setRuleAppIndexToAutoMode() {
         for (final Goal g : openGoals) {
-            g.ruleAppIndex ().autoModeStarted ();
+            g.ruleAppIndex().autoModeStarted();
         }
     }
 
 
-    public void setRuleAppIndexToInteractiveMode () {
+    public void setRuleAppIndexToInteractiveMode() {
         for (final Goal g : openGoals) {
-            g.ruleAppIndex ().autoModeStopped ();
+            g.ruleAppIndex().autoModeStopped();
         }
     }
 
@@ -1195,9 +1212,9 @@ public class Proof implements Named {
         return root.countBranches();
     }
 
-    /** Retrieves a bunch of statistics to the proof tree.
-     * This implementation traverses the proof tree only once.
-     * Statistics are not cached; don't call this method too often.
+    /**
+     * Retrieves a bunch of statistics to the proof tree. This implementation traverses the proof
+     * tree only once. Statistics are not cached; don't call this method too often.
      */
     public Statistics getStatistics() {
         return new Statistics(this);
@@ -1241,6 +1258,7 @@ public class Proof implements Named {
 
     /**
      * Registers the given {@link ProofDisposedListener}.
+     *
      * @param l The {@link ProofDisposedListener} to register.
      */
     public void addProofDisposedListener(ProofDisposedListener l) {
@@ -1251,6 +1269,7 @@ public class Proof implements Named {
 
     /**
      * Unregisters the given {@link ProofDisposedListener}.
+     *
      * @param l The {@link ProofDisposedListener} to unregister.
      */
     public void removeProofDisposedListener(ProofDisposedListener l) {
@@ -1261,14 +1280,18 @@ public class Proof implements Named {
 
     /**
      * Returns all registered {@link ProofDisposedListener}.
+     *
      * @return All registered {@link ProofDisposedListener}.
      */
     public ProofDisposedListener[] getProofDisposedListeners() {
-        return proofDisposedListener.toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+        return proofDisposedListener
+                .toArray(new ProofDisposedListener[proofDisposedListener.size()]);
     }
 
     /**
-     * Fires the event {@link ProofDisposedListener#proofDisposed(ProofDisposedEvent)} to all listener.
+     * Fires the event {@link ProofDisposedListener#proofDisposed(ProofDisposedEvent)} to all
+     * listener.
+     *
      * @param e The event to fire.
      */
     protected void fireProofDisposed(ProofDisposedEvent e) {
@@ -1279,7 +1302,9 @@ public class Proof implements Named {
     }
 
     /**
-     * Fires the event {@link ProofDisposedListener#proofDisposing(ProofDisposedEvent)} to all listener.
+     * Fires the event {@link ProofDisposedListener#proofDisposing(ProofDisposedEvent)} to all
+     * listener.
+     *
      * @param e The event to fire.
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
@@ -1295,7 +1320,9 @@ public class Proof implements Named {
 
     /**
      * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
-     * @return The {@link File} under which the {@link Proof} was saved the last time or {@code null} if not available.
+     *
+     * @return The {@link File} under which the {@link Proof} was saved the last time or
+     *         {@code null} if not available.
      */
     public File getProofFile() {
         return proofFile;
@@ -1303,29 +1330,30 @@ public class Proof implements Named {
 
     /**
      * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     *
      * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
      */
     public void setProofFile(File proofFile) {
         this.proofFile = proofFile;
     }
 
-    public void saveToFile(File file) throws IOException{
+    public void saveToFile(File file) throws IOException {
         ProofSaver saver = new ProofSaver(this, file);
         saver.save();
     }
 
     /**
      *
-     * @return the current profile's factory for the active strategy,
-     *  or the default factory if there is no active strategy.
+     * @return the current profile's factory for the active strategy, or the default factory if
+     *         there is no active strategy.
      * @see Profile#getStrategyFactory(Name)
      * @see #getActiveStrategy()
      */
     public StrategyFactory getActiveStrategyFactory() {
         Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
-        return activeStrategyName != null ?
-                getServices().getProfile().getStrategyFactory(activeStrategyName) :
-                    getServices().getProfile().getDefaultStrategyFactory();
+        return activeStrategyName != null
+                ? getServices().getProfile().getStrategyFactory(activeStrategyName)
+                : getServices().getProfile().getDefaultStrategyFactory();
 
     }
 
@@ -1333,13 +1361,13 @@ public class Proof implements Named {
      * Retrieves a user-defined data.
      *
      * @param service the class for which the data were registered
-     * @param <T>     any class
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if(userData==null){
+            if (userData == null) {
                 return null;
             }
             return userData.get(service);
@@ -1352,7 +1380,7 @@ public class Proof implements Named {
      * Register a user-defined data in this node info.
      *
      * @param obj an object to be registered
-     * @param service  the key under it should be registered
+     * @param service the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -1361,6 +1389,7 @@ public class Proof implements Named {
 
     /**
      * Remove a previous registered user-defined data.
+     *
      * @param obj registered object
      * @param service the key under which the data was registered
      * @param <T> arbitray object
@@ -1377,7 +1406,8 @@ public class Proof implements Named {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if(userData == null) userData = new Lookup();
+        if (userData == null)
+            userData = new Lookup();
         return userData;
     }
 }

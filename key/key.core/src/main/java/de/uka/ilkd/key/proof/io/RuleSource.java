@@ -15,9 +15,10 @@ public abstract class RuleSource {
     public abstract File file();
 
     /**
-     * Provides an URL to the location the RuleSource is read from.
-     * This is more general than returning a file (works also e.g. in case of jar files where the
-     * file would be "jar:file:///...").
+     * Provides an URL to the location the RuleSource is read from. This is more general than
+     * returning a file (works also e.g. in case of jar files where the file would be
+     * "jar:file:///...").
+     *
      * @return the location of the RuleSource as url
      * @throws IOException on I/O errors
      */

@@ -26,8 +26,9 @@ public class Position {
     }
 
     public static Position make(Token ctx) {
-        return new Position(ctx.getTokenSource().getSourceName(), ctx.getLine(), ctx.getCharPositionInLine(), ctx.getStartIndex(),
-                ctx.getStopIndex() - ctx.getStartIndex()/*maybe +1*/);
+        return new Position(ctx.getTokenSource().getSourceName(), ctx.getLine(),
+            ctx.getCharPositionInLine(), ctx.getStartIndex(),
+            ctx.getStopIndex() - ctx.getStartIndex()/* maybe +1 */);
     }
 
 

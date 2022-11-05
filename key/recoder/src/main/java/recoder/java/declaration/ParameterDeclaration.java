@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() ==
- * 0 for abstract methods) without initializer (for Java).
+ * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * methods) without initializer (for Java).
  */
 
 public class ParameterDeclaration extends VariableDeclaration {
@@ -47,7 +47,7 @@ public class ParameterDeclaration extends VariableDeclaration {
      * Parameter declaration.
      *
      * @param typeRef a type reference.
-     * @param name    an identifier.
+     * @param name an identifier.
      */
 
     public ParameterDeclaration(TypeReference typeRef, Identifier name) {
@@ -59,12 +59,13 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param mods    a modifier mutable list.
+     * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param name    an identifier.
+     * @param name an identifier.
      */
 
-    public ParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name) {
+    public ParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            Identifier name) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
         setVariableSpecification(getFactory().createVariableSpecification(name));
@@ -146,8 +147,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -195,11 +195,10 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

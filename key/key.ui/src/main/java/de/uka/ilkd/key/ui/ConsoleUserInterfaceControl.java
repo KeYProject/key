@@ -52,7 +52,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-    ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
+    ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
     final byte verbosity;
     final KeYMediator mediator;
@@ -72,10 +72,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private File keyProblemFile = null;
 
     /**
-     * We want to record whether there was a proof that could not be proven.
-     * {@link Main} calls System.exit() after all files have been loaded with
-     * {@link #loadProblem(java.io.File)}. Program return value depends on
-     * whether there has been a proof attempt that was not successful.
+     * We want to record whether there was a proof that could not be proven. {@link Main} calls
+     * System.exit() after all files have been loaded with {@link #loadProblem(java.io.File)}.
+     * Program return value depends on whether there has been a proof attempt that was not
+     * successful.
      */
     public boolean allProofsSuccessful = true;
 
@@ -89,49 +89,43 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         this(verbose ? Verbosity.TRACE : Verbosity.NORMAL, loadOnly);
     }
 
-    private void printResults(final int openGoals,
-                              TaskFinishedInfo info,
-                              final Object result2) {
+    private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
         if (verbosity >= Verbosity.DEBUG) {
             LOGGER.info("]"); // end progress bar
         }
         if (verbosity > Verbosity.SILENT) {
             LOGGER.info("[ DONE  ... rule application ]");
             if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("\n== Proof " + (openGoals > 0 ? "open" : "closed") + " ==");
+                LOGGER.info("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
                 final Statistics stat = info.getProof().getStatistics();
-                LOGGER.info("Proof steps: " + stat.nodes);
-                LOGGER.info("Branches: " + stat.branches);
-                LOGGER.info("Automode Time: " + stat.autoModeTimeInMillis + "ms");
-                LOGGER.info("Time per step: " + stat.timePerStepInMillis + "ms");
+                LOGGER.info("Proof steps: {}", stat.nodes);
+                LOGGER.info("Branches: {}", stat.branches);
+                LOGGER.info("Automode Time: {} ms", stat.autoModeTimeInMillis);
+                LOGGER.info("Time per step: {} ms", stat.timePerStepInMillis);
             }
-            LOGGER.info("Number of goals remaining open: " + openGoals);
+            LOGGER.info("Number of goals remaining open: {}", openGoals);
             if (openGoals == 0) {
                 LOGGER.info("Proved");
             } else {
                 LOGGER.info("Not proved");
             }
-            System.out.flush();
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
 
         /*
-         * It is assumed that this part of the code is never reached, unless a
-         * value has been assigned to keyProblemFile in method loadProblem(File).
+         * It is assumed that this part of the code is never reached, unless a value has been
+         * assigned to keyProblemFile in method loadProblem(File).
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-                + " save a proof but no corresponding key problem file is "
-                + "available.";
+            + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
-         * We "delete" the value of keyProblemFile at this point by assigning
-         * null to it. That way we prevent KeY from saving another proof (that
-         * belongs to another key problem file) for a key problem file whose
-         * execution cycle has already been finished (and whose proof has
-         * already been saved). It is assumed that a new value has been assigned
-         * beforehand in method loadProblem(File), if this part of the code is
-         * reached again.
+         * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
+         * we prevent KeY from saving another proof (that belongs to another key problem file) for a
+         * key problem file whose execution cycle has already been finished (and whose proof has
+         * already been saved). It is assumed that a new value has been assigned beforehand in
+         * method loadProblem(File), if this part of the code is reached again.
          */
         keyProblemFile = null;
     }
@@ -153,8 +147,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         }
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
-        if (info.getSource() instanceof ProverCore
-                || info.getSource() instanceof ProofMacro) {
+        if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
                 printResults(openGoals, info, result2);
             }
@@ -163,7 +156,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             System.exit(-1);
         }
         if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: " + openGoals);
+            LOGGER.info("Number of open goals after loading: {}", openGoals);
             System.exit(0);
         }
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
@@ -171,8 +164,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             try {
                 Pair<String, Location> script = problemLoader.readProofScript();
                 ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
-                        "Script started", 0));
+                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                 pse.execute(this, proof);
                 // The start and end messages are fake to persuade the system ...
                 // All this here should refactored anyway ...
@@ -194,18 +186,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskStarted(info);
         progressMax = info.getSize();
         if (TaskKind.Strategy.equals(info.getKind())) {
-            LOGGER.debug(info.getMessage() + " ["); // start progress bar
+            System.out.println(info.getMessage() + " ["); // start progress bar
         } else {
-            LOGGER.debug(info.getMessage());
+            System.out.println(info.getMessage());
         }
     }
 
     @Override
     public void loadProblem(File file) {
         /*
-         * Current file is stored in a private field.
-         * It will be used in method printResults() to determine file names,
-         * in which proofs will be written.
+         * Current file is stored in a private field. It will be used in method printResults() to
+         * determine file names, in which proofs will be written.
          */
         keyProblemFile = file;
         getProblemLoader(file, null, null, null, mediator).runSynchronously();
@@ -214,24 +205,22 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file          the File with the problem description or the proof
-     * @param classPath     the class path entries to use.
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
-     * @param includes      the included files to use
+     * @param includes the included files to use
      */
-    public void loadProblem(File file,
-                            List<File> classPath,
-                            File bootClassPath,
-                            List<File> includes) {
+    public void loadProblem(File file, List<File> classPath, File bootClassPath,
+            List<File> includes) {
         ProblemLoader problemLoader =
-                getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
+            getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
     public void loadProofFromBundle(File proofBundle, File proofFilename) {
         ProblemLoader problemLoader =
-                getProblemLoader(proofBundle, null, null, null, getMediator());
+            getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
         problemLoader.runAsynchronously();
     }
@@ -252,37 +241,38 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void progressStarted(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
+    public final void progressStarted(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStarted({})", sender);
     }
 
     @Override
-    final public void progressStopped(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
+    public final void progressStopped(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.progressStopped({})", sender);
     }
 
     @Override
-    final public void reportException(Object sender, ProofOblInput input, Exception e) {
+    public final void reportException(Object sender, ProofOblInput input, Exception e) {
         LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
     }
 
     @Override
-    final public void reportStatus(Object sender, String status, int progress) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
+    public final void reportStatus(Object sender, String status, int progress) {
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{},{})", sender, status,
+            progress);
     }
 
     @Override
-    final public void reportStatus(Object sender, String status) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
+    public final void reportStatus(Object sender, String status) {
+        LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{})", sender, status);
     }
 
     @Override
-    final public void resetStatus(Object sender) {
-        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
+    public final void resetStatus(Object sender) {
+        LOGGER.debug("ConsoleUserInterfaceControl.resetStatus({})", sender);
     }
 
     @Override
-    final public void taskProgress(int position) {
+    public final void taskProgress(int position) {
         super.taskProgress(position);
         if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
             if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
@@ -292,13 +282,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void setMaximum(int maximum) {
-        LOGGER.debug("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
+    public final void setMaximum(int maximum) {
+        LOGGER.debug("ConsoleUserInterfaceControl.setMaximum({})", maximum);
     }
 
     @Override
-    final public void setProgress(int progress) {
-        LOGGER.debug("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
+    public final void setProgress(int progress) {
+        LOGGER.debug("ConsoleUserInterfaceControl.setProgress({})", progress);
     }
 
     @Override
@@ -307,16 +297,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public void openExamples() {
+    public final void openExamples() {
         LOGGER.info("Open Examples not suported by console UI.");
     }
 
     @Override
-    final public ProblemInitializer createProblemInitializer(Profile profile) {
-        ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile),
-                this);
-        return pi;
+    public final ProblemInitializer createProblemInitializer(Profile profile) {
+        return new ProblemInitializer(this, new Services(profile), this);
     }
 
     /**
@@ -338,7 +325,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    final public boolean selectProofObligation(InitConfig initConfig) {
+    public final boolean selectProofObligation(InitConfig initConfig) {
         ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
         return sel.selectProofObligation();
     }
@@ -372,13 +359,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result         the result
-     * @param proof          the proof
+     * @param result the result
+     * @param proof the proof
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof,
-                                    File keyProblemFile) {
+    public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }
@@ -408,8 +394,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-            ) {
+                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
             } catch (IOException e) {
                 e.printStackTrace();

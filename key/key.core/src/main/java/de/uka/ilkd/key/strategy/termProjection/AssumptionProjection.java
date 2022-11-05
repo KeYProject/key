@@ -8,8 +8,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**
- * Term projection that delivers the assumptions of a taclet application
- * (the formulas that the \assumes clause of the taclet refers to).
+ * Term projection that delivers the assumptions of a taclet application (the formulas that the
+ * \assumes clause of the taclet refers to).
  */
 public class AssumptionProjection implements ProjectionToTerm {
 
@@ -20,21 +20,18 @@ public class AssumptionProjection implements ProjectionToTerm {
     }
 
     public static ProjectionToTerm create(int no) {
-        return new AssumptionProjection ( no );
+        return new AssumptionProjection(no);
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        assert app instanceof TacletApp :
-            "Projection is only applicable to taclet apps," +
-            " but got " + app;
-        final TacletApp tapp = (TacletApp)app;
-        
-        assert tapp.ifFormulaInstantiations() != null :
-            "Projection is only applicable to taclet apps with assumptions," +
-            " but got " + app;
-        
-        return tapp
-            .ifFormulaInstantiations ().take ( no ).head ()
-            .getConstrainedFormula ().formula ();
+        assert app instanceof TacletApp
+                : "Projection is only applicable to taclet apps," + " but got " + app;
+        final TacletApp tapp = (TacletApp) app;
+
+        assert tapp.ifFormulaInstantiations() != null
+                : "Projection is only applicable to taclet apps with assumptions," + " but got "
+                    + app;
+
+        return tapp.ifFormulaInstantiations().take(no).head().getConstrainedFormula().formula();
     }
 }

@@ -6,17 +6,17 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class MatchTermSVInstruction extends  MatchSchemaVariableInstruction<TermSV> {
+public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermSV> {
 
     protected MatchTermSVInstruction(TermSV op) {
         super(op);
     }
-  
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {   
+    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
         return addInstantiation(subst, mc, services);
     }
 

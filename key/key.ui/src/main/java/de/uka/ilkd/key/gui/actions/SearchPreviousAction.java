@@ -6,8 +6,8 @@ import java.awt.event.ActionEvent;
 
 
 /*
- * Menu option for showing the next search result
- * Keyboard shortcut: F3. This shortcut is set in the KeyStrokemanager
+ * Menu option for showing the next search result Keyboard shortcut: F3. This shortcut is set in the
+ * KeyStrokemanager
  */
 public class SearchPreviousAction extends MainWindowAction {
 

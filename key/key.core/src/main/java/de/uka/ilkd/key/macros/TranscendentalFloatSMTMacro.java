@@ -12,8 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class captures a proof macro which is meant to fully automise KeY proof
- * workflow.
+ * This class captures a proof macro which is meant to fully automise KeY proof workflow.
  *
  * It is experimental.
  *
@@ -53,10 +52,7 @@ public class TranscendentalFloatSMTMacro extends SequentialProofMacro {
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {
-                new FullAutoMacro(),
-                new TranscendentalMacro()
-        };
+        return new ProofMacro[] { new FullAutoMacro(), new TranscendentalMacro() };
     }
 
     private static class FullAutoMacro extends StrategyProofMacro {

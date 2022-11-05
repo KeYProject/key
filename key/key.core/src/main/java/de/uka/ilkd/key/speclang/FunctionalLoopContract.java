@@ -23,8 +23,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *            a loop contract.
+     * @param contract a loop contract.
      */
     FunctionalLoopContract(LoopContract contract) {
         super(contract);
@@ -32,10 +31,8 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *            a loop contract.
-     * @param id
-     *            an ID.
+     * @param contract a loop contract.
+     * @param id an ID.
      */
     FunctionalLoopContract(LoopContract contract, int id) {
         super(contract, id);
@@ -82,8 +79,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
      * @see LoopContract#replaceEnhancedForVariables(de.uka.ilkd.key.java.StatementBlock, Services)
      */
     public void replaceEnhancedForVariables(Services services) {
-        setAuxiliaryContract(
-                getAuxiliaryContract().replaceEnhancedForVariables(
-                        getAuxiliaryContract().getBlock(), services));
+        setAuxiliaryContract(getAuxiliaryContract()
+                .replaceEnhancedForVariables(getAuxiliaryContract().getBlock(), services));
     }
 }

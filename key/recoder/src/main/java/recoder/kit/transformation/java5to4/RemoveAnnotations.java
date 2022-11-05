@@ -22,13 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Deals with annotations. Removes all annotation use specification and
- * all annotation types, except those, that are used as regular interfaces
- * as well (which is bad coding style, however).<br>
- * WARNING: A target program may not compile after this transformation if
- * any method that is declared in java.lang.annotation.Annotation is referenced.
- * Since this transformation is intended for "downgrading" from Java5 to Java 1.4,
- * that wouldn't work anyway.
+ * Deals with annotations. Removes all annotation use specification and all annotation types, except
+ * those, that are used as regular interfaces as well (which is bad coding style, however).<br>
+ * WARNING: A target program may not compile after this transformation if any method that is
+ * declared in java.lang.annotation.Annotation is referenced. Since this transformation is intended
+ * for "downgrading" from Java5 to Java 1.4, that wouldn't work anyway.
  *
  * @author Tobias Gutzmann
  * @since 0.80
@@ -42,7 +40,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
     /**
      * @param sc
      */
-    public RemoveAnnotations(CrossReferenceServiceConfiguration sc, NonTerminalProgramElement root) {
+    public RemoveAnnotations(CrossReferenceServiceConfiguration sc,
+            NonTerminalProgramElement root) {
         super(sc);
         this.root = root;
     }
@@ -59,7 +58,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
                 toRemove.add((AnnotationUseSpecification) pe);
             } else if (pe instanceof AnnotationDeclaration) {
                 AnnotationDeclaration ad = (AnnotationDeclaration) pe;
-                List<TypeReference> trl = getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
+                List<TypeReference> trl =
+                    getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
                 boolean remove = true;
                 for (int i = 0; i < trl.size(); i++) {
                     if (!(trl.get(i).getASTParent() instanceof AnnotationUseSpecification)) {
@@ -75,8 +75,10 @@ public class RemoveAnnotations extends TwoPassTransformation {
                         break;
                     }
                 }
-                if (remove) unusedAnnotationTypes.add(ad);
-                else usedAnnotationTypes.add(ad);
+                if (remove)
+                    unusedAnnotationTypes.add(ad);
+                else
+                    usedAnnotationTypes.add(ad);
             }
         }
         return super.analyze();

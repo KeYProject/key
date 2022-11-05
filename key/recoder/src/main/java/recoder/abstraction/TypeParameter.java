@@ -22,7 +22,7 @@ public interface TypeParameter extends ClassType {
 
     List<? extends TypeArgument> getBoundTypeArguments(int boundidx);
 
-    //public Member getDeclaringMember();
+    // public Member getDeclaringMember();
     ClassType getContainingClassType();
 
     /**
@@ -56,9 +56,10 @@ public interface TypeParameter extends ClassType {
                         continue;
                     TypeParameter tryUpwards = null;
                     {
-//						find ridx
+                        // find ridx
                         int ridx = -1;
-                        List<? extends TypeArgument> rl = ((ParameterizedType) superCT).getTypeArgs();
+                        List<? extends TypeArgument> rl =
+                            ((ParameterizedType) superCT).getTypeArgs();
                         for (int j = 0; j < rl.size(); j++) {
                             TypeArgument ta = rl.get(j);
                             if (ta.getTypeName().equals(t1.getName())) {

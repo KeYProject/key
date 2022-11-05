@@ -19,14 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This visitor evaluates all basic (level 0) declarations.
- * This includes:
+ * This visitor evaluates all basic (level 0) declarations. This includes:
  * <ul>
- *     <li>Option Declarations</li>
- *     <li>Sorts</li>
- *     <li>Program variables</li>
- *     <li>Schema variables</li>
- *     <li>Rulesets</li>
+ * <li>Option Declarations</li>
+ * <li>Sorts</li>
+ * <li>Program variables</li>
+ * <li>Schema variables</li>
+ * <li>Rulesets</li>
  * </ul>
  * <p>
  * These information are registered into the given {@link NamespaceSet}.
@@ -44,9 +43,8 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        mapMapOf(ctx.option_decls(), ctx.options_choice(),
-                ctx.ruleset_decls(), ctx.sort_decls(),
-                ctx.prog_var_decls(), ctx.schema_var_decls());
+        mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
+            ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
 
@@ -61,15 +59,14 @@ public class DeclarationBuilder extends DefaultBuilder {
                 Named name = lookup(pvName);
                 if (name != null) {
                     // commented out as pv do not have unique name (at the moment)
-                    //  throw new AmbigiousDeclException(varName, getSourceName(), getLine(), getColumn())
-                    if (!(name instanceof ProgramVariable) ||
-                            !((ProgramVariable) name).getKeYJavaType().equals(kjt)) {
-                        programVariables().add(new LocationVariable
-                                (pvName, kjt));
+                    // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
+                    // getColumn())
+                    if (!(name instanceof ProgramVariable)
+                            || !((ProgramVariable) name).getKeYJavaType().equals(kjt)) {
+                        programVariables().add(new LocationVariable(pvName, kjt));
                     }
                 } else {
-                    programVariables()
-                            .add(new LocationVariable(pvName, kjt));
+                    programVariables().add(new LocationVariable(pvName, kjt));
                 }
             }
         }
@@ -119,12 +116,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             String sortId = accept(idCtx);
             Name sortName = new Name(sortId);
 
-            ImmutableSet<Sort> ext =
-                    sortExt == null ? ImmutableSet.empty() :
-                            DefaultImmutableSet.fromCollection(sortExt);
-            ImmutableSet<Sort> oneOf =
-                    sortOneOf == null ? ImmutableSet.empty() :
-                            DefaultImmutableSet.fromCollection(sortOneOf);
+            ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
+                    : DefaultImmutableSet.fromCollection(sortExt);
+            ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
+                    : DefaultImmutableSet.fromCollection(sortOneOf);
 
             // attention: no expand to java.lang here!
             if (sorts().lookup(sortName) == null) {

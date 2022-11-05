@@ -5,8 +5,7 @@ package recoder.kit;
 import recoder.abstraction.Method;
 
 /**
- * Problem report indicating that a method has been overwritten with a different
- * return type.
+ * Problem report indicating that a method has been overwritten with a different return type.
  */
 public class DifferentReturnTypeOverwrite extends Conflict {
 

@@ -59,13 +59,13 @@ public class TestProofScriptCommand {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.write(tmpKey, lines);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(tmpKey.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
 
         Proof proof = env.getLoadedProof();
 
         String script = props.get("script");
-        ProofScriptEngine pse = new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
+        ProofScriptEngine pse =
+            new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
 
         try {
             pse.execute(env.getUi(), proof);
@@ -75,7 +75,8 @@ public class TestProofScriptCommand {
             return;
         }
 
-        Assertions.assertFalse(props.containsKey("exception"), "exception would have been expected");
+        Assertions.assertFalse(props.containsKey("exception"),
+            "exception would have been expected");
 
         ImmutableList<Goal> goals = proof.openGoals();
         if (props.containsKey("goals")) {

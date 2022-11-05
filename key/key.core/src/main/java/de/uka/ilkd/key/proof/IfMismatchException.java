@@ -4,13 +4,13 @@ package de.uka.ilkd.key.proof;
 public class IfMismatchException extends SVInstantiationException {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 933425921270034135L;
 
     public IfMismatchException(String description) {
-	super(description);
-    } 
+        super(description);
+    }
 
 
 }

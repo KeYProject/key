@@ -32,7 +32,7 @@ public class Instanceof extends TypeOperator {
     /**
      * Instanceof.
      *
-     * @param child   an expression.
+     * @param child an expression.
      * @param typeref a type reference.
      */
 
@@ -82,8 +82,7 @@ public class Instanceof extends TypeOperator {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position

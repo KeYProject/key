@@ -15,8 +15,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchReturnValParameterDeclaration extends
-        CcatchNonstandardParameterDeclaration implements ParameterContainer {
+public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParameterDeclaration
+        implements ParameterContainer {
 
     private final ParameterDeclaration delegate;
 
@@ -47,14 +47,11 @@ public class CcatchReturnValParameterDeclaration extends
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {

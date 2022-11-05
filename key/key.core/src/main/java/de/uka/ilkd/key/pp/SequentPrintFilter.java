@@ -11,8 +11,8 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 
 /**
- * Filter a given sequent to prepare it for the SequentPrinter class
- * by adjusting constraints, deleting formulas, etc.
+ * Filter a given sequent to prepare it for the SequentPrinter class by adjusting constraints,
+ * deleting formulas, etc.
  */
 public abstract class SequentPrintFilter {
     /**
@@ -25,7 +25,7 @@ public abstract class SequentPrintFilter {
      */
     ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 
-     /**
+    /**
      * the antecedent of the filtered formula
      */
     ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
@@ -44,6 +44,7 @@ public abstract class SequentPrintFilter {
 
     /**
      * sets the (original) sequent of this filter
+     *
      * @param s the sequent s is set to
      */
     public void setSequent(Sequent s) {
@@ -54,8 +55,9 @@ public abstract class SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered antecedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered antecedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
@@ -63,8 +65,9 @@ public abstract class SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered succcedent and the constraints to use for
-     * instantiating metavariables when printing
+     * Get the formulas of the filtered succcedent and the constraints to use for instantiating
+     * metavariables when printing
+     *
      * @return the filtered succcedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
@@ -72,8 +75,8 @@ public abstract class SequentPrintFilter {
     }
 
     /**
-     * converts the complete original sequent into
-     * antecedent/succendent lists of print filter entries.
+     * converts the complete original sequent into antecedent/succendent lists of print filter
+     * entries.
      */
     protected void filterIdentity() {
         antec = ImmutableSLList.<SequentPrintFilterEntry>nil();

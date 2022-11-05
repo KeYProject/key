@@ -10,33 +10,31 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 
 /**
- * Binary feature that returns zero iff a certain Taclet app has not already
- * been performed
+ * Binary feature that returns zero iff a certain Taclet app has not already been performed
  */
 public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
-    public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature ();
+    public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
 
     @Override
     public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        if ( !app.ifInstsComplete () ) {
+        if (!app.ifInstsComplete()) {
             return true;
         }
 
-        return !containsRuleApp ( goal.appliedRuleApps (), app, pos );
+        return !containsRuleApp(goal.appliedRuleApps(), app, pos);
     }
 
     @Override
-    protected boolean comparePio(TacletApp newApp,
-                                 TacletApp oldApp,
-                                 PosInOccurrence newPio, PosInOccurrence oldPio) {
-        final Term newFocus = newPio.subTerm ();
-        final Term oldFocus = oldPio.subTerm ();
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
+            PosInOccurrence oldPio) {
+        final Term newFocus = newPio.subTerm();
+        final Term oldFocus = oldPio.subTerm();
         if (!newFocus.equalsModIrrelevantTermLabels(oldFocus)) {
             return false;
         }
 
-        if (newFocus.isRigid ()) {
+        if (newFocus.isRigid()) {
             return true;
         }
 

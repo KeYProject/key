@@ -24,10 +24,10 @@ public class SetUnion extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSetUnion(this);
+        v.performActionOnSetUnion(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSetUnion(this);
     }

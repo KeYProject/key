@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
- * Facade for the management of {@link SolverType}.
- * This class holds references to common and known solver type instances.
+ * Facade for the management of {@link SolverType}. This class holds references to common and known
+ * solver type instances.
  * <p>
  * To add a new solver type, use the service loader with the {@link SolverType} interface.
  *
@@ -15,15 +15,13 @@ import java.util.*;
 public final class SolverTypes {
 
     /**
-     * All available solver types, including legacy solvers.
-     * The objects in this map are identically returned
-     * whenever {@link #getSolverTypes()} is called.
+     * All available solver types, including legacy solvers. The objects in this map are identically
+     * returned whenever {@link #getSolverTypes()} is called.
      */
     private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
     /**
-     * The available legacy solvers out of the {@link #SOLVERS} list.
-     * The objects in this map are identically returned
-     * whenever {@link #getLegacySolvers()} is called.
+     * The available legacy solvers out of the {@link #SOLVERS} list. The objects in this map are
+     * identically returned whenever {@link #getLegacySolvers()} is called.
      */
     private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(1);
 
@@ -32,9 +30,10 @@ public final class SolverTypes {
     }
 
     /**
-     * Loads and returns the available solver types using the {@link SolverPropertiesLoader}.
-     * The returned SolverType objects don't change (singletons).
-     * @return  the available solver types, including legacy solvers
+     * Loads and returns the available solver types using the {@link SolverPropertiesLoader}. The
+     * returned SolverType objects don't change (singletons).
+     *
+     * @return the available solver types, including legacy solvers
      */
     @Nonnull
     public static Collection<SolverType> getSolverTypes() {
@@ -48,6 +47,7 @@ public final class SolverTypes {
 
     /**
      * Returns the available legacy solver types according to the {@link SolverPropertiesLoader}.
+     *
      * @return the available legacy solver types
      */
     @Nonnull
@@ -61,10 +61,8 @@ public final class SolverTypes {
     /**
      * Z3 counterexample solver.
      */
-    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream()
-                    .filter(it -> it.getClass()
-                    .equals(SolverTypeImplementation.class) && it.getName()
-                    .equals("Z3_CE"))
+    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(
+        it -> it.getClass().equals(SolverTypeImplementation.class) && it.getName().equals("Z3_CE"))
             .findFirst().orElse(null);
 
 }

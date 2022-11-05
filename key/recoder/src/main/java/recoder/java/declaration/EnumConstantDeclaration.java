@@ -29,7 +29,8 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
         super();
     }
 
-    public EnumConstantDeclaration(EnumConstantSpecification spec, ASTList<DeclarationSpecifier> annotations) {
+    public EnumConstantDeclaration(EnumConstantSpecification spec,
+            ASTList<DeclarationSpecifier> annotations) {
         super();
         setEnumConstantSpecification(spec);
         setDeclarationSpecifiers(annotations);
@@ -119,27 +120,35 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
     @Override
     public void setMemberParent(TypeDeclaration t) {
         if (!(t instanceof EnumDeclaration))
-            throw new IllegalArgumentException("Only an EnumDeclarations can be parent of an EnumConstantDeclaration");
+            throw new IllegalArgumentException(
+                "Only an EnumDeclarations can be parent of an EnumConstantDeclaration");
         super.setMemberParent(t);
     }
 
     @Override
     public void validate() throws ModelException {
         if (typeReference != null)
-            throw new ModelException("TypeReference set in EnumConstantDeclaration in " + parent.getFullName());
+            throw new ModelException(
+                "TypeReference set in EnumConstantDeclaration in " + parent.getFullName());
         if (declarationSpecifiers != null) {
             for (int i = 0; i < declarationSpecifiers.size(); i++) {
                 DeclarationSpecifier ds = declarationSpecifiers.get(i);
                 if (!(ds instanceof AnnotationUse))
-                    throw new ModelException("EnumConstantDeclaration may not contain modifiers in " + parent.getFullName());
+                    throw new ModelException("EnumConstantDeclaration may not contain modifiers in "
+                        + parent.getFullName());
             }
         }
         if (!(parent instanceof EnumDeclaration))
-            throw new ModelException("Illegal parent type (" + parent.getClass().getCanonicalName() + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
+            throw new ModelException("Illegal parent type (" + parent.getClass().getCanonicalName()
+                + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
         if (fieldSpecs.size() != 1)
-            throw new ModelException("Only one EnumConstantSpecification per EnumConstantDeclaration allowed in " + parent.getFullName());
+            throw new ModelException(
+                "Only one EnumConstantSpecification per EnumConstantDeclaration allowed in "
+                    + parent.getFullName());
         if (!(fieldSpecs.get(0) instanceof EnumConstantSpecification))
-            throw new ModelException("child of EnumConstantDeclaration is not an EnumConstantSpecification in " + parent.getFullName());
+            throw new ModelException(
+                "child of EnumConstantDeclaration is not an EnumConstantSpecification in "
+                    + parent.getFullName());
     }
 
 }

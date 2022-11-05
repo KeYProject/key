@@ -18,35 +18,33 @@ public class AboutAction extends MainWindowAction {
     private static final long serialVersionUID = 8240213594748334802L;
 
     public AboutAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("About KeY");
+        super(mainWindow);
+        setName("About KeY");
         setIcon(IconFactory.help(16));
-	// About KeY
+        // About KeY
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	showAbout();
+        showAbout();
     }
 
     public void showAbout() {
 
-    	JOptionPane.showMessageDialog(mainWindow, new Object[] {
-				IconFactory.keyVersionLogo(),
-				KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-						+ "\n\nWWW: http://key-project.org/"
-						+ "\n\nVersion " + KeYConstants.VERSION},
-				"The KeY Project",
-				JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(mainWindow,
+            new Object[] { IconFactory.keyVersionLogo(),
+                KeYConstants.COPYRIGHT.replace("and", "\n" + UnicodeHelper.emSpaces(8) + "and")
+                    + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION },
+            "The KeY Project", JOptionPane.INFORMATION_MESSAGE);
 
-//	JOptionPane pane = new JOptionPane(
-//	        KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-//	        + "\n\nWWW: http://key-project.org/"
-//	        + "\n\nVersion " + KeYConstants.VERSION
-//	                , JOptionPane.INFORMATION_MESSAGE,
-//	        JOptionPane.DEFAULT_OPTION, IconFactory.keyVersionLogo(108, 68));
-//	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
-//	dialog.setVisible(true);
+        // JOptionPane pane = new JOptionPane(
+        // KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+        // + "\n\nWWW: http://key-project.org/"
+        // + "\n\nVersion " + KeYConstants.VERSION
+        // , JOptionPane.INFORMATION_MESSAGE,
+        // JOptionPane.DEFAULT_OPTION, IconFactory.keyVersionLogo(108, 68));
+        // JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
+        // dialog.setVisible(true);
     }
 
 }

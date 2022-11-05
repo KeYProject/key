@@ -15,7 +15,8 @@ import java.util.List;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class VariableDeclaration extends JavaDeclaration implements TypeReferenceContainer {
+public abstract class VariableDeclaration extends JavaDeclaration
+        implements TypeReferenceContainer {
 
     /**
      * Type reference.
@@ -34,9 +35,9 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
     /**
      * Variable declaration.
      *
-     * @param mods    a modifier mutable list.
+     * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param vars    a variable specification mutable list.
+     * @param vars a variable specification mutable list.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {
@@ -89,10 +90,9 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public TypeReference getTypeReferenceAt(int index) {
@@ -123,8 +123,7 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
     }
 
     /**
-     * Get variables.
-     * WARNING: as of 0.80 final, this is not a mutable list any more due to
+     * Get variables. WARNING: as of 0.80 final, this is not a mutable list any more due to
      * implementation of ParameterDeclaration - changes on this list don't have effects there!!
      *
      * @return the variable specification mutable list.

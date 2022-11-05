@@ -5,6 +5,7 @@ import recoder.service.ProgramModelInfo;
 
 /**
  * RecodeR extension for JML's \bigint type.
+ *
  * @author bruns
  *
  */

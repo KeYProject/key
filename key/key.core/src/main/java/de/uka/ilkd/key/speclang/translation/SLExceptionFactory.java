@@ -20,8 +20,8 @@ import static java.text.MessageFormat.format;
 /**
  * Factory for exception during parsing of specification languages.
  * <p>
- * This class produces exception with position information. For this,
- * the class can be constructed from antlr3.
+ * This class produces exception with position information. For this, the class can be constructed
+ * from antlr3.
  */
 public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
@@ -34,9 +34,9 @@ public class SLExceptionFactory {
 
     private List<PositionedString> warnings = new LinkedList<>();
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
     public SLExceptionFactory(@Nonnull Parser parser, String fileName, Position offsetPos) {
         this.line = parser.input.LT(1).getLine();
@@ -75,9 +75,9 @@ public class SLExceptionFactory {
         return this;
     }
 
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
     private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn - 1;
@@ -88,11 +88,11 @@ public class SLExceptionFactory {
         return this.createAbsolutePosition(pos.getLine(), pos.getColumn());
     }
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
-    //region warnings
+    // region warnings
 
     /**
      * This is used for features without semantics such as labels or annotations.
@@ -118,12 +118,15 @@ public class SLExceptionFactory {
      * Used for features with semantics (currently) not supported in KeY/DL.
      */
     public void addUnderspecifiedWarning(String feature) {
-        String msg = format("{0} is not supported and translated to an underspecified term or formula.", feature);
+        String msg = format(
+            "{0} is not supported and translated to an underspecified term or formula.", feature);
         addWarning(msg);
     }
 
     public void addUnderspecifiedWarning(org.antlr.v4.runtime.Token t) {
-        String msg = format("{0} is not supported and translated to an underspecified term or formula.", t.getText());
+        String msg =
+            format("{0} is not supported and translated to an underspecified term or formula.",
+                t.getText());
         addWarning(msg, t);
     }
 
@@ -144,36 +147,30 @@ public class SLExceptionFactory {
     public List<PositionedString> getWarnings() {
         return warnings;
     }
-    //endregion
+    // endregion
 
     /**
      * Creates a string with the position information of the passed token.
      */
     public PositionedString createPositionedString(String text, Token t) {
-        return new PositionedString(text,
-                fileName,
-                createAbsolutePosition(t.getLine(),
-                        t.getCharPositionInLine()));
+        return new PositionedString(text, fileName,
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     public PositionedString createPositionedString(String msg, org.antlr.v4.runtime.Token t) {
-        return new PositionedString(msg,
-                fileName,
-                createAbsolutePosition(t.getLine(),
-                        t.getCharPositionInLine()));
+        return new PositionedString(msg, fileName,
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     /**
-     * Creates a string with position information from the given relative
-     * position.
+     * Creates a string with position information from the given relative position.
      *
      * @param text the {@link String}
-     * @param pos  the {@link Position}
-     * @return <code>text</code> as {@link PositionedString} with absolute
-     * position in the current file
+     * @param pos the {@link Position}
+     * @return <code>text</code> as {@link PositionedString} with absolute position in the current
+     *         file
      */
-    public PositionedString createPositionedString(final String text,
-                                                   final Position pos) {
+    public PositionedString createPositionedString(final String text, final Position pos) {
         return new PositionedString(text, fileName, createAbsolutePosition(pos));
     }
 
@@ -181,36 +178,29 @@ public class SLExceptionFactory {
      * Creates a string with the current absolute position information
      */
     public PositionedString createPositionedString(String text) {
-        return new PositionedString(text,
-                fileName,
-                createAbsolutePosition(this.line, this.column));
+        return new PositionedString(text, fileName, createAbsolutePosition(this.line, this.column));
     }
 
 
     /**
-     * Creates an SLTranslationException with current absolute position
-     * information.
+     * Creates an SLTranslationException with current absolute position information.
      */
     public SLTranslationException createException(String message) {
-        return new SLTranslationException(message,
-                fileName, createAbsolutePosition(this.line, this.column));
+        return new SLTranslationException(message, fileName,
+            createAbsolutePosition(this.line, this.column));
     }
 
 
     /**
-     * Creates an SLTranslationException with the position information of the
-     * passed token.
+     * Creates an SLTranslationException with the position information of the passed token.
      */
     public SLTranslationException createException(String message, Token t) {
-        return new SLTranslationException(message,
-                fileName,
-                createAbsolutePosition(t.getLine(),
-                        t.getCharPositionInLine()));
+        return new SLTranslationException(message, fileName,
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     /**
-     * Creates an SLTranslationException with current absolute position
-     * information.
+     * Creates an SLTranslationException with current absolute position information.
      */
     public SLTranslationException createException(String message, Throwable cause) {
         SLTranslationException result = createException(message);
@@ -235,8 +225,7 @@ public class SLExceptionFactory {
     }
 
     /**
-     * Creates an SLTranslationException with the position information of the
-     * passed token.
+     * Creates an SLTranslationException with the position information of the passed token.
      *
      * @param cause the exception which causes the new exception to be created.
      */
@@ -248,13 +237,11 @@ public class SLExceptionFactory {
 
 
     /**
-     * Creates an SLWarningException with current absolute position
-     * information.
+     * Creates an SLWarningException with current absolute position information.
      */
     public SLTranslationException createWarningException(String message) {
-        return new SLWarningException(message,
-                fileName,
-                createAbsolutePosition(this.line, this.column));
+        return new SLWarningException(message, fileName,
+            createAbsolutePosition(this.line, this.column));
     }
 
     public SLTranslationException createWarningException(String message, Token t) {
@@ -262,10 +249,9 @@ public class SLExceptionFactory {
     }
 
     /**
-     * Create a message from a {@link RecognitionException}. This needs to be
-     * done manually because antlr exceptions are not designed to provide error
-     * messages, see: http://www.antlr3.org/api/ActionScript/org/antlr/runtime/
-     * RecognitionException.html
+     * Create a message from a {@link RecognitionException}. This needs to be done manually because
+     * antlr exceptions are not designed to provide error messages, see:
+     * http://www.antlr3.org/api/ActionScript/org/antlr/runtime/ RecognitionException.html
      */
     private String createMessage(RecognitionException e, Position pos) {
         String message = e.getMessage();
@@ -273,8 +259,8 @@ public class SLExceptionFactory {
             return message;
         } else {
             /*
-             * A sequence of "instanceof" cases can be defined here in order to
-             * create custom error messages for all relevant exception types.
+             * A sequence of "instanceof" cases can be defined here in order to create custom error
+             * messages for all relevant exception types.
              */
 
             // Convert the error position into a string
@@ -282,21 +268,19 @@ public class SLExceptionFactory {
             String token = e.token != null ? "'" + e.token.getText() + "'" : "";
 
             if (e instanceof NoViableAltException) {
-                return "No viable alternative at line " + errorPosition + " "
-                        + token;
+                return "No viable alternative at line " + errorPosition + " " + token;
             }
             if (e instanceof MismatchedTokenException) {
                 return "Mismatched token at line " + errorPosition + " " + token;
             }
-            return "[" + e.getClass().getName()
-                    + "] Unspecified syntax error at line " + errorPosition + " "
-                    + token;
+            return "[" + e.getClass().getName() + "] Unspecified syntax error at line "
+                + errorPosition + " " + token;
         }
     }
 
     /**
-     * Converts an ANTLRException into an SLTranslationException with the same
-     * message and stack trace, and with current absolute position information.
+     * Converts an ANTLRException into an SLTranslationException with the same message and stack
+     * trace, and with current absolute position information.
      */
     public SLTranslationException convertException(RecognitionException e) {
         // no conversion necessary if e is already a SLTranslationException
@@ -308,12 +292,11 @@ public class SLExceptionFactory {
         return new SLTranslationException(message, fileName, pos, e);
     }
 
-    public SLTranslationException convertException(
-            String message, RecognitionException e) {
+    public SLTranslationException convertException(String message, RecognitionException e) {
         Position pos;
         pos = createAbsolutePosition(e.line, e.charPositionInLine);
 
-        return new SLTranslationException(
-                String.format("%s (%s)", message, e.getClass().getName()), fileName, pos, e);
+        return new SLTranslationException(String.format("%s (%s)", message, e.getClass().getName()),
+            fileName, pos, e);
     }
 }

@@ -11,8 +11,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 
 /**
- * A {@link MergeContract} for {@link UnparametricMergeProcedure}s like
- * {@link MergeByIfThenElse}.
+ * A {@link MergeContract} for {@link UnparametricMergeProcedure}s like {@link MergeByIfThenElse}.
  *
  * @author Dominic Scheurer
  */
@@ -24,9 +23,8 @@ public class UnparameterizedMergeContract implements MergeContract {
     private final MergePointStatement mps;
     private final KeYJavaType kjt;
 
-    public UnparameterizedMergeContract(
-            MergeProcedure mergeProcedure,
-            MergePointStatement mps, KeYJavaType kjt) {
+    public UnparameterizedMergeContract(MergeProcedure mergeProcedure, MergePointStatement mps,
+            KeYJavaType kjt) {
         this.mergeProcedure = mergeProcedure;
         this.mps = mps;
         this.kjt = kjt;

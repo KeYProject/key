@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**
  * Checks, whether the position in occurrence is in the succedent.
- * 
+ *
  * @author christoph
  */
 class SuccChecker implements Checker {

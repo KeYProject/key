@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
 /**
- *  Constructor reference.
- *  @author <TT>AutoDoc</TT>
+ * Constructor reference.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
-public interface ConstructorReference extends MethodOrConstructorReference,
-                                              MemberReference {
+public interface ConstructorReference extends MethodOrConstructorReference, MemberReference {
 
 
 }

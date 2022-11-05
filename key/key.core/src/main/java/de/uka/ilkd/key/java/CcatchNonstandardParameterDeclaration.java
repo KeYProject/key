@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java;
  *
  * @author Dominic Steinhöfel
  */
-public abstract class CcatchNonstandardParameterDeclaration
-        extends JavaNonTerminalProgramElement {
+public abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {
 
 }

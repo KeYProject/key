@@ -8,7 +8,7 @@ import de.uka.ilkd.key.gui.configuration.ViewSelector;
 public class ToolTipOptionsAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -360744615149278733L;
 
@@ -19,7 +19,7 @@ public class ToolTipOptionsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	 ViewSelector vselector = new ViewSelector(mainWindow);
-	 vselector.setVisible(true);
+        ViewSelector vselector = new ViewSelector(mainWindow);
+        vselector.setVisible(true);
     }
 }

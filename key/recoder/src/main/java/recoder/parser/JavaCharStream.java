@@ -2,8 +2,8 @@
 package recoder.parser;
 
 /**
- * An implementation of interface CharStream, where the stream is assumed to
- * contain only ASCII characters (with java-like unicode escape processing).
+ * An implementation of interface CharStream, where the stream is assumed to contain only ASCII
+ * characters (with java-like unicode escape processing).
  */
 
 public class JavaCharStream {
@@ -26,12 +26,12 @@ public class JavaCharStream {
     static int available;
     static int tokenBegin;
 
-    public JavaCharStream(java.io.Reader dstream,
-                          int startline, int startcolumn, int buffersize) {
+    public JavaCharStream(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
         if (inputStream != null)
-            throw new Error("\n   ERROR: Second call to the constructor of a static JavaCharStream.  You must\n" +
-                    "       either use ReInit() or set the JavaCC option STATIC to false\n" +
-                    "       during the generation of this class.");
+            throw new Error(
+                "\n   ERROR: Second call to the constructor of a static JavaCharStream.  You must\n"
+                    + "       either use ReInit() or set the JavaCC option STATIC to false\n"
+                    + "       during the generation of this class.");
         inputStream = dstream;
         line = startline;
         column = startcolumn - 1;
@@ -43,8 +43,7 @@ public class JavaCharStream {
         nextCharBuf = new char[4096];
     }
 
-    public JavaCharStream(java.io.Reader dstream,
-                          int startline, int startcolumn) {
+    public JavaCharStream(java.io.Reader dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
@@ -53,26 +52,29 @@ public class JavaCharStream {
     }
 
     public JavaCharStream(java.io.InputStream dstream, String encoding, int startline,
-                          int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException {
-        this(encoding == null ? new java.io.InputStreamReader(dstream) : new java.io.InputStreamReader(dstream, encoding), startline, startcolumn, buffersize);
+            int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException {
+        this(
+            encoding == null ? new java.io.InputStreamReader(dstream)
+                    : new java.io.InputStreamReader(dstream, encoding),
+            startline, startcolumn, buffersize);
     }
 
-    public JavaCharStream(java.io.InputStream dstream, int startline,
-                          int startcolumn, int buffersize) {
+    public JavaCharStream(java.io.InputStream dstream, int startline, int startcolumn,
+            int buffersize) {
         this(new java.io.InputStreamReader(dstream), startline, startcolumn, 4096);
     }
 
     public JavaCharStream(java.io.InputStream dstream, String encoding, int startline,
-                          int startcolumn) throws java.io.UnsupportedEncodingException {
+            int startcolumn) throws java.io.UnsupportedEncodingException {
         this(dstream, encoding, startline, startcolumn, 4096);
     }
 
-    public JavaCharStream(java.io.InputStream dstream, int startline,
-                          int startcolumn) {
+    public JavaCharStream(java.io.InputStream dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
-    public JavaCharStream(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException {
+    public JavaCharStream(java.io.InputStream dstream, String encoding)
+            throws java.io.UnsupportedEncodingException {
         this(dstream, encoding, 1, 1, 4096);
     }
 
@@ -82,45 +84,45 @@ public class JavaCharStream {
 
     static final int hexval(char c) throws java.io.IOException {
         switch (c) {
-            case '0':
-                return 0;
-            case '1':
-                return 1;
-            case '2':
-                return 2;
-            case '3':
-                return 3;
-            case '4':
-                return 4;
-            case '5':
-                return 5;
-            case '6':
-                return 6;
-            case '7':
-                return 7;
-            case '8':
-                return 8;
-            case '9':
-                return 9;
+        case '0':
+            return 0;
+        case '1':
+            return 1;
+        case '2':
+            return 2;
+        case '3':
+            return 3;
+        case '4':
+            return 4;
+        case '5':
+            return 5;
+        case '6':
+            return 6;
+        case '7':
+            return 7;
+        case '8':
+            return 8;
+        case '9':
+            return 9;
 
-            case 'a':
-            case 'A':
-                return 10;
-            case 'b':
-            case 'B':
-                return 11;
-            case 'c':
-            case 'C':
-                return 12;
-            case 'd':
-            case 'D':
-                return 13;
-            case 'e':
-            case 'E':
-                return 14;
-            case 'f':
-            case 'F':
-                return 15;
+        case 'a':
+        case 'A':
+            return 10;
+        case 'b':
+        case 'B':
+            return 11;
+        case 'c':
+        case 'C':
+            return 12;
+        case 'd':
+        case 'D':
+            return 13;
+        case 'e':
+        case 'E':
+            return 14;
+        case 'f':
+        case 'F':
+            return 15;
         }
 
         throw new java.io.IOException(); // Should never come here
@@ -142,8 +144,7 @@ public class JavaCharStream {
         try {
             if (wrapAround) {
                 System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize - tokenBegin);
-                System.arraycopy(buffer, 0, newbuffer,
-                        bufsize - tokenBegin, bufpos);
+                System.arraycopy(buffer, 0, newbuffer, bufsize - tokenBegin, bufpos);
                 buffer = newbuffer;
 
                 System.arraycopy(bufline, tokenBegin, newbufline, 0, bufsize - tokenBegin);
@@ -181,8 +182,7 @@ public class JavaCharStream {
             maxNextCharInd = nextCharInd = 0;
 
         try {
-            if ((i = inputStream.read(nextCharBuf, maxNextCharInd,
-                    4096 - maxNextCharInd)) == -1) {
+            if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
                 inputStream.close();
                 throw new java.io.IOException();
             } else
@@ -254,18 +254,18 @@ public class JavaCharStream {
         }
 
         switch (c) {
-            case '\r':
-                prevCharIsCR = true;
-                break;
-            case '\n':
-                prevCharIsLF = true;
-                break;
-            case '\t':
-                column--;
-                column += (tabSize - (column % tabSize));
-                break;
-            default:
-                break;
+        case '\r':
+            prevCharIsCR = true;
+            break;
+        case '\n':
+            prevCharIsLF = true;
+            break;
+        case '\t':
+            column--;
+            column += (tabSize - (column % tabSize));
+            break;
+        default:
+            break;
         }
 
         bufline[bufpos] = line;
@@ -292,7 +292,7 @@ public class JavaCharStream {
 
             int backSlashCnt = 1;
 
-            for (; ; ) // Read all the backslashes
+            for (;;) // Read all the backslashes
             {
                 if (++bufpos == available)
                     AdjustBuffSize();
@@ -327,15 +327,13 @@ public class JavaCharStream {
                 while ((c = ReadByte()) == 'u')
                     ++column;
 
-                buffer[bufpos] = c = (char) (hexval(c) << 12 |
-                        hexval(ReadByte()) << 8 |
-                        hexval(ReadByte()) << 4 |
-                        hexval(ReadByte()));
+                buffer[bufpos] = c = (char) (hexval(c) << 12 | hexval(ReadByte()) << 8
+                        | hexval(ReadByte()) << 4 | hexval(ReadByte()));
 
                 column += 4;
             } catch (java.io.IOException e) {
-                throw new Error("Invalid escape character at line " + line +
-                        " column " + column + ".");
+                throw new Error(
+                    "Invalid escape character at line " + line + " column " + column + ".");
             }
 
             if (backSlashCnt == 1)
@@ -395,8 +393,8 @@ public class JavaCharStream {
         if (bufpos >= tokenBegin)
             return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
         else
-            return new String(buffer, tokenBegin, bufsize - tokenBegin) +
-                    new String(buffer, 0, bufpos + 1);
+            return new String(buffer, tokenBegin, bufsize - tokenBegin)
+                    + new String(buffer, 0, bufpos + 1);
     }
 
     static public char[] GetSuffix(int len) {
@@ -405,8 +403,7 @@ public class JavaCharStream {
         if ((bufpos + 1) >= len)
             System.arraycopy(buffer, bufpos - len + 1, ret, 0, len);
         else {
-            System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0,
-                    len - bufpos - 1);
+            System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0, len - bufpos - 1);
             System.arraycopy(buffer, 0, ret, len - bufpos - 1, bufpos + 1);
         }
 
@@ -436,8 +433,7 @@ public class JavaCharStream {
         int i = 0, j = 0, k = 0;
         int nextColDiff = 0, columnDiff = 0;
 
-        while (i < len &&
-                bufline[j = start % bufsize] == bufline[k = ++start % bufsize]) {
+        while (i < len && bufline[j = start % bufsize] == bufline[k = ++start % bufsize]) {
             bufline[j] = newLine;
             nextColDiff = columnDiff + bufcolumn[k] - bufcolumn[j];
             bufcolumn[j] = newCol + columnDiff;
@@ -461,8 +457,7 @@ public class JavaCharStream {
         column = bufcolumn[j];
     }
 
-    public void ReInit(java.io.Reader dstream,
-                       int startline, int startcolumn, int buffersize) {
+    public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
         inputStream = dstream;
         line = startline;
         column = startcolumn - 1;
@@ -479,8 +474,7 @@ public class JavaCharStream {
         nextCharInd = bufpos = -1;
     }
 
-    public void ReInit(java.io.Reader dstream,
-                       int startline, int startcolumn) {
+    public void ReInit(java.io.Reader dstream, int startline, int startcolumn) {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 
@@ -488,27 +482,30 @@ public class JavaCharStream {
         ReInit(dstream, 1, 1, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, String encoding, int startline,
-                       int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException {
-        ReInit(encoding == null ? new java.io.InputStreamReader(dstream) : new java.io.InputStreamReader(dstream, encoding), startline, startcolumn, buffersize);
+    public void ReInit(java.io.InputStream dstream, String encoding, int startline, int startcolumn,
+            int buffersize) throws java.io.UnsupportedEncodingException {
+        ReInit(
+            encoding == null ? new java.io.InputStreamReader(dstream)
+                    : new java.io.InputStreamReader(dstream, encoding),
+            startline, startcolumn, buffersize);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline,
-                       int startcolumn, int buffersize) {
+    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn,
+            int buffersize) {
         ReInit(new java.io.InputStreamReader(dstream), startline, startcolumn, buffersize);
     }
 
-    public void ReInit(java.io.InputStream dstream, String encoding, int startline,
-                       int startcolumn) throws java.io.UnsupportedEncodingException {
+    public void ReInit(java.io.InputStream dstream, String encoding, int startline, int startcolumn)
+            throws java.io.UnsupportedEncodingException {
         ReInit(dstream, encoding, startline, startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline,
-                       int startcolumn) {
+    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn) {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException {
+    public void ReInit(java.io.InputStream dstream, String encoding)
+            throws java.io.UnsupportedEncodingException {
         ReInit(dstream, encoding, 1, 1, 4096);
     }
 

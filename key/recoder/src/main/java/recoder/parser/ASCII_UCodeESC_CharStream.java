@@ -4,8 +4,8 @@
 package recoder.parser;
 
 /**
- * An implementation of interface CharStream, where the stream is assumed to
- * contain only ASCII characters (with java-like unicode escape processing).
+ * An implementation of interface CharStream, where the stream is assumed to contain only ASCII
+ * characters (with java-like unicode escape processing).
  */
 
 public final class ASCII_UCodeESC_CharStream {
@@ -27,8 +27,8 @@ public final class ASCII_UCodeESC_CharStream {
     private int nextCharInd = -1;
     private int inBuf = 0;
 
-    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline,
-                                     int startcolumn, int buffersize) {
+    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline, int startcolumn,
+            int buffersize) {
         inputStream = dstream;
         line = startline;
         column = startcolumn - 1;
@@ -40,63 +40,60 @@ public final class ASCII_UCodeESC_CharStream {
         nextCharBuf = new char[4096];
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline,
-                                     int startcolumn) {
+    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream,
-                                     int startline, int startcolumn, int buffersize) {
-        this(new java.io.InputStreamReader(dstream), startline, startcolumn,
-                4096);
+    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream, int startline, int startcolumn,
+            int buffersize) {
+        this(new java.io.InputStreamReader(dstream), startline, startcolumn, 4096);
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream,
-                                     int startline, int startcolumn) {
+    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
     static final int hexval(char c) throws java.io.IOException {
         switch (c) {
-            case '0':
-                return 0;
-            case '1':
-                return 1;
-            case '2':
-                return 2;
-            case '3':
-                return 3;
-            case '4':
-                return 4;
-            case '5':
-                return 5;
-            case '6':
-                return 6;
-            case '7':
-                return 7;
-            case '8':
-                return 8;
-            case '9':
-                return 9;
+        case '0':
+            return 0;
+        case '1':
+            return 1;
+        case '2':
+            return 2;
+        case '3':
+            return 3;
+        case '4':
+            return 4;
+        case '5':
+            return 5;
+        case '6':
+            return 6;
+        case '7':
+            return 7;
+        case '8':
+            return 8;
+        case '9':
+            return 9;
 
-            case 'a':
-            case 'A':
-                return 10;
-            case 'b':
-            case 'B':
-                return 11;
-            case 'c':
-            case 'C':
-                return 12;
-            case 'd':
-            case 'D':
-                return 13;
-            case 'e':
-            case 'E':
-                return 14;
-            case 'f':
-            case 'F':
-                return 15;
+        case 'a':
+        case 'A':
+            return 10;
+        case 'b':
+        case 'B':
+            return 11;
+        case 'c':
+        case 'C':
+            return 12;
+        case 'd':
+        case 'D':
+            return 13;
+        case 'e':
+        case 'E':
+            return 14;
+        case 'f':
+        case 'F':
+            return 15;
         }
 
         throw new java.io.IOException(); // Should never come here
@@ -109,36 +106,27 @@ public final class ASCII_UCodeESC_CharStream {
 
         try {
             if (wrapAround) {
-                System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize
-                        - tokenBegin);
-                System.arraycopy(buffer, 0, newbuffer, bufsize - tokenBegin,
-                        bufpos);
+                System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize - tokenBegin);
+                System.arraycopy(buffer, 0, newbuffer, bufsize - tokenBegin, bufpos);
                 buffer = newbuffer;
 
-                System.arraycopy(bufline, tokenBegin, newbufline, 0, bufsize
-                        - tokenBegin);
-                System.arraycopy(bufline, 0, newbufline, bufsize - tokenBegin,
-                        bufpos);
+                System.arraycopy(bufline, tokenBegin, newbufline, 0, bufsize - tokenBegin);
+                System.arraycopy(bufline, 0, newbufline, bufsize - tokenBegin, bufpos);
                 bufline = newbufline;
 
-                System.arraycopy(bufcolumn, tokenBegin, newbufcolumn, 0,
-                        bufsize - tokenBegin);
-                System.arraycopy(bufcolumn, 0, newbufcolumn, bufsize
-                        - tokenBegin, bufpos);
+                System.arraycopy(bufcolumn, tokenBegin, newbufcolumn, 0, bufsize - tokenBegin);
+                System.arraycopy(bufcolumn, 0, newbufcolumn, bufsize - tokenBegin, bufpos);
                 bufcolumn = newbufcolumn;
 
                 bufpos += (bufsize - tokenBegin);
             } else {
-                System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize
-                        - tokenBegin);
+                System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize - tokenBegin);
                 buffer = newbuffer;
 
-                System.arraycopy(bufline, tokenBegin, newbufline, 0, bufsize
-                        - tokenBegin);
+                System.arraycopy(bufline, tokenBegin, newbufline, 0, bufsize - tokenBegin);
                 bufline = newbufline;
 
-                System.arraycopy(bufcolumn, tokenBegin, newbufcolumn, 0,
-                        bufsize - tokenBegin);
+                System.arraycopy(bufcolumn, tokenBegin, newbufcolumn, 0, bufsize - tokenBegin);
                 bufcolumn = newbufcolumn;
 
                 bufpos -= tokenBegin;
@@ -157,8 +145,7 @@ public final class ASCII_UCodeESC_CharStream {
             maxNextCharInd = nextCharInd = 0;
 
         try {
-            if ((i = inputStream.read(nextCharBuf, maxNextCharInd,
-                    4096 - maxNextCharInd)) == -1) {
+            if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
                 inputStream.close();
                 throw new java.io.IOException();
             } else
@@ -186,8 +173,7 @@ public final class ASCII_UCodeESC_CharStream {
     public final char BeginToken() throws java.io.IOException {
         if (inBuf > 0) {
             --inBuf;
-            return buffer[tokenBegin = (bufpos == bufsize - 1) ? (bufpos = 0)
-                    : ++bufpos];
+            return buffer[tokenBegin = (bufpos == bufsize - 1) ? (bufpos = 0) : ++bufpos];
         }
 
         tokenBegin = 0;
@@ -226,18 +212,18 @@ public final class ASCII_UCodeESC_CharStream {
         }
 
         switch (c) {
-            case '\r':
-                prevCharIsCR = true;
-                break;
-            case '\n':
-                prevCharIsLF = true;
-                break;
-            case '\t':
-                column--;
-                column += (8 - (column & 07));
-                break;
-            default:
-                break;
+        case '\r':
+            prevCharIsCR = true;
+            break;
+        case '\n':
+            prevCharIsLF = true;
+            break;
+        case '\t':
+            column--;
+            column += (8 - (column & 07));
+            break;
+        default:
+            break;
         }
 
         bufline[bufpos] = line;
@@ -260,7 +246,7 @@ public final class ASCII_UCodeESC_CharStream {
 
             int backSlashCnt = 1;
 
-            for (; ; ) // Read all the backslashes
+            for (;;) // Read all the backslashes
             {
                 if (++bufpos == available)
                     AdjustBuffSize();
@@ -295,14 +281,15 @@ public final class ASCII_UCodeESC_CharStream {
                 while ((c = (char) ((char) 0xff & ReadByte())) == 'u')
                     ++column;
 
-                buffer[bufpos] = c = (char) (hexval(c) << 12
-                        | hexval((char) ((char) 0xff & ReadByte())) << 8
-                        | hexval((char) ((char) 0xff & ReadByte())) << 4 | hexval((char) ((char) 0xff & ReadByte())));
+                buffer[bufpos] =
+                    c = (char) (hexval(c) << 12 | hexval((char) ((char) 0xff & ReadByte())) << 8
+                            | hexval((char) ((char) 0xff & ReadByte())) << 4
+                            | hexval((char) ((char) 0xff & ReadByte())));
 
                 column += 4;
             } catch (java.io.IOException e) {
-                throw new Error("Invalid escape character at line " + line
-                        + " column " + column + ".");
+                throw new Error(
+                    "Invalid escape character at line " + line + " column " + column + ".");
             }
 
             if (backSlashCnt == 1)
@@ -358,8 +345,7 @@ public final class ASCII_UCodeESC_CharStream {
             bufpos += bufsize;
     }
 
-    public void ReInit(java.io.Reader dstream, int startline, int startcolumn,
-                       int buffersize) {
+    public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
         inputStream = dstream;
         line = startline;
         column = startcolumn - 1;
@@ -380,14 +366,12 @@ public final class ASCII_UCodeESC_CharStream {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline,
-                       int startcolumn, int buffersize) {
-        ReInit(new java.io.InputStreamReader(dstream), startline, startcolumn,
-                4096);
+    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn,
+            int buffersize) {
+        ReInit(new java.io.InputStreamReader(dstream), startline, startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline,
-                       int startcolumn) {
+    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn) {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 
@@ -405,8 +389,7 @@ public final class ASCII_UCodeESC_CharStream {
         if ((bufpos + 1) >= len)
             System.arraycopy(buffer, bufpos - len + 1, ret, 0, len);
         else {
-            System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0, len
-                    - bufpos - 1);
+            System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0, len - bufpos - 1);
             System.arraycopy(buffer, 0, ret, len - bufpos - 1, bufpos + 1);
         }
 
@@ -436,9 +419,7 @@ public final class ASCII_UCodeESC_CharStream {
         int i = 0, j = 0, k = 0;
         int nextColDiff = 0, columnDiff = 0;
 
-        while (i < len
-                && bufline[j = start % bufsize] == bufline[k = ++start
-                % bufsize]) {
+        while (i < len && bufline[j = start % bufsize] == bufline[k = ++start % bufsize]) {
             bufline[j] = newLine;
             nextColDiff = columnDiff + bufcolumn[k] - bufcolumn[j];
             bufcolumn[j] = newCol + columnDiff;

@@ -6,14 +6,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * Projection that can store and returns an arbitrary term or formula. Objects
- * of this class are mainly used like bound variables and together with features
- * like <code>LetFeature</code> and <code>ForEachCP</code>.
+ * Projection that can store and returns an arbitrary term or formula. Objects of this class are
+ * mainly used like bound variables and together with features like <code>LetFeature</code> and
+ * <code>ForEachCP</code>.
  */
 public class TermBuffer implements ProjectionToTerm {
 
     private Term t = null;
-    
+
     public Term getContent() {
         return t;
     }

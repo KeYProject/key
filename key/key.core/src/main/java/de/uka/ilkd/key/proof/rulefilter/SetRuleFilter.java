@@ -10,14 +10,14 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet<Rule> set = new LinkedHashSet<Rule> ();
+    private HashSet<Rule> set = new LinkedHashSet<Rule>();
 
-    public void addRuleToSet ( Rule rule ) {
-    	set.add(rule);
+    public void addRuleToSet(Rule rule) {
+        set.add(rule);
     }
 
-    public boolean filter( Rule rule ) {
-        return set.contains ( rule );
+    public boolean filter(Rule rule) {
+        return set.contains(rule);
     }
 
     public boolean isEmpty() {

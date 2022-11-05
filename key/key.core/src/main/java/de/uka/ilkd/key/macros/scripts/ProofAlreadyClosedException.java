@@ -3,10 +3,9 @@ package de.uka.ilkd.key.macros.scripts;
 import java.net.URL;
 
 /**
- * Thrown if during the execution of a command, the proof is already closed. May
- * or may not lead to exceptional termination of the whole script based on the
- * <code>@failonclosed</code> setting.
- * 
+ * Thrown if during the execution of a command, the proof is already closed. May or may not lead to
+ * exceptional termination of the whole script based on the <code>@failonclosed</code> setting.
+ *
  * @author Dominic Steinhoefel
  */
 public class ProofAlreadyClosedException extends ScriptException {

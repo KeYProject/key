@@ -3,11 +3,11 @@ package de.uka.ilkd.key.macros.scripts.meta;
 /**
  * Currently not implemented in {@link ArgumentsLifter}
  * <p>
- * Used to mark flag for proof script commands.
- * For example "instantitate formula='...' ... hide" is denoted as
+ * Used to mark flag for proof script commands. For example "instantitate formula='...' ... hide" is
+ * denoted as
  * <p>
  * <code><pre>
- * @Flag(name="hide"}
+ * &#64;Flag(name="hide"}
  * boolean hideFormula.
  * </pre></code>
  * <p>

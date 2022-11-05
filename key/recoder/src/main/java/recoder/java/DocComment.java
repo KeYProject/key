@@ -55,8 +55,7 @@ public class DocComment extends Comment {
     }
 
     /**
-     * Factory method that creates a tag info object that can analyze this
-     * comment.
+     * Factory method that creates a tag info object that can analyze this comment.
      *
      * @return a tag info object describing the tags in this comment.
      * @see recoder.java.TagInfo

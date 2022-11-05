@@ -13,37 +13,31 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * A lattice for all predicates accepting the given sort. This lattice consists
- * of 2^n + 1 elements, where n is the number of applicable predicates. Each
- * element is a conjunction of the given predicates. The last element is a top
- * element which is true for all inputs.
+ * A lattice for all predicates accepting the given sort. This lattice consists of 2^n + 1 elements,
+ * where n is the number of applicable predicates. Each element is a conjunction of the given
+ * predicates. The last element is a top element which is true for all inputs.
  * <p>
- * It may happen that certain elements of the lattice are equivalent to the
- * bottom element, since the respective combinations of predicates are
- * unsatisfiable. It should however not happen that combinations of predicates
- * are valid, that is they equal the top element. For efficiency reasons, the
- * lattice is only lazily generated on-demand by the iterator. Therefore, the
- * unsatisfiable combinations cannot be removed at generation time.
+ * It may happen that certain elements of the lattice are equivalent to the bottom element, since
+ * the respective combinations of predicates are unsatisfiable. It should however not happen that
+ * combinations of predicates are valid, that is they equal the top element. For efficiency reasons,
+ * the lattice is only lazily generated on-demand by the iterator. Therefore, the unsatisfiable
+ * combinations cannot be removed at generation time.
  *
  * @author Dominic Scheurer
  */
-public class ConjunctivePredicateAbstractionLattice extends
-        AbstractPredicateAbstractionLattice {
+public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_AND_";
 
-    private List<AbstractionPredicate> predicates =
-            new ArrayList<AbstractionPredicate>();
+    private List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
 
     /**
-     * Constructs a new {@link ConjunctivePredicateAbstractionLattice} for the
-     * given list of applicable predicates. The caller is responsible for making
-     * sure that none of the predicates is valid.
+     * Constructs a new {@link ConjunctivePredicateAbstractionLattice} for the given list of
+     * applicable predicates. The caller is responsible for making sure that none of the predicates
+     * is valid.
      *
-     * @param applicablePredicates
-     *            The predicates to generate the lattice from.
+     * @param applicablePredicates The predicates to generate the lattice from.
      */
-    public ConjunctivePredicateAbstractionLattice(
-            List<AbstractionPredicate> applicablePredicates) {
+    public ConjunctivePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();
 
         assert predicates != null : "Do not call this constructor with a null argument.";
@@ -52,27 +46,25 @@ public class ConjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice#join(de.uka.ilkd
+     *
+     * @see de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice#join(de.uka.ilkd
      * .key.axiom_abstraction.AbstractDomainElement,
      * de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement)
      */
     @Override
-    public AbstractDomainElement join(AbstractDomainElement a,
-            AbstractDomainElement b) {
+    public AbstractDomainElement join(AbstractDomainElement a, AbstractDomainElement b) {
         /*
-         * The join result is a PredicateAbstractionDomainElement constructed of
-         * the intersection of the respective predicates.
+         * The join result is a PredicateAbstractionDomainElement constructed of the intersection of
+         * the respective predicates.
          */
         return super.join(a, b, (set1, set2) -> (set1.intersect(set2)),
-                set -> new ConjunctivePredicateAbstractionDomainElement(set));
+            set -> new ConjunctivePredicateAbstractionDomainElement(set));
     }
 
     /**
-     * The iterator for this lattice will first return the bottom element, then
-     * all conjunctions of length n of the predicates, then all conjunctions of
-     * length n-1, and so on, until finally the top element is returned.
+     * The iterator for this lattice will first return the bottom element, then all conjunctions of
+     * length n of the predicates, then all conjunctions of length n-1, and so on, until finally the
+     * top element is returned.
      */
     @Override
     public Iterator<AbstractDomainElement> iterator() {
@@ -90,7 +82,7 @@ public class ConjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -107,26 +99,25 @@ public class ConjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "Conjunctive Predicate Abstraction Lattice of size " + size()
-                + " with predicates " + predicates.toString();
+        return "Conjunctive Predicate Abstraction Lattice of size " + size() + " with predicates "
+            + predicates.toString();
     }
 
     /**
      * @see ConjunctivePredicateAbstractionLattice#iterator()
      */
-    private class PredicateLatticeIterator extends
-            AbstractPredicateLatticeIterator {
+    private class PredicateLatticeIterator extends AbstractPredicateLatticeIterator {
         private int nrZeroes = -1;
         private int idx = 0;
 
         /**
-         * Constructs a new {@link PredicateLatticeIterator}; initializes the
-         * bit sets for the iteration.
+         * Constructs a new {@link PredicateLatticeIterator}; initializes the bit sets for the
+         * iteration.
          */
         public PredicateLatticeIterator() {
             super(predicates == null ? 0 : predicates.size());
@@ -143,7 +134,7 @@ public class ConjunctivePredicateAbstractionLattice extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Iterator#hasNext()
          */
         @Override
@@ -153,7 +144,7 @@ public class ConjunctivePredicateAbstractionLattice extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Iterator#next()
          */
         @Override
@@ -169,32 +160,27 @@ public class ConjunctivePredicateAbstractionLattice extends
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
-                    DefaultImmutableSet.<AbstractionPredicate> nil();
+                DefaultImmutableSet.<AbstractionPredicate>nil();
 
-            ImmutableFixedLengthBitSet currBitSet =
-                    getBitSetsByNumZeroes().get(nrZeroes).get(idx);
+            ImmutableFixedLengthBitSet currBitSet = getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 
             for (int nonZeroPosition : currBitSet.getNonzeroPositions()) {
                 try {
                     predicatesForElem =
-                            predicatesForElem.addUnique(predicates
-                                    .get(nonZeroPosition));
-                }
-                catch (NotUniqueException e) {
+                        predicatesForElem.addUnique(predicates.get(nonZeroPosition));
+                } catch (NotUniqueException e) {
                     // Not unique -- just don't add
                 }
             }
 
             if (getBitSetsByNumZeroes().get(nrZeroes).size() - 1 > idx) {
                 idx++;
-            }
-            else {
+            } else {
                 nrZeroes++;
                 idx = 0;
             }
 
-            return new ConjunctivePredicateAbstractionDomainElement(
-                    predicatesForElem);
+            return new ConjunctivePredicateAbstractionDomainElement(predicatesForElem);
         }
     }
 

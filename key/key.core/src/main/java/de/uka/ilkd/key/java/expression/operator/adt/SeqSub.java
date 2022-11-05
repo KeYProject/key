@@ -17,36 +17,36 @@ public class SeqSub extends Operator {
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return PREFIX;
     }
 
 
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqSub(this);
+        v.performActionOnSeqSub(this);
     }
 
 
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqSub(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 3;
+        return 3;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         // bugfix, this used to return the join for the the first two arguments'

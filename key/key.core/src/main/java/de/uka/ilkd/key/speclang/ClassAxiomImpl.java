@@ -25,6 +25,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Represents an axiom specified in a class.
+ *
  * @author bruns
  *
  */
@@ -37,43 +38,38 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
 
-    /** JML axioms may not be declared static, but they may be used like static specifications.
-     * This is the case when it does not refer to an instance.
+    /**
+     * JML axioms may not be declared static, but they may be used like static specifications. This
+     * is the case when it does not refer to an instance.
      */
     private final boolean isStatic;
 
 
-    public ClassAxiomImpl(String name,
-	    KeYJavaType kjt,
-	    VisibilityModifier visibility,
-	    Term rep,
-	    ProgramVariable selfVar) {
-	assert name != null;
-	assert kjt != null;
-	this.name = name;
-	this.kjt = kjt;
-	this.visibility = visibility;
-	this.originalRep = rep;
-	this.originalSelfVar = selfVar;
-	final OpCollector oc = new OpCollector();
-	originalRep.execPostOrder(oc);
-	this.isStatic        = !oc.contains(originalSelfVar);
+    public ClassAxiomImpl(String name, KeYJavaType kjt, VisibilityModifier visibility, Term rep,
+            ProgramVariable selfVar) {
+        assert name != null;
+        assert kjt != null;
+        this.name = name;
+        this.kjt = kjt;
+        this.visibility = visibility;
+        this.originalRep = rep;
+        this.originalSelfVar = selfVar;
+        final OpCollector oc = new OpCollector();
+        originalRep.execPostOrder(oc);
+        this.isStatic = !oc.contains(originalSelfVar);
     }
 
 
-    public ClassAxiomImpl(String name, String displayName,
-        KeYJavaType kjt,
-        VisibilityModifier visibility,
-        Term rep,
-        ProgramVariable selfVar) {
-        this(name,kjt,visibility,rep,selfVar);
+    public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
+            VisibilityModifier visibility, Term rep, ProgramVariable selfVar) {
+        this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }
 
     @Override
     public ClassAxiomImpl map(UnaryOperator<Term> op, Services services) {
-        return new ClassAxiomImpl(
-                name, name, kjt, visibility, op.apply(originalRep), originalSelfVar);
+        return new ClassAxiomImpl(name, name, kjt, visibility, op.apply(originalRep),
+            originalSelfVar);
     }
 
 
@@ -107,36 +103,33 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
     @Override
     public int hashCode() {
-       return 17*(name.hashCode() + 17 * kjt.hashCode()) + (isStatic ? 13 : 7);
+        return 17 * (name.hashCode() + 17 * kjt.hashCode()) + (isStatic ? 13 : 7);
     }
 
     @Override
     public String getName() {
-	return name;
+        return name;
     }
 
 
 
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
 
 
     @Override
     public VisibilityModifier getVisibility() {
-	return visibility;
+        return visibility;
     }
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<ProgramVariable> replaceVars =
-                ImmutableSLList.<ProgramVariable>nil();
-        replaceVars = replaceVars.append(
-                services.getTypeConverter().getHeapLDT().getHeap());
+        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.<ProgramVariable>nil();
+        replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
@@ -147,24 +140,21 @@ public final class ClassAxiomImpl extends ClassAxiom {
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);
         final RuleSet ruleSet = new RuleSet(new Name("classAxiom"));
-        return taclets.add(TG.generateAxiomTaclet(tacletName, rep,
-                                                       replaceVars, kjt, ruleSet,
-                                                       services));
+        return taclets
+                .add(TG.generateAxiomTaclet(tacletName, rep, replaceVars, kjt, ruleSet, services));
     }
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
-	    Services services) {
-	return DefaultImmutableSet.nil();
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+        return DefaultImmutableSet.nil();
     }
 
 
     @Override
     public String toString() {
-	return "axiom "+originalRep.toString();
+        return "axiom " + originalRep.toString();
     }
-
 
 
 
@@ -173,7 +163,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
      */
     @Override
     public IObserverFunction getTarget() {
-	return null;
+        return null;
     }
 
 }

@@ -23,12 +23,11 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class TestParser {
     /**
-     * Test that {@code KeYParser} correctly translates {@code \include}
-     * statements into {@code Includes} instances.
+     * Test that {@code KeYParser} correctly translates {@code \include} statements into
+     * {@code Includes} instances.
      * <p>
-     * Previously, this was broken because the token source name, which is
-     * needed for includes specified by a path relative to the KeY file's
-     * location, was uninitialized.
+     * Previously, this was broken because the token source name, which is needed for includes
+     * specified by a path relative to the KeY file's location, was uninitialized.
      *
      * @throws IOException
      */
@@ -40,8 +39,7 @@ public class TestParser {
         assumeTrue(include.exists());
 
         final Includes expected = new Includes();
-        expected.put(include.toString(),
-                RuleSourceFactory.initRuleFile(include.toURI().toURL()));
+        expected.put(include.toString(), RuleSourceFactory.initRuleFile(include.toURI().toURL()));
         final String keyFile = "\\include \"" + include.getPath() + "\";";
         KeyAst.File file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
         Includes actual = file.getIncludes(new File(".").toURI().toURL());
@@ -54,9 +52,9 @@ public class TestParser {
 
     @Test
     public void testGenericSort() throws IOException {
-        String content = "\\sorts { \\generic gen; } \n\n" +
-                "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n" +
-                "\\problem { true }";
+        String content = "\\sorts { \\generic gen; } \n\n"
+            + "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n"
+            + "\\problem { true }";
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
@@ -76,8 +74,8 @@ public class TestParser {
     public void testIssue39() {
         assertThrows(ProblemLoaderException.class, () -> {
             File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file,
-                    null, null, null);
+            KeYEnvironment<DefaultUserInterfaceControl> env =
+                KeYEnvironment.load(file, null, null, null);
         });
 
     }

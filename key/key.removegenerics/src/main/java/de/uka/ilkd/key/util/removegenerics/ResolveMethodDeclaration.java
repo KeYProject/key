@@ -10,7 +10,8 @@ class ResolveMethodDeclaration extends GenericResolutionTransformation {
 
     private MethodDeclaration declaration;
 
-    public ResolveMethodDeclaration(MethodDeclaration declaration, CrossReferenceServiceConfiguration sc) {
+    public ResolveMethodDeclaration(MethodDeclaration declaration,
+            CrossReferenceServiceConfiguration sc) {
         super(sc);
         this.declaration = declaration;
     }
@@ -23,17 +24,17 @@ class ResolveMethodDeclaration extends GenericResolutionTransformation {
         } else {
             setProblemReport(EQUIVALENCE);
         }
-        
+
         return getProblemReport();
     }
-    
+
     @Override
     public void transform() {
 
-        if(getProblemReport() == IDENTITY)
+        if (getProblemReport() == IDENTITY)
             return;
-        
+
         declaration.setTypeParameters(null);
-        
+
     }
 }

@@ -58,7 +58,7 @@ abstract class ClassTypeTopSort implements Formats {
             int idx = classesDFS.indexOf(c);
             if (idx == -1) {
                 Debug.error(Format.toString("Could not find " + ELEMENT_LONG, c) + "\nList: "
-                        + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
+                    + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
                 System.exit(0);
             }
             if (decrIndeg(idx) == 0) {

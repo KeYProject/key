@@ -8,8 +8,7 @@ import java.io.IOException;
  * @version 1 (22.07.19)
  */
 public enum MaterialDesignRegular implements IconFont {
-    _3D_ROTATION('\ue84d'),
-    AC_UNIT('\ueb3b'),
+    _3D_ROTATION('\ue84d'), AC_UNIT('\ueb3b'),
 
     ACCESS_ALARM('\ue190'),
 
@@ -31,20 +30,10 @@ public enum MaterialDesignRegular implements IconFont {
 
     ADB('\ue60e'),
 
-    ADD('\ue145'),
-    ADD_A_PHOTO('\ue439'),
-    ADD_ALARM('\ue193'),
-    ADD_ALERT('\ue003'),
-    ADD_BOX('\ue146'),
-    ADD_CIRCLE('\ue147'),
-    ADD_CIRCLE_OUTLINE('\ue148'),
-    ADD_LOCATION('\ue567'),
-    ADD_SHOPPING_CART('\ue854'),
-    ADD_TO_PHOTOS('\ue39d'),
-    ADD_TO_QUEUE('\ue05c'),
-    ADJUST('\ue39e'),
-    AIRLINE_SEAT_FLAT('\ue630'),
-    AIRLINE_SEAT_FLAT_ANGLED('\ue631'),
+    ADD('\ue145'), ADD_A_PHOTO('\ue439'), ADD_ALARM('\ue193'), ADD_ALERT('\ue003'),
+    ADD_BOX('\ue146'), ADD_CIRCLE('\ue147'), ADD_CIRCLE_OUTLINE('\ue148'), ADD_LOCATION('\ue567'),
+    ADD_SHOPPING_CART('\ue854'), ADD_TO_PHOTOS('\ue39d'), ADD_TO_QUEUE('\ue05c'), ADJUST('\ue39e'),
+    AIRLINE_SEAT_FLAT('\ue630'), AIRLINE_SEAT_FLAT_ANGLED('\ue631'),
 
     AIRLINE_SEAT_INDIVIDUAL_SUITE('\ue632'),
 
@@ -1828,21 +1817,10 @@ public enum MaterialDesignRegular implements IconFont {
 
     WB_SUNNY('\ue430'),
 
-    WC('\ue63d'),
-    WEB('\ue051'),
-    WEB_ASSET('\ue069'),
-    WEEKEND('\ue16b'),
-    WHATSHOT('\ue80e'),
-    WIDGETS('\ue1bd'),
-    WIFI('\ue63e'),
-    WIFI_LOCK('\ue1e1'),
-    WIFI_TETHERING('\ue1e2'),
-    WORK('\ue8f9'),
-    WRAP_TEXT('\ue25b'),
-    YOUTUBE_SEARCHED_FOR('\ue8fa'),
-    ZOOM_IN('\ue8ff'),
-    ZOOM_OUT('\ue900'),
-    ZOOM_OUT_MAP('\ue56b');
+    WC('\ue63d'), WEB('\ue051'), WEB_ASSET('\ue069'), WEEKEND('\ue16b'), WHATSHOT('\ue80e'),
+    WIDGETS('\ue1bd'), WIFI('\ue63e'), WIFI_LOCK('\ue1e1'), WIFI_TETHERING('\ue1e2'),
+    WORK('\ue8f9'), WRAP_TEXT('\ue25b'), YOUTUBE_SEARCHED_FOR('\ue8fa'), ZOOM_IN('\ue8ff'),
+    ZOOM_OUT('\ue900'), ZOOM_OUT_MAP('\ue56b');
 
     private char codepoint;
     private Font font;
@@ -1855,7 +1833,7 @@ public enum MaterialDesignRegular implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null)
             font = Font.createFont(Font.TRUETYPE_FONT,
-                    getClass().getResourceAsStream("/fonts/MaterialIcons-Regular.ttf"));
+                getClass().getResourceAsStream("/fonts/MaterialIcons-Regular.ttf"));
         return font;
     }
 

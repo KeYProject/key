@@ -13,27 +13,22 @@ public class Relations {
     /**
      * Structural equality and hash code for program elements.
      * <p>
-     * To be considered equal, the types of the objects must match, except for
-     * certain allowed combinations with
-     * {@link recoder.java.reference.UncollatedReferenceQualifier}s.<BR>
-     * In case of {@link recoder.java.Identifier}or
-     * {@link recoder.java.expression.Literal}s, the textual representations
-     * are compared, while {@link recoder.java.declaration.Modifier}are
+     * To be considered equal, the types of the objects must match, except for certain allowed
+     * combinations with {@link recoder.java.reference.UncollatedReferenceQualifier}s.<BR>
+     * In case of {@link recoder.java.Identifier}or {@link recoder.java.expression.Literal}s, the
+     * textual representations are compared, while {@link recoder.java.declaration.Modifier}are
      * compared by type only. <BR>
-     * {@link recoder.java.NonTerminalProgramElement}s are compared
-     * child-by-child in the given order. Note that the corresponding iterator
-     * reports all children without separation. In case that two children of the
-     * same type play different roles (e.g. return types of methods and thrown
-     * exceptions if there was no need for a method name), this behavior must be
-     * overriden. <BR>
-     * The function does not compare comments or indentation information.
-     * Instead, the toSource method can be used to perform a more stringent
-     * comparison.
+     * {@link recoder.java.NonTerminalProgramElement}s are compared child-by-child in the given
+     * order. Note that the corresponding iterator reports all children without separation. In case
+     * that two children of the same type play different roles (e.g. return types of methods and
+     * thrown exceptions if there was no need for a method name), this behavior must be overriden.
+     * <BR>
+     * The function does not compare comments or indentation information. Instead, the toSource
+     * method can be used to perform a more stringent comparison.
      * <p>
-     * The hash code calculated takes into acount the type of the element, its
-     * name if it is a {@link recoder.java.NamedProgramElement}and the number
-     * of its children. For reasons of efficiency, no further recursion is
-     * performed.
+     * The hash code calculated takes into acount the type of the element, its name if it is a
+     * {@link recoder.java.NamedProgramElement}and the number of its children. For reasons of
+     * efficiency, no further recursion is performed.
      */
     public final static HashCode STRUCTURAL_EQUALITY = new HashCode() {
 
@@ -54,7 +49,8 @@ public class Relations {
             } else if (x == null) {
                 return 0;
             } else {
-                throw new IllegalArgumentException("Structural hashcodes are only defined for program elements");
+                throw new IllegalArgumentException(
+                    "Structural hashcodes are only defined for program elements");
             }
         }
 
@@ -84,10 +80,12 @@ public class Relations {
                 NonTerminalProgramElement b = (NonTerminalProgramElement) y;
                 int n = a.getChildCount();
                 int m = b.getChildCount();
-                if ((a instanceof ArrayLengthReference) && (b instanceof UncollatedReferenceQualifier)) {
+                if ((a instanceof ArrayLengthReference)
+                        && (b instanceof UncollatedReferenceQualifier)) {
                     m -= 1;
                 }
-                if ((b instanceof ArrayLengthReference) && (a instanceof UncollatedReferenceQualifier)) {
+                if ((b instanceof ArrayLengthReference)
+                        && (a instanceof UncollatedReferenceQualifier)) {
                     n -= 1;
                 }
                 if (n != m) {
@@ -114,7 +112,8 @@ public class Relations {
                         return ((BooleanLiteral) x).getValue() == ((BooleanLiteral) y).getValue();
                     }
                     if (x instanceof StringLiteral) {
-                        return ((StringLiteral) x).getValue().equals(((StringLiteral) y).getValue());
+                        return ((StringLiteral) x).getValue()
+                                .equals(((StringLiteral) y).getValue());
                     }
                     if (x instanceof NullLiteral) {
                         return true;
@@ -123,7 +122,8 @@ public class Relations {
                         return ((CharLiteral) x).getValue().equals(((CharLiteral) y).getValue());
                     }
                     if (x instanceof DoubleLiteral) {
-                        return ((DoubleLiteral) x).getValue().equals(((DoubleLiteral) y).getValue());
+                        return ((DoubleLiteral) x).getValue()
+                                .equals(((DoubleLiteral) y).getValue());
                     }
                     if (x instanceof LongLiteral) {
                         return ((LongLiteral) x).getValue().equals(((LongLiteral) y).getValue());
@@ -136,7 +136,8 @@ public class Relations {
                 }
                 return true;
             } else {
-                throw new IllegalArgumentException("Structural equality is only defined for program elements");
+                throw new IllegalArgumentException(
+                    "Structural equality is only defined for program elements");
             }
         }
     };
@@ -145,8 +146,7 @@ public class Relations {
      */
     public final static Order NAMED_MODEL_ELEMENT_ORDER = new ModelElementLexicalOrder("%n");
     /**
-     * Lexical order objects comparing full names, positions and units if
-     * necessary.
+     * Lexical order objects comparing full names, positions and units if necessary.
      */
     public final static Order UNAMBIGUOUS_ORDER = new ModelElementLexicalOrder("%u|%p|%N");
 
@@ -166,7 +166,8 @@ public class Relations {
         }
 
         public boolean isComparable(Object x, Object y) {
-            return (x == null && y == null) || ((x instanceof ModelElement) && (y instanceof ModelElement));
+            return (x == null && y == null)
+                    || ((x instanceof ModelElement) && (y instanceof ModelElement));
         }
 
         protected String toString(Object x) {

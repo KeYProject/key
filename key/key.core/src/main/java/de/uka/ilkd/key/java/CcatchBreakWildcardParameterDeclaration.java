@@ -11,8 +11,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchBreakWildcardParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     public CcatchBreakWildcardParameterDeclaration(ExtList children) {
     }

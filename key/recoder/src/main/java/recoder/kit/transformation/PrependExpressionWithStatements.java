@@ -15,8 +15,8 @@ import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 
 /**
- * Transformation that prepends a given expression (such as a method or variable
- * reference) with a statement or a list of statements.
+ * Transformation that prepends a given expression (such as a method or variable reference) with a
+ * statement or a list of statements.
  *
  * @author AL
  */
@@ -29,15 +29,15 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
     private ShiftPreceedingStatementExpressions shifter;
 
     /**
-     * Creates a new transformation object that inserts the given statements
-     * such that no state changes take place between the statements and the
-     * evaluation of the expression.
+     * Creates a new transformation object that inserts the given statements such that no state
+     * changes take place between the statements and the evaluation of the expression.
      *
-     * @param sc         the service configuration to use.
-     * @param x          the expression that shall be prepended.
+     * @param sc the service configuration to use.
+     * @param x the expression that shall be prepended.
      * @param statements the statements to prepend.
      */
-    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, ASTList<Statement> statements) {
+    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
+            ASTList<Statement> statements) {
         super(sc);
         if (x == null) {
             throw new IllegalArgumentException("Missing expression");
@@ -50,22 +50,21 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
     }
 
     /**
-     * Creates a new transformation object that inserts the given statement such
-     * that no state changes take place between the statement and the evaluation
-     * of the expression.
+     * Creates a new transformation object that inserts the given statement such that no state
+     * changes take place between the statement and the evaluation of the expression.
      *
-     * @param sc        the service configuration to use.
-     * @param x         the expression that shall be prepended.
+     * @param sc the service configuration to use.
+     * @param x the expression that shall be prepended.
      * @param statement the statement to prepend.
      */
-    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, Statement statement) {
+    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
+            Statement statement) {
         this(sc, x, new ASTArrayList<Statement>(statement));
     }
 
     /**
-     * @return the problem report, may be
-     * {@link recoder.kit.Transformation#IDENTITY}, or
-     * {@link recoder.kit.Transformation#EQUIVALENCE}.
+     * @return the problem report, may be {@link recoder.kit.Transformation#IDENTITY}, or
+     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
         if (statements.isEmpty()) {
@@ -88,8 +87,8 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
             int j = statements.size();
             if (i >= j) {
                 for (--j, --i; j >= 0; --j, --i) {
-                    if (!ProgramElement.STRUCTURAL_EQUALITY.equals(statements.get(j), grandpa
-                            .getStatementAt(i))) {
+                    if (!ProgramElement.STRUCTURAL_EQUALITY.equals(statements.get(j),
+                        grandpa.getStatementAt(i))) {
                         break;
                     }
                 }
@@ -112,7 +111,8 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         shifter.transform();
         Statement statement = shifter.getEnclosingStatement();
         // this is a syntactic transformation!
-        PrepareStatementList preparer = new PrepareStatementList(getServiceConfiguration(), statement, true);
+        PrepareStatementList preparer =
+            new PrepareStatementList(getServiceConfiguration(), statement, true);
         preparer.execute();
         ASTList<Statement> body = preparer.getStatementList();
         // the statement might have been cloned

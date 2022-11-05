@@ -17,15 +17,15 @@ public class SumProdHandler implements SMTHandler {
 
     private Function bsumOp, bprodOp;
 
-    //key is the term to identify the bsum, value is the name used for that function.
+    // key is the term to identify the bsum, value is the name used for that function.
     private final HashMap<Term, SExpr> usedBsumTerms = new LinkedHashMap();
 
-    //key is the term to identify the bprod, value is the name used for that function.
+    // key is the term to identify the bprod, value is the name used for that function.
     private final HashMap<Term, SExpr> usedBprodTerms = new LinkedHashMap();
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         bsumOp = services.getTypeConverter().getIntegerLDT().getBsum();
         bprodOp = services.getTypeConverter().getIntegerLDT().getBprod();
     }
@@ -68,14 +68,13 @@ public class SumProdHandler implements SMTHandler {
             SExpr ret = new SExpr("bprod" + s, IntegerOpHandler.INT, exprs);
             usedBprodTerms.put(term, ret);
             return ret;
-        } else { //unreachable
+        } else { // unreachable
             return new SExpr("ERROR");
         }
     }
 
     private SExpr bsumOrProdDecl(String fun, String number) {
-        return new SExpr("declare-fun", IntegerOpHandler.INT,
-                new SExpr(fun + number),
-                new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));
+        return new SExpr("declare-fun", IntegerOpHandler.INT, new SExpr(fun + number),
+            new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));
     }
 }

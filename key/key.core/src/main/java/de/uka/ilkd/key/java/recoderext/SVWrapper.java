@@ -6,6 +6,7 @@ public interface SVWrapper {
 
     /**
      * sets the schema variable of sort statement
+     *
      * @param sv the SchemaVariable to wrap
      */
     void setSV(SchemaVariable sv);

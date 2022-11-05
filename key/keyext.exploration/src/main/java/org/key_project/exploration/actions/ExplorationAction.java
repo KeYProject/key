@@ -28,15 +28,15 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     Term promptForTerm(MainWindow window, Term term) {
-        final String initialValue = term == null
-                ? ""
-                : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
+        final String initialValue =
+            term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 
         Term result = null;
 
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-            if (input == null) return null;
+            if (input == null)
+                return null;
 
             KeyIO io = new KeyIO(window.getMediator().getServices());
             try {
@@ -44,14 +44,14 @@ public abstract class ExplorationAction extends MainWindowAction {
 
                 if (term != null && !result.sort().equals(term.sort())) {
                     JOptionPane.showMessageDialog(window,
-                            String.format("%s is of sort %s, but we need a term of sort %s",
-                                    result, result.sort(), term.sort()),
-                            "Sort mismatch", JOptionPane.ERROR_MESSAGE);
+                        String.format("%s is of sort %s, but we need a term of sort %s", result,
+                            result.sort(), term.sort()),
+                        "Sort mismatch", JOptionPane.ERROR_MESSAGE);
                     result = null;
                 }
             } catch (BuildingException e) {
-                JOptionPane.showMessageDialog(window, e.getMessage(),
-                        "Malformed input", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(window, e.getMessage(), "Malformed input",
+                    JOptionPane.ERROR_MESSAGE);
             }
         }
 
