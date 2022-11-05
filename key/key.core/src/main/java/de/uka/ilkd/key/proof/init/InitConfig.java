@@ -86,8 +86,8 @@ public class InitConfig {
     public InitConfig(Services services) {
         this.services = services;
 
-        category2DefaultChoice =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+        category2DefaultChoice = new HashMap<>(
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices());
     }
 
 
