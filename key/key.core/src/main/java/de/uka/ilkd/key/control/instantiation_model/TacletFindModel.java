@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -276,6 +277,12 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     private Term addOrigin(Term term) {
+
+        if (term.getOriginRef() == null) {
+            term = services.getTermFactory().atomize(term);
+            term = services.getTermFactory().setOriginRefTypeRecursive(term, OriginRefType.USER_INTERACTION, true);
+        }
+
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
             return services.getTermBuilder().addLabelToAllSubs(
                 OriginTermLabel.removeOriginLabels(term, services),

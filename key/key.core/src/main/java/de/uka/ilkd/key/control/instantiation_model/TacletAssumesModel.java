@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.nparser.KeyIO;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
@@ -123,6 +124,9 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             }
 
             Term term = parseFormula(manualInput);
+
+            term = services.getTermFactory().atomize(term);
+            term = services.getTermFactory().setOriginRefTypeRecursive(term, OriginRefType.USER_INTERACTION, true);
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
                     .getUseOriginLabels()) {

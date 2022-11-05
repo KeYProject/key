@@ -65,6 +65,41 @@ public class SequentBackTransformer {
         return new PositionMap(pos);
     }
 
+    private ArrayList<InsertionTerm> extractAntecedentTerms(boolean continueOnError) throws TransformException {
+        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
+
+        for (SequentFormula sf : sequent.antecedent()) {
+
+            Term topTerm = sf.formula();
+
+            if (topTerm.containsJavaBlockRecursive()) {
+                if (continueOnError) {
+                    result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, topTerm));
+                    continue;
+                }
+                throw new TransformException("Cannot transform antecedent formula with modularities");
+            }
+
+            var split = splitFormula(topTerm, Junctor.AND);
+
+            for (var term : split) {
+                if (isRequires(term)) {
+                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
+                } else if (isUserInteraction(term)) {
+                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
+                } else {
+                    if (continueOnError) {
+                        result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term));
+                        continue;
+                    }
+                    throw new TransformException("Failed to categorize antecedent-term '" + term + "'");
+                }
+            }
+        }
+
+        return result;
+    }
+
     private ArrayList<InsertionTerm> extractSuccedentTerms(boolean continueOnError)
             throws TransformException {
         ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
@@ -79,8 +114,7 @@ public class SequentBackTransformer {
                     result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, topTerm));
                     continue;
                 }
-                throw new TransformException(
-                    "Cannot transform succedent formula with modularities");
+                throw new TransformException("Cannot transform succedent formula with modularities");
             }
 
             var split = splitFormula(topTerm, Junctor.AND);
@@ -88,8 +122,7 @@ public class SequentBackTransformer {
             boolean ensuresInSplit = false;
             for (var term : split) {
                 if (isRequires(term)) {
-                    // special-case, an [assume] in the succedent (e.g. by applying teh notLeft
-                    // taclet)
+                    // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
                     result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
                 } else if (isEnsures(term)) {
                     if (ensuresInResult) {
@@ -97,10 +130,8 @@ public class SequentBackTransformer {
                             result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
                             continue;
                         }
-                        throw new TransformException(
-                            "Cannot transform sequent with multiple 'real' succedents"); // TODO how
-                                                                                         // to
-                                                                                         // display?
+                        // TODO how to display?
+                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
                     }
                     result.add(new InsertionTerm(InsertionType.ASSERT, term));
                     ensuresInSplit = true;
@@ -110,13 +141,13 @@ public class SequentBackTransformer {
                             result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
                             continue;
                         }
-                        throw new TransformException(
-                            "Cannot transform sequent with multiple 'real' succedents"); // TODO how
-                                                                                         // to
-                                                                                         // display?
+                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
                     }
                     result.add(new InsertionTerm(InsertionType.ASSIGNABLE, term));
                     ensuresInSplit = true;
+                } else if (isUserInteraction(term)) {
+                    // special-case, an [user_interaction] in the succedent (probably cut)
+                    result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
                 } else {
                     if (continueOnError) {
                         result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
@@ -128,42 +159,6 @@ public class SequentBackTransformer {
             }
             if (ensuresInSplit) {
                 ensuresInResult = true;
-            }
-        }
-
-        return result;
-    }
-
-    private ArrayList<InsertionTerm> extractAntecedentTerms(boolean continueOnError)
-            throws TransformException {
-        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
-
-        for (SequentFormula sf : sequent.antecedent()) {
-
-            Term topTerm = sf.formula();
-
-            if (topTerm.containsJavaBlockRecursive()) {
-                if (continueOnError) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, topTerm));
-                    continue;
-                }
-                throw new TransformException(
-                    "Cannot transform antecedent formula with modularities");
-            }
-
-            var split = splitFormula(topTerm, Junctor.AND);
-
-            for (var term : split) {
-                if (isRequires(term)) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
-                } else {
-                    if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term));
-                        continue;
-                    }
-                    throw new TransformException(
-                        "Failed to categorize antecedent-term '" + term + "'");
-                }
             }
         }
 
@@ -205,6 +200,19 @@ public class SequentBackTransformer {
             return false;
 
         return origins.stream().allMatch(p -> p.Type.isEnsures());
+    }
+
+    private boolean isUserInteraction(Term term) {
+        if (term.containsJavaBlockRecursive())
+            return false;
+
+        var origins = getSubOriginRefs(term, true).stream()
+                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
+        if (origins.size() == 0)
+            return false;
+
+        return origins.stream().allMatch(p -> p.Type.isUserInteraction());
     }
 
     private boolean isAssignable(Term term) {
