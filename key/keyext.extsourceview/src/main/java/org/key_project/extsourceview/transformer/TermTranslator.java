@@ -281,6 +281,12 @@ public class TermTranslator {
             return "\\invariant_for(this)";
         }
 
+        if (term.op().name().toString().equals("not")
+                && term.sub(0).op().name().toString().equals("equals")
+                && term.sub(0).arity() == 2) {
+            return String.format("%s != %s", bracketTranslate(term.sub(0), term.sub(0).sub(0)), bracketTranslate(term.sub(0), term.sub(0).sub(1)));
+        }
+
         // try to manually build the JML
 
         if (term.op() instanceof LocationVariable && term.arity() == 0) {
@@ -314,11 +320,7 @@ public class TermTranslator {
 
             Object[] p = new String[term.arity()];
             for (int i = 0; i < term.arity(); i++) {
-                if (needsBrackets(term, term.sub(i))) {
-                    p[i] = "(" + translate(term.sub(i)) + ")";
-                } else {
-                    p[i] = translate(term.sub(i));
-                }
+                p[i] = bracketTranslate(term, term.sub(i));
             }
             return String.format(fmt, p);
         }
@@ -334,6 +336,14 @@ public class TermTranslator {
         }
 
         throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
+    }
+
+    private String bracketTranslate(Term base, Term child) throws TransformException {
+        if (needsBrackets(base, child)) {
+            return "(" + translate(child) + ")";
+        } else {
+            return translate(child);
+        }
     }
 
     private boolean needsBrackets(Term base, Term child) {
