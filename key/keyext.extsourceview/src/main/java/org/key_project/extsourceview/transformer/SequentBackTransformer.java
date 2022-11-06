@@ -35,14 +35,7 @@ public class SequentBackTransformer {
     }
 
     public InsertionSet extract(boolean continueOnError) throws TransformException {
-        var ante = extractAntecedentTerms(continueOnError);
-        var succ = extractSuccedentTerms(continueOnError);
-
-        var result = new ArrayList<InsertionTerm>();
-        result.addAll(ante);
-        result.addAll(succ);
-
-        return new InsertionSet(ImmutableList.fromList(result));
+        return new InsertionSet(ImmutableList.fromList(extractTerms(continueOnError)));
 
     }
 
@@ -65,115 +58,99 @@ public class SequentBackTransformer {
         return new PositionMap(pos);
     }
 
-    private ArrayList<InsertionTerm> extractAntecedentTerms(boolean continueOnError) throws TransformException {
-        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
+    private ArrayList<InsertionTerm> extractTerms(boolean continueOnError) throws TransformException {
+
+        ArrayList<InsertionTerm> result = new ArrayList<>();
+
+        boolean completeAssertSetInResult = false;
 
         for (SequentFormula sf : sequent.antecedent()) {
-
-            Term topTerm = sf.formula();
-
-            if (topTerm.containsJavaBlockRecursive()) {
-                if (continueOnError) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, topTerm));
-                    continue;
-                }
-                throw new TransformException("Cannot transform antecedent formula with modularities");
-            }
-
-            var split = splitFormula(topTerm, Junctor.AND);
+            List<Term> split = splitFormula(sf.formula(), Junctor.AND);
 
             for (var term : split) {
-                if (isRequires(term)) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
-                } else if (isUserInteraction(term)) {
-                    result.add(new InsertionTerm(InsertionType.ASSUME, term));
-                } else {
+                try {
+                    InsertionTerm insterm = categorizeTerm(term, true);
+                    if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
+                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    }
+                    result.add(insterm);
+                } catch (TransformException e) {
                     if (continueOnError) {
                         result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term));
                         continue;
                     }
-                    throw new TransformException("Failed to categorize antecedent-term '" + term + "'");
+                    throw e;
                 }
             }
+            if (result.stream().anyMatch(p -> p.Type == InsertionType.ASSERT)) completeAssertSetInResult = true;
+
+        }
+
+        for (SequentFormula sf : sequent.succedent()) {
+            List<Term> split = splitFormula(sf.formula(), Junctor.AND);
+
+            for (var term : split) {
+                try {
+                    InsertionTerm insterm = categorizeTerm(term, false);
+                    if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
+                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    }
+                    result.add(insterm);
+                } catch (TransformException e) {
+                    if (continueOnError) {
+                        result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
+                        continue;
+                    }
+                    throw e;
+                }
+            }
+            if (result.stream().anyMatch(p -> p.Type == InsertionType.ASSERT)) completeAssertSetInResult = true;
         }
 
         return result;
     }
 
-    private ArrayList<InsertionTerm> extractSuccedentTerms(boolean continueOnError)
-            throws TransformException {
-        ArrayList<InsertionTerm> result = new ArrayList<InsertionTerm>();
+    private InsertionTerm categorizeTerm(Term term, boolean ante) throws TransformException {
 
-        boolean ensuresInResult = false;
-        for (SequentFormula sf : sequent.succedent()) {
+        boolean succ = !ante;
 
-            Term topTerm = sf.formula();
-
-            if (topTerm.containsJavaBlockRecursive()) {
-                if (continueOnError) {
-                    result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, topTerm));
-                    continue;
-                }
-                throw new TransformException("Cannot transform succedent formula with modularities");
-            }
-
-            var split = splitFormula(topTerm, Junctor.AND);
-
-            boolean ensuresInSplit = false;
-            for (var term : split) {
-                if (isRequires(term)) {
-                    // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
-                    result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
-                } else if (isEnsures(term)) {
-                    if (ensuresInResult) {
-                        if (continueOnError) {
-                            result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
-                            continue;
-                        }
-                        // TODO how to display?
-                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
-                    }
-                    result.add(new InsertionTerm(InsertionType.ASSERT, term));
-                    ensuresInSplit = true;
-                } else if (isAssignable(term)) {
-                    if (ensuresInResult) {
-                        if (continueOnError) {
-                            result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
-                            continue;
-                        }
-                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
-                    }
-                    result.add(new InsertionTerm(InsertionType.ASSIGNABLE, term));
-                    ensuresInSplit = true;
-                } else if (isUserInteraction(term)) {
-                    // special-case, an [user_interaction] in the succedent (probably cut)
-                    result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
-                } else if (isLoopInitiallyValid(term)) {
-                    if (ensuresInResult) {
-                        if (continueOnError) {
-                            result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
-                            continue;
-                        }
-                        // TODO how to display?
-                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
-                    }
-                    result.add(new InsertionTerm(InsertionType.ASSERT, term));
-                    ensuresInSplit = true;
-                } else {
-                    if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
-                        continue;
-                    }
-                    throw new TransformException(
-                        "Failed to categorize succedent-term '" + term + "'");
-                }
-            }
-            if (ensuresInSplit) {
-                ensuresInResult = true;
-            }
+        if (term.containsJavaBlockRecursive()) {
+            throw new TransformException("Cannot transform antecedent formula with modularities");
         }
 
-        return result;
+        if (ante && isRequires(term)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (ante && isUserInteraction(term)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (succ && isRequires(term)) {
+            // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+        }
+
+        if (succ && isEnsures(term)) {
+            // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
+            return new InsertionTerm(InsertionType.ASSERT, termNot(term));
+        }
+
+        if (succ && isAssignable(term)) {
+            return new InsertionTerm(InsertionType.ASSIGNABLE, term);
+        }
+
+        if (succ && isUserInteraction(term)) {
+            // special-case, an [user_interaction] in the succedent (probably cut)
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+        }
+
+        if (succ && isLoopInitiallyValid(term)) {
+            // special-case, an [user_interaction] in the succedent (probably cut)
+            return new InsertionTerm(InsertionType.ASSERT, term);
+        }
+
+        throw new TransformException("Failed to categorize term '" + term + "'");
     }
 
     private Term termNot(Term term) {

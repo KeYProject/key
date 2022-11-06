@@ -83,7 +83,7 @@ public class TermTranslator {
 
             new AbstractMap.SimpleEntry<>("binaryOr", "%s | %s"),
             new AbstractMap.SimpleEntry<>("binaryAnd", "%s & %s"),
-            new AbstractMap.SimpleEntry<>("binaryXOr", "%s ^ %s")
+            new AbstractMap.SimpleEntry<>("binaryXOr", "%s ^ %s"),
 
             //new AbstractMap.SimpleEntry<>("orJint", ""),
             //new AbstractMap.SimpleEntry<>("orJlong", ""),
@@ -98,18 +98,18 @@ public class TermTranslator {
             //new AbstractMap.SimpleEntry<>("moduloLong", ""),
             //new AbstractMap.SimpleEntry<>("moduloChar", ""),
 
-            //new AbstractMap.SimpleEntry<>("javaUnaryMinusInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaUnaryMinusLong", ""),
+            new AbstractMap.SimpleEntry<>("javaUnaryMinusInt", "-%s"),
+            new AbstractMap.SimpleEntry<>("javaUnaryMinusLong", "-%s"),
             //new AbstractMap.SimpleEntry<>("javaBitwiseNegation", ""),
-            //new AbstractMap.SimpleEntry<>("javaAddInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaAddLong", ""),
-            //new AbstractMap.SimpleEntry<>("javaSubInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaSubLong", ""),
-            //new AbstractMap.SimpleEntry<>("javaMulInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaMulLong", ""),
-            //new AbstractMap.SimpleEntry<>("javaMod", ""),
-            //new AbstractMap.SimpleEntry<>("javaDivInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaDivLong", ""),
+            new AbstractMap.SimpleEntry<>("javaAddInt", "%s + %s"),
+            new AbstractMap.SimpleEntry<>("javaAddLong", "%s + %s"),
+            new AbstractMap.SimpleEntry<>("javaSubInt", "%s - %s"),
+            new AbstractMap.SimpleEntry<>("javaSubLong", "%s - %s"),
+            new AbstractMap.SimpleEntry<>("javaMulInt", "%s * %s"),
+            new AbstractMap.SimpleEntry<>("javaMulLong", "%s * %s"),
+            new AbstractMap.SimpleEntry<>("javaMod", "%s % %s"),
+            new AbstractMap.SimpleEntry<>("javaDivInt", "%s / %s"),
+            new AbstractMap.SimpleEntry<>("javaDivLong", "%s / %s"),
             //new AbstractMap.SimpleEntry<>("javaShiftRightInt", ""),
             //new AbstractMap.SimpleEntry<>("javaShiftRightLong", ""),
             //new AbstractMap.SimpleEntry<>("javaShiftLeftInt", ""),
@@ -122,11 +122,11 @@ public class TermTranslator {
             //new AbstractMap.SimpleEntry<>("javaBitwiseAndLong", ""),
             //new AbstractMap.SimpleEntry<>("javaBitwiseXOrInt", ""),
             //new AbstractMap.SimpleEntry<>("javaBitwiseXOrLong", ""),
-            //new AbstractMap.SimpleEntry<>("javaCastByte", ""),
-            //new AbstractMap.SimpleEntry<>("javaCastShort", ""),
-            //new AbstractMap.SimpleEntry<>("javaCastInt", ""),
-            //new AbstractMap.SimpleEntry<>("javaCastLong", ""),
-            //new AbstractMap.SimpleEntry<>("javaCastChar", ""),
+            new AbstractMap.SimpleEntry<>("javaCastByte", "%s"),
+            new AbstractMap.SimpleEntry<>("javaCastShort", "%s"),
+            new AbstractMap.SimpleEntry<>("javaCastInt", "%s"),
+            new AbstractMap.SimpleEntry<>("javaCastLong", "%s"),
+            new AbstractMap.SimpleEntry<>("javaCastChar", "%s")
 
             //new AbstractMap.SimpleEntry<>("inByte", ""),
             //new AbstractMap.SimpleEntry<>("inShort", ""),
@@ -331,11 +331,37 @@ public class TermTranslator {
         }
 
         if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
-            return String.format("\\forall %s %s; %s", term.boundVars().get(0).sort().name(), term.boundVars().get(0).name().toString(), translate(term.sub(0)));
+            var qv = term.boundVars().get(0);
+            var sub = term.sub(0);
+            return String.format("\\forall %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
         }
 
         if (term.op() == Quantifier.EX && term.boundVars().size() == 1 && term.arity() == 1) {
-            return String.format("\\exists %s %s; %s", term.boundVars().get(0).sort().name(), term.boundVars().get(0).name().toString(), translate(term.sub(0)));
+            var qv = term.boundVars().get(0);
+            var sub = term.sub(0);
+            return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+        }
+
+        if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
+            var qv = term.boundVars().get(0);
+            var lo = term.sub(0);
+            var hi = term.sub(1);
+            var cond = term.sub(2);
+            return String.format("\\sum %s %s; %s <= %s <= %s;%s",
+                    qv.sort().name(), qv.name().toString(),
+                    translate(lo), qv.name().toString(), translate(hi),
+                    translate(cond));
+        }
+
+        if (term.op().name().toString().equals("bprod") && term.boundVars().size() == 1 && term.arity() == 3) {
+            var qv = term.boundVars().get(0);
+            var lo = term.sub(0);
+            var hi = term.sub(1);
+            var cond = term.sub(2);
+            return String.format("\\product %s %s; %s <= %s && %s < %s;%s",
+                    qv.sort().name(), qv.name().toString(),
+                    translate(lo), qv.name().toString(), qv.name().toString(), translate(hi),
+                    translate(cond));
         }
 
         if (term.op().name().toString().endsWith("::select")) {
