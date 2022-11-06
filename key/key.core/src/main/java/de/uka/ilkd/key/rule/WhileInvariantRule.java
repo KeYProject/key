@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -544,11 +545,17 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
-            final Term invTerm, Term reachableState, Services services, Goal initGoal) {
+            Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
+
+        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, true);
+        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_REACHABLE, true);
+
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
+        sfTerm = tb.tf().atomize(sfTerm);
+
         return new SequentFormula(sfTerm);
     }
 

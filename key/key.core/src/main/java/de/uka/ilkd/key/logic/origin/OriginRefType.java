@@ -26,6 +26,7 @@ public enum OriginRefType {
     IMPLICIT_ENSURES_EXCNULL("ensures_exc_null"),
     IMPLICIT_ENSURES_SELFINVARIANT("ensures_self_invariant"),
     IMPLICIT_ENSURES_ASSIGNABLE("ensures_assignable_implicit"),
+
     IMPLICIT_REQUIRES_SELFNOTNULL("requires_self_not_null"),
     IMPLICIT_REQUIRES_SELFCREATED("requires_self_created"),
     IMPLICIT_REQUIRES_SELFEXACTINSTANCE("requires_self_exact_instance"),
@@ -33,9 +34,14 @@ public enum OriginRefType {
     IMPLICIT_REQUIRES_MEASUREDBY_INITIAL("requires_measuredby_initial"),
     IMPLICIT_REQUIRES_WELLFORMEDHEAP("requires_wellformed_heap"),
     IMPLICIT_REQUIRES_SELFINVARIANT("requires_self_invariant"),
+    IMPLICIT_REQUIRES_PARAM_NON_NULL("ensures_param_non_null"),
+
     IMPLICIT_SIGNALS_SELFINVARIANT("signals_self_invariant"),
 
-    USER_INTERACTION("user_interaction");
+    USER_INTERACTION("user_interaction"),
+
+    LOOP_INITIALLYVALID_INVARIANT("loop_initiallyvalid_invariant"),
+    LOOP_INITIALLYVALID_REACHABLE("loop_initiallyvalid_reachable");
 
 
     private final String name;
@@ -58,7 +64,8 @@ public enum OriginRefType {
                 || this == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
                 || this == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
                 || this == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL
-                || this == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL;
+                || this == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL
+                || this == OriginRefType.IMPLICIT_REQUIRES_PARAM_NON_NULL;
     }
 
     public boolean isEnsures() {

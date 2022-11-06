@@ -1657,7 +1657,7 @@ public class JMLSpecFactory {
                         originalSpec.first.start.getTokenSource().getSourceName(),
                         new Position(originalSpec.first.start.getLine(),
                             originalSpec.first.start.getCharPositionInLine()),
-                        services);
+                        services, null);
                 res = res.append(nonNullPositionedString);
             }
         }

@@ -1,6 +1,7 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -201,7 +202,7 @@ public class TermTranslator {
         try {
             return translate(iterm);
         } catch (TransformException e) {
-            return "// @unknown (TRANSLATE-ERROR);";
+            return "//@ unknown (TRANSLATE-ERROR); //" + translateRaw(iterm.Term, true);
         }
     }
 
@@ -329,11 +330,36 @@ public class TermTranslator {
             return translate(term.sub(2)); //TODO ??
         }
 
-        // all hope is lost - error out
-
-        if (origin != null) {
-            unmodifiedTerm(origin.SourceTerm, term);
+        if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
+            return String.format("\\forall %s %s; %s", term.boundVars().get(0).sort().name(), term.boundVars().get(0).name().toString(), translate(term.sub(0)));
         }
+
+        if (term.op() == Quantifier.EX && term.boundVars().size() == 1 && term.arity() == 1) {
+            return String.format("\\exists %s %s; %s", term.boundVars().get(0).sort().name(), term.boundVars().get(0).name().toString(), translate(term.sub(0)));
+        }
+
+        if (term.op().name().toString().endsWith("::select")) {
+
+            Term selectHeap = term.sub(0);
+            Term selectBase = term.sub(1);
+            Term selectSel = term.sub(2);
+
+
+            if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self")) {
+                return translate(selectSel);
+            }
+
+            if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
+                return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
+            }
+
+        }
+
+        if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+            return term.op().toString();
+        }
+
+        // all hope is lost - error out
 
         throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
     }

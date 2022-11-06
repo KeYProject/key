@@ -148,6 +148,17 @@ public class SequentBackTransformer {
                 } else if (isUserInteraction(term)) {
                     // special-case, an [user_interaction] in the succedent (probably cut)
                     result.add(new InsertionTerm(InsertionType.ASSUME, termNot(term)));
+                } else if (isLoopInitiallyValid(term)) {
+                    if (ensuresInResult) {
+                        if (continueOnError) {
+                            result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
+                            continue;
+                        }
+                        // TODO how to display?
+                        throw new TransformException("Cannot transform sequent with multiple 'real' succedents");
+                    }
+                    result.add(new InsertionTerm(InsertionType.ASSERT, term));
+                    ensuresInSplit = true;
                 } else {
                     if (continueOnError) {
                         result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
@@ -232,6 +243,19 @@ public class SequentBackTransformer {
             return false;
 
         return true;
+    }
+
+    private boolean isLoopInitiallyValid(Term term) {
+        if (term.containsJavaBlockRecursive())
+            return false;
+
+        var origins = getSubOriginRefs(term, true).stream()
+                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
+        if (origins.size() == 0)
+            return false;
+
+        return origins.stream().allMatch(p -> p.Type == OriginRefType.LOOP_INITIALLYVALID_INVARIANT || p.Type == OriginRefType.LOOP_INITIALLYVALID_REACHABLE);
     }
 
     private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
