@@ -33,6 +33,66 @@ public final class Arrays {
 	public static java.util.ArrayList asList(java.lang.String[] arr);
 
 	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : false)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static boolean[] copyOf(boolean[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static byte[] copyOf(byte[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static char[] copyOf(char[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static int[] copyOf(int[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static short[] copyOf(short[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static long[] copyOf(long[] original, int newLength);
+
+	/*@ public normal_behavior
       @ ensures \result <==> (
       @     a == a2 ||
       @     (a != null && a2 != null && a.length == a2.length &&
