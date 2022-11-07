@@ -33,6 +33,58 @@ public final class Arrays {
 	public static java.util.ArrayList asList(java.lang.String[] arr);
 
 	/*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; a[j] == a2[j]))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+	public static boolean equals(/*@ nullable */ byte[] a, /*@ nullable */ byte[] a2);
+
+	/*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; a[j] == a2[j]))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+	public static boolean equals(/*@ nullable */ int[] a, /*@ nullable */ int[] a2);
+
+	/*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; a[j] == a2[j]))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+	public static boolean equals(/*@ nullable */ short[] a, /*@ nullable */ short[] a2);
+
+	/*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; a[j] == a2[j]))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+	public static boolean equals(/*@ nullable */ long[] a, /*@ nullable */ long[] a2);
+
+	/*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; a[j] == a2[j]))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+	public static boolean equals(/*@ nullable */ char[] a, /*@ nullable */ char[] a2);
+
+	// Float and double equals are left out since they use binary equality, not float equality
+
+	/*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
       @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; a[i] == val);
       @ assignable a[fromIndex..toIndex - 1];
