@@ -80,10 +80,9 @@ public class IntegerHandler extends LDTHandler {
         jmlBigintMap.put(MULT, intLDT.getMul());
         jmlBigintMap.put(DIVISION, intLDT.getJDivision());
         jmlBigintMap.put(MODULO, intLDT.getJavaMod());
-        // TODO bigint bitwise operators
-        // jmlBigintMap.put(BITWISE_AND, intLDT.getBitwiseAndJlong());
-        // jmlBigintMap.put(BITWISE_OR, intLDT.getBitwiseOrJlong());
-        // jmlBigintMap.put(BITWISE_XOR, intLDT.getXorJlong());
+        jmlBigintMap.put(BITWISE_AND, intLDT.getBinaryAnd());
+        jmlBigintMap.put(BITWISE_OR, intLDT.getBinaryOr());
+        jmlBigintMap.put(BITWISE_XOR, intLDT.getBinaryXOr());
         jmlBigintMap.put(SHIFT_RIGHT, intLDT.getShiftright());
         jmlBigintMap.put(SHIFT_LEFT, intLDT.getShiftleft());
         // jmlBigintMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getUnsignedshiftrightJlong());
