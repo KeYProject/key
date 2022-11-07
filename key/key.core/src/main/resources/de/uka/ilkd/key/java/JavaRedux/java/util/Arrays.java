@@ -93,6 +93,56 @@ public final class Arrays {
 	public static long[] copyOf(long[] original, int newLength);
 
 	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : false)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static boolean[] copyOfRange(boolean[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static char[] copyOfRange(char[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static short[] copyOfRange(short[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static int[] copyOfRange(int[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static long[] copyOfRange(long[] original, int from, int to);
+
+	/*@ public normal_behavior
       @ ensures \result <==> (
       @     a == a2 ||
       @     (a != null && a2 != null && a.length == a2.length &&
