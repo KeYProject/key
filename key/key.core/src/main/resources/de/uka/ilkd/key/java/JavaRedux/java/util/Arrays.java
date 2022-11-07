@@ -93,6 +93,26 @@ public final class Arrays {
 	public static long[] copyOf(long[] original, int newLength);
 
 	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static float[] copyOf(float[] original, int newLength);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static double[] copyOf(double[] original, int newLength);
+
+	/*@ public normal_behavior
 	  @ requires 0 <= from <= to && from <= original.length;
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
@@ -141,6 +161,26 @@ public final class Arrays {
       @ assignable \nothing;
       @*/
 	public static long[] copyOfRange(long[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static float[] copyOfRange(float[] original, int from, int to);
+
+	/*@ public normal_behavior
+	  @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @ );
+      @ assignable \nothing;
+      @*/
+	public static double[] copyOfRange(double[] original, int from, int to);
 
 	/*@ public normal_behavior
       @ ensures \result <==> (
