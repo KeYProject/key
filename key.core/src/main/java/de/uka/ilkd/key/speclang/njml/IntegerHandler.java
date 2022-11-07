@@ -79,7 +79,7 @@ public class IntegerHandler extends LDTHandler {
         jmlBigintMap.put(SUBTRACT, intLDT.getSub());
         jmlBigintMap.put(MULT, intLDT.getMul());
         jmlBigintMap.put(DIVISION, intLDT.getJDivision());
-        jmlBigintMap.put(MODULO, intLDT.getJavaMod());
+        jmlBigintMap.put(MODULO, intLDT.getJModulo());
         jmlBigintMap.put(BITWISE_AND, intLDT.getBinaryAnd());
         jmlBigintMap.put(BITWISE_OR, intLDT.getBinaryOr());
         jmlBigintMap.put(BITWISE_XOR, intLDT.getBinaryXOr());
