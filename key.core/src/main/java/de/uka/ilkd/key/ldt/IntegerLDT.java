@@ -559,6 +559,9 @@ public final class IntegerLDT extends LDT {
 
 
 
+    // TODO Wiesler: What does this function do?
+    //  * If this is code, it should be handled by taclets
+    //  * If this is spec, it should be handled by the parser or Translator
     /**
      * returns the function symbol for the given operation null if no function is found for the
      * given operator
