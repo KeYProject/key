@@ -113,6 +113,14 @@ public final class TermFactory {
         return newTerm;
     }
 
+    public @Nonnull Term[] setOriginRefTypeRecursive(Term[] base, OriginRefType t, boolean force) {
+        for (int i = 0; i < base.length; i++) {
+            base[i] = setOriginRefTypeRecursive(base[i], t, force);
+        }
+        return base;
+    }
+
+
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         base = addMissingOriginRefs(base);
 

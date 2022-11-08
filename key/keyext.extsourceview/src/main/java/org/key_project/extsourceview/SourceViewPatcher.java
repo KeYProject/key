@@ -35,7 +35,7 @@ public class SourceViewPatcher {
         // currently we support only proofs with a single file
         URI fileUri = sourceView.getSelectedFile();
 
-        if (fileUri == null) return; // no proof, or no source
+        if (fileUri == null) throw new InternTransformException("No source loaded"); // no proof, or no source
 
         try {
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);

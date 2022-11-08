@@ -548,9 +548,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 
-        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, true);
-        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED, true);
-
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
@@ -596,12 +593,19 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
-            RuleApp ruleApp, Instantiation inst, final Term invTerm, Term reachableState,
+            RuleApp ruleApp, Instantiation inst, Term invTerm, Term reachableState,
             Goal initGoal) {
+        final TermBuilder tb = services.getTermBuilder();
+
         initGoal.setBranchLabel("Invariant Initially Valid");
+
+        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, true);
+        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED, true);
+
         initGoal.changeFormula(
             initFormula(termLabelState, inst, invTerm, reachableState, services, initGoal),
             ruleApp.posInOccurrence());
+
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
             initGoal, null, null);
     }
@@ -609,12 +613,23 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void prepareBodyPreservesBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, final Sequent applicationSequent, Instantiation inst,
-            final Term invTerm, Term wellFormedAnon, Term frameCondition, final Term variantPO,
-            Goal bodyGoal, final JavaBlock guardJb, final Term guardTrueTerm,
-            final Term[] uBeforeLoopDefAnonVariant, final Term uAnonInv) {
+            Term invTerm, Term wellFormedAnon, Term frameCondition, Term variantPO,
+            Goal bodyGoal, final JavaBlock guardJb, Term guardTrueTerm,
+            Term[] uBeforeLoopDefAnonVariant, Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
+
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
+
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED, true);
+        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT, true);
+
+        frameCondition = tb.tf().setOriginRefTypeRecursive(frameCondition, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE, true);
+        variantPO = tb.tf().setOriginRefTypeRecursive(variantPO, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, true);
+        guardTrueTerm = tb.tf().setOriginRefTypeRecursive(guardTrueTerm, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD, true);
+        uBeforeLoopDefAnonVariant = tb.tf().setOriginRefTypeRecursive(uBeforeLoopDefAnonVariant, OriginRefType.LOOP_BODYPRESERVEDINV_ANONVARIANT, true);
+
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+
 
         bodyGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
