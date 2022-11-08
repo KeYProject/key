@@ -14,6 +14,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +124,18 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
+        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
         if (succ && isRequires(term)) {
             // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
             return new InsertionTerm(InsertionType.ASSUME, termNot(term));
@@ -142,8 +155,11 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSUME, termNot(term));
         }
 
-        if (succ && isLoopInitiallyValid(term)) {
-            // special-case, an [user_interaction] in the succedent (probably cut)
+        if (succ && isType(term, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)) {
+            return new InsertionTerm(InsertionType.ASSERT, term);
+        }
+
+        if (succ && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT)) {
             return new InsertionTerm(InsertionType.ASSERT, term);
         }
 
@@ -207,7 +223,8 @@ public class SequentBackTransformer {
         if (origin == null)
             return false;
         if (origin.Type != OriginRefType.JML_ASSIGNABLE
-                && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE)
+                && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
+                && origin.Type != OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE)
             return false;
 
         if (term.op() != Quantifier.ALL)
@@ -218,7 +235,7 @@ public class SequentBackTransformer {
         return true;
     }
 
-    private boolean isLoopInitiallyValid(Term term) {
+    private boolean isType(Term term, OriginRefType... filter) {
         if (term.containsJavaBlockRecursive())
             return false;
 
@@ -228,7 +245,7 @@ public class SequentBackTransformer {
         if (origins.size() == 0)
             return false;
 
-        return origins.stream().allMatch(p -> p.Type == OriginRefType.LOOP_INITIALLYVALID_INVARIANT || p.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED);
+        return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q));
     }
 
     private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {

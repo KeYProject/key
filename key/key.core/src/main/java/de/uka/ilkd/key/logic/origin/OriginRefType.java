@@ -43,7 +43,7 @@ public enum OriginRefType {
     LOOP_INITIALLYVALID_INVARIANT("loop_initiallyvalid_invariant"),
     LOOP_INITIALLYVALID_WELLFORMED("loop_initiallyvalid_wellformed"),
 
-    LOOP_BODYPRESERVEDINV_WELLFORMED("loop_bodypreservesinvarriant_"),
+    LOOP_BODYPRESERVEDINV_WELLFORMED("loop_bodypreservesinvarriant_wellformed"),
     LOOP_BODYPRESERVEDINV_INVARIANT("loop_bodypreservesinvarriant_invariant"),
     LOOP_BODYPRESERVEDINV_ASSIGNABLE("loop_bodypreservesinvarriant_assignable"),
     LOOP_BODYPRESERVEDINV_VARIANT("loop_bodypreservesinvarriant_variant"),

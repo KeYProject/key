@@ -626,7 +626,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         frameCondition = tb.tf().setOriginRefTypeRecursive(frameCondition, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE, true);
         variantPO = tb.tf().setOriginRefTypeRecursive(variantPO, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, true);
         guardTrueTerm = tb.tf().setOriginRefTypeRecursive(guardTrueTerm, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD, true);
-        uBeforeLoopDefAnonVariant = tb.tf().setOriginRefTypeRecursive(uBeforeLoopDefAnonVariant, OriginRefType.LOOP_BODYPRESERVEDINV_ANONVARIANT, true);
 
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
 

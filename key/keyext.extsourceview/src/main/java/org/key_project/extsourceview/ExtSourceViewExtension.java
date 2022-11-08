@@ -78,8 +78,6 @@ public class ExtSourceViewExtension
             // some kind of internal error happened?
             LOGGER.error("error while updateing ext-sourceview", e);
             view.BackTransformationView.setStatusException(e);
-            JOptionPane.showMessageDialog(window, e.toString(), "ERROR WHIE UPDATING SV",
-                JOptionPane.ERROR_MESSAGE);
         }
     }
 }
