@@ -42,7 +42,7 @@ public class Utils {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
-            if (t.getOriginRef() != null && (!atom || t.getOriginRef().IsAtom)) {
+            if (t.getOriginRef() != null && (!atom || t.getOriginRef().isAtom())) {
                 return t;
             }
 
@@ -57,13 +57,13 @@ public class Utils {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().IsAtom))
+            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().isAtom()))
                 r.add(term.getOriginRef());
         }
 
         for (Term t : term.subs()) {
             if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().IsAtom))
+                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().isAtom()))
                     r.add(t.getOriginRef());
                 r.addAll(getSubOriginRefs(t, false, onlyAtoms));
             }

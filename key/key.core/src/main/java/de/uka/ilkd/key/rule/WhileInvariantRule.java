@@ -554,7 +554,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
-        sfTerm = tb.tf().atomize(sfTerm);
 
         return new SequentFormula(sfTerm);
     }

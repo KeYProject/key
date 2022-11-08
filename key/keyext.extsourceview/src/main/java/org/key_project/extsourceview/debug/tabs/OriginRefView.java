@@ -124,7 +124,7 @@ public class OriginRefView extends DebugTab {
             });
         }
         {
-            var cbSec = new JCheckBox("Section [Source]", true);
+            var cbSec = new JCheckBox("Section [Source]", false);
             pnlConf.add(cbSec, gbc(1, 2));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.showSectionSource = cbSec.isSelected();
@@ -132,7 +132,7 @@ public class OriginRefView extends DebugTab {
             });
         }
         {
-            var cbSec = new JCheckBox("Section [Children]", true);
+            var cbSec = new JCheckBox("Section [Children]", false);
             pnlConf.add(cbSec, gbc(1, 3));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.showSectionChildren = cbSec.isSelected();
@@ -205,7 +205,7 @@ public class OriginRefView extends DebugTab {
             if (highlightAllChildren) {
                 originRefs = Utils.getSubOriginRefs(t, true, highlightOnlyAtoms);
             } else {
-                if (t.getOriginRef() != null && (!highlightOnlyAtoms || t.getOriginRef().IsAtom)) {
+                if (t.getOriginRef() != null && (!highlightOnlyAtoms || t.getOriginRef().isAtom())) {
                     originRefs.add(t.getOriginRef());
                 }
             }
@@ -278,7 +278,7 @@ public class OriginRefView extends DebugTab {
                     {
                         OriginRef o = term.getOriginRef();
                         if (o != null) {
-                            txt.append(o.toString());
+                            txt.append(origRefToString(term, o));
                             txt.append("\n");
                         }
                     }
@@ -315,7 +315,7 @@ public class OriginRefView extends DebugTab {
                     TermImpl term = (TermImpl) t;
 
                     for (OriginRef o : Utils.getSubOriginRefs(term, false, showOnlyAtoms)) {
-                        txt.append(o.toString());
+                        txt.append(origRefToString(term, o));
                         txt.append("\n");
                     }
 
@@ -341,7 +341,7 @@ public class OriginRefView extends DebugTab {
                     {
                         OriginRef o = parent.getOriginRef();
                         if (o != null) {
-                            txt.append(o.toString());
+                            txt.append(origRefToString(parent, o));
                             txt.append("\n");
                         }
                     }
@@ -354,6 +354,15 @@ public class OriginRefView extends DebugTab {
         } catch (IOException | URISyntaxException e) {
             taSource.setText(e.toString());
         }
+    }
+
+    private String origRefToString(Term t, OriginRef o) {
+
+        var f0 = (o.isAtom() ? "A" : " ");
+        var f1 = (o.isBooleanTerm() ? "B" : " ");
+        var f2 = (TermTranslator.isUnmodifiedTerm(t, o.SourceTerm) ? " " : "C");
+
+        return "["+f0+"|"+f1+"|"+f2+"] " + o.toString();
     }
 
     private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {

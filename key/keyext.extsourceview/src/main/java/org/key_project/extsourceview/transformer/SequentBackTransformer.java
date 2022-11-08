@@ -154,8 +154,7 @@ public class SequentBackTransformer {
         Term result = svc.getTermBuilder().not(term);
 
         if (term.getOriginRef() != null && result.getOriginRef() == null) {
-            result = svc.getTermFactory().setOriginRef(result,
-                term.getOriginRef().WithMetadata(false, true));
+            result = svc.getTermFactory().setOriginRef(result, term.getOriginRef(), false);
         }
 
         return result;
@@ -166,7 +165,7 @@ public class SequentBackTransformer {
             return false;
 
         var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
                 .collect(Collectors.toList());
         if (origins.size() == 0)
             return false;
@@ -179,7 +178,7 @@ public class SequentBackTransformer {
             return false;
 
         var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
                 .collect(Collectors.toList());
         if (origins.size() == 0)
             return false;
@@ -192,7 +191,7 @@ public class SequentBackTransformer {
             return false;
 
         var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
                 .collect(Collectors.toList());
         if (origins.size() == 0)
             return false;
@@ -224,7 +223,7 @@ public class SequentBackTransformer {
             return false;
 
         var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.IsAtom && p.Type != OriginRefType.UNKNOWN)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
                 .collect(Collectors.toList());
         if (origins.size() == 0)
             return false;

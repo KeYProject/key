@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic.origin;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -24,20 +25,20 @@ public class OriginRef {
 
     public final OriginRefType Type;
 
-    public final boolean IsBooleanTerm;
-    public final boolean IsAtom;
-
     public final Term SourceTerm;
 
     private String sourceStringCache = null;
-    private boolean cached = false;
+    private boolean sourceStringCached = false;
 
-    public OriginRef(OriginRefType type, boolean isatom, boolean isbool, Term t) {
-        this(null, 0, 0, 0, 0, type, isatom, isbool, t);
+    private Boolean isAtomCache = null;
+    private Boolean isBooleanTermCache = null;
+
+    public OriginRef(OriginRefType type, Term t) {
+        this(null, 0, 0, 0, 0, type, t);
     }
 
     public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd,
-            OriginRefType type, boolean isatom, boolean isbool, Term term) {
+            OriginRefType type, Term term) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
@@ -52,8 +53,6 @@ public class OriginRef {
             ColumnEnd = colEnd;
         }
 
-        IsAtom = isatom;
-        IsBooleanTerm = isbool;
         Type = type;
         SourceTerm = term;
     }
@@ -67,8 +66,7 @@ public class OriginRef {
 
         return this.Type == cmp.Type && this.LineStart == cmp.LineStart
                 && this.LineEnd == cmp.LineEnd && this.ColumnStart == cmp.ColumnStart
-                && this.ColumnEnd == cmp.ColumnEnd && this.IsAtom == cmp.IsAtom
-                && this.IsBooleanTerm == cmp.IsBooleanTerm
+                && this.ColumnEnd == cmp.ColumnEnd
                 && Objects.equals(this.SourceTerm, cmp.SourceTerm);
     }
 
@@ -91,8 +89,6 @@ public class OriginRef {
         hash += 7 * this.LineEnd;
         hash += 7 * this.ColumnStart;
         hash += 7 * this.ColumnEnd;
-        hash += 7 * (this.IsAtom ? 0 : 1);
-        hash += 7 * (this.IsBooleanTerm ? 0 : 1);
         hash += 7 * (this.SourceTerm == null ? 0 : this.SourceTerm.hashCode());
         return hash;
     }
@@ -113,7 +109,7 @@ public class OriginRef {
     }
 
     public @Nonnull Optional<String> sourceString() {
-        if (!cached) {
+        if (!sourceStringCached) {
 
             if (File != null) {
 
@@ -138,14 +134,14 @@ public class OriginRef {
                         }
                     }
                     sourceStringCache = r.toString();
-                    cached = true;
+                    sourceStringCached = true;
                 } catch (IOException e) {
                     sourceStringCache = null;
-                    cached = true;
+                    sourceStringCached = true;
                 }
             } else {
                 sourceStringCache = null;
-                cached = true;
+                sourceStringCached = true;
             }
 
         }
@@ -162,8 +158,6 @@ public class OriginRef {
 
     @Override
     public String toString() {
-
-        String flags = "[" + (IsAtom ? "A" : " ") + "|" + (IsBooleanTerm ? "B" : " ") + "]";
 
         String padType = String.format("%-17s", Type);
 
@@ -199,21 +193,45 @@ public class OriginRef {
 
         }
 
-        return flags + " " + padType + " || " + fileStr;
+        return padType + " || " + fileStr;
     }
 
     public OriginRef WithType(OriginRefType t) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom,
-            IsBooleanTerm, SourceTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, SourceTerm);
     }
 
-    public OriginRef WithIsAtom(boolean a) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a,
-            IsBooleanTerm, SourceTerm);
+    public boolean isAtom() {
+        if (isAtomCache == null) {
+
+            if (!isBooleanTerm()) {
+                isAtomCache = false;
+            } else if (hasAtomChildren()) {
+                isAtomCache = false;
+            } else {
+                isAtomCache = true;
+            }
+        }
+
+        return isAtomCache;
     }
 
-    public OriginRef WithMetadata(boolean atom, boolean booltype) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, atom, booltype,
-            SourceTerm);
+    public boolean hasAtomChildren() {
+        for (var sub: SourceTerm.subs()) {
+            if (sub.getOriginRef() == null) continue;
+
+            if (sub.getOriginRef().isAtom()) return true;
+
+            if (sub.getOriginRef().hasAtomChildren()) return true;
+        }
+
+        return false;
+    }
+
+    public boolean isBooleanTerm() {
+        if (isBooleanTermCache == null) {
+            isBooleanTermCache = SourceTerm.op().sort(SourceTerm.subs()) == Sort.FORMULA; //TODO is this right?
+        }
+
+        return isBooleanTermCache;
     }
 }

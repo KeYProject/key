@@ -98,7 +98,11 @@ public final class TermFactory {
         return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
     }
 
-    public @Nonnull Term setOriginRef(Term base, OriginRef origref) {
+    public @Nonnull Term setOriginRef(Term base, OriginRef origref, boolean addMissing) {
+        if (addMissing) {
+            base = addMissingOriginRefs(base);
+        }
+
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
             base.getLabels(), origref);
 
@@ -110,13 +114,15 @@ public final class TermFactory {
     }
 
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
+        base = addMissingOriginRefs(base);
+
         OriginRef origref = base.getOriginRef();
         if (origref != null && origref.Type != t) {
             origref = origref.WithType(t);
         }
 
         if (origref == null && force) {
-            origref = new OriginRef(t, false, true, base);
+            origref = new OriginRef(t, base);
         }
 
         var subs = base.subs().toList();
@@ -128,49 +134,20 @@ public final class TermFactory {
     }
 
     /***
-     * ensure that the OriginRefs of teh term and all subterms are set and have the correct IsAtom /
-     * IsBooleanTerm flags This does happen autom. on normal parsed JML but can be neccessary on
+     * ensure that the OriginRefs of teh term and all subterms are set.
+     * This does happen autom. on normal parsed JML but can be neccessary on
      * manually created terms
      */
-    public @Nonnull Term atomize(Term term) {
-
-        Sort sort = term.op().sort(term.subs());
-
-        boolean boolterm = (sort == Sort.FORMULA);
-
+    public @Nonnull Term addMissingOriginRefs(Term term) {
         List<Term> subs = term.subs().toList();
-        subs.replaceAll(this::atomize);
-
-        term = doCreateTerm(term.op(), createSubtermArray(subs.toArray(new Term[0])),
-            term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef());
-
-        boolean hasAtomChilds = termHasAtomChilds(term);
-
-        boolean shouldBeAtom = (!hasAtomChilds && boolterm);
+        subs.replaceAll(this::addMissingOriginRefs);
 
         if (term.getOriginRef() != null) {
-
-            OriginRef or = term.getOriginRef();
-
-            if (!or.IsAtom && shouldBeAtom) {
-                return setOriginRef(term, or.WithIsAtom(true));
-            } else {
-                return term;
-            }
-
-        } else {
-
-            return setOriginRef(term,
-                new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm, term));
-
+            return term;
         }
-    }
 
-    private boolean termHasAtomChilds(Term t) {
-        return t.subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom)
-                || t.subs().stream().anyMatch(this::termHasAtomChilds);
+        return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, term), false);
     }
-
     // -------------------------------------------------------------------------
     // private interface
     // -------------------------------------------------------------------------

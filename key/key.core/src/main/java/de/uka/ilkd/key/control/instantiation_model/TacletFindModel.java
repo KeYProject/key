@@ -279,7 +279,6 @@ public class TacletFindModel extends AbstractTableModel {
     private Term addOrigin(Term term) {
 
         if (term.getOriginRef() == null) {
-            term = services.getTermFactory().atomize(term);
             term = services.getTermFactory().setOriginRefTypeRecursive(term, OriginRefType.USER_INTERACTION, true);
         }
 

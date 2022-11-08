@@ -125,7 +125,6 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 
             Term term = parseFormula(manualInput);
 
-            term = services.getTermFactory().atomize(term);
             term = services.getTermFactory().setOriginRefTypeRecursive(term, OriginRefType.USER_INTERACTION, true);
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()

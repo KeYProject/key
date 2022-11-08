@@ -1,7 +1,6 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -219,7 +218,7 @@ public class TermTranslator {
 
         // simple case - use origin directly
 
-        if (origin != null && unmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
+        if (origin != null && isUnmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
             var r = origin.sourceString();
             if (r.isEmpty()) {
                 throw new TransformException("Failed to get origin of term");
@@ -409,7 +408,7 @@ public class TermTranslator {
         return true;
     }
 
-    private static boolean unmodifiedTerm(Term a, Term b) {
+    public static boolean isUnmodifiedTerm(Term a, Term b) {
         if (a == b)
             return true;
 
@@ -449,7 +448,7 @@ public class TermTranslator {
 
         for (int i = 0; i < a.arity(); i++) {
 
-            if (!unmodifiedTerm(a.sub(i), b.sub(i)))
+            if (!isUnmodifiedTerm(a.sub(i), b.sub(i)))
                 return false;
 
         }

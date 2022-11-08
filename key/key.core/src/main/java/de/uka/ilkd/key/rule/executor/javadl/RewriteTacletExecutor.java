@@ -60,8 +60,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         }
 
         if (term.getOriginRef() != null && with.getOriginRef() == null) {
-            with = services.getTermFactory().setOriginRef(with, term.getOriginRef());
-            with = services.getTermFactory().atomize(with);
+            with = services.getTermFactory().setOriginRef(with, term.getOriginRef(), true);
         }
 
         return with;
