@@ -160,8 +160,8 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels, OriginRef originref) {
         final Term newTerm = (labels == null || labels.isEmpty()
-                ? new TermImpl(op, subs, boundVars, javaBlock, originref)
-                : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
+                ? new TermImpl(op, subs, boundVars, javaBlock, (originref == null) ? null : originref.copy())
+                : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, (originref == null) ? null : originref.copy())).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.

@@ -98,6 +98,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.triggerOnClick = cbClick.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.triggerOnClick = cbClick.isSelected();
         }
         {
             var cbAtom = new JCheckBox("Only show atoms", true);
@@ -106,6 +107,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showOnlyAtoms = cbAtom.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showOnlyAtoms = cbAtom.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [ToString]", true);
@@ -114,6 +116,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showSectionRepr = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showSectionRepr = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [Self]", true);
@@ -122,6 +125,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showSectionSelf = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showSectionSelf = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [Source]", false);
@@ -130,6 +134,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showSectionSource = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showSectionSource = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [Children]", false);
@@ -138,6 +143,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showSectionChildren = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showSectionChildren = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [Parent]", true);
@@ -146,6 +152,7 @@ public class OriginRefView extends DebugTab {
                 OriginRefView.this.showSectionParent = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
             });
+            OriginRefView.this.showSectionParent = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Enable Highlights", true);
@@ -153,6 +160,7 @@ public class OriginRefView extends DebugTab {
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightEnabled = cbSec.isSelected();
             });
+            OriginRefView.this.highlightEnabled = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Highlight Only Atoms", true);
@@ -160,6 +168,7 @@ public class OriginRefView extends DebugTab {
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected();
             });
+            OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Search for Parent", true);
@@ -167,6 +176,7 @@ public class OriginRefView extends DebugTab {
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightParents = cbSec.isSelected();
             });
+            OriginRefView.this.highlightParents = cbSec.isSelected();
         }
         {
             var cbSec = new JCheckBox("Highlight union of all children", true);
@@ -174,6 +184,7 @@ public class OriginRefView extends DebugTab {
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightAllChildren = cbSec.isSelected();
             });
+            OriginRefView.this.highlightAllChildren = cbSec.isSelected();
         }
 
         this.add(pnlConf, BorderLayout.NORTH);
@@ -350,7 +361,7 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
             }
 
-            taSource.setText(txt.toString());
+            taSource.setText(txt.toString().stripTrailing());
         } catch (IOException | URISyntaxException e) {
             taSource.setText(e.toString());
         }

@@ -202,36 +202,42 @@ public class OriginRef {
 
     public boolean isAtom() {
         if (isAtomCache == null) {
-
-            if (!isBooleanTerm()) {
-                isAtomCache = false;
-            } else if (hasAtomChildren()) {
-                isAtomCache = false;
-            } else {
-                isAtomCache = true;
-            }
+            isAtomCache = calculateIsAtom(SourceTerm);
         }
 
         return isAtomCache;
     }
 
-    public boolean hasAtomChildren() {
-        for (var sub: SourceTerm.subs()) {
-            if (sub.getOriginRef() == null) continue;
+    public boolean isBooleanTerm() {
+        if (isBooleanTermCache == null) {
+            isBooleanTermCache = calculateIsBooleanTerm(SourceTerm);
+        }
 
-            if (sub.getOriginRef().isAtom()) return true;
+        return isBooleanTermCache;
+    }
 
-            if (sub.getOriginRef().hasAtomChildren()) return true;
+    private static boolean calculateIsAtom(Term t) {
+        if (!calculateIsBooleanTerm(t)) return false;
+
+        if (hasAtomChildren(t)) return false;
+
+        return true;
+    }
+
+    private static boolean calculateIsBooleanTerm(Term t) {
+        return t.op().sort(t.subs()) == Sort.FORMULA; //TODO is this right?
+    }
+
+    private static boolean hasAtomChildren(Term t) {
+        for (var sub: t.subs()) {
+            if (calculateIsAtom(sub)) return true;
+            if (hasAtomChildren(sub)) return true;
         }
 
         return false;
     }
 
-    public boolean isBooleanTerm() {
-        if (isBooleanTermCache == null) {
-            isBooleanTermCache = SourceTerm.op().sort(SourceTerm.subs()) == Sort.FORMULA; //TODO is this right?
-        }
-
-        return isBooleanTermCache;
+    public OriginRef copy() {
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, SourceTerm);
     }
 }
