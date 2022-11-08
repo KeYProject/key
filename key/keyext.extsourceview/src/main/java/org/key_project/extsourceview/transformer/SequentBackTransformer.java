@@ -133,7 +133,7 @@ public class SequentBackTransformer {
 
         if (succ && isEnsures(term)) {
             // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
-            return new InsertionTerm(InsertionType.ASSERT, termNot(term));
+            return new InsertionTerm(InsertionType.ASSERT, term);
         }
 
         if (succ && isAssignable(term)) {
