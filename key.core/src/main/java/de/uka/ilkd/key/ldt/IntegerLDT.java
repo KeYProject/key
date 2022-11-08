@@ -10,24 +10,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -61,7 +43,7 @@ public final class IntegerLDT extends LDT {
     // the following fields cache the symbols from integerHeader.key.
     // (explanations see there)
     private final Function sharp;
-    private final Function numberSymbol[] = new Function[10];
+    private final Function[] numberSymbol = new Function[10];
     private final Function neglit;
     private final Function numbers;
     private final Function charID;
@@ -113,30 +95,11 @@ public final class IntegerLDT extends LDT {
     private final Function moduloInt;
     private final Function moduloLong;
     private final Function moduloChar;
-    private final Function javaUnaryMinusInt;
-    private final Function javaUnaryMinusLong;
-    private final Function javaBitwiseNegation;
-    private final Function javaAddInt;
-    private final Function javaAddLong;
     private final Function javaSubInt;
-    private final Function javaSubLong;
     private final Function javaMulInt;
-    private final Function javaMulLong;
     private final Function javaMod;
     private final Function javaDivInt;
     private final Function javaDivLong;
-    private final Function javaShiftRightInt;
-    private final Function javaShiftRightLong;
-    private final Function javaShiftLeftInt;
-    private final Function javaShiftLeftLong;
-    private final Function javaUnsignedShiftRightInt;
-    private final Function javaUnsignedShiftRightLong;
-    private final Function javaBitwiseOrInt;
-    private final Function javaBitwiseOrLong;
-    private final Function javaBitwiseAndInt;
-    private final Function javaBitwiseAndLong;
-    private final Function javaBitwiseXOrInt;
-    private final Function javaBitwiseXOrLong;
     private final Function javaCastByte;
     private final Function javaCastShort;
     private final Function javaCastInt;
@@ -219,30 +182,11 @@ public final class IntegerLDT extends LDT {
         moduloInt = addFunction(services, "moduloInt");
         moduloLong = addFunction(services, "moduloLong");
         moduloChar = addFunction(services, "moduloChar");
-        javaUnaryMinusInt = addFunction(services, "javaUnaryMinusInt");
-        javaUnaryMinusLong = addFunction(services, "javaUnaryMinusLong");
-        javaBitwiseNegation = addFunction(services, "javaBitwiseNegation");
-        javaAddInt = addFunction(services, "javaAddInt");
-        javaAddLong = addFunction(services, "javaAddLong");
         javaSubInt = addFunction(services, "javaSubInt");
-        javaSubLong = addFunction(services, "javaSubLong");
         javaMulInt = addFunction(services, "javaMulInt");
-        javaMulLong = addFunction(services, "javaMulLong");
         javaMod = addFunction(services, "javaMod");
         javaDivInt = addFunction(services, "javaDivInt");
         javaDivLong = addFunction(services, "javaDivLong");
-        javaShiftRightInt = addFunction(services, "javaShiftRightInt");
-        javaShiftRightLong = addFunction(services, "javaShiftRightLong");
-        javaShiftLeftInt = addFunction(services, "javaShiftLeftInt");
-        javaShiftLeftLong = addFunction(services, "javaShiftLeftLong");
-        javaUnsignedShiftRightInt = addFunction(services, "javaUnsignedShiftRightInt");
-        javaUnsignedShiftRightLong = addFunction(services, "javaUnsignedShiftRightLong");
-        javaBitwiseOrInt = addFunction(services, "javaBitwiseOrInt");
-        javaBitwiseOrLong = addFunction(services, "javaBitwiseOrLong");
-        javaBitwiseAndInt = addFunction(services, "javaBitwiseAndInt");
-        javaBitwiseAndLong = addFunction(services, "javaBitwiseAndLong");
-        javaBitwiseXOrInt = addFunction(services, "javaBitwiseXOrInt");
-        javaBitwiseXOrLong = addFunction(services, "javaBitwiseXOrLong");
         javaCastByte = addFunction(services, "javaCastByte");
         javaCastShort = addFunction(services, "javaCastShort");
         javaCastInt = addFunction(services, "javaCastInt");
@@ -557,11 +501,6 @@ public final class IntegerLDT extends LDT {
         }
     }
 
-
-
-    // TODO Wiesler: What does this function do?
-    //  * If this is code, it should be handled by taclets
-    //  * If this is spec, it should be handled by the parser or Translator
     /**
      * returns the function symbol for the given operation null if no function is found for the
      * given operator
@@ -571,50 +510,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
-        final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
-        final boolean isLong = opReturnType == PrimitiveType.JAVA_LONG;
-        final boolean isBigint = opReturnType == PrimitiveType.JAVA_BIGINT;
-
-        if (op instanceof GreaterThan) {
-            return getGreaterThan();
-        } else if (op instanceof GreaterOrEquals) {
-            return getGreaterOrEquals();
-        } else if (op instanceof LessThan) {
-            return getLessThan();
-        } else if (op instanceof LessOrEquals) {
-            return getLessOrEquals();
-        } else if (op instanceof Divide) {
-            return isLong ? javaDivLong : (isBigint ? jdiv : javaDivInt);
-        } else if (op instanceof Times) {
-            return isLong ? javaMulLong : (isBigint ? mul : javaMulInt);
-        } else if (op instanceof Plus) {
-            return isLong ? javaAddInt : (isBigint ? add : javaAddInt);
-        } else if (op instanceof Minus) {
-            return isLong ? javaSubLong : (isBigint ? sub : javaSubInt);
-        } else if (op instanceof Modulo) {
-            return isBigint ? jmod : javaMod;
-        } else if (op instanceof ShiftLeft) {
-            return isLong ? javaShiftLeftLong : javaShiftLeftInt;
-        } else if (op instanceof ShiftRight) {
-            return isLong ? javaShiftRightLong : javaShiftRightInt;
-        } else if (op instanceof UnsignedShiftRight) {
-            return isLong ? javaUnsignedShiftRightLong : javaUnsignedShiftRightInt;
-        } else if (op instanceof BinaryAnd) {
-            return isLong ? javaBitwiseAndLong : javaBitwiseAndInt;
-        } else if (op instanceof BinaryNot) {
-            return javaBitwiseNegation;
-        } else if (op instanceof BinaryOr) {
-            return isLong ? javaBitwiseOrLong : javaBitwiseOrInt;
-        } else if (op instanceof BinaryXOr) {
-            return isLong ? javaBitwiseOrLong : javaBitwiseXOrInt;
-        } else if (op instanceof Negative) {
-            return isLong ? javaUnaryMinusLong
-                    : (isBigint ? neglit : javaUnaryMinusInt);
-        } else if (op instanceof TypeCast) {
-            return getSpecCast(opReturnType);
-        } else {
-            return null;
-        }
+        return null;
     }
 
     @Nullable
@@ -648,11 +544,6 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
-        if (subs.length == 1) {
-            return isResponsible(op, subs[0], services, ec);
-        } else if (subs.length == 2) {
-            return isResponsible(op, subs[0], subs[1], services, ec);
-        }
         return false;
     }
 
@@ -661,12 +552,6 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
-        if (left != null && left.sort().extendsTrans(targetSort()) && right != null
-                && right.sort().extendsTrans(targetSort())) {
-            if (getFunctionFor(op, services, ec) != null) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -674,11 +559,6 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
-        if (sub != null && sub.sort().extendsTrans(targetSort())) {
-            if (op instanceof Negative) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -740,34 +620,8 @@ public final class IntegerLDT extends LDT {
 
     @Override
     public final Type getType(Term t) {
-        Operator op = t.op();
-        if (op == javaUnaryMinusInt || op == javaAddInt || op == javaSubInt || op == javaMulInt
-                || op == javaDivInt || op == javaShiftRightInt || op == javaShiftLeftInt
-                || op == javaUnsignedShiftRightInt || op == javaBitwiseOrInt
-                || op == javaBitwiseAndInt || op == javaBitwiseXOrInt) {
-            return PrimitiveType.JAVA_INT;
-        } else if (op == javaUnaryMinusLong || op == javaAddLong || op == javaSubLong
-                || op == javaMulLong || op == javaDivLong || op == javaShiftRightLong
-                || op == javaShiftLeftLong || op == javaUnsignedShiftRightLong
-                || op == javaBitwiseOrLong || op == javaBitwiseAndLong
-                || op == javaBitwiseXOrLong) {
-            return PrimitiveType.JAVA_LONG;
-        } else if (op == javaBitwiseNegation || op == javaMod) {
-            return getType(t.sub(0));
-        } else if (op == javaCastByte) {
-            return PrimitiveType.JAVA_BYTE;
-        } else if (op == javaCastShort) {
-            return PrimitiveType.JAVA_SHORT;
-        } else if (op == javaCastInt) {
-            return PrimitiveType.JAVA_INT;
-        } else if (op == javaCastLong) {
-            return PrimitiveType.JAVA_LONG;
-        } else if (op == javaCastChar) {
-            return PrimitiveType.JAVA_CHAR;
-        } else {
-            assert false : "IntegerLDT: Cannot get Java type for term: " + t;
-            return null;
-        }
+        assert false : "IntegerLDT: Cannot get Java type for term: " + t;
+        return null;
     }
 
 
@@ -835,10 +689,6 @@ public final class IntegerLDT extends LDT {
      * returns the function symbol interpreted as the Java addition on int (or promotabel to int)
      * operators, i.e. this addition performs a modulo operation wrt. to the range of type
      * <code>int</code>. This function is independent of the chosen integer semantics.
-     *
-     * In case you want to represent the Java addition on operands promotable to <code>int</code>
-     * which shall be interpreted by the chosen integer semantics use
-     * {@link IntegerLDT#getJavaAddInt()} instead
      *
      * @return mathematical interpreted function realising the Java addition on operands of or
      *         promotable to type <code>int</code>
