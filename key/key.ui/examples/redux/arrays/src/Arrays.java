@@ -55,7 +55,7 @@ public final class Arrays {
     }
 
     /*@ public normal_behavior
-	  @ requires 0 <= newLength;
+      @ requires 0 <= newLength;
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @ 	\result[i] == (i < original.length ? original[i] : 0)
@@ -77,7 +77,7 @@ public final class Arrays {
     }
 
     /*@ public normal_behavior
-	  @ requires 0 <= from <= to && from <= original.length;
+      @ requires 0 <= from <= to && from <= original.length;
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @ 	\result[i - from] == (i < original.length ? original[i] : 0)
