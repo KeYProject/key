@@ -10,13 +10,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.util.collection.ImmutableList;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -232,7 +229,7 @@ public class SequentBackTransformer {
         if (origins.size() == 0)
             return false;
 
-        return origins.stream().allMatch(p -> p.Type == OriginRefType.LOOP_INITIALLYVALID_INVARIANT || p.Type == OriginRefType.LOOP_INITIALLYVALID_REACHABLE);
+        return origins.stream().allMatch(p -> p.Type == OriginRefType.LOOP_INITIALLYVALID_INVARIANT || p.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED);
     }
 
     private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {

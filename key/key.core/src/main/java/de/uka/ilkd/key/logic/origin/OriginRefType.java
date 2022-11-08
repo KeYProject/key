@@ -41,7 +41,7 @@ public enum OriginRefType {
     USER_INTERACTION("user_interaction"),
 
     LOOP_INITIALLYVALID_INVARIANT("loop_initiallyvalid_invariant"),
-    LOOP_INITIALLYVALID_REACHABLE("loop_initiallyvalid_reachable");
+    LOOP_INITIALLYVALID_WELLFORMED("loop_initiallyvalid_wellformed");
 
 
     private final String name;

@@ -549,7 +549,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, true);
-        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_REACHABLE, true);
+        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED, true);
 
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
