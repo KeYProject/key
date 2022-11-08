@@ -739,7 +739,7 @@ public final class SourceView extends JComponent {
 
     private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
             Node node) {
-        if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+        if (pos != null && !pos.getURI().equals(PositionInfo.UNKNOWN_URI) && pos.startEndValid()
                 && pos.getURI() != null) {
             list.addLast(new Pair<>(node, pos));
             node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(pos.getURI());
