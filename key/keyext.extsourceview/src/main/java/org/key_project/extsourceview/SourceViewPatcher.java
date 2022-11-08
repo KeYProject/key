@@ -32,8 +32,10 @@ public class SourceViewPatcher {
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
-        URI fileUri = sourceView.getSelectedFile(); // currently we support only proofs with a
-                                                    // single file
+        // currently we support only proofs with a single file
+        URI fileUri = sourceView.getSelectedFile();
+
+        if (fileUri == null) return; // no proof, or no source
 
         try {
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);

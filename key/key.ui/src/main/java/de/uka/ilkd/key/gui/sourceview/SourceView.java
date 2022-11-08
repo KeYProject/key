@@ -989,7 +989,11 @@ public final class SourceView extends JComponent {
     }
 
     public URI getSelectedFile() {
-        return tabPane.getSelectedTab().absoluteFileName;
+        Tab tab = tabPane.getSelectedTab();
+        if (tab == null) {
+            return null;
+        }
+        return tab.absoluteFileName;
     }
 
     public boolean hasFile(URI fileURI) {
