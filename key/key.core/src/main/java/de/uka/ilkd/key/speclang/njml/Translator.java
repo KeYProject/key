@@ -2148,7 +2148,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             insertSimpleClause(type, heap, t.getTerm(), ContractClauses.ENSURES,
                 ContractClauses.ENSURES_FREE, ContractClauses.ENSURES);
         }
-        return addOrigin(ctx, t, false);
+        return t; // no add-origin, because the `t` should aready have one
     }
 
 
@@ -2162,7 +2162,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             insertSimpleClause(type, heap, t.getTerm(), ContractClauses.REQUIRES,
                 ContractClauses.REQUIRES_FREE, ContractClauses.REQUIRES);
         }
-        return addOrigin(ctx, t, false);
+        return t; // no add-origin, because the `t` should aready have one
     }
 
     @Override
@@ -2173,13 +2173,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
             seq.stream().reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();
         contractClauses.measuredBy = result;
-        return addOrigin(ctx, new SLExpression(result), false);
+        return new SLExpression(result); // no add-origin, because the `result` should aready have one
     }
 
 
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
-        return addOrigin(ctx, this.<SLExpression>accept(ctx.predornot()), false);
+        return accept(ctx.predornot()); // no add-origin, because it should aready have one
     }
 
     @Override
@@ -2187,7 +2187,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.predornot());
         assert t != null;
         contractClauses.diverges = t.getTerm();
-        return addOrigin(ctx, t, false);
+        return t; // no add-origin, because the `t` should aready have one
     }
 
     @Override
