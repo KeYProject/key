@@ -142,13 +142,29 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
+        if (ante && isType(term, OriginRefType.LOOP_USECASE_WELLFORMED)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (ante && isType(term, OriginRefType.LOOP_USECASE_INVARIANT)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
+        if (ante && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
+            return new InsertionTerm(InsertionType.ASSUME, term);
+        }
+
         if (succ && isRequires(term)) {
             // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
             return new InsertionTerm(InsertionType.ASSUME, termNot(term));
         }
 
+        if (succ && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
+            // special-case, this should be an [assume] (int the antecedent)
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+        }
+
         if (succ && isEnsures(term)) {
-            // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
             return new InsertionTerm(InsertionType.ASSERT, term);
         }
 

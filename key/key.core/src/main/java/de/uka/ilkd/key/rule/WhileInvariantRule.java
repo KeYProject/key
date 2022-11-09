@@ -645,12 +645,18 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void prepareUseCaseBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, Instantiation inst, Term wellFormedAnon, Goal useGoal,
-            final JavaBlock guardJb, final Term guardFalseTerm, final Term[] uAnon,
-            final Term uAnonInv) {
+            final JavaBlock guardJb, Term guardFalseTerm, final Term[] uAnon,
+            Term uAnonInv) {
+        final TermBuilder tb = services.getTermBuilder();
+
         useGoal.setBranchLabel("Use Case");
+
+        guardFalseTerm = tb.tf().setOriginRefTypeRecursive(guardFalseTerm, OriginRefType.LOOP_USECASE_GUARD, true);
+        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_USECASE_INVARIANT, true);
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.LOOP_USECASE_WELLFORMED, true);
+
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        final TermBuilder tb = services.getTermBuilder();
 
         Term guardFalseRestPsi = useCaseFormula(termLabelState, services, ruleApp, inst, useGoal,
             guardJb, guardFalseTerm);
