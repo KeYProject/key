@@ -22,19 +22,19 @@ public class TermTranslator {
     //     (see IntegerHandler.java)
     //     (see OverloadedOperatorHandler.java)
 
-    public Map<String, String> nullaryFuncs = Map.ofEntries(
+    public Map<String, String> nullaryFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("null", "null"),
             new AbstractMap.SimpleEntry<>("TRUE", "true"),
             new AbstractMap.SimpleEntry<>("FALSE", "false"),
             new AbstractMap.SimpleEntry<>("self", "this")
     );
 
-    public Map<String, String> bracketFuncs = Map.ofEntries(
+    public Map<String, String> bracketFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("wellFormed", "\\wellFormed"),
             new AbstractMap.SimpleEntry<>("java.lang.Object::<inv>", "\\invariant_for")
     );
 
-    public Map<String, String> inlineFuncs = Map.ofEntries(
+    public Map<String, String> inlineFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("or", "%s || %s"),
             new AbstractMap.SimpleEntry<>("and", "%s && %s"),
             new AbstractMap.SimpleEntry<>("imp", "%s -> %s"),
@@ -164,8 +164,11 @@ public class TermTranslator {
 
         var v = printer.toString();
 
-        if (singleLine)
-            v = v.replaceAll("\\r", "").replaceAll("\\n", " ");
+        if (singleLine) {
+            v = v.replaceAll("\\r", "").replaceAll("\\n", " ").replaceAll("[ ]{2,}", " ");
+        }
+
+        v = v.trim();
 
         return v;
     }

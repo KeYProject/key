@@ -62,11 +62,9 @@ public class Utils {
         }
 
         for (Term t : term.subs()) {
-            if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().isAtom()))
-                    r.add(t.getOriginRef());
-                r.addAll(getSubOriginRefs(t, false, onlyAtoms));
-            }
+            if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().isAtom()))
+                r.add(t.getOriginRef());
+            r.addAll(getSubOriginRefs(t, false, onlyAtoms));
         }
 
         return r;

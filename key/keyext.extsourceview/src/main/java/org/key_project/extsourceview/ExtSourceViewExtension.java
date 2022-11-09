@@ -29,8 +29,9 @@ public class ExtSourceViewExtension
 
     private DebugView view;
 
-    public boolean HideNonRelevantTerms = true;
+    public boolean HideNonRelevantTerms = false;
     public boolean ContinueInError = false;
+    public boolean RecursiveOriginLookup = false;
 
     public ExtSourceViewExtension() {
         Inst = this;
@@ -69,7 +70,7 @@ public class ExtSourceViewExtension
     public void update(MainWindow window, KeYMediator mediator) {
         try {
             SourceViewPatcher.updateSourceview(window, mediator, HideNonRelevantTerms,
-                ContinueInError);
+                ContinueInError, RecursiveOriginLookup);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent

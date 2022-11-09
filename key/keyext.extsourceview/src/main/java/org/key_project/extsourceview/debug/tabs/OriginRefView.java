@@ -325,7 +325,7 @@ public class OriginRefView extends DebugTab {
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl) t;
 
-                    for (OriginRef o : Utils.getSubOriginRefs(term, false, showOnlyAtoms)) {
+                    for (OriginRef o : Utils.getSubOriginRefs(term, false, false)) {
                         txt.append(origRefToString(term, o));
                         txt.append("\n");
                     }

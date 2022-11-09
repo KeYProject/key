@@ -50,6 +50,7 @@ public class BackTransformationView extends DebugTab {
                 ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
             });
+            ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
         }
         {
             var cbx = new JCheckBox("Fail on unknown terms", true);
@@ -58,6 +59,16 @@ public class BackTransformationView extends DebugTab {
                 ExtSourceViewExtension.Inst.ContinueInError = !cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
             });
+            ExtSourceViewExtension.Inst.ContinueInError = !cbx.isSelected();
+        }
+        {
+            var cbx = new JCheckBox("Recursive Origin Lookup", false);
+            pnlConf.add(cbx, gbc(1, 2));
+            cbx.addItemListener(e -> {
+                ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
+                ExtSourceViewExtension.Inst.update(window, mediator);
+            });
+            ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
         }
         {
             var ctrl = new JButton("Retry");

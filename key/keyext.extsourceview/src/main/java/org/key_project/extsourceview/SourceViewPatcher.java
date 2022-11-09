@@ -28,7 +28,7 @@ public class SourceViewPatcher {
     private final static int HIGHTLIGHT_LEVEL = 11;
 
     public static void updateSourceview(MainWindow window, KeYMediator mediator,
-            boolean hideNonRelevant, boolean continueOnError)
+            boolean hideNonRelevant, boolean continueOnError, boolean recursiveLookup)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -44,11 +44,11 @@ public class SourceViewPatcher {
         }
 
         SequentBackTransformer transformer = new SequentBackTransformer(mediator.getServices(),
-            mediator.getSelectedProof(), mediator.getSelectedNode());
+            mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError, recursiveLookup);
 
         TermTranslator translator = new TermTranslator(mediator.getServices());
 
-        InsertionSet parts = transformer.extract(continueOnError);
+        InsertionSet parts = transformer.extract();
 
         PositionMap posmap = transformer.generatePositionMap();
 

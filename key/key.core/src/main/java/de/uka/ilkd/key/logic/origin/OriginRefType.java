@@ -44,7 +44,8 @@ public enum OriginRefType {
     LOOP_INITIALLYVALID_WELLFORMED("loop_initiallyvalid_wellformed"),
 
     LOOP_BODYPRESERVEDINV_WELLFORMED("loop_bodypreservesinvarriant_wellformed"),
-    LOOP_BODYPRESERVEDINV_INVARIANT("loop_bodypreservesinvarriant_invariant"),
+    LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE("loop_bodypreservesinvarriant_invariant_before"),
+    LOOP_BODYPRESERVEDINV_INVARIANT_AFTER("loop_bodypreservesinvarriant_invariant_after"),
     LOOP_BODYPRESERVEDINV_ASSIGNABLE("loop_bodypreservesinvarriant_assignable"),
     LOOP_BODYPRESERVEDINV_VARIANT("loop_bodypreservesinvarriant_variant"),
     LOOP_BODYPRESERVEDINV_GUARD("loop_bodypreservesinvarriant_guard"),
@@ -63,7 +64,7 @@ public enum OriginRefType {
     }
 
     public boolean isRequires() {
-        return this == OriginRefType.JML_REQUIRES
+        return     this == OriginRefType.JML_REQUIRES
                 || this == OriginRefType.JML_REQUIRES_FREE
                 || this == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
                 || this == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK

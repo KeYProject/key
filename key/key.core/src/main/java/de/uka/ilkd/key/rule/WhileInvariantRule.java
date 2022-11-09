@@ -621,11 +621,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
 
         wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED, true);
-        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT, true);
+        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE, true);
 
         frameCondition = tb.tf().setOriginRefTypeRecursive(frameCondition, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE, true);
         variantPO = tb.tf().setOriginRefTypeRecursive(variantPO, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, true);
         guardTrueTerm = tb.tf().setOriginRefTypeRecursive(guardTrueTerm, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD, true);
+
+        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER, true);
 
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
 

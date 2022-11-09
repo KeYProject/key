@@ -18,22 +18,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.key_project.extsourceview.Utils.getSubOriginRefs;
+
 public class SequentBackTransformer {
 
     private final Services svc;
     private final Proof proof;
-    private final Node node;
     private final Sequent sequent;
 
-    public SequentBackTransformer(Services svc, Proof proof, Node node) {
+    private final boolean continueOnError;
+    private final boolean recursiveOriginLookup;
+
+    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup) {
         this.svc = svc;
         this.proof = proof;
-        this.node = node;
         this.sequent = node.sequent();
+
+        this.continueOnError = continueOnError;
+        this.recursiveOriginLookup = recursiveOriginLookup;
     }
 
-    public InsertionSet extract(boolean continueOnError) throws TransformException {
-        return new InsertionSet(ImmutableList.fromList(extractTerms(continueOnError)));
+    public InsertionSet extract() throws TransformException {
+        return new InsertionSet(ImmutableList.fromList(extractTerms()));
 
     }
 
@@ -56,7 +62,7 @@ public class SequentBackTransformer {
         return new PositionMap(pos);
     }
 
-    private ArrayList<InsertionTerm> extractTerms(boolean continueOnError) throws TransformException {
+    private ArrayList<InsertionTerm> extractTerms() throws TransformException {
 
         ArrayList<InsertionTerm> result = new ArrayList<>();
 
@@ -120,7 +126,7 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
-        if (ante && isUserInteraction(term)) {
+        if (ante && isType(term, OriginRefType.USER_INTERACTION)) {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
@@ -132,7 +138,7 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT)) {
+        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE)) {
             return new InsertionTerm(InsertionType.ASSUME, term);
         }
 
@@ -150,7 +156,7 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSIGNABLE, term);
         }
 
-        if (succ && isUserInteraction(term)) {
+        if (succ && isType(term, OriginRefType.USER_INTERACTION)) {
             // special-case, an [user_interaction] in the succedent (probably cut)
             return new InsertionTerm(InsertionType.ASSUME, termNot(term));
         }
@@ -159,7 +165,7 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSERT, term);
         }
 
-        if (succ && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT)) {
+        if (succ && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER)) {
             return new InsertionTerm(InsertionType.ASSERT, term);
         }
 
@@ -177,94 +183,55 @@ public class SequentBackTransformer {
     }
 
     private boolean isRequires(Term term) {
-        if (term.containsJavaBlockRecursive())
-            return false;
-
-        var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.Type != OriginRefType.UNKNOWN)
-                .collect(Collectors.toList());
-        if (origins.size() == 0)
-            return false;
-
-        return origins.stream().allMatch(p -> p.Type.isRequires());
+        return isType(term,
+                OriginRefType.JML_REQUIRES,
+                OriginRefType.JML_REQUIRES_FREE,
+                OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT,
+                OriginRefType.IMPLICIT_REQUIRES_PARAMSOK,
+                OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE,
+                OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP,
+                OriginRefType.IMPLICIT_REQUIRES_SELFCREATED,
+                OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL,
+                OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL,
+                OriginRefType.IMPLICIT_REQUIRES_PARAM_NON_NULL);
     }
 
     private boolean isEnsures(Term term) {
-        if (term.containsJavaBlockRecursive())
-            return false;
-
-        var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.Type != OriginRefType.UNKNOWN)
-                .collect(Collectors.toList());
-        if (origins.size() == 0)
-            return false;
-
-        return origins.stream().allMatch(p -> p.Type.isEnsures());
-    }
-
-    private boolean isUserInteraction(Term term) {
-        if (term.containsJavaBlockRecursive())
-            return false;
-
-        var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.Type != OriginRefType.UNKNOWN)
-                .collect(Collectors.toList());
-        if (origins.size() == 0)
-            return false;
-
-        return origins.stream().allMatch(p -> p.Type.isUserInteraction());
+        return isType(term,
+                OriginRefType.JML_ENSURES,
+                OriginRefType.JML_ENSURES_FREE,
+                OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT,
+                OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE,
+                OriginRefType.IMPLICIT_ENSURES_EXCNULL);
     }
 
     private boolean isAssignable(Term term) {
-        if (term.containsJavaBlockRecursive())
-            return false;
-
-        var origin = term.getOriginRef();
-        if (origin == null)
-            return false;
-        if (origin.Type != OriginRefType.JML_ASSIGNABLE
-                && origin.Type != OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
-                && origin.Type != OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE)
-            return false;
-
-        if (term.op() != Quantifier.ALL)
-            return false;
-        if (term.sub(0).op() != Quantifier.ALL)
-            return false;
-
-        return true;
+        return isType(term, OriginRefType.JML_ASSIGNABLE, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE);
     }
 
     private boolean isType(Term term, OriginRefType... filter) {
         if (term.containsJavaBlockRecursive())
             return false;
 
-        var origins = getSubOriginRefs(term, true).stream()
-                .filter(p -> p.Type != OriginRefType.UNKNOWN)
-                .collect(Collectors.toList());
-        if (origins.size() == 0)
-            return false;
+        if (recursiveOriginLookup) {
 
-        return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q));
-    }
+            var origins = getSubOriginRefs(term, true, false).stream()
+                    .filter(p -> p.Type != OriginRefType.UNKNOWN)
+                    .collect(Collectors.toList());
+            if (origins.size() == 0)
+                return false;
 
-    private ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf) {
-        ArrayList<OriginRef> r = new ArrayList<>();
+            return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q));
 
-        if (includeSelf) {
-            if (term.getOriginRef() != null)
-                r.add(term.getOriginRef());
-        }
+        } else {
 
-        for (Term t : term.subs()) {
-            if (t instanceof TermImpl) {
-                if (t.getOriginRef() != null)
-                    r.add(t.getOriginRef());
-                r.addAll(getSubOriginRefs(t, false));
+            var origin = term.getOriginRef();
+            if (origin == null) {
+                return false;
             }
-        }
+            return Arrays.stream(filter).anyMatch(q -> origin.Type == q);
 
-        return r;
+        }
     }
 
     private List<Term> splitFormula(Term f, Operator j) {
