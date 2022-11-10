@@ -15,6 +15,7 @@ import java.awt.*;
 import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
+import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbcf;
 
 public class BackTransformationView extends DebugTab {
 
@@ -33,37 +34,41 @@ public class BackTransformationView extends DebugTab {
 
         {
             var ctrl = new JRadioButton("Position at Start+End", true);
-            pnlConf.add(ctrl, gbc(0, 0));
+            pnlConf.add(ctrl, gbcf(0, 0));
             ctrl.addActionListener(e -> {
                 /* TODO */ });
         }
         {
             var ctrl = new JRadioButton("Position at logical pos", false);
-            pnlConf.add(ctrl, gbc(0, 1));
+            pnlConf.add(ctrl, gbcf(0, 1));
             ctrl.addActionListener(e -> {
                 /* TODO */ });
         }
         {
+            pnlConf.add(Box.createHorizontalGlue(), gbc(1, 0)); // spacer
+            pnlConf.add(Box.createHorizontalGlue(), gbc(1, 1)); // spacer
+        }
+        {
             var cbx = new JCheckBox("Show all InsTerms", false);
-            pnlConf.add(cbx, gbc(1, 0));
+            pnlConf.add(cbx, gbcf(2, 0));
             cbx.addItemListener(e -> {
-                ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
+                ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
             });
-            ExtSourceViewExtension.Inst.HideNonRelevantTerms = !cbx.isSelected();
+            ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected();
         }
         {
             var cbx = new JCheckBox("Fail on unknown terms", true);
-            pnlConf.add(cbx, gbc(1, 1));
+            pnlConf.add(cbx, gbcf(2, 1));
             cbx.addItemListener(e -> {
-                ExtSourceViewExtension.Inst.ContinueInError = !cbx.isSelected();
+                ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
             });
-            ExtSourceViewExtension.Inst.ContinueInError = !cbx.isSelected();
+            ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected();
         }
         {
             var cbx = new JCheckBox("Recursive Origin Lookup", false);
-            pnlConf.add(cbx, gbc(1, 2));
+            pnlConf.add(cbx, gbcf(3, 0));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
                 ExtSourceViewExtension.Inst.update(window, mediator);
@@ -71,8 +76,17 @@ public class BackTransformationView extends DebugTab {
             ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
         }
         {
+            var cbx = new JCheckBox("Allow untagged forumlas", false);
+            pnlConf.add(cbx, gbcf(3, 1));
+            cbx.addItemListener(e -> {
+                ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
+                ExtSourceViewExtension.Inst.update(window, mediator);
+            });
+            ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
+        }
+        {
             var ctrl = new JButton("Retry");
-            pnlConf.add(ctrl, gbc(2, 0, 1, 3));
+            pnlConf.add(ctrl, gbcf(4, 0, 1, 2));
             ctrl.addActionListener(e -> ExtSourceViewExtension.Inst.update(window, mediator));
         }
 

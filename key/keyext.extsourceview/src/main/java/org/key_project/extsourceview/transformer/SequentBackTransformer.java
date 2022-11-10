@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,14 +29,16 @@ public class SequentBackTransformer {
 
     private final boolean continueOnError;
     private final boolean recursiveOriginLookup;
+    private final boolean allowNoOriginFormulas;
 
-    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup) {
+    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup, boolean allowNoOriginFormulas) {
         this.svc = svc;
         this.proof = proof;
         this.sequent = node.sequent();
 
         this.continueOnError = continueOnError;
         this.recursiveOriginLookup = recursiveOriginLookup;
+        this.allowNoOriginFormulas = allowNoOriginFormulas;
     }
 
     public InsertionSet extract() throws TransformException {
@@ -185,6 +188,14 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSERT, term);
         }
 
+        if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
+            if (ante) {
+                return new InsertionTerm(InsertionType.ASSUME, term);
+            } else {
+                return new InsertionTerm(InsertionType.ASSERT, term);
+            }
+        }
+
         throw new TransformException("Failed to categorize term '" + term + "'");
     }
 
@@ -229,24 +240,25 @@ public class SequentBackTransformer {
         if (term.containsJavaBlockRecursive())
             return false;
 
-        if (recursiveOriginLookup) {
+        var origins = getRelevantOrigins(term);
+        if (origins.size() == 0)
+            return false;
 
-            var origins = getSubOriginRefs(term, true, false).stream()
+        return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q));
+
+    }
+
+    private List<OriginRef> getRelevantOrigins(Term term) {
+        if (recursiveOriginLookup) {
+            return getSubOriginRefs(term, true, false).stream()
                     .filter(p -> p.Type != OriginRefType.UNKNOWN)
                     .collect(Collectors.toList());
-            if (origins.size() == 0)
-                return false;
-
-            return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q));
-
         } else {
-
             var origin = term.getOriginRef();
             if (origin == null) {
-                return false;
+                return Collections.emptyList();
             }
-            return Arrays.stream(filter).anyMatch(q -> origin.Type == q);
-
+            return Collections.singletonList(origin);
         }
     }
 
