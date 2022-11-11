@@ -40,6 +40,8 @@ public class InsertionTerm {
             return false;
         if (orig.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)
             return false;
+        if (orig.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
+            return false;
 
         return true;
     }

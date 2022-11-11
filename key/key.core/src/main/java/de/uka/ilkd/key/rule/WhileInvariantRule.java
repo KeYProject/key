@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -235,6 +236,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
+            OriginFuncNameMap.put(pv, anonFuncName);
             final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;

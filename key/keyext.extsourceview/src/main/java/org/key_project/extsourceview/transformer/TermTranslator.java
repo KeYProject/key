@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -21,6 +22,7 @@ public class TermTranslator {
     //TODO use better and more fail-safe way to handle this
     //     (see IntegerHandler.java)
     //     (see OverloadedOperatorHandler.java)
+    //     (see HeapLDT.java)
 
     public Map<String, String> nullaryFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("null", "null"),
@@ -125,14 +127,19 @@ public class TermTranslator {
             new AbstractMap.SimpleEntry<>("javaCastShort", "%s"),
             new AbstractMap.SimpleEntry<>("javaCastInt", "%s"),
             new AbstractMap.SimpleEntry<>("javaCastLong", "%s"),
-            new AbstractMap.SimpleEntry<>("javaCastChar", "%s")
+            new AbstractMap.SimpleEntry<>("javaCastChar", "%s"),
 
             //new AbstractMap.SimpleEntry<>("inByte", ""),
             //new AbstractMap.SimpleEntry<>("inShort", ""),
             //new AbstractMap.SimpleEntry<>("inInt", ""),
             //new AbstractMap.SimpleEntry<>("inLong", ""),
             //new AbstractMap.SimpleEntry<>("inChar", ""),
-            //new AbstractMap.SimpleEntry<>("index", "")
+            //new AbstractMap.SimpleEntry<>("index", ""),
+
+            new AbstractMap.SimpleEntry<>("length", "%s.length"),
+            //new AbstractMap.SimpleEntry<>("acc", ""),
+            //new AbstractMap.SimpleEntry<>("reach", ""),
+            new AbstractMap.SimpleEntry<>("prec", "%s < %s") //is this right?
     );
 
 
@@ -231,10 +238,14 @@ public class TermTranslator {
 
         // handle annoying special cases
 
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
+        if (origin != null
+                && (origin.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
+                || origin.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED
+                || origin.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
+                || origin.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
                 && term.op().name().toString().equals("wellFormed") && term.arity() == 1
-                && term.sub(0).op().name().toString().equals("heap")) {
-            return "\\wellFormed(heap)"; // TODO not valid JML
+                && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
+            return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
         }
 
         if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
@@ -284,10 +295,18 @@ public class TermTranslator {
             return "\\invariant_for(this)";
         }
 
+        // special not-case
+
         if (term.op().name().toString().equals("not")
                 && term.sub(0).op().name().toString().equals("equals")
                 && term.sub(0).arity() == 2) {
             return String.format("%s != %s", bracketTranslate(term.sub(0), term.sub(0).sub(0)), bracketTranslate(term.sub(0), term.sub(0).sub(1)));
+        }
+
+        // Use OriginFuncNameMap
+
+        if (term.op() instanceof Function && term.op().arity() == 0 && OriginFuncNameMap.has(term.op().name())) {
+            return OriginFuncNameMap.get(term.op().name()).toString();
         }
 
         // try to manually build the JML
@@ -381,6 +400,14 @@ public class TermTranslator {
                 return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
             }
 
+        }
+
+        //if (term.op().name().toString().equals("length") && term.op().sort(term.subs()).name().toString().equals("int")) {
+        //    return translate(term.sub(0)) + ".length";
+        //}
+
+        if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+            return term.op().toString();
         }
 
         if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
