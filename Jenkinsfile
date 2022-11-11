@@ -26,7 +26,7 @@ pipeline {
 
         stage('Test: JUnit') {
             steps {
-                sh 'cd key && ./gradlew --continue test'
+                sh 'cd key && ./gradlew --continue test -x key.core.symbolic_execution:test -x key.core.proof_references:test'
             }
         }
 
@@ -45,6 +45,14 @@ pipeline {
         stage('Test: testRunAllInfProofs') {
             steps {
                 sh 'cd key && ./gradlew --continue testRunAllInfProofs'
+            }
+        }
+
+        stage('Test: Optional Features') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'cd key && ./gradlew --continue key.core.symbolic_execution:test key.core.proof_references:test'
+                }
             }
         }
 
