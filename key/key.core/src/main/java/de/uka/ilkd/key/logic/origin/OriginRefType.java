@@ -3,6 +3,7 @@ package de.uka.ilkd.key.logic.origin;
 public enum OriginRefType {
 
     UNKNOWN("unknown"),
+    JAVA_STMT("java_statement"),
 
     JML_ACCESSIBLE("accessible"),
     JML_ASSERT("assert"),

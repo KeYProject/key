@@ -252,6 +252,7 @@ public class SequentBackTransformer {
         if (recursiveOriginLookup) {
             return getSubOriginRefs(term, true, false).stream()
                     .filter(p -> p.Type != OriginRefType.UNKNOWN)
+                    .filter(p -> p.Type != OriginRefType.JAVA_STMT)
                     .collect(Collectors.toList());
         } else {
             var origin = term.getOriginRef();

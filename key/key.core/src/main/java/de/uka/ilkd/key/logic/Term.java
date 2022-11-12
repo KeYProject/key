@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import java.util.List;
+
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
  * of the syntax of a logic, an instance of this class can stand for a term or a formula. This is
@@ -144,6 +146,8 @@ public interface Term extends SVSubstitute, Sorted {
     public ImmutableArray<TermLabel> getLabels();
 
     public @Nullable OriginRef getOriginRef();
+
+    public List<OriginRef> getOriginRefRecursive();
 
     public boolean hasOriginRef();
 

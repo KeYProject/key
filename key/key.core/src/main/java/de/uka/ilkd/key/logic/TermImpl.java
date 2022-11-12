@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.logic;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -700,6 +699,20 @@ public class TermImpl implements Term {
 
     public @Nullable OriginRef getOriginRef() {
         return originRef;
+    }
+
+    public @Nonnull List<OriginRef> getOriginRefRecursive() {
+        ArrayList<OriginRef> r = new ArrayList<>();
+
+        if (this.getOriginRef() != null) {
+            r.add(this.getOriginRef());
+        }
+
+        for (Term t : subs()) {
+            r.addAll(t.getOriginRefRecursive());
+        }
+
+        return r;
     }
 
     public boolean hasOriginRef() {

@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.logic.origin;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -217,6 +219,8 @@ public class OriginRef {
     }
 
     private static boolean calculateIsAtom(Term t) {
+        if (t == null) return false;
+
         if (!calculateIsBooleanTerm(t)) return false;
 
         if (hasAtomChildren(t)) return false;
@@ -225,6 +229,8 @@ public class OriginRef {
     }
 
     private static boolean calculateIsBooleanTerm(Term t) {
+        if (t == null) return false;
+
         return t.op().sort(t.subs()) == Sort.FORMULA; //TODO is this right?
     }
 
@@ -239,5 +245,14 @@ public class OriginRef {
 
     public OriginRef copy() {
         return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, SourceTerm);
+    }
+
+    public static OriginRef fromStatement(SourceElement stmt) {
+        var pi = stmt.getPositionInfo();
+        return new OriginRef(
+                pi.getURI().toString(),
+                pi.getStartPosition().getLine(), pi.getEndPosition().getLine(),
+                pi.getStartPosition().getColumn(), pi.getEndPosition().getColumn(),
+                OriginRefType.JAVA_STMT, null);
     }
 }

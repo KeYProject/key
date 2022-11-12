@@ -5,27 +5,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -146,10 +138,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         if (applicationPosInOccurrence != null) {
             // if applicationPosInOccurence == null then the source term does not exist in the sequent (eg [CUT])
 
-            Term term = applicationPosInOccurrence.subTerm();
-            if (term.getOriginRef() != null && instantiatedFormula.getOriginRef() == null) {
-                instantiatedFormula = services.getTermFactory().setOriginRef(instantiatedFormula, term.getOriginRef(), true);
-            }
+            Term apioTerm = applicationPosInOccurrence.subTerm();
+
+            instantiatedFormula = updateOriginRefs(apioTerm, instantiatedFormula, services, goal);
+
         } else {
 
             instantiatedFormula = services.getTermFactory().addMissingOriginRefs(instantiatedFormula);
@@ -490,5 +482,40 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         return res;
     }
 
+    protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal) {
+        TermFactory tf = svc.getTermFactory();
+        
+        if (findTerm.getOriginRef() != null && replTerm.getOriginRef() == null) {
+            replTerm = tf.setOriginRef(replTerm, findTerm.getOriginRef(), true);
+        }
 
+        if (findTerm.getOriginRef() == null && findTerm.javaBlock() != null && findTerm.op() == Modality.DIA &&
+                replTerm.op() == UpdateApplication.UPDATE_APPLICATION &&
+                replTerm.sub(0).getOriginRef() == null && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
+            Node node = goal.node();
+            SourceElement activeStatement = null;
+            while ((activeStatement == null || activeStatement.getPositionInfo() == PositionInfo.UNDEFINED || activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) && node != null) {
+                activeStatement = node.getNodeInfo().getActiveStatement();
+                node = node.parent();
+            }
+            if (activeStatement != null && activeStatement.getPositionInfo() != PositionInfo.UNDEFINED && activeStatement.getPositionInfo().getURI() != PositionInfo.UNKNOWN_URI) {
+                // We land here if:
+                // - The taclet matched a diamond-op replTerm java code
+                // - And replaced it replTerm an update-application
+                // - and we found a node wiht an activeStatement replTerm a valid PositionInfo
+                // --> TODO check this logic
+
+                OriginRef origref = OriginRef.fromStatement(activeStatement);
+
+                Term s1 = replTerm.sub(0);
+                Term s2 = replTerm.sub(1);
+
+                s1 = tf.setOriginRefTypeRecursive(s1, origref, true);
+
+                replTerm = tf.createTerm(replTerm.op(), new ImmutableArray<>(s1, s2), replTerm.boundVars(), replTerm.javaBlock(), replTerm.getLabels(), replTerm.getOriginRef());
+            }
+        }
+
+        return replTerm;
+    }
 }

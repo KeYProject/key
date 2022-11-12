@@ -35,7 +35,6 @@ public class OriginRefView extends DebugTab {
 
     private JTextArea taSource;
 
-    private boolean showOnlyAtoms = true;
     private boolean triggerOnClick = false;
 
     private boolean showSectionRepr = true;
@@ -99,15 +98,6 @@ public class OriginRefView extends DebugTab {
                 refreshShownTerm(window, mediator);
             });
             OriginRefView.this.triggerOnClick = cbClick.isSelected();
-        }
-        {
-            var cbAtom = new JCheckBox("Only show atoms", true);
-            pnlConf.add(cbAtom, gbc(0, 1));
-            cbAtom.addItemListener(e -> {
-                OriginRefView.this.showOnlyAtoms = cbAtom.isSelected();
-                refreshShownTerm(window, mediator);
-            });
-            OriginRefView.this.showOnlyAtoms = cbAtom.isSelected();
         }
         {
             var cbSec = new JCheckBox("Section [ToString]", true);
@@ -339,7 +329,7 @@ public class OriginRefView extends DebugTab {
                 txt.append("----------<PARENT>----------\n");
                 txt.append("\n");
 
-                Term parent = Utils.getParentWithOriginRef(pos, showOnlyAtoms, false);
+                Term parent = Utils.getParentWithOriginRef(pos, true, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm()
                         && parent.getOriginRef() != null) {
                     txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent))
@@ -371,7 +361,7 @@ public class OriginRefView extends DebugTab {
 
         var f0 = (o.isAtom() ? "A" : " ");
         var f1 = (o.isBooleanTerm() ? "B" : " ");
-        var f2 = (TermTranslator.isUnmodifiedTerm(t, o.SourceTerm) ? " " : "C");
+        var f2 = (o.SourceTerm == null) ? "/" : (TermTranslator.isUnmodifiedTerm(t, o.SourceTerm) ? " " : "C");
 
         return "["+f0+"|"+f1+"|"+f2+"] " + o.toString();
     }

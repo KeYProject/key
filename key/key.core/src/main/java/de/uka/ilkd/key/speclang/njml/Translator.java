@@ -247,8 +247,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         String src = ctx.start.getTokenSource().getSourceName();
 
-        Sort sort = expr.getTerm().op().sort(expr.getTerm().subs());
-
         Term term = expr.getTerm();
 
         var lStart = ctx.start.getLine();

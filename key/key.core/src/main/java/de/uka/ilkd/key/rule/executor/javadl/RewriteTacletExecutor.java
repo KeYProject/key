@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -9,10 +11,14 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -21,6 +27,7 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.util.stream.Collectors;
 
@@ -59,11 +66,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             with = services.getTermBuilder().cast(maxSort, with);
         }
 
-        if (term.getOriginRef() != null && with.getOriginRef() == null) {
-            with = services.getTermFactory().setOriginRef(with, term.getOriginRef(), true);
-        }
-
-        return with;
+        return updateOriginRefs(term, with, services, goal);
     }
 
 

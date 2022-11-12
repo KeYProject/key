@@ -104,7 +104,7 @@ public final class TermFactory {
         }
 
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
-            base.getLabels(), origref);
+                base.getLabels(), origref);
 
         if (newTerm instanceof TermImpl && base instanceof TermImpl) {
             ((TermImpl) newTerm).setOrigin(base.getOrigin());
@@ -120,12 +120,11 @@ public final class TermFactory {
         return base;
     }
 
-
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         base = addMissingOriginRefs(base);
 
         OriginRef origref = base.getOriginRef();
-        if (origref != null && origref.Type != t) {
+        if (origref != null && origref.Type != t && (origref.Type != OriginRefType.JAVA_STMT || force)) {
             origref = origref.WithType(t);
         }
 
@@ -139,6 +138,22 @@ public final class TermFactory {
 
         return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
             base.javaBlock(), base.getLabels(), origref);
+    }
+
+    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRef t, boolean replaceExisting) {
+        base = addMissingOriginRefs(base);
+
+        OriginRef origref = base.getOriginRef();
+        if (origref == null || replaceExisting) {
+            origref = t;
+        }
+
+        var subs = base.subs().toList();
+
+        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, replaceExisting));
+
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+                base.javaBlock(), base.getLabels(), origref);
     }
 
     /***

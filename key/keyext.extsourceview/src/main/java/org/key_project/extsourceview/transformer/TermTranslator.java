@@ -228,7 +228,7 @@ public class TermTranslator {
 
         // simple case - use origin directly
 
-        if (origin != null && isUnmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
+        if (origin != null && origin.SourceTerm != null && isUnmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
             var r = origin.sourceString();
             if (r.isEmpty()) {
                 throw new TransformException("Failed to get origin of term");
