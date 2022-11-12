@@ -1,36 +1,24 @@
 <configuration>
+    <!-- disables logback configuration messages on start up, see #1725 -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
+
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>key.log</file>
+        <file>${user.home}/.key/logs/key_${timestamp}.log</file>
         <append>false</append>
         <encoder>
             <pattern>%date|%level|%thread|%logger|%file:%line|%msg|%ex|%n</pattern>
             <outputPatternAsHeader>true</outputPatternAsHeader>
         </encoder>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>key-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <maxFileSize>10MB</maxFileSize>
-            <maxHistory>5</maxHistory>
-            <totalSizeCap>100MB</totalSizeCap>
-        </rollingPolicy>
     </appender>
-
-    <appender name="HTML" class="ch.qos.logback.core.FileAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                <pattern>%relative%date%thread%mdc%level%logger%msg</pattern>
-            </layout>
-        </encoder>
-        <file>key.log.html</file>
-    </appender>
-
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
+            <level>INFO</level>
         </filter>
     </appender>
 
