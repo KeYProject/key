@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -21,9 +24,9 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given classtype. Returns <CODE>
      * null</CODE>, if the given type is not a class file.
      *
-     * @param ct  a class type.
-     * @param the corresponding class file, or <CODE>null</CODE>, if the
-     *            given type has no bytecode representation.
+     * @param ct a class type.
+     * @param the corresponding class file, or <CODE>null</CODE>, if the given type has no bytecode
+     *        representation.
      */
     ClassFile getClassFile(ClassType ct);
 
@@ -31,9 +34,9 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given method. Returns <CODE>null
      * </CODE>, if the given method is not a method info.
      *
-     * @param m   a method.
-     * @param the corresponding bytecode element, or <CODE>null</CODE>, if
-     *            the given method has no bytecode representation.
+     * @param m a method.
+     * @param the corresponding bytecode element, or <CODE>null</CODE>, if the given method has no
+     *        bytecode representation.
      */
     MethodInfo getMethodInfo(Method m);
 
@@ -41,9 +44,9 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given constructor. Returns <CODE>
      * null</CODE>, if the given constructor is not a constructor info.
      *
-     * @param c   a constructor.
-     * @param the corresponding bytecode element, or <CODE>null</CODE>, if
-     *            the given constructor has no bytecode representation.
+     * @param c a constructor.
+     * @param the corresponding bytecode element, or <CODE>null</CODE>, if the given constructor has
+     *        no bytecode representation.
      */
     ConstructorInfo getConstructorInfo(Constructor c);
 
@@ -51,9 +54,9 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given field. Returns <CODE>null
      * </CODE>, if the given field is not a field info.
      *
-     * @param f   a field.
-     * @param the corresponding field info, or <CODE>null</CODE>, if the
-     *            given field has no bytecode representation.
+     * @param f a field.
+     * @param the corresponding field info, or <CODE>null</CODE>, if the given field has no bytecode
+     *        representation.
      */
     FieldInfo getFieldInfo(Field f);
 

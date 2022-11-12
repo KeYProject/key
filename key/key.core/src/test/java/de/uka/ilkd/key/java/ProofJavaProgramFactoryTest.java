@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
@@ -52,7 +55,7 @@ public class ProofJavaProgramFactoryTest {
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         Optional<Method> om = findMethod(cu, "AssertsFalse", "m");
-        LOGGER.debug("{}",cu);
+        LOGGER.debug("{}", cu);
         Assertions.assertTrue(om.isPresent(), "Could not find method AssertsFalse#m()");
         MethodDeclaration m = (MethodDeclaration) om.get();
         assertContainsComment(m, it -> it.startsWith("/*@ normal_behavior"));
@@ -83,7 +86,7 @@ public class ProofJavaProgramFactoryTest {
         Assertions.assertTrue(ghost2.getDeclarationSpecifiers().get(0) instanceof Ghost);
         Assertions.assertEquals("k1_old", ghost2.getVariables().get(0).getName());
 
-        For forLoop = (For) m.getBody().getStatementAt(4); //retrieve the for loop
+        For forLoop = (For) m.getBody().getStatementAt(4); // retrieve the for loop
         assertContainsComment(forLoop, it -> it.equals("//@ ghost int k0_old = k0;"));
         assertContainsComment(forLoop, it -> it.equals("//@ ghost int k1_old = k1;"));
         assertContainsComment(forLoop, it -> it.startsWith("/*@ loop_invariant"));
@@ -99,7 +102,8 @@ public class ProofJavaProgramFactoryTest {
         Assertions.assertEquals("k1_old", var4.getName());
 
         EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
-        EmptyStatement lastStatementInForLoop = (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
+        EmptyStatement lastStatementInForLoop =
+                (EmptyStatement) lastStatement((StatementBlock) forLoop.getBody());
         assertContainsComment(empty1, it -> it.equals("//@ set k0_old = k0;"));
         assertContainsComment(lastStatementInForLoop, it -> it.equals("//@ set k1_old = k1;"));
 
@@ -142,7 +146,7 @@ public class ProofJavaProgramFactoryTest {
         String expected = IOUtil.readFrom(expectedFile);
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
-        //Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
+        // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
 
         String out = getActualResult(cu);
         LOGGER.debug("{}", out);
@@ -165,8 +169,8 @@ public class ProofJavaProgramFactoryTest {
 
 
     private String getActualResult(CompilationUnit cu) {
-        Function<String, String> prepareComment = it ->
-                it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
+        Function<String, String> prepareComment =
+                it -> it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
 
         StringWriter out = new StringWriter();
         PrintWriter actual = new PrintWriter(out);
@@ -175,10 +179,8 @@ public class ProofJavaProgramFactoryTest {
             ProgramElement pe = walker.getProgramElement();
             ASTList<Comment> b = pe.getComments();
             if (b != null && !b.isEmpty()) {
-                actual.format("(%d/%d) -- %s\n",
-                        pe.getStartPosition().getLine(),
-                        pe.getEndPosition().getLine(),
-                        pe.getClass().getName());
+                actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
+                        pe.getEndPosition().getLine(), pe.getClass().getName());
                 for (Comment comment : pe.getComments()) {
                     actual.format("  * %s\n", prepareComment.apply(comment.getText()));
                 }
@@ -197,17 +199,18 @@ public class ProofJavaProgramFactoryTest {
 
     private void assertContainsComment(JavaProgramElement m, Predicate<String> needle) {
         ASTList<Comment> haystack = m.getComments();
-        Optional<Comment> search = haystack.stream()
-                .filter(it -> needle.test(it.getText()))
-                .findFirst();
+        Optional<Comment> search =
+                haystack.stream().filter(it -> needle.test(it.getText())).findFirst();
 
-        Assertions.assertTrue(search.isPresent(), "Could not find comment satisfying the given predicate.");
+        Assertions.assertTrue(search.isPresent(),
+                "Could not find comment satisfying the given predicate.");
     }
 
     private CompilationUnit getCompilationUnit(File inputFile) throws IOException {
-        Assumptions.assumeTrue(inputFile.exists(), "Required input file " + inputFile + " does not exists!");
+        Assumptions.assumeTrue(inputFile.exists(),
+                "Required input file " + inputFile + " does not exists!");
         String content = IOUtil.readFrom(inputFile);
-        return r2k.recoderCompilationUnits(new String[]{content}).get(0);
+        return r2k.recoderCompilationUnits(new String[] { content }).get(0);
     }
 
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
@@ -216,8 +219,7 @@ public class ProofJavaProgramFactoryTest {
             if (td instanceof ClassDeclaration) {
                 ClassDeclaration clazz = (ClassDeclaration) td;
                 if (clazz.getName().equals(className)) {
-                    return clazz.getMethods().stream()
-                            .filter(it -> it.getName().equals(methodName))
+                    return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();
                 }
             }

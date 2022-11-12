@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -7,11 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link ProofScriptCommand} is an executable mutation on the given proof.
- * It abstracts complex operations, and made them accessible for an API.
+ * A {@link ProofScriptCommand} is an executable mutation on the given proof. It abstracts complex
+ * operations, and made them accessible for an API.
  * <p>
- * {@link ProofScriptCommand} are supported by the java.util.{@link java.util.ServiceLoader}.
- * You can add new proof script commands by add a new entry to <code>META-INF/service/de.uka.ilkd.key.macros.scripts.ProofScriptCommand</code>.
+ * {@link ProofScriptCommand} are supported by the java.util.{@link java.util.ServiceLoader}. You
+ * can add new proof script commands by add a new entry to
+ * <code>META-INF/service/de.uka.ilkd.key.macros.scripts.ProofScriptCommand</code>.
  * <p>
  * <b>Version 2 (2017-03-28):</b> change of the interface support for structured arguments.
  * </p>
@@ -31,24 +35,22 @@ public interface ProofScriptCommand<T> {
      * @param arguments
      * @return
      */
-    T evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception;
+    T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception;
 
     /**
      * @param uiControl the current ui controller
-     * @param args      the script arguments
-     * @param stateMap  the current state
-     * @throws ScriptException      if something bad happens
+     * @param args the script arguments
+     * @param stateMap the current state
+     * @throws ScriptException if something bad happens
      * @throws InterruptedException if something bad happens
      */
-    //TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
-    void execute(AbstractUserInterfaceControl uiControl, T args,
-                 EngineState stateMap) throws ScriptException, InterruptedException;
+    // TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
+    void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
+            throws ScriptException, InterruptedException;
 
     /**
-     * Returns the name of this proof command.
-     * The name should be constant and not be clash with the name of other commands.
-     * The name is essential for finding this command within an hashmap.
+     * Returns the name of this proof command. The name should be constant and not be clash with the
+     * name of other commands. The name is essential for finding this command within an hashmap.
      *
      * @return a non-null, non-empty string
      * @see ProofScriptEngine

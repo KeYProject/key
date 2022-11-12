@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -16,9 +19,8 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
         setTooltip("Uses regular expressions-based syntax highlighting. "
                 + "This helps to understand sequents, but may "
                 + "slow down the rendering of longer ones.");
-        final boolean useSyntaxHighlighting =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .isUseSyntaxHighlighting();
+        final boolean useSyntaxHighlighting = ProofIndependentSettings.DEFAULT_INSTANCE
+                .getViewSettings().isUseSyntaxHighlighting();
         setSelected(useSyntaxHighlighting);
     }
 

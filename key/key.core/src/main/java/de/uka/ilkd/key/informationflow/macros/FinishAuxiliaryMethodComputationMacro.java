@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -24,16 +27,13 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  *
  * @author christoph
  */
-public class FinishAuxiliaryMethodComputationMacro
-        extends AbstractFinishAuxiliaryComputationMacro {
+public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (poForProof instanceof SymbolicExecutionPO) {
                 return true;
             }
@@ -42,20 +42,16 @@ public class FinishAuxiliaryMethodComputationMacro
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          final Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
-        final InfFlowContractPO ifPO =
-                (InfFlowContractPO) services.getSpecificationRepository()
-                                         .getProofOblInput(initiatingProof);
+        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getSpecificationRepository()
+                .getProofOblInput(initiatingProof);
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 

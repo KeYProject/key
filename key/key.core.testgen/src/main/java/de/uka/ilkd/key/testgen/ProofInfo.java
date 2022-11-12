@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -81,10 +84,11 @@ public class ProofInfo {
         if (c instanceof FunctionalOperationContract) {
             FunctionalOperationContract t = (FunctionalOperationContract) c;
             OriginalVariables orig = t.getOrigVars();
-            Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self, orig.params, orig.atPres, services);
+            Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
+                    orig.params, orig.atPres, services);
             return post;
         }
-        //no pre <==> false
+        // no pre <==> false
         return services.getTermBuilder().ff();
     }
 
@@ -98,7 +102,7 @@ public class ProofInfo {
         Term f = getPO();
         JavaBlock block = getJavaBlock(f);
 
-        //    getUpdate(f);
+        // getUpdate(f);
         StringWriter sw = new StringWriter();
         sw.write("   " + getUpdate(f) + "\n");
         PrettyPrinter pw = new CustomPrettyPrinter(sw, false);
@@ -180,10 +184,12 @@ public class ProofInfo {
     private String processUpdate(Term update) {
         if (update.op() instanceof ElementaryUpdate) {
             ElementaryUpdate up = (ElementaryUpdate) update.op();
-            if (up.lhs().sort().extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
+            if (up.lhs().sort()
+                    .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
                 return "";
             }
-            return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0) + ";";
+            return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
+                    + ";";
         }
         StringBuilder result = new StringBuilder();
         for (Term sub : update.subs()) {

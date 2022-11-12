@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -36,7 +39,8 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(FormulaSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
+            FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
@@ -44,15 +48,18 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchTermSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(VariableSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
+            VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(ProgramSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
+            ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(UpdateSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
+            UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 
@@ -64,14 +71,15 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchProgramInstruction(prg);
     }
 
-    public static MatchInstruction matchAndBindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static MatchInstruction matchAndBindVariables(
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 
     public static MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
-    
+
     public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
         return new MatchElementaryUpdateInstruction(elementaryUpdate);
     }
@@ -83,12 +91,16 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified {@link Term} {@code instantiationCandidate}
-     * w.r.t. the given constraints by {@link MatchConditions} 
+     * tries to match the schema variable of this instruction with the specified {@link Term}
+     * {@code instantiationCandidate} w.r.t. the given constraints by {@link MatchConditions}
+     *
      * @param instantiationCandidate the {@link Term} to be matched
-     * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous matches of this schemavariable)
+     * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous
+     *        matches of this schemavariable)
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
+     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
+     *         the pair {@link (sv, instantiationCandidate)} added
      */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services);
+    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
+            Services services);
 }

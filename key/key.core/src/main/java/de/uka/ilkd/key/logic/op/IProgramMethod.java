@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -14,17 +17,16 @@ import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-public interface IProgramMethod extends IObserverFunction, SourceElement,
-        ProgramElement, MemberDeclaration {
+public interface IProgramMethod
+        extends IObserverFunction, SourceElement, ProgramElement, MemberDeclaration {
 
     public abstract MethodDeclaration getMethodDeclaration();
 
     /**
-     * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This
-     * method does not care about the invoker as argSort does.
-     * 
-     * @param i
-     *            the int specifying the parameter position
+     * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method does not care
+     * about the invoker as argSort does.
+     *
+     * @param i the int specifying the parameter position
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
     public abstract KeYJavaType getParameterType(int i);
@@ -83,8 +85,8 @@ public interface IProgramMethod extends IObserverFunction, SourceElement,
     public ImmutableArray<KeYJavaType> getParamTypes();
 
     /**
-     * @return The list of {@link LocationVariable}s passed as parameters to
-     *         this {@link IProgramMethod}.
+     * @return The list of {@link LocationVariable}s passed as parameters to this
+     *         {@link IProgramMethod}.
      */
     public ImmutableList<LocationVariable> collectParameters();
 }

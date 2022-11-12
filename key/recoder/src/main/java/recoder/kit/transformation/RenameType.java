@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -17,12 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Transformation that renames a type declaration and all known references to
- * that type. The new name should not hide another type in the declaration
- * context.
+ * Transformation that renames a type declaration and all known references to that type. The new
+ * name should not hide another type in the declaration context.
  * <p>
- * <B>Implementation warning: </B> does not (yet) check vadility of new name in
- * the context.
+ * <B>Implementation warning: </B> does not (yet) check vadility of new name in the context.
  *
  * @author AL
  */
@@ -37,15 +38,14 @@ public class RenameType extends TwoPassTransformation {
     private List<? extends Constructor> cons;
 
     /**
-     * Creates a new transformation object that renames a type declaration and
-     * all known references to that type. The new name should not hide another
-     * type in the declaration context.
+     * Creates a new transformation object that renames a type declaration and all known references
+     * to that type. The new name should not hide another type in the declaration context.
      *
-     * @param sc      the service configuration to use.
-     * @param type    the type declaration to be renamed; may not be <CODE>null
+     * @param sc the service configuration to use.
+     * @param type the type declaration to be renamed; may not be <CODE>null
      *                </CODE> and may not be an anonymous type.
-     * @param newName the new name for the element; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     *        valid identifier name.
      */
     public RenameType(CrossReferenceServiceConfiguration sc, TypeDeclaration type, String newName) {
         super(sc);
@@ -63,10 +63,9 @@ public class RenameType extends TwoPassTransformation {
     }
 
     /**
-     * Collects all references to the type and all existing array variants, as
-     * well as all constructor declarations. Constructor references are not
-     * relevant, as they are either nameless (super / this), or contain a type
-     * reference already.
+     * Collects all references to the type and all existing array variants, as well as all
+     * constructor declarations. Constructor references are not relevant, as they are either
+     * nameless (super / this), or contain a type reference already.
      *
      * @return the problem report.
      */
@@ -90,8 +89,8 @@ public class RenameType extends TwoPassTransformation {
     }
 
     /**
-     * Locally renames the type declaration, all type references and
-     * constructors collected in the analyzation phase.
+     * Locally renames the type declaration, all type references and constructors collected in the
+     * analyzation phase.
      *
      * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
@@ -103,7 +102,8 @@ public class RenameType extends TwoPassTransformation {
         for (int i = cons.size() - 1; i >= 0; i -= 1) {
             Constructor con = cons.get(i);
             if (con instanceof ConstructorDeclaration) {
-                replace(((ConstructorDeclaration) con).getIdentifier(), pf.createIdentifier(newName));
+                replace(((ConstructorDeclaration) con).getIdentifier(),
+                        pf.createIdentifier(newName));
             }
         }
         for (int i = refs.size() - 1; i >= 0; i -= 1) {

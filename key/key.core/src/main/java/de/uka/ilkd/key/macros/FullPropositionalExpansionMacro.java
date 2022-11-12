@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
 /**
- * The macro FullPropositionalExpansionMacro apply rules to decompose
- * propositional toplevel formulas; it even splits the goal if necessary.
+ * The macro FullPropositionalExpansionMacro apply rules to decompose propositional toplevel
+ * formulas; it even splits the goal if necessary.
  *
  * The rules that are applied can be set in {@link #ADMITTED_RULES}.
  *
@@ -19,8 +22,8 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     @Override
     public String getDescription() {
-        return "Apply rules to decompose propositional toplevel formulas; " +
-                "splits the goal if necessary";
+        return "Apply rules to decompose propositional toplevel formulas; "
+                + "splits the goal if necessary";
     }
 
     @Override
@@ -28,13 +31,11 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
         return "split-prop";
     }
 
-    private static final String[] ADMITTED_RULES = {
-        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
-        "andRight", "orLeft", "impLeft",
-        "closeTrue", "closeFalse", "true_left", "false_right",
-//        "ifthenelse_split", "ifthenelse_split_for",
-        "equivLeft", "equivRight"
-    };
+    private static final String[] ADMITTED_RULES =
+            { "andLeft", "orRight", "impRight", "notLeft", "notRight", "close", "andRight",
+                    "orLeft", "impLeft", "closeTrue", "closeFalse", "true_left", "false_right",
+                    // "ifthenelse_split", "ifthenelse_split_for",
+                    "equivLeft", "equivRight" };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -6,8 +9,7 @@ import recoder.ModelElement;
 import recoder.NamedModelElement;
 
 /**
- * Filter predicate for named model elements. Can search for certain names and
- * types (optionally).
+ * Filter predicate for named model elements. Can search for certain names and types (optionally).
  *
  * @author AL
  */
@@ -28,13 +30,12 @@ public class NamedModelElementFilter implements ModelElementFilter {
     }
 
     /**
-     * Create a filter that accepts any named model element with the given name
-     * and type.
+     * Create a filter that accepts any named model element with the given name and type.
      *
      * @param type the most general type to accept.
      * @param name the name that is accepted.
      * @throws IllegalArgumentException if the type is not a subtype of
-     *                                  {@link recoder.NamedModelElement}.
+     *         {@link recoder.NamedModelElement}.
      */
     public NamedModelElementFilter(Class type, String name) {
         if (!NamedModelElement.class.isAssignableFrom(type)) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -6,12 +9,11 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 
 /**
- * Sets the behavior if an already closed proof is encountered: Either throw an
- * exception (default behavior, sensible for specially tailored scripts for
- * which a prematurely closed proof is unexpected) or peacefully terminate (if
- * the script addresses different problems of different complexity in a
- * try-and-error manner, etc.).
- * 
+ * Sets the behavior if an already closed proof is encountered: Either throw an exception (default
+ * behavior, sensible for specially tailored scripts for which a prematurely closed proof is
+ * unexpected) or peacefully terminate (if the script addresses different problems of different
+ * complexity in a try-and-error manner, etc.).
+ *
  * @author Dominic Steinhoefel
  */
 public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedCommand.Parameters> {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -20,9 +23,10 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (9/16/20)
  */
-@KeYGuiExtension.Info(name="Test case generation", description = "key.testgen", experimental = false)
-public class TestgenExtension implements
-        KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
+@KeYGuiExtension.Info(name = "Test case generation", description = "key.testgen",
+        experimental = false)
+public class TestgenExtension
+        implements KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
 
     private TestGenerationAction actionTestGeneration;
@@ -60,7 +64,8 @@ public class TestgenExtension implements
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+            JComponent component) {
         return Collections.emptyList();
     }
 

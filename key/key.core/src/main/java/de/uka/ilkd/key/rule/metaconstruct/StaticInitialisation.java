@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -26,8 +29,7 @@ public class StaticInitialisation extends ProgramTransformer {
             SVInstantiations insts) {
         KeYJavaType typeToBeInitialised = null;
         if (pe instanceof FieldReference) {
-            final ProgramVariable pv = ((FieldReference) pe)
-                    .getProgramVariable();
+            final ProgramVariable pv = ((FieldReference) pe).getProgramVariable();
             if (pv.isStatic()) {
                 typeToBeInitialised = pv.getContainerType();
             } else {
@@ -42,19 +44,16 @@ public class StaticInitialisation extends ProgramTransformer {
             }
         } else if (pe instanceof MethodReference) {
             final MethodReference mr = (MethodReference) pe;
-            final ExecutionContext ec = insts.getContextInstantiation()
-                    .activeStatementContext();
+            final ExecutionContext ec = insts.getContextInstantiation().activeStatementContext();
             final IProgramMethod m;
-            final KeYJavaType mrPrefixType = mr
-                    .determineStaticPrefixType(services, ec);
+            final KeYJavaType mrPrefixType = mr.determineStaticPrefixType(services, ec);
             if (ec == null) {
                 // in this case we are at the top level of a diamond
                 // in this case we assume as scope the type of the method prefix
-                m = mr.method(services, mrPrefixType,
-                    mr.getMethodSignature(services, null), mrPrefixType);
+                m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null),
+                        mrPrefixType);
             } else {
-                m = mr.method(services,
-                    mr.determineStaticPrefixType(services, ec), ec);
+                m = mr.method(services, mr.determineStaticPrefixType(services, ec), ec);
             }
             if (m != null) {
                 if (m.isStatic()) {
@@ -67,8 +66,7 @@ public class StaticInitialisation extends ProgramTransformer {
         } else {
             // at the moment the 'new' case is catched via static method
             // call of <createObject>
-            Debug.fail(
-                "static initialisation: Unexpected case in static initialisation.");
+            Debug.fail("static initialisation: Unexpected case in static initialisation.");
         }
 
         if (typeToBeInitialised == null) {
@@ -76,11 +74,9 @@ public class StaticInitialisation extends ProgramTransformer {
             return null;
         }
 
-        final MethodReference methodCall = KeYJavaASTFactory.methodCall(
-            typeToBeInitialised,
-            ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
+        final MethodReference methodCall = KeYJavaASTFactory.methodCall(typeToBeInitialised,
+                ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
 
-        return new ProgramElement[] {
-            KeYJavaASTFactory.passiveExpression(methodCall) };
+        return new ProgramElement[] { KeYJavaASTFactory.passiveExpression(methodCall) };
     }
 }

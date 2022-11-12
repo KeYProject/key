@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -13,8 +16,8 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import java.awt.event.ActionEvent;
 
 /**
- * This action is responsible for the invocation of an SMT solver For
- * example the toolbar button is parameterized with an instance of this action
+ * This action is responsible for the invocation of an SMT solver For example the toolbar button is
+ * parameterized with an instance of this action
  *
  * @author ?
  * @author Alicia Appelhagen (move from MainWindow to own class)
@@ -31,8 +34,8 @@ public class SMTInvokeAction extends MainWindowAction {
     private final transient SolverTypeCollection solverUnion;
 
     /**
-     * Create a new SMTInvokeAction belonging to the given MainWindow.
-     * The resulting action starts the given solver union.
+     * Create a new SMTInvokeAction belonging to the given MainWindow. The resulting action starts
+     * the given solver union.
      *
      * @param solverUnion the solvers/solver types to be started by this action
      * @param mainWindow the main window this action belongs to
@@ -53,8 +56,7 @@ public class SMTInvokeAction extends MainWindowAction {
     @Override
     public boolean isEnabled() {
         return super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
-                && mediator != null
-                && mediator.getSelectedProof() != null
+                && mediator != null && mediator.getSelectedProof() != null
                 && !mediator.getSelectedProof().closed();
     }
 
@@ -68,14 +70,13 @@ public class SMTInvokeAction extends MainWindowAction {
 
         Thread thread = new Thread(() -> {
 
-            DefaultSMTSettings settings = new DefaultSMTSettings(
-                    proof.getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    proof.getSettings().getNewSMTSettings(), proof);
+            DefaultSMTSettings settings =
+                    new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                            proof.getSettings().getNewSMTSettings(), proof);
             SolverLauncher launcher = new SolverLauncher(settings);
             launcher.addListener(new SolverListener(settings, proof));
-            launcher.launch(solverUnion.getTypes(),
-                    SMTProblem.createSMTProblems(proof),
+            launcher.launch(solverUnion.getTypes(), SMTProblem.createSMTProblems(proof),
                     proof.getServices());
 
         }, "SMTRunner");

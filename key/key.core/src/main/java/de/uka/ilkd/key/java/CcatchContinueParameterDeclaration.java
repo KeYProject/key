@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -11,11 +14,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchContinueParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchContinueParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
-    public CcatchContinueParameterDeclaration(ExtList children) {
-    }
+    public CcatchContinueParameterDeclaration(ExtList children) {}
 
     @Override
     public int getChildCount() {

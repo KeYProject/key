@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -23,10 +26,10 @@ public class Intersect extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnIntersect(this);
+        v.performActionOnIntersect(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printIntersect(this);
     }

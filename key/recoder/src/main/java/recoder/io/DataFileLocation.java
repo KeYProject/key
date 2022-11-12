@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.io;
@@ -19,8 +22,8 @@ public class DataFileLocation implements DataLocation {
     String canonicalPath;
 
     /**
-     * Creates a new data file location for the specified file. The file might
-     * be changed to its canonical form.
+     * Creates a new data file location for the specified file. The file might be changed to its
+     * canonical form.
      */
     public DataFileLocation(File f) {
         setFile(f);
@@ -51,9 +54,8 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form "
-     * <type>: <location-specific-name>", i.e. file:/bin/sh
-     * url:http://mywww/myfile
+     * returns a URL-like string representation of the location in the form " <type>:
+     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
      * zip:recoder.zip:recoder/java/JavaProgramFactory.class
      */
     public String toString() {
@@ -61,9 +63,8 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * determines whether the data source provides a reader interface. If this
-     * is not the case, the reader is placed on top of an input stream, which
-     * causes efficiency losses.
+     * determines whether the data source provides a reader interface. If this is not the case, the
+     * reader is placed on top of an input stream, which causes efficiency losses.
      *
      * @return true iff the data location provides reader functionality
      */
@@ -75,8 +76,8 @@ public class DataFileLocation implements DataLocation {
      * returns an input stream for the content of the location
      *
      * @return the according input stream
-     * @throws IOException thrown if an error occurs with retrieving the input stream
-     *                     from the according data object.
+     * @throws IOException thrown if an error occurs with retrieving the input stream from the
+     *         according data object.
      */
     public InputStream getInputStream() throws IOException {
         return new BufferedInputStream(new FileInputStream(file));
@@ -90,14 +91,12 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * returns a reader for the according data content. If the data source does
-     * not provide a reader, an adapter reader is placed on top of an input
-     * stream.
+     * returns a reader for the according data content. If the data source does not provide a
+     * reader, an adapter reader is placed on top of an input stream.
      *
      * @return the according reader
-     * @throws IOException thrown if an error occurs with retrieving the reader or
-     *                     the underlying input stream from the according data
-     *                     object.
+     * @throws IOException thrown if an error occurs with retrieving the reader or the underlying
+     *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
         return new FileReader(file);
@@ -120,9 +119,8 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * determines whether the data source provides a writer interface. If this
-     * is not the case, the writer is placed on top of an output stream, which
-     * causes efficiency losses.
+     * determines whether the data source provides a writer interface. If this is not the case, the
+     * writer is placed on top of an output stream, which causes efficiency losses.
      *
      * @return true iff the data location provides writer functionality
      */
@@ -134,30 +132,27 @@ public class DataFileLocation implements DataLocation {
      * returns an output stream for manipulating the content of the location
      *
      * @return the according output stream
-     * @throws IOException thrown if an error occurs with retrieving the output
-     *                     stream from the according data object.
+     * @throws IOException thrown if an error occurs with retrieving the output stream from the
+     *         according data object.
      */
     public OutputStream getOutputStream() throws IOException {
         return new FileOutputStream(file);
     }
 
     /**
-     * tells the location, that the earlier created output stream has been
-     * closed
+     * tells the location, that the earlier created output stream has been closed
      */
     public void outputStreamClosed() {
         // nothing to do
     }
 
     /**
-     * returns a writer for the according data content. If the data source does
-     * not provide a writer, an adapter reader is placed on top of an output
-     * stream.
+     * returns a writer for the according data content. If the data source does not provide a
+     * writer, an adapter reader is placed on top of an output stream.
      *
      * @return the according writer
-     * @throws IOException thrown if an error occurs with retrieving the writer or
-     *                     the underlying output stream from the according data
-     *                     object.
+     * @throws IOException thrown if an error occurs with retrieving the writer or the underlying
+     *         output stream from the according data object.
      */
     public Writer getWriter() throws IOException {
         return new FileWriter(file);

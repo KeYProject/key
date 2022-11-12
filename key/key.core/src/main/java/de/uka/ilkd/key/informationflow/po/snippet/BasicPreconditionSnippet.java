@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -11,16 +14,14 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicPreconditionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
-                        ProofObligationVars poVars)
+    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.PRECONDITION) == null) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "precondition for a contract without precondition.");
+            throw new UnsupportedOperationException(
+                    "Tried to produce a " + "precondition for a contract without precondition.");
         }
         assert Term.class.equals(BasicSnippetData.Key.PRECONDITION.getType());
-        Term origPre = (Term) d.get(
-                BasicSnippetData.Key.PRECONDITION);
+        Term origPre = (Term) d.get(BasicSnippetData.Key.PRECONDITION);
         return replace(origPre, d.origVars, poVars.pre, d.tb);
     }
 }

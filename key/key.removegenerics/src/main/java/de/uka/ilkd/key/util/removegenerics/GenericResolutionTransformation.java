@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import org.slf4j.Logger;
@@ -17,14 +20,12 @@ import recoder.kit.TwoPassTransformation;
 import java.util.Collection;
 
 /**
- * This is the base class to all transformations used in the generics removal
- * process.
+ * This is the base class to all transformations used in the generics removal process.
  * <p>
- * It allows 2 things: 1) calculating the target type of a type (which is the
- * type when type variables are no longer) and 2) to print out debug info.
+ * It allows 2 things: 1) calculating the target type of a type (which is the type when type
+ * variables are no longer) and 2) to print out debug info.
  * <p>
- * String creation is a little tedious in recoder so {@link #toString(Object)}
- * does a lot of it.
+ * String creation is a little tedious in recoder so {@link #toString(Object)} does a lot of it.
  *
  * @author MU
  */
@@ -32,7 +33,8 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
 
     // allow debug output
     public static boolean DEBUG_OUTPUT = Boolean.getBoolean("resolvegen.verbose");
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenericResolutionTransformation.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(GenericResolutionTransformation.class);
 
     public GenericResolutionTransformation() {
         super();
@@ -43,10 +45,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
     }
 
     /**
-     * get the type of the reference that it will have in a generic-free
-     * environment. If the expression once had type <code>V</code> for some
-     * (unbound) type variable it will then have <code>java.lang.Object</code>
-     * etc.
+     * get the type of the reference that it will have in a generic-free environment. If the
+     * expression once had type <code>V</code> for some (unbound) type variable it will then have
+     * <code>java.lang.Object</code> etc.
      *
      * @param t the type to be resolved
      * @return the coresponding type in the generic-free environment
@@ -67,9 +68,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
         }
 
         /*
-         * it might be necessary to do the following block more than once in a
-         * situation like: G&lt;A, B extends A&gt; where B would be replaced by A,
-         * which needs to be resolved to Object.
+         * it might be necessary to do the following block more than once in a situation like:
+         * G&lt;A, B extends A&gt; where B would be replaced by A, which needs to be resolved to
+         * Object.
          */
         while (t instanceof TypeParameter) {
             changed = true;
@@ -105,16 +106,13 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
     }
 
     /**
-     * if the global debug flag {@link #DEBUG_OUTPUT} is set to true print out a
-     * message.
+     * if the global debug flag {@link #DEBUG_OUTPUT} is set to true print out a message.
      * <p>
-     * First the message-head is printed followed by a ':', followed by a
-     * ;-separated list of the arguments. Each argument is converted to a string
-     * using the {@link #toString(Object)}.
+     * First the message-head is printed followed by a ':', followed by a ;-separated list of the
+     * arguments. Each argument is converted to a string using the {@link #toString(Object)}.
      *
      * @param msg the message's head
-     * @param arg 0 or more objects that will be expanded to a ;-separated list
-     *            after the message
+     * @param arg 0 or more objects that will be expanded to a ;-separated list after the message
      */
 
     public static void debugOut(String msg, Object... arg) {
@@ -133,13 +131,13 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
     /**
      * convert an object to a String.
      * <p>
-     * For some classes {@link Object#toString()} is lame, so that the following
-     * classes are caught here:
+     * For some classes {@link Object#toString()} is lame, so that the following classes are caught
+     * here:
      * <ul>
-     * <li> {@link MethodDeclaration}
-     * <li> {@link NamedModelElement}
-     * <li> {@link Collection} - which handle each element with toString </li>
-     * Anything else will be transoformed using {@link Object#toString()}.
+     * <li>{@link MethodDeclaration}
+     * <li>{@link NamedModelElement}
+     * <li>{@link Collection} - which handle each element with toString</li> Anything else will be
+     * transoformed using {@link Object#toString()}.
      *
      * @param object the object to be transformed, may be null
      * @return a String representing the object.

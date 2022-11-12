@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.PrintWriter;
@@ -11,33 +14,21 @@ import java.io.Writer;
  * @version 1 (8/5/20)
  */
 public class JunitXmlWriter implements AutoCloseable {
-/* format:
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites disabled="" errors="" failures="" name="" tests="" time="">
-<testsuite disabled="" errors="" failures="" hostname="" id=""
-           name="" package="" skipped="" tests="" time="" timestamp="">
-    <properties>
-        <property name="" value=""/>
-    </properties>
-    <testcase assertions="" classname="" name="" status="" time="">
-        <skipped/>
-        <error message="" type=""/>
-        <failure message="" type=""/>
-        <system-out/>
-        <system-err/>
-    </testcase>
-    <system-out/>
-    <system-err/>
-</testsuite>
-</testsuites>
- */
+    /*
+     * format: <?xml version="1.0" encoding="UTF-8"?> <testsuites disabled="" errors="" failures=""
+     * name="" tests="" time=""> <testsuite disabled="" errors="" failures="" hostname="" id=""
+     * name="" package="" skipped="" tests="" time="" timestamp=""> <properties> <property name=""
+     * value=""/> </properties> <testcase assertions="" classname="" name="" status="" time="">
+     * <skipped/> <error message="" type=""/> <failure message="" type=""/> <system-out/>
+     * <system-err/> </testcase> <system-out/> <system-err/> </testsuite> </testsuites>
+     */
 
     private final PrintWriter writer;
 
     public JunitXmlWriter(Writer writer, String fqName, int total) {
         this.writer = new PrintWriter(writer);
-        this.writer.format("<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\">",
-                fqName, total);
+        this.writer.format("<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\">", fqName,
+                total);
     }
 
     @Override
@@ -48,9 +39,8 @@ public class JunitXmlWriter implements AutoCloseable {
         writer.close();
     }
 
-    public void addTestcase(String name, String classname,
-                            boolean skipped, String error,
-                            String failure, String sout, String serr) {
+    public void addTestcase(String name, String classname, boolean skipped, String error,
+            String failure, String sout, String serr) {
         writer.format("<testcase name=\"%s\"  classname=\"%s\">", name, classname);
         if (skipped)
             writer.format("<skipped/>");

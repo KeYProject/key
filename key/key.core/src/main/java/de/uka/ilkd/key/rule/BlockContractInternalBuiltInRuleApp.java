@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -19,10 +22,8 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -31,18 +32,12 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
-     * @param ifInstantiations
-     *            if instantiations.
-     * @param statement
-     *            the statement which the applied contract belongs to.
-     * @param contract
-     *            the contract being applied.
-     * @param heaps
-     *            the heap context.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     * @param statement the statement which the applied contract belongs to.
+     * @param contract the contract being applied.
+     * @param heaps the heap context.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,

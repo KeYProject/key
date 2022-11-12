@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -5,8 +8,8 @@ package recoder.service;
 import recoder.ModelException;
 
 /**
- * Exception indicating that a vital class file is missing, usually a super type
- * of a known class file.
+ * Exception indicating that a vital class file is missing, usually a super type of a known class
+ * file.
  *
  * @author AL
  * @since 0.72
@@ -31,7 +34,7 @@ public class MissingClassFileException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s    an explanation.
+     * @param s an explanation.
      * @param name the name of the missing file.
      */
     public MissingClassFileException(String s, String name) {

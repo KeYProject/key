@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension.api;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -17,8 +20,7 @@ public interface TabPanel {
     @Nonnull
     String getTitle();
 
-    default @Nullable
-    Icon getIcon() {
+    default @Nullable Icon getIcon() {
         return null;
     }
 
@@ -28,21 +30,18 @@ public interface TabPanel {
     /**
      * @return non-null
      */
-    default @Nonnull
-    Collection<Action> getTitleActions() {
+    default @Nonnull Collection<Action> getTitleActions() {
         return Collections.emptyList();
     }
 
     /**
      * @return
      */
-    default @Nonnull
-    Collection<CAction> getTitleCActions() {
+    default @Nonnull Collection<CAction> getTitleCActions() {
         return Collections.emptyList();
     }
 
-    default @Nullable
-    DefaultCDockable.Permissions getPermissions() {
+    default @Nullable DefaultCDockable.Permissions getPermissions() {
         return null;
     }
 }

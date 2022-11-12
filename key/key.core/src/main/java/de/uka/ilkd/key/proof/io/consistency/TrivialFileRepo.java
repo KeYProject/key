@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.File;
@@ -15,8 +18,9 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
- * This FileRepo does not cache any files but writes to / reads from the original files on disk.
- * It can be used for recreating the old behavior of KeY without a FileRepo.
+ * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
+ * can be used for recreating the old behavior of KeY without a FileRepo.
+ *
  * @author Wolfram Pfeifer
  */
 public class TrivialFileRepo implements FileRepo {

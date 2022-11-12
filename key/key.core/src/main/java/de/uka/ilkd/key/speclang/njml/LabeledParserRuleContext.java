@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -17,14 +20,16 @@ public class LabeledParserRuleContext {
     public final TermLabel second;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
+        if (first == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = first;
         this.second = second;
     }
 
 
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
+        if (first == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = first;
         second = null;
     }
@@ -33,7 +38,8 @@ public class LabeledParserRuleContext {
         this(ctx, constructTermLabel(ctx, specType));
     }
 
-    private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    private static TermLabel constructTermLabel(ParserRuleContext ctx,
+            OriginTermLabel.SpecType specType) {
         String filename = ctx.start.getTokenSource().getSourceName();
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);

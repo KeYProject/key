@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -18,13 +21,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Utility class to obtain or transform Identifiers obeying a set of naming
- * conventions. There should be distinguishable Identifiers for features,
- * constants and classes for any given base name.
+ * Utility class to obtain or transform Identifiers obeying a set of naming conventions. There
+ * should be distinguishable Identifiers for features, constants and classes for any given base
+ * name.
  * <p>
- * The default Java naming scheme defines lower case first letters for features,
- * upper case first letters for classes, lower case for packages, and upper case
- * for constants (final attributes).
+ * The default Java naming scheme defines lower case first letters for features, upper case first
+ * letters for classes, lower case for packages, and upper case for constants (final attributes).
  * <p>
  * Examples: <BR>
  * createFeatureName("HelloWorld").equals("helloWorld") <BR>
@@ -114,8 +116,8 @@ public abstract class Naming {
 
     public static Identifier createMemberName(Identifier base) {
         String text = base.getText();
-        return hasLowerCaseBegin(text) ? base.deepClone() : base.getFactory().createIdentifier(
-                makeLowerCaseBegin(text));
+        return hasLowerCaseBegin(text) ? base.deepClone()
+                : base.getFactory().createIdentifier(makeLowerCaseBegin(text));
     }
 
     public static String createClassName(String base) {
@@ -124,8 +126,8 @@ public abstract class Naming {
 
     public static Identifier createClassName(Identifier base) {
         String text = base.getText();
-        return hasUpperCaseBegin(text) ? base.deepClone() : base.getFactory().createIdentifier(
-                makeUpperCaseBegin(text));
+        return hasUpperCaseBegin(text) ? base.deepClone()
+                : base.getFactory().createIdentifier(makeUpperCaseBegin(text));
     }
 
     public static String createPackageName(String base) {
@@ -148,19 +150,17 @@ public abstract class Naming {
     }
 
     /**
-     * Makes a valid system-specific file path name from a logical (dotted)
-     * name. For instance, "java.lang" is converted into "java" +
-     * File.separatorChar + "lang".
+     * Makes a valid system-specific file path name from a logical (dotted) name. For instance,
+     * "java.lang" is converted into "java" + File.separatorChar + "lang".
      */
     public static String makeFilename(String logicalName) {
         return logicalName.replace('.', File.separatorChar);
     }
 
     /**
-     * Concatenates two strings with a dot in the middle. Null strings are
-     * considered empty. The implementation is faster than the usual "+"
-     * translation and slightly faster than StringBuffer operations and it also
-     * needs less memory.
+     * Concatenates two strings with a dot in the middle. Null strings are considered empty. The
+     * implementation is faster than the usual "+" translation and slightly faster than StringBuffer
+     * operations and it also needs less memory.
      */
     public static String dot(String prefix, String suffix) {
         if (prefix == null) {
@@ -184,9 +184,9 @@ public abstract class Naming {
     }
 
     /**
-     * Returns the name of an array type with the given basename and the given
-     * number of dimensions. If dimensions are zero or the basename is null, the
-     * basename is returned. Example: <CODE>toArrayTypeName("java.lang.Object",
+     * Returns the name of an array type with the given basename and the given number of dimensions.
+     * If dimensions are zero or the basename is null, the basename is returned. Example:
+     * <CODE>toArrayTypeName("java.lang.Object",
      * 2)</CODE> yields <CODE>"java.lang.Object[][]"</CODE>.
      */
     public static String toArrayTypeName(String basename, int dimensions) {
@@ -205,10 +205,9 @@ public abstract class Naming {
     }
 
     /**
-     * Creates the dotted path name for a reference prefix. Returns an empty
-     * string if the prefix is not a
-     * {@link recoder.java.reference.NameReference}. Appends array brackets if
-     * the prefix is a type reference with a dimension > 0.
+     * Creates the dotted path name for a reference prefix. Returns an empty string if the prefix is
+     * not a {@link recoder.java.reference.NameReference}. Appends array brackets if the prefix is a
+     * type reference with a dimension > 0.
      *
      * @param ref a reference prefix.
      * @return the dotted representation of the given reference.
@@ -251,13 +250,12 @@ public abstract class Naming {
     }
 
     /**
-     * Creates the dotted path name for a reference prefix and appends a suffix
-     * string. Returns the suffix if the prefix is not a
-     * {@link recoder.java.reference.NameReference}. Ignores the suffix if it
-     * is <CODE>null</CODE> or empty. Assumes that the prefix is not a type
-     * reference with a dimension > 0.
+     * Creates the dotted path name for a reference prefix and appends a suffix string. Returns the
+     * suffix if the prefix is not a {@link recoder.java.reference.NameReference}. Ignores the
+     * suffix if it is <CODE>null</CODE> or empty. Assumes that the prefix is not a type reference
+     * with a dimension > 0.
      *
-     * @param ref    a reference prefix.
+     * @param ref a reference prefix.
      * @param suffix a suffix string.
      * @return the dotted representation of the given reference and the suffix.
      * @since 0.72
@@ -304,8 +302,9 @@ public abstract class Naming {
 
     /*
      * Returns the fully qualified name of the package of a compilation unit.
-     * @param cu a compilation unit. @return the canonical name of the unit, or
-     * <CODE> "" </CODE> if the unit has the default package.
+     *
+     * @param cu a compilation unit. @return the canonical name of the unit, or <CODE> "" </CODE> if
+     * the unit has the default package.
      */
     public static String getPackageName(CompilationUnit cu) {
         PackageSpecification spec = cu.getPackageSpecification();
@@ -320,10 +319,10 @@ public abstract class Naming {
     }
 
     /**
-     * Derives the canonical name for a compilation unit. Combines the name of
-     * the package and the name of the primary type declaration. If the primary
-     * type declaration is not public, or no type is declared within the compilation unit,
-     * it's attempted to keep the old filename instead.
+     * Derives the canonical name for a compilation unit. Combines the name of the package and the
+     * name of the primary type declaration. If the primary type declaration is not public, or no
+     * type is declared within the compilation unit, it's attempted to keep the old filename
+     * instead.
      *
      * @param cu a compilation unit.
      * @return the canonical name of the unit.
@@ -334,10 +333,9 @@ public abstract class Naming {
         // TODO Gutzmann - put back in. This is a hack for as long
         // as recoder does not recognize enums as types
         /*
-        if (m == null) {
-            throw new IllegalArgumentException("Compilation unit " + cu.getName() + " has no primary type declaration");
-        }
-        */
+         * if (m == null) { throw new IllegalArgumentException("Compilation unit " + cu.getName() +
+         * " has no primary type declaration"); }
+         */
         String name;
         if (m == null || (!m.isPublic() && cu.getDataLocation() != null)) {
             // keep original filename, if possible
@@ -351,7 +349,8 @@ public abstract class Naming {
                 possibleFileName = dataLocStr.substring(lastSlash + 1);
             // TODO check if filename is correct
             name = possibleFileName;
-        } else name = m.getName();
+        } else
+            name = m.getName();
         String pname = getPackageName(cu);
         if (pname.length() == 0) {
             return name;
@@ -361,10 +360,9 @@ public abstract class Naming {
     }
 
     /**
-     * Derives the canoncial file name for a compilation unit. Combines the name
-     * of the package and the name of the primary type declaration, transforms
-     * it into a platform specific file name and appends the ".java" filename
-     * suffix.
+     * Derives the canoncial file name for a compilation unit. Combines the name of the package and
+     * the name of the primary type declaration, transforms it into a platform specific file name
+     * and appends the ".java" filename suffix.
      *
      * @param cu a compilation unit.
      * @return the canonical file name of the unit.
@@ -427,8 +425,7 @@ public abstract class Naming {
     }
 
     /**
-     * Checks if the given name is a Java keyword and hence an invalid
-     * identifier.
+     * Checks if the given name is a Java keyword and hence an invalid identifier.
      *
      * @param name the name to check.
      * @return <CODE>true</CODE> if the given name is a keyword, <CODE>false

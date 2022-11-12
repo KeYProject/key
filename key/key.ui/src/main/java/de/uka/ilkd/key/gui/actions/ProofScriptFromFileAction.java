@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -38,11 +41,11 @@ public class ProofScriptFromFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
 
         File dir = null;
-        if(lastDirectory != null) {
+        if (lastDirectory != null) {
             dir = lastDirectory;
         } else {
             Proof currentProof = mediator.getSelectedProof();
-            if(currentProof != null) {
+            if (currentProof != null) {
                 File currentFile = currentProof.getProofFile();
                 if (currentFile != null) {
                     dir = currentFile.getParentFile();
@@ -59,7 +62,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
             fc.setCurrentDirectory(dir);
             int res = fc.showOpenDialog(mainWindow);
-            if(res == JFileChooser.APPROVE_OPTION) {
+            if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
                 lastDirectory = selectedFile.getParentFile();
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, selectedFile);

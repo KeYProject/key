@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -59,8 +62,7 @@ public class LicenseAction extends MainWindowAction {
     }
 
     public void showLicense() {
-        URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
-                "LICENSE.TXT");
+        URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class, "LICENSE.TXT");
 
         URL thirdPartyLic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
                 "THIRD_PARTY_LICENSES.txt");
@@ -74,8 +76,8 @@ public class LicenseAction extends MainWindowAction {
         pane.addTab("Third party libraries", createLicenseViewer(readStream(thirdPartyLic, "")));
 
         JButton okButton = new JButton("OK");
-        okButton.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
-                .getTopLevelAncestor()).dispose());
+        okButton.addActionListener(
+                e -> ((JDialog) ((JButton) e.getSource()).getTopLevelAncestor()).dispose());
         fr.getContentPane().add(okButton, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         fr.setSize(600, 900);

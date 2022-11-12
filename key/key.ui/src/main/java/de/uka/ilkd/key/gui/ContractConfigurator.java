@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
@@ -21,83 +24,67 @@ import de.uka.ilkd.key.speclang.Contract;
 
 
 public class ContractConfigurator extends JDialog {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4002043118399402599L;
     private ContractSelectionPanel contractPanel;
     private JButton okButton;
     private JButton cancelButton;
-    
+
     private boolean successful = false;
-    
-    
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
-    
-    public ContractConfigurator(JDialog owner,
-            		        Services services, 
-            		        Contract[] contracts,
-            		        String title,
-            		        boolean allowMultipleContracts) {
+
+
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
+    public ContractConfigurator(JDialog owner, Services services, Contract[] contracts,
+            String title, boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
-        init(services,
-             contracts,
-             title,
-             allowMultipleContracts);
+        init(services, contracts, title, allowMultipleContracts);
     }
-    
-    
-    public ContractConfigurator(Frame owner,
-                                Services services,
-                                Contract[] contracts,
-                                String title,
-                                boolean allowMultipleContracts) {
+
+
+    public ContractConfigurator(Frame owner, Services services, Contract[] contracts, String title,
+            boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
-        init(services,
-             contracts,
-             title,
-             allowMultipleContracts);
+        init(services, contracts, title, allowMultipleContracts);
     }
-    
-    
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
-    
+
+
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
     /**
      * Helper for constructors.
      */
-    private void init(Services services, 
-                      Contract[] contracts,
-                      String title,
-                      boolean allowMultipleContracts) {        
-        //create contract panel
-        contractPanel = new ContractSelectionPanel(services, 
-        				           allowMultipleContracts);
+    private void init(Services services, Contract[] contracts, String title,
+            boolean allowMultipleContracts) {
+        // create contract panel
+        contractPanel = new ContractSelectionPanel(services, allowMultipleContracts);
         contractPanel.setContracts(contracts, title);
         contractPanel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e){                
-        	if(e.getClickCount() == 2){
-        	    okButton.doClick();
-        	}
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    okButton.doClick();
+                }
             }
-        });        
+        });
         contractPanel.setMinimumSize(new Dimension(800, 500));
         getContentPane().add(contractPanel);
-        
-        //create button panel
+
+        // create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         Dimension buttonDim = new Dimension(100, 27);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
-                                                 (int)buttonDim.getHeight() 
-                                                    + 10));
+        buttonPanel
+                .setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
-        
-        //create "ok" button
+
+        // create "ok" button
         okButton = new JButton("OK");
         okButton.setPreferredSize(buttonDim);
         okButton.setMinimumSize(buttonDim);
@@ -111,7 +98,7 @@ public class ContractConfigurator extends JDialog {
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
 
-        //create "cancel" button
+        // create "cancel" button
         cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(buttonDim);
         cancelButton.setMinimumSize(buttonDim);
@@ -125,32 +112,28 @@ public class ContractConfigurator extends JDialog {
         buttonPanel.add(cancelButton);
         ActionListener escapeListener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if(event.getActionCommand().equals("ESC")) {
+                if (event.getActionCommand().equals("ESC")) {
                     cancelButton.doClick();
                 }
             }
         };
-        cancelButton.registerKeyboardAction(
-                            escapeListener,
-                            "ESC",
-                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JComponent.WHEN_IN_FOCUSED_WINDOW);
+        cancelButton.registerKeyboardAction(escapeListener, "ESC",
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        
-        //show
-        getContentPane().setLayout(new BoxLayout(getContentPane(), 
-                                                 BoxLayout.Y_AXIS));        
+
+        // show
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         pack();
         setLocationRelativeTo(getOwner());
         setVisible(true);
     }
-      
-    
-   
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
+
+
+
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
+
     /**
      * Tells whether the user clicked "ok".
      */
@@ -163,6 +146,6 @@ public class ContractConfigurator extends JDialog {
      * Returns the selected contract.
      */
     public Contract getContract() {
-	return contractPanel.getContract();
+        return contractPanel.getContract();
     }
 }

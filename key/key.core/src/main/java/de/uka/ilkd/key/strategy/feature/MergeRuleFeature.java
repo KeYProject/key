@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -13,9 +16,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * Costs for the {@link MergeRule}; cheap if the first statement in the chosen
- * top-level formula is a {@link MergePointStatement}, otherwise, infinitely
- * expensive.
+ * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
+ * a {@link MergePointStatement}, otherwise, infinitely expensive.
  *
  * @author Dominic Scheurer
  */
@@ -27,15 +29,14 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term t = pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
             return TopRuleAppCost.INSTANCE;
         }
 
-        return JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(t)
-                .javaBlock()) instanceof MergePointStatement
+        return JavaTools.getActiveStatement(
+                TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement
                         ? NumberRuleAppCost.create(0)
                         : TopRuleAppCost.INSTANCE;
     }

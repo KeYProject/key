@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -16,8 +19,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Replaces a local variable declaration <code> #t #v[]; </code> with
- * <code>#t[] #v;</code>
+ * Replaces a local variable declaration <code> #t #v[]; </code> with <code>#t[] #v;</code>
  *
  * @author N/A
  */
@@ -33,18 +35,15 @@ public class ArrayPostDecl extends ProgramTransformer {
 
         final LocalVariableDeclaration declaration = (LocalVariableDeclaration) pe;
         final ImmutableArray<Modifier> modifiers = declaration.getModifiers();
-        final TypeReference originalTypeReference = declaration
-                .getTypeReference();
+        final TypeReference originalTypeReference = declaration.getTypeReference();
 
         final VariableSpecification var = declaration.getVariables().get(0);
 
         final IProgramVariable variable = var.getProgramVariable();
-        return new ProgramElement[] {
-            KeYJavaASTFactory.declare(modifiers, variable, var.getInitializer(),
-                originalTypeReference.getProgramElementName(),
+        return new ProgramElement[] { KeYJavaASTFactory.declare(modifiers, variable,
+                var.getInitializer(), originalTypeReference.getProgramElementName(),
                 originalTypeReference.getDimensions() + var.getDimensions(),
-                originalTypeReference.getReferencePrefix(),
-                variable.getKeYJavaType()) };
+                originalTypeReference.getReferencePrefix(), variable.getKeYJavaType()) };
     }
 
 }

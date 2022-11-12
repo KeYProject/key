@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -53,7 +56,8 @@ public class IncludeFinder extends AbstractBuilder<Void> {
             filename += ".key";
 
         if (relativePath) {
-            filename = filename.replace('/', File.separatorChar); // Not required for Windows, but whatsoever
+            filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
+                                                                  // whatsoever
             filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
             URL path = new URL(base.getProtocol(), base.getHost(), base.getPort(),
                     basePath + "/" + filename);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.GridBagConstraints;
@@ -50,7 +53,7 @@ class SequentViewPanel extends JPanel {
         add(javax.swing.Box.createGlue(), gbc);
 
         setBorder(new SequentHideWarningBorder(sequentView.getTitle(), sequentView));
-//        setBorder(new TitledBorder("xxx"));
+        // setBorder(new TitledBorder("xxx"));
 
     }
 }

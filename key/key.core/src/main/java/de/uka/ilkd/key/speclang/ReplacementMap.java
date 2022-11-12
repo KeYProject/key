@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Label;
@@ -24,6 +27,7 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
 
     /**
      * constructs a replacement map with the given term factory
+     *
      * @param tf a term factory
      */
     public ReplacementMap(TermFactory tf) {
@@ -33,8 +37,8 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds a mapping for the self variable.
      *
-     * @param oldSelf  the old self variable.
-     * @param newSelf  the new self variable.
+     * @param oldSelf the old self variable.
+     * @param newSelf the new self variable.
      * @param services services.
      */
     public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services) {
@@ -54,7 +58,7 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      * @param services services.
      */
     public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
-                             final Map<Label, S> newFlags, TermServices services) {
+            final Map<Label, S> newFlags, TermServices services) {
         if (newFlags != null) {
             if (newFlags.size() != oldFlags.size()) {
                 throw new IllegalArgumentException("flags have to have the same size");
@@ -70,10 +74,10 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      *
      * @param oldVariable old variable.
      * @param newVariable new variable.
-     * @param services    services.
+     * @param services services.
      */
     public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
-                                TermServices services) {
+            TermServices services) {
         if (newVariable != null) {
             if (!oldVariable.sort().equals(newVariable.sort())) {
                 throw new IllegalArgumentException("variables have to have the same sort");
@@ -87,15 +91,13 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      *
      * @param oldRemembranceHeaps old remembrance heaps.
      * @param newRemembranceHeaps new remembrance heaps.
-     * @param services            services.
+     * @param services services.
      */
     public void replaceRemembranceHeaps(
             final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
-            final Map<LocationVariable, ? extends S> newRemembranceHeaps,
-            final Services services) {
+            final Map<LocationVariable, ? extends S> newRemembranceHeaps, final Services services) {
         if (newRemembranceHeaps != null) {
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                    .getAllHeaps()) {
+            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                     continue;
                 }
@@ -115,21 +117,19 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      *
      * @param oldRemembranceLocalVariables old remembrance variables.
      * @param newRemembranceLocalVariables new remembrance variables.
-     * @param services                     services
+     * @param services services
      */
     public void replaceRemembranceLocalVariables(
             final Map<LocationVariable, LocationVariable> oldRemembranceLocalVariables,
             final Map<LocationVariable, ? extends S> newRemembranceLocalVariables,
             final TermServices services) {
         if (newRemembranceLocalVariables != null) {
-            for (final Entry<LocationVariable, LocationVariable> entry
-                    : oldRemembranceLocalVariables.entrySet()) {
+            for (final Entry<LocationVariable, LocationVariable> entry : oldRemembranceLocalVariables
+                    .entrySet()) {
                 LocationVariable localVariable = entry.getKey();
                 if (newRemembranceLocalVariables.get(localVariable) != null) {
-                    LocationVariable oldRemembranceLocalVariable
-                            = entry.getValue();
-                    S newRemembranceLocalVariable
-                            = newRemembranceLocalVariables.get(localVariable);
+                    LocationVariable oldRemembranceLocalVariable = entry.getValue();
+                    S newRemembranceLocalVariable = newRemembranceLocalVariables.get(localVariable);
                     assert oldRemembranceLocalVariable.sort()
                             .equals(newRemembranceLocalVariable.sort());
                     put(convert(oldRemembranceLocalVariable, services),

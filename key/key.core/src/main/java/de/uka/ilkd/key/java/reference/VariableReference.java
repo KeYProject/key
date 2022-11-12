@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -17,8 +20,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
-                               implements  NameReference, Expression,
-                               ReferencePrefix {
+        implements NameReference, Expression, ReferencePrefix {
 
     protected final ProgramVariable variable;
 
@@ -32,17 +34,17 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
     public VariableReference(ProgramVariable variable, PositionInfo pi) {
-	super(pi);
-	this.variable = variable;
+        super(pi);
+        this.variable = variable;
     }
 
     public VariableReference(ProgramVariable variable) {
-	this(variable, PositionInfo.UNDEFINED);
+        this(variable, PositionInfo.UNDEFINED);
     }
 
 
-    public ProgramElementName getProgramElementName(){
-	return (ProgramElementName) variable.name();
+    public ProgramElementName getProgramElementName() {
+        return (ProgramElementName) variable.name();
     }
 
     public int getChildCount() {
@@ -50,12 +52,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual"
-     * child array
+     * Returns the child at the specified index in this node's "virtual" child array
+     *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *  of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
@@ -66,8 +67,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public ProgramElementName getIdentifier(){
-	return (ProgramElementName) variable.name();
+    public ProgramElementName getIdentifier() {
+        return (ProgramElementName) variable.name();
     }
 
 
@@ -85,29 +86,30 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-	variable.prettyPrint(p);
+        variable.prettyPrint(p);
     }
 
     /**
-     * calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnVariableReference(this);
+        v.performActionOnVariableReference(this);
     }
 
     /**
-     * We do not have a prefix, so fake it!
-     * This way we implement ReferencePrefix
+     * We do not have a prefix, so fake it! This way we implement ReferencePrefix
+     *
      * @author VK
      */
     public ReferencePrefix getReferencePrefix() {
-	return null;
+        return null;
     }
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-	return this;
+        return this;
     }
 
     /**
@@ -117,16 +119,15 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param ec the execution context
      * @return the KeY java type
      */
-    public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return getKeYJavaType();
+        return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType() {
-	return variable != null? variable.getKeYJavaType() : null;
+        return variable != null ? variable.getKeYJavaType() : null;
     }
 }

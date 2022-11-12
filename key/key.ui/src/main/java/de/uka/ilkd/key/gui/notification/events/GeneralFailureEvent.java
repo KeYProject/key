@@ -1,40 +1,41 @@
-/*
- * Created on 18.03.2005
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
 /**
- * A notification event caused by a general unexpected failure
- * (usually caused by a bug of the system)
+ * A notification event caused by a general unexpected failure (usually caused by a bug of the
+ * system)
+ *
  * @author bubel
  */
 public class GeneralFailureEvent extends NotificationEvent {
 
     private String errorMessage = "Unknown Error.";
-    
-    
+
+
     protected GeneralFailureEvent(NotificationEventID id) {
         super(id);
     }
 
     /**
      * creates an instance of this event
+     *
      * @param errorMessage a String describing the failure
      */
     public GeneralFailureEvent(String errorMessage) {
         super(NotificationEventID.GENERAL_FAILURE);
         this.errorMessage = errorMessage;
     }
-    
+
 
     /**
-     * @return the error message describing the reason for
-     * this event    
+     * @return the error message describing the reason for this event
      */
     public String getErrorMessage() {
         return errorMessage;
-    }        
-    
+    }
+
 }

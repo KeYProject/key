@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This variable condition checks if a type is an enum type.
- * 
+ *
  * @author mulbrich
  * @since 2006-12-14
  */
@@ -25,21 +28,19 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
 
     /**
      * creates a condition that checks if a type is a EnumDeclaration
-     * 
-     * @param resolver
-     *            the type resolver to be checked
-     * @param negated
-     *            should the result be negated
+     *
+     * @param resolver the type resolver to be checked
+     * @param negated should the result be negated
      */
     public EnumTypeCondition(TypeResolver resolver, boolean negated) {
         this.resolver = resolver;
         this.negated = negated;
     }
 
-    
+
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute candidate,
-            SVInstantiations svInst, Services services) {
+    public boolean check(SchemaVariable var, SVSubstitute candidate, SVInstantiations svInst,
+            Services services) {
 
         if (!resolver.isComplete(var, candidate, svInst, services)) {
             // not yet complete
@@ -53,9 +54,9 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
         }
     }
 
-    
-    @Override    
+
+    @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isEnumType(" + resolver + ")";
+        return (negated ? "\\not" : "") + "\\isEnumType(" + resolver + ")";
     }
 }

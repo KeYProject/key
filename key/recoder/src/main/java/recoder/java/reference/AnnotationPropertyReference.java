@@ -1,9 +1,6 @@
-/*
- * Created on 10.06.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -12,7 +9,8 @@ import recoder.java.declaration.AnnotationElementValuePair;
 /**
  * @author ich
  */
-public class AnnotationPropertyReference extends JavaNonTerminalProgramElement implements MemberReference {
+public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
+        implements MemberReference {
     /**
      * serialization id
      */
@@ -38,7 +36,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ProgramElement#getASTParent()
      */
     public NonTerminalProgramElement getASTParent() {
@@ -53,7 +53,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
         this.parent = parent;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
@@ -61,7 +63,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement i
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public AnnotationPropertyReference deepClone() {

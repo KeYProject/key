@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
@@ -11,31 +14,36 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
  * <p>
  * The default implementation is {@link SymbolicObject}.
  * </p>
+ *
  * @author Martin Hentschel
  * @see SymbolicObject
  */
 public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
-   /**
-    * Returns the name of this object.
-    * @return The name of this object.
-    */
-   public Term getName();
-   
-   /**
-    * Returns the name of this object as human readable {@link String}.
-    * @return The name of this object as human readable {@link String}.
-    */
-   public String getNameString();
-   
-   /**
-    * Returns the type of this object.
-    * @return The type of this object.
-    */
-   public Sort getType();
-   
-   /**
-    * Returns the type of this object as human readable string.
-    * @return The type of this object as human readable string.
-    */
-   public String getTypeString();
+    /**
+     * Returns the name of this object.
+     *
+     * @return The name of this object.
+     */
+    public Term getName();
+
+    /**
+     * Returns the name of this object as human readable {@link String}.
+     *
+     * @return The name of this object as human readable {@link String}.
+     */
+    public String getNameString();
+
+    /**
+     * Returns the type of this object.
+     *
+     * @return The type of this object.
+     */
+    public Sort getType();
+
+    /**
+     * Returns the type of this object as human readable string.
+     *
+     * @return The type of this object as human readable string.
+     */
+    public String getTypeString();
 }

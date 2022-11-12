@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.expression;
@@ -7,11 +10,11 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
 /**
- * Redundant Parentheses. Modelled as a special "identity" unary "infix"
- * operator.
+ * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.
  */
 
-public class ParenthesizedExpression extends Operator implements ExpressionStatement, ReferencePrefix {
+public class ParenthesizedExpression extends Operator
+        implements ExpressionStatement, ReferencePrefix {
 
     /**
      * serialization id
@@ -123,8 +126,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position

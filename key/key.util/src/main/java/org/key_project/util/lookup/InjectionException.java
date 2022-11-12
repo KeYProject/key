@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.lookup;
 
 /**
@@ -23,7 +26,8 @@ public class InjectionException extends RuntimeException {
         super(cause);
     }
 
-    protected InjectionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected InjectionException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

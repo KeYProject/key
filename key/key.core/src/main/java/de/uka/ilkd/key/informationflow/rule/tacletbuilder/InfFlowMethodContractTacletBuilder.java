@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -45,8 +48,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
-                               Services services) {
+    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(methodContract, schemaDataAssumes, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
@@ -54,8 +56,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    Term generateSchemaFind(ProofObligationVars schemaDataFind,
-                            Services services) {
+    Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
         BasicPOSnippetFactory fFind =
                 POSnippetFactory.getBasicFactory(methodContract, schemaDataFind, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
@@ -65,27 +66,22 @@ public final class InfFlowMethodContractTacletBuilder
     @Override
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
-                POSnippetFactory.getBasicFactory(methodContract, appData,
-                                                 services);
+                POSnippetFactory.getBasicFactory(methodContract, appData, services);
         return f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
 
     @Override
     Term buildContractApplications(ProofObligationVars contAppData,
-                                   ProofObligationVars contAppData2,
-                                   Services services) {
+            ProofObligationVars contAppData2, Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInformFlowContracts(methodContract.getTarget(), services);
-        ImmutableList<Term> contractsApplications =
-                ImmutableSLList.<Term>nil();
+        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
-                    POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                                                       contAppData2, services);
-            contractsApplications =
-                    contractsApplications.append(
-                    f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
+                    POSnippetFactory.getInfFlowFactory(cont, contAppData, contAppData2, services);
+            contractsApplications = contractsApplications
+                    .append(f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
 
         return and(contractsApplications);
@@ -93,7 +89,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     private ImmutableSet<InformationFlowContract> getInformFlowContracts(IProgramMethod pm,
-                                                                         Services services) {
+            Services services) {
         ImmutableSet<Contract> contracts =
                 services.getSpecificationRepository().getContracts(pm.getContainerType(), pm);
         ImmutableSet<InformationFlowContract> ifContracts =

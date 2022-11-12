@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -26,7 +29,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     @Override
     protected void execute(Map<String, String> args) throws ScriptException, InterruptedException {
         String wrappedCmdname = args.get("#2");
-        if(wrappedCmdname == null) {
+        if (wrappedCmdname == null) {
             throw new ScriptException("Missing command to apply onAll to");
         }
 
@@ -48,9 +51,9 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     private HashMap<String, String> rearrangeArgs(Map<String, String> args) {
         HashMap<String, String> newArgs = new HashMap<>();
         for (Entry<String, String> en : args.entrySet()) {
-            if(en.getKey().matches("#[0-9]+")) {
+            if (en.getKey().matches("#[0-9]+")) {
                 int no = Integer.parseInt(en.getKey().substring(1));
-                if(no != 1) {
+                if (no != 1) {
                     newArgs.put("#" + (no - 1), en.getValue());
                 }
             } else {
@@ -60,14 +63,15 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
         return newArgs;
     }
 
-    private <A> void executeWrappedCommand(ProofScriptCommand<A> command, HashMap<String, String> newArgs) throws Exception {
+    private <A> void executeWrappedCommand(ProofScriptCommand<A> command,
+            HashMap<String, String> newArgs) throws Exception {
         A params = command.evaluateArguments(state, newArgs);
 
         // Node selectedNode = state.getSelectedNode();
         for (Goal g : proof.openGoals()) {
             // if (isBelow(g, selectedNode)) {
-                state.setGoal(g);
-                command.execute(uiControl, params, state);
+            state.setGoal(g);
+            command.execute(uiControl, params, state);
             // }
         }
         // state.setGoal(selectedNode);
@@ -79,7 +83,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
         }
 
         Node node = g.node();
-        while(node != null) {
+        while (node != null) {
             if (node == above) {
                 return true;
             }

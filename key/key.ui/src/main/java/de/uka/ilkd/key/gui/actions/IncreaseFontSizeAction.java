@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -14,21 +17,22 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      * generated sUID
      */
     private static final long serialVersionUID = 1670432514230642280L;
-    
+
     /**
      * creates the action to increase the font size of the sequent and proof view
+     *
      * @param mainWindow the main window
      */
     public IncreaseFontSizeAction(MainWindow mainWindow) {
         super(mainWindow);
-	
+
         setName("Larger");
         setIcon(IconFactory.plus(16));
 
         Config.DEFAULT.addConfigChangeListener(this);
         lookupAcceleratorKey();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Config.DEFAULT.larger();

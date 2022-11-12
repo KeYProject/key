@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import java.math.BigDecimal;
@@ -13,6 +16,7 @@ import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 
 /**
  * Literal for JML \real type;
+ *
  * @author bruns
  *
  */
@@ -22,19 +26,19 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     private static final Logger LOGGER = LoggerFactory.getLogger(RealLiteral.class);
     private final String value;
 
-    public RealLiteral (int value){
-        this(""+value+".0");
+    public RealLiteral(int value) {
+        this("" + value + ".0");
     }
 
-    public RealLiteral(String value){
+    public RealLiteral(String value) {
         this.value = value.intern();
     }
 
-    public RealLiteral(BigDecimal value){
+    public RealLiteral(BigDecimal value) {
         this(value.toString());
     }
 
-    public RealLiteral(){
+    public RealLiteral() {
         this("0.0");
     }
 
@@ -58,17 +62,17 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
 
     }
 
-    public String getValue(){
+    public String getValue() {
         return value;
     }
 
-    public String toString(){
+    public String toString() {
         return value;
     }
 
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (o instanceof RealLiteral)
-            return value.equals(((RealLiteral)o).getValue());
+            return value.equals(((RealLiteral) o).getValue());
         else
             return false;
     }

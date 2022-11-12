@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testcase.smt.ce;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -22,12 +25,12 @@ import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Use this class for testing SMT: It provides a mechanism to load proofs and
- * taclets. Do not modify this class directly but derive subclasses to implement
- * tests.
+ * Use this class for testing SMT: It provides a mechanism to load proofs and taclets. Do not modify
+ * this class directly but derive subclasses to implement tests.
  */
 public abstract class TestCommons {
-    protected static File folder = new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
+    protected static File folder =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
     /**
      * The set of taclets
      */
@@ -55,7 +58,8 @@ public abstract class TestCommons {
 
     public abstract boolean toolNotInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
+    protected boolean correctResult(String filepath, boolean isValid)
+            throws ProblemLoaderException {
         if (toolNotInstalled()) {
             return true;
         }
@@ -110,8 +114,8 @@ public abstract class TestCommons {
     }
 
     /**
-     * Returns a set of taclets that can be used for tests. REMARK: First you
-     * have to call <code>parse</code> to instantiate the set of taclets.
+     * Returns a set of taclets that can be used for tests. REMARK: First you have to call
+     * <code>parse</code> to instantiate the set of taclets.
      *
      * @return set of taclets.
      */
@@ -144,8 +148,7 @@ public abstract class TestCommons {
     }
 
     /**
-     * Calls
-     * <code>parse(File file, Profile profile) with the standard profile for testing.
+     * Calls <code>parse(File file, Profile profile) with the standard profile for testing.
      */
     protected ProofAggregate parse(File file) {
         return parse(file, profile);
@@ -155,15 +158,14 @@ public abstract class TestCommons {
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
      * @param file problem file.
-     * @param pro  determines the profile that should be used.
+     * @param pro determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      */
     protected ProofAggregate parse(File file, Profile pro) {
         assertTrue(file.exists());
         ProofAggregate result = null;
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),
-                    file, null, pro);
+            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

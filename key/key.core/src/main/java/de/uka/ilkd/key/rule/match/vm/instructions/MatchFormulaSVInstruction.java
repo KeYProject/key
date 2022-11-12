@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -27,12 +30,12 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        
+
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) { 
+        if (result != null) {
             termPosition.gotoNextSibling();
         }
-        
+
         return result;
     }
 

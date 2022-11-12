@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -36,14 +39,9 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(name = "Exploration",
         description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
-        experimental = false,
-        optional = true,
-        priority = 10000)
-public class ExplorationExtension implements KeYGuiExtension,
-        KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Startup,
-        KeYGuiExtension.Toolbar,
-        KeYGuiExtension.MainMenu,
+        experimental = false, optional = true, priority = 10000)
+public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
@@ -53,11 +51,11 @@ public class ExplorationExtension implements KeYGuiExtension,
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                PosInSequent pos) {
             if (model.isExplorationModeSelected()) {
                 return Arrays.asList(new AddFormulaToAntecedentAction(),
-                        new AddFormulaToSuccedentAction(),
-                        new EditFormulaAction(pos),
+                        new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
                         new DeleteFormulaAction(pos));
             }
             return super.getContextActions(mediator, kind, pos);
@@ -67,15 +65,15 @@ public class ExplorationExtension implements KeYGuiExtension,
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
-            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class), ExplorationNodeData.class);
+            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
+                    ExplorationNodeData.class);
         }
     };
 
     @Nonnull
     @Override
     public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-                                          @Nonnull ContextMenuKind kind,
-                                          @Nonnull Object underlyingObject) {
+            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -85,7 +83,8 @@ public class ExplorationExtension implements KeYGuiExtension,
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
-            explorationToolbar.add(new JCheckBox(new ShowInteractiveBranchesAction(model, mainWindow)));
+            explorationToolbar
+                    .add(new JCheckBox(new ShowInteractiveBranchesAction(model, mainWindow)));
         }
         return explorationToolbar;
     }
@@ -120,25 +119,27 @@ public class ExplorationExtension implements KeYGuiExtension,
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
+        if (leftPanel == null)
+            leftPanel = new ExplorationStepsList(window);
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
+        if (leftPanel == null)
+            leftPanel = new ExplorationStepsList(MainWindow.getInstance());
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
 
     @Override
-    public @Nonnull
-    List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
-        return Arrays.asList(
-                new ToggleExplorationAction(model, mainWindow),
+    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+        return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
                 new ShowInteractiveBranchesAction(model, mainWindow));
     }
 }
+
 
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     public static final ColorSettings.ColorProperty DARK_TURQOUIS_COLOR =

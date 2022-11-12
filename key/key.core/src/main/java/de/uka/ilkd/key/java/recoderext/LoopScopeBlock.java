@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -23,9 +26,8 @@ public class LoopScopeBlock extends JavaStatement
     protected Statement body;
 
     /**
-     * This constructor should only be used in the SchemaJavaParser! Make sure
-     * to call {@link #setBody(Statement)} and
-     * {@link #setIndexPV(Expression)} afterward.
+     * This constructor should only be used in the SchemaJavaParser! Make sure to call
+     * {@link #setBody(Statement)} and {@link #setIndexPV(Expression)} afterward.
      */
     public LoopScopeBlock() {
         this.indexPV = null;
@@ -33,7 +35,7 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * 
+     *
      * @param resultVar
      * @param body
      */
@@ -64,9 +66,8 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Set body.
-     * 
-     * @param body
-     *            the Statement
+     *
+     * @param body the Statement
      */
     public void setBody(Statement body) {
         this.body = body;
@@ -74,7 +75,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get body.
-     * 
+     *
      * @return the Statement
      */
     public Statement getBody() {
@@ -82,11 +83,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Finds the source element that occurs first in the source. Returns the
-     * first element of the first child.
-     * 
-     * @return the last source element in the syntactical representation of this
-     *         element, may be equals to this element.
+     * Finds the source element that occurs first in the source. Returns the first element of the
+     * first child.
+     *
+     * @return the last source element in the syntactical representation of this element, may be
+     *         equals to this element.
      */
 
     public SourceElement getFirstElement() {
@@ -94,11 +95,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Finds the source element that occurs last in the source. Returns the last
-     * element of the body.
-     * 
-     * @return the last source element in the syntactical representation of this
-     *         element, may be equals to this element.
+     * Finds the source element that occurs last in the source. Returns the last element of the
+     * body.
+     *
+     * @return the last source element in the syntactical representation of this element, may be
+     *         equals to this element.
      */
 
     public SourceElement getLastElement() {
@@ -107,7 +108,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -121,14 +122,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     * Returns the child at the specified index in this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -160,7 +158,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
     public int getStatementCount() {
@@ -169,14 +167,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array.
-     * 
-     * @param index
-     *            an index for a statement.
+     * Return the statement at the specified index in this node's "virtual" statement array.
+     *
+     * @param index an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
@@ -187,7 +182,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     public int getExpressionCount() {
@@ -195,14 +190,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array.
-     * 
-     * @param index
-     *            an index for a expression.
+     * Return the expression at the specified index in this node's "virtual" expression array.
+     *
+     * @param index an index for a expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -213,19 +205,15 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param q
-     *            the new child.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
+     *
+     * @param p the old child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @exception ClassCastException if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (indexPV == p) {
@@ -260,12 +248,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object
      */
     public LoopScopeBlock deepClone() {

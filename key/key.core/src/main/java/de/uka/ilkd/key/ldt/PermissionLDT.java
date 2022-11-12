@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
@@ -28,17 +31,20 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+            Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+            Services services, ExecutionContext ec) {
         return false;
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub, de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+            de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
         return false;
     }
 

@@ -1,8 +1,6 @@
-/*
- * Created on 11.03.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.java.declaration;
 
 import recoder.java.Identifier;
@@ -26,7 +24,7 @@ public class AnnotationDeclaration extends InterfaceDeclaration {
     }
 
     public AnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
-                                 ASTList<MemberDeclaration> members) {
+            ASTList<MemberDeclaration> members) {
         super(modifiers, name, null, members);
     }
 
@@ -57,14 +55,18 @@ public class AnnotationDeclaration extends InterfaceDeclaration {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitAnnotationDeclaration(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public AnnotationDeclaration deepClone() {

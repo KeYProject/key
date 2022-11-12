@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -9,8 +12,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 
 /**
- * This macro does nothing and is not applicable. It can be used to create
- * compound macros, e.g. as an alternative macro for {@link DoWhileFinallyMacro}.
+ * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as
+ * an alternative macro for {@link DoWhileFinallyMacro}.
  *
  * @author christoph
  */
@@ -32,18 +35,14 @@ public class SkipMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         return false;
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,                                          
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            throws InterruptedException {
         // do nothing
         return new ProofMacroFinishedInfo(this, goals);
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -31,7 +34,7 @@ public class CyclicInheritanceException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s  an explanation.
+     * @param s an explanation.
      * @param ct a class type which is part of the cycle.
      */
     public CyclicInheritanceException(String s, ClassType ct) {

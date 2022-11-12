@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 
@@ -21,11 +24,8 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // proof obligation where we have to show that there is an isomorphism.
     @Override
     protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
-                                                    InfFlowSpec infFlowSpec2,
-                                                    BasicSnippetData d,
-                                                    ProofObligationVars vs1,
-                                                    ProofObligationVars vs2,
-                                                    Term eqAtLocsTerm) {
+            InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, Term eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();

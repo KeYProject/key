@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder;
@@ -22,8 +25,8 @@ public interface NamedModelElement extends ModelElement {
     String getName();
 
     /**
-     * Lexical order on names of named model elements. The model elements may be
-     * null; null elements are considered as empty strings.
+     * Lexical order on names of named model elements. The model elements may be null; null elements
+     * are considered as empty strings.
      */
     class LexicalOrder extends Order.CustomLexicalOrder {
 
@@ -32,7 +35,8 @@ public interface NamedModelElement extends ModelElement {
         }
 
         public boolean isComparable(Object x, Object y) {
-            return (x == null && y == null) || ((x instanceof NamedModelElement) && (y instanceof NamedModelElement));
+            return (x == null && y == null)
+                    || ((x instanceof NamedModelElement) && (y instanceof NamedModelElement));
         }
     }
 

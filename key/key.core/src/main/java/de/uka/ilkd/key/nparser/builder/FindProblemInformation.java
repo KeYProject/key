@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -16,8 +19,7 @@ import java.util.Objects;
  * @see #getProblemInformation()
  */
 public class FindProblemInformation extends AbstractBuilder<Object> {
-    private final @Nonnull
-    ProblemInformation information = new ProblemInformation();
+    private final @Nonnull ProblemInformation information = new ProblemInformation();
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
@@ -30,8 +32,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         information.setProfile(acceptFirst(ctx.profile()));
         information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
-        ctx.classPaths().forEach(it ->
-                information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
+        ctx.classPaths().forEach(
+                it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
         information.setJavaSource(acceptFirst(ctx.javaSource()));
         return null;
     }
@@ -94,8 +96,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     /**
      * The found problem information.
      */
-    public @Nonnull
-    ProblemInformation getProblemInformation() {
+    public @Nonnull ProblemInformation getProblemInformation() {
         return information;
     }
 }

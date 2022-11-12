@@ -1,11 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 /**
- *  Member declaration.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Member declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
 public interface MemberDeclaration extends Declaration, NonTerminalProgramElement {

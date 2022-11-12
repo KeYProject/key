@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -24,7 +27,7 @@ public class UpdateHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         this.services = services;
     }
 
@@ -48,7 +51,7 @@ public class UpdateHandler implements SMTHandler {
     }
 
     private void collectUpdates(Term update, List<SExpr> individualUpdates, MasterHandler trans) {
-        if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term subUpd : update.subs()) {
                 collectUpdates(subUpd, individualUpdates, trans);
             }

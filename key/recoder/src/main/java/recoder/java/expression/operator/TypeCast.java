@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.expression.operator;
@@ -29,9 +32,9 @@ public class TypeCast extends TypeOperator {
     }
 
     /**
-     * Note: The ordering of the arguments does not match the syntactical
-     * appearance of a Java type case, but the order in the superclass
-     * TypeOperator. However, getASTChildren yields them in the right order.
+     * Note: The ordering of the arguments does not match the syntactical appearance of a Java type
+     * case, but the order in the superclass TypeOperator. However, getASTChildren yields them in
+     * the right order.
      */
 
     public TypeCast(Expression child, TypeReference typeref) {
@@ -76,8 +79,7 @@ public class TypeCast extends TypeOperator {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -132,8 +134,7 @@ public class TypeCast extends TypeOperator {
     }
 
     /**
-     * Checks if this operator is left or right associative. Type casts are
-     * right associative.
+     * Checks if this operator is left or right associative. Type casts are right associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.

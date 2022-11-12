@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.syntax;
 
 import junit.framework.Assert;
@@ -22,7 +25,8 @@ public class CloneTest extends TestCase {
             String buffer1 = cu.toSource();
             CompilationUnit cv = cu.deepClone();
             if (!ProgramElement.STRUCTURAL_EQUALITY.equals(cu, cv)) {
-                Assert.fail("Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
+                Assert.fail("Printed tree of " + Format.toString("%u", cu)
+                        + " has changed its structure");
             }
             String buffer2 = cv.toSource();
             if (!buffer1.equals(buffer2)) {

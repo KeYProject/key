@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
@@ -9,8 +12,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 /**
  * Listener for an {@link InnerNodeView}
  *
- * Reacts on mouse events to highlight the selected part of the sequent and it
- * pops up a menu showing all applicable actions at the highlighted position.
+ * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
+ * showing all applicable actions at the highlighted position.
  */
 public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
 
@@ -47,14 +50,14 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
     }
 
     @Override
-    public void mouseExited(MouseEvent me) { }
+    public void mouseExited(MouseEvent me) {}
 
     @Override
-    public void mousePressed(MouseEvent e) { }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
-    public void mouseReleased(MouseEvent e) { }
+    public void mouseReleased(MouseEvent e) {}
 
     @Override
-    public void mouseEntered(MouseEvent e) { }
+    public void mouseEntered(MouseEvent e) {}
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.io;
@@ -32,18 +35,17 @@ public abstract class ProjectFileIO {
     }
 
     /**
-     * Loads properties from the project file and returns the file names of the
-     * compilation units stored in the project file. It is left to subclasses to
-     * locate the project file.
+     * Loads properties from the project file and returns the file names of the compilation units
+     * stored in the project file. It is left to subclasses to locate the project file.
      *
      * @return the filenames of the known compilation units.
      */
     public abstract String[] load() throws IOException;
 
     /**
-     * Saves the project properties to the project file and adds all known
-     * compilation units. This method does not write back the compilation units
-     * themselves. It is left to subclasses to locate the project file.
+     * Saves the project properties to the project file and adds all known compilation units. This
+     * method does not write back the compilation units themselves. It is left to subclasses to
+     * locate the project file.
      */
     public abstract void save() throws IOException;
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -26,8 +29,8 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         super(mainWindow);
         setIcon(IconFactory.ORIGIN_HIGHLIGHT_ICON.get());
         setEnabled(true);
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-                .getViewSettings().isHighlightOrigin());
+        setSelected(
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin());
 
         setMenuPath("Origin Tracking");
         setName("Highlight Origins");
@@ -35,19 +38,19 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
                 + "highlight its origin in the source view.");
         putValue(KeyAction.CHECKBOX, true);
 
-        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addSettingsListener(
-            event -> {
-                boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
-                    .getTermLabelSettings().getUseOriginLabels();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .addSettingsListener(event -> {
+                    boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
+                            .getTermLabelSettings().getUseOriginLabels();
 
-                setEnabled(useOriginLabels);
-            });
+                    setEnabled(useOriginLabels);
+                });
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean oldValue = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getViewSettings().isHighlightOrigin();
+        boolean oldValue =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHighlightOrigin(!oldValue);
     }
 }

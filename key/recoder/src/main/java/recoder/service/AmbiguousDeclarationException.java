@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -32,10 +35,11 @@ public class AmbiguousDeclarationException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param declaration        the declaration found to be ambiguous.
+     * @param declaration the declaration found to be ambiguous.
      * @param conflictingElement the alternative declaration, found earlier.
      */
-    public AmbiguousDeclarationException(Declaration declaration, ProgramModelElement conflictingElement) {
+    public AmbiguousDeclarationException(Declaration declaration,
+            ProgramModelElement conflictingElement) {
         this.declaration = declaration;
         this.conflictingElement = conflictingElement;
     }
@@ -43,11 +47,12 @@ public class AmbiguousDeclarationException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s                  an explanation.
-     * @param declaration        the declaration found to be ambiguous.
+     * @param s an explanation.
+     * @param declaration the declaration found to be ambiguous.
      * @param conflictingElement the alternative declaration, found earlier.
      */
-    public AmbiguousDeclarationException(String s, Declaration declaration, ProgramModelElement conflictingElement) {
+    public AmbiguousDeclarationException(String s, Declaration declaration,
+            ProgramModelElement conflictingElement) {
         super(s);
         this.declaration = declaration;
         this.conflictingElement = conflictingElement;

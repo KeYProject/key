@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -10,31 +13,32 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  While.
+ * While.
  */
 
 public class While extends LoopStatement {
 
     /**
-     *      While.
+     * While.
      */
 
     public While() {}
 
     /**
-     *      While.
-     *      @param guard an expression.
-     *      @param body a statement.
-     *	    @param pos a PositionInformation.
+     * While.
+     *
+     * @param guard an expression.
+     * @param body a statement.
+     * @param pos a PositionInformation.
      */
 
-    public While(Expression guard, Statement body, PositionInfo pos,
-		 ExtList comments){
-        super(guard,body,comments,pos);
+    public While(Expression guard, Statement body, PositionInfo pos, ExtList comments) {
+        super(guard, body, comments, pos);
     }
-    
+
     /**
      * create a new While statement with no position info and no comments but guard and body set
+     *
      * @param guard an expression.
      * @param body a statement.
      */
@@ -43,15 +47,16 @@ public class While extends LoopStatement {
         super(guard, body, new ExtList());
     }
 
-	/**
-     *      While.
-     *      @param guard an expression.
-     *      @param body a statement.
-     *	    @param pos a PositionInformation.
+    /**
+     * While.
+     *
+     * @param guard an expression.
+     * @param body a statement.
+     * @param pos a PositionInformation.
      */
 
-    public While(Expression guard, Statement body, PositionInfo pos){
-        super(guard, body, pos);	
+    public While(Expression guard, Statement body, PositionInfo pos) {
+        super(guard, body, pos);
     }
 
     public SourceElement getLastElement() {
@@ -59,20 +64,23 @@ public class While extends LoopStatement {
     }
 
     /**
-     *      Is checked before iteration.
-     *      @return the boolean value.
+     * Is checked before iteration.
+     *
+     * @return the boolean value.
      */
 
     public boolean isCheckedBeforeIteration() {
         return true;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnWhile(this);
+        v.performActionOnWhile(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

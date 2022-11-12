@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -13,9 +16,8 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
     }
 
     /**
-     * @return true iff the stored rule app is applicable for the given sequent,
-     * i.e. always true since NoFindTaclets are not bound to a find-position
-     * (if-formulas are not considered)
+     * @return true iff the stored rule app is applicable for the given sequent, i.e. always true
+     *         since NoFindTaclets are not bound to a find-position (if-formulas are not considered)
      */
     @Override
     protected boolean isStillApplicable(Goal p_goal) {

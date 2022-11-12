@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 
@@ -23,9 +26,8 @@ public class DefaultSMTSettings implements SMTSettings {
 
 
     public DefaultSMTSettings(ProofDependentSMTSettings pdSettings,
-                              ProofIndependentSMTSettings piSettings,
-                              NewSMTTranslationSettings newTransSettings,
-                              Proof proof) {
+            ProofIndependentSMTSettings piSettings, NewSMTTranslationSettings newTransSettings,
+            Proof proof) {
         super();
         this.pdSettings = pdSettings;
         this.piSettings = piSettings;
@@ -68,8 +70,7 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public String getSMTTemporaryFolder() {
-        return PathConfig.getKeyConfigDir()
-                + File.separator + "smt_formula";
+        return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
     }
 
     @Override

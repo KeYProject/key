@@ -1,27 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.util;
 
 /**
  * This interface defines two order relation between objects. The <CODE>
- * lessOrEquals</CODE> predicate defines an order, the <CODE>less</CODE>
- * predicate defines a strict order. Both orders may be partial. The following
- * must hold:
+ * lessOrEquals</CODE> predicate defines an order, the <CODE>less</CODE> predicate defines a strict
+ * order. Both orders may be partial. The following must hold:
  * <UL>
- * <LI>the orders are <I>antisymmetric </I> and <I>asymmetric </I> (strict
- * order) <BR>
+ * <LI>the orders are <I>antisymmetric </I> and <I>asymmetric </I> (strict order) <BR>
  * <CODE>lessOrEquals(x,&nbsp;y)&nbsp;&amp;&amp;&nbsp;lessOrEquals(y,&nbsp;x)
  * </CODE> implies <CODE>equals(x,&nbsp;y)</CODE> and <CODE>less(x,&nbsp;y)
  * </CODE> implies <CODE>!less(y,&nbsp;x)</CODE></LI>
- * <LI>the orders are <I>reflexive </I> and <I>irreflexive </I> (strict order)
- * <BR>
- * <CODE>lessOrEquals(x,&nbsp;x)</CODE> and <CODE>!less(x,&nbsp;x)</CODE>
- * </LI>
+ * <LI>the orders are <I>reflexive </I> and <I>irreflexive </I> (strict order) <BR>
+ * <CODE>lessOrEquals(x,&nbsp;x)</CODE> and <CODE>!less(x,&nbsp;x)</CODE></LI>
  * <LI>the orders are <I>transitive </I> <BR>
  * <CODE>(less(x,&nbsp;y)&nbsp;&amp;&amp;&nbsp;less(y,&nbsp;z))</CODE> implies
  * <CODE>less(x,&nbsp;z)</CODE> (same for <CODE>lessOrEquals</CODE>).</LI>
- * <LI>the orders can be <I>total </I>( <I>alternative </I>, <I>linear </I>)
- * <BR>
+ * <LI>the orders can be <I>total </I>( <I>alternative </I>, <I>linear </I>) <BR>
  * <CODE>isComparable(x,&nbsp;y)</CODE> implies <CODE>
  * less(x,&nbsp;y)&nbsp;||&nbsp;less(y,&nbsp;x)</CODE></LI>
  * </UL>
@@ -29,41 +27,38 @@ package recoder.util;
  * lessOrEquals(x,&nbsp;y)&nbsp;==&nbsp;(less(x,&nbsp;y)&nbsp;||&nbsp;equals(x,&nbsp;y))
  * </CODE>, </BLOCKQUOTE> this interface extends an equality relation.
  * <p>
- * <SMALL>The usual way is to calculate all relations at once and returning a
- * status code such as <CODE>int compareTo(x, y)</CODE>. However, this
- * function alone can not capture partial orders and is not efficient if the
- * single comparisons become costly - see for instance the subset relation. The
- * prize to pay for the more explicite interface is a slight code overhead, but
- * this should not lead to a noticeable loss of performance. And of course,
- * <CODE>lessOrEquals(x,&nbsp;y)</CODE> should be a bit more comprehensible
- * than <CODE>compareTo(x,&nbsp;y)&nbsp; <=&nbsp;0</CODE>. </SMALL>
+ * <SMALL>The usual way is to calculate all relations at once and returning a status code such as
+ * <CODE>int compareTo(x, y)</CODE>. However, this function alone can not capture partial orders and
+ * is not efficient if the single comparisons become costly - see for instance the subset relation.
+ * The prize to pay for the more explicite interface is a slight code overhead, but this should not
+ * lead to a noticeable loss of performance. And of course, <CODE>lessOrEquals(x,&nbsp;y)</CODE>
+ * should be a bit more comprehensible than <CODE>compareTo(x,&nbsp;y)&nbsp; <=&nbsp;0</CODE>.
+ * </SMALL>
  * <p>
- * Whether or not objects of different type or <CODE>null</CODE> objects are
- * allowed is up to the specific implementation. This <CODE>isComparable
- * </CODE> predicate should be defined for all objects. The orders are total, if
- * the predicate yields true for any input - with the possible exception of
- * <CODE>null</CODE> objects. If two objects are not comparable, the result of
- * the other predicates is not defined unless stated explicitely.
+ * Whether or not objects of different type or <CODE>null</CODE> objects are allowed is up to the
+ * specific implementation. This <CODE>isComparable
+ * </CODE> predicate should be defined for all objects. The orders are total, if the predicate
+ * yields true for any input - with the possible exception of <CODE>null</CODE> objects. If two
+ * objects are not comparable, the result of the other predicates is not defined unless stated
+ * explicitely.
  *
  * @author AL
  */
 public interface Order extends Equality {
 
     /**
-     * Natural order relation object based on the objects' natural hash codes.
-     * The order is total except for <CODE>null</CODE> objects.
+     * Natural order relation object based on the objects' natural hash codes. The order is total
+     * except for <CODE>null</CODE> objects.
      */
     Order NATURAL = new Order.Natural();
     /**
-     * Identity order relation object based on the objects' identities. The
-     * order is total, including <CODE>null</CODE> objects (which are minimum
-     * elements).
+     * Identity order relation object based on the objects' identities. The order is total,
+     * including <CODE>null</CODE> objects (which are minimum elements).
      */
     Order IDENTITY = new Order.Identity();
     /**
-     * Lexical order relation object based on the objects' textual
-     * representation. The order is total except for <CODE>null</CODE>
-     * objects.
+     * Lexical order relation object based on the objects' textual representation. The order is
+     * total except for <CODE>null</CODE> objects.
      */
     Order LEXICAL = new Order.Lexical();
 
@@ -77,8 +72,8 @@ public interface Order extends Equality {
     boolean isComparable(Object x, Object y);
 
     /**
-     * Check if the first object is less than the second one. This comparison is
-     * strict: <CODE>less(x,&nbsp;y)</CODE> implies <CODE>!equals(x,&nbsp;y)
+     * Check if the first object is less than the second one. This comparison is strict:
+     * <CODE>less(x,&nbsp;y)</CODE> implies <CODE>!equals(x,&nbsp;y)
      * </CODE>.
      *
      * @param x the first object.
@@ -88,8 +83,8 @@ public interface Order extends Equality {
     boolean less(Object x, Object y);
 
     /**
-     * Check if the first object is greater than the second one. This comparison
-     * is strict: <CODE>greater(x,&nbsp;y)</CODE> implies <CODE>
+     * Check if the first object is greater than the second one. This comparison is strict:
+     * <CODE>greater(x,&nbsp;y)</CODE> implies <CODE>
      * !equals(x,&nbsp;y)</CODE>.
      *
      * @param x the first object.
@@ -112,17 +107,15 @@ public interface Order extends Equality {
      *
      * @param x the first object.
      * @param y the second object.
-     * @return true if the first object is greater than or equals the second
-     * one.
+     * @return true if the first object is greater than or equals the second one.
      */
     boolean greaterOrEquals(Object x, Object y);
 
     /**
-     * Natural order implementation using the inherited default methods. This
-     * implementation operates on the standard hash codes and implements
-     * {@link recoder.util.HashCode}, which will work for Integer but might be
-     * pretty meaningless for other types. No <CODE>null</CODE> objects are
-     * allowed, but all others are comparable.
+     * Natural order implementation using the inherited default methods. This implementation
+     * operates on the standard hash codes and implements {@link recoder.util.HashCode}, which will
+     * work for Integer but might be pretty meaningless for other types. No <CODE>null</CODE>
+     * objects are allowed, but all others are comparable.
      */
     class Natural implements Order, HashCode {
         public final boolean equals(Object x, Object y) {
@@ -155,11 +148,10 @@ public interface Order extends Equality {
     }
 
     /**
-     * Identity order implementation comparing objects by address. The
-     * implementation uses <CODE>System.identityHashCode</CODE> and implements
-     * {@link recoder.util.HashCode}. The order is based upon this encoding
-     * which allows retrieval of objects but has no further meaning. Note that
-     * <CODE>x&nbsp;!=&nbsp;null</CODE> implies <CODE>less(null,&nbsp;x)
+     * Identity order implementation comparing objects by address. The implementation uses
+     * <CODE>System.identityHashCode</CODE> and implements {@link recoder.util.HashCode}. The order
+     * is based upon this encoding which allows retrieval of objects but has no further meaning.
+     * Note that <CODE>x&nbsp;!=&nbsp;null</CODE> implies <CODE>less(null,&nbsp;x)
      * </CODE> and of course <CODE>equals(null,&nbsp;null)</CODE>.
      */
     class Identity implements Order, HashCode {
@@ -171,7 +163,8 @@ public interface Order extends Equality {
             return System.identityHashCode(x);
         }
 
-        public final boolean isComparable(@SuppressWarnings("unused") Object x, @SuppressWarnings("unused") Object y) {
+        public final boolean isComparable(@SuppressWarnings("unused") Object x,
+                @SuppressWarnings("unused") Object y) {
             return true;
         }
 
@@ -193,8 +186,8 @@ public interface Order extends Equality {
     }
 
     /**
-     * Custom lexical order implementation comparing objects by comparison of a
-     * unicode string mapping.
+     * Custom lexical order implementation comparing objects by comparison of a unicode string
+     * mapping.
      */
     abstract class CustomLexicalOrder implements Order, HashCode {
 
@@ -205,7 +198,8 @@ public interface Order extends Equality {
             return toString(x).hashCode();
         }
 
-        public boolean isComparable(@SuppressWarnings("unused") Object x, @SuppressWarnings("unused") Object y) {
+        public boolean isComparable(@SuppressWarnings("unused") Object x,
+                @SuppressWarnings("unused") Object y) {
             return true;
         }
 
@@ -246,8 +240,7 @@ public interface Order extends Equality {
     }
 
     /**
-     * Lexical order implementation comparing objects by their unicode string
-     * representations.
+     * Lexical order implementation comparing objects by their unicode string representations.
      */
     class Lexical extends CustomLexicalOrder {
 

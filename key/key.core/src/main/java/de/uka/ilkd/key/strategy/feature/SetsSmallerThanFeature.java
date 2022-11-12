@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -17,26 +20,22 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     private final LocSetLDT locSetLDT;
 
 
-    private SetsSmallerThanFeature(ProjectionToTerm left,
-                                   ProjectionToTerm right,
-                                   LocSetLDT locSetLDT) {
+    private SetsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+            LocSetLDT locSetLDT) {
         this.left = left;
         this.right = right;
         this.locSetLDT = locSetLDT;
     }
 
 
-    public static Feature create(ProjectionToTerm left,
-                                 ProjectionToTerm right,
-                                   LocSetLDT locSetLDT) {
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+            LocSetLDT locSetLDT) {
         return new SetsSmallerThanFeature(left, right, locSetLDT);
     }
 
 
     @Override
-    protected boolean filter(TacletApp app,
-                             PosInOccurrence pos,
-                             Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final Term leftTerm = left.toTerm(app, pos, goal);
         final Term rightTerm = right.toTerm(app, pos, goal);
 
@@ -44,10 +43,12 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     }
 
 
-    protected boolean origLessThan(Term leftTerm,
-                                   Term rightTerm, 
-                                   PosInOccurrence pos, 
-                                   Goal goal) {// TODO: Why is this method needed?
+    protected boolean origLessThan(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {// TODO:
+                                                                                                   // Why
+                                                                                                   // is
+                                                                                                   // this
+                                                                                                   // method
+                                                                                                   // needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final ImmutableList<Term> literalsLeftTerm = m1.getResult();
@@ -64,9 +65,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
         protected void collect(Term te) {
             final Operator op = te.op();
-            if (op == locSetLDT.getUnion() ||
-                    op == locSetLDT.getIntersect() ||
-                      op == locSetLDT.getDisjoint()) {
+            if (op == locSetLDT.getUnion() || op == locSetLDT.getIntersect()
+                    || op == locSetLDT.getDisjoint()) {
                 collect(te.sub(0));
                 collect(te.sub(1));
             } else {

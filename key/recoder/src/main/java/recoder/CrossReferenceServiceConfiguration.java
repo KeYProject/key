@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder;
@@ -9,8 +12,8 @@ import recoder.service.SourceInfo;
 public class CrossReferenceServiceConfiguration extends DefaultServiceConfiguration {
 
     /**
-     * The cross reference source info of this service configuration. This is a
-     * copy of the sourceInfo attribute, to avoid type casts.
+     * The cross reference source info of this service configuration. This is a copy of the
+     * sourceInfo attribute, to avoid type casts.
      */
     private CrossReferenceSourceInfo crossReferencer;
 
@@ -36,8 +39,8 @@ public class CrossReferenceServiceConfiguration extends DefaultServiceConfigurat
     }
 
     /**
-     * The cross reference source info is a subclass of the source info, so this
-     * class simply overrides the source info factory method.
+     * The cross reference source info is a subclass of the source info, so this class simply
+     * overrides the source info factory method.
      */
     protected SourceInfo makeSourceInfo() {
         return new DefaultCrossReferenceSourceInfo(this);

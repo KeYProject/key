@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
@@ -14,8 +17,8 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * A string with associated position information (file and line number). The
- * position information is used for error reporting.
+ * A string with associated position information (file and line number). The position information is
+ * used for error reporting.
  */
 public class PositionedString {
     private static final Logger LOGGER = LoggerFactory.getLogger(PositionedString.class);
@@ -33,7 +36,8 @@ public class PositionedString {
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
-    public PositionedString(@Nonnull String text, @Nullable String fileName, @Nullable Position pos) {
+    public PositionedString(@Nonnull String text, @Nullable String fileName,
+            @Nullable Position pos) {
         if (text == null) {
             throw new IllegalArgumentException();
         }
@@ -50,7 +54,8 @@ public class PositionedString {
     }
 
     public PositionedString(@Nonnull String text, Token t) {
-        this(text, t.getInputStream().getSourceName(), new Position(t.getLine(), t.getCharPositionInLine()));
+        this(text, t.getInputStream().getSourceName(),
+                new Position(t.getLine(), t.getCharPositionInLine()));
     }
 
     public PositionedString(@Nonnull String text, String fileName) {
@@ -72,13 +77,11 @@ public class PositionedString {
 
     public PositionedString prependAndUpdatePosition(String text) {
         if (this.pos.getColumn() < text.length()) {
-            LOGGER.debug("Column of given position " + pos
-                    + " is smaller than prepended text " + "\"" + text
-                    + "\". This will result in a negative column value for "
+            LOGGER.debug("Column of given position " + pos + " is smaller than prepended text "
+                    + "\"" + text + "\". This will result in a negative column value for "
                     + "returned " + PositionedString.class.getSimpleName() + ".");
         }
-        Position newPos = new Position(this.pos.getLine(), this.pos.getColumn()
-                - text.length());
+        Position newPos = new Position(this.pos.getLine(), this.pos.getColumn() - text.length());
         return new PositionedString(text + this.text, this.fileName, newPos);
     }
 
@@ -101,7 +104,8 @@ public class PositionedString {
             return false;
         }
         PositionedString that = (PositionedString) o;
-        return text.equals(that.text) && Objects.equals(fileName, that.fileName) && Objects.equals(pos, that.pos);
+        return text.equals(that.text) && Objects.equals(fileName, that.fileName)
+                && Objects.equals(pos, that.pos);
     }
 
     @Override

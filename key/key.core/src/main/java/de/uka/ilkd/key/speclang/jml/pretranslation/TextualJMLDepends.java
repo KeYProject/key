@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -12,13 +15,14 @@ import java.util.Map;
 
 
 /**
- * A JML depends / accessible clause for a model field in textual form.
- * Note that such clauses for *methods* are part of TextualJMLSpecCase.
+ * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
+ * *methods* are part of TextualJMLSpecCase.
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
     private Map<Name, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<String> mods, Name[] heaps, @Nonnull LabeledParserRuleContext depends) {
+    public TextualJMLDepends(ImmutableList<String> mods, Name[] heaps,
+            @Nonnull LabeledParserRuleContext depends) {
         super(mods);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             this.depends.put(hName, ImmutableSLList.nil());

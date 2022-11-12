@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -11,8 +14,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * This filter takes a search string and yields a sequent containing only
- * sequent formulas that match the search.
+ * This filter takes a search string and yields a sequent containing only sequent formulas that
+ * match the search.
  *
  * @author jschiffl
  */
@@ -32,7 +35,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
     protected void filterSequent() {
         Iterator<SequentFormula> it;
 
-        if(antec != null) {
+        if (antec != null) {
             // Result has already been computed. No need to recompute.
             return;
         }

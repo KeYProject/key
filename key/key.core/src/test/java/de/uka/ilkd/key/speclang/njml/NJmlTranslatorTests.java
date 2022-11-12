@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -20,14 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1 (6/1/21)
  */
 public class NJmlTranslatorTests {
-    public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
-            + File.separator + "speclang"
-            + File.separator + "testFile.key";
+    public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+            + "speclang" + File.separator + "testFile.key";
     private final JmlIO jmlIO;
 
     public NJmlTranslatorTests() {
-        JavaInfo javaInfo = new HelperClassForTests().parse(
-                new File(testFile)).getFirstProof().getJavaInfo();
+        JavaInfo javaInfo =
+                new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         jmlIO = new JmlIO().services(services).classType(testClassType);
@@ -43,33 +45,33 @@ public class NJmlTranslatorTests {
         assertEquals(1, result.size(), "Too many invariants found.");
     }
 
-// weigl: ignored since fix #1640, due to interface change
-//    @Test
-//    public void testModelMethodWithAtSignInBody() {
-//        ImmutableList<TextualJMLConstruct> result =
-//                jmlIO.parseClassLevel("/*@ model int f(int x) { \n" +
-//                        "@  return x+1; " +
-//                        "@ }*/", "Test.java", new Position(0, 0));
-//        assertNotNull(result);
-//        TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-//        assertEquals("int f (int x);", decl.getParsableDeclaration().trim());
-//        String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-//        assertEquals("f(x) == (x+1)", eqString);
-//    }
-//
-//    @Test
-//    public void testModelMethodWithAtSignInBody2() {
-//        ImmutableList<TextualJMLConstruct> result =
-//                jmlIO.parseClassLevel("/*@ model int f(int[] arr) { \n" +
-//                        "@  //this is a comment \n" +
-//                        "@  return arr[1]; //comment\n" +
-//                        "@ }*/", "Test.java", new Position(0, 0));
-//        assertNotNull(result);
-//        TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-//        assertEquals("int f (int[] arr);", decl.getParsableDeclaration().trim());
-//        String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-//        assertEquals("f(arr) == (arr[1])", eqString);
-//    }
+    // weigl: ignored since fix #1640, due to interface change
+    // @Test
+    // public void testModelMethodWithAtSignInBody() {
+    // ImmutableList<TextualJMLConstruct> result =
+    // jmlIO.parseClassLevel("/*@ model int f(int x) { \n" +
+    // "@ return x+1; " +
+    // "@ }*/", "Test.java", new Position(0, 0));
+    // assertNotNull(result);
+    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
+    // assertEquals("int f (int x);", decl.getParsableDeclaration().trim());
+    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
+    // assertEquals("f(x) == (x+1)", eqString);
+    // }
+    //
+    // @Test
+    // public void testModelMethodWithAtSignInBody2() {
+    // ImmutableList<TextualJMLConstruct> result =
+    // jmlIO.parseClassLevel("/*@ model int f(int[] arr) { \n" +
+    // "@ //this is a comment \n" +
+    // "@ return arr[1]; //comment\n" +
+    // "@ }*/", "Test.java", new Position(0, 0));
+    // assertNotNull(result);
+    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
+    // assertEquals("int f (int[] arr);", decl.getParsableDeclaration().trim());
+    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
+    // assertEquals("f(arr) == (arr[1])", eqString);
+    // }
 
     @Test
     public void testWarnRequires() {
@@ -80,7 +82,9 @@ public class NJmlTranslatorTests {
         assertNotNull(result);
         ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
         PositionedString message = warnings.head();
-        assertEquals("Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
-                "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)", message.toString());
+        assertEquals(
+                "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                        + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
+                message.toString());
     }
 }

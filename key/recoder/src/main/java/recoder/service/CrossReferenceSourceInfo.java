@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -16,8 +19,8 @@ import java.util.List;
 public interface CrossReferenceSourceInfo extends SourceInfo {
 
     /**
-     * Returns the list of references to a given method (or constructor). The
-     * references stem from all known compilation units.
+     * Returns the list of references to a given method (or constructor). The references stem from
+     * all known compilation units.
      *
      * @param m a method.
      * @return the possibly empty list of references to the given method.
@@ -25,8 +28,8 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<MemberReference> getReferences(Method m);
 
     /**
-     * Returns the list of references to a given constructor. The references
-     * stem from all known compilation units.
+     * Returns the list of references to a given constructor. The references stem from all known
+     * compilation units.
      *
      * @param m a constructor.
      * @return the possibly empty list of references to the given constructor.
@@ -34,8 +37,8 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<ConstructorReference> getReferences(Constructor m);
 
     /**
-     * Returns the list of references to a given variable. The references stem
-     * from all known compilation units.
+     * Returns the list of references to a given variable. The references stem from all known
+     * compilation units.
      *
      * @param v a variable.
      * @return the possibly empty list of references to the given variable.
@@ -43,8 +46,8 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<VariableReference> getReferences(Variable v);
 
     /**
-     * Returns the list of references to a given field. The references stem from
-     * all known compilation units.
+     * Returns the list of references to a given field. The references stem from all known
+     * compilation units.
      *
      * @param f a field.
      * @return the possibly empty list of references to the given field.
@@ -52,8 +55,8 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<FieldReference> getReferences(Field f);
 
     /**
-     * Returns the list of references to a given type. The references stem from
-     * all known compilation units.
+     * Returns the list of references to a given type. The references stem from all known
+     * compilation units.
      *
      * @param t a type.
      * @return the possibly empty list of references to the given type.
@@ -61,8 +64,8 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<TypeReference> getReferences(Type t);
 
     /**
-     * Returns the list of references to a given package. The references stem
-     * from all known compilation units.
+     * Returns the list of references to a given package. The references stem from all known
+     * compilation units.
      *
      * @param p a package.
      * @return the possibly empty list of references to the given package.

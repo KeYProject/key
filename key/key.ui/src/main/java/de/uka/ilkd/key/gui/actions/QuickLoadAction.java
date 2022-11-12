@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -6,8 +9,9 @@ import java.io.File;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
- * Load the file saved at the location described by {@link QuickSaveAction}.
- * Use the F6 key to access this feature.
+ * Load the file saved at the location described by {@link QuickSaveAction}. Use the F6 key to
+ * access this feature.
+ *
  * @author daniel
  *
  */

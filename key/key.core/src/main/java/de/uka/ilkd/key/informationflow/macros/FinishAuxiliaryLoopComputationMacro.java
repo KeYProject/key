@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -21,21 +24,19 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-public class FinishAuxiliaryLoopComputationMacro extends
-        AbstractFinishAuxiliaryComputationMacro {
+public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                     proof.getServices().getSpecificationRepository().getProofOblInput(proof);
 
             if (poForProof instanceof LoopInvExecutionPO) {
-                final Node parentOfInitiatingGoal = ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
-                if (parentOfInitiatingGoal != null &&
-                        parentOfInitiatingGoal.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                final Node parentOfInitiatingGoal =
+                        ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
+                if (parentOfInitiatingGoal != null && parentOfInitiatingGoal
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
                     return true;
                 }
             }
@@ -45,11 +46,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          final Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;

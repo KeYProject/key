@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import bibliothek.gui.dock.common.CLocation;
@@ -68,10 +71,8 @@ public class SequentViewDock extends DefaultMultipleCDockable {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (node != null) //TODO Check if also proof needs to be set!
-                sequentView.getMainWindow()
-                        .getMediator().getSelectionModel()
-                        .setSelectedNode(node);
+            if (node != null) // TODO Check if also proof needs to be set!
+                sequentView.getMainWindow().getMediator().getSelectionModel().setSelectedNode(node);
         }
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.gui.fonticons.*;
@@ -23,11 +26,10 @@ public class Icons {
 
     public static final Icon SECOND_BRANCH = new ImageIcon(SECOND_BRANCH_IMAGE);
 
-    public static final IconProvider SECOND_BRANCH_HIDE = new IconFontProvider(
-            FontAwesomeSolid.ELLIPSIS_V);
+    public static final IconProvider SECOND_BRANCH_HIDE =
+            new IconFontProvider(FontAwesomeSolid.ELLIPSIS_V);
     public static final IconFontProvider EXPLORE_DISABLE =
             new IconFontProvider(MaterialDesignRegular.EXPLORE, Color.GRAY);
 
-    private Icons() {
-    }
+    private Icons() {}
 }

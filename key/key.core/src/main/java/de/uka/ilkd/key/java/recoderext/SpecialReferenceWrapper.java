@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.*;
@@ -23,8 +26,7 @@ public class SpecialReferenceWrapper extends ThisReference
     }
 
 
-    public SpecialReferenceWrapper(TypeReference typeRef,
-                                   ReferencePrefix myprefix) {
+    public SpecialReferenceWrapper(TypeReference typeRef, ReferencePrefix myprefix) {
         this.typeRef = typeRef;
         this.myprefix = myprefix;
         expressionParent = null;
@@ -39,8 +41,7 @@ public class SpecialReferenceWrapper extends ThisReference
     /**
      * Make parent role valid.
      */
-    public void makeParentRoleValid() {
-    }
+    public void makeParentRoleValid() {}
 
     /**
      * Get AST parent.
@@ -70,9 +71,8 @@ public class SpecialReferenceWrapper extends ThisReference
         expressionParent = c;
     }
 
-    //don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    // don't think we need it
+    public void accept(SourceVisitor v) {}
 
     public SpecialReferenceWrapper deepClone() {
         return new SpecialReferenceWrapper(typeRef, myprefix);

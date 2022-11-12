@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -24,8 +27,8 @@ public class DetachChange extends TreeChange {
     private int position;
 
     /**
-     * An attach change that effectively replaced this This information may be
-     * redundant, but is not in general.
+     * An attach change that effectively replaced this This information may be redundant, but is not
+     * in general.
      */
     private AttachChange replacement;
 
@@ -82,9 +85,8 @@ public class DetachChange extends TreeChange {
             buf.append(Format.toString("%c %n", getChangeRoot()));
             buf.append(Format.toString(" from %c %n in %u @%p", getChangeRootParent()));
             /*
-             * buf.append(" in role "); buf.append(getChangePositionCode() &
-             * 15); buf.append(" at index "); buf.append(getChangePositionCode() >>
-             * 4);
+             * buf.append(" in role "); buf.append(getChangePositionCode() & 15);
+             * buf.append(" at index "); buf.append(getChangePositionCode() >> 4);
              */
         }
         return buf.toString();

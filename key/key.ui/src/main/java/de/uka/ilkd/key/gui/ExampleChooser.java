@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import org.key_project.util.java.IOUtil;
@@ -25,8 +28,7 @@ import java.util.*;
 
 public final class ExampleChooser extends JDialog {
     /**
-     * This path is also accessed by the Eclipse integration of KeY
-     * to find the right examples.
+     * This path is also accessed by the Eclipse integration of KeY to find the right examples.
      */
     public static final String EXAMPLES_PATH = "examples";
 
@@ -69,15 +71,15 @@ public final class ExampleChooser extends JDialog {
     private Example selectedExample;
 
     /**
-     * This class wraps a {@link File} and has a special {@link #toString()} method
-     * only using the short file name w/o path.
+     * This class wraps a {@link File} and has a special {@link #toString()} method only using the
+     * short file name w/o path.
      * <p>
      * Used for displaying files in the examples list w/o prefix
      */
     public static class Example {
         /**
-         * The default category under which examples range if they do not
-         * have {@link #KEY_PATH} set.
+         * The default category under which examples range if they do not have {@link #KEY_PATH}
+         * set.
          */
         private static final String DEFAULT_CATEGORY_PATH = "Unsorted";
 
@@ -87,33 +89,31 @@ public final class ExampleChooser extends JDialog {
         private static final String KEY_PATH = "example.path";
 
         /**
-         * The {@link Properties} key to specify the name of the example.
-         * Directory name if left open.
+         * The {@link Properties} key to specify the name of the example. Directory name if left
+         * open.
          */
         private static final String KEY_NAME = "example.name";
 
         /**
-         * The {@link Properties} key to specify the file for the example.
-         * KEY_FILE_NAME by default
+         * The {@link Properties} key to specify the file for the example. KEY_FILE_NAME by default
          */
         private static final String KEY_FILE = "example.file";
 
         /**
-         * The {@link Properties} key to specify the proof file in the tree.
-         * May be left open
+         * The {@link Properties} key to specify the proof file in the tree. May be left open
          */
         private static final String KEY_PROOF_FILE = "example.proofFile";
 
         /**
-         * The {@link Properties} key to specify the path in the tree.
-         * Prefix to specify additional files to load. Append 1, 2, 3, ...
+         * The {@link Properties} key to specify the path in the tree. Prefix to specify additional
+         * files to load. Append 1, 2, 3, ...
          */
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
 
         /**
-         * The {@link Properties} key to specify the path in the tree.
-         * Prefix to specify export files which are not shown as tabs in the example wizard but are extracted to Java projects in the Eclipse integration.
-         * Append 1, 2, 3, ...
+         * The {@link Properties} key to specify the path in the tree. Prefix to specify export
+         * files which are not shown as tabs in the example wizard but are extracted to Java
+         * projects in the Eclipse integration. Append 1, 2, 3, ...
          */
         private static final String EXPORT_FILE_PREFIX = "example.exportFile.";
 
@@ -190,7 +190,8 @@ public final class ExampleChooser extends JDialog {
             node.add(new DefaultMutableTreeNode(this));
         }
 
-        private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path, int from) {
+        private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path,
+                int from) {
             if (from == path.length) {
                 return root;
             }
@@ -213,21 +214,21 @@ public final class ExampleChooser extends JDialog {
 
     }
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
     private ExampleChooser(File examplesDir) {
         super(MainWindow.getInstance(), "Load Example", true);
         assert examplesDir != null;
         assert examplesDir.isDirectory();
 
-        //create list panel
+        // create list panel
         final JPanel listPanel = new JPanel();
         listPanel.setLayout(new BorderLayout());
         getContentPane().add(listPanel);
 
-        //create example list
+        // create example list
         final DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode());
         List<Example> examples = listExamples(examplesDir);
         for (Example example : examples) {
@@ -249,7 +250,7 @@ public final class ExampleChooser extends JDialog {
         final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
         exampleScrollPane.setBorder(new TitledBorder("Examples"));
 
-        //create description label
+        // create description label
         tabPane = new JTabbedPane(JTabbedPane.TOP);
 
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -258,36 +259,38 @@ public final class ExampleChooser extends JDialog {
         split.setDividerLocation(300);
         listPanel.add(split, BorderLayout.CENTER);
 
-        //create button panel
+        // create button panel
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         final Dimension buttonDim = new Dimension(140, 27);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-                (int) buttonDim.getHeight()
-                        + 10));
+        buttonPanel
+                .setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
 
-        //create "load" button
+        // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
-            if (selectedExample == null) throw new RuntimeException("No example selected");
+            if (selectedExample == null)
+                throw new RuntimeException("No example selected");
             fileToLoad = selectedExample.getObligationFile();
             setVisible(false);
         });
         buttonPanel.add(loadButton);
         getRootPane().setDefaultButton(loadButton);
 
-        //create "load proof" button
+        // create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(e -> {
-            if (selectedExample == null) throw new IllegalStateException("No example selected");
-            if (!selectedExample.hasProof()) throw new IllegalStateException("Selected example has no proof.");
+            if (selectedExample == null)
+                throw new IllegalStateException("No example selected");
+            if (!selectedExample.hasProof())
+                throw new IllegalStateException("Selected example has no proof.");
             fileToLoad = selectedExample.getProofFile();
             setVisible(false);
         });
         buttonPanel.add(loadProofButton);
 
-        //create "cancel" button
+        // create "cancel" button
         cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> {
             fileToLoad = null;
@@ -299,31 +302,28 @@ public final class ExampleChooser extends JDialog {
                 cancelButton.doClick();
             }
         };
-        cancelButton.registerKeyboardAction(
-                escapeListener,
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        cancelButton.registerKeyboardAction(escapeListener, "ESC",
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // select first example
-        DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
+        DefaultMutableTreeNode firstLeaf =
+                ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
         TreePath pathToFirstLeaf = new TreePath(firstLeaf.getPath());
         exampleList.getSelectionModel().setSelectionPath(pathToFirstLeaf);
         exampleList.makeVisible(pathToFirstLeaf);
 
         // show
-        getContentPane().setLayout(new BoxLayout(getContentPane(),
-                BoxLayout.Y_AXIS));
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setSize(800, 400);
     }
 
 
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
 
     public static File lookForExamples() {
-        //weigl: using java properties: -Dkey.examples.dir="..."
+        // weigl: using java properties: -Dkey.examples.dir="..."
         if (System.getProperty(KEY_EXAMPLE_DIR) != null) {
             return new File(System.getProperty(KEY_EXAMPLE_DIR));
         }
@@ -345,7 +345,8 @@ public final class ExampleChooser extends JDialog {
         }
     }
 
-    private static StringBuilder extractDescription(File file, StringBuilder sb, Properties properties) {
+    private static StringBuilder extractDescription(File file, StringBuilder sb,
+            Properties properties) {
         try (BufferedReader r = new BufferedReader(new FileReader(file))) {
             String line;
             boolean emptyLineSeen = false;
@@ -381,8 +382,7 @@ public final class ExampleChooser extends JDialog {
             return;
         }
 
-        DefaultMutableTreeNode node =
-                (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 
@@ -410,9 +410,9 @@ public final class ExampleChooser extends JDialog {
         }
     }
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
     private void addTab(String string, String name, boolean wrap) {
         JTextArea area = new JTextArea();
@@ -426,8 +426,8 @@ public final class ExampleChooser extends JDialog {
     }
 
     /**
-     * Shows the dialog, using the passed examples directory. If null is passed,
-     * tries to find examples directory on its own.
+     * Shows the dialog, using the passed examples directory. If null is passed, tries to find
+     * examples directory on its own.
      */
     public static File showInstance(String examplesDirString) {
         // get examples directory
@@ -440,28 +440,28 @@ public final class ExampleChooser extends JDialog {
 
         if (!examplesDir.isDirectory()) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "The examples directory cannot be found.\n" +
-                            "Please install them at " +
-                            (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/" : examplesDirString),
-                    "Error loading examples",
-                    JOptionPane.ERROR_MESSAGE);
+                    "The examples directory cannot be found.\n" + "Please install them at "
+                            + (examplesDirString == null
+                                    ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
+                                    : examplesDirString),
+                    "Error loading examples", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
-        //show dialog
+        // show dialog
         if (instance == null) {
             instance = new ExampleChooser(examplesDir);
         }
         instance.setLocationRelativeTo(instance.getOwner());
         instance.setVisible(true);
 
-        //return result
+        // return result
         return instance.fileToLoad;
     }
 
     /**
-     * Lists all examples in the given directory.
-     * This method is also accessed by the eclipse based projects.
+     * Lists all examples in the given directory. This method is also accessed by the eclipse based
+     * projects.
      *
      * @param examplesDir The examples directory to list examples in.
      * @return The found examples.

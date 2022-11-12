@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -11,8 +14,8 @@ import javax.annotation.Nullable;
 
 
 /**
- * Common superinterface of all constructs created by the specification
- * language front ends and managed by SpecificationRepository.
+ * Common superinterface of all constructs created by the specification language front ends and
+ * managed by SpecificationRepository.
  */
 public interface SpecificationElement {
 
@@ -33,8 +36,8 @@ public interface SpecificationElement {
 
 
     /**
-     * Returns the KeYJavaType representing the class/interface to which the
-     * specification element belongs.
+     * Returns the KeYJavaType representing the class/interface to which the specification element
+     * belongs.
      */
     public KeYJavaType getKJT();
 

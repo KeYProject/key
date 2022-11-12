@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
@@ -7,9 +10,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * A symbolic execution state is a pair of a symbolic state in form of a
- * parallel update, and a path condition in form of a JavaDL formula.
- * 
+ * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
+ * condition in form of a JavaDL formula.
+ *
  * @author Dominic Scheurer
  */
 public class SymbolicExecutionState extends Pair<Term, Term> {
@@ -17,25 +20,19 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     private Node correspondingNode = null;
 
     /**
-     * @param symbolicState
-     *            The symbolic state (parallel update).
-     * @param pathCondition
-     *            The path condition (formula).
+     * @param symbolicState The symbolic state (parallel update).
+     * @param pathCondition The path condition (formula).
      */
     public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
         super(symbolicState, pathCondition);
     }
 
     /**
-     * @param symbolicState
-     *            The symbolic state (parallel update).
-     * @param pathCondition
-     *            The path condition (formula).
-     * @param correspondingNode
-     *            The node corresponding to this SE state.
+     * @param symbolicState The symbolic state (parallel update).
+     * @param pathCondition The path condition (formula).
+     * @param correspondingNode The node corresponding to this SE state.
      */
-    public SymbolicExecutionState(Term symbolicState, Term pathCondition,
-            Node correspondingNode) {
+    public SymbolicExecutionState(Term symbolicState, Term pathCondition, Node correspondingNode) {
         this(symbolicState, pathCondition);
         this.correspondingNode = correspondingNode;
     }
@@ -62,8 +59,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     }
 
     /**
-     * @param The
-     *            node corresponding to this SE state.
+     * @param The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
@@ -76,17 +72,15 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
                 + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services))
                 + "), Path Condition=("
-                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
-                + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
     }
 
     /**
      * Removes a trailing newline (\n) char from the given string.
      *
-     * @param str
-     *            The string to remove the newline char from.
-     * @return The given string with the removed trailing \n char, or the
-     *         original string if it does not end with an \n.
+     * @param str The string to remove the newline char from.
+     * @return The given string with the removed trailing \n char, or the original string if it does
+     *         not end with an \n.
      */
     private String rmN(String str) {
         if (str.endsWith("\n") && str.length() > 1) {

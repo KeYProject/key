@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 
@@ -51,15 +54,15 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     /**
      * Translation of a string to a list of strings by using {@link #SET_DELIMITER}.
+     *
      * @param str a nonnull, emptible string
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
     private static @Nonnull List<String> parseStringList(@Nonnull String str) {
         // escape special chars (in particular the comma)
-        return Arrays.stream(str.split(SET_DELIMITER))
-                     .map(s -> SettingsConverter.convert(s, true))
-                     .collect(Collectors.toCollection(ArrayList::new));
+        return Arrays.stream(str.split(SET_DELIMITER)).map(s -> SettingsConverter.convert(s, true))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -68,9 +71,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
      */
     private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
         // escape special chars (in particular the comma)
-        return seq.stream()
-                  .map(s -> SettingsConverter.convert(s, false))
-                  .collect(Collectors.joining(SET_DELIMITER));
+        return seq.stream().map(s -> SettingsConverter.convert(s, false))
+                .collect(Collectors.joining(SET_DELIMITER));
     }
 
     public boolean isInitialized() {
@@ -98,7 +100,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public void addSettingsListener(SettingsListener l) {
         listenerList.add(l);
     }
-    
+
     @Override
     public void removeSettingsListener(SettingsListener l) {
         listenerList.remove(l);
@@ -141,8 +143,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
     }
 
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
-        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key,
-                parseStringSet(defValue),
+        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
                 AbstractPropertiesSettings::parseStringSet,
                 AbstractPropertiesSettings::stringSetToString);
         propertyEntries.add(pe);
@@ -152,14 +153,13 @@ public abstract class AbstractPropertiesSettings implements Settings {
     /**
      * Creates a string list property.
      *
-     * @param key      the key value of this property inside {@link Properties} instance
+     * @param key the key value of this property inside {@link Properties} instance
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
-                                                                   @Nullable String defValue) {
-        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
-                parseStringList(defValue),
+            @Nullable String defValue) {
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
                 AbstractPropertiesSettings::parseStringList,
                 AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
@@ -194,9 +194,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
             this(key, defaultValue, convert, Objects::toString);
         }
 
-        private DefaultPropertyEntry(String key, T defaultValue,
-                                     Function<String, T> convert,
-                                     Function<T, String> toString) {
+        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
+                Function<T, String> toString) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;

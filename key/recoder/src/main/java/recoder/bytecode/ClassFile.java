@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.bytecode;
@@ -134,8 +137,8 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     public boolean isOrdinaryInterface() {
-        return (accessFlags & AccessFlags.INTERFACE) != 0 &&
-                (accessFlags & AccessFlags.ANNOTATION) == 0;
+        return (accessFlags & AccessFlags.INTERFACE) != 0
+                && (accessFlags & AccessFlags.ANNOTATION) == 0;
     }
 
     public boolean isAnnotationType() {
@@ -147,8 +150,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     public boolean isOrdinaryClass() {
-        return (accessFlags & AccessFlags.INTERFACE) == 0 &&
-                (accessFlags & AccessFlags.ENUM) == 0;
+        return (accessFlags & AccessFlags.INTERFACE) == 0 && (accessFlags & AccessFlags.ENUM) == 0;
     }
 
     public final List<ClassType> getSupertypes() {

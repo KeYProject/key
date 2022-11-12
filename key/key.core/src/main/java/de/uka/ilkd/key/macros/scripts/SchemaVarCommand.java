@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Name;
@@ -13,20 +16,20 @@ import java.util.Map;
 /**
  *
  */
-public class SchemaVarCommand
-        extends AbstractCommand<SchemaVarCommand.Parameters> {
+public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameters> {
 
     public SchemaVarCommand() {
         super(Parameters.class);
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
-    @Override public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    @Override
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
 
         if (args.type == null || args.var == null) {
             throw new ScriptException("Missing argument: type var");
@@ -44,24 +47,22 @@ public class SchemaVarCommand
             SchemaVariable sv;
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
-            }
-            else {
+            } else {
                 Sort sort = state.toSort(args.type);
                 sv = SchemaVariableFactory.createTermSV(schemaVar, sort);
             }
 
-            Term term = state.getProof().getServices().getTermFactory()
-                    .createTerm(sv);
+            Term term = state.getProof().getServices().getTermFactory().createTerm(sv);
 
             abbrMap.put(term, args.var, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScriptException(e);
         }
 
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "schemaVar";
     }
 

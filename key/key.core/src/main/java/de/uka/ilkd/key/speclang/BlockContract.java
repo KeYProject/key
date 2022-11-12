@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
@@ -29,16 +32,16 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 public interface BlockContract extends AuxiliaryContract {
 
     /**
-    *
-    * @param newBlock the new block.
-    * @param newPreconditions the new preconditions.
-    * @param newPostconditions the new postconditions.
-    * @param newModifiesClauses the new modifies clauses.
-    * @param newInfFlowSpecs the new information flow specifications.
-    * @param newVariables the new variables.
-    * @param newMeasuredBy the new measured-by clause.
-    * @return a new block contract with the specified attributes.
-    */
+     *
+     * @param newBlock the new block.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiesClauses the new modifies clauses.
+     * @param newInfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @return a new block contract with the specified attributes.
+     */
     public BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newFreePreconditions,
@@ -49,18 +52,15 @@ public interface BlockContract extends AuxiliaryContract {
             Term newMeasuredBy);
 
     /**
-     * @param newKJT
-     *            the type containing the new target method.
-     * @param newPM
-     *            the new target method.
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
      * @return a new block contract equal to this one except that it belongs to a different target.
      */
     @Override
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
-     * @param newBlock
-     *            the new block.
+     * @param newBlock the new block.
      * @return a new block contract equal to this one except that it belongs to a different block.
      */
     @Override

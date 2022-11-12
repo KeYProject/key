@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -23,8 +26,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *            a loop contract.
+     * @param contract a loop contract.
      */
     FunctionalLoopContract(LoopContract contract) {
         super(contract);
@@ -32,10 +34,8 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *            a loop contract.
-     * @param id
-     *            an ID.
+     * @param contract a loop contract.
+     * @param id an ID.
      */
     FunctionalLoopContract(LoopContract contract, int id) {
         super(contract, id);
@@ -82,8 +82,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
      * @see LoopContract#replaceEnhancedForVariables(de.uka.ilkd.key.java.StatementBlock, Services)
      */
     public void replaceEnhancedForVariables(Services services) {
-        setAuxiliaryContract(
-                getAuxiliaryContract().replaceEnhancedForVariables(
-                        getAuxiliaryContract().getBlock(), services));
+        setAuxiliaryContract(getAuxiliaryContract()
+                .replaceEnhancedForVariables(getAuxiliaryContract().getBlock(), services));
     }
 }

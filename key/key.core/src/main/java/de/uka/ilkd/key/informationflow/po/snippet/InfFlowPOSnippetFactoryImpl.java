@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,42 +41,33 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
             new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
 
 
-    InfFlowPOSnippetFactoryImpl(InformationFlowContract contract,
-                                ProofObligationVars vars1,
-                                ProofObligationVars vars2,
-                                Services services) {
+    InfFlowPOSnippetFactoryImpl(InformationFlowContract contract, ProofObligationVars vars1,
+            ProofObligationVars vars2, Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
     }
 
-    InfFlowPOSnippetFactoryImpl(BlockContract contract,
-                                ProofObligationVars vars1,
-                                ProofObligationVars vars2,
-                                ExecutionContext context,
-                                Services services) {
+    InfFlowPOSnippetFactoryImpl(BlockContract contract, ProofObligationVars vars1,
+            ProofObligationVars vars2, ExecutionContext context, Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
     }
 
-    InfFlowPOSnippetFactoryImpl(LoopSpecification invariant,
-                                ProofObligationVars vars1,
-                                ProofObligationVars vars2,
-                                ExecutionContext context,
-                                Term guardTerm,
-                                Services services) {
+    InfFlowPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars vars1,
+            ProofObligationVars vars2, ExecutionContext context, Term guardTerm,
+            Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
     }
 
-    InfFlowPOSnippetFactoryImpl(BasicSnippetData d,
-                                ProofObligationVars vars1,
-                                ProofObligationVars vars2) {
+    InfFlowPOSnippetFactoryImpl(BasicSnippetData d, ProofObligationVars vars1,
+            ProofObligationVars vars2) {
         this.data = d;
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
@@ -89,23 +83,23 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                 factoryMethods.put(s, fm);
             }
         } catch (InstantiationException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
+                    ex);
         }
     }
 
@@ -115,15 +109,14 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         try {
             InfFlowFactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
-                throw new UnsupportedOperationException("Unknown factory " +
-                         "method for snippet \"" + snippet.name() + ".");
+                throw new UnsupportedOperationException(
+                        "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars1, poVars2);
             return result;
         } catch (TermCreationException e) {
-            throw new UnsupportedOperationException("Factory method for " +
-                     "snippet \"" + snippet.name() + "threw " +
-                     "TermCreationException: " + e.getMessage());
+            throw new UnsupportedOperationException("Factory method for " + "snippet \""
+                    + snippet.name() + "threw " + "TermCreationException: " + e.getMessage());
         }
     }
 }

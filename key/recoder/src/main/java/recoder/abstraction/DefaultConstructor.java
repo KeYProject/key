@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.abstraction;
@@ -21,8 +24,8 @@ public class DefaultConstructor implements Constructor {
     protected ClassType ownerClass;
 
     /**
-     * Create a new default constructor for the given class type. The name of
-     * the constructor is set appropriately.
+     * Create a new default constructor for the given class type. The name of the constructor is set
+     * appropriately.
      *
      * @param ownerClass the owner class of this constructor.
      */
@@ -32,8 +35,7 @@ public class DefaultConstructor implements Constructor {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -42,8 +44,7 @@ public class DefaultConstructor implements Constructor {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param service the program model info for this element.
      */
@@ -94,8 +95,8 @@ public class DefaultConstructor implements Constructor {
     /**
      * Checks if this member is public.
      *
-     * @return <CODE>true</CODE>, if the containing class type is public,
-     * <CODE>false</CODE> otherwise.
+     * @return <CODE>true</CODE>, if the containing class type is public, <CODE>false</CODE>
+     *         otherwise.
      */
     public boolean isPublic() {
         return getContainingClassType().isPublic() && !getContainingClassType().isEnumType();
@@ -194,8 +195,7 @@ public class DefaultConstructor implements Constructor {
     }
 
     /**
-     * Returns the (empty) list of class types locally defined within this
-     * container.
+     * Returns the (empty) list of class types locally defined within this container.
      *
      * @return a list of contained class types.
      */
@@ -221,7 +221,9 @@ public class DefaultConstructor implements Constructor {
         return Naming.getFullName(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isVarArgMethod()
      */
     public boolean isVarArgMethod() {

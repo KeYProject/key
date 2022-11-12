@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 
@@ -15,7 +18,7 @@ public final class ProblemLoaderException extends Exception {
         super(msg, cause);
         this.origin = origin;
     }
-    
+
     public ProblemLoaderException(AbstractProblemLoader origin, String msg) {
         super(msg);
         this.origin = origin;
@@ -24,15 +27,17 @@ public final class ProblemLoaderException extends Exception {
     public AbstractProblemLoader getOrigin() {
         return origin;
     }
-    
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         if (getMessage() != null)
             sb = sb.append(getMessage());
         sb = sb.append(" (");
-        if (origin == null) sb = sb.append("unknown origin");
-        else sb = sb.append("file: ").append(origin.getFile());
+        if (origin == null)
+            sb = sb.append("unknown origin");
+        else
+            sb = sb.append("file: ").append(origin.getFile());
         if (getCause() != null) {
             sb = sb.append("; caused by: ");
             sb = sb.append(getCause());

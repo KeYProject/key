@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.ArrayList;
@@ -20,29 +23,27 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
- * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in
- * proof scripts. It is possible to
+ * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
+ * possible to
  *
  * <ul>
- * <li>set a breakpoint statement which makes the macro stop when the breakpoint
- * is reached (option "breakpoint", default is no breakpoint),</li>
- * <li>prevent the proof from splitting (option "splits", default is true, i.e.,
- * splitting allowed),</li>
- * <li>whitelist certain rule names which will always be allowed, even after a
- * breakpoint (option "whitelist", default is none, supply a comma-separated
- * list of rule names),</li>
- * <li>limit the rule applications to those working on formulas with a modality
- * (parameter "symbex-only", default is true),</li>
- * <li>prevent the application of rules that are tagged as not "human-readable"
- * (parameter "human-readable-only", default is true).</li>
+ * <li>set a breakpoint statement which makes the macro stop when the breakpoint is reached (option
+ * "breakpoint", default is no breakpoint),</li>
+ * <li>prevent the proof from splitting (option "splits", default is true, i.e., splitting
+ * allowed),</li>
+ * <li>whitelist certain rule names which will always be allowed, even after a breakpoint (option
+ * "whitelist", default is none, supply a comma-separated list of rule names),</li>
+ * <li>limit the rule applications to those working on formulas with a modality (parameter
+ * "symbex-only", default is true),</li>
+ * <li>prevent the application of rules that are tagged as not "human-readable" (parameter
+ * "human-readable-only", default is true).</li>
  * </ul>
  *
  * All parameters are optional, the default configuration works like the
- * {@link FinishSymbolicExecutionMacro}. The parameters mentioned above have to
- * be prefixed with "arg_" in proof scripts. From proof scripts, it is also
- * possible (for all macros, and so also for this one) to start the macro on one
- * particular formula (via parameter "occ") and thus to realize focussed
- * applications.
+ * {@link FinishSymbolicExecutionMacro}. The parameters mentioned above have to be prefixed with
+ * "arg_" in proof scripts. From proof scripts, it is also possible (for all macros, and so also for
+ * this one) to start the macro on one particular formula (via parameter "occ") and thus to realize
+ * focussed applications.
  *
  * @author Dominic Steinhoefel
  */

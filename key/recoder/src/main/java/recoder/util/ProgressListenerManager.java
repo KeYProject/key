@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.util;
 
 /**
- * Helper class that handles progress listener registration and broadcasts.
- * Caches and reuses the event object, so listeners should not store the event
- * object.
+ * Helper class that handles progress listener registration and broadcasts. Caches and reuses the
+ * event object, so listeners should not store the event object.
  *
  * @author AL
  * @since 0.72

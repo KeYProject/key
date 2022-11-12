@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -17,8 +20,7 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractAuxiliaryContractBuiltInRuleApp
-        extends AbstractBuiltInRuleApp {
+public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      * @see #getStatement()
@@ -42,15 +44,12 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
-     * @param ifInstantiations
-     *            if instantiations.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
      */
-    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence occurrence, ImmutableList<PosInOccurrence> ifInstantiations) {
+    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
+            ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
@@ -118,10 +117,8 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp
     /**
      * Sets the proof obligation variables and execution context to new values.
      *
-     * @param vars
-     *            new proof obligation variables.
-     * @param context
-     *            new execution context.
+     * @param vars new proof obligation variables.
+     * @param context new execution context.
      */
     public void update(IFProofObligationVars vars, ExecutionContext context) {
         this.infFlowVars = vars;

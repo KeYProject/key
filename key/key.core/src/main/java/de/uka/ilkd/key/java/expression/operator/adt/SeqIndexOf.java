@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Represents a function giving the index of some element in a sequence (if it exists).
+ *
  * @author bruns
  *
  */
@@ -29,7 +33,7 @@ public class SeqIndexOf extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqIndexOf(this);
+        v.performActionOnSeqIndexOf(this);
     }
 
     @Override

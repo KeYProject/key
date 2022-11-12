@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import javax.swing.JMenuItem;
@@ -9,16 +12,16 @@ public class SMTMenuItem extends JMenuItem {
     private SolverTypeCollection solverUnion;
 
     public SMTMenuItem(SolverTypeCollection solverUnion) {
-	super();
-	this.solverUnion = solverUnion;
-	this.setText(solverUnion.toString());
+        super();
+        this.solverUnion = solverUnion;
+        this.setText(solverUnion.toString());
     }
-    
+
     public SolverTypeCollection getSolverUnion() {
-	return solverUnion;
+        return solverUnion;
     }
-    
-    public String toString(){
-	return solverUnion.toString();
+
+    public String toString() {
+        return solverUnion.toString();
     }
 }

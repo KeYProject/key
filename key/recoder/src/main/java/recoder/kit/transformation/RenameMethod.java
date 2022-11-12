@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -15,11 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Transformation that renames a method and all known references to that method.
- * The new name should not be used for another method with the same signature.
+ * Transformation that renames a method and all known references to that method. The new name should
+ * not be used for another method with the same signature.
  * <p>
- * <B>Implementation warning: </B> does not (yet) check vadility of new name in
- * the context
+ * <B>Implementation warning: </B> does not (yet) check vadility of new name in the context
  *
  * @author AL
  * @author AM
@@ -35,16 +37,17 @@ public class RenameMethod extends TwoPassTransformation {
     private List<MethodReference> refs;
 
     /**
-     * Creates a new transformation object that renames a method and all
-     * redefined versions and all references to them. The new name should not
-     * conflict with another method in any of the occurances.
+     * Creates a new transformation object that renames a method and all redefined versions and all
+     * references to them. The new name should not conflict with another method in any of the
+     * occurances.
      *
-     * @param sc      the service configuration to use.
-     * @param method  the method to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the element; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     * @param sc the service configuration to use.
+     * @param method the method to be renamed; may not be <CODE>null</CODE>.
+     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     *        valid identifier name.
      */
-    public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method, String newName) {
+    public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method,
+            String newName) {
         super(sc);
         if (method == null) {
             throw new IllegalArgumentException("Missing method");
@@ -59,12 +62,10 @@ public class RenameMethod extends TwoPassTransformation {
     /**
      * Collects all related methods and all references.
      *
-     * @return the problem report: {@link recoder.kit.Identity}(the name has
-     * not changed), {@link recoder.kit.Equivalence}, or
-     * {@link MissingMethodDeclarations}(some of related methods are
-     * not available as source code), or {@link IllegalName}.
-     * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo,
-     * Method)
+     * @return the problem report: {@link recoder.kit.Identity}(the name has not changed),
+     *         {@link recoder.kit.Equivalence}, or {@link MissingMethodDeclarations}(some of related
+     *         methods are not available as source code), or {@link IllegalName}.
+     * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo, Method)
      */
     public ProblemReport analyze() {
         if (newName.equals(methodToRename.getName())) {
@@ -104,8 +105,8 @@ public class RenameMethod extends TwoPassTransformation {
     }
 
     /**
-     * Locally renames the method declaration and all method references
-     * collected in the analyzation phase.
+     * Locally renames the method declaration and all method references collected in the analyzation
+     * phase.
      *
      * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
@@ -122,17 +123,16 @@ public class RenameMethod extends TwoPassTransformation {
     }
 
     /**
-     * Returns a list of method declaration that are to be renamed (valid after
-     * analyze has been called), or that have been renamed (after transform has
-     * been called).
+     * Returns a list of method declaration that are to be renamed (valid after analyze has been
+     * called), or that have been renamed (after transform has been called).
      */
     public List<MethodDeclaration> getRenamedMethods() {
         return methods;
     }
 
     /**
-     * Problem report indicating that certain method declarations redefining the
-     * method to rename are not available in source code.
+     * Problem report indicating that certain method declarations redefining the method to rename
+     * are not available in source code.
      */
     public static class MissingMethodDeclarations extends MissingSources {
 

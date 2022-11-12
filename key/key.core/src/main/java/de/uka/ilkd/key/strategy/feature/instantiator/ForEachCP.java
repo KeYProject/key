@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
@@ -14,10 +17,9 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
 /**
- * Feature representing a <code>ChoicePoint</code> that iterates over the
- * terms returned by a <code>TermGenerator</code>. The terms are stored in a
- * <code>TermBuffer</code> one after the other and can subsequently be used
- * to instantiate a rule application
+ * Feature representing a <code>ChoicePoint</code> that iterates over the terms returned by a
+ * <code>TermGenerator</code>. The terms are stored in a <code>TermBuffer</code> one after the other
+ * and can subsequently be used to instantiate a rule application
  */
 public class ForEachCP implements Feature {
 
@@ -26,56 +28,46 @@ public class ForEachCP implements Feature {
     private final TermBuffer var;
     private final TermGenerator generator;
     private final Feature body;
-    
+
     /**
-     * @param var
-     *            <code>TermBuffer</code> in which the terms are going to
-     *            be stored
-     * @param generator
-     *            the terms that are to be iterated over
-     * @param body
-     *            a feature that is supposed to be evaluated repeatedly for the
-     *            possible values of <code>var</code>
+     * @param var <code>TermBuffer</code> in which the terms are going to be stored
+     * @param generator the terms that are to be iterated over
+     * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
+     *        <code>var</code>
      */
-    public static Feature create(TermBuffer var,
-                                 TermGenerator generator,
-                                 Feature body,
-                                 BackTrackingManager manager) {
-        return new ForEachCP ( var, generator, body, manager );
+    public static Feature create(TermBuffer var, TermGenerator generator, Feature body,
+            BackTrackingManager manager) {
+        return new ForEachCP(var, generator, body, manager);
     }
 
-    private ForEachCP(TermBuffer var,
-                      TermGenerator generator,
-                      Feature body,
-                      BackTrackingManager manager) {
+    private ForEachCP(TermBuffer var, TermGenerator generator, Feature body,
+            BackTrackingManager manager) {
         this.var = var;
         this.generator = generator;
         this.body = body;
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(final RuleApp app,
-                               final PosInOccurrence pos,
-                               final Goal goal) {
-        final Term outerVarContent = var.getContent ();
-        var.setContent ( null );
-        
-        manager.passChoicePoint ( new CP ( app, pos, goal ), this );
-       
+    public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal) {
+        final Term outerVarContent = var.getContent();
+        var.setContent(null);
+
+        manager.passChoicePoint(new CP(app, pos, goal), this);
+
         final RuleAppCost res;
-        if ( var.getContent() != null )
-            res = body.computeCost ( app, pos, goal );
+        if (var.getContent() != null)
+            res = body.computeCost(app, pos, goal);
         else
             res = NumberRuleAppCost.getZeroCost();
-        
-        var.setContent ( outerVarContent );
+
+        var.setContent(outerVarContent);
         return res;
     }
 
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private final Iterator<Term> terms;
-            private final RuleApp        oldApp;
+            private final RuleApp oldApp;
 
             private BranchIterator(Iterator<Term> terms, RuleApp oldApp) {
                 this.terms = terms;
@@ -83,15 +75,16 @@ public class ForEachCP implements Feature {
             }
 
             public boolean hasNext() {
-                return terms.hasNext ();
+                return terms.hasNext();
             }
 
             public CPBranch next() {
-                final Term generatedTerm = terms.next ();
-                return new CPBranch () {
+                final Term generatedTerm = terms.next();
+                return new CPBranch() {
                     public void choose() {
-                        var.setContent ( generatedTerm );
+                        var.setContent(generatedTerm);
                     }
+
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
@@ -104,19 +97,18 @@ public class ForEachCP implements Feature {
         }
 
         private final PosInOccurrence pos;
-        private final RuleApp         app;
-        private final Goal            goal;
-    
+        private final RuleApp app;
+        private final Goal goal;
+
         private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
         }
-    
+
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            return new BranchIterator ( generator.generate ( app, pos, goal ),
-                                        oldApp );
+            return new BranchIterator(generator.generate(app, pos, goal), oldApp);
         }
     }
-    
+
 }

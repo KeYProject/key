@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -30,12 +33,9 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param occurrence
-     *            the position at which the rule is applied.
-     * @param ifInstantiations
-     *            if instantiations.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
      */
     public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
@@ -49,10 +49,8 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param goal
-     *            the current goal.
-     * @param rule
-     *            the rule being applied.
+     * @param goal the current goal.
+     * @param rule the rule being applied.
      * @return this.
      */
     public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal,
@@ -61,12 +59,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
             return this;
         }
         final Services services = goal.proof().getServices();
-        final AbstractBlockContractRule.Instantiation instantiation = rule
-                .instantiate(posInOccurrence().subTerm(), goal, services);
-        final ImmutableSet<BlockContract> contracts = AbstractBlockContractRule
-                .getApplicableContracts(instantiation, goal, services);
+        final AbstractBlockContractRule.Instantiation instantiation =
+                rule.instantiate(posInOccurrence().subTerm(), goal, services);
+        final ImmutableSet<BlockContract> contracts =
+                AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement);
-        ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract> nil();
+        ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract cont : contracts) {
             if (cont.getBlock().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {
@@ -80,12 +78,9 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param statement
-     *            the new statement.
-     * @param contract
-     *            the new contract.
-     * @param heaps
-     *            the new heap context.
+     * @param statement the new statement.
+     * @param contract the new contract.
+     * @param heaps the new heap context.
      */
     public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {

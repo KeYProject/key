@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -16,19 +19,17 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * Syntactic transformation returning a mutable statement list that contains the
- * given statement, and creating a new {@linkrecoder.java.StatementBlock} if
- * necessary. It is necessary to create a new block, if
- * {@link recoder.kit.StatementKit#getStatementMutableList}returns <CODE>null
- * </CODE>. This is the case if the statement container allows only a single
- * statement and the given statement is not inside a
- * {@link recoder.java.StatementBlock}. If the statement has no parent, it is
- * wrapped into a new statement list.
+ * Syntactic transformation returning a mutable statement list that contains the given statement,
+ * and creating a new {@linkrecoder.java.StatementBlock} if necessary. It is necessary to create a
+ * new block, if {@link recoder.kit.StatementKit#getStatementMutableList}returns <CODE>null
+ * </CODE>. This is the case if the statement container allows only a single statement and the given
+ * statement is not inside a {@link recoder.java.StatementBlock}. If the statement has no parent, it
+ * is wrapped into a new statement list.
  * <DL>
  * <DT>Added:
- * <DD>a new statement block, containing a cloned version of a statement if
- * this is necessary and the transformation is visible. The original or cloned
- * statement is returned by the {@link #getStatement()}method.
+ * <DD>a new statement block, containing a cloned version of a statement if this is necessary and
+ * the transformation is visible. The original or cloned statement is returned by the
+ * {@link #getStatement()}method.
  * <DT>Removed:
  * <DD>the original statement wrapped by a block, in case this is necessary.
  * </DL>
@@ -44,13 +45,14 @@ public class PrepareStatementList extends TwoPassTransformation {
     private ASTList<Statement> list;
 
     /**
-     * Creates a new transformation object that wraps a statement with a new
-     * statement block if necessary.
+     * Creates a new transformation object that wraps a statement with a new statement block if
+     * necessary.
      *
      * @param sc the service configuration to use.
-     * @param s  a statement to be wrapped by a new statement block.
+     * @param s a statement to be wrapped by a new statement block.
      */
-    public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s, boolean isVisible) {
+    public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s,
+            boolean isVisible) {
         super(sc);
         if (s == null) {
             throw new IllegalArgumentException("Missing statement");
@@ -64,12 +66,10 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Returns a new
-     * {@link recoder.kit.transformation.PrepareStatementList.IllegalParentContext}
-     * if the statement is not embedded in a statement container, otherwise
-     * {@link #NO_PROBLEM}if the statement is a local variable declaration
-     * (which might potentially change program semantics), otherwise
-     * {@link #EQUIVALENCE}.
+     * Returns a new {@link recoder.kit.transformation.PrepareStatementList.IllegalParentContext} if
+     * the statement is not embedded in a statement container, otherwise {@link #NO_PROBLEM}if the
+     * statement is a local variable declaration (which might potentially change program semantics),
+     * otherwise {@link #EQUIVALENCE}.
      *
      * @return the problem report.
      */
@@ -97,8 +97,7 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Clones the statement and replaces it with a new statement block
-     * containing the cloned tree.
+     * Clones the statement and replaces it with a new statement block containing the cloned tree.
      *
      * @see #analyze()
      */
@@ -115,9 +114,8 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Returns the new statement block after the transformation, if there had
-     * one to be inserted. The block will contain the statement or a clone of
-     * the statement as sole child node.
+     * Returns the new statement block after the transformation, if there had one to be inserted.
+     * The block will contain the statement or a clone of the statement as sole child node.
      *
      * @return the new statement block replacing the given statement, or <CODE>
      * null</CODE> if there a new block was not necessary.
@@ -135,12 +133,10 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Returns the statement that has been wrapped. If this is a visible
-     * transformation and the statement had to be wrapped, a clone of the
-     * initial argument is returned.
+     * Returns the statement that has been wrapped. If this is a visible transformation and the
+     * statement had to be wrapped, a clone of the initial argument is returned.
      *
-     * @return the statement that has been wrapped, possibly a clone of the
-     * original statement.
+     * @return the statement that has been wrapped, possibly a clone of the original statement.
      */
     public Statement getStatement() {
         return statement;

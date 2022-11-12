@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JCheckBox;
 
 /**
- * {@link JCheckBox} indicating whether taclet info is displayed for inner nodes
- * in proof tree.
+ * {@link JCheckBox} indicating whether taclet info is displayed for inner nodes in proof tree.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -23,15 +25,15 @@ public class TacletInfoToggle extends JCheckBox {
         setName(getClass().getSimpleName());
     }
 
-   @Override
-   public void setSelected(boolean b) {
-      super.setSelected(b);
-      if (innerNodeView != null) {
-         innerNodeView.tacletInfo.setVisible(isSelected());
-      }
-   }
+    @Override
+    public void setSelected(boolean b) {
+        super.setSelected(b);
+        if (innerNodeView != null) {
+            innerNodeView.tacletInfo.setVisible(isSelected());
+        }
+    }
 
-   public void setSequentView(SequentView sequentView) {
+    public void setSequentView(SequentView sequentView) {
         if (sequentView instanceof InnerNodeView) {
             innerNodeView = (InnerNodeView) sequentView;
             setEnabled(true);

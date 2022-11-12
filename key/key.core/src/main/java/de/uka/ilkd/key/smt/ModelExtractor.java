@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -39,6 +42,7 @@ interface Query {
      */
     String getResult();
 }
+
 
 abstract class AbstractQuery implements Query {
     protected String result;
@@ -113,6 +117,7 @@ class ConstantQuery extends AbstractQuery {
     }
 }
 
+
 /**
  * Query for the value of a position of a sequence.
  *
@@ -169,6 +174,7 @@ class SeqFieldQuery extends AbstractQuery {
     }
 }
 
+
 /**
  * Query for the value of an array field of an object in a heap.
  *
@@ -222,6 +228,7 @@ class ArrayFieldQuery extends AbstractQuery {
     }
 }
 
+
 /**
  * Query for the value of a named field of an object in a heap.
  *
@@ -260,8 +267,7 @@ class FieldQuery extends AbstractQuery {
     @Override
     public String getQuery() {
 
-        String q = enclose(SELECT_ID + " "
-                + heapID + " " + objectID + " " + fieldID);
+        String q = enclose(SELECT_ID + " " + heapID + " " + objectID + " " + fieldID);
 
         q = enclose(q);
 
@@ -280,6 +286,7 @@ class FieldQuery extends AbstractQuery {
     }
 
 }
+
 
 /**
  * Query for checking if a location is in a location set.
@@ -315,8 +322,8 @@ class LocSetQuery extends AbstractQuery {
 
     @Override
     public String getQuery() {
-        String q = enclose(SMTObjTranslator.ELEMENTOF + " " + objectID + " "
-                + fieldID + " " + locSetID);
+        String q = enclose(
+                SMTObjTranslator.ELEMENTOF + " " + objectID + " " + fieldID + " " + locSetID);
         q = enclose(q);
         return getVal(q);
     }
@@ -333,6 +340,7 @@ class LocSetQuery extends AbstractQuery {
         result = parts[3];
     }
 }
+
 
 /**
  * Query for finding out the length of a sequence.
@@ -390,6 +398,7 @@ class SeqLengthQuery extends AbstractQuery {
     }
 
 }
+
 
 /**
  * Query for finding out the length of an object.
@@ -449,8 +458,10 @@ class ObjectLengthQuery extends AbstractQuery {
 
 }
 
+
 /**
- * Query for finding out the value of a function(classinvariant or model field) for an object in a heap.
+ * Query for finding out the value of a function(classinvariant or model field) for an object in a
+ * heap.
  *
  * @author mihai
  */
@@ -507,6 +518,7 @@ class FunValueQuery extends AbstractQuery {
 
 }
 
+
 /**
  * Query for finding out if an object is an exact instance of its sort.
  *
@@ -538,7 +550,8 @@ class ExactInstanceQuery extends AbstractQuery {
     public String getQuery() {
 
 
-        String typeof = Util.processName(SMTObjTranslator.getExactInstanceName(sort.name().toString()));
+        String typeof =
+                Util.processName(SMTObjTranslator.getExactInstanceName(sort.name().toString()));
 
         String q = enclose(typeof + " " + objectId);
         q = enclose(q);
@@ -562,6 +575,7 @@ class ExactInstanceQuery extends AbstractQuery {
         result = parts[2];
     }
 }
+
 
 /**
  * Query for finding out if a given object is of a given sort.
@@ -594,7 +608,8 @@ class ObjectTypeQuery extends AbstractQuery {
     @Override
     public String getQuery() {
 
-        String typeof = Util.processName(SMTObjTranslator.getTypePredicateName(sort.name().toString()));
+        String typeof =
+                Util.processName(SMTObjTranslator.getTypePredicateName(sort.name().toString()));
 
         String q = enclose(typeof + " " + objectId);
         q = enclose(q);
@@ -618,7 +633,8 @@ class ObjectTypeQuery extends AbstractQuery {
 
 
 /**
- * Class for sending queries to the solver and extracting the relevant information regarding the model.
+ * Class for sending queries to the solver and extracting the relevant information regarding the
+ * model.
  *
  * @author mihai
  */
@@ -657,27 +673,27 @@ public class ModelExtractor {
     public void addFunction(SMTFunction f) {
         if (f.getDomainSorts().size() == 0) {
             switch (f.getImageSort().getId()) {
-                case SMTObjTranslator.HEAP_SORT:
-                    heaps.add(f);
-                    break;
-                case SMTObjTranslator.FIELD_SORT:
-                    fields.add(f);
-                    break;
-                case SMTObjTranslator.LOCSET_SORT:
-                    locsets.add(f);
-                    break;
-                case SMTObjTranslator.OBJECT_SORT:
-                    objects.add(f);
-                    break;
-                case SMTObjTranslator.BINT_SORT:
-                    ints.add(f);
-                    break;
-                case SMTObjTranslator.SEQ_SORT:
-                    seqs.add(f);
-                    break;
-                default:
-                    bools.add(f);
-                    break;
+            case SMTObjTranslator.HEAP_SORT:
+                heaps.add(f);
+                break;
+            case SMTObjTranslator.FIELD_SORT:
+                fields.add(f);
+                break;
+            case SMTObjTranslator.LOCSET_SORT:
+                locsets.add(f);
+                break;
+            case SMTObjTranslator.OBJECT_SORT:
+                objects.add(f);
+                break;
+            case SMTObjTranslator.BINT_SORT:
+                ints.add(f);
+                break;
+            case SMTObjTranslator.SEQ_SORT:
+                seqs.add(f);
+                break;
+            default:
+                bools.add(f);
+                break;
             }
         } else if (f.getDomainSorts().size() == 2) {
 
@@ -717,7 +733,7 @@ public class ModelExtractor {
     private void generateBasicQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
-        //generate constant queries
+        // generate constant queries
 
         List<SMTFunction> constants = new LinkedList<>();
         constants.addAll(objects);
@@ -734,7 +750,7 @@ public class ModelExtractor {
             queries.add(q);
         }
 
-        //generate heap queries
+        // generate heap queries
 
         for (SMTFunction h : heaps) {
             String heapID = h.getId();
@@ -742,14 +758,14 @@ public class ModelExtractor {
 
             for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
-                //generate the obj inv query
+                // generate the obj inv query
                 for (String fun : objFunctions.keySet()) {
                     FunValueQuery iq = new FunValueQuery(objectID, heapID, fun);
                     queries.add(iq);
                 }
 
 
-                //generate the named fields queries
+                // generate the named fields queries
                 for (SMTFunction f : fields) {
                     String fieldID = f.getId();
 
@@ -769,7 +785,7 @@ public class ModelExtractor {
             }
         }
 
-        //generate exactInstance queries
+        // generate exactInstance queries
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
@@ -787,7 +803,7 @@ public class ModelExtractor {
         }
 
 
-        //generate locset Queries
+        // generate locset Queries
         int locsetSize = (int) types.getSettings().getLocSetBound();
         for (String locSetID : getAllIDs(locsetSize)) {
 
@@ -818,7 +834,7 @@ public class ModelExtractor {
 
         }
 
-        //generate Object length queries
+        // generate Object length queries
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
@@ -829,7 +845,7 @@ public class ModelExtractor {
 
         }
 
-        //generate Seq len query
+        // generate Seq len query
 
         for (String seqID : getAllIDs((int) types.getSettings().getSeqBound())) {
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.statement;
@@ -47,7 +50,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      * Assert.
      *
      * @param cond the condition expression (may not be null).
-     * @param msg  the message expression.
+     * @param msg the message expression.
      */
     public Assert(Expression cond, Expression msg) {
         if (cond == null) {
@@ -102,8 +105,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -149,11 +151,10 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -198,10 +199,9 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (condition != null) {

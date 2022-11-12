@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -10,9 +13,8 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s,
- * into the given {@link SchemaVariable} for later use in other conditions and
- * transformers.
+ * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s, into the given
+ * {@link SchemaVariable} for later use in other conditions and transformers.
  *
  * @author Dominic Steinhoefel
  */

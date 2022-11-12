@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.collection.ImmutableList;
@@ -17,90 +20,96 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionStart}.
+ *
  * @author Martin Hentschel
  */
-public class ExecutionStart extends AbstractExecutionNode<SourceElement> implements IExecutionStart {
-   /**
-    * The up to know discovered {@link IExecutionTermination}s.
-    */
-   private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
-   
-   /**
-    * Constructor.
-    * @param settings The {@link ITreeSettings} to use.
-    * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    */
-   public ExecutionStart(ITreeSettings settings,
-                         Node proofNode) {
-      super(settings, proofNode);
-   }
+public class ExecutionStart extends AbstractExecutionNode<SourceElement>
+        implements IExecutionStart {
+    /**
+     * The up to know discovered {@link IExecutionTermination}s.
+     */
+    private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String lazyComputeName() {
-      return DEFAULT_START_NODE_NAME;
-   }
+    /**
+     * Constructor.
+     *
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     *        {@link IExecutionNode}.
+     */
+    public ExecutionStart(ITreeSettings settings, Node proofNode) {
+        super(settings, proofNode);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionConstraint[] lazyComputeConstraints() {
-      return SymbolicExecutionUtil.createExecutionConstraints(this);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Start";
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String lazyComputeName() {
+        return DEFAULT_START_NODE_NAME;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<IExecutionTermination> getTerminations() {
-      return terminations;
-   }
-   
-   /**
-    * Registers the given {@link IExecutionTermination}.
-    * @param termination The {@link IExecutionTermination} to register.
-    */
-   public void addTermination(IExecutionTermination termination) {
-      if (termination != null) {
-         terminations = terminations.append(termination);
-      }
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected IExecutionConstraint[] lazyComputeConstraints() {
+        return SymbolicExecutionUtil.createExecutionConstraints(this);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected PosInOccurrence lazyComputeModalityPIO() {
-      return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getElementType() {
+        return "Start";
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public SourceElement getActiveStatement() {
-      Term modalityTerm = getModalityPIO().subTerm();
-      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
-      return NodeInfo.computeActiveStatement(firstStatement);
-   }
-   
-   /**
-    * Removes the given termination.
-    * @param termination The termination to be deleted.
-    * @author Anna Filighera
-    */
-   public void removeTermination(IExecutionTermination termination) {
-      terminations = terminations.removeAll(termination);
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImmutableList<IExecutionTermination> getTerminations() {
+        return terminations;
+    }
+
+    /**
+     * Registers the given {@link IExecutionTermination}.
+     *
+     * @param termination The {@link IExecutionTermination} to register.
+     */
+    public void addTermination(IExecutionTermination termination) {
+        if (termination != null) {
+            terminations = terminations.append(termination);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PosInOccurrence lazyComputeModalityPIO() {
+        return SymbolicExecutionUtil
+                .findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SourceElement getActiveStatement() {
+        Term modalityTerm = getModalityPIO().subTerm();
+        SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+        return NodeInfo.computeActiveStatement(firstStatement);
+    }
+
+    /**
+     * Removes the given termination.
+     *
+     * @param termination The termination to be deleted.
+     * @author Anna Filighera
+     */
+    public void removeTermination(IExecutionTermination termination) {
+        terminations = terminations.removeAll(termination);
+    }
 }

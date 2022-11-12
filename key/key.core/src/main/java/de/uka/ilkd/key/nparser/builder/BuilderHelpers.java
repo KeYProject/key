@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -10,15 +13,15 @@ import javax.annotation.Nullable;
  */
 public final class BuilderHelpers {
     public static String getPosition(@Nullable ParserRuleContext node) {
-        if (node == null) return " pos n/a";
+        if (node == null)
+            return " pos n/a";
         return getPosition(node.start);
     }
 
     public static String getPosition(@Nullable Token t) {
-        return t == null
-                ? " pos n/a"
-                : String.format(" %s:%d#%d",
-                t.getInputStream().getSourceName(), t.getLine(), t.getCharPositionInLine());
+        return t == null ? " pos n/a"
+                : String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(),
+                        t.getCharPositionInLine());
     }
 
 }

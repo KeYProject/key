@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 import org.key_project.util.java.IOUtil;
@@ -8,9 +11,9 @@ import java.io.*;
 /**
  * This class is responsible for starting external processes:
  * <ol>
- * <li> It creates the process (stderr is merged to stdout).</li>
- * <li> Creates the pipe that is used for communication.</li>
- * <li> Starts the process and returns. </li>
+ * <li>It creates the process (stderr is merged to stdout).</li>
+ * <li>Creates the pipe that is used for communication.</li>
+ * <li>Starts the process and returns.</li>
  * </ol>
  * Remark: Does not block the invoking thread.
  *
@@ -20,14 +23,12 @@ public class ExternalProcessLauncher {
     /**
      * the store of all messages send to and received from the external process
      */
-    private final @Nonnull
-    SolverCommunication session;
+    private final @Nonnull SolverCommunication session;
 
     /**
      * the delimiters which separate the messages
      */
-    private final @Nonnull
-    String[] messageDelimiters;
+    private final @Nonnull String[] messageDelimiters;
 
     /**
      * the external process
@@ -42,18 +43,18 @@ public class ExternalProcessLauncher {
     /**
      * Creates the external process launcher.
      *
-     * @param session           the store for the messages send to and received from the process
+     * @param session the store for the messages send to and received from the process
      * @param messageDelimiters delimiters which separate the messages
      */
     public ExternalProcessLauncher(@Nonnull SolverCommunication session,
-                                   @Nonnull String[] messageDelimiters) {
+            @Nonnull String[] messageDelimiters) {
         this.session = session;
         this.messageDelimiters = messageDelimiters;
     }
 
     /**
-     * Main procedure of the class. Starts the external process and connects the pipe to it.
-     * stderr and stdout of the process are merged.
+     * Main procedure of the class. Starts the external process and connects the pipe to it. stderr
+     * and stdout of the process are merged.
      *
      * @param command command (program and arguments) which is used to start the external process
      * @throws IOException if an I/O error occurs
@@ -80,7 +81,7 @@ public class ExternalProcessLauncher {
             process.destroy();
         }
         // TODO: where to close the pipe?
-        //pipe.close();
+        // pipe.close();
     }
 
     public Pipe getPipe() {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -11,10 +14,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl
- *         This filter takes a search string and regroups the sequent
- *         so that the sequent formulas matching the search are grouped around
- *         the sequent arrow, so that they can be viewed together.
+ * @author jschiffl This filter takes a search string and regroups the sequent so that the sequent
+ *         formulas matching the search are grouped around the sequent arrow, so that they can be
+ *         viewed together.
  */
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {

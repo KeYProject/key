@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -14,20 +17,19 @@ import recoder.java.ProgramElement;
 public class ASTIterator {
 
     /**
-     * Return value for ASTListener methods, that signals that no child node
-     * should be entered.
+     * Return value for ASTListener methods, that signals that no child node should be entered.
      */
     public static final int ENTER_NONE = 0;
 
     /**
-     * Return value for ASTListener methods, that signals that only some
-     * children nodes should be entered - each child will be queried separately.
+     * Return value for ASTListener methods, that signals that only some children nodes should be
+     * entered - each child will be queried separately.
      */
     public static final int ENTER_SOME = 1;
 
     /**
-     * Return value for ASTListener methods, that signals that all children
-     * should be entered without further questions.
+     * Return value for ASTListener methods, that signals that all children should be entered
+     * without further questions.
      */
     public static final int ENTER_ALL = 2;
 
@@ -75,8 +77,8 @@ public class ASTIterator {
     }
 
     /**
-     * Recurses through the given AST in depth first search order. This method
-     * calls the ASTIteratorListener methods.
+     * Recurses through the given AST in depth first search order. This method calls the
+     * ASTIteratorListener methods.
      *
      * @param pe the current program element.
      */
@@ -87,24 +89,24 @@ public class ASTIterator {
                 NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
-                    case ASTIterator.ENTER_NONE:
-                        break;
-                    case ASTIterator.ENTER_SOME:
-                        childCount = ntpe.getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            ProgramElement child = ntpe.getChildAt(i);
-                            if (listener.enterChildNode(this, ntpe, child)) {
-                                recurse(child);
-                                listener.returnedFromChildNode(this, ntpe, child);
-                            }
-                        }
-                        break;
-                    case ASTIterator.ENTER_ALL:
-                        childCount = ntpe.getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            ProgramElement child = ntpe.getChildAt(i);
+                case ASTIterator.ENTER_NONE:
+                    break;
+                case ASTIterator.ENTER_SOME:
+                    childCount = ntpe.getChildCount();
+                    for (int i = 0; i < childCount; i++) {
+                        ProgramElement child = ntpe.getChildAt(i);
+                        if (listener.enterChildNode(this, ntpe, child)) {
                             recurse(child);
+                            listener.returnedFromChildNode(this, ntpe, child);
                         }
+                    }
+                    break;
+                case ASTIterator.ENTER_ALL:
+                    childCount = ntpe.getChildCount();
+                    for (int i = 0; i < childCount; i++) {
+                        ProgramElement child = ntpe.getChildAt(i);
+                        recurse(child);
+                    }
                 }
             }
             listener.leavingNode(this, pe);
@@ -112,9 +114,9 @@ public class ASTIterator {
     }
 
     /**
-     * Recurses through the given AST in depth first search order. This method
-     * is only called if no iterator listener has been assigned. The purpose of
-     * this method is to be specialized within subclasses:
+     * Recurses through the given AST in depth first search order. This method is only called if no
+     * iterator listener has been assigned. The purpose of this method is to be specialized within
+     * subclasses:
      *
      * <PRE>
      * <p>

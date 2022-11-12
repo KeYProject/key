@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -7,8 +10,7 @@ import de.uka.ilkd.key.logic.op.Function;
 
 
 /**
- * A schema variable that is used as placeholder for auxiliary heap skolem
- * constants.
+ * A schema variable that is used as placeholder for auxiliary heap skolem constants.
  */
 public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
 
@@ -16,15 +18,12 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
             new IsSelectSkolemConstantTermFeature();
 
 
-    private IsSelectSkolemConstantTermFeature() {
-    }
+    private IsSelectSkolemConstantTermFeature() {}
 
 
     @Override
     protected boolean filter(Term t, Services services) {
-        return t.hasLabels() &&
-               t.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL) &&
-               t.op().arity() == 0 &&
-               t.op() instanceof Function;
+        return t.hasLabels() && t.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)
+                && t.op().arity() == 0 && t.op() instanceof Function;
     }
 }

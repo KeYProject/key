@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.loop;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -11,9 +14,9 @@ import java.io.File;
 import java.util.Objects;
 
 /**
- * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on
- * more subtle and exotic cases, like nested loops with multiple labeled breaks
- * and continues, combination with exceptional behavior / try-catch, etc.
+ * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on more subtle and exotic
+ * cases, like nested loops with multiple labeled breaks and continues, combination with exceptional
+ * behavior / try-catch, etc.
  * <p>
  * TODO: Add more test cases for the scenarios sketched above.
  *
@@ -21,7 +24,8 @@ import java.util.Objects;
  */
 public class LoopScopeInvRuleTests {
 
-    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "loopScopeInvRule/");
+    private static final File TEST_RESOURCES_DIR_PREFIX =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "loopScopeInvRule/");
 
     /**
      * Automatic proof of a benchmark with labeled breaks and continues.

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
@@ -26,21 +29,12 @@ public class TextualJMLAssertStatementTest {
 
     @Test
     public void testTextRepr() {
-        assertTextRepr(
-                "//@ assert true;",
-                "assert true ;"
-        );
-        assertTextRepr(
-                "//@ assert 1 + 2 == 3 && 2 != 3;",
-                "assert 1 + 2 == 3 && 2 != 3 ;"
-        );
-        assertTextRepr(
-                "//@ assert (\\forall int j; 0 <= j < 10; true);",
-                "assert ( \\forall int j ; 0 <= j < 10 ; true ) ;"
-        );
+        assertTextRepr("//@ assert true;", "assert true ;");
+        assertTextRepr("//@ assert 1 + 2 == 3 && 2 != 3;", "assert 1 + 2 == 3 && 2 != 3 ;");
+        assertTextRepr("//@ assert (\\forall int j; 0 <= j < 10; true);",
+                "assert ( \\forall int j ; 0 <= j < 10 ; true ) ;");
         assertTextRepr(
                 "//@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));",
-                "assert ( \\forall int j ; 0 <= j < 10 ; ( \\exists int k ; 0 <= k < 10 ; j == k ) ) ;"
-        );
+                "assert ( \\forall int j ; 0 <= j < 10 ; ( \\exists int k ; 0 <= k < 10 ; j == k ) ) ;");
     }
 }

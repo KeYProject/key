@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -16,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Immediately saves the currently selected proof to a temporaly location. This
- * feature can be conveniently accessed with the F5 key.
+ * Immediately saves the currently selected proof to a temporaly location. This feature can be
+ * conveniently accessed with the F5 key.
  *
  * @author bruns
  */

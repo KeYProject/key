@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.collection;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,50 +27,34 @@ public class TestLeftistHeapOfInteger {
 
     @BeforeEach
     public void setUp() {
-        a = ImmutableSLList.<Integer>nil()
-                .prepend(13)
-                .prepend(20)
-                .prepend(5)
-                .prepend(7)
-                .prepend(16)
-                .prepend(60)
-                .prepend(20)
-                .prepend(-34);
-        b = ImmutableSLList.<Integer>nil()
-                .prepend(-1000)
-                .prepend(1000)
-                .prepend(8);
+        a = ImmutableSLList.<Integer>nil().prepend(13).prepend(20).prepend(5).prepend(7).prepend(16)
+                .prepend(60).prepend(20).prepend(-34);
+        b = ImmutableSLList.<Integer>nil().prepend(-1000).prepend(1000).prepend(8);
     }
 
     @Test
     public void testInsertElements() {
         ImmutableHeap<Integer> h = ImmutableLeftistHeap.nilHeap();
-        assertTrue(h.isEmpty() && h.size() == 0,
-                "Empty heap should be empty");
+        assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h.insert(1);
-        assertTrue(h.isEmpty() && h.size() == 0,
-                "Empty heap should be empty");
+        assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h = h.insert(1);
         assertTrue(!h.isEmpty() && h.size() == 1 && h.findMin() == 1,
                 "Heap should contain one element");
 
         h = h.deleteMin();
-        assertTrue(h.isEmpty() && h.size() == 0,
-                "Empty heap should be empty");
+        assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h = h.insert(1).insert(2);
-        assertTrue(!h.isEmpty() && h.size() == 2 &&
-                        h.findMin() == 1,
+        assertTrue(!h.isEmpty() && h.size() == 2 && h.findMin() == 1,
                 "Heap should contain two elements");
         h = h.deleteMin();
-        assertTrue(!h.isEmpty() && h.size() == 1 &&
-                        h.findMin() == 2,
+        assertTrue(!h.isEmpty() && h.size() == 1 && h.findMin() == 2,
                 "Heap should contain one element");
         h = h.deleteMin();
-        assertTrue(h.isEmpty() && h.size() == 0,
-                "Empty heap should be empty");
+        assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
     }
 
     private boolean equals(Iterator<Integer> t0, Iterator<Integer> t1) {
@@ -89,8 +76,7 @@ public class TestLeftistHeapOfInteger {
     }
 
     private void checkHeap(ImmutableList<Integer> elements, ImmutableHeap<Integer> h) {
-        assertTrue(h.size() == elements.size() &&
-                        (h.size() == 0) == h.isEmpty(),
+        assertTrue(h.size() == elements.size() && (h.size() == 0) == h.isEmpty(),
                 "Heap has incorrect size");
 
         assertTrue(equals(h.iterator(), elements.iterator()),
@@ -140,8 +126,7 @@ public class TestLeftistHeapOfInteger {
 
         h = h.insert(ImmutableSLList.<Integer>nil().iterator());
         checkHeap(ImmutableSLList.nil(), h);
-        assertTrue(h.isEmpty() && h.size() == 0,
-                "Empty heap should be empty");
+        assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h = h.insert(a.iterator());
         checkHeap(a, h);
@@ -156,8 +141,8 @@ public class TestLeftistHeapOfInteger {
         checkHeap(a.prepend(a).prepend(a).prepend(a), h);
 
         h = h.insert(h.sortedIterator());
-        checkHeap(a.prepend(a).prepend(a).prepend(a)
-                .prepend(a).prepend(a).prepend(a).prepend(a), h);
+        checkHeap(a.prepend(a).prepend(a).prepend(a).prepend(a).prepend(a).prepend(a).prepend(a),
+                h);
     }
 
     @Test

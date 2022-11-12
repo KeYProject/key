@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -20,25 +23,22 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      * {@inheritDoc}
      *
      * <p>
-     * The macros are always started on the last active goal (in contrast
-     * to the same goal as it is done in the SequentialProofMacro).
+     * The macros are always started on the last active goal (in contrast to the same goal as it is
+     * done in the SequentialProofMacro).
      *
-     * @throws InterruptedException
-     *             if one of the wrapped macros is interrupted.
+     * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          final ProverTaskListener listener) throws InterruptedException, Exception {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, final ProverTaskListener listener)
+            throws InterruptedException, Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
             if (macro.canApplyTo(proof, goals, posInOcc)) {
                 final ProverTaskListener pml = new ProofMacroListener(macro.getName(), listener);
                 pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-                synchronized(macro) {
+                synchronized (macro) {
                     // wait for macro to terminate
                     info = macro.applyTo(uic, proof, goals, posInOcc, pml);
                 }

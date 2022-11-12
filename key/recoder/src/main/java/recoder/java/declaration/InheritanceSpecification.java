@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -17,7 +20,8 @@ import recoder.list.generic.ASTList;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class InheritanceSpecification extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
+public abstract class InheritanceSpecification extends JavaNonTerminalProgramElement
+        implements TypeReferenceContainer {
 
     /**
      * Parent.
@@ -120,8 +124,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -147,11 +150,10 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -231,10 +233,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public TypeReference getTypeReferenceAt(int index) {

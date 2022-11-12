@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -6,8 +9,8 @@ import java.awt.event.ActionEvent;
 
 
 /*
- * Menu option for showing the next search result
- * Keyboard shortcut: F3. This shortcut is set in the KeyStrokemanager
+ * Menu option for showing the next search result Keyboard shortcut: F3. This shortcut is set in the
+ * KeyStrokemanager
  */
 public class SearchPreviousAction extends MainWindowAction {
 

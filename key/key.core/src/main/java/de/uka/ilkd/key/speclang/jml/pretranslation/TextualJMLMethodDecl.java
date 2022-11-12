@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
@@ -17,29 +20,25 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
 
     public TextualJMLMethodDecl(ImmutableList<String> mods,
-                                JmlParser.Method_declarationContext methodDefinition) {
+            JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
     }
 
     public String getParsableDeclaration() {
-        String m = mods.stream()
-                .map(it -> {
-                    if (JMLTransformer.javaMods.contains(it)) {
-                        return it;
-                    } else {
-                        return StringUtil.repeat(" ", it.length());
-                    }
-                })
-                .collect(Collectors.joining(" "));
+        String m = mods.stream().map(it -> {
+            if (JMLTransformer.javaMods.contains(it)) {
+                return it;
+            } else {
+                return StringUtil.repeat(" ", it.length());
+            }
+        }).collect(Collectors.joining(" "));
 
-        String paramsString = methodDefinition.param_list().param_decl()
-                .stream()
-                .map(it -> it.typespec().getText() +
-                        " " + it.p.getText() + StringUtil.repeat("[]", it.LBRACKET().size()))
+        String paramsString = methodDefinition.param_list().param_decl().stream()
+                .map(it -> it.typespec().getText() + " " + it.p.getText()
+                        + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
-        return String.format("%s %s %s (%s);",
-                m, methodDefinition.typespec().getText(),
+        return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
                 getMethodName(), paramsString);
     }
 
@@ -62,8 +61,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }

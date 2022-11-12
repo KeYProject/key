@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 /**
@@ -10,22 +13,22 @@ public class ConversionException extends InjectionException {
 
     /**
      * A conversion exception with no cause (to display).
+     *
      * @param message the respective String message to be passed.
      * @param argument the proof script argument.
      */
-    public ConversionException(String message,
-                               ProofScriptArgument<?> argument) {
+    public ConversionException(String message, ProofScriptArgument<?> argument) {
         super(message, argument);
     }
 
     /**
      * A conversion exception with a cause to be displayed.
+     *
      * @param message the respective String message to be passed.
      * @param cause the cause of the exception.
      * @param argument the proof script argument.
      */
-    public ConversionException(String message, Throwable cause,
-                               ProofScriptArgument<?> argument) {
+    public ConversionException(String message, Throwable cause, ProofScriptArgument<?> argument) {
         super(message, cause, argument);
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.expression.operator;
@@ -90,8 +93,8 @@ public class Positive extends Operator {
     }
 
     /**
-     * Checks if this operator is left or right associative. Ordinary unary
-     * operators are right associative.
+     * Checks if this operator is left or right associative. Ordinary unary operators are right
+     * associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.

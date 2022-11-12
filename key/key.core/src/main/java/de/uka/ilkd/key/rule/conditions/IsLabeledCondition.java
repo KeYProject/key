@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
@@ -15,8 +18,8 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Checks whether the given statement is labeled, i.e., actual a
- * LabeledStatement. This information is obtained from the program prefix.
+ * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
+ * is obtained from the program prefix.
  *
  * @author Dominic Steinhoefel
  */

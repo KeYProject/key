@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
 /**
- * Iterator over subtree. Current implementation iteratively traverses the tree
- * depth-first.
+ * Iterator over subtree. Current implementation iteratively traverses the tree depth-first.
  *
  * @author bruns
  */
@@ -65,7 +67,7 @@ class SubtreeIterator implements Iterator<Node> {
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Changing the proof tree "
-                + "structure this way is not allowed.");
+        throw new UnsupportedOperationException(
+                "Changing the proof tree " + "structure this way is not allowed.");
     }
 }

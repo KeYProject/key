@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
@@ -17,8 +20,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Generic removing lemma generator adds the default implementation only that all
  * {@link GenericSort}s are replaced to equally named {@link ProxySort}s.
  *
- * <p>This is done since the resulting term is to be used as a proof obligation
- * in which generic sorts must not appear; proxy sorts, however, may.
+ * <p>
+ * This is done since the resulting term is to be used as a proof obligation in which generic sorts
+ * must not appear; proxy sorts, however, may.
  *
  * For every generic sort, precisely one proxy sort is introduced.
  */
@@ -30,10 +34,11 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     private final Map<Sort, Sort> sortMap = new HashMap<Sort, Sort>();
 
 
-    /** {@inheritDoc}
+    /**
+     * {@inheritDoc}
      * <p>
-     * The generic removing implementation replaces sort depending functions
-     * if their sort argument is a generic sort.
+     * The generic removing implementation replaces sort depending functions if their sort argument
+     * is a generic sort.
      */
     @Override
     protected Operator replaceOp(Operator op, TermServices services) {
@@ -42,7 +47,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
             SortDependingFunction sdf = (SortDependingFunction) op;
             Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
-            if(sort != repSort) {
+            if (sort != repSort) {
                 op = sdf.getInstanceFor(repSort, services);
             }
         }
@@ -54,15 +59,14 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * {@inheritDoc}
      *
      * <p>
-     * The generic removing implementation replaces generic sorts by equally
-     * named proxy sorts.
+     * The generic removing implementation replaces generic sorts by equally named proxy sorts.
      */
     @Override
     protected Sort replaceSort(Sort sort, TermServices services) {
-        if(sort instanceof GenericSort) {
+        if (sort instanceof GenericSort) {
 
             Sort cached = sortMap.get(sort);
-            if(cached != null) {
+            if (cached != null) {
                 return cached;
             }
 
@@ -79,13 +83,12 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * Replace sorts.
      *
-     * @param extendsSorts
-     *            the extends sorts
-     * @param services
-     *            the services
+     * @param extendsSorts the extends sorts
+     * @param services the services
      * @return the immutable set
      */
-    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts, TermServices services) {
+    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts,
+            TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {
             result = result.add(replaceSort(sort, services));

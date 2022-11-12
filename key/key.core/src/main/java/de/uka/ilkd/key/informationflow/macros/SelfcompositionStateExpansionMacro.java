@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Set;
@@ -23,10 +26,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * The macro SelfcompositionStateExpansionMacro applies rules to extract
- * the self-composed states after the merge of the symbolic execution goals
- * which is included in the proof obligation generation from information flow
- * contracts. This macro splits the goal.
+ * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
+ * after the merge of the symbolic execution goals which is included in the proof obligation
+ * generation from information flow contracts. This macro splits the goal.
  *
  * The rules that are applied can be set in {@link #ADMITTED_RULES}.
  *
@@ -46,9 +48,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
                 + "obligation generation from information flow contracts.";
     }
 
-    private static final String[] ADMITTED_RULES = {
-        "andLeft", "orLeft", "impRight", "unfold_computed_formula", "andRight"
-    };
+    private static final String[] ADMITTED_RULES =
+            { "andLeft", "orLeft", "impRight", "unfold_computed_formula", "andRight" };
 
     private static final String INF_FLOW_UNFOLD_PREFIX = "unfold_computed_formula";
 
@@ -65,28 +66,27 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+            Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
-        if ("andLeft".equals(ruleName) &&
-            pio.sequentFormula().formula().op() instanceof UpdateApplication) {
+        if ("andLeft".equals(ruleName)
+                && pio.sequentFormula().formula().op() instanceof UpdateApplication) {
             return false;
         } else {
             return true;
         }
     }
-    
+
 
     /**
      * {@inheritDoc}
      *
      * <p>
-     * This compound macro is applicable if and only if the first macro is applicable.
-     * If there is no first macro, this is not applicable.
+     * This compound macro is applicable if and only if the first macro is applicable. If there is
+     * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -97,7 +97,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
         final ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof AbstractInfFlowPO) && super.canApplyTo(proof, goals, posInOcc);
+        return (poForProof instanceof AbstractInfFlowPO)
+                && super.canApplyTo(proof, goals, posInOcc);
     }
 
     @Override
@@ -106,14 +107,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     /**
-     * This strategy accepts all rule apps for which the rule name is in the
-     * admitted set or has INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.
+     * This strategy accepts all rule apps for which the rule name is in the admitted set or has
+     * INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.
      */
     private class SelfCompExpansionStrategy implements Strategy {
 
-        private final Name NAME =
-                new Name(SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy
-                                .class.getSimpleName());
+        private final Name NAME = new Name(
+                SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
 
@@ -127,18 +127,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence pio,
-                                       Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if (    (   admittedRuleNames.contains(name)
-                     || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
-                 && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                JavaCardDLStrategyFactory strategyFactory =
-                        new JavaCardDLStrategyFactory();
+            if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
+                    && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
+                JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
-                        strategyFactory.create(goal.proof(),
-                                               new StrategyProperties());
+                        strategyFactory.create(goal.proof(), new StrategyProperties());
                 RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
                 if ("orLeft".equals(name)) {
                     costs = costs.add(NumberRuleAppCost.create(100));
@@ -156,12 +151,11 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
@@ -9,9 +12,9 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
- * Copy a term that is currently selected (i.e., under the mouse cursor) in the
- * current goal view to the default system clip board.
- * 
+ * Copy a term that is currently selected (i.e., under the mouse cursor) in the current goal view to
+ * the default system clip board.
+ *
  * @author bruns
  */
 public class CopyToClipboardAction extends MainWindowAction {

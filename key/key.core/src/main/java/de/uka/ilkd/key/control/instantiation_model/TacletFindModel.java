@@ -1,4 +1,7 @@
-    package de.uka.ilkd.key.control.instantiation_model;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
+package de.uka.ilkd.key.control.instantiation_model;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -94,8 +97,8 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private ArrayList<Pair<SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
         ArrayList<Pair<SchemaVariable, String>> rowVec = new ArrayList<>();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it = tacletApp
-                .instantiations().pairIterator();
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
+                tacletApp.instantiations().pairIterator();
         int count = 0;
 
         while (it.hasNext()) {
@@ -161,12 +164,11 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the given string that represents the term (or formula) using the given
-     * variable namespace and the given namespace for functions and default
-     * namespaces for the others
+     * parses the given string that represents the term (or formula) using the given variable
+     * namespace and the given namespace for functions and default namespaces for the others
      *
-     * @param s       the String to parse
-     * @param varNS   the variable namespace
+     * @param s the String to parse
+     * @param varNS the variable namespace
      * @param functNS the function namespace
      */
     private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
@@ -179,18 +181,19 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * Parse the declaration of an identifier (i.e. the declaration of a variable or
-     * skolem function)
+     * Parse the declaration of an identifier (i.e. the declaration of a variable or skolem
+     * function)
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
-        KeYParser.Id_declarationContext ctx = ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
+        KeYParser.Id_declarationContext ctx =
+                ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
         Sort sort = ctx.s != null ? services.getNamespaces().sorts().lookup(ctx.s.getText()) : null;
         return new IdDeclaration(ctx.id.getText(), sort);
     }
 
     /**
-     * throws an exception iff no input in indicated row, and no metavariable
-     * instantiation is possible
+     * throws an exception iff no input in indicated row, and no metavariable instantiation is
+     * possible
      *
      */
 
@@ -212,11 +215,10 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a Term corresponding to the entry in the
-     * row
+     * parses the indicated row and returns a Term corresponding to the entry in the row
      *
-     * @param irow    the row to be parsed
-     * @param varNS   the variable namespace that will be passed to parseTerm
+     * @param irow the row to be parsed
+     * @param varNS the variable namespace that will be passed to parseTerm
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
@@ -246,8 +248,8 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a identifier declaration corresponding
-     * to the entry in the row
+     * parses the indicated row and returns a identifier declaration corresponding to the entry in
+     * the row
      *
      * @param irow the row to be parsed
      * @return the parsed declaration
@@ -280,18 +282,15 @@ public class TacletFindModel extends AbstractTableModel {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
             return services.getTermBuilder().addLabelToAllSubs(
                     OriginTermLabel.removeOriginLabels(term, services),
-                    new OriginTermLabel(new NodeOrigin(
-                            SpecType.USER_INTERACTION,
-                            originalApp.rule().displayName(),
-                            goal.node().serialNr())));
+                    new OriginTermLabel(new NodeOrigin(SpecType.USER_INTERACTION,
+                            originalApp.rule().displayName(), goal.node().serialNr())));
         } else {
             return term;
         }
     }
 
     /**
-     * parses the indicated row and returns the ProgramElement corresponding to the
-     * entry in the row
+     * parses the indicated row and returns the ProgramElement corresponding to the entry in the row
      *
      * @param irow the row to be parsed
      * @return the parsed term
@@ -301,8 +300,8 @@ public class TacletFindModel extends AbstractTableModel {
         String instantiation = (String) getValueAt(irow, 1);
         SchemaVariable sv = (SchemaVariable) getValueAt(irow, 0);
 
-        ContextInstantiationEntry contextInstantiation = originalApp.instantiations()
-                .getContextInstantiation();
+        ContextInstantiationEntry contextInstantiation =
+                originalApp.instantiations().getContextInstantiation();
 
         final PosInProgram prefix;
         if (contextInstantiation == null) {
@@ -404,11 +403,11 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
-                        final Namespace<QuantifiableVariable> extVarNS = result
-                                .extendVarNamespaceForSV(nss.variables(), sv);
+                        final Namespace<QuantifiableVariable> extVarNS =
+                                result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<Function> functNS = result
-                                .extendedFunctionNameSpace(nss.functions());
+                        Namespace<Function> functNS =
+                                result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);
                         sort = instance.sort();
@@ -457,8 +456,7 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * returns the index of the row the given Schemavariable stands
      *
-     * @return the index of the row the given Schemavariable stands (-1 if not
-     *         found)
+     * @return the index of the row the given Schemavariable stands (-1 if not found)
      */
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -11,10 +14,9 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * The getTypeReference method returns null - constructors do not have explicit
- * return types. A constructor declaration contains its own name even though it
- * must match the class name: the name occurs as syntactical element and hence
- * must be represented.
+ * The getTypeReference method returns null - constructors do not have explicit return types. A
+ * constructor declaration contains its own name even though it must match the class name: the name
+ * occurs as syntactical element and hence must be represented.
  */
 
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
@@ -35,15 +37,15 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     /**
      * Constructor declaration.
      *
-     * @param modifier   a visibility modifier.
-     * @param name       an identifier.
+     * @param modifier a visibility modifier.
+     * @param name an identifier.
      * @param parameters a parameter declaration mutable list.
      * @param exceptions a throws.
-     * @param body       a statement block.
+     * @param body a statement block.
      */
 
     public ConstructorDeclaration(VisibilityModifier modifier, Identifier name,
-                                  ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+            ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
         super(null, null, name, parameters, exceptions, body);
         ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
         if (mods != null) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -39,8 +42,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         setIcon(IconFactory.ORIGIN_LABELS.get(MainWindow.TOOLBAR_ICON_SIZE));
 
         setEnabled(true);
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels());
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels());
 
         setMenuPath("Origin Tracking");
         putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
@@ -63,9 +66,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
                     }
                 }
 
-                services.getSpecificationRepository().map(
-                        term -> OriginTermLabel.removeOriginLabels(term, services),
-                        services);
+                services.getSpecificationRepository()
+                        .map(term -> OriginTermLabel.removeOriginLabels(term, services), services);
             }
 
             mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
@@ -78,49 +80,32 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
         if (!settings.getUseOriginLabels()) {
-            Object[] options = {
-                "Reload",
-                "Continue without reloading",
-                "Cancel"
-            };
+            Object[] options = { "Reload", "Continue without reloading", "Cancel" };
 
-            int selection = JOptionPane.showOptionDialog(
-                    mainWindow,
+            int selection = JOptionPane.showOptionDialog(mainWindow,
                     "Origin information will be added to all newly loaded proofs.\n"
                             + "To see origin information in your current proof, "
                             + "you need to reload it.",
-                    "Origin",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[2]);
+                    "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                    options, options[2]);
 
             switch (selection) {
             case 0:
                 QuickSaveAction.quickSave(mainWindow);
                 QuickLoadAction.quickLoad(mainWindow);
-                //fallthrough
+                // fallthrough
             case 1:
                 settings.setUseOriginLabels(!settings.getUseOriginLabels());
                 handleAction();
             }
         } else {
-            Object[] options = {
-                "Remove",
-                "Cancel"
-            };
+            Object[] options = { "Remove", "Cancel" };
 
-            int selection = JOptionPane.showOptionDialog(
-                    mainWindow,
+            int selection = JOptionPane.showOptionDialog(mainWindow,
                     "All origin information will be removed from "
                             + "every open goal and every proof obligation.",
-                    "Origin",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[1]);
+                    "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                    options, options[1]);
 
             if (selection == 0) {
                 settings.setUseOriginLabels(!settings.getUseOriginLabels());
@@ -128,7 +113,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             }
         }
 
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels());
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels());
     }
 }

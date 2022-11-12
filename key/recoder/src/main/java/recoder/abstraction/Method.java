@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.abstraction;
@@ -64,7 +67,7 @@ public interface Method extends Member, ClassTypeContainer {
      * Checks if this method takes a variable number of arguments.
      *
      * @return <CODE>true</CODE> if this methods takes a variable number of arguments,
-     * <code>false</code> otherwise.
+     *         <code>false</code> otherwise.
      * @since 0.80
      */
     boolean isVarArgMethod();

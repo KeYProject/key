@@ -1,15 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 /**
  * An exception which can be thrown by the term label system.
  *
  * <p>
- * {@link TermLabelFactory} methods can throw an instance if the requested term
- * label cannot be created.
+ * {@link TermLabelFactory} methods can throw an instance if the requested term label cannot be
+ * created.
  *
  * <p>
- * {@link TermLabelManager} can throw this if a requested label name has not
- * been registered.
+ * {@link TermLabelManager} can throw this if a requested label name has not been registered.
  *
  * @author mattias ulbrich
  */

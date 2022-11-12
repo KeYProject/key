@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.Stack;
@@ -52,16 +55,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      *
-     * @param block
-     *            a block that begins with a loop.
-     * @param loopLabels
-     *            all labels belonging to the loop.
-     * @param breakLabel
-     *            the label used for break statements.
-     * @param continueLabel
-     *            the label used for continue statements.
-     * @param services
-     *            services.
+     * @param block a block that begins with a loop.
+     * @param loopLabels all labels belonging to the loop.
+     * @param breakLabel the label used for break statements.
+     * @param continueLabel the label used for continue statements.
+     * @param services services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,

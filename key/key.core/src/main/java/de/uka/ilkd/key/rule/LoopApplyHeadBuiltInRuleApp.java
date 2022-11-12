@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -32,10 +35,8 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param pio
-     *            the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
@@ -43,12 +44,9 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule
-     *            the rule being applied.
-     * @param pio
-     *            the position at which the rule is applied.
-     * @param contracts
-     *            the contracts on which the rule is applied.
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
+     * @param contracts the contracts on which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableSet<LoopContract> contracts) {

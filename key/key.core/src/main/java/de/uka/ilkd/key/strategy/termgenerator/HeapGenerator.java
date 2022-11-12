@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
@@ -13,12 +16,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * The heap generator returns an iterator over all terms of sort heap 
- * that 
- * <ol> 
+ * The heap generator returns an iterator over all terms of sort heap that
+ * <ol>
  * <li>can be found in the sequent</li>
  * <li>are top level in the sense that they are not part of a larger term expression</li>
- * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>  
+ * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>
  * </ol>
  */
 public class HeapGenerator implements TermGenerator {
@@ -27,11 +29,11 @@ public class HeapGenerator implements TermGenerator {
     public static final TermGenerator INSTANCE_EXCLUDE_UPDATES = new HeapGenerator(false);
 
     private final boolean includeUpdates;
-    
+
     private HeapGenerator(boolean includeUpdates) {
-        this.includeUpdates = includeUpdates;        
+        this.includeUpdates = includeUpdates;
     }
-    
+
     @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();

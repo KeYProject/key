@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Identifier;
@@ -14,7 +17,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     private static final long serialVersionUID = 6966957683489654730L;
     private Identifier methodName;
     private ASTList<TypeReference> paramTypes;
-   
+
     public MethodSignature(Identifier methodName, ASTList<TypeReference> paramTypes) {
         super();
         this.methodName = methodName;
@@ -23,9 +26,10 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public ProgramElement getChildAt(int i) {
-        if (i == 0) return methodName;
+        if (i == 0)
+            return methodName;
         i--;
-        if (i>=0 && i<paramTypes.size()) {
+        if (i >= 0 && i < paramTypes.size()) {
             return paramTypes.get(i);
         }
         return null;
@@ -33,7 +37,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public int getChildCount() {
-        return 1+paramTypes.size();
+        return 1 + paramTypes.size();
     }
 
     @Override
@@ -56,13 +60,11 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     }
 
     @Override
-    public void accept(SourceVisitor arg0) {
-    }
+    public void accept(SourceVisitor arg0) {}
 
     @Override
     public SourceElement deepClone() {
-        throw new IllegalStateException("Not implemented in "
-                +"MethodSignature");
+        throw new IllegalStateException("Not implemented in " + "MethodSignature");
     }
 
 

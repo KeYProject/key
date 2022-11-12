@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import java.util.Iterator;
@@ -7,7 +10,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 
 /**
  * A simple lattice for booleans.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class BooleanLattice extends AbstractDomainLattice {
@@ -15,9 +18,8 @@ public class BooleanLattice extends AbstractDomainLattice {
     /**
      * All elements of this abstract domain.
      */
-    public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS = {
-            Bottom.getInstance(), False.getInstance(), True.getInstance(),
-            Top.getInstance() };
+    public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS =
+            { Bottom.getInstance(), False.getInstance(), True.getInstance(), Top.getInstance() };
 
     /**
      * The singleton instance of the lattice.
@@ -27,8 +29,7 @@ public class BooleanLattice extends AbstractDomainLattice {
     /**
      * Private constructor: Singleton.
      */
-    private BooleanLattice() {
-    }
+    private BooleanLattice() {}
 
     /**
      * @return The singleton instance of this lattice.
@@ -38,11 +39,9 @@ public class BooleanLattice extends AbstractDomainLattice {
     }
 
     @Override
-    public AbstractDomainElement join(AbstractDomainElement elem1,
-            AbstractDomainElement elem2) {
+    public AbstractDomainElement join(AbstractDomainElement elem1, AbstractDomainElement elem2) {
 
-        if (!(elem1 instanceof BooleanDomainElem)
-                || !(elem2 instanceof BooleanDomainElem)) {
+        if (!(elem1 instanceof BooleanDomainElem) || !(elem2 instanceof BooleanDomainElem)) {
             throw new IllegalArgumentException(
                     "Expected arguments of the abstract domain of sign analysis.");
         }
@@ -57,8 +56,7 @@ public class BooleanLattice extends AbstractDomainLattice {
         if (a.isTrue()) {
             if (b.isFalse()) {
                 return Top.getInstance();
-            }
-            else {
+            } else {
                 return True.getInstance();
             }
         }
@@ -66,8 +64,7 @@ public class BooleanLattice extends AbstractDomainLattice {
         if (a.isFalse()) {
             if (b.isTrue()) {
                 return Top.getInstance();
-            }
-            else {
+            } else {
                 return False.getInstance();
             }
         }
@@ -94,8 +91,7 @@ public class BooleanLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {
-            }
+            public void remove() {}
         };
     }
 

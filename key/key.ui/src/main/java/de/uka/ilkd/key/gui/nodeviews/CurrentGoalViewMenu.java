@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Component;
@@ -69,7 +72,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private Set<String> clutterRuleSets;
     private Set<String> clutterRules;
 
-    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
+    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; // reduce for debugging.
 
     private KeYMediator mediator;
     private TacletAppComparator comp = new TacletAppComparator();
@@ -82,15 +85,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     /**
-     * Creates a new menu that displays all applicable actions and rules at the
-     * given position
+     * Creates a new menu that displays all applicable actions and rules at the given position
      *
      * @param sequentView the SequentView that is the parent of this menu
-     * @param findList    with all applicable FindTaclets
+     * @param findList with all applicable FindTaclets
      * @param rewriteList with all applicable RewriteTaclets
-     * @param noFindList  with all applicable noFindTaclets
+     * @param noFindList with all applicable noFindTaclets
      * @param builtInList with all applicable BuiltInRules
-     * @param pos         the PosInSequent
+     * @param pos the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
@@ -102,23 +104,20 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
-        createMenu(removeRewrites(findList).prepend(rewriteList), removeIntroduceAxiomTaclet(noFindList),
-                builtInList, new MenuControl());
+        createMenu(removeRewrites(findList).prepend(rewriteList),
+                removeIntroduceAxiomTaclet(noFindList), builtInList, new MenuControl());
     }
 
     /**
-     * Removes the unsound "introduceAxiom" taclet from the list of displayed
-     * taclets.
+     * Removes the unsound "introduceAxiom" taclet from the list of displayed taclets.
      *
-     * @param list
-     *            The list from which to filter.
+     * @param list The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
-    private static ImmutableList<TacletApp>
-            removeIntroduceAxiomTaclet(ImmutableList<TacletApp> list) {
-        return list.stream().filter(
-                app -> !app.rule().name().toString()
-                        .equals(INTRODUCE_AXIOM_TACLET_NAME))
+    private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
+            ImmutableList<TacletApp> list) {
+        return list.stream()
+                .filter(app -> !app.rule().name().toString().equals(INTRODUCE_AXIOM_TACLET_NAME))
                 .collect(ImmutableSLList.toImmutableList());
     }
 
@@ -220,7 +219,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private void addMacroMenu() {
         ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
         if (!menu.isEmpty()) {
-//            addSeparator();
+            // addSeparator();
             add(menu);
         }
     }
@@ -253,8 +252,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     /**
-     * Creates the menu item for the "defocusing" merge rule which links partner
-     * nodes to merge nodes.
+     * Creates the menu item for the "defocusing" merge rule which links partner nodes to merge
+     * nodes.
      */
     private void createMergeRuleMenu() {
         if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(), getPos().getPosInOccurrence(),
@@ -274,9 +273,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             // we add two items in this case: one for auto one for interactive
         } else if (builtInRule == WhileInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(
-                    builtInRule.displayName(),
-                    APPLY_RULE,
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                     "Applies a known and complete loop specification immediately.",
                     ENTER_LOOP_SPECIFICATION,
                     "Allows to modify an existing or to enter a new loop specification.",
@@ -380,8 +377,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     /**
-     * adds a TacletMenuItem for each taclet in the list and sets the given
-     * MenuControl as the ActionListener
+     * adds a TacletMenuItem for each taclet in the list and sets the given MenuControl as the
+     * ActionListener
      *
      * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
@@ -412,7 +409,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             }
             if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
-        }
+            }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -427,7 +424,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         for (TacletApp app : normalTaclets) {
             target.add(createMenuItem(app, control));
             ++currentSize;
-            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
+            if (currentSize >= TOO_MANY_TACLETS_THRESHOLD) {
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
@@ -435,53 +432,39 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             }
         }
 
-        //add globally
+        // add globally
         if (insHiddenItem.getAppSize() > 0) {
             add(insHiddenItem);
             insHiddenItem.addActionListener(control);
         }
 
-        //add globally
+        // add globally
         if (insSystemInvItem.getAppSize() > 0) {
             add(insSystemInvItem);
             insSystemInvItem.addActionListener(control);
         }
 
-        //JMenu more = new JMenu(MORE_RULES);
+        // JMenu more = new JMenu(MORE_RULES);
 
-        /*for (final TacletApp app : taclets) {
-            final Taclet taclet = app.taclet();
-            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
-                continue;
-            }
+        /*
+         * for (final TacletApp app : taclets) { final Taclet taclet = app.taclet(); if
+         * (!mediator.getFilterForInteractiveProving().filter(taclet)) { continue; }
+         *
+         * if (!insHiddenItem.isResponsible(taclet) && !insSystemInvItem.isResponsible(taclet)) {
+         * final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
+         * mediator.getNotationInfo(), mediator.getServices()); item.addActionListener(control);
+         * boolean rareRule = false; for (RuleSet rs : taclet.getRuleSets()) { if
+         * (clutterRuleSets.contains(rs.name())) { rareRule = true; } } if
+         * (clutterRules.contains(taclet.name())) { rareRule = true; }
+         *
+         * if (rareRule) { more.add(item); } else { add(item); } } }
+         */
 
-            if (!insHiddenItem.isResponsible(taclet) && !insSystemInvItem.isResponsible(taclet)) {
-                final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
-                        mediator.getNotationInfo(), mediator.getServices());
-                item.addActionListener(control);
-                boolean rareRule = false;
-                for (RuleSet rs : taclet.getRuleSets()) {
-                    if (clutterRuleSets.contains(rs.name())) {
-                        rareRule = true;
-                    }
-                }
-                if (clutterRules.contains(taclet.name())) {
-                    rareRule = true;
-                }
+        /*
+         * if (more.getItemCount() > 0) { add(more); }
+         */
+    }
 
-                if (rareRule) {
-                    more.add(item);
-                } else {
-                    add(item);
-                }
-            }
-        }
-        */
-
-        /*if (more.getItemCount() > 0) {
-            add(more);
-        }*/
-        }
     private boolean isRareRule(Taclet taclet) {
         if (clutterRules.contains(taclet.name().toString())) {
             return true;
@@ -491,9 +474,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private Component createMenuItem(TacletApp app, MenuControl control) {
-        final DefaultTacletMenuItem item =
-                new DefaultTacletMenuItem(this, app,
-                        mediator.getNotationInfo(), mediator.getServices());
+        final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
+                mediator.getNotationInfo(), mediator.getServices());
         item.addActionListener(control);
         return item;
     }
@@ -540,17 +522,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 assert goal != null;
 
                 Thread thread = new Thread(() -> {
-                    DefaultSMTSettings settings = new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                            goal.proof().getSettings().getNewSMTSettings(),
-                            goal.proof());
+                    DefaultSMTSettings settings =
+                            new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
+                                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                                    goal.proof().getSettings().getNewSMTSettings(), goal.proof());
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, goal.proof()));
                     Collection<SMTProblem> list = new LinkedList<SMTProblem>();
                     list.add(new SMTProblem(goal));
-                    launcher.launch(solverUnion.getTypes(),
-                            list,
-                            goal.proof().getServices());
+                    launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
                 thread.start();
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
@@ -590,8 +570,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                     if (occ != null && occ.posInTerm() != null) {
                         // trim string, otherwise window gets too large (bug #1430)
                         final String oldTerm = occ.subTerm().toString();
-                        final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200)
-                                : oldTerm;
+                        final String term =
+                                oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
                         String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
                                 "Enter abbreviation for term: \n" + term, "New Abbreviation",
                                 JOptionPane.QUESTION_MESSAGE, null, null, "");
@@ -601,8 +581,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                 if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                             "Only letters, numbers and '_' are allowed for Abbreviations",
-                                            "Sorry",
-                                            JOptionPane.INFORMATION_MESSAGE);
+                                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
                                             abbreviation, true);
@@ -686,9 +665,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         /**
-         * this is a rough estimation about the goal complexity. The complexity depends
-         * on the depth of the term to be replaced. If no such term exists we add a
-         * constant (may be refined in future)
+         * this is a rough estimation about the goal complexity. The complexity depends on the depth
+         * of the term to be replaced. If no such term exists we add a constant (may be refined in
+         * future)
          */
         private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
             int result = 0;
@@ -758,10 +737,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         /*
-         * A score is a list of named values (comparable lexicographically). Smaller
-         * value means the taclet should be higher on the list offered to the user. Two
-         * scores need not contain the same named criteria, but the scoring scheme must
-         * force a decision before the first divergence point.
+         * A score is a list of named values (comparable lexicographically). Smaller value means the
+         * taclet should be higher on the list offered to the user. Two scores need not contain the
+         * same named criteria, but the scoring scheme must force a decision before the first
+         * divergence point.
          */
         public LinkedHashMap<String, Integer> score(TacletApp o1) {
             LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();

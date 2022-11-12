@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Choice;
@@ -9,8 +12,8 @@ import java.util.*;
 /**
  * A POJO representing the information on choices in ASTs.
  * <p>
- * Notion: A choice, e.g. {@code permission:on} contains a category  {@code permission}
- * and an option {@code on}.
+ * Notion: A choice, e.g. {@code permission:on} contains a category {@code permission} and an option
+ * {@code on}.
  *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
@@ -22,8 +25,8 @@ public class ChoiceInformation {
     private final Map<String, Set<String>> foundChoicesAndOptions = new HashMap<>();
 
     /**
-     * This set contains categories were an options was activated.
-     * Helps to prevent double activation of contradictory options.
+     * This set contains categories were an options was activated. Helps to prevent double
+     * activation of contradictory options.
      */
     private final HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
 

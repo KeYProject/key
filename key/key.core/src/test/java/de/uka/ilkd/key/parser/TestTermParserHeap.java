@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
@@ -43,7 +46,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
         Operator op = lookup_func(sort + "::select");
-        Term[] params = new Term[]{heap, object, field};
+        Term[] params = new Term[] { heap, object, field };
         return tf.createTerm(op, params);
     }
 
@@ -61,7 +64,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
 
         pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
-        Term expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
+        Term expected = parseTerm(
+                "union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
         verifyParsing(expected, pp);
     }
 
@@ -82,8 +86,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testBracketHeapUpdate() throws Exception {
-        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
-        String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        String complicatedHeapPretty =
+                "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
+        String complicatedHeapVerbose =
+                "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
 
         String prettySyntax = "a.f@h[anon({}, h2)]";
@@ -91,24 +97,22 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         /*
-         * Testing a more complicated term in which bracket syntax is applied
-         * before and after @-Operator.
+         * Testing a more complicated term in which bracket syntax is applied before and
+         * after @-Operator.
          */
         prettySyntax = "a.next.next.array[i]@" + complicatedHeapPretty;
-        verboseSyntax = "int::select(" + complicatedHeapVerbose + ", "
-                + "int[]::select(" + complicatedHeapVerbose + ", "
-                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
-                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
-                + " a, testTermParserHeap.A::$next)"
-                + ", testTermParserHeap.A::$next)"
-                + ", testTermParserHeap.A::$array)"
+        verboseSyntax = "int::select(" + complicatedHeapVerbose + ", " + "int[]::select("
+                + complicatedHeapVerbose + ", " + "testTermParserHeap.A::select("
+                + complicatedHeapVerbose + ", " + "testTermParserHeap.A::select("
+                + complicatedHeapVerbose + ", " + " a, testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$next)" + ", testTermParserHeap.A::$array)"
                 + ", arr(i))";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     /*
-     * The @-Operator can be used to specify the heap, which belongs to a
-     * field access. That operator is tested in the method below.
+     * The @-Operator can be used to specify the heap, which belongs to a field access. That
+     * operator is tested in the method below.
      */
     @Test
     public void testAtOperator_1() throws Exception {
@@ -140,9 +144,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("a.next.next.next.f@h",
-                expectedParseResult,
-                "(a.next).next.next.f@h",
-                "(a.next.next).next.f@h",
+                expectedParseResult, "(a.next).next.next.f@h", "(a.next.next).next.f@h",
                 "(a.next.next.next).f@h");
     }
 
@@ -153,7 +155,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
-        compareStringRepresentationAgainstTermRepresentation("(a.next.next@h2).next.f@h", expectedParseResult);
+        compareStringRepresentationAgainstTermRepresentation("(a.next.next@h2).next.f@h",
+                expectedParseResult);
     }
 
     @Test
@@ -167,7 +170,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testAtOperator_7() throws Exception {
         Term aDotF = getSelectTerm("int", h, a, f); // a.f
-        Term aDotArray = getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        Term aDotArray = getSelectTerm("int[]", tb.getBaseHeap(), a,
+                parseTerm("testTermParserHeap.A::$array")); // a.array
         Term expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f@h]", expectedParseResult);
 
@@ -179,36 +183,36 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",
-                expectedParseResult,
-                "((a.next@heap)).next.f@h");
+                expectedParseResult, "((a.next@heap)).next.f@h");
     }
 
     @Test
     public void testBugResettingCounter() throws Exception {
         String prettySyntax = "a.f = a.f@h";
-        String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f) = int::select(h, a, testTermParserHeap.A::$f)";
+        String verboseSyntax =
+                "int::select(heap, a, testTermParserHeap.A::$f) = int::select(h, a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     /*
-     * In this test, the @-Operator is applied on a non-select term.
-     * This should cause a parser error. This test verifies that the correct
-     * Exception is thrown.
+     * In this test, the @-Operator is applied on a non-select term. This should cause a parser
+     * error. This test verifies that the correct Exception is thrown.
      */
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            @Nonnull Term t = io.parseExpression("(a.f + a.f)@h2");
+            @Nonnull
+            Term t = io.parseExpression("(a.f + a.f)@h2");
             LOGGER.info("Out: {}", t);
             fail();
         } catch (Exception e) {
-            //assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));
+            // assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));
         }
     }
 
     // this was a bug in the pretty printing
     @Test
-    //@Ignore(value="weigl: This test is not comprehensible anymore.")
+    // @Ignore(value="weigl: This test is not comprehensible anymore.")
     public void testUnknownConstant() throws Exception {
         parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
         String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";
@@ -218,17 +222,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testQuantifiedSelect() throws Exception {
         String quantification = "\\forall java.lang.Object o; \\forall Field f; o.f = 1";
-        String expectedToString = "all{o:java.lang.Object}(all{f:Field}(equals(any::select(heap,o,f),Z(1(#)))))";
+        String expectedToString =
+                "all{o:java.lang.Object}(all{f:Field}(equals(any::select(heap,o,f),Z(1(#)))))";
         comparePrettyPrintAgainstToString(quantification, expectedToString);
 
         quantification = "\\forall Field f; a.f = any::select(heap, a, f)";
-        expectedToString = "all{f:Field}(equals(int::select(heap,a,testTermParserHeap.A::$f),any::select(heap,a,f)))";
+        expectedToString =
+                "all{f:Field}(equals(int::select(heap,a,testTermParserHeap.A::$f),any::select(heap,a,f)))";
         comparePrettyPrintAgainstToString(quantification, expectedToString);
 
     }
 
-    private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws
-            Exception {
+    private void comparePrettyPrintAgainstToString(String quantification, String expectedToString)
+            throws Exception {
         Term t = parseTerm(quantification);
         assertEquals(expectedToString, t.toString());
         assertEqualsIgnoreWhitespaces(quantification, printTerm(t));
@@ -237,9 +243,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testGenericObjectProperties() throws Exception {
         // test pretty syntax
-        comparePrettySyntaxAgainstVerboseSyntax("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<created>",
+                "boolean::select(heap,a,java.lang.Object::<created>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>",
+                "boolean::select(heap,a,java.lang.Object::<initialized>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<transient>",
+                "int::select(heap,a,java.lang.Object::<transient>)");
 
         // test fallback mode in case non-default select-type is used
         parseAndPrint("int::select(heap,a,java.lang.Object::<created>)");
@@ -248,40 +257,45 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testQueryBasic_1() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)", "testTermParserHeap.A::query(heap, a, i)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)",
+                "testTermParserHeap.A::query(heap, a, i)");
     }
 
     @Test
     public void testQueryBasic_2() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h", "testTermParserHeap.A::query(h, a, i)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h",
+                "testTermParserHeap.A::query(h, a, i)");
     }
 
     @Test
     public void testQueryBasic_3() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, "
-                + "int::select(heap, a, testTermParserHeap.A::$f))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h",
+                "testTermParserHeap.A::query(h, a, "
+                        + "int::select(heap, a, testTermParserHeap.A::$f))");
 
     }
 
     @Test
     public void testQueryBasic_4() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.next.query(a.f)@h", "testTermParserHeap.A::query(h, "
-                + "testTermParserHeap.A::select(h, a, testTermParserHeap.A::$next),  "
-                + "int::select(heap, a, testTermParserHeap.A::$f))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.next.query(a.f)@h",
+                "testTermParserHeap.A::query(h, "
+                        + "testTermParserHeap.A::select(h, a, testTermParserHeap.A::$next),  "
+                        + "int::select(heap, a, testTermParserHeap.A::$f))");
 
     }
 
     @Test
     public void testQueryBasic_5() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().getNext()@h", "testTermParserHeap.A::getNext(h, "
-                + "testTermParserHeap.A::getNext(h, a))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().getNext()@h",
+                "testTermParserHeap.A::getNext(h, " + "testTermParserHeap.A::getNext(h, a))");
 
     }
 
     @Test
     public void testQueryBasic_6() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().next@h", "testTermParserHeap.A::select(h, "
-                + "testTermParserHeap.A::getNext(h, a), testTermParserHeap.A::$next)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().next@h",
+                "testTermParserHeap.A::select(h, "
+                        + "testTermParserHeap.A::getNext(h, a), testTermParserHeap.A::$next)");
 
     }
 
@@ -294,15 +308,17 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testQueryBasic_8() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@heap).next@h", "testTermParserHeap.A::select(h, "
-                + "testTermParserHeap.A::getNext(heap, a), testTermParserHeap.A::$next)");
+        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@heap).next@h",
+                "testTermParserHeap.A::select(h, "
+                        + "testTermParserHeap.A::getNext(heap, a), testTermParserHeap.A::$next)");
 
     }
 
     @Test
     public void testQueryBasic_9() throws Exception {
-        comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, "
-                + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
+        comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h",
+                "testTermParserHeap.A::getNext(h, "
+                        + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
 
     }
 
@@ -324,8 +340,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testQueryInheritance_1() throws Exception {
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)",
-                "testTermParserHeap.A::query(heap, a, i)",
-                "a.(testTermParserHeap.A::query)(i)");
+                "testTermParserHeap.A::query(heap, a, i)", "a.(testTermParserHeap.A::query)(i)");
 
     }
 
@@ -333,8 +348,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testQueryInheritance_2() throws Exception {
         // test public query defined in superclass, which is not overridden
         comparePrettySyntaxAgainstVerboseSyntax("a1.query(i)",
-                "testTermParserHeap.A::query(heap, a1, i)",
-                "a1.(testTermParserHeap.A::query)(i)");
+                "testTermParserHeap.A::query(heap, a1, i)", "a1.(testTermParserHeap.A::query)(i)");
 
     }
 
@@ -381,7 +395,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testQueryInheritance_8() throws Exception {
-        // test overridden query with explicitly specified classname in combination with a non-standard heap
+        // test overridden query with explicitly specified classname in combination with a
+        // non-standard heap
         comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()@h",
                 "testTermParserHeap.A1::queryOverridden(h,a1)");
 
@@ -405,8 +420,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         // static method access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
-                "testTermParserHeap.A::staticMethod(heap)",
-                "a.staticMethod()",
+                "testTermParserHeap.A::staticMethod(heap)", "a.staticMethod()",
                 "a1.staticMethod()");
 
         // static array access
@@ -438,7 +452,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         // element of static array
         pretty = "heap[testTermParserHeap.A.staticArray[i] := i]";
-        verbose = "store(heap, int[]::select(heap,null,testTermParserHeap.A::$staticArray), arr(i), i)";
+        verbose =
+                "store(heap, int[]::select(heap,null,testTermParserHeap.A::$staticArray), arr(i), i)";
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
         // object property

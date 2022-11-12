@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import de.uka.ilkd.key.java.Services;
@@ -7,25 +10,24 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
 /**
- * The Bottom element of the boolean lattice, representing
- * no boolean at all.
- * 
+ * The Bottom element of the boolean lattice, representing no boolean at all.
+ *
  * @author Dominic Scheurer
  */
 public class Bottom extends BooleanDomainElem {
 
-   private static final Bottom INSTANCE = new Bottom();
-   
-   private Bottom() {}
-   
-   public static Bottom getInstance() {
-      return INSTANCE;
-   }
-   
-   @Override
-   public Name name() {
-      return new Name("bottom");
-   }
+    private static final Bottom INSTANCE = new Bottom();
+
+    private Bottom() {}
+
+    public static Bottom getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public Name name() {
+        return new Name("bottom");
+    }
 
     @Override
     public Term getDefiningAxiom(Term varOrConst, Services services) {

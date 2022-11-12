@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -8,8 +11,8 @@ import java.util.Properties;
 import java.util.Vector;
 
 /**
- * this class represents a java style structured comment. Such a comment has an
- * introductionary description and a list of tagged descriptions.
+ * this class represents a java style structured comment. Such a comment has an introductionary
+ * description and a list of tagged descriptions.
  *
  * @author Rainer Neumann
  * @deprecated This class will be integrated into DocComment.
@@ -37,19 +40,18 @@ public class TaggedComment {
      */
     protected String introText;
     /**
-     * the tags contained in the comment. This is required to obtain the order
-     * in which the tags occur
+     * the tags contained in the comment. This is required to obtain the order in which the tags
+     * occur
      */
     protected Vector tagNames;
     /**
-     * the tags and their string values. Tags are stored without the leading
-     * <tt>@</tt> sign
+     * the tags and their string values. Tags are stored without the leading <tt>@</tt> sign
      */
     protected Properties tagValues;
 
     /**
-     * creates a new instance from the given string. The given string <b>must
-     * not </b> be <tt>null</tt>!
+     * creates a new instance from the given string. The given string <b>must not </b> be
+     * <tt>null</tt>!
      *
      * @param comment the string containing the comment
      */
@@ -70,7 +72,7 @@ public class TaggedComment {
         TaggedComment tc = new TaggedComment(sw.toString());
         System.out.println("intro:");
         System.out.println(tc.getIntro());
-        for (Enumeration tags = tc.getTags(); tags.hasMoreElements(); ) {
+        for (Enumeration tags = tc.getTags(); tags.hasMoreElements();) {
             String tag = (String) tags.nextElement();
             System.out.println("@" + tag);
             System.out.println(tc.getTagValue(tag));
@@ -78,11 +80,10 @@ public class TaggedComment {
     }
 
     /**
-     * strips comment characters from the beginning and end of the given string
-     * representing a single line.
+     * strips comment characters from the beginning and end of the given string representing a
+     * single line.
      *
-     * @param line the string representing the line. The line is assumed to be
-     *             non empty.
+     * @param line the string representing the line. The line is assumed to be non empty.
      * @return the stripped and trimmed string
      */
     protected String stripCommentChars(String line) {
@@ -169,8 +170,8 @@ public class TaggedComment {
     }
 
     /**
-     * returns the introductionary text of the comment. This is the text
-     * starting at the beginning of the comment to the first tag.
+     * returns the introductionary text of the comment. This is the text starting at the beginning
+     * of the comment to the first tag.
      *
      * @return the intro of the comment
      */
@@ -181,8 +182,7 @@ public class TaggedComment {
     }
 
     /**
-     * determines whether or not there are tags contained in the underlying
-     * comment.
+     * determines whether or not there are tags contained in the underlying comment.
      *
      * @return <tt>true</tt> iff the comment contains tags
      */
@@ -202,8 +202,8 @@ public class TaggedComment {
     }
 
     /**
-     * return an enumeration of tags contained in the comment in order of their
-     * apperance in the comment.
+     * return an enumeration of tags contained in the comment in order of their apperance in the
+     * comment.
      *
      * @return an non-empty enumeration object.
      */
@@ -218,8 +218,7 @@ public class TaggedComment {
     }
 
     /**
-     * returns the text for the given tag or <tt>null</tt> if that tag is not
-     * defined.
+     * returns the text for the given tag or <tt>null</tt> if that tag is not defined.
      *
      * @param tag the name of the tag
      * @return the value of that tag or <tt>null</tt>

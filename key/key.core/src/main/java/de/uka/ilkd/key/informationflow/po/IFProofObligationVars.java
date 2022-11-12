@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.HashMap;
@@ -11,8 +14,8 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
 /**
- * This class contains the set of four sets of ProofObligationVars necessary for
- * information flow proofs.
+ * This class contains the set of four sets of ProofObligationVars necessary for information flow
+ * proofs.
  *
  * @author christoph
  *
@@ -24,24 +27,20 @@ public class IFProofObligationVars {
     private final Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
 
 
-    public IFProofObligationVars(ProofObligationVars symbExecVars,
-                                 Services services) {
+    public IFProofObligationVars(ProofObligationVars symbExecVars, Services services) {
         this(new ProofObligationVars(symbExecVars, "_A", services),
-             new ProofObligationVars(symbExecVars, "_B", services),
-             symbExecVars);
+                new ProofObligationVars(symbExecVars, "_B", services), symbExecVars);
     }
 
 
-    public IFProofObligationVars(ProofObligationVars c1,
-                                  ProofObligationVars c2,
-                                  ProofObligationVars symbExecVars) {
+    public IFProofObligationVars(ProofObligationVars c1, ProofObligationVars c2,
+            ProofObligationVars symbExecVars) {
         this.c1 = c1;
         this.c2 = c2;
         this.symbExecVars = symbExecVars;
 
         assert symbExecVars != null;
-        infFlowToSymbExecVarsMaps =
-                new HashMap<ProofObligationVars, Map<Term, Term>>();
+        infFlowToSymbExecVarsMaps = new HashMap<ProofObligationVars, Map<Term, Term>>();
         infFlowToSymbExecVarsMaps.put(c1, new HashMap<Term, Term>());
         infFlowToSymbExecVarsMaps.put(c2, new HashMap<Term, Term>());
         linkSymbExecVarsToCopies();
@@ -64,9 +63,7 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(StateVars ifVars,
-                                       StateVars seVars,
-                                       Map<Term, Term> map) {
+    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<Term, Term> map) {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
             final Term ifTerm = ifVarsIt.next();

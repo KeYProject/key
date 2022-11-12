@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
@@ -22,15 +25,15 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
 
     private final MainWindow mainWindow;
 
-    BlockContractExternalCompletion(MainWindow mainWindow){
+    BlockContractExternalCompletion(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
 
     @Override
-    public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
-            final Goal goal, final boolean force) {
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
+            final boolean force) {
         BlockContractExternalBuiltInRuleApp result =
-        		(BlockContractExternalBuiltInRuleApp) application;
+                (BlockContractExternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -41,21 +44,20 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation =
-                BlockContractExternalRule.INSTANCE
+        final Instantiation instantiation = BlockContractExternalRule.INSTANCE
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
                 BlockContractExternalRule.getApplicableContracts(instantiation, goal, services);
-        final AuxiliaryContractConfigurator<BlockContract> configurator
-            = new AuxiliaryContractConfigurator<>("Block Contract Configurator",
-                    new BlockContractSelectionPanel(services, true),
-                    mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
-                    "Contracts for Block: " + instantiation.statement);
+        final AuxiliaryContractConfigurator<BlockContract> configurator =
+                new AuxiliaryContractConfigurator<>("Block Contract Configurator",
+                        new BlockContractSelectionPanel(services, true), mainWindow, services,
+                        contracts.toArray(new BlockContract[contracts.size()]),
+                        "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                     HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(
-                    (StatementBlock) instantiation.statement, configurator.getContract(), heaps);
+            result.update((StatementBlock) instantiation.statement, configurator.getContract(),
+                    heaps);
         }
         return result;
     }
@@ -66,10 +68,10 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
     }
 
     /**
-     * Checks if the app is supported.
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof BlockContractExternalRule;
-   }
+        return app.rule() instanceof BlockContractExternalRule;
+    }
 }

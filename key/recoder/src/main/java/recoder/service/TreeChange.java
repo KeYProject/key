@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -7,8 +10,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
 /**
- * An atomic change of a syntax tree represented by the root of the
- * corresponding subtree. These changes are used for change reports.
+ * An atomic change of a syntax tree represented by the root of the corresponding subtree. These
+ * changes are used for change reports.
  */
 public abstract class TreeChange {
 
@@ -37,12 +40,11 @@ public abstract class TreeChange {
     }
 
     /**
-     * Checks if this change is included in a bigger one and may be considered
-     * redundant for sake of information update. Minor changes are important for
-     * the undo mechanism.
+     * Checks if this change is included in a bigger one and may be considered redundant for sake of
+     * information update. Minor changes are important for the undo mechanism.
      *
-     * @return <CODE>true</CODE>, if the changed tree is contained within
-     * another changed tree that occured in the same update period.
+     * @return <CODE>true</CODE>, if the changed tree is contained within another changed tree that
+     *         occured in the same update period.
      */
     public boolean isMinor() {
         return isMinor;
@@ -53,8 +55,8 @@ public abstract class TreeChange {
     }
 
     /**
-     * Returns the root of the tree that has changed. Note that the "root" is
-     * not necessarily a non terminal.
+     * Returns the root of the tree that has changed. Note that the "root" is not necessarily a non
+     * terminal.
      *
      * @return the root element of the change.
      */
@@ -63,18 +65,17 @@ public abstract class TreeChange {
     }
 
     /**
-     * Returns the parent of the root of the tree that has changed. The parent
-     * may differ from the current parent of the root, if the root has been
-     * detached and reattached somewhere else.
+     * Returns the parent of the root of the tree that has changed. The parent may differ from the
+     * current parent of the root, if the root has been detached and reattached somewhere else.
      *
      * @return the parent of the root element of the change.
      */
     public abstract NonTerminalProgramElement getChangeRootParent();
 
     /**
-     * Returns the compilation unit that has changed. The unit may differ from
-     * the current unit of the root, if the root has been detached and
-     * reattached somewhere else. The unit can be equals the change root.
+     * Returns the compilation unit that has changed. The unit may differ from the current unit of
+     * the root, if the root has been detached and reattached somewhere else. The unit can be equals
+     * the change root.
      *
      * @return the compilation unit that has changed.
      */

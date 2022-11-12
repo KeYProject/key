@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.core;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -63,8 +66,8 @@ public final class Main {
      */
     private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
     /**
-     * If this option is set, the (Disk)FileRepo does not delete its temporary directories
-     * (can be used for debugging).
+     * If this option is set, the (Disk)FileRepo does not delete its temporary directories (can be
+     * used for debugging).
      */
     private static final String KEEP_FILEREPOS = "--keep-fileRepos";
     private static final String DEBUG = "--debug";
@@ -78,8 +81,8 @@ public final class Main {
     private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    //    deprecated
-//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    // deprecated
+    // public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -88,9 +91,8 @@ public final class Main {
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
     /**
-     * The {@link KeYDesktop} used by KeY. The default implementation is
-     * replaced in Eclipse. For this reason the {@link Desktop} should never
-     * be used directly.
+     * The {@link KeYDesktop} used by KeY. The default implementation is replaced in Eclipse. For
+     * this reason the {@link Desktop} should never be used directly.
      */
     private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
@@ -119,14 +121,14 @@ public final class Main {
     /**
      * Determines which {@link UserInterfaceControl} is to be used.
      * <p>
-     * By specifying <code>AUTO</code> as command line argument this will be set
-     * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
+     * By specifying <code>AUTO</code> as command line argument this will be set to
+     * {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
      */
     private static UiMode uiMode = UiMode.INTERACTIVE;
 
     /**
-     * Determines whether to actually prove or only load a problem when
-     * {@link Main#uiMode} is {@link UiMode#AUTO}.
+     * Determines whether to actually prove or only load a problem when {@link Main#uiMode} is
+     * {@link UiMode#AUTO}.
      * <p>
      * This can be controlled from the command line by specifying the argument
      * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
@@ -148,8 +150,8 @@ public final class Main {
     private static List<File> fileArguments;
 
     /**
-     * Lists all features currently marked as experimental. Unless invoked with
-     * command line option --experimental , those will be deactivated.
+     * Lists all features currently marked as experimental. Unless invoked with command line option
+     * --experimental , those will be deactivated.
      */
     private static boolean experimentalMode;
 
@@ -159,8 +161,7 @@ public final class Main {
     private static File riflFileName = null;
 
     /**
-     * Save all contracts in selected location to automate the creation
-     * of multiple ".key"-files
+     * Save all contracts in selected location to automate the creation of multiple ".key"-files
      */
     private static boolean saveAllContracts = false;
 
@@ -170,14 +171,13 @@ public final class Main {
 
     /**
      * <p>
-     * This flag indicates if the example chooser should be shown
-     * if {@link #examplesDir} is defined (not {@code null}). It is set
-     * in the Eclipse integration to {@code false}, because it is required
-     * to define the path to a different one without showing the chooser.
+     * This flag indicates if the example chooser should be shown if {@link #examplesDir} is defined
+     * (not {@code null}). It is set in the Eclipse integration to {@code false}, because it is
+     * required to define the path to a different one without showing the chooser.
      * </p>
      * <p>
-     * Conclusion: It must be possible to use KeY with a custom examples
-     * directory without show in the chooser on startup.
+     * Conclusion: It must be possible to use KeY with a custom examples directory without show in
+     * the chooser on startup.
      * </p>
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
@@ -228,7 +228,8 @@ public final class Main {
         LOGGER.debug("Available processors:  " + rt.availableProcessors());
     }
 
-    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
+    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui,
+            List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -240,7 +241,8 @@ public final class Main {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
         } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
-                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
+                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .getShowLoadExamplesDialog()) {
             ui.openExamples();
         }
     }
@@ -261,35 +263,49 @@ public final class Main {
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
+        cl.addOption(AUTOSAVE, "<number>",
+                "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addOption(NO_PRUNING_CLOSED, null,
                 "disables pruning and goal back in closed branches (saves memory)");
         cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
                 + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
-        cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
+        cl.addOption(TACLET_DIR, "<dir>",
+                "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
-        cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
+        cl.addOption(AUTO, null,
+                "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: " + Verbosity.NORMAL + ")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
-        cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
-        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
+        cl.addOption(EXAMPLES, "<directory>",
+                "load the directory containing the example files on startup");
+        cl.addOption(RIFL, "<filename>",
+                "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
-        cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
-        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
+        cl.addOption(SAVE_ALL_CONTRACTS, null,
+                "save all selected contracts for automatic execution");
+        cl.addOption(TIMEOUT, "<timeout>",
+                "timeout for each automatic proof of a problem in ms (default: "
+                        + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
-        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
+        cl.addOption(JUSTIFY_RULES, "<filename>",
+                "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
         cl.addText("\n", true);
-        cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.", false);
+        cl.addText("The '" + JUSTIFY_RULES
+                + "' option has a number of additional parameters you can set.", false);
         cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.", false);
         cl.addText("\n", true);
-        cl.addOption(JMAX_RULES, "<number>", "maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
+        cl.addOption(JMAX_RULES, "<number>",
+                "maximum number of rule application to perform (default: "
+                        + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
         cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
+        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: "
+                + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
         cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
-        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
+        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>",
+                "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
         return cl;
@@ -489,11 +505,12 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
-        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
-        } catch (IOException e) {
-            //LOGGER.log(Level.INFO, e.getMessage(), e);
-        }*/
+        /*
+         * String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL :
+         * LOGGING_CONFIG_DEFAULT; try (final InputStream in =
+         * Main.class.getResourceAsStream(configuration)) { } catch (IOException e) {
+         * //LOGGER.log(Level.INFO, e.getMessage(), e); }
+         */
     }
 
     public static boolean isExperimentalMode() {
@@ -515,13 +532,14 @@ public final class Main {
      * {@link ConsoleUserInterfaceControl} will be used if {@link Main#uiMode} is
      * {@link UiMode#AUTO} and {@link WindowUserInterfaceControl} otherwise.
      *
-     * @return a <code>UserInterfaceControl</code> based on the value of
-     * <code>uiMode</code>
+     * @return a <code>UserInterfaceControl</code> based on the value of <code>uiMode</code>
      */
-    private static AbstractMediatorUserInterfaceControl createUserInterface(List<File> fileArguments) {
+    private static AbstractMediatorUserInterfaceControl createUserInterface(
+            List<File> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
-            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
+            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
+            // bug #1216
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
@@ -546,15 +564,16 @@ public final class Main {
         } else {
             updateSplashScreen();
 
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
+            /*
+             * explicitly enable pruning in closed branches for interactive mode (if not manually
+             * disabled)
+             */
             GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
 
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent =
-                        mainWindow.getRecentFiles().getMostRecent();
+                RecentFileEntry mostRecent = mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
                     File mostRecentFile = new File(mostRecent.getAbsolutePath());
@@ -572,9 +591,8 @@ public final class Main {
     }
 
     public static void ensureExamplesAvailable() {
-        File examplesDir = getExamplesDir() == null ?
-                ExampleChooser.lookForExamples() :
-                new File(getExamplesDir());
+        File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
+                : new File(getExamplesDir());
         if (examplesDir.exists()) {
             setExamplesDir(examplesDir.getAbsolutePath());
         } else {
@@ -601,8 +619,7 @@ public final class Main {
 
             opt = new LemmataAutoModeOptions(options, KeYConstants.INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
-            LemmataHandler handler = new LemmataHandler(opt,
-                    AbstractProfile.getDefaultProfile());
+            LemmataHandler handler = new LemmataHandler(opt, AbstractProfile.getDefaultProfile());
             handler.start();
 
         } catch (Exception e) {
@@ -626,11 +643,10 @@ public final class Main {
     }
 
     /**
-     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially
-     * others) to determine working directory. In case there is at least one
-     * location (i.e. a file or directory) specified as command line argument,
-     * working directory is determined based on first location that occurred in
-     * the list of arguments. Otherwise, value of System.getProperty("user.home")
+     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially others) to determine
+     * working directory. In case there is at least one location (i.e. a file or directory)
+     * specified as command line argument, working directory is determined based on first location
+     * that occurred in the list of arguments. Otherwise, value of System.getProperty("user.home")
      * is used to determine working directory.
      *
      * @return {@link File} object representing working directory.
@@ -649,8 +665,8 @@ public final class Main {
     }
 
     /**
-     * Perform necessary actions before loading any problem files.
-     * Currently only performs RIFL to JML transformation.
+     * Perform necessary actions before loading any problem files. Currently only performs RIFL to
+     * JML transformation.
      */
     private static List<File> preProcessInput(List<File> filesOnStartup) {
         List<File> result = new ArrayList<File>();
@@ -662,14 +678,15 @@ public final class Main {
             }
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
-//            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
+            // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             try {
                 RIFLTransformer transformer = new RIFLTransformer();
                 transformer.doTransform(riflFileName, fileNameOnStartUp,
                         RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
                 if (verbosity > Verbosity.SILENT) {
-                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp
+                            + " ...");
                 }
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException e) {
@@ -693,9 +710,8 @@ public final class Main {
     }
 
     /**
-     * Defines the examples directory. This method is used by the
-     * Eclipse integration (KeY4Eclipse) to use the examples extract
-     * from the plug-in into the workspace.
+     * Defines the examples directory. This method is used by the Eclipse integration (KeY4Eclipse)
+     * to use the examples extract from the plug-in into the workspace.
      *
      * @param newExamplesDir The new examples directory to use.
      */
@@ -704,8 +720,8 @@ public final class Main {
     }
 
     /**
-     * Returns the {@link KeYDesktop} to use. Never use {@link Desktop}
-     * directly because the {@link KeYDesktop} is different in Eclipse.
+     * Returns the {@link KeYDesktop} to use. Never use {@link Desktop} directly because the
+     * {@link KeYDesktop} is different in Eclipse.
      *
      * @return The {@link KeYDesktop} to use.
      */

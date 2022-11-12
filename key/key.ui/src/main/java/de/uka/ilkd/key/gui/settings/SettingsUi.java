@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -31,7 +34,7 @@ public class SettingsUi extends JPanel {
     private JTree treeSettingsPanels = new JTree(treeModel);
     private JTextField txtSearch = new JTextField();
     private MainWindow mainWindow;
-    //private JScrollPane center;
+    // private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -40,14 +43,17 @@ public class SettingsUi extends JPanel {
             private static final long serialVersionUID = 1770380144400699946L;
 
             @Override
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                    boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 SettingsTreeNode node = (SettingsTreeNode) value;
                 SettingsProvider panel = node.provider;
                 JLabel lbl;
                 if (panel == null) {
-                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
+                            leaf, row, hasFocus);
                 } else {
-                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(), sel, expanded, leaf, row, hasFocus);
+                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(),
+                            sel, expanded, leaf, row, hasFocus);
                     lbl.setFont(lbl.getFont().deriveFont(16f));
 
                     if (!node.isLeaf()) {
@@ -77,16 +83,16 @@ public class SettingsUi extends JPanel {
         });
 
         root = new JSplitPane();
-        //root.setRightComponent(center = new JScrollPane());
+        // root.setRightComponent(center = new JScrollPane());
         treeSettingsPanels.addTreeSelectionListener(e -> {
             SettingsTreeNode n = (SettingsTreeNode) e.getPath().getLastPathComponent();
             if (n.provider != null && n.provider.getPanel(mainWindow) != null) {
                 JComponent comp = n.provider.getPanel(mainWindow);
-                //center.setViewportView(comp);
-                //center.getVerticalScrollBar().setValue(0);
-                //center.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                //comp.setSize(center.getWidth(), comp.getHeight());
-                //comp.setPreferredSize(new Dimension(center.getWidth(), comp.getHeight()));
+                // center.setViewportView(comp);
+                // center.getVerticalScrollBar().setValue(0);
+                // center.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                // comp.setSize(center.getWidth(), comp.getHeight());
+                // comp.setPreferredSize(new Dimension(center.getWidth(), comp.getHeight()));
                 setSettingsPanel(comp);
             }
         });
@@ -100,9 +106,9 @@ public class SettingsUi extends JPanel {
     }
 
     private void setSettingsPanel(JComponent comp) {
-        //int dividerLocation = root.getDividerLocation();
+        // int dividerLocation = root.getDividerLocation();
         root.setRightComponent(comp);
-        //root.setDividerLocation(dividerLocation);
+        // root.setDividerLocation(dividerLocation);
 
         root.setDividerLocation(root.getLeftComponent().getPreferredSize().width);
     }
@@ -128,7 +134,7 @@ public class SettingsUi extends JPanel {
         getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
         list.forEach(it -> treeSettingsPanels.expandPath(it));
 
-        if(!providers.isEmpty()){
+        if (!providers.isEmpty()) {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));
         }
     }
@@ -138,7 +144,7 @@ public class SettingsUi extends JPanel {
 
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {
-            for (Enumeration e = node.children(); e.hasMoreElements(); ) {
+            for (Enumeration e = node.children(); e.hasMoreElements();) {
                 TreeNode n = (TreeNode) e.nextElement();
                 TreePath path = parent.pathByAddingChild(n);
                 getPaths(path, list);
@@ -166,6 +172,7 @@ public class SettingsUi extends JPanel {
     }
 }
 
+
 class SettingsTreeNode implements TreeNode {
     final SettingsProvider provider;
     final List<SettingsTreeNode> children;
@@ -173,8 +180,7 @@ class SettingsTreeNode implements TreeNode {
     SettingsTreeNode(SettingsProvider cur, List<SettingsProvider> providers) {
         provider = cur;
         if (!providers.isEmpty()) {
-            children = providers.stream().map(SettingsTreeNode::new)
-                    .collect(Collectors.toList());
+            children = providers.stream().map(SettingsTreeNode::new).collect(Collectors.toList());
         } else {
             children = Collections.emptyList();
         }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,16 +16,13 @@ import java.util.Map;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
-public class IntegerHandler extends LDTHandler  {
+public class IntegerHandler extends LDTHandler {
 
-    private final Map<JMLOperator, Operator> jmlIntMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlIntMap = new EnumMap<>(JMLOperator.class);
 
-    private final Map<JMLOperator, Operator> jmlLongMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlLongMap = new EnumMap<>(JMLOperator.class);
 
-    private final Map<JMLOperator, Operator> jmlBigintMap =
-            new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlBigintMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<PrimitiveType, Map<JMLOperator, Operator>> opCategories =
             new IdentityHashMap<>();

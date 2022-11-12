@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.function.Function;
@@ -7,8 +10,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.Services;
 
 /**
- * A generic {@link Term} replace visitor based on a filter predicate and a
- * replacement function for the filtered subterms.
+ * A generic {@link Term} replace visitor based on a filter predicate and a replacement function for
+ * the filtered subterms.
  *
  * @author Dominic Steinhoefel
  */
@@ -20,9 +23,9 @@ public class GenericTermReplacer {
             newTopLevelTerm = replacer.apply(t);
         }
 
-        final Term[] newSubs = newTopLevelTerm.subs().stream()
-                .map(sub -> replace(sub, filter, replacer, services)).collect(Collectors.toList())
-                .toArray(new Term[0]);
+        final Term[] newSubs =
+                newTopLevelTerm.subs().stream().map(sub -> replace(sub, filter, replacer, services))
+                        .collect(Collectors.toList()).toArray(new Term[0]);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
                 newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),

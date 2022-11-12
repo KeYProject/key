@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -6,13 +9,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
 /**
- * An abstract domain element for a predicate abstraction lattice encapsulating
- * exactly one abstraction predicate.
+ * An abstract domain element for a predicate abstraction lattice encapsulating exactly one
+ * abstraction predicate.
  *
  * @author Dominic Scheurer
  */
-public class SimplePredicateAbstractionDomainElement extends
-        AbstractPredicateAbstractionDomainElement {
+public class SimplePredicateAbstractionDomainElement
+        extends AbstractPredicateAbstractionDomainElement {
 
     /**
      * The bottom element of any predicate abstraction lattice.
@@ -27,8 +30,8 @@ public class SimplePredicateAbstractionDomainElement extends
             new SimplePredicateAbstractionDomainElement(true);
 
     /**
-     * Constructs a new {@link SimplePredicateAbstractionDomainElement} from a
-     * given list of abstraction predicates.
+     * Constructs a new {@link SimplePredicateAbstractionDomainElement} from a given list of
+     * abstraction predicates.
      */
     public SimplePredicateAbstractionDomainElement(
             final ImmutableSet<AbstractionPredicate> predicates) {
@@ -36,9 +39,8 @@ public class SimplePredicateAbstractionDomainElement extends
     }
 
     /**
-     * Constructs a new {@link SimplePredicateAbstractionDomainElement} that is
-     * a top element if isTopElem is set to true; otherwise, it is a bottom
-     * element.
+     * Constructs a new {@link SimplePredicateAbstractionDomainElement} that is a top element if
+     * isTopElem is set to true; otherwise, it is a bottom element.
      */
     private SimplePredicateAbstractionDomainElement(boolean isTopElem) {
         super(isTopElem);
@@ -46,8 +48,7 @@ public class SimplePredicateAbstractionDomainElement extends
 
     @Override
     protected Term combinePredicates(Term preds, Term newPred, Services services) {
-        throw new RuntimeException(
-                "In the simple predicate abstraction lattice, "
+        throw new RuntimeException("In the simple predicate abstraction lattice, "
                 + "elements should not be combined.");
     }
 
@@ -58,17 +59,14 @@ public class SimplePredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SimplePredicateAbstractionDomainElement
-                && (this != TOP || obj == TOP)
-                && (this != BOTTOM || obj == BOTTOM)
-                && this.getPredicates().equals(
-                        ((SimplePredicateAbstractionDomainElement) obj)
-                                .getPredicates());
+        return obj instanceof SimplePredicateAbstractionDomainElement && (this != TOP || obj == TOP)
+                && (this != BOTTOM || obj == BOTTOM) && this.getPredicates()
+                        .equals(((SimplePredicateAbstractionDomainElement) obj).getPredicates());
     }
 
     @Override

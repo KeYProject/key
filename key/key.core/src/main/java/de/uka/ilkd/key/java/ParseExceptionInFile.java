@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.parser.Location;
@@ -11,9 +14,8 @@ import java.net.MalformedURLException;
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
  * <p>
- * The filename is used to display the location of an error in the sources. Line
- * and column number are not stored here explicitly but retrieved from the
- * cause.
+ * The filename is used to display the location of an error in the sources. Line and column number
+ * are not stored here explicitly but retrieved from the cause.
  *
  * @author mulbrich
  */

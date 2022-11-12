@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -6,8 +9,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a simple FIFO using a dynamically growing and shrinking
- * array.
+ * This class implements a simple FIFO using a dynamically growing and shrinking array.
  *
  * @author RN
  */
@@ -76,8 +78,8 @@ public class Queue {
     }
 
     /**
-     * copies the data array to the given array. Data in the new array starts at
-     * position 0. It is assumed, that the new array has a suitable size.
+     * copies the data array to the given array. Data in the new array starts at position 0. It is
+     * assumed, that the new array has a suitable size.
      *
      * @param dest the destination array
      */

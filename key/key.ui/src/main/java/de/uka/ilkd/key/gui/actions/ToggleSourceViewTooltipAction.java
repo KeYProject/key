@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -25,7 +28,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"
             + " source view will show a tooltip with additional information.";
 
-//    private static final long serialVersionUID = -3352122484627890921L;
+    // private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
     private final SettingsListener viewSettingsListener = new SettingsListener() {
@@ -50,8 +53,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     }
 
     /**
-     * Updates the state of this action according to
-     * {@link ViewSettings#isShowSourceViewTooltips()}
+     * Updates the state of this action according to {@link ViewSettings#isShowSourceViewTooltips()}
      */
     protected void updateSelectedState() {
         final boolean setting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -8,8 +11,8 @@ import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * This proof saver derivative wraps its generated output stream into a
- * {@link GZIPOutputStream} thus compressing proof files.
+ * This proof saver derivative wraps its generated output stream into a {@link GZIPOutputStream}
+ * thus compressing proof files.
  *
  * @author tbormer on 12.02.16.
  */
@@ -18,12 +21,9 @@ public class GZipProofSaver extends ProofSaver {
     /**
      * Instantiates a new proof saver.
      *
-     * @param proof
-     *            the non-<code>null</code> proof to save
-     * @param fileName
-     *            the name of the file to write to
-     * @param internalVersion
-     *            the internal version
+     * @param proof the non-<code>null</code> proof to save
+     * @param fileName the name of the file to write to
+     * @param internalVersion the internal version
      */
     public GZipProofSaver(Proof proof, String fileName, String internalVersion) {
         super(proof, fileName, internalVersion);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -5,8 +8,7 @@ package recoder.service;
 import java.util.List;
 
 /**
- * Record of the syntactical changes that occured after the last validation of
- * the model.
+ * Record of the syntactical changes that occured after the last validation of the model.
  *
  * @author AL
  * @since 0.5

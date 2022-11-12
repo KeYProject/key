@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -16,7 +19,7 @@ public class SeqSingleton extends Operator {
     public SeqSingleton(ExtList children) {
         super(children);
     }
-    
+
     public SeqSingleton(Expression child) {
         super(child);
     }
@@ -33,10 +36,10 @@ public class SeqSingleton extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSeqSingleton(this);
+        v.performActionOnSeqSingleton(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqSingleton(this);
     }
@@ -46,6 +49,6 @@ public class SeqSingleton extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }
 }

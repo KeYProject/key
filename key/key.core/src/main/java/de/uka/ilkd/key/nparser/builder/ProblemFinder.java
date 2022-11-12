@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
@@ -9,8 +12,8 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import javax.annotation.Nullable;
 
 /**
- * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation)
- * of a {@link de.uka.ilkd.key.nparser.KeyAst.File}.
+ * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation) of
+ * a {@link de.uka.ilkd.key.nparser.KeyAst.File}.
  *
  * @author weigl
  */
@@ -39,14 +42,14 @@ public class ProblemFinder extends ExpressionBuilder {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
                 chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
-                //.replace("\\\\:", ":");
+            // .replace("\\\\:", ":");
             else
                 chooseContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
                 proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
-                //.replace("\\\\:", ":");
+            // .replace("\\\\:", ":");
             else
                 proofObligation = "";
         }

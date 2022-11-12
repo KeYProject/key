@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.gui.configuration.ViewSelector;
 public class ToolTipOptionsAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -360744615149278733L;
 
@@ -19,7 +22,7 @@ public class ToolTipOptionsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	 ViewSelector vselector = new ViewSelector(mainWindow);
-	 vselector.setVisible(true);
+        ViewSelector vselector = new ViewSelector(mainWindow);
+        vselector.setVisible(true);
     }
 }

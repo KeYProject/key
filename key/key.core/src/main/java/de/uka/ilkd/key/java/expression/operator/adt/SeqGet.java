@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Represents a sequence getter function.
+ *
  * @author bruns
  * @since 1.7.2120
  *
@@ -30,7 +34,7 @@ public class SeqGet extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqGet(this);
+        v.performActionOnSeqGet(this);
     }
 
     @Override

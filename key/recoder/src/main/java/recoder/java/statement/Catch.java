@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.statement;
@@ -46,7 +49,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Catch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
 
@@ -118,8 +121,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -153,11 +155,10 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -199,10 +200,9 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
@@ -223,11 +223,10 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     /*
-     * Return the parameter declaration at the specified index in this node's
-     * "virtual" parameter declaration array. @param index an index for a
-     * parameter declaration. @return the parameter declaration with the given
-     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is
-     * out of bounds.
+     * Return the parameter declaration at the specified index in this node's "virtual" parameter
+     * declaration array. @param index an index for a parameter declaration. @return the parameter
+     * declaration with the given index. @exception ArrayIndexOutOfBoundsException if <tt> index
+     * </tt> is out of bounds.
      */
 
     public ParameterDeclaration getParameterDeclarationAt(int index) {

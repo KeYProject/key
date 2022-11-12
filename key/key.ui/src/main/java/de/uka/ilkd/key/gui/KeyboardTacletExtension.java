@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -48,10 +51,8 @@ import java.util.stream.Collectors;
  */
 @KeYGuiExtension.Info(name = "Keyboard Taclet Control",
         description = "This extension control over the application of taclets via the keyboard.",
-        optional = true
-)
-public class KeyboardTacletExtension implements KeYGuiExtension,
-        KeYGuiExtension.LeftPanel {
+        optional = true)
+public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
     @Override
@@ -69,17 +70,12 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
         });
 
         /*
-        window.currentGoalView.setFocusable(true);
-        window.currentGoalView.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                panel.processKeyPressed(e);
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-        });
+         * window.currentGoalView.setFocusable(true); window.currentGoalView.addKeyListener(new
+         * KeyAdapter() {
+         *
+         * @Override public void keyTyped(KeyEvent e) { panel.processKeyPressed(e); }
+         *
+         * @Override public void keyPressed(KeyEvent e) { } });
          */
 
         panel = new KeyboardTacletPanel(window);
@@ -87,7 +83,8 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
     }
 }
 
-//@SuppressWarnings("WeakerAccess")
+
+// @SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
     private static final String PROP_MODEL = "taclets";
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyboardTacletPanel.class);
@@ -96,7 +93,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final ActivateAction actionActivate = new ActivateAction();
     private final FilterMouseAction actionFilterUsingMouse = new FilterMouseAction();
     private final DirectModeAction actionDirectMode = new DirectModeAction();
-    private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets = new OnlyCompleteTacletsAction();
+    private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets =
+            new OnlyCompleteTacletsAction();
     private final MainWindow mainWindow;
     @Nullable
     private KeyboardTacletModel model;
@@ -111,13 +109,15 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     public KeyboardTacletPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         this.services = mainWindow.getMediator().getServices();
-        //txtInput.setEditable(false);
+        // txtInput.setEditable(false);
         setLayout(new BorderLayout());
         JPanel pNorth = new JPanel(new MigLayout("fillX"));
         add(pNorth, BorderLayout.NORTH);
-        /*pNorth.add(new JCheckBox(actionActivate));
-        pNorth.add(new JCheckBox(actionFilterUsingMouse), "wrap");
-        pNorth.add(new JCheckBox(actionDirectMode), "wrap");*/
+        /*
+         * pNorth.add(new JCheckBox(actionActivate)); pNorth.add(new
+         * JCheckBox(actionFilterUsingMouse), "wrap"); pNorth.add(new JCheckBox(actionDirectMode),
+         * "wrap");
+         */
         JLabel lblInput = new JLabel("Input:");
         lblInput.setLabelFor(txtInput);
         pNorth.add(lblInput);
@@ -141,16 +141,18 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             }
         });
 
-        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION, e -> {
-            if (actionFilterUsingMouse.isSelected())
-                buildModel();
-        });
+        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION,
+                e -> {
+                    if (actionFilterUsingMouse.isSelected())
+                        buildModel();
+                });
 
         pCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(new JScrollPane(pCenter));
         addPropertyChangeListener(PROP_MODEL, (e) -> {
             if (e.getOldValue() != null)
-                ((KeyboardTacletModel) e.getOldValue()).removePropertyChangeListener(updateListener);
+                ((KeyboardTacletModel) e.getOldValue())
+                        .removePropertyChangeListener(updateListener);
             ((KeyboardTacletModel) e.getNewValue()).addPropertyChangeListener(updateListener);
             updateListener.propertyChange(e);
         });
@@ -194,8 +196,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
     @Override
     public Collection<CAction> getTitleCActions() {
-        CDropDownButton btnOptions = new CDropDownButton("Options",
-                IconFontSwing.buildIcon(FontAwesomeSolid.COGS, 12));
+        CDropDownButton btnOptions =
+                new CDropDownButton("Options", IconFontSwing.buildIcon(FontAwesomeSolid.COGS, 12));
         btnOptions.add(DockingHelper.translateAction(actionActivate));
         btnOptions.addSeparator();
         btnOptions.add(DockingHelper.translateAction(actionDirectMode));
@@ -205,7 +207,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private void updateCurrentPrefix() {
-        //txtInput.setText(model.getCurrentPrefix() + " " + model.getCurrentPos());
+        // txtInput.setText(model.getCurrentPrefix() + " " + model.getCurrentPos());
     }
 
     /**
@@ -226,13 +228,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             String name = model.getPrefixTable().get(prefix);
             int pLength = prefix.length();
             JLabel lblName = new JLabel(
-                    String.format("<html><u>%s</u>%s</html>",
-                            prefix, name.substring(pLength)));
+                    String.format("<html><u>%s</u>%s</html>", prefix, name.substring(pLength)));
             box.add(lblName);
 
             int i = 0;
             for (RuleApp tacletApp : model.getTaclets().get(name)) {
-                box.add(new JLabel("" + (++i)));//new JLabel(tacletApp.toString()));
+                box.add(new JLabel("" + (++i)));// new JLabel(tacletApp.toString()));
             }
             pCenter.add(box);
         }
@@ -289,7 +290,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
-            pCenter.add(new JLabel("<html><b>Warning:</b> No last mouse position found in the sequent."));
+            pCenter.add(new JLabel(
+                    "<html><b>Warning:</b> No last mouse position found in the sequent."));
         }
 
         if (actionFilterUsingMouse.isSelected() && pos != null) {
@@ -300,8 +302,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 }
             };
             try {
-                ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(
-                        filter, pos.getPosInOccurrence(), services);
+                ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(filter,
+                        pos.getPosInOccurrence(), services);
                 t.forEach(taclets::add);
             } catch (NullPointerException e) {
                 LOGGER.debug("NPE", e);
@@ -313,8 +315,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
-            taclets = taclets.stream().filter(RuleApp::complete)
-                    .collect(Collectors.toList());
+            taclets = taclets.stream().filter(RuleApp::complete).collect(Collectors.toList());
         }
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
@@ -380,6 +381,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 }
 
+
 /**
  *
  */
@@ -409,18 +411,15 @@ class KeyboardTacletModel {
     }
 
     static int getClashFreePrefix(String unique, Collection<String> strings) {
-        return strings.stream()
-                .filter(it -> !it.equals(unique))
-                .mapToInt(c -> getPrefixLength(unique, c))
-                .max().orElse(0);
+        return strings.stream().filter(it -> !it.equals(unique))
+                .mapToInt(c -> getPrefixLength(unique, c)).max().orElse(0);
     }
 
     static int getPrefixLength(String a, String b) {
         int i = 0;
-        for (; i < Math.min(a.length(), b.length()) &&
-                (a.charAt(i) == b.charAt(i) || !charValid(a.charAt(i)) || !charValid(b.charAt(i)))
-                ; i++) {
-            ;//empty
+        for (; i < Math.min(a.length(), b.length()) && (a.charAt(i) == b.charAt(i)
+                || !charValid(a.charAt(i)) || !charValid(b.charAt(i))); i++) {
+            ;// empty
         }
         return i;
     }
@@ -435,7 +434,7 @@ class KeyboardTacletModel {
     }
 
     static boolean charValid(char c) {
-        return true; //return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
+        return true; // return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -452,22 +451,22 @@ class KeyboardTacletModel {
 
     public void processChar(char c) {
         switch (c) {
-            case '\u001B': //escape
-                reset();
-                break;
-            case '\b':
-                if (currentPrefix.length() <= 1)
-                    setCurrentPrefix("");
-                else
-                    setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
-                break;
-            default:
-                if ('0' <= c && c <= '9') {
-                    setCurrentPos(c - '0');
-                }
-                if (charValid(c)) {
-                    setCurrentPrefix(currentPrefix + c);
-                }
+        case '\u001B': // escape
+            reset();
+            break;
+        case '\b':
+            if (currentPrefix.length() <= 1)
+                setCurrentPrefix("");
+            else
+                setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+            break;
+        default:
+            if ('0' <= c && c <= '9') {
+                setCurrentPos(c - '0');
+            }
+            if (charValid(c)) {
+                setCurrentPrefix(currentPrefix + c);
+            }
         }
     }
 

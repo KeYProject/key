@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -30,10 +33,10 @@ public class SeqConcat extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSeqConcat(this);
+        v.performActionOnSeqConcat(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqConcat(this);
     }

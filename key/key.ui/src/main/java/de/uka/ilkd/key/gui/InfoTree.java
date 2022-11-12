@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import javax.swing.JTree;
@@ -26,8 +29,8 @@ public class InfoTree extends JTree {
     }
 
     /*
-     * This function is expected to return only {@link InfoTreeNode} instances.
-     * The super method returns {@link DefaultMutableTreeNode} instances.
+     * This function is expected to return only {@link InfoTreeNode} instances. The super method
+     * returns {@link DefaultMutableTreeNode} instances.
      */
     @Override
     public InfoTreeNode getLastSelectedPathComponent() {

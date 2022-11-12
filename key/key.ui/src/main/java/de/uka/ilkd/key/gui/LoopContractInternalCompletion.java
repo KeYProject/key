@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
@@ -21,13 +24,13 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
 
     private final MainWindow mainWindow;
 
-    LoopContractInternalCompletion(MainWindow mainWindow){
+    LoopContractInternalCompletion(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
 
     @Override
-    public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
-            final Goal goal, final boolean force) {
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
+            final boolean force) {
         LoopContractInternalBuiltInRuleApp result =
                 (LoopContractInternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
@@ -40,16 +43,15 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation =
-                LoopContractInternalRule.INSTANCE
+        final Instantiation instantiation = LoopContractInternalRule.INSTANCE
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
                 LoopContractInternalRule.getApplicableContracts(instantiation, goal, services);
-        final AuxiliaryContractConfigurator<LoopContract> configurator
-            = new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
-                    new LoopContractSelectionPanel(services, true),
-                    mainWindow, services, contracts.toArray(new LoopContract[contracts.size()]),
-                    "Contracts for Block: " + instantiation.statement);
+        final AuxiliaryContractConfigurator<LoopContract> configurator =
+                new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
+                        new LoopContractSelectionPanel(services, true), mainWindow, services,
+                        contracts.toArray(new LoopContract[contracts.size()]),
+                        "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                     HeapContext.getModHeaps(services, instantiation.isTransactional());
@@ -64,10 +66,10 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
     }
 
     /**
-     * Checks if the app is supported.
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the Eclipse plug-ins like
+     * the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof LoopContractInternalRule;
-   }
+        return app.rule() instanceof LoopContractInternalRule;
+    }
 }

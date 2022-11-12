@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Label;
@@ -34,19 +37,23 @@ class ContractClauses {
 
 
     @SuppressWarnings("unused")
-    static class Clauses<K, V> {}
+    static class Clauses<K, V> {
+    }
 
     private final Map<Clauses<?, ?>, List<Pair<Object, Object>>> clauseData = new LinkedHashMap<>();
 
     public <K, V> ContractClauses add(Clauses<K, V> type, K heapOrLabel, V t) {
-        List<Pair<Object, Object>> list = clauseData.computeIfAbsent(type, key -> new LinkedList<>());
+        List<Pair<Object, Object>> list =
+                clauseData.computeIfAbsent(type, key -> new LinkedList<>());
         list.add(new Pair<>(heapOrLabel, t));
         return this;
     }
 
     @SuppressWarnings("unchecked")
     public <K, V> List<Pair<K, V>> get(Clauses<K, V> type) {
-        List<Pair<Object, Object>> list = clauseData.computeIfAbsent(type, key -> new LinkedList<>());
-        return list.stream().map(p -> new Pair<>((K) p.first, (V) p.second)).collect(Collectors.toList());
+        List<Pair<Object, Object>> list =
+                clauseData.computeIfAbsent(type, key -> new LinkedList<>());
+        return list.stream().map(p -> new Pair<>((K) p.first, (V) p.second))
+                .collect(Collectors.toList());
     }
 }

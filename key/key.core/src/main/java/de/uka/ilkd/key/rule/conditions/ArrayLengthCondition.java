@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -17,32 +20,29 @@ public final class ArrayLengthCondition extends VariableConditionAdapter {
 
 
     public ArrayLengthCondition(SchemaVariable reference, boolean negation) {
-	this.reference = reference;
-	this.negation  = negation;
+        this.reference = reference;
+        this.negation = negation;
     }
 
 
     @Override
-    public boolean check(SchemaVariable var, 
-			 SVSubstitute subst, 
-			 SVInstantiations svInst,
-			 Services services) {
-	if(var == reference) {
-	    ProgramVariable attribute;
-	    if(subst instanceof FieldReference) {
-		attribute = ((FieldReference)subst).getProgramVariable();
-	    } else {
-		attribute = (ProgramVariable)subst;
-	    }
-	    return negation 
-	           ^ attribute == services.getJavaInfo().getArrayLength();
-	}
-	return true;
+    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+            Services services) {
+        if (var == reference) {
+            ProgramVariable attribute;
+            if (subst instanceof FieldReference) {
+                attribute = ((FieldReference) subst).getProgramVariable();
+            } else {
+                attribute = (ProgramVariable) subst;
+            }
+            return negation ^ attribute == services.getJavaInfo().getArrayLength();
+        }
+        return true;
     }
 
-    
+
     @Override
-    public String toString () {
-	return (negation ? " \\not " : "" ) + "\\isArrayLength(" + reference + ")";
+    public String toString() {
+        return (negation ? " \\not " : "") + "\\isArrayLength(" + reference + ")";
     }
 }

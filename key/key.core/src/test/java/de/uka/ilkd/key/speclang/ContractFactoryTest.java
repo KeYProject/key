@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -30,9 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ContractFactoryTest {
     /** the filename of the key file which is needed to create Services and JavaInfo */
-    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY
-        + File.separator + "speclang"
-        + File.separator + "testFile.key";
+    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+            + "speclang" + File.separator + "testFile.key";
 
     /** JavaInfo containing information about the available datatypes and methods */
     private JavaInfo javaInfo;
@@ -52,8 +54,8 @@ public class ContractFactoryTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = new HelperClassForTests().parse(new File(TEST_FILE))
-                                                .getFirstProof().getJavaInfo();
+            javaInfo = new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof()
+                    .getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
@@ -62,47 +64,33 @@ public class ContractFactoryTest {
 
     /**
      * Checks that two equal assignable clauses are combined correctly, i.e. without if-expressions.
+     *
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
     public void testCombineEqualAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" +
-                            "@  requires a != 5;\n" +
-                            "@  ensures \\result == 3;\n" +
-                            "@  assignable \\nothing;\n" +
-                            "@\n" +
-                            "@ also\n" +
-                            "@\n" +
-                            "@ exceptional_behavior\n" +
-                            "@  requires a == 5;\n" +
-                            "@  assignable \\nothing;\n" +
-                            "@  signals (RuntimeException e) true;\n" +
-                            "@  signals_only RuntimeException;\n" +
-                            "@*/";
+        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
+                + "@  ensures \\result == 3;\n" + "@  assignable \\nothing;\n" + "@\n" + "@ also\n"
+                + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
+                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
+                + "@  signals_only RuntimeException;\n" + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
 
     /**
-     * Checks that two different assignable clauses are combined correctly:
-     * \nothing and \strictly_nothing should be combined to empty (w/o if-then-else).
+     * Checks that two different assignable clauses are combined correctly: \nothing and
+     * \strictly_nothing should be combined to empty (w/o if-then-else).
+     *
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
     public void testCombineEmptyAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" +
-                            "@  requires a != 5;\n" +
-                            "@  ensures \\result == 3;\n" +
-                            "@  assignable \\strictly_nothing;\n" +
-                            "@\n" +
-                            "@ also\n" +
-                            "@\n" +
-                            "@ exceptional_behavior\n" +
-                            "@  requires a == 5;\n" +
-                            "@  assignable \\nothing;\n" +
-                            "@  signals (RuntimeException e) true;\n" +
-                            "@  signals_only RuntimeException;\n" +
-                            "@*/";
+        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
+                + "@  ensures \\result == 3;\n" + "@  assignable \\strictly_nothing;\n" + "@\n"
+                + "@ also\n" + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
+                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
+                + "@  signals_only RuntimeException;\n" + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
@@ -110,32 +98,26 @@ public class ContractFactoryTest {
     /**
      * Checks that two different assignable clauses are combined correctly, i.e. using intersection
      * and if-expressions with preconditions of the original contracts in their conditions.
+     *
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
     public void testCombineDifferentAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" +
-                            "@  requires a != 5;\n" +
-                            "@  ensures \\result == 3;\n" +
-                            "@  assignable l;\n" +
-                            "@\n" +
-                            "@ also\n" +
-                            "@\n" +
-                            "@ exceptional_behavior\n" +
-                            "@  requires a == 5;\n" +
-                            "@  assignable \\nothing;\n" +
-                            "@  signals (RuntimeException e) true;\n" +
-                            "@  signals_only RuntimeException;\n" +
-                            "@*/";
+        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
+                + "@  ensures \\result == 3;\n" + "@  assignable l;\n" + "@\n" + "@ also\n" + "@\n"
+                + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
+                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
+                + "@  signals_only RuntimeException;\n" + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
-        assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs)," +
-            "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l)," +
-            "allLocs))", woLabels.toString());
+        assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
+                + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+                + "allLocs))", woLabels.toString());
     }
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
      * returns the modifies term of the resulting combined contract (with origin labels removed).
+     *
      * @param contractStr the string containing the contracts for method m
      * @return the combined modifies term of the contracts in the input string, without origin
      *         labels
@@ -147,8 +129,7 @@ public class ContractFactoryTest {
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
-            signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {
@@ -162,7 +143,7 @@ public class ContractFactoryTest {
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];
         int i = 0;
         for (Contract c : contractSet) {
-            cs[i] = (FunctionalOperationContract)c;
+            cs[i] = (FunctionalOperationContract) c;
             i++;
         }
 
