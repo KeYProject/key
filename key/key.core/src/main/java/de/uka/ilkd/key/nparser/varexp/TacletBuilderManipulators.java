@@ -246,6 +246,10 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("isObserver", ObserverCondition.class, TSV, TSV);
     public static final AbstractConditionBuilder CONSTANT = new ConstructorBasedBuilder("isConstant", ConstantCondition.class, ASV);
 
+    public static final AbstractConditionBuilder ONLY_ELEMENTARY = new ConstructorBasedBuilder("onlyElementary",
+            OnlyElementary.class,
+            USV);
+
     public static final AbstractConditionBuilder ONLY_EVENT_UPDATES = new ConstructorBasedBuilder("onlyEventUpdates",
                                                                                OnlyEventUpdates.class,
                                                                                USV);
@@ -256,6 +260,9 @@ public class TacletBuilderManipulators {
             USV);
     public static final AbstractConditionBuilder ONLY_INVERSE_ANON_EVENT_UPDATES = new ConstructorBasedBuilder("onlyInverseAnonEventUpdates",
             OnlyInverseAnonEventUpdates.class, USV);
+
+    public static final AbstractConditionBuilder NO_ELEMENTARY = new ConstructorBasedBuilder("noElementary",
+            NoElementary.class, USV);
 
     public static final AbstractConditionBuilder NO_EVENT_UPDATE = new ConstructorBasedBuilder("noEventUpdate",
             NoEventUpdate.class, USV);
@@ -360,7 +367,7 @@ public class TacletBuilderManipulators {
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT,
                 IS_IN_STRICTFP,
-                NO_EVENT_UPDATE, NO_INVERSE_EVENT_UPDATE, ONLY_EVENT_UPDATES, ONLY_INVERSE_EVENT_UPDATES,
+                NO_ELEMENTARY, NO_EVENT_UPDATE, NO_INVERSE_EVENT_UPDATE, ONLY_ELEMENTARY, ONLY_EVENT_UPDATES, ONLY_INVERSE_EVENT_UPDATES,
                 APPLY_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_EVENT_UPDATE_ON_RIGID,
                 NO_ANON_EVENT_UPDATE, NO_INVERSE_ANON_EVENT_UPDATE, ONLY_ANON_EVENT_UPDATES, ONLY_INVERSE_ANON_EVENT_UPDATES,
                 APPLY_ANON_EVENT_UPDATE_ON_RIGID, APPLY_INVERSE_ANON_EVENT_UPDATE_ON_RIGID
