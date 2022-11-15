@@ -35,7 +35,9 @@ public class SourceViewPatcher {
         // currently we support only proofs with a single file
         URI fileUri = sourceView.getSelectedFile();
 
-        if (fileUri == null) throw new InternTransformException("No source loaded"); // no proof, or no source
+        if (fileUri == null) {
+            throw new InternTransformException("No source loaded"); // no proof, or no source
+        }
 
         try {
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);
@@ -54,16 +56,15 @@ public class SourceViewPatcher {
 
         for (var iterm : parts.get()) {
 
-            if (!iterm.IsRevelant() && hideNonRelevant)
+            if (!iterm.IsRevelant() && hideNonRelevant) {
                 continue;
+            }
 
             int line = posmap.getLineForInsTerm(iterm);
 
             int indentation = posmap.getLineIndent(line);
 
-            String jmlstr =
-                " ".repeat(indentation) + (continueOnError ? translator.translateSafe(iterm)
-                        : translator.translate(iterm));
+            String jmlstr = " ".repeat(indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
                 addInsertion(sourceView, fileUri, line, iterm, jmlstr);

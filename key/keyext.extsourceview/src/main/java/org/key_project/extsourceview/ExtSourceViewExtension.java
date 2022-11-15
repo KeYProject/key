@@ -69,9 +69,13 @@ public class ExtSourceViewExtension
     }
 
     public void update(MainWindow window, KeYMediator mediator) {
+        if (mediator.getSelectedProof() == null || window.getSourceViewFrame().getSourceView().getSelectedFile() == null) {
+            view.BackTransformationView.clearStatus();
+            return;
+        }
+
         try {
-            SourceViewPatcher.updateSourceview(window, mediator, !ShowNonRelevantTerms,
-                !FailOnError, RecursiveOriginLookup, AllowUntaggedFormulas);
+            SourceViewPatcher.updateSourceview(window, mediator, !ShowNonRelevantTerms, !FailOnError, RecursiveOriginLookup, AllowUntaggedFormulas);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
