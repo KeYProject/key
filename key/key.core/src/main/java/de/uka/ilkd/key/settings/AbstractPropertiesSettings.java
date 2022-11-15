@@ -20,19 +20,10 @@ public abstract class AbstractPropertiesSettings implements Settings {
     private static Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
     private static Function<String, Double> parseDouble = Double::parseDouble;
 
-    /**
-     *
-     */
     protected Properties properties = new Properties();
 
-    /**
-     *
-     */
     protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
-    /**
-     *
-     */
     protected List<SettingsListener> listenerList = new LinkedList<>();
 
     private static Set<String> parseStringSet(String o) {

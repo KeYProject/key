@@ -57,7 +57,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     public final JTextArea tacletInfo;
 
-    Node node;
+    transient Node node;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);

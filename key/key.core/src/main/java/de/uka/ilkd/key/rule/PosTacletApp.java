@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -286,12 +287,33 @@ public class PosTacletApp extends TacletApp {
         if (!super.equals(o)) {
             return false;
         }
-        return ((PosTacletApp) o).posInOccurrence().equals(posInOccurrence());
+        return ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
     }
 
     @Override
     public int hashCode() {
         return super.hashCode() + 13 * posInOccurrence().hashCode();
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (!super.equalsModProofIrrelevancy(o)) {
+            return false;
+        }
+        var posA = ((PosTacletApp) o).pos;
+        var posB = pos;
+        if (posA == null && posB == null) {
+            return true;
+        } else if (posA == null || posB == null) {
+            return false;
+        } else {
+            return posA.eqEquals(posB);
+        }
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return rule().hashCode(); // TODO
     }
 
     @Override

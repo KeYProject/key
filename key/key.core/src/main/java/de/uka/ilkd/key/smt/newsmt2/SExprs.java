@@ -188,6 +188,14 @@ public class SExprs {
         return patternSExpr(e, Arrays.asList(patterns));
     }
 
+    public static SExpr named(SExpr ass, String name) {
+        ArrayList<SExpr> children = new ArrayList<>();
+        children.add(ass);
+        children.add(new SExpr(":named", Type.VERBATIM));
+        children.add(new SExpr(name));
+        return new SExpr("!", ass.getType(), children);
+    }
+
     /**
      * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
      *

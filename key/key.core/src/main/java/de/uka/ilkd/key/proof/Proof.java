@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -631,6 +631,16 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
+    public void setStepIndices() {
+        var stepIndex = 0;
+        var nodeIterator = this.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            var node = nodeIterator.next();
+            node.setStepIndex(stepIndex);
+            stepIndex++;
+        }
+    }
+
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point. It has been
@@ -655,7 +665,7 @@ public class Proof implements Named {
             final Set<Node> residualLeaves = new TreeSet<Node>(new Comparator<Node>() {
                 @Override
                 public int compare(Node o1, Node o2) {
-                    return o1.serialNr() - o2.serialNr();
+                    return Integer.compare(o1.serialNr(), o2.serialNr());
                 }
             });
 
@@ -1233,7 +1243,11 @@ public class Proof implements Named {
             result.append("unnamed");
         }
         result.append("\nProoftree:\n");
-        result.append(root.toString());
+        if (countNodes() < 50) {
+            result.append(root.toString());
+        } else {
+            result.append("<too large to include>");
+        }
         return result.toString();
     }
 
@@ -1247,6 +1261,9 @@ public class Proof implements Named {
     }
 
     public void addRuleAppListener(RuleAppListener p) {
+        if (p == null) {
+            return;
+        }
         synchronized (ruleAppListenerList) {
             ruleAppListenerList.add(p);
         }
@@ -1341,6 +1358,11 @@ public class Proof implements Named {
 
     public void saveToFile(File file) throws IOException {
         ProofSaver saver = new ProofSaver(this, file);
+        saver.save();
+    }
+
+    public void saveProofObligationToFile(File file) throws IOException{
+        ProofSaver saver = new ProofSaver(this, file, false);
         saver.save();
     }
 

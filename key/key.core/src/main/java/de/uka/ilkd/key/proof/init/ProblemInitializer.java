@@ -386,7 +386,7 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
+    public void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
             throws ProofInputException {
         if (pl == null) {
             throw new ProofInputException("No proof");
@@ -624,6 +624,14 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
+
     public interface ProblemInitializerListener {
         void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
@@ -638,13 +646,5 @@ public final class ProblemInitializer {
         void resetStatus(Object sender);
 
         void reportException(Object sender, ProofOblInput input, Exception e);
-    }
-
-    public ProblemInitializerListener getListener() {
-        return listener;
-    }
-
-    public ProgressMonitor getProgMon() {
-        return progMon;
     }
 }

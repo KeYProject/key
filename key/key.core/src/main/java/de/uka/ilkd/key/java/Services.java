@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -32,7 +34,7 @@ import org.key_project.util.lookup.Lookup;
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, ProofDisposedListener {
     /**
      * the proof
      */
@@ -311,6 +313,9 @@ public class Services implements TermServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
+        if (proof != null) {
+            proof.addProofDisposedListener(this);
+        }
     }
 
 
@@ -372,6 +377,16 @@ public class Services implements TermServices {
 
     public interface ITermProgramVariableCollectorFactory {
         public TermProgramVariableCollector create(Services services);
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        proof = null;
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+        proof = null;
     }
 
     /**

@@ -62,9 +62,10 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private Throwable doWork() {
         try {
-            load();
+            load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
+            exception.printStackTrace();
             final String errorMessage = "Failed to load "
                 + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, exception));

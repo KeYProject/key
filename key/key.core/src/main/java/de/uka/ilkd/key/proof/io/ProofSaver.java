@@ -43,6 +43,15 @@ public class ProofSaver extends OutputStreamProofSaver {
         this.file = file;
     }
 
+    public ProofSaver(Proof proof, File file, boolean saveProofSteps) {
+        this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
+    }
+
+    public ProofSaver(Proof proof, File file, String internalVersion, boolean saveProofSteps) {
+        super(proof, internalVersion, saveProofSteps);
+        this.file = file;
+    }
+
     /**
      * Save the proof to file referenced by {@code file}.
      *

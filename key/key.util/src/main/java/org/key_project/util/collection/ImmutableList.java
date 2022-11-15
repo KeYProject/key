@@ -1,5 +1,7 @@
 package org.key_project.util.collection;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -9,7 +11,7 @@ import java.util.stream.StreamSupport;
 /**
  * List interface to be implemented by non-destructive lists
  */
-public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
+public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable, EqualsModProofIrrelevancy {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.
@@ -206,5 +208,78 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
             result.add(it.next());
         }
         return result;
+    }
+
+    default boolean hasPrefix(ImmutableList<T> other) {
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
+        if (Objects.equals(head(), other.head())) {
+            return tail().hasPrefix(other.tail());
+        } else {
+            return false;
+        }
+    }
+
+    default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!hasPrefix(prefix)) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
+        return this.tail().stripPrefix(prefix.tail());
+    }
+
+    default T last() {
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
+        if (tail().isEmpty()) {
+            return head();
+        }
+        return tail().last();
+    }
+
+    @Override
+    default boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof ImmutableList)) {
+            return false;
+        }
+        var that = (ImmutableList<?>) obj;
+        if (size() != that.size()) {
+            return false;
+        }
+        var self = this;
+        while (!self.isEmpty()) {
+            var obj1 = self.head();
+            var obj2 = that.head();
+            if (!(obj1 instanceof EqualsModProofIrrelevancy)) {
+                return false;
+            }
+            if (!(obj2 instanceof EqualsModProofIrrelevancy)) {
+                return false;
+            }
+            if (!((EqualsModProofIrrelevancy) obj1).equalsModProofIrrelevancy(obj2)) {
+                return false;
+            }
+            self = self.tail();
+            that = that.tail();
+        }
+        return true;
+    }
+
+    @Override
+    default int hashCodeModProofIrrelevancy() {
+        var self = this;
+        var hashcode = Objects.hash(this.size());
+        while (!self.isEmpty()) {
+            hashcode = Objects.hash(self.head());
+            self = self.tail();
+        }
+        return hashcode;
     }
 }

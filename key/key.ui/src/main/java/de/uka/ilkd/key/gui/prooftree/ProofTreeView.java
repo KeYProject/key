@@ -5,7 +5,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.MainWindowTabbedPane;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.NodeInfoVisualizer;
 import de.uka.ilkd.key.gui.NodeInfoVisualizerListener;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
@@ -17,8 +17,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
@@ -568,7 +566,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return IconFactory.PROOF_TREE.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        return IconFactory.PROOF_TREE.get(MainWindow.TAB_ICON_SIZE);
     }
 
     @Override
@@ -867,7 +865,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             final String notes = node.getNodeInfo().getNotes();
 
             if (notes != null) {
-                tooltipText += ".\nNotes: " + notes;
+                tooltipText += ". Notes: " + notes;
+            }
+            if (node.getNodeInfo().isUselessApplication()) {
+                tooltipText += ". Marked as superfluous by the proof analysis algorithm";
             }
 
             Icon defaultIcon;
@@ -875,6 +876,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 defaultIcon = IconFactory.WINDOW_ICON.get();
             } else if (notes != null) {
                 defaultIcon = IconFactory.editFile(16);
+            } else if (node.getNodeInfo().isUselessApplication()) {
+                defaultIcon = IconFactory.uselessAppLogo(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);
             } else if (node.getNodeInfo().getScriptRuleApplication()) {

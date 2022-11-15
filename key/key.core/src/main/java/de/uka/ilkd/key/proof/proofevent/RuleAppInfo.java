@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Node;
@@ -25,17 +23,17 @@ public class RuleAppInfo {
     /**
      * RuleApp this event reports
      */
-    RuleApp app = null;
+    private RuleApp app = null;
 
     /**
      * Node the rule has been applied on
      */
-    Node originalNode = null;
+    private Node originalNode = null;
 
     /**
      * New nodes that have been introduced by this rule application
      */
-    ImmutableList<NodeReplacement> newNodes = null;
+    private ImmutableList<NodeReplacement> newNodes = null;
 
     public RuleApp getRuleApp() {
         return app;
@@ -52,8 +50,8 @@ public class RuleAppInfo {
      * @return Nodes by which the original one has been replaced (the original node, if only the
      *         closure constraint of this node has been changed)
      */
-    public Iterator<NodeReplacement> getReplacementNodes() {
-        return newNodes.iterator();
+    public ImmutableList<NodeReplacement> getReplacementNodes() {
+        return newNodes;
     }
 
 

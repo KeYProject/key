@@ -70,6 +70,8 @@ public class NodeInfo {
     /** has the rule app of the node been applied by a proof script? */
     private boolean scriptingApplication = false;
 
+    private boolean uselessApplication = false;
+
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
@@ -92,6 +94,17 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("loop_expand"));
         symbolicExecNames.add(new Name("loop_scope_expand"));
         symbolicExecNames.add(new Name("loop_scope_inv_taclet"));
+    }
+
+    /**
+     * Copy the NodeInfo of another proof node into this object.
+     * @param node a proof node
+     */
+    public void copyFrom(Node node) {
+        branchLabel = node.getNodeInfo().branchLabel;
+        interactiveApplication = node.getNodeInfo().interactiveApplication;
+        scriptingApplication = node.getNodeInfo().scriptingApplication;
+        notes = node.getNodeInfo().notes;
     }
 
 
@@ -422,5 +435,22 @@ public class NodeInfo {
 
     public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
         this.sequentChangeInfo = sequentChangeInfo;
+    }
+
+    /**
+     * Returns true if the proof step does not contribute to the proof.
+     * Returns false if the proof step is useful in closing the proof.
+     */
+    public boolean isUselessApplication() {
+        return uselessApplication;
+    }
+
+    /**
+     * Mark this node as useless or useful.
+     *
+     * @param uselessApplication whether this node should be marked as useless
+     */
+    public void setUselessApplication(boolean uselessApplication) {
+        this.uselessApplication = uselessApplication;
     }
 }

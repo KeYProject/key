@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -42,4 +44,32 @@ public interface IBuiltInRuleApp extends RuleApp {
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
+    @Override
+    default boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof IBuiltInRuleApp)) {
+            return false;
+        }
+        var that = (IBuiltInRuleApp) obj;
+        if (!(Objects.equals(rule(), that.rule()) && Objects.equals(getHeapContext(), that.getHeapContext()))) {
+            return false;
+        }
+        var ifInsts1 = ifInsts();
+        var ifInsts2 = that.ifInsts();
+        if (ifInsts1.size() != ifInsts2.size()) {
+            return false;
+        }
+        while (!ifInsts1.isEmpty()) {
+            if (!ifInsts1.head().eqEquals(ifInsts2.head())) {
+                return false;
+            }
+            ifInsts1 = ifInsts1.tail();
+            ifInsts2 = ifInsts2.tail();
+        }
+        return true; // TODO: check pos
+    }
+
+    @Override
+    default int hashCodeModProofIrrelevancy() {
+        return 0; // TODO
+    }
 }

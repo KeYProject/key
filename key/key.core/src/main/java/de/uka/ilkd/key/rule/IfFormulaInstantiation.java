@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 
 /*
@@ -9,7 +10,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
  * of a taclet.
  */
 
-public interface IfFormulaInstantiation {
+public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
 
     /**
      * @return the cf this is pointing to
@@ -17,4 +18,18 @@ public interface IfFormulaInstantiation {
     SequentFormula getConstrainedFormula();
 
     String toString(Services services);
+
+    @Override
+    default boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof IfFormulaInstantiation)) {
+            return false;
+        }
+        var that = (IfFormulaInstantiation) obj;
+        return getConstrainedFormula().equalsModProofIrrelevancy(that.getConstrainedFormula());
+    }
+
+    @Override
+    default int hashCodeModProofIrrelevancy() {
+        return getConstrainedFormula().hashCodeModProofIrrelevancy();
+    }
 }

@@ -22,7 +22,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     private final String title;
 
 
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio) {
+    public RuleAppSMT(SMTRule rule, PosInOccurrence pio) {
         this(rule, pio, null, "SMT Rule App");
     }
 

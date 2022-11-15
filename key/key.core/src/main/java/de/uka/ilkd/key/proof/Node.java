@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,6 +50,7 @@ public class Node implements Iterable<Node> {
 
     /** The parent node. **/
     private Node parent = null;
+    private BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
@@ -99,10 +101,11 @@ public class Node implements Iterable<Node> {
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
+    private int stepIndex = 0;
+
     /**
      * creates an empty node that is root and leaf.
      */
-
     public Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
@@ -779,5 +782,24 @@ public class Node implements Iterable<Node> {
         if (userData == null)
             userData = new Lookup();
         return userData;
+    }
+
+    public BranchLocation branchLocation() {
+        if (branchLocation == null) {
+            var prev = parent != null ? parent.branchLocation() : BranchLocation.root();
+            if (parent != null && parent.children.size() > 1) {
+                prev = prev.append(new Pair<>(parent, siblingNr));
+            }
+            this.branchLocation = prev;
+        }
+        return branchLocation;
+    }
+
+    public int getStepIndex() {
+        return stepIndex;
+    }
+
+    public void setStepIndex(int stepIndex) {
+        this.stepIndex = stepIndex;
     }
 }

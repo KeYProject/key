@@ -47,6 +47,10 @@ public class DockingHelper {
         RIGHT_PANEL.add(SourceViewFrame.class.getName());
     }
 
+    public static void addLeftPanel(String className) {
+        LEFT_PANEL.add(className);
+    }
+
     /**
      * Sets the current layout of the docking framework back to factory default.
      * <p>

@@ -76,6 +76,7 @@ public class OutputStreamProofSaver {
 
     protected final Proof proof;
     protected final String internalVersion;
+    protected final boolean saveProofSteps;
 
     LogicPrinter printer;
 
@@ -86,6 +87,20 @@ public class OutputStreamProofSaver {
     public OutputStreamProofSaver(Proof proof, String internalVersion) {
         this.proof = proof;
         this.internalVersion = internalVersion;
+        this.saveProofSteps = true;
+    }
+
+    /**
+     * Create a new OutputStreamProofSaver.
+     *
+     * @param proof the proof to save
+     * @param internalVersion currently running KeY version
+     * @param saveProofSteps whether to save the performed proof steps
+     */
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+        this.proof = proof;
+        this.internalVersion = internalVersion;
+        this.saveProofSteps = saveProofSteps;
     }
 
     /**
@@ -186,13 +201,14 @@ public class OutputStreamProofSaver {
                 ps.println("}\n");
             }
 
-            // \proof
-            ps.println("\\proof {");
-            ps.println(writeLog());
-            ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-            node2Proof(proof.root(), ps);
-            ps.println("}");
-
+            if (saveProofSteps) {
+                // \proof
+                ps.println("\\proof {");
+                ps.println(writeLog());
+                ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
+                node2Proof(proof.root(), ps);
+                ps.println("}");
+            }
         }
     }
 
@@ -664,8 +680,8 @@ public class OutputStreamProofSaver {
         return s;
     }
 
-    public String getInteresting(SVInstantiations inst) {
-        StringBuilder s = new StringBuilder();
+    public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
+        var s = new ArrayList<String>();
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
                 .interesting()) {
@@ -676,11 +692,21 @@ public class OutputStreamProofSaver {
             if (!(value instanceof Term || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
-                    + "FIXME: Unhandled instantiation type: " + value.getClass());
+                        + "FIXME: Unhandled instantiation type: " + value.getClass());
             }
 
             String singleInstantiation =
-                var.name() + "=" + printAnything(value, proof.getServices(), false);
+                    var.name() + "=" + printAnything(value, proof.getServices(), false);
+            s.add(singleInstantiation);
+        }
+
+        return s;
+    }
+
+    public String getInteresting(SVInstantiations inst) {
+        StringBuilder s = new StringBuilder();
+
+        for (var singleInstantiation : getInterestingInstantiations(inst)) {
             s.append(" (inst \"").append(escapeCharacters(singleInstantiation)).append("\")");
         }
 

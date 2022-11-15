@@ -30,7 +30,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * redundance free, i.e., the created sequent must be exactly the same as when creating the
      * sequent by subsequently inserting all formulas
      */
-    Semisequent(ImmutableList<SequentFormula> seqList) {
+    public Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }

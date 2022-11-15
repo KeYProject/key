@@ -1,0 +1,39 @@
+package org.key_project.slicing.ui;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.proof.Node;
+
+import java.awt.event.ActionEvent;
+
+/**
+ * Context menu action to select the proof step that created a formula.
+ *
+ * @author Arne Keller
+ */
+public class ShowCreatedByAction extends MainWindowAction {
+
+    private static final long serialVersionUID = 1475202264543002419L;
+
+    /**
+     * The node to switch to.
+     */
+    private final transient Node node;
+
+    /**
+     * Construct a new action.
+     *
+     * @param mw main window
+     * @param node node to switch to
+     */
+    public ShowCreatedByAction(MainWindow mw, Node node) {
+        super(mw);
+        setName("Show proof step that created this formula");
+        this.node = node;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        getMediator().getSelectionModel().setSelectedNode(node);
+    }
+}

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util;
 
 
-public class Quadruple<T1, T2, T3, T4> {
+public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T3, T4>> {
     public final T1 first;
     public final T2 second;
     public final T3 third;
@@ -44,5 +44,34 @@ public class Quadruple<T1, T2, T3, T4> {
         if (fourth != null)
             res += 37 * fourth.hashCode();
         return res;
+    }
+
+    @Override
+    public int compareTo(Quadruple<T1, T2, T3, T4> o) {
+        if (first instanceof Comparable) {
+            var r1 = ((Comparable<T1>) first).compareTo(o.first);
+            if (r1 != 0) {
+                return r1;
+            }
+        }
+        if (second instanceof Comparable) {
+            var r1 = ((Comparable<T2>) second).compareTo(o.second);
+            if (r1 != 0) {
+                return r1;
+            }
+        }
+        if (third instanceof Comparable) {
+            var r1 = ((Comparable<T3>) third).compareTo(o.third);
+            if (r1 != 0) {
+                return r1;
+            }
+        }
+        if (fourth instanceof Comparable) {
+            var r1 = ((Comparable<T4>) fourth).compareTo(o.fourth);
+            if (r1 != 0) {
+                return r1;
+            }
+        }
+        return 0;
     }
 }

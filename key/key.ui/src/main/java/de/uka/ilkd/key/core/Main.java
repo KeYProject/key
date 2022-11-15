@@ -111,7 +111,7 @@ public final class Main {
     /**
      * Level of verbosity for command line outputs.
      */
-    private static byte verbosity = Verbosity.NORMAL;
+    private static byte verbosity = Verbosity.INFO;
 
     private static String examplesDir = null;
 

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -111,6 +112,7 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    public static final String SMT_NOT_RUN = "Your proof has been loaded, but SMT solvers have not been run";
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE =
@@ -156,6 +158,18 @@ public class IntermediateProofReplayer {
     }
 
     /**
+     * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
+     * intermediate parsing results.
+     *
+     * @param loader The problem loader, for reporting errors.
+     * @param proof The proof object into which to load the replayed proof.
+     */
+    protected IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof) {
+        this.proof = proof;
+        this.loader = loader;
+    }
+
+    /**
      * @return the lastSelectedGoal
      */
     public Goal getLastSelectedGoal() {
@@ -177,7 +191,7 @@ public class IntermediateProofReplayer {
         int reportInterval = 1;
         if (listener != null && progressMonitor != null) {
             int max = !queue.isEmpty() && queue.peekFirst().second != null
-                    ? queue.peekFirst().second.countAllChildren()
+                    ? queue.peekFirst().second.subtreeSize()
                     : 1;
             listener.reportStatus(this, "Replaying proof", max);
             reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
@@ -589,7 +603,7 @@ public class IntermediateProofReplayer {
                 error = true;
             }
             if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                status = "Your proof has been loaded, but SMT solvers have not been run";
+                status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());
@@ -648,6 +662,10 @@ public class IntermediateProofReplayer {
             }
         }
         ourApp = ruleApps.iterator().next();
+        if (ourApp instanceof OneStepSimplifierRuleApp) {
+            ourApp.setIfInsts(builtinIfInsts);
+            ((OneStepSimplifierRuleApp) ourApp).restrictedIfInsts = true;
+        }
         builtinIfInsts = null;
         return ourApp;
     }
@@ -799,7 +817,7 @@ public class IntermediateProofReplayer {
      * @param pos Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
-    private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+    protected static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
@@ -822,8 +840,8 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            LinkedList<String> loadedInsts, Services services) {
+    protected static TacletApp constructInsts(TacletApp app, Goal currGoal,
+            Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null)
             return app;
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
@@ -969,7 +987,7 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletAppConstructionException extends Exception {
+    public static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
         TacletAppConstructionException(String s) {
@@ -984,10 +1002,10 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a built-in rule app.
      */
-    static class BuiltInConstructionException extends Exception {
+    public static class BuiltInConstructionException extends Exception {
         private static final long serialVersionUID = -735474220502290816L;
 
-        BuiltInConstructionException(String s) {
+        public BuiltInConstructionException(String s) {
             super(s);
         }
 

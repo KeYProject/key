@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule;
 import java.util.*;
 
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.Node;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -174,7 +175,10 @@ public abstract class Taclet implements Rule, Named {
      */
     protected TacletExecutor<? extends Taclet> executor;
 
-
+    /**
+     * The proof node that added this taclet to the set of available taclets.
+     */
+    private Node addedBy = null;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -923,6 +927,14 @@ public abstract class Taclet implements Rule, Named {
     public String getOrigin() { return origin; }
 
     public void setOrigin(@Nullable String origin) { this.origin = origin; }
+
+    public void setAddedBy(Node addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public Node getAddedBy() {
+        return addedBy;
+    }
 }
 
 

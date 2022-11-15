@@ -225,6 +225,16 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
+    private void focusResults() {
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.stopInterface(true);
+        try {
+            SMTFocusResults.focus(problems, mediator.getServices());
+        } finally {
+            mediator.startInterface(true);
+        }
+    }
+
     private void showInformation(InternSMTProblem problem) {
         new InformationWindow(progressDialog, problem.solver, problem.information,
             "Information for " + problem.toString());
@@ -611,6 +621,12 @@ public class SolverListener implements SolverLauncherListener {
             } else if (obj instanceof InternSMTProblem) {
                 showInformation((InternSMTProblem) obj);
             }
+
+        }
+
+        @Override
+        public void focusButtonClicked() {
+            focusResults();
         }
     };
 

@@ -7,10 +7,11 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JavaBlock {
+public class JavaBlock implements EqualsModProofIrrelevancy {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
@@ -135,4 +136,21 @@ public class JavaBlock {
         return sw.toString();
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof JavaBlock)) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        JavaBlock other = (JavaBlock) obj;
+        // quite inefficient, but sufficient
+        return toString().equals(other.toString());
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return 0;
+    }
 }

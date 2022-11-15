@@ -72,6 +72,10 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    public static final IconFontProvider SLICE_ICON =
+        new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
+    public static final IconFontProvider USELESS_APP_ICON =
+            new IconFontProvider(FontAwesomeSolid.TIMES);
 
     /**
      * PLUS SQUARED
@@ -437,6 +441,11 @@ public final class IconFactory {
     public static Icon editFile(int size) {
         return EDIT.load(size);
         // return scaleIcon(editFile, size, size);
+    }
+
+    public static Icon uselessAppLogo(int size) {
+        return USELESS_APP_ICON.load(size);
+        // return scaleIcon(interactiveAppLogo, size, size);
     }
 
     public static Icon interactiveAppLogo(int size) {

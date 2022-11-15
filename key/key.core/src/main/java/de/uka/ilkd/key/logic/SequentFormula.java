@@ -2,6 +2,8 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.RealEquals;
 
 
 /**
@@ -12,11 +14,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * class by providing a way to add additional annotations or to cache local information about the
  * formula.
  */
-public class SequentFormula {
+public class SequentFormula implements EqualsModProofIrrelevancy {
 
     private final Term term;
 
     private final int hashCode;
+    private final int hashCode2;
 
     /**
      * creates a new SequentFormula
@@ -29,6 +32,7 @@ public class SequentFormula {
         }
         this.term = term;
         this.hashCode = term.hashCode() * 13;
+        this.hashCode2 = term.hashCodeModProofIrrelevancy();
     }
 
     /** @return the stored Term */
@@ -57,5 +61,24 @@ public class SequentFormula {
 
     public int hashCode() {
         return hashCode;
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof SequentFormula) {
+            SequentFormula cmp = (SequentFormula) obj;
+            if (term.equalsModProofIrrelevancy(cmp.formula())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return hashCode2;
     }
 }

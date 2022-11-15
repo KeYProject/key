@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
@@ -1023,6 +1024,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
      */
     @Test
     public void testSimpleInstanceMethodContractApplication() throws Exception {
+        OneStepSimplifier.disableOSSRestriction = true; // proof is too old to support this option
         // Create expected results
         ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(
             new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE),
@@ -1040,6 +1042,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             "/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof",
             "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
             true, false, false, preResult, terminationResult);
+        OneStepSimplifier.disableOSSRestriction = false;
     }
 
     /**
@@ -1071,6 +1074,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
      */
     @Test
     public void testSimpleMethodContractApplication() throws Exception {
+        OneStepSimplifier.disableOSSRestriction = true; // proof is too old to support this option
         // Create expected results
         ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(
             new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE),
@@ -1088,6 +1092,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             "/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof",
             "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
             true, false, false, preResult, terminationResult);
+        OneStepSimplifier.disableOSSRestriction = false;
     }
 
     /**
