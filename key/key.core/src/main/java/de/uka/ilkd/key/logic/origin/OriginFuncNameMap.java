@@ -6,25 +6,25 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OriginFuncNameMap { //TODO this should _not_ be static !!!
+public class OriginFuncNameMap {
 
-    private static final Map<Name, ProgramVariable> map = new HashMap<>();
+    private final Map<Name, ProgramVariable> map = new HashMap<>();
 
-    private static final Object lock = new Object();
+    private final Object lock = new Object();
 
-    public static void put(ProgramVariable src, Name repl) {
+    public void put(ProgramVariable src, Name repl) {
         synchronized (lock) {
             map.put(repl, src);
         }
     }
 
-    public static ProgramVariable get(Name repl) {
+    public ProgramVariable get(Name repl) {
         synchronized (lock) {
             return map.get(repl);
         }
     }
 
-    public static boolean has(Name repl) {
+    public boolean has(Name repl) {
         synchronized (lock) {
             return map.containsKey(repl);
         }

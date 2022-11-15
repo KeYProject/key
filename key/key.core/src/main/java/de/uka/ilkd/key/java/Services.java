@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.lookup.Lookup;
@@ -98,6 +101,8 @@ public class Services implements TermServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
+    private final OriginFuncNameMap ofuncNameMap;
+
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
@@ -115,6 +120,7 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(
             new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
+        ofuncNameMap = new OriginFuncNameMap();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
@@ -133,6 +139,7 @@ public class Services implements TermServices {
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
+        ofuncNameMap = new OriginFuncNameMap();
     }
 
     private Services(Services s) {
@@ -150,6 +157,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        ofuncNameMap = s.ofuncNameMap;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -368,6 +376,10 @@ public class Services implements TermServices {
      */
     public Proof getProof() {
         return proof;
+    }
+
+    public OriginFuncNameMap getOriginFuncNameMap() {
+        return ofuncNameMap;
     }
 
     public interface ITermProgramVariableCollectorFactory {

@@ -27,7 +27,9 @@ public class TermTranslator {
     public Map<String, String> nullaryFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("null", "null"),
             new AbstractMap.SimpleEntry<>("TRUE", "true"),
+            new AbstractMap.SimpleEntry<>("true", "true"),
             new AbstractMap.SimpleEntry<>("FALSE", "false"),
+            new AbstractMap.SimpleEntry<>("false", "false"),
             new AbstractMap.SimpleEntry<>("self", "this")
     );
 
@@ -305,8 +307,8 @@ public class TermTranslator {
 
         // Use OriginFuncNameMap
 
-        if (term.op() instanceof Function && term.op().arity() == 0 && OriginFuncNameMap.has(term.op().name())) {
-            return OriginFuncNameMap.get(term.op().name()).toString();
+        if (term.op() instanceof Function && term.op().arity() == 0 && svc.getOriginFuncNameMap().has(term.op().name())) {
+            return svc.getOriginFuncNameMap().get(term.op().name()).toString();
         }
 
         // try to manually build the JML
@@ -412,6 +414,13 @@ public class TermTranslator {
 
         if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
             return term.op().toString();
+        }
+
+        if (term.op() == Junctor.TRUE) {
+            return "true";
+        }
+        if (term.op() == Junctor.FALSE) {
+            return "false";
         }
 
         // all hope is lost - error out

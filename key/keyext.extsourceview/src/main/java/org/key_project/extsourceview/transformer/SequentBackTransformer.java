@@ -256,7 +256,7 @@ public class SequentBackTransformer {
                     .collect(Collectors.toList());
         } else {
             var origin = term.getOriginRef();
-            if (origin == null) {
+            if (origin == null || origin.Type == OriginRefType.UNKNOWN || origin.Type == OriginRefType.JAVA_STMT) {
                 return Collections.emptyList();
             }
             return Collections.singletonList(origin);
