@@ -64,8 +64,9 @@ public class NestedLoopUsecaseRuleImp{
         final Term heapAnonUpdate = tb.anonUpd(heapLDT.getHeap(), mod, heapPrime);
 
         //anonymizes the events
-        final Name freshConsSymb = new Name(tb.newName("f_" + tb.newName(Sort.ANY), services.getNamespaces()));
-        final Function freshConsFunc = new Function(freshConsSymb, Sort.ANY, true);
+        Sort intS = services.getTypeConverter().getIntegerLDT().targetSort();
+        final Name freshConsSymb = new Name(tb.newName("f_" + tb.newName(intS), services.getNamespaces()));
+        final Function freshConsFunc = new Function(freshConsSymb, intS, true);
         services.getNamespaces().functions().addSafely(freshConsFunc);
         final Term freshCons = tb.func(freshConsFunc);
         final Term anonEv = tb.anonEventUpdate(freshCons);

@@ -106,8 +106,6 @@ public class SideProof {
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
 
-
-
 		return ps.start();
 	}
 
@@ -124,6 +122,7 @@ public class SideProof {
 //			}
 //			System.out.println("Applied rules:" + info.getAppliedRuleApps());
 		}
+
 
 		try {
 			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
