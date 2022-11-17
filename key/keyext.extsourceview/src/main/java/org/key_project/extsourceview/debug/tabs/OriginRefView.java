@@ -351,7 +351,7 @@ public class OriginRefView extends DebugTab {
 
         var f0 = (o.isAtom() ? "A" : " ");
         var f1 = (o.isBooleanTerm() ? "B" : " ");
-        var f2 = (o.SourceTerm == null) ? "/" : (TermTranslator.isUnmodifiedTerm(t, o.SourceTerm) ? " " : "C");
+        var f2 = (o.SourceTerm == null) ? "/" : (t.getOriginRef().size() > 9 ? "+" : (""+t.getOriginRef().size()));
 
         return "["+f0+"|"+f1+"|"+f2+"] " + o.toString();
     }

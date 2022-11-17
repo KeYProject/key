@@ -72,6 +72,17 @@ public class OriginRef {
                 && Objects.equals(this.SourceTerm, cmp.SourceTerm);
     }
 
+    public boolean equalsModSource(OriginRef o) {
+        if (o.getClass() != this.getClass())
+            return false;
+
+        return this.Type == o.Type &&
+               this.LineStart == o.LineStart &&
+               this.LineEnd == o.LineEnd &&
+               this.ColumnStart == o.ColumnStart &&
+               this.ColumnEnd == o.ColumnEnd;
+    }
+
     private int hashcode = -1;
 
     @Override

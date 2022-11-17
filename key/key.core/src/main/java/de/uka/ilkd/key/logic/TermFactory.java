@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -112,8 +113,8 @@ public final class TermFactory {
             base = addMissingOriginRefs(base);
         }
 
-        var olist = new HashSet<>(base.getOriginRef().toList());
-        olist.addAll(origref);
+        var olist = base.getOriginRef().toList();
+        olist.addAll(origref.stream().filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p))).collect(Collectors.toList()));
 
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
                 base.getLabels(), new ImmutableArray<>(olist));

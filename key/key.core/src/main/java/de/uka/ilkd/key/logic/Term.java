@@ -150,8 +150,6 @@ public interface Term extends SVSubstitute, Sorted {
 
     public List<OriginRef> getOriginRefRecursive();
 
-    public boolean hasOriginRef();
-
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.
      *
