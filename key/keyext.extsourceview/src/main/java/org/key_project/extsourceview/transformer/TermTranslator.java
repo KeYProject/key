@@ -14,6 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TermTranslator {
 
@@ -150,11 +151,12 @@ public class TermTranslator {
     }
 
     public String translateWithOrigin(Term term) {
-        OriginRef or = term.getOriginRef();
-        if (or == null) {
+        ImmutableArray<OriginRef> or = term.getOriginRef();
+
+        if (or.size() == 0) {
             return "";
         }
-        return or.sourceString().orElse("");
+        return or.get(0).sourceString().orElse("");
     }
 
     public String translateRaw(Term term, boolean singleLine) {
@@ -226,76 +228,90 @@ public class TermTranslator {
     }
 
     public String translate(Term term) throws TransformException {
-        OriginRef origin = term.getOriginRef();
+        var origin = term.getOriginRef()
+                .stream()
+                .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
+                .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
 
-        // simple case - use origin directly
+        if (origin.size() == 1) {
 
-        if (origin != null && origin.SourceTerm != null && isUnmodifiedTerm(origin.SourceTerm, term) && origin.hasFile()) {
-            var r = origin.sourceString();
-            if (r.isEmpty()) {
-                throw new TransformException("Failed to get origin of term");
+            OriginRef singleorig = origin.get(0);
+
+            // simple case - use origin directly
+
+            if (singleorig.SourceTerm != null && origin.get(0).hasFile()) {
+                var r = origin.get(0).sourceString();
+                if (r.isEmpty()) {
+                    throw new TransformException("Failed to get origin of term");
+                }
+                return r.get();
             }
-            return r.get();
+
+            // handle annoying special cases
+
+            if ((singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
+                    || singleorig.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED
+                    || singleorig.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
+                    || singleorig.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
+                    && term.op().name().toString().equals("wellFormed") && term.arity() == 1
+                    && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
+                return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
+                    && term.op() == Equality.EQUALS && term.sub(1).op().name().toString().equals("TRUE")
+                    && term.sub(0).op().name().toString().equals("boolean::select")
+                    && term.sub(0).arity() == 3
+                    && term.sub(0).sub(0).op().name().toString().equals("heap")
+                    && term.sub(0).sub(1).op().name().toString().equals("self") && term.sub(0).sub(2)
+                    .op().name().toString().equals("java.lang.Object::<created>")) {
+                return "\\created(this)"; // TODO not valid JML
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE
+                    && term.op() == Equality.EQUALS && term.sub(1).op().name().toString().equals("TRUE")
+                    && term.sub(0).op().name().toString().endsWith("::exactInstance")
+                    && term.sub(0).arity() == 1
+                    && term.sub(0).sub(0).op().name().toString().equals("self")) {
+                return "\\exactInstance(this)"; // TODO not valid JML
+            }
+
+            if (term.op().name().toString().endsWith("::exactInstance")
+                    && term.arity() == 1
+                    && term.sub(0).op().name().toString().equals("self")) {
+                return "\\exactInstance(this)"; // TODO not valid JML
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL
+                    && term.op().name().toString().equals("measuredByEmpty")) {
+                return "\\measuredByEmpty()"; // TODO not valid JML
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL
+                    && term.op() == Equality.EQUALS && term.sub(0).op().name().toString().equals("self")
+                    && term.sub(1).op().name().toString().equals("null")) {
+                return "this == null";
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
+                    && term.op().name().toString().equals("java.lang.Object::<inv>")
+                    && term.sub(1).op().name().toString().equals("self")) {
+                return "\\invariant_for(this)";
+            }
+
+            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
+                    && term.op().name().toString().equals("java.lang.Object::<inv>")
+                    && term.sub(1).op().name().toString().equals("self")) {
+                return "\\invariant_for(this)";
+            }
+
         }
 
-        // handle annoying special cases
 
-        if (origin != null
-                && (origin.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
-                || origin.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED
-                || origin.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
-                || origin.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
-                && term.op().name().toString().equals("wellFormed") && term.arity() == 1
-                && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
-            return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
-        }
 
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
-                && term.op() == Equality.EQUALS && term.sub(1).op().name().toString().equals("TRUE")
-                && term.sub(0).op().name().toString().equals("boolean::select")
-                && term.sub(0).arity() == 3
-                && term.sub(0).sub(0).op().name().toString().equals("heap")
-                && term.sub(0).sub(1).op().name().toString().equals("self") && term.sub(0).sub(2)
-                        .op().name().toString().equals("java.lang.Object::<created>")) {
-            return "\\created(this)"; // TODO not valid JML
-        }
-
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE
-                && term.op() == Equality.EQUALS && term.sub(1).op().name().toString().equals("TRUE")
-                && term.sub(0).op().name().toString().endsWith("::exactInstance")
-                && term.sub(0).arity() == 1
-                && term.sub(0).sub(0).op().name().toString().equals("self")) {
-            return "\\exactInstance(this)"; // TODO not valid JML
-        }
-
-        if (term.op().name().toString().endsWith("::exactInstance")
-                && term.arity() == 1
-                && term.sub(0).op().name().toString().equals("self")) {
-            return "\\exactInstance(this)"; // TODO not valid JML
-        }
-
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL
-                && term.op().name().toString().equals("measuredByEmpty")) {
-            return "\\measuredByEmpty()"; // TODO not valid JML
-        }
-
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL
-                && term.op() == Equality.EQUALS && term.sub(0).op().name().toString().equals("self")
-                && term.sub(1).op().name().toString().equals("null")) {
-            return "this == null";
-        }
-
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
-                && term.op().name().toString().equals("java.lang.Object::<inv>")
-                && term.sub(1).op().name().toString().equals("self")) {
-            return "\\invariant_for(this)";
-        }
-
-        if (origin != null && origin.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
-                && term.op().name().toString().equals("java.lang.Object::<inv>")
-                && term.sub(1).op().name().toString().equals("self")) {
-            return "\\invariant_for(this)";
-        }
+        // ======= try to manually build the JML =======
 
         // special not-case
 
@@ -311,7 +327,7 @@ public class TermTranslator {
             return svc.getOriginFuncNameMap().get(term.op().name()).toString();
         }
 
-        // try to manually build the JML
+        // ...
 
         if (term.op() instanceof LocationVariable && term.arity() == 0) {
             return term.op().name().toString();
@@ -443,6 +459,7 @@ public class TermTranslator {
         if (child.op().arity() == 0) return false;
         if (child.op() instanceof Function && child.op().name().toString().equals("Z")) return false;
         if (child.op() instanceof Function && bracketFuncs.containsKey(child.op().name().toString())) return false;
+        if (child.op().name().toString().endsWith("::select")) return false;
 
         return true;
     }

@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -53,7 +54,7 @@ public final class TermFactory {
      */
     public Term createTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            ImmutableArray<TermLabel> labels, OriginRef originref) {
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -67,14 +68,14 @@ public final class TermFactory {
 
     public Term createTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            OriginRef originref) {
+            ImmutableArray<OriginRef> originref) {
 
         return createTerm(op, subs, boundVars, javaBlock, null, originref);
     }
 
 
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, OriginRef originref) {
+            JavaBlock javaBlock, ImmutableArray<OriginRef> originref) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, originref);
     }
 
@@ -84,27 +85,38 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, ImmutableArray<TermLabel> labels, OriginRef originref) {
+            JavaBlock javaBlock, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, originref);
     }
 
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels,
-            OriginRef originref) {
+            ImmutableArray<OriginRef> originref) {
         return createTerm(op, new Term[] { sub1, sub2 }, null, null, labels, originref);
     }
 
 
-    public Term createTerm(Operator op, ImmutableArray<TermLabel> labels, OriginRef originref) {
+    public Term createTerm(Operator op, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
     }
 
-    public @Nonnull Term setOriginRef(Term base, OriginRef origref, boolean addMissing) {
+    public @Nonnull Term addOriginRef(Term base, OriginRef origref, boolean addMissing) {
+        return addOriginRef(base, Collections.singleton(origref), addMissing);
+    }
+
+    public @Nonnull Term addOriginRef(Term base, ImmutableArray<OriginRef> origref, boolean addMissing) {
+        return addOriginRef(base, origref.toList(), addMissing);
+    }
+
+    public @Nonnull Term addOriginRef(Term base, Collection<OriginRef> origref, boolean addMissing) {
         if (addMissing) {
             base = addMissingOriginRefs(base);
         }
 
+        var olist = new HashSet<>(base.getOriginRef().toList());
+        olist.addAll(origref);
+
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
-                base.getLabels(), origref);
+                base.getLabels(), new ImmutableArray<>(olist));
 
         if (newTerm instanceof TermImpl && base instanceof TermImpl) {
             ((TermImpl) newTerm).setOrigin(base.getOrigin());
@@ -113,23 +125,20 @@ public final class TermFactory {
         return newTerm;
     }
 
-    public @Nonnull Term[] setOriginRefTypeRecursive(Term[] base, OriginRefType t, boolean force) {
-        for (int i = 0; i < base.length; i++) {
-            base[i] = setOriginRefTypeRecursive(base[i], t, force);
-        }
-        return base;
-    }
-
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         base = addMissingOriginRefs(base);
 
-        OriginRef origref = base.getOriginRef();
-        if (origref != null && origref.Type != t && (origref.Type != OriginRefType.JAVA_STMT || force)) {
-            origref = origref.WithType(t);
-        }
+        var origref = base.getOriginRef().toList();
+        origref.replaceAll(o -> {
+            if (o.Type == OriginRefType.JAVA_STMT && !force) {
+                return o;
+            } else {
+                return o.WithType(t);
+            }
+        });
 
-        if (origref == null && force) {
-            origref = new OriginRef(t, base);
+        if (origref.isEmpty() && force) {
+            origref.add(new OriginRef(t, base));
         }
 
         var subs = base.subs().toList();
@@ -137,23 +146,7 @@ public final class TermFactory {
         subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false));
 
         return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
-            base.javaBlock(), base.getLabels(), origref);
-    }
-
-    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRef t, boolean replaceExisting) {
-        base = addMissingOriginRefs(base);
-
-        OriginRef origref = base.getOriginRef();
-        if (origref == null || replaceExisting) {
-            origref = t;
-        }
-
-        var subs = base.subs().toList();
-
-        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, replaceExisting));
-
-        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
-                base.javaBlock(), base.getLabels(), origref);
+            base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
     /***
@@ -165,11 +158,11 @@ public final class TermFactory {
         List<Term> subs = term.subs().toList();
         subs.replaceAll(this::addMissingOriginRefs);
 
-        if (term.getOriginRef() != null) {
+        if (!term.getOriginRef().isEmpty()) {
             return term;
         }
 
-        return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, term), false);
+        return addOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, term), false);
     }
     // -------------------------------------------------------------------------
     // private interface
@@ -181,10 +174,10 @@ public final class TermFactory {
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            ImmutableArray<TermLabel> labels, OriginRef originref) {
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         final Term newTerm = (labels == null || labels.isEmpty()
-                ? new TermImpl(op, subs, boundVars, javaBlock, (originref == null) ? null : originref.copy())
-                : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, (originref == null) ? null : originref.copy())).checked();
+                ? new TermImpl(op, subs, boundVars, javaBlock, (originref == null) ? (new ImmutableArray<>()) : originref)
+                : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, (originref == null) ? (new ImmutableArray<>()) : originref)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.

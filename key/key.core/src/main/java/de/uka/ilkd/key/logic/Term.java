@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -145,7 +146,7 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public ImmutableArray<TermLabel> getLabels();
 
-    public @Nullable OriginRef getOriginRef();
+    public @Nonnull ImmutableArray<OriginRef> getOriginRef();
 
     public List<OriginRef> getOriginRefRecursive();
 

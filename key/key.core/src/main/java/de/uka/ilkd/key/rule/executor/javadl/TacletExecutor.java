@@ -484,14 +484,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal) {
         TermFactory tf = svc.getTermFactory();
-        
-        if (findTerm.getOriginRef() != null && replTerm.getOriginRef() == null) {
-            replTerm = tf.setOriginRef(replTerm, findTerm.getOriginRef(), true);
-        }
 
-        if (findTerm.getOriginRef() == null && findTerm.javaBlock() != null && findTerm.op() == Modality.DIA &&
-                replTerm.op() == UpdateApplication.UPDATE_APPLICATION &&
-                replTerm.sub(0).getOriginRef() == null && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
+        replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef(), true);
+
+        if (findTerm.javaBlock() != null && findTerm.op() == Modality.DIA && replTerm.op() == UpdateApplication.UPDATE_APPLICATION && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
             Node node = goal.node();
             SourceElement activeStatement = null;
             while ((activeStatement == null || activeStatement.getPositionInfo() == PositionInfo.UNDEFINED || activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) && node != null) {
@@ -510,7 +506,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 Term s1 = replTerm.sub(0);
                 Term s2 = replTerm.sub(1);
 
-                s1 = tf.setOriginRefTypeRecursive(s1, origref, true);
+                s1 = tf.addOriginRef(s1, origref, true);
 
                 replTerm = tf.createTerm(replTerm.op(), new ImmutableArray<>(s1, s2), replTerm.boundVars(), replTerm.javaBlock(), replTerm.getLabels(), replTerm.getOriginRef());
             }

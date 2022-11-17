@@ -78,7 +78,7 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
-    protected final OriginRef originRef;
+    protected final ImmutableArray<OriginRef> originRef;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -96,7 +96,7 @@ public class TermImpl implements Term {
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            @Nullable OriginRef originRef) {
+            @Nonnull ImmutableArray<OriginRef> originRef) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -697,16 +697,12 @@ public class TermImpl implements Term {
         this.origin = origin;
     }
 
-    public @Nullable OriginRef getOriginRef() {
+    public @Nonnull ImmutableArray<OriginRef> getOriginRef() {
         return originRef;
     }
 
     public @Nonnull List<OriginRef> getOriginRefRecursive() {
-        ArrayList<OriginRef> r = new ArrayList<>();
-
-        if (this.getOriginRef() != null) {
-            r.add(this.getOriginRef());
-        }
+        ArrayList<OriginRef> r = new ArrayList<>(this.getOriginRef().toList());
 
         for (Term t : subs()) {
             r.addAll(t.getOriginRefRecursive());

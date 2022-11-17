@@ -202,9 +202,7 @@ public class SequentBackTransformer {
     private Term termNot(Term term) {
         Term result = svc.getTermBuilder().not(term);
 
-        if (term.getOriginRef() != null && result.getOriginRef() == null) {
-            result = svc.getTermFactory().setOriginRef(result, term.getOriginRef(), false);
-        }
+        result = svc.getTermFactory().addOriginRef(result, term.getOriginRef(), false);
 
         return result;
     }
@@ -255,11 +253,10 @@ public class SequentBackTransformer {
                     .filter(p -> p.Type != OriginRefType.JAVA_STMT)
                     .collect(Collectors.toList());
         } else {
-            var origin = term.getOriginRef();
-            if (origin == null || origin.Type == OriginRefType.UNKNOWN || origin.Type == OriginRefType.JAVA_STMT) {
-                return Collections.emptyList();
-            }
-            return Collections.singletonList(origin);
+            return term.getOriginRef().stream()
+                    .filter(p -> p.Type != OriginRefType.UNKNOWN)
+                    .filter(p -> p.Type != OriginRefType.JAVA_STMT)
+                    .collect(Collectors.toList());
         }
     }
 

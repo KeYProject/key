@@ -21,6 +21,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 
@@ -206,15 +207,13 @@ public class OriginRefView extends DebugTab {
             if (highlightAllChildren) {
                 originRefs = Utils.getSubOriginRefs(t, true, highlightOnlyAtoms);
             } else {
-                if (t.getOriginRef() != null && (!highlightOnlyAtoms || t.getOriginRef().isAtom())) {
-                    originRefs.add(t.getOriginRef());
-                }
+                originRefs.addAll(t.getOriginRef().stream().filter(p -> !highlightOnlyAtoms || p.isAtom()).collect(Collectors.toList()));
             }
 
             if (originRefs.isEmpty() && highlightParents) {
                 var parentTerm = Utils.getParentWithOriginRef(pos, true, true);
                 if (parentTerm != null) {
-                    originRefs.add(parentTerm.getOriginRef());
+                    originRefs.addAll(parentTerm.getOriginRef().toList());
                 }
             }
 
@@ -277,8 +276,7 @@ public class OriginRefView extends DebugTab {
                     TermImpl term = (TermImpl) t;
 
                     {
-                        OriginRef o = term.getOriginRef();
-                        if (o != null) {
+                        for (var o: term.getOriginRef()) {
                             txt.append(origRefToString(term, o));
                             txt.append("\n");
                         }
@@ -293,8 +291,7 @@ public class OriginRefView extends DebugTab {
                 if (t instanceof TermImpl) {
                     TermImpl term = (TermImpl) t;
 
-                    OriginRef o = term.getOriginRef();
-                    if (o != null && o.hasFile()) {
+                    for (var o: term.getOriginRef().stream().filter(OriginRef::hasFile).collect(Collectors.toList())) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = Utils.getLines(mediator, o.File, i, i);
                             txt.append(str.stripTrailing()).append("\n");
@@ -330,21 +327,14 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
 
                 Term parent = Utils.getParentWithOriginRef(pos, true, false);
-                if (parent != null && parent != pos.getPosInOccurrence().subTerm()
-                        && parent.getOriginRef() != null) {
-                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent))
-                            .append("\n");
-                    txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent))
-                            .append("\n");
-                    txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true))
-                            .append("\n");
+                if (parent != null && parent != pos.getPosInOccurrence().subTerm()) {
+                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent)).append("\n");
+                    txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
+                    txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true)).append("\n");
                     txt.append("\n");
-                    {
-                        OriginRef o = parent.getOriginRef();
-                        if (o != null) {
-                            txt.append(origRefToString(parent, o));
-                            txt.append("\n");
-                        }
+                    for (var o: parent.getOriginRef()) {
+                        txt.append(origRefToString(parent, o));
+                        txt.append("\n");
                     }
                 }
 

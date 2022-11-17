@@ -460,15 +460,15 @@ public class JMLSpecFactory {
             final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
             throws SLTranslationException {
 
-        Pair<Boolean, OriginRef> strictlyPure =
+        boolean strictlyPure =
             translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod);
 
-        clauses.hasMod.put(heap, !strictlyPure.first);
+        clauses.hasMod.put(heap, !strictlyPure);
 
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else {
-            if (strictlyPure.first) {
+            if (strictlyPure) {
                 // assignable strictly_nothing is set
 
                 final ImmutableList<LabeledParserRuleContext> assignableNothing =
@@ -726,7 +726,7 @@ public class JMLSpecFactory {
         }
     }
 
-    private Pair<Boolean, OriginRef> translateStrictlyPure(IProgramMethod pm,
+    private boolean translateStrictlyPure(IProgramMethod pm,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
@@ -736,11 +736,11 @@ public class JMLSpecFactory {
 
             // less than nothing is marked by some special term
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
-                return new Pair<>(true, translated.getOriginRef());
+                return true;
             }
         }
 
-        return new Pair<>(false, null);
+        return false;
     }
 
     private Term translateMeasuredBy(IProgramMethod pm, ProgramVariable selfVar,

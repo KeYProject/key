@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -42,7 +43,7 @@ public class Utils {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();
-            if (t.getOriginRef() != null && (!atom || t.getOriginRef().isAtom())) {
+            if (t.getOriginRef().stream().anyMatch(p -> !atom || p.isAtom())) {
                 return t;
             }
 
@@ -57,13 +58,11 @@ public class Utils {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
-            if (term.getOriginRef() != null && (!onlyAtoms || term.getOriginRef().isAtom()))
-                r.add(term.getOriginRef());
+            r.addAll(term.getOriginRef().stream().filter(p -> !onlyAtoms || p.isAtom()).collect(Collectors.toList()));
         }
 
         for (Term t : term.subs()) {
-            if (t.getOriginRef() != null && (!onlyAtoms || t.getOriginRef().isAtom()))
-                r.add(t.getOriginRef());
+            r.addAll(t.getOriginRef().stream().filter(p -> !onlyAtoms || p.isAtom()).collect(Collectors.toList()));
             r.addAll(getSubOriginRefs(t, false, onlyAtoms));
         }
 
