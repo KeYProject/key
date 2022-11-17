@@ -196,7 +196,7 @@ public class SequentBackTransformer {
             }
         }
 
-        throw new TransformException("Failed to categorize term '" + term + "'");
+        throw new TermTransformException(term, "Failed to categorize term '" + term + "'");
     }
 
     private Term termNot(Term term) {

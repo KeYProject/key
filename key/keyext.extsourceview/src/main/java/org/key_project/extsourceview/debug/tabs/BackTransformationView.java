@@ -2,11 +2,13 @@ package org.key_project.extsourceview.debug.tabs;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.extsourceview.ExtSourceViewExtension;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.InternTransformException;
+import org.key_project.extsourceview.transformer.TermTransformException;
+import org.key_project.extsourceview.transformer.TermTranslator;
 import org.key_project.extsourceview.transformer.TransformException;
 
 import javax.annotation.Nonnull;
@@ -120,11 +122,25 @@ public class BackTransformationView extends DebugTab {
         taSource.setText("");
     }
 
-    public void setStatusFailure(TransformException e) {
+    public void setStatusFailure(Services svc, TransformException e) {
         taSource.setBackground(new Color(255, 208, 121));
-        taSource.setText(
-            String.format("[FAILED TO TRANSFORM]\n\n%s\n\n--------------------------------\n\n%s",
-                e.getMessage(), e));
+        if (e instanceof TermTransformException) {
+            var tte = (TermTransformException)e;
+            taSource.setText(String.format(
+                    "[FAILED TO TRANSFORM]\n\n%s"+
+                    "\n\n--------------------------------\n\n%s"+
+                    "\n\n--------------------------------\n\n%s"+
+                    "\n\n--------------------------------\n\n%s",
+                    e.getMessage(),
+                    tte.Term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
+                    (new TermTranslator(svc, true)).translateSafe(tte.Term),
+                    e));
+        } else {
+            taSource.setText(String.format(
+                    "[FAILED TO TRANSFORM]\n\n%s\n\n--------------------------------\n\n%s",
+                    e.getMessage(),
+                    e));
+        }
     }
 
     public void setStatusException(InternTransformException e) {

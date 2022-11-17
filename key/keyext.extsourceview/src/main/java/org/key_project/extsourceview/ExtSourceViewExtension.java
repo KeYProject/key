@@ -80,7 +80,7 @@ public class ExtSourceViewExtension
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
-            view.BackTransformationView.setStatusFailure(e);
+            view.BackTransformationView.setStatusFailure(mediator.getServices(), e);
         } catch (InternTransformException e) {
             // some kind of internal error happened?
             LOGGER.error("error while updateing ext-sourceview", e);
