@@ -17,8 +17,10 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 public class IntegerHandler extends LDTHandler {
 
     private final Map<JMLOperator, Operator> jmlIntMap = new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlCheckedIntMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlLongMap = new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, Operator> jmlCheckedLongMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlBigintMap = new EnumMap<>(JMLOperator.class);
 
@@ -57,6 +59,23 @@ public class IntegerHandler extends LDTHandler {
         jmlIntMap.put(GTE, intLDT.getGreaterOrEquals());
         jmlIntMap.put(LTE, intLDT.getLessOrEquals());
 
+        jmlCheckedIntMap.put(ADD, intLDT.getCheckedAddInt());
+        jmlCheckedIntMap.put(SUBTRACT, intLDT.getCheckedSubInt());
+        jmlCheckedIntMap.put(MULT, intLDT.getCheckedMulInt());
+        jmlCheckedIntMap.put(DIVISION, intLDT.getCheckedDivInt());
+        jmlCheckedIntMap.put(BITWISE_AND, intLDT.getCheckedBitwiseAndInt());
+        jmlCheckedIntMap.put(BITWISE_OR, intLDT.getCheckedBitwiseOrInt());
+        jmlCheckedIntMap.put(BITWISE_XOR, intLDT.getCheckedBitwiseXOrInt());
+        jmlCheckedIntMap.put(SHIFT_RIGHT, intLDT.getCheckedShiftRightInt());
+        jmlCheckedIntMap.put(SHIFT_LEFT, intLDT.getCheckedShiftLeftInt());
+        jmlCheckedIntMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getCheckedUnsignedShiftRightInt());
+        // jmlCheckedIntMap.put(BITWISE_NEGATE, inCheckedtLDT.getBitwiseNegateInt());
+        jmlCheckedIntMap.put(UNARY_MINUS, intLDT.getCheckedUnaryMinusInt());
+        jmlCheckedIntMap.put(GT, intLDT.getGreaterThan());
+        jmlCheckedIntMap.put(LT, intLDT.getLessThan());
+        jmlCheckedIntMap.put(GTE, intLDT.getGreaterOrEquals());
+        jmlCheckedIntMap.put(LTE, intLDT.getLessOrEquals());
+
         jmlLongMap.put(ADD, intLDT.getAddJlong());
         jmlLongMap.put(SUBTRACT, intLDT.getSubJlong());
         jmlLongMap.put(MULT, intLDT.getMulJlong());
@@ -74,6 +93,23 @@ public class IntegerHandler extends LDTHandler {
         jmlLongMap.put(LT, intLDT.getLessThan());
         jmlLongMap.put(GTE, intLDT.getGreaterOrEquals());
         jmlLongMap.put(LTE, intLDT.getLessOrEquals());
+
+        jmlCheckedLongMap.put(ADD, intLDT.getCheckedAddLong());
+        jmlCheckedLongMap.put(SUBTRACT, intLDT.getCheckedSubLong());
+        jmlCheckedLongMap.put(MULT, intLDT.getCheckedMulLong());
+        jmlCheckedLongMap.put(DIVISION, intLDT.getCheckedDivLong());
+        jmlCheckedLongMap.put(BITWISE_AND, intLDT.getCheckedBitwiseAndLong());
+        jmlCheckedLongMap.put(BITWISE_OR, intLDT.getCheckedBitwiseOrLong());
+        jmlCheckedLongMap.put(BITWISE_XOR, intLDT.getCheckedBitwiseXOrLong());
+        jmlCheckedLongMap.put(SHIFT_RIGHT, intLDT.getCheckedShiftRightLong());
+        jmlCheckedLongMap.put(SHIFT_LEFT, intLDT.getCheckedShiftLeftLong());
+        jmlCheckedLongMap.put(UNSIGNED_SHIFT_RIGHT, intLDT.getCheckedUnsignedShiftRightLong());
+        // jmlCheckedLongMap.put(BITWISE_NEGATE, inCheckedtLDT.getBitwiseNegateLong());
+        jmlCheckedLongMap.put(UNARY_MINUS, intLDT.getCheckedUnaryMinusLong());
+        jmlCheckedLongMap.put(GT, intLDT.getGreaterThan());
+        jmlCheckedLongMap.put(LT, intLDT.getLessThan());
+        jmlCheckedLongMap.put(GTE, intLDT.getGreaterOrEquals());
+        jmlCheckedLongMap.put(LTE, intLDT.getLessOrEquals());
 
         jmlBigintMap.put(ADD, intLDT.getAdd());
         jmlBigintMap.put(SUBTRACT, intLDT.getSub());
@@ -107,22 +143,28 @@ public class IntegerHandler extends LDTHandler {
 
     @Override
     protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
-        switch (this.specMathMode) {
-        case BIGINT: {
-            var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)
-                    || PrimitiveType.JAVA_LONG.equals(promotedType)
-                    || PrimitiveType.JAVA_BIGINT.equals(promotedType);
-            if (!isIntLike) {
-                return null;
-            }
-
-            // Always use bigint operator
-            return jmlBigintMap.get(op);
-        }
-        case JAVA:
+        if (specMathMode == SpecMathMode.JAVA) {
             return LDTHandler.getOperatorFromMap(opCategories.get(promotedType), op);
         }
 
-        throw new AssertionError("unreachable");
+        var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)
+                || PrimitiveType.JAVA_LONG.equals(promotedType)
+                || PrimitiveType.JAVA_BIGINT.equals(promotedType);
+        if (!isIntLike) {
+            return null;
+        }
+
+        if (this.specMathMode == SpecMathMode.BIGINT) {
+            // Always use bigint operator
+            return jmlBigintMap.get(op);
+        }
+
+        if (PrimitiveType.JAVA_BIGINT.equals(promotedType)) {
+            return jmlBigintMap.get(op);
+        } else if (PrimitiveType.JAVA_LONG.equals(promotedType)) {
+            return jmlCheckedLongMap.get(op);
+        } else {
+            return jmlCheckedIntMap.get(op);
+        }
     }
 }

@@ -95,6 +95,29 @@ public final class IntegerLDT extends LDT {
     private final Function moduloInt;
     private final Function moduloLong;
     private final Function moduloChar;
+    private final Function checkedUnaryMinusInt;
+    private final Function checkedUnaryMinusLong;
+    private final Function checkedBitwiseNegation;
+    private final Function checkedAddInt;
+    private final Function checkedAddLong;
+    private final Function checkedSubInt;
+    private final Function checkedSubLong;
+    private final Function checkedMulInt;
+    private final Function checkedMulLong;
+    private final Function checkedDivInt;
+    private final Function checkedDivLong;
+    private final Function checkedShiftRightInt;
+    private final Function checkedShiftRightLong;
+    private final Function checkedShiftLeftInt;
+    private final Function checkedShiftLeftLong;
+    private final Function checkedUnsignedShiftRightInt;
+    private final Function checkedUnsignedShiftRightLong;
+    private final Function checkedBitwiseOrInt;
+    private final Function checkedBitwiseOrLong;
+    private final Function checkedBitwiseAndInt;
+    private final Function checkedBitwiseAndLong;
+    private final Function checkedBitwiseXOrInt;
+    private final Function checkedBitwiseXOrLong;
     private final Function javaSubInt;
     private final Function javaMulInt;
     private final Function javaMod;
@@ -182,6 +205,31 @@ public final class IntegerLDT extends LDT {
         moduloInt = addFunction(services, "moduloInt");
         moduloLong = addFunction(services, "moduloLong");
         moduloChar = addFunction(services, "moduloChar");
+
+        checkedUnaryMinusInt = addFunction(services, "checkedUnaryMinusInt");
+        checkedUnaryMinusLong = addFunction(services, "checkedUnaryMinusLong");
+        checkedBitwiseNegation = addFunction(services, "checkedBitwiseNegation");
+        checkedAddInt = addFunction(services, "checkedAddInt");
+        checkedAddLong = addFunction(services, "checkedAddLong");
+        checkedSubInt = addFunction(services, "checkedSubInt");
+        checkedSubLong = addFunction(services, "checkedSubLong");
+        checkedMulInt = addFunction(services, "checkedMulInt");
+        checkedMulLong = addFunction(services, "checkedMulLong");
+        checkedDivInt = addFunction(services, "checkedDivInt");
+        checkedDivLong = addFunction(services, "checkedDivLong");
+        checkedShiftRightInt = addFunction(services, "checkedShiftRightInt");
+        checkedShiftRightLong = addFunction(services, "checkedShiftRightLong");
+        checkedShiftLeftInt = addFunction(services, "checkedShiftLeftInt");
+        checkedShiftLeftLong = addFunction(services, "checkedShiftLeftLong");
+        checkedUnsignedShiftRightInt = addFunction(services, "checkedUnsignedShiftRightInt");
+        checkedUnsignedShiftRightLong = addFunction(services, "checkedUnsignedShiftRightLong");
+        checkedBitwiseOrInt = addFunction(services, "checkedBitwiseOrInt");
+        checkedBitwiseOrLong = addFunction(services, "checkedBitwiseOrLong");
+        checkedBitwiseAndInt = addFunction(services, "checkedBitwiseAndInt");
+        checkedBitwiseAndLong = addFunction(services, "checkedBitwiseAndLong");
+        checkedBitwiseXOrInt = addFunction(services, "checkedBitwiseXOrInt");
+        checkedBitwiseXOrLong = addFunction(services, "checkedBitwiseXOrLong");
+
         javaSubInt = addFunction(services, "javaSubInt");
         javaMulInt = addFunction(services, "javaMulInt");
         javaMod = addFunction(services, "javaMod");
@@ -450,6 +498,98 @@ public final class IntegerLDT extends LDT {
 
     public Function getBinaryAnd() {
         return binaryAnd;
+    }
+
+    public Function getCheckedUnaryMinusInt() {
+        return checkedUnaryMinusInt;
+    }
+
+    public Function getCheckedUnaryMinusLong() {
+        return checkedUnaryMinusLong;
+    }
+
+    public Function getCheckedBitwiseNegation() {
+        return checkedBitwiseNegation;
+    }
+
+    public Function getCheckedAddInt() {
+        return checkedAddInt;
+    }
+
+    public Function getCheckedAddLong() {
+        return checkedAddLong;
+    }
+
+    public Function getCheckedSubInt() {
+        return checkedSubInt;
+    }
+
+    public Function getCheckedSubLong() {
+        return checkedSubLong;
+    }
+
+    public Function getCheckedMulInt() {
+        return checkedMulInt;
+    }
+
+    public Function getCheckedMulLong() {
+        return checkedMulLong;
+    }
+
+    public Function getCheckedDivInt() {
+        return checkedDivInt;
+    }
+
+    public Function getCheckedDivLong() {
+        return checkedDivLong;
+    }
+
+    public Function getCheckedShiftRightInt() {
+        return checkedShiftRightInt;
+    }
+
+    public Function getCheckedShiftRightLong() {
+        return checkedShiftRightLong;
+    }
+
+    public Function getCheckedShiftLeftInt() {
+        return checkedShiftLeftInt;
+    }
+
+    public Function getCheckedShiftLeftLong() {
+        return checkedShiftLeftLong;
+    }
+
+    public Function getCheckedUnsignedShiftRightInt() {
+        return checkedUnsignedShiftRightInt;
+    }
+
+    public Function getCheckedUnsignedShiftRightLong() {
+        return checkedUnsignedShiftRightLong;
+    }
+
+    public Function getCheckedBitwiseOrInt() {
+        return checkedBitwiseOrInt;
+    }
+
+    public Function getCheckedBitwiseOrLong() {
+        return checkedBitwiseOrLong;
+    }
+
+    public Function getCheckedBitwiseAndInt() {
+        return checkedBitwiseAndInt;
+    }
+
+    public Function getCheckedBitwiseAndLong() {
+        return checkedBitwiseAndLong;
+    }
+
+    public Function getCheckedBitwiseXOrInt() {
+        return checkedBitwiseXOrInt;
+    }
+
+    public Function getCheckedBitwiseXOrLong() {
+        return checkedBitwiseXOrLong;
     }
 
     /**

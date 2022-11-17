@@ -308,6 +308,7 @@ jmlprimary
   | seqdefterm                                                                        #pignore4
   | oldexpression                                                                     #pignore5
   | bigint_math_expression                                                            #primaryBigintMathExpression
+  | safe_math_expression                                                              #primarySafeMathExpression
   | java_math_expression                                                              #primaryJavaMathExpression
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
@@ -383,6 +384,7 @@ infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEM
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
 java_math_expression: (JAVA_MATH LPAREN expression RPAREN);
+safe_math_expression: (SAFE_MATH LPAREN expression RPAREN);
 bigint_math_expression: (BIGINT_MATH LPAREN expression RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;

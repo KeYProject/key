@@ -321,9 +321,12 @@ public class JMLSpecFactory {
     private static @Nullable SpecMathMode specMathModeFromModifiers(
             ImmutableList<JMLModifier> mods) {
         for (var mod : mods) {
-            // Consistency: bigint is returned when bot modifiers are given
+            // Consistency: bigint > safe > java
             if (mod == JMLModifier.SPEC_BIGINT_MATH) {
                 return SpecMathMode.BIGINT;
+            }
+            if (mod == JMLModifier.SPEC_SAVE_MATH) {
+                return SpecMathMode.JAVA;
             }
             if (mod == JMLModifier.SPEC_JAVA_MATH) {
                 return SpecMathMode.JAVA;

@@ -1750,13 +1750,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SpecMathMode mode) {
         var old = this.termFactory.replaceSpecMathMode(mode);
         var result = accept(ctx);
-        this.termFactory.replaceSpecMathMode(old);
+        var replaced = this.termFactory.replaceSpecMathMode(old);
+        assert replaced == mode;
         return result;
     }
 
     @Override
     public Object visitJava_math_expression(JmlParser.Java_math_expressionContext ctx) {
         return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.JAVA);
+    }
+
+    @Override
+    public Object visitSafe_math_expression(JmlParser.Safe_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.SAFE);
     }
 
     @Override

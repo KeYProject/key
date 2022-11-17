@@ -63,9 +63,11 @@ public final class JMLInfoExtractor {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
         var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
+        var specSafeMath = checkForNotContaining("spec_safe_math", "behaviour", comments);
         var specJavaMath = checkForNotContaining("spec_java_math", "behaviour", comments);
-        // Consistency: bigint is returned when bot modifiers are given
-        return specBigintMath ? SpecMathMode.BIGINT : (specJavaMath ? SpecMathMode.JAVA : null);
+        // Consistency: bigint > safe > java
+        return specBigintMath ? SpecMathMode.BIGINT
+                : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
     }
 
     private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {
